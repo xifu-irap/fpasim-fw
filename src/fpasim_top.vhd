@@ -41,6 +41,10 @@ use work.FRONTPANEL.all;
 use work.fpasim_pkg.all;
 
 entity fpasim_top is
+		generic ( 
+			C_DMA_MAX_TIME : integer := 19;
+			C_PCIE_LANE    : integer := 4
+		);
 		port(
 		--	Opal Kelly inouts --
 		okUH      : in     STD_LOGIC_VECTOR(4 downto 0);
@@ -52,7 +56,71 @@ entity fpasim_top is
 		sys_clkp	: in	STD_LOGIC;		             -- System clk signal 200 MHz						
 		sys_clkn	: in 	STD_LOGIC;		             -- System clk signal 200 MHz						
 		
-		led       : out    STD_LOGIC_VECTOR(3 downto 0)  -- Life leds
+		led       : out    STD_LOGIC_VECTOR(3 downto 0);  -- Life leds
+
+		--Clock/Data connection to ADC on FMC150 (ADS62P49)
+		clk_ab_p         : in    std_logic;
+		clk_ab_n         : in    std_logic;
+		cha_p            : in    std_logic_vector(6 downto 0);
+		cha_n            : in    std_logic_vector(6 downto 0);
+		chb_p            : in    std_logic_vector(6 downto 0);
+		chb_n            : in    std_logic_vector(6 downto 0);
+
+		--Clock/Data connection to DAC on FMC150 (DAC3283)
+		dac_dclk_p       : out   std_logic;
+		dac_dclk_n       : out   std_logic;
+		dac_data_p       : out   std_logic_vector(7 downto 0);
+		dac_data_n       : out   std_logic_vector(7 downto 0);
+		dac_frame_p      : out   std_logic;
+		dac_frame_n      : out   std_logic;
+		txenable         : out   std_logic;
+
+		--Serial Peripheral Interface (SPI)
+		spi_sclk         : out   std_logic; -- Shared SPI clock line
+		spi_sdata        : out   std_logic; -- Shared SPI sata line
+
+		-- ADC specific signals
+		adc_n_en         : out   std_logic; -- SPI chip select
+		adc_sdo          : in    std_logic; -- SPI data out
+		adc_reset        : out   std_logic; -- SPI reset
+
+		-- CDCE specific signals
+		cdce_n_en        : out   std_logic; -- SPI chip select
+		cdce_sdo         : in    std_logic; -- SPI data out
+		cdce_n_reset     : out   std_logic;
+		cdce_n_pd        : out   std_logic;
+		ref_en           : out   std_logic;
+		pll_status       : in    std_logic;
+
+		-- DAC specific signals
+		dac_n_en         : out   std_logic; -- SPI chip select
+		dac_sdo          : in    std_logic; -- SPI data out
+
+		-- Monitoring specific signals
+		mon_n_en         : out   std_logic; -- SPI chip select
+		mon_sdo          : in    std_logic; -- SPI data out
+		mon_n_reset      : out   std_logic;
+		mon_n_int        : in    std_logic;
+
+		--FMC 
+		RESET_DRE			: in   std_logic; -- RESET FORM OPALKELLY
+
+		FPA_science_P		: in std_logic_vector(7 downto 0);
+		FPA_science_N		: in std_logic_vector(7 downto 0);
+		
+		FPA_science_MSB_P			: in std_logic_vector(7 downto 0);
+		FPA_science_MSB_N			: in std_logic_vector(7 downto 0);
+
+		HPC1_HK_CLK_P	: out  std_logic;	-- 20MHz Clock for all links DAQ HK and CONF
+		HPC1_HK_CLK_N	: out  std_logic;	-- 20MHz Clock for all links DAQ HK and CONF
+
+		FPA_bias_P		: out std_logic_vector(15 downto 0);
+		FPA_bias_N		: out std_logic_vector(15 downto 0);
+
+		HPC1_DAQ_D_P		: out std_logic_vector(15 downto 0);
+		HPC1_DAQ_D_N		: out std_logic_vector(15 downto 0);
+		
+		clk_6_25MHz		: in   std_logic	
 
 		);
 end entity;
@@ -118,6 +186,10 @@ signal flush_data_valid : std_logic;
 signal flush_data_in    : std_logic_vector(c_data_width-1 downto 0);
 signal flushing         : std_logic;
 signal nb_words_stored  : std_logic_vector(c_read_write_count_width-1 downto 0);
+
+-- FMC 150 signals --
+
+signal fmc_locked :std_logic;
 
 begin
 ----------------------------------------------------
@@ -390,6 +462,76 @@ port map (
 			i_fifo_read        =>  fifo_out_read_en,     -- 1-bit input, Fifo Out read				
 			i_fifo_write       =>  fifo_in_read_en,       -- 1-bit input, Fifo Out write 
 			o_nb_words_stored  =>  nb_words_stored		 -- 9-bits output, Number of words stored in the fifo	
+		);
+
+	Control_FMC150_inst: FMC150_CONTROLER 
+		Port map(
+			cpu_reset			=> sys_rst,
+			HW_RESET      	 	=> open,         -- RESET harware from System CLOCK MMCM
+			LOCKED      	 	=> fmc_locked,	 -- ALL CLOCK MMCM LOCKED
+			SYSCLK_P      	 	=> sysclk_p, 
+			SYSCLK_N      	 	=> sysclk_n,
+			
+			--Clock/Data connection to ADC on FMC150 (ADS62P49)
+			clk_ab_p				=>	clk_ab_p,
+			clk_ab_n				=>	clk_ab_n,
+			cha_p					=>	cha_p,
+			cha_n					=>	cha_n,
+			chb_p					=>	chb_p,
+			chb_n					=>	chb_n,
+			rxenable				=>  open,
+	
+			--Serial Peripheral Interface (SPI)
+			spi_sclk				=>	spi_sclk,  -- Shared SPI clock line
+			spi_sdata				=>	spi_sdata, -- Shared SPI sata line
+	
+			-- ADC specific signals
+			adc_n_en				=>	adc_n_en, -- SPI chip select
+			adc_sdo				    =>	adc_sdo,  -- SPI data out
+			adc_reset				=>	adc_reset,-- SPI reset
+	
+			-- CDCE specific signals
+			cdce_n_en 			    =>	cdce_n_en,-- SPI chip select
+			cdce_sdo				=>	cdce_sdo, -- SPI data out
+			cdce_n_reset			=>	cdce_n_reset,
+			cdce_n_pd				=>	cdce_n_pd,
+			ref_en				    =>	ref_en,
+			pll_status			    =>	pll_status,
+	
+			-- DAC specific signals
+			dac_n_en 				=>	dac_n_en, -- SPI chip select
+			dac_sdo 				=>	dac_sdo,-- SPI data out
+	
+			-- Monitoring specific signals
+			mon_n_en 				=>	mon_n_en, -- SPI chip select
+			mon_sdo 				=>	mon_sdo, -- SPI data out
+			mon_n_reset 			=>	mon_n_reset,
+			mon_n_int 			    =>	mon_n_int,
+	
+			--FMC Present status
+			prsnt_m2c_l 			=>	'1',
+
+			-- FMC init OUTPUT
+			RESET_FADC		        =>  '0',
+
+		    -- End of FMC150 configuration
+			FMC150_READY	        =>  open,
+
+			-- Clock from system input clock 
+			SYS_CLK				    =>  open,
+			CLK_8X			     	=>  open,
+
+			-- Clock from ADC input clock 
+			CLK_ADC_DIV2		     =>  CLK_ADC_4X,	--122.88MHz
+			CLK_ADC_DIV4		     =>  CLK_ADC_2X,	--61.44MHz
+			CLK_ADC_DIV8		     =>  CLK_ADC_1X,	--30.72MHz
+			CLK_ADC_DIV16		     =>  CLK_ADC,	--15.36MHz
+			mmcm_adac_locked_out     =>  mmcm_adac_locked_out,	
+			
+			--RECONSTRUCTED Clock/Data FROM FADC on FMC150 (ADS62P49)
+			FADC_CHAB_CLK		    =>  FADC_CHAB_CLK,
+			FADC_CHA_16			    =>  FADC_CHA_16,
+			FADC_CHB_16			    =>  FADC_CHB_16
 		);
 
 end RTL;
