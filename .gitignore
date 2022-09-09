@@ -1,7 +1,18 @@
 *.pdf
-/ip/**/*.*
-/ip/*/*.*
-!/ip/*/*.xdc
-!/ip/*/*.xci
-!/ip/*/*.mif
 
+
+/ip/xilinx/coregen/*/*.*
+/ip/xilinx/coregen/*/**/*.*
+!/ip/xilinx/coregen/*/*.xdc
+!/ip/xilinx/coregen/*/*.xci
+!/ip/xilinx/coregen/*/*.mif
+
+/project/vivado00/fpasim.runs/.jobs/**/*
+/project/vivado00/fpasim.runs/synth_1/**/*
+/project/vivado00/fpasim.ip_user_files/**/*
+/project/vivado00/fpasim.hw/**/*
+/project/vivado00/fpasim.cache/*
+
+
+/doc/**/*
+/.vscode/*
