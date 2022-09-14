@@ -256,7 +256,7 @@ begin
   wr_tmp2                                       <= data_valid_sync_rx;
   data_tmp2(c_FIFO_IDX0_H downto c_FIFO_IDX0_L) <= data_sync_rx;
 
-  inst_fifo_async_with_error_user_to_regdecode : entity fpasim.fifo_async_with_error
+  inst_fifo_async_user_to_regdecode : entity fpasim.fifo_async
     generic map(
       g_CDC_SYNC_STAGES   => 2,
       g_FIFO_MEMORY_TYPE  => "auto",
