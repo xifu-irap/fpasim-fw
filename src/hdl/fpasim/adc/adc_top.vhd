@@ -231,9 +231,9 @@ begin
   adc0_tmp1 <= data_tmp1(c_IDX0_H downto c_IDX0_L);
 
   ---------------------------------------------------------------------
-  -- synchronize fifo flags: i_clk_adc -> i_clk
+  -- synchronize error fifo flags: i_clk_adc -> i_clk
   ---------------------------------------------------------------------
-  errors_tmp0(1) <= '1' when wr_rst_busy0 = '1' and wr_rst_tmp0 = '1' else '0';
+  errors_tmp0(1) <= '1' when wr_tmp0 = '1' and wr_rst_busy0 = '1' else '0';
   errors_tmp0(0) <= '1' when wr_tmp0 = '1' and full0 = '1' else '0';
   gen_errors_sync : for i in errors_tmp0'range generate
     inst_single_bit_synchronizer_full0 : entity fpasim.single_bit_synchronizer
