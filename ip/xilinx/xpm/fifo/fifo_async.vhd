@@ -23,6 +23,9 @@
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                doc extract from the Xilinx IP              
+--
+-- This module intanciates a asynchronuous FIFO with the empty and full flags
+-- -------------------------------------------------------------------------------------------------------------
 
 -- -------------------------------------------------------------------------------------------------------------
 -- Parameter usage table, organized as follows:

@@ -22,7 +22,10 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details               doc extract from the Xilinx IP              
+--!   @details               doc extract from the Xilinx IP     
+-- This module intanciates a synchronuous FIFO with the empty and full flags
+-- -------------------------------------------------------------------------------------------------------------
+
 
 -- -------------------------------------------------------------------------------------------------------------
 -- XPM_FIFO instantiation template for Synchronous FIFO configurations

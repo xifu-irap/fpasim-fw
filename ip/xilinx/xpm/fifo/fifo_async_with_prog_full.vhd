@@ -17,12 +17,18 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   fifo_async.vhd 
+--!   @file                   fifo_async_with_prog_full.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                doc extract from the Xilinx IP              
+--!   @details                doc extract from the Xilinx IP   
+--  This module instanciates a asynchronous fifo with empty, full and prog full flags
+-- -------------------------------------------------------------------------------------------------------------
+
+
+
+
 
 -- -------------------------------------------------------------------------------------------------------------
 -- Parameter usage table, organized as follows:
