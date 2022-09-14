@@ -33,8 +33,6 @@
 --
 -- -------------------------------------------------------------------------------------------------------------
 
-
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -42,64 +40,71 @@ use ieee.numeric_std.all;
 library fpasim;
 use fpasim.pkg_fpasim.all;
 
-entity g_PIXEL_OUTPUT_WIDTH is
+entity mux_squid is
   generic(
-    g_PIXEL_ID_WIDTH     : positive := pkg_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
+    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
     g_PIXEL_RESULT_INPUT_WIDTH  : positive := pkg_TES_MULT_SUB_Q_WIDTH_S; -- pixel input result bus width  (expressed in bits). Possible values: [1; max integer value[
     g_PIXEL_RESULT_OUTPUT_WIDTH : positive := pkg_MUX_SQUID_ADD_Q_WIDTH_S -- pixel output result bus width (expressed in bits). Possible values: [1; max integer value[
   );
   port(
-    i_clk                      : in  std_logic; -- clock
-    i_rst_status               : in  std_logic; -- reset error flag(s)
-    i_debug_pulse              : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    i_clk                         : in  std_logic; -- clock
+    i_rst_status                  : in  std_logic; -- reset error flag(s)
+    i_debug_pulse                 : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
 
     -- RAM: mux_squid_offset
     -- wr
-    i_wr_mux_squid_offset_en   : in  std_logic; -- write enable
-    i_wr_mux_squid_offset_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- write address
-    i_wr_mux_squid_offset_data : in  std_logic_vector(15 downto 0); -- write data
+    i_mux_squid_offset_wr_en      : in  std_logic; -- write enable
+    i_mux_squid_offset_wr_rd_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- write address
+    i_mux_squid_offset_wr_data    : in  std_logic_vector(15 downto 0); -- write data
+    -- rd
+    i_mux_squid_offset_rd_en      : in  std_logic; -- rd en
+    o_mux_squid_offset_rd_valid   : out std_logic; -- rd data valid
+    o_mux_squid_offset_rd_data    : out std_logic_vector(15 downto 0); -- rd data
 
     -- RAM: mux_squid_tf
     -- wr
-    i_wr_mux_squid_tf_en       : in  std_logic; -- write enable
-    i_wr_mux_squid_tf_addr     : in  std_logic_vector(12 downto 0); -- write address
-    i_wr_mux_squid_tf_data     : in  std_logic_vector(15 downto 0); -- write data
-
+    i_mux_squid_tf_wr_en          : in  std_logic; -- write enable
+    i_mux_squid_tf_wr_rd_addr     : in  std_logic_vector(12 downto 0); -- write address
+    i_mux_squid_tf_wr_data        : in  std_logic_vector(15 downto 0); -- write data
+    --rd
+    i_mux_squid_tf_rd_en          : in  std_logic; -- rd enable
+    o_mux_squid_tf_rd_valid       : out std_logic; -- rd data valid
+    o_mux_squid_tf_rd_data        : out std_logic_vector(15 downto 0); -- read data
     ---------------------------------------------------------------------
     -- input1
     ---------------------------------------------------------------------
-    i_pixel_sof                : in  std_logic; -- first pixel sample
-    i_pixel_eof                : in  std_logic; -- last pixel sample
-    i_pixel_valid              : in  std_logic; -- valid pixel sample
-    i_pixel_id                 : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id
-    i_pixel_result             : in  std_logic_vector(g_PIXEL_RESULT_INPUT_WIDTH - 1 downto 0); -- pixel result
+    i_pixel_sof                   : in  std_logic; -- first pixel sample
+    i_pixel_eof                   : in  std_logic; -- last pixel sample
+    i_pixel_valid                 : in  std_logic; -- valid pixel sample
+    i_pixel_id                    : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id
+    i_pixel_result                : in  std_logic_vector(g_PIXEL_RESULT_INPUT_WIDTH - 1 downto 0); -- pixel result
     ---------------------------------------------------------------------
     -- input2
     ---------------------------------------------------------------------
-    i_mux_squid_feedback       : in  std_logic_vector(13 downto 0); -- mux squid feedback value
+    i_mux_squid_feedback          : in  std_logic_vector(13 downto 0); -- mux squid feedback value
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
-    o_pixel_sof                : out std_logic; -- first pixel sample
-    o_pixel_eof                : out std_logic; -- last pixel sample
-    o_pixel_valid              : out std_logic; -- valid pixel sample
-    o_pixel_id                 : out std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id
-    o_pixel_result             : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0); -- pixel result
+    o_pixel_sof                   : out std_logic; -- first pixel sample
+    o_pixel_eof                   : out std_logic; -- last pixel sample
+    o_pixel_valid                 : out std_logic; -- valid pixel sample
+    o_pixel_id                    : out std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id
+    o_pixel_result                : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0); -- pixel result
     ---------------------------------------------------------------------
     -- errors/status
     ---------------------------------------------------------------------
-    o_errors                   : out std_logic_vector(15 downto 0); -- output errors
-    o_status                   : out std_logic_vector(7 downto 0) -- output status
+    o_errors                      : out std_logic_vector(15 downto 0); -- output errors
+    o_status                      : out std_logic_vector(7 downto 0) -- output status
   );
-end entity g_PIXEL_OUTPUT_WIDTH;
+end entity mux_squid;
 
-architecture RTL of g_PIXEL_OUTPUT_WIDTH is
+architecture RTL of mux_squid is
   constant c_RAM_RD_LATENCY               : positive := pkg_MUX_SQUID_RD_RAM_LATENCY;
-  constant c_MEMORY_SIZE_MUX_SQUID_OFFSET : positive := (2 ** (i_wr_mux_squid_offset_addr'length)) * (i_wr_mux_squid_offset_data'length); -- memory size in bits
-  constant c_MEMORY_SIZE_MUX_SQUID_TF     : positive := (2 ** (i_wr_mux_squid_tf_addr'length)) * i_wr_mux_squid_tf_data'length; -- memory size in bits
+  constant c_MEMORY_SIZE_MUX_SQUID_OFFSET : positive := (2 ** (i_mux_squid_offset_wr_rd_addr'length)) * (i_mux_squid_offset_wr_data'length); -- memory size in bits
+  constant c_MEMORY_SIZE_MUX_SQUID_TF     : positive := (2 ** (i_mux_squid_tf_wr_rd_addr'length)) * i_mux_squid_tf_wr_data'length; -- memory size in bits
 
   constant c_MUX_SQUID_SUB_Q_WIDTH_A : positive := pkg_MUX_SQUID_SUB_Q_WIDTH_A;
   constant c_MUX_SQUID_SUB_Q_WIDTH_B : positive := pkg_MUX_SQUID_SUB_Q_WIDTH_B;
@@ -143,30 +148,48 @@ architecture RTL of g_PIXEL_OUTPUT_WIDTH is
   -- mux_squid_offset
   ---------------------------------------------------------------------
   -- RAM
-  signal mux_squid_offset_ena   : std_logic;
-  signal mux_squid_offset_wea   : std_logic;
-  signal mux_squid_offset_addra : std_logic_vector(i_wr_mux_squid_offset_addr'range);
-  signal mux_squid_offset_dina  : std_logic_vector(i_wr_mux_squid_offset_data'range);
+  signal mux_squid_offset_wea    : std_logic;
+  signal mux_squid_offset_ena    : std_logic;
+  signal mux_squid_offset_addra  : std_logic_vector(i_mux_squid_offset_wr_rd_addr'range);
+  signal mux_squid_offset_dina   : std_logic_vector(i_mux_squid_offset_wr_data'range);
+  signal mux_squid_offset_regcea : std_logic;
+  signal mux_squid_offset_douta  : std_logic_vector(i_mux_squid_offset_wr_data'range);
 
+  signal mux_squid_offset_web    : std_logic;
   signal mux_squid_offset_enb    : std_logic;
-  signal mux_squid_offset_addrb  : std_logic_vector(i_wr_mux_squid_offset_addr'range);
+  signal mux_squid_offset_addrb  : std_logic_vector(i_mux_squid_offset_wr_rd_addr'range);
+  signal mux_squid_offset_dinb   : std_logic_vector(i_mux_squid_offset_wr_data'range);
   signal mux_squid_offset_regceb : std_logic;
-  signal mux_squid_offset_doutb  : std_logic_vector(i_wr_mux_squid_offset_data'range);
-  signal mux_squid_offset_error  : std_logic;
+  signal mux_squid_offset_doutb  : std_logic_vector(i_mux_squid_offset_wr_data'range);
+
+  -- sync with rd RAM output
+  signal mux_squid_offset_rd_en_rw : std_logic;
+  -- ram check
+  signal mux_squid_offset_error    : std_logic;
+
   ---------------------------------------------------------------------
   -- mux_squid_tf
   ---------------------------------------------------------------------
   -- RAM
-  signal mux_squid_tf_ena        : std_logic;
-  signal mux_squid_tf_wea        : std_logic;
-  signal mux_squid_tf_addra      : std_logic_vector(i_wr_mux_squid_tf_addr'range);
-  signal mux_squid_tf_dina       : std_logic_vector(i_wr_mux_squid_tf_data'range);
+  signal mux_squid_tf_wea    : std_logic;
+  signal mux_squid_tf_ena    : std_logic;
+  signal mux_squid_tf_addra  : std_logic_vector(i_mux_squid_tf_wr_rd_addr'range);
+  signal mux_squid_tf_dina   : std_logic_vector(i_mux_squid_tf_wr_data'range);
+  signal mux_squid_tf_regcea : std_logic;
+  signal mux_squid_tf_douta  : std_logic_vector(i_mux_squid_tf_wr_data'range);
 
+  signal mux_squid_tf_web    : std_logic;
   signal mux_squid_tf_enb    : std_logic;
-  signal mux_squid_tf_addrb  : std_logic_vector(i_wr_mux_squid_tf_addr'range);
+  signal mux_squid_tf_addrb  : std_logic_vector(i_mux_squid_tf_wr_rd_addr'range);
+  signal mux_squid_tf_dinb   : std_logic_vector(i_mux_squid_tf_wr_data'range);
   signal mux_squid_tf_regceb : std_logic;
-  signal mux_squid_tf_doutb  : std_logic_vector(i_wr_mux_squid_tf_data'range);
-  signal mux_squid_tf_error  : std_logic;
+  signal mux_squid_tf_doutb  : std_logic_vector(i_mux_squid_tf_wr_data'range);
+
+  -- sync with rd ram output
+  signal mux_squid_tf_rd_en_rw : std_logic;
+
+  -- ram check
+  signal mux_squid_tf_error : std_logic;
 
   ---------------------------------------------------------------------
   -- sync with the mux_squid_tf out
@@ -179,7 +202,7 @@ architecture RTL of g_PIXEL_OUTPUT_WIDTH is
   signal pixel_valid_ry : std_logic;
   signal pixel_id_ry    : std_logic_vector(i_pixel_id'range);
 
-  signal mux_squid_offset_ry : std_logic_vector(i_wr_mux_squid_offset_data'range);
+  signal mux_squid_offset_ry : std_logic_vector(i_mux_squid_offset_wr_data'range);
 
   -------------------------------------------------------------------
   -- add: mux_squid_offset + mux_squid_tf
@@ -270,20 +293,30 @@ begin
   ---------------------------------------------------------------------
   -- RAM: mux_squid_offset
   ---------------------------------------------------------------------
-  mux_squid_offset_ena   <= i_wr_mux_squid_offset_en;
-  mux_squid_offset_wea   <= i_wr_mux_squid_offset_en;
-  mux_squid_offset_addra <= i_wr_mux_squid_offset_addr;
-  mux_squid_offset_dina  <= i_wr_mux_squid_offset_data;
+  mux_squid_offset_ena   <= i_mux_squid_offset_wr_en;
+  mux_squid_offset_wea   <= i_mux_squid_offset_wr_en;
+  mux_squid_offset_addra <= i_mux_squid_offset_wr_rd_addr;
+  mux_squid_offset_dina  <= i_mux_squid_offset_wr_data;
 
-  inst_sdpram_mux_squid_offset : entity fpasim.sdpram
+  mux_squid_offset_regcea <= i_mux_squid_offset_rd_en;
+
+  inst_tdpram_mux_squid_offset : entity fpasim.tdpram
     generic map(
+      -- port A
       g_ADDR_WIDTH_A       => mux_squid_offset_addra'length,
       g_BYTE_WRITE_WIDTH_A => mux_squid_offset_dina'length,
       g_WRITE_DATA_WIDTH_A => mux_squid_offset_dina'length,
+      g_WRITE_MODE_A       => "no_change",
+      g_READ_DATA_WIDTH_A  => mux_squid_offset_dina'length,
+      g_READ_LATENCY_A     => c_RAM_RD_LATENCY,
+      -- port B
       g_ADDR_WIDTH_B       => mux_squid_offset_addra'length,
+      g_BYTE_WRITE_WIDTH_B => mux_squid_offset_dina'length,
+      g_WRITE_DATA_WIDTH_B => mux_squid_offset_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => mux_squid_offset_dina'length,
       g_READ_LATENCY_B     => c_RAM_RD_LATENCY,
+      -- other
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_MUX_SQUID_OFFSET,
@@ -294,24 +327,54 @@ begin
       ---------------------------------------------------------------------
       -- port A
       ---------------------------------------------------------------------
-      i_clka   => i_clk,                -- clock
-      i_ena    => mux_squid_offset_ena, -- memory enable
-      i_wea(0) => mux_squid_offset_wea, -- write enable
-      i_addra  => mux_squid_offset_addra, -- write address
-      i_dina   => mux_squid_offset_dina, -- write data input
+      i_rsta   => '0',
+      i_clka   => i_clk,
+      i_ena    => mux_squid_offset_ena,
+      i_wea(0) => mux_squid_offset_wea,
+      i_addra  => mux_squid_offset_addra,
+      i_dina   => mux_squid_offset_dina,
+      i_regcea => mux_squid_offset_regcea,
+      o_douta  => mux_squid_offset_douta,
       ---------------------------------------------------------------------
       -- port B
       ---------------------------------------------------------------------
-      i_rstb   => '0',                  -- reset the ouput register
-      i_clkb   => i_clk,                -- clock
-      i_enb    => mux_squid_offset_enb, -- memory enable
-      i_addrb  => mux_squid_offset_addrb, -- read address
-      i_regceb => mux_squid_offset_regceb, -- clock enable for the last register stage on the output data path
-      o_doutb  => mux_squid_offset_doutb -- read data output
+      i_rstb   => '0',
+      i_clkb   => i_clk,
+      i_web(0) => mux_squid_offset_web,
+      i_enb    => mux_squid_offset_enb,
+      i_addrb  => mux_squid_offset_addrb,
+      i_dinb   => mux_squid_offset_dinb,
+      i_regceb => mux_squid_offset_regceb,
+      o_doutb  => mux_squid_offset_doutb
     );
+  mux_squid_offset_web    <= '0';
+  mux_squid_offset_dinb   <= (others => '0');
   mux_squid_offset_enb    <= i_pixel_valid;
   mux_squid_offset_addrb  <= i_pixel_id;
   mux_squid_offset_regceb <= i_pixel_valid;
+
+  -------------------------------------------------------------------
+  -- sync with rd RAM output
+  -------------------------------------------------------------------
+  inst_pipeliner_sync_with_tdpram_mux_squid_offset_outa : entity fpasim.pipeliner
+    generic map(
+      g_NB_PIPES   => c_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
+    )
+    port map(
+      i_clk     => i_clk,               -- clock signal
+      i_data(0) => i_mux_squid_offset_rd_en, -- input data
+      o_data(0) => mux_squid_offset_rd_en_rw -- output data with/without delay
+    );
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
+  o_mux_squid_offset_rd_valid <= mux_squid_offset_rd_en_rw;
+  o_mux_squid_offset_rd_data  <= mux_squid_offset_douta;
+
+  ---------------------------------------------------------------------
+  -- RAM check
+  ---------------------------------------------------------------------
 
   inst_ram_check_sdpram_mux_squid_offset : entity fpasim.ram_check
     generic map(
@@ -336,20 +399,30 @@ begin
   ---------------------------------------------------------------------
   -- RAM: mux_squid_tf
   ---------------------------------------------------------------------
-  mux_squid_tf_ena   <= i_wr_mux_squid_tf_en;
-  mux_squid_tf_wea   <= i_wr_mux_squid_tf_en;
-  mux_squid_tf_addra <= i_wr_mux_squid_tf_addr;
-  mux_squid_tf_dina  <= i_wr_mux_squid_tf_data;
+  mux_squid_tf_ena   <= i_mux_squid_tf_wr_en;
+  mux_squid_tf_wea   <= i_mux_squid_tf_wr_en;
+  mux_squid_tf_addra <= i_mux_squid_tf_wr_rd_addr;
+  mux_squid_tf_dina  <= i_mux_squid_tf_wr_data;
 
-  inst_sdpram_mux_squid_tf : entity fpasim.sdpram
+  mux_squid_tf_regcea <= i_mux_squid_tf_rd_en;
+
+  inst_tdpram_mux_squid_tf : entity fpasim.tdpram
     generic map(
+      -- port A
       g_ADDR_WIDTH_A       => mux_squid_tf_addra'length,
       g_BYTE_WRITE_WIDTH_A => mux_squid_tf_dina'length,
       g_WRITE_DATA_WIDTH_A => mux_squid_tf_dina'length,
+      g_WRITE_MODE_A       => "no_change",
+      g_READ_DATA_WIDTH_A  => mux_squid_tf_dina'length,
+      g_READ_LATENCY_A     => c_RAM_RD_LATENCY,
+      -- port B
       g_ADDR_WIDTH_B       => mux_squid_tf_addra'length,
+      g_BYTE_WRITE_WIDTH_B => mux_squid_tf_dina'length,
+      g_WRITE_DATA_WIDTH_B => mux_squid_tf_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => mux_squid_tf_dina'length,
       g_READ_LATENCY_B     => c_RAM_RD_LATENCY,
+      -- other
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_MUX_SQUID_TF,
@@ -360,25 +433,54 @@ begin
       ---------------------------------------------------------------------
       -- port A
       ---------------------------------------------------------------------
-      i_clka   => i_clk,                -- clock
-      i_ena    => mux_squid_tf_ena,     -- memory enable
-      i_wea(0) => mux_squid_tf_wea,     -- write enable
-      i_addra  => mux_squid_tf_addra,   -- write address
-      i_dina   => mux_squid_tf_dina,    -- write data input
+      i_rsta   => '0',
+      i_clka   => i_clk,
+      i_ena    => mux_squid_tf_ena,
+      i_wea(0) => mux_squid_tf_wea,
+      i_addra  => mux_squid_tf_addra,
+      i_dina   => mux_squid_tf_dina,
+      i_regcea => mux_squid_tf_regcea,
+      o_douta  => mux_squid_tf_douta,
       ---------------------------------------------------------------------
       -- port B
       ---------------------------------------------------------------------
-      i_rstb   => '0',                  -- reset the ouput register
-      i_clkb   => i_clk,                -- clock
-      i_enb    => mux_squid_tf_enb,     -- memory enable
-      i_addrb  => mux_squid_tf_addrb,   -- read address
-      i_regceb => mux_squid_tf_regceb,  -- clock enable for the last register stage on the output data path
-      o_doutb  => mux_squid_tf_doutb    -- read data output
+      i_rstb   => '0',
+      i_clkb   => i_clk,
+      i_web(0) => mux_squid_tf_web,
+      i_enb    => mux_squid_tf_enb,
+      i_addrb  => mux_squid_tf_addrb,
+      i_dinb   => mux_squid_tf_dinb,
+      i_regceb => mux_squid_tf_regceb,
+      o_doutb  => mux_squid_tf_doutb
     );
+  mux_squid_tf_web    <= '0';
+  mux_squid_tf_dinb   <= (others => '0');
   mux_squid_tf_enb    <= pixel_valid_rx;
   mux_squid_tf_addrb  <= result_sub_rx;
   mux_squid_tf_regceb <= pixel_valid_rx;
 
+  -------------------------------------------------------------------
+  -- sync with rd RAM output
+  -------------------------------------------------------------------
+  inst_pipeliner_sync_with_tdpram_mux_squid_tf_outa : entity fpasim.pipeliner
+    generic map(
+      g_NB_PIPES   => c_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
+    )
+    port map(
+      i_clk     => i_clk,               -- clock signal
+      i_data(0) => i_mux_squid_tf_rd_en, -- input data
+      o_data(0) => mux_squid_tf_rd_en_rw -- output data with/without delay
+    );
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
+  o_mux_squid_tf_rd_valid <= mux_squid_tf_rd_en_rw;
+  o_mux_squid_tf_rd_data  <= mux_squid_tf_douta;
+
+  ---------------------------------------------------------------------
+  -- check RAM
+  ---------------------------------------------------------------------
   inst_ram_check_sdpram_mux_squid_tf : entity fpasim.ram_check
     generic map(
       g_WR_ADDR_WIDTH => mux_squid_tf_addra'length,
@@ -421,6 +523,7 @@ begin
   pixel_sof_ry   <= data_pipe_tmp3(c_IDX2_H);
   pixel_eof_ry   <= data_pipe_tmp3(c_IDX1_H);
   pixel_id_ry    <= data_pipe_tmp3(c_IDX0_H downto c_IDX0_L);
+
 
   -----------------------------------------------------------------
   -- sync with sub_sfixed_mux_squid out
