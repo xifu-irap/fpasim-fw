@@ -54,9 +54,13 @@ entity amp_squid is
     ---------------------------------------------------------------------
     -- RAM: amp_squid_tf
     -- wr
-    i_wr_amp_squid_tf_en          : in  std_logic; -- write enable
-    i_wr_amp_squid_tf_addr        : in  std_logic_vector(12 downto 0); -- write address
-    i_wr_amp_squid_tf_data        : in  std_logic_vector(15 downto 0); -- write data
+    i_amp_squid_tf_wr_en          : in  std_logic; -- write enable
+    i_amp_squid_tf_wr_rd_addr     : in  std_logic_vector(12 downto 0); -- write address
+    i_amp_squid_tf_wr_data        : in  std_logic_vector(15 downto 0); -- write data
+    -- rd
+    i_amp_squid_tf_rd_en          : in  std_logic; -- rd enable
+    o_amp_squid_tf_rd_valid       : out std_logic; -- rd data valid
+    o_amp_squid_tf_rd_data        : out std_logic_vector(15 downto 0); -- read data
 
     i_fpasim_gain                 : in  std_logic_vector(2 downto 0); -- fpasim gain value
     ---------------------------------------------------------------------
@@ -89,7 +93,7 @@ end entity amp_squid;
 
 architecture RTL of amp_squid is
   constant c_RAM_RD_LATENCY           : positive := pkg_AMP_SQUID_RD_RAM_LATENCY;
-  constant c_MEMORY_SIZE_AMP_SQUID_TF : positive := (2 ** (i_wr_amp_squid_tf_addr'length)) * i_wr_amp_squid_tf_data'length; -- memory size in bits
+  constant c_MEMORY_SIZE_AMP_SQUID_TF : positive := (2 ** (i_amp_squid_tf_wr_rd_addr'length)) * i_amp_squid_tf_wr_data'length; -- memory size in bits
 
   constant c_pkg_AMP_SQUID_SUB_Q_WIDTH_S : positive := pkg_AMP_SQUID_SUB_Q_WIDTH_S;
   constant c_AMP_SQUID_MULT_Q_WIDTH_A    : positive := pkg_AMP_SQUID_MULT_Q_WIDTH_A;
@@ -130,16 +134,24 @@ architecture RTL of amp_squid is
   -- mux_squid_tf
   ---------------------------------------------------------------------
   -- RAM
-  signal amp_squid_tf_ena   : std_logic;
-  signal amp_squid_tf_wea   : std_logic;
-  signal amp_squid_tf_addra : std_logic_vector(i_wr_amp_squid_tf_addr'range);
-  signal amp_squid_tf_dina  : std_logic_vector(i_wr_amp_squid_tf_data'range);
+  signal amp_squid_tf_ena    : std_logic;
+  signal amp_squid_tf_wea    : std_logic;
+  signal amp_squid_tf_addra  : std_logic_vector(i_amp_squid_tf_wr_rd_addr'range);
+  signal amp_squid_tf_dina   : std_logic_vector(i_amp_squid_tf_wr_data'range);
+  signal amp_squid_tf_regcea : std_logic;
+  signal amp_squid_tf_douta  : std_logic_vector(i_amp_squid_tf_wr_data'range);
 
+  signal amp_squid_tf_web    : std_logic;
   signal amp_squid_tf_enb    : std_logic;
-  signal amp_squid_tf_addrb  : std_logic_vector(i_wr_amp_squid_tf_addr'range);
+  signal amp_squid_tf_addrb  : std_logic_vector(i_amp_squid_tf_wr_rd_addr'range);
+  signal amp_squid_tf_dinb   : std_logic_vector(i_amp_squid_tf_wr_data'range);
   signal amp_squid_tf_regceb : std_logic;
-  signal amp_squid_tf_doutb  : std_logic_vector(i_wr_amp_squid_tf_data'range);
+  signal amp_squid_tf_doutb  : std_logic_vector(i_amp_squid_tf_wr_data'range);
 
+  -- sync with rd RAM output
+  signal amp_squid_tf_rd_en_rw : std_logic;
+
+  -- ram check
   signal amp_squid_tf_error : std_logic;
 
   ---------------------------------------------------------------------
@@ -246,20 +258,30 @@ begin
   ---------------------------------------------------------------------
   -- RAM: mux_squid_tf
   ---------------------------------------------------------------------
-  amp_squid_tf_ena   <= i_wr_amp_squid_tf_en;
-  amp_squid_tf_wea   <= i_wr_amp_squid_tf_en;
-  amp_squid_tf_addra <= i_wr_amp_squid_tf_addr;
-  amp_squid_tf_dina  <= i_wr_amp_squid_tf_data;
+  amp_squid_tf_ena   <= i_amp_squid_tf_wr_en;
+  amp_squid_tf_wea   <= i_amp_squid_tf_wr_en;
+  amp_squid_tf_addra <= i_amp_squid_tf_wr_rd_addr;
+  amp_squid_tf_dina  <= i_amp_squid_tf_wr_data;
 
-  inst_sdpram_mux_squid_tf : entity fpasim.sdpram
+  amp_squid_tf_regcea <= i_amp_squid_tf_rd_en;
+
+  inst_tdpram_amp_squid_tf : entity fpasim.tdpram
     generic map(
+      -- port A
       g_ADDR_WIDTH_A       => amp_squid_tf_addra'length,
       g_BYTE_WRITE_WIDTH_A => amp_squid_tf_dina'length,
       g_WRITE_DATA_WIDTH_A => amp_squid_tf_dina'length,
+      g_WRITE_MODE_A       => "no_change",
+      g_READ_DATA_WIDTH_A  => amp_squid_tf_dina'length,
+      g_READ_LATENCY_A     => c_RAM_RD_LATENCY,
+      -- port B
       g_ADDR_WIDTH_B       => amp_squid_tf_addra'length,
+      g_BYTE_WRITE_WIDTH_B => amp_squid_tf_dina'length,
+      g_WRITE_DATA_WIDTH_B => amp_squid_tf_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => amp_squid_tf_dina'length,
       g_READ_LATENCY_B     => c_RAM_RD_LATENCY,
+      -- others
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_AMP_SQUID_TF,
@@ -270,26 +292,55 @@ begin
       ---------------------------------------------------------------------
       -- port A
       ---------------------------------------------------------------------
-      i_clka   => i_clk,                -- clock
-      i_ena    => amp_squid_tf_ena,     -- memory enable
-      i_wea(0) => amp_squid_tf_wea,     -- write enable
-      i_addra  => amp_squid_tf_addra,   -- write address
-      i_dina   => amp_squid_tf_dina,    -- write data input
+      i_rsta   => '0',
+      i_clka   => i_clk,
+      i_ena    => amp_squid_tf_ena,
+      i_wea(0) => amp_squid_tf_wea,
+      i_addra  => amp_squid_tf_addra,
+      i_dina   => amp_squid_tf_dina,
+      i_regcea => amp_squid_tf_regcea,
+      o_douta  => amp_squid_tf_douta,
       ---------------------------------------------------------------------
       -- port B
       ---------------------------------------------------------------------
-      i_rstb   => '0',                  -- reset the ouput register
-      i_clkb   => i_clk,                -- clock
-      i_enb    => amp_squid_tf_enb,     -- memory enable
-      i_addrb  => amp_squid_tf_addrb,   -- read address
-      i_regceb => amp_squid_tf_regceb,  -- clock enable for the last register stage on the output data path
-      o_doutb  => amp_squid_tf_doutb    -- read data output
+      i_rstb   => '0',
+      i_clkb   => i_clk,
+      i_web(0) => amp_squid_tf_web,
+      i_enb    => amp_squid_tf_enb,
+      i_addrb  => amp_squid_tf_addrb,
+      i_dinb   => amp_squid_tf_dinb,
+      i_regceb => amp_squid_tf_regceb,
+      o_doutb  => amp_squid_tf_doutb
     );
+  amp_squid_tf_web    <= '0';
+  amp_squid_tf_dinb   <= (others => '0');
   amp_squid_tf_enb    <= pixel_valid_rx;
   amp_squid_tf_addrb  <= result_sub_rx;
   amp_squid_tf_regceb <= pixel_valid_rx;
 
-  inst_ram_check_sdpram_mux_squid_tf : entity fpasim.ram_check
+  -------------------------------------------------------------------
+  -- sync with rd RAM output
+  -------------------------------------------------------------------
+  inst_pipeliner_sync_with_tdpram_amp_squid_tf_outa : entity fpasim.pipeliner
+    generic map(
+      g_NB_PIPES   => c_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
+    )
+    port map(
+      i_clk     => i_clk,               -- clock signal
+      i_data(0) => i_amp_squid_tf_rd_en, -- input data
+      o_data(0) => amp_squid_tf_rd_en_rw -- output data with/without delay
+    );
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
+  o_amp_squid_tf_rd_valid <= amp_squid_tf_rd_en_rw;
+  o_amp_squid_tf_rd_data  <= amp_squid_tf_douta;
+
+  ---------------------------------------------------------------------
+  -- ram check
+  ---------------------------------------------------------------------
+  inst_ram_check_sdpram_amp_squid_tf : entity fpasim.ram_check
     generic map(
       g_WR_ADDR_WIDTH => amp_squid_tf_addra'length,
       g_RD_ADDR_WIDTH => amp_squid_tf_addrb'length

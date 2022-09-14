@@ -50,9 +50,13 @@ entity amp_squid_top is
     ---------------------------------------------------------------------
     -- RAM: amp_squid_tf
     -- wr
-    i_wr_amp_squid_tf_en          : in  std_logic; -- write enable
-    i_wr_amp_squid_tf_addr        : in  std_logic_vector(12 downto 0); -- write address
-    i_wr_amp_squid_tf_data        : in  std_logic_vector(15 downto 0); -- write data
+    i_amp_squid_tf_wr_en          : in  std_logic; -- write enable
+    i_amp_squid_tf_wr_rd_addr     : in  std_logic_vector(12 downto 0); -- write address
+    i_amp_squid_tf_wr_data        : in  std_logic_vector(15 downto 0); -- write data
+    -- rd
+    i_amp_squid_tf_rd_en          : in  std_logic; -- rd enable
+    o_amp_squid_tf_rd_valid       : out std_logic; -- rd data valid
+    o_amp_squid_tf_rd_data        : out std_logic_vector(15 downto 0); -- read data
 
     -- gain
     i_fpasim_gain                 : in  std_logic_vector(2 downto 0); -- gain value
@@ -97,6 +101,9 @@ architecture RTL of amp_squid_top is
   ---------------------------------------------------------------------
   -- mux_squid
   ---------------------------------------------------------------------
+  signal amp_squid_tf_rd_valid : std_logic;
+  signal amp_squid_tf_rd_data  : std_logic_vector(o_amp_squid_tf_rd_data'range);
+
   signal pixel_sof    : std_logic;
   signal pixel_eof    : std_logic;
   signal pixel_valid  : std_logic;
@@ -142,9 +149,13 @@ begin
       ---------------------------------------------------------------------
       -- RAM: amp_squid_tf
       -- wr
-      i_wr_amp_squid_tf_en          => i_wr_amp_squid_tf_en,
-      i_wr_amp_squid_tf_addr        => i_wr_amp_squid_tf_addr,
-      i_wr_amp_squid_tf_data        => i_wr_amp_squid_tf_data,
+      i_amp_squid_tf_wr_en          => i_amp_squid_tf_wr_en,
+      i_amp_squid_tf_wr_rd_addr     => i_amp_squid_tf_wr_rd_addr,
+      i_amp_squid_tf_wr_data        => i_amp_squid_tf_wr_data,
+      -- rd
+      i_amp_squid_tf_rd_en          => i_amp_squid_tf_rd_en,
+      o_amp_squid_tf_rd_valid       => amp_squid_tf_rd_valid,
+      o_amp_squid_tf_rd_data        => amp_squid_tf_rd_data,
       i_fpasim_gain                 => i_fpasim_gain,
       ---------------------------------------------------------------------
       -- input1
@@ -197,6 +208,10 @@ begin
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
+  -- rd amp squid tf
+  o_amp_squid_tf_rd_valid <= amp_squid_tf_rd_valid;
+  o_amp_squid_tf_rd_data  <= amp_squid_tf_rd_data;
+
   o_pixel_sof    <= pixel_sof;
   o_pixel_eof    <= pixel_eof;
   o_pixel_valid  <= pixel_valid;
