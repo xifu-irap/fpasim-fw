@@ -44,7 +44,7 @@ use fpasim.pkg_fpasim.all;
 entity sync_top is
   generic(
     g_PULSE_DURATION   : positive := 2; -- duration of the output pulse. Possible values [1;integer max value[
-    g_SYNC_DELAY_WIDTH : positive  := 6 -- delay bus width (expressed in bits). Possible values [1;integer max value[
+    g_SYNC_DELAY_WIDTH : positive := 6  -- delay bus width (expressed in bits). Possible values [1;integer max value[
   );
   port(
     ---------------------------------------------------------------------
@@ -102,16 +102,19 @@ architecture RTL of sync_top is
   constant c_FIFO_DEPTH : integer := 16; --see IP
   constant c_FIFO_WIDTH : integer := c_IDX0_H + 1; --see IP
 
-  signal wr_rst_tmp0  : std_logic;
-  signal wr_tmp0      : std_logic;
-  signal data_tmp0    : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
-  signal full0        : std_logic;
-  signal wr_rst_busy0 : std_logic;
+  signal wr_rst_tmp0 : std_logic;
+  signal wr_tmp0     : std_logic;
+  signal data_tmp0   : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
+  --signal full0        : std_logic;
+  --signal wr_rst_busy0 : std_logic;
 
-  signal rd1          : std_logic;
-  signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
-  signal empty1       : std_logic;
-  signal rd_rst_busy1 : std_logic;
+  signal errors_sync0 : std_logic_vector(3 downto 0);
+  signal empty_sync0  : std_logic;
+
+  signal rd1       : std_logic;
+  signal data_tmp1 : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
+  signal empty1    : std_logic;
+  --signal rd_rst_busy1 : std_logic;
 
   signal sync_valid1 : std_logic;
   signal sync1       : std_logic;
@@ -130,13 +133,6 @@ architecture RTL of sync_top is
 
   signal sync_valid2 : std_logic;
   signal sync2       : std_logic;
-
-  -------------------------------------------------------------------
-  -- sync fifo flags : @i_clk_dac -> @i_clk
-  -------------------------------------------------------------------
-  signal errors_tmp0      : std_logic_vector(1 downto 0);
-  signal errors_tmp0_sync : std_logic_vector(1 downto 0);
-  signal empty1_sync      : std_logic;
 
   ---------------------------------------------------------------------
   -- error latching
@@ -208,7 +204,7 @@ begin
   wr_tmp0             <= sync_valid_r2;
   data_tmp0(c_IDX0_H) <= sync_ry;
   wr_rst_tmp0         <= i_rst;
-  inst_fifo_async : entity fpasim.fifo_async
+  inst_fifo_async_with_error : entity fpasim.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
       g_FIFO_MEMORY_TYPE  => "auto",
@@ -217,28 +213,39 @@ begin
       g_READ_DATA_WIDTH   => data_tmp1'length,
       g_READ_MODE         => "std",
       g_RELATED_CLOCKS    => 0,
-      g_WRITE_DATA_WIDTH  => data_tmp0'length
+      g_WRITE_DATA_WIDTH  => data_tmp0'length,
+      ---------------------------------------------------------------------
+      -- resynchronization: fifo errors/empty flag
+      ---------------------------------------------------------------------
+      g_SYNC_SIDE         => "wr",      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
+      g_DEST_SYNC_FF      => 2,         -- Number of register stages used to synchronize signal in the destination clock domain.   
+      g_SRC_INPUT_REG     => 1          -- 0- Do not register input (src_in), 1- Register input (src_in) once using src_clk 
+
     )
     port map(
       ---------------------------------------------------------------------
       -- write side
       ---------------------------------------------------------------------
-      i_wr_clk        => i_clk,         -- write clock
-      i_wr_rst        => wr_rst_tmp0,   -- write reset 
-      i_wr_en         => wr_tmp0,       -- write enable
-      i_wr_din        => data_tmp0,     -- write data
-      o_wr_full       => full0,         -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_wr_rst_busy   => wr_rst_busy0,  -- Active-High indicator that the FIFO write domain is currently in a reset state
-
+      i_wr_clk        => i_clk,
+      i_wr_rst        => wr_rst_tmp0,
+      i_wr_en         => wr_tmp0,
+      i_wr_din        => data_tmp0,
+      o_wr_full       => open,
+      o_wr_rst_busy   => open,
       ---------------------------------------------------------------------
-      -- port B
+      -- read side
       ---------------------------------------------------------------------
-      i_rd_clk        => i_ref_clk,     -- read clock
-      i_rd_en         => rd1,           -- read enable (Must be held active-low when rd_rst_busy is active high)
-      o_rd_dout_valid => sync_valid1,   -- When asserted, this signal indicates that valid data is available on the output bus
+      i_rd_clk        => i_ref_clk,
+      i_rd_en         => rd1,
+      o_rd_dout_valid => sync_valid1,
       o_rd_dout       => data_tmp1,
-      o_rd_empty      => empty1,        -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_rd_rst_busy   => rd_rst_busy1   -- Active-High indicator that the FIFO read domain is currently in a reset state
+      o_rd_empty      => empty1,
+      o_rd_rst_busy   => open,
+      ---------------------------------------------------------------------
+      -- resynchronized errors/status 
+      ---------------------------------------------------------------------
+      o_errors_sync   => errors_sync0,
+      o_empty_sync    => empty_sync0
     );
 
   rd1 <= '1' when empty1 = '0' else '0';
@@ -270,73 +277,11 @@ begin
   o_sync       <= sync2;
 
   ---------------------------------------------------------------------
-  -- synchronize fifo flags with i_ref_clk -> i_clk
-  ---------------------------------------------------------------------
-  errors_tmp0(1) <= '1' when rd_rst_busy1 = '1' and rd1 = '1' else '0';
-  errors_tmp0(0) <= '1' when rd1 = '1' and empty1 = '1' else '0';
-  gen_errors_sync : for i in errors_tmp0'range generate
-    inst_single_bit_synchronizer_empty_error : entity fpasim.single_bit_synchronizer
-      generic map(
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | DEST_SYNC_FF         | Integer            | Range: 2 - 10. Default value = 4.                                       |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | Number of register stages used to synchronize signal in the destination clock domain.    
-        g_DEST_SYNC_FF  => 2,
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | SRC_INPUT_REG        | Integer            | Allowed values: 1, 0. Default value = 1.                                |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | 0- Do not register input (src_in)                                                                                   |
-        -- | 1- Register input (src_in) once using src_clk 
-        g_SRC_INPUT_REG => 1
-      )
-      port map(
-        ---------------------------------------------------------------------
-        -- source
-        ---------------------------------------------------------------------
-        i_src_clk  => i_ref_clk,        -- source clock
-        i_src      => errors_tmp0(i),   -- input signal to be synchronized to dest_clk domain
-        ---------------------------------------------------------------------
-        -- destination
-        ---------------------------------------------------------------------
-        i_dest_clk => i_clk,            -- destination clock domain
-        o_dest     => errors_tmp0_sync(i) -- src_in synchronized to the destination clock domain. This output is registered.   
-      );
-
-  end generate gen_errors_sync;
-
-  inst_single_bit_synchronizer_empty : entity fpasim.single_bit_synchronizer
-    generic map(
-      -- +---------------------------------------------------------------------------------------------------------------------+
-      -- | DEST_SYNC_FF         | Integer            | Range: 2 - 10. Default value = 4.                                       |
-      -- |---------------------------------------------------------------------------------------------------------------------|
-      -- | Number of register stages used to synchronize signal in the destination clock domain.    
-      g_DEST_SYNC_FF  => 2,
-      -- +---------------------------------------------------------------------------------------------------------------------+
-      -- | SRC_INPUT_REG        | Integer            | Allowed values: 1, 0. Default value = 1.                                |
-      -- |---------------------------------------------------------------------------------------------------------------------|
-      -- | 0- Do not register input (src_in)                                                                                   |
-      -- | 1- Register input (src_in) once using src_clk 
-      g_SRC_INPUT_REG => 1
-    )
-    port map(
-      ---------------------------------------------------------------------
-      -- source
-      ---------------------------------------------------------------------
-      i_src_clk  => i_ref_clk,          -- source clock
-      i_src      => empty1,             -- input signal to be synchronized to dest_clk domain
-      ---------------------------------------------------------------------
-      -- destination
-      ---------------------------------------------------------------------
-      i_dest_clk => i_clk,              -- destination clock domain
-      o_dest     => empty1_sync         -- src_in synchronized to the destination clock domain. This output is registered.   
-    );
-
-  ---------------------------------------------------------------------
   -- Error latching
   ---------------------------------------------------------------------
-  error_tmp(2) <= errors_tmp0_sync(0);  -- fifo rd empty error
-  error_tmp(1) <= '1' when wr_tmp0 = '1' and full0 = '1' else '0';
-  error_tmp(0) <= (wr_rst_busy0 and wr_tmp0) or errors_tmp0_sync(1);
+  error_tmp(2) <= errors_sync0(2) or errors_sync0(3); -- fifo rst error
+  error_tmp(1) <= errors_sync0(1);      -- fifo rd empty error
+  error_tmp(0) <= errors_sync0(0);      -- fifo wr full error
   gen_errors_latch : for i in error_tmp'range generate
     inst_one_error_latch : entity fpasim.one_error_latch
       port map(
@@ -348,22 +293,24 @@ begin
       );
   end generate gen_errors_latch;
 
-  o_errors(15 downto 6) <= (others => '0');
-  o_errors(5)           <= error_pulse_generator_r2;
-  o_errors(4)           <= error_tmp_bis(0);
+  o_errors(15 downto 9) <= (others => '0');
+  o_errors(8)           <= error_pulse_generator_r2;
+  o_errors(7 downto 5)  <= (others => '0');
+  o_errors(4)           <= error_tmp_bis(2); -- fifo rst error
   o_errors(3 downto 2)  <= (others => '0');
-  o_errors(1)           <= error_tmp_bis(2); -- rd fifo empty error
-  o_errors(0)           <= error_tmp_bis(1); -- wr fifo full error
+  o_errors(1)           <= error_tmp_bis(1); -- fifo rd empty error
+  o_errors(0)           <= error_tmp_bis(0); -- fifo wr full error
 
   o_status(7 downto 1) <= (others => '0');
-  o_status(0)          <= empty1_sync;
+  o_status(0)          <= empty_sync0;
 
   ---------------------------------------------------------------------
   -- for simulation only
   ---------------------------------------------------------------------
-  assert not (error_tmp_bis(0) = '1') report "[sync_top] => FIFO is used before the end of the initialization " severity error;
+  assert not (error_pulse_generator_r2 = '1') report "[sync_top] => detect a input pulse during the output pulse generation " severity error;
+  assert not (error_tmp_bis(2) = '1') report "[sync_top] => FIFO is used before the end of the initialization " severity error;
 
-  assert not (error_tmp_bis(1) = '1') report "[sync_top] => FIFO write a full FIFO" severity error;
-  assert not (error_tmp_bis(2) = '1') report "[sync_top] => FIFO read an empty FIFO" severity error;
+  assert not (error_tmp_bis(1) = '1') report "[sync_top] => FIFO read an empty FIFO" severity error;
+  assert not (error_tmp_bis(0) = '1') report "[sync_top] => FIFO write a full FIFO" severity error;
 
 end architecture RTL;
