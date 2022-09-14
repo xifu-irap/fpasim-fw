@@ -24,12 +24,12 @@
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
 --
--- This module detects a hole in the dac dataflow.
--- it performs the following steps:
---   . generate an error for each hole found in the data flow by checking the valid signal.
---   . the error signal is validated only if it was detected when the function is enabled
+-- This module generates an error if the module detects the following pattern in the data flow:
+--  data_valid -> hole -> data_valid
 --
--- Note: The valid signal is assumed to be continuous
+-- Note: 
+--   . the error signal is valid only if it was detected when the function is enabled
+--   
 -- 
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -185,5 +185,6 @@ begin
   ---------------------------------------------------------------------
   -- for simulation only
   ---------------------------------------------------------------------
-  assert not (error_tmp_bis(0) = '1') report "[dac_check_dataflow] => hole in the dataflow" severity error;
+  assert not (error_tmp_bis(0) = '1') report "[dac_check_dataflow] => detect, in the data flow, the following pattern: data_valid -> hole -> data_valid" severity error;
+
 end architecture RTL;
