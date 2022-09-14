@@ -717,7 +717,7 @@ sleep <= '0';
       MEMORY_OPTIMIZATION     => "true",                -- String
       MEMORY_PRIMITIVE        => g_MEMORY_PRIMITIVE,    -- String
       MEMORY_SIZE             => g_MEMORY_SIZE,         -- DECIMAL
-      MESSAGE_CONTROL         => 1,     -- DECIMAL
+      MESSAGE_CONTROL         => 0,     -- DECIMAL
       READ_DATA_WIDTH_A       => g_READ_DATA_WIDTH_A,   -- DECIMAL
       READ_DATA_WIDTH_B       => g_READ_DATA_WIDTH_B,   -- DECIMAL
       READ_LATENCY_A          => g_READ_LATENCY_A,      -- DECIMAL
@@ -727,7 +727,7 @@ sleep <= '0';
       RST_MODE_A              => "SYNC",                -- String
       RST_MODE_B              => "SYNC",                -- String
       SIM_ASSERT_CHK          => 1,  -- DECIMAL; 0=disable simulation messages, 1=enable simulation messages
-      USE_EMBEDDED_CONSTRAINT => 1,     -- DECIMAL
+      USE_EMBEDDED_CONSTRAINT => 0,     -- DECIMAL
       USE_MEM_INIT            => 1,     -- DECIMAL
       USE_MEM_INIT_MMI        => 0,     -- DECIMAL
       WAKEUP_TIME             => "disable_sleep",       -- String

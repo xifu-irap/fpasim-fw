@@ -592,7 +592,7 @@ begin
       MEMORY_OPTIMIZATION     => "true",                -- String
       MEMORY_PRIMITIVE        => g_MEMORY_PRIMITIVE,    -- String
       MEMORY_SIZE             => g_MEMORY_SIZE,         -- DECIMAL
-      MESSAGE_CONTROL         => 1,     -- DECIMAL
+      MESSAGE_CONTROL         => 0,     -- DECIMAL
       READ_DATA_WIDTH_B       => g_READ_DATA_WIDTH_B,   -- DECIMAL
       READ_LATENCY_B          => g_READ_LATENCY_B,      -- DECIMAL
       READ_RESET_VALUE_B      => "0",   -- String

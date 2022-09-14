@@ -558,7 +558,7 @@ begin
       MEMORY_OPTIMIZATION => "true",    -- String
       MEMORY_PRIMITIVE    => g_MEMORY_PRIMITIVE,    -- String
       MEMORY_SIZE         => g_MEMORY_SIZE,         -- DECIMAL
-      MESSAGE_CONTROL     => 1,         -- DECIMAL
+      MESSAGE_CONTROL     => 0,         -- DECIMAL
       READ_DATA_WIDTH_A   => g_READ_DATA_WIDTH_A,   -- DECIMAL
       READ_LATENCY_A      => g_READ_LATENCY_A,      -- DECIMAL
       READ_RESET_VALUE_A  => "0",       -- String
