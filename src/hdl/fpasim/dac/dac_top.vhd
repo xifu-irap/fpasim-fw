@@ -217,6 +217,9 @@ begin
       o_status      => status2
     );
 
+---------------------------------------------------------------------
+-- check if no hole in the output data flow
+---------------------------------------------------------------------
   inst_dac_check_dataflow : entity fpasim.dac_check_dataflow
     port map(
       ---------------------------------------------------------------------
