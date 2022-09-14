@@ -42,68 +42,76 @@ entity tes_top is
   );
 
   port(
-    i_clk                  : in  std_logic; -- clock signal
-    i_rst                  : in  std_logic; -- reset signal
+    i_clk                     : in  std_logic; -- clock signal
+    i_rst                     : in  std_logic; -- reset signal
 
-    i_rst_status           : in  std_logic; -- reset error flag(s)
-    i_debug_pulse          : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    i_rst_status              : in  std_logic; -- reset error flag(s)
+    i_debug_pulse             : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
-    i_en                   : in  std_logic; -- enable
+    i_en                      : in  std_logic; -- enable
 
-    i_cmd_valid            : in  std_logic; -- valid command
-    i_cmd_pulse_height     : in  std_logic_vector(10 downto 0); -- pulse height command
-    i_cmd_pixel_id         : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id command
-    i_cmd_time_shift       : in  std_logic_vector(3 downto 0); -- time shift command
+    i_cmd_valid               : in  std_logic; -- valid command
+    i_cmd_pulse_height        : in  std_logic_vector(10 downto 0); -- pulse height command
+    i_cmd_pixel_id            : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id command
+    i_cmd_time_shift          : in  std_logic_vector(3 downto 0); -- time shift command
 
     -- RAM: pulse shape
     -- wr
-    i_wr_pulse_shape_en    : in  std_logic; -- write enable
-    i_wr_pulse_shape_addr  : in  std_logic_vector(14 downto 0); -- write address
-    i_wr_pulse_shape_data  : in  std_logic_vector(15 downto 0); -- write data
+    i_pulse_shape_wr_en       : in  std_logic; -- write enable
+    i_pulse_shape_wr_rd_addr  : in  std_logic_vector(14 downto 0); -- write address
+    i_pulse_shape_wr_data     : in  std_logic_vector(15 downto 0); -- write data
+    -- rd
+    i_pulse_shape_rd_en       : in  std_logic; -- rd enable
+    o_pulse_shape_rd_valid    : out std_logic; -- rd data valid
+    o_pulse_shape_rd_data     : out std_logic_vector(15 downto 0); -- rd data
 
     -- RAM:
     -- wr
-    i_wr_steady_state_en   : in  std_logic; -- write enable
-    i_wr_steady_state_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- write address
-    i_wr_steady_state_data : in  std_logic_vector(15 downto 0); -- write data
+    i_steady_state_wr_en      : in  std_logic; -- write enable
+    i_steady_state_wr_rd_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- write address
+    i_steady_state_wr_data    : in  std_logic_vector(15 downto 0); -- write data
+    -- rd
+    i_steady_state_rd_en      : in  std_logic; -- rd enable
+    o_steady_state_rd_valid   : out std_logic; -- rd data valid
+    o_steady_state_rd_data    : out std_logic_vector(15 downto 0); -- read data
 
     ---------------------------------------------------------------------
     -- from the adc
     ---------------------------------------------------------------------
-    i_data_valid           : in  std_logic; --  input valid data
+    i_data_valid              : in  std_logic; --  input valid data
 
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
-    o_pixel_sof            : out std_logic; -- first pixel sample
-    o_pixel_eof            : out std_logic; -- last pixel sample
-    o_pixel_valid          : out std_logic; -- valid pixel sample
-    o_pixel_id             : out std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- output pixel id
-    o_pixel_result         : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0); -- output pixel result
-    o_frame_sof            : out std_logic; -- first frame sample
-    o_frame_eof            : out std_logic; -- last frame sample
-    o_frame_id             : out std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0); -- output frame id
+    o_pixel_sof               : out std_logic; -- first pixel sample
+    o_pixel_eof               : out std_logic; -- last pixel sample
+    o_pixel_valid             : out std_logic; -- valid pixel sample
+    o_pixel_id                : out std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- output pixel id
+    o_pixel_result            : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0); -- output pixel result
+    o_frame_sof               : out std_logic; -- first frame sample
+    o_frame_eof               : out std_logic; -- last frame sample
+    o_frame_id                : out std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0); -- output frame id
     ---------------------------------------------------------------------
     -- errors/status
     ---------------------------------------------------------------------
-    o_errors               : out std_logic_vector(15 downto 0); -- output errors
-    o_status               : out std_logic_vector(7 downto 0) -- output status
+    o_errors                  : out std_logic_vector(15 downto 0); -- output errors
+    o_status                  : out std_logic_vector(7 downto 0) -- output status
   );
 end entity tes_top;
 
 architecture RTL of tes_top is
-  constant c_FRAME_SIZE                   : positive := pkg_FRAME_SIZE;
-  constant c_FRAME_WIDTH                  : positive := pkg_FRAME_WIDTH;
+  constant c_FRAME_SIZE  : positive := pkg_FRAME_SIZE;
+  constant c_FRAME_WIDTH : positive := pkg_FRAME_WIDTH;
   ---------------------------------------------------------------------
   -- tes_signalling
   ---------------------------------------------------------------------
-  signal pixel_sof0   : std_logic;
-  signal pixel_eof0   : std_logic;
-  signal pixel_id0    : std_logic_vector(o_pixel_id'range);
-  signal pixel_valid0 : std_logic;
+  signal pixel_sof0      : std_logic;
+  signal pixel_eof0      : std_logic;
+  signal pixel_id0       : std_logic_vector(o_pixel_id'range);
+  signal pixel_valid0    : std_logic;
 
   signal frame_sof0 : std_logic;
   signal frame_eof0 : std_logic;
@@ -112,6 +120,12 @@ architecture RTL of tes_top is
   ---------------------------------------------------------------------
   -- tes_pulse_shape_manager
   ---------------------------------------------------------------------
+  signal pulse_shape_rd_valid1 : std_logic;
+  signal pulse_shape_rd_data1  : std_logic_vector(o_pulse_shape_rd_data'range);
+
+  signal steady_state_rd_valid1 : std_logic;
+  signal steady_state_rd_data1  : std_logic_vector(o_steady_state_rd_data'range);
+
   signal pixel_sof1    : std_logic;
   signal pixel_eof1    : std_logic;
   signal pixel_id1     : std_logic_vector(o_pixel_id'range);
@@ -178,47 +192,56 @@ begin
       g_PIXEL_RESULT_OUTPUT_WIDTH => pixel_result1'length
     )
     port map(
-      i_clk                  => i_clk,  -- clock signal
-      i_rst                  => i_rst,  -- reset signal
-      i_rst_status           => i_rst_status, -- reset error flags
-      i_debug_pulse          => i_debug_pulse, -- '1': delay error, '0': latch error
+      i_clk                     => i_clk, -- clock signal
+      i_rst                     => i_rst, -- reset signal
+      i_rst_status              => i_rst_status, -- reset error flags
+      i_debug_pulse             => i_debug_pulse, -- '1': delay error, '0': latch error
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
-      i_cmd_valid            => i_cmd_valid, -- '1': command is valid, '0': otherwise
-      i_cmd_pulse_height     => i_cmd_pulse_height, -- pulse height value
-      i_cmd_pixel_id         => i_cmd_pixel_id, -- pixel id
-      i_cmd_time_shift       => i_cmd_time_shift, -- time shift value
+      i_cmd_valid               => i_cmd_valid, -- '1': command is valid, '0': otherwise
+      i_cmd_pulse_height        => i_cmd_pulse_height, -- pulse height value
+      i_cmd_pixel_id            => i_cmd_pixel_id, -- pixel id
+      i_cmd_time_shift          => i_cmd_time_shift, -- time shift value
       -- RAM: pulse shape
       -- wr
-      i_wr_pulse_shape_en    => i_wr_pulse_shape_en, -- write enable
-      i_wr_pulse_shape_addr  => i_wr_pulse_shape_addr, -- write address
-      i_wr_pulse_shape_data  => i_wr_pulse_shape_data, -- write data
+      i_pulse_shape_wr_en       => i_pulse_shape_wr_en, -- write enable
+      i_pulse_shape_wr_rd_addr  => i_pulse_shape_wr_rd_addr, -- write address
+      i_pulse_shape_wr_data     => i_pulse_shape_wr_data, -- write data
+      -- rd
+      i_pulse_shape_rd_en       => i_pulse_shape_rd_en,
+      o_pulse_shape_rd_valid    => pulse_shape_rd_valid1,
+      o_pulse_shape_rd_data     => pulse_shape_rd_data1,
       -- RAM:
       -- wr
-      i_wr_steady_state_en   => i_wr_steady_state_en, -- write enable
-      i_wr_steady_state_addr => i_wr_steady_state_addr, -- write address
-      i_wr_steady_state_data => i_wr_steady_state_data, -- write data
+      i_steady_state_wr_en      => i_steady_state_wr_en, -- write enable
+      i_steady_state_wr_rd_addr => i_steady_state_wr_rd_addr, -- write address
+      i_steady_state_wr_data    => i_steady_state_wr_data, -- write data
+      -- rd
+      i_steady_state_rd_en      => i_steady_state_rd_en, -- write enable
+      o_steady_state_rd_valid   => steady_state_rd_valid1, -- write address
+      o_steady_state_rd_data    => steady_state_rd_data1, -- write data
+
       ---------------------------------------------------------------------
       -- input data
       ---------------------------------------------------------------------
-      i_pixel_sof            => pixel_sof0, -- tag the first sample of the pixel
-      i_pixel_eof            => pixel_eof0, -- tag the last sample of the pixel
-      i_pixel_id             => pixel_id0, -- id of the pixel
-      i_pixel_valid          => pixel_valid0, -- valid pixel sample
+      i_pixel_sof               => pixel_sof0, -- tag the first sample of the pixel
+      i_pixel_eof               => pixel_eof0, -- tag the last sample of the pixel
+      i_pixel_id                => pixel_id0, -- id of the pixel
+      i_pixel_valid             => pixel_valid0, -- valid pixel sample
       ---------------------------------------------------------------------
       -- output data
       ---------------------------------------------------------------------
-      o_pixel_sof            => pixel_sof1, -- tag the first sample of the pixel
-      o_pixel_eof            => pixel_eof1, -- tag the last sample of the pixel
-      o_pixel_id             => pixel_id1, -- id of the pixel
-      o_pixel_valid          => pixel_valid1, -- valid pixel result
-      o_pixel_result         => pixel_result1, -- pixel result
+      o_pixel_sof               => pixel_sof1, -- tag the first sample of the pixel
+      o_pixel_eof               => pixel_eof1, -- tag the last sample of the pixel
+      o_pixel_id                => pixel_id1, -- id of the pixel
+      o_pixel_valid             => pixel_valid1, -- valid pixel result
+      o_pixel_result            => pixel_result1, -- pixel result
       -----------------------------------------------------------------
       -- errors/status
       -----------------------------------------------------------------
-      o_errors               => errors1,
-      o_status               => status1
+      o_errors                  => errors1,
+      o_status                  => status1
     );
 
   ---------------------------------------------------------------------
@@ -245,6 +268,14 @@ begin
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
+  -- rd pulse shape
+  o_pulse_shape_rd_valid <= pulse_shape_rd_valid1;
+  o_pulse_shape_rd_data  <= pulse_shape_rd_data1;
+
+  -- rd steady state
+  o_steady_state_rd_valid <= steady_state_rd_valid1;
+  o_steady_state_rd_data  <= steady_state_rd_data1;
+
   o_pixel_sof    <= pixel_sof1;
   o_pixel_eof    <= pixel_eof1;
   o_pixel_valid  <= pixel_valid1;
