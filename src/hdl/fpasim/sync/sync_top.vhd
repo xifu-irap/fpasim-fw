@@ -293,11 +293,10 @@ begin
       );
   end generate gen_errors_latch;
 
-  o_errors(15 downto 9) <= (others => '0');
-  o_errors(8)           <= error_pulse_generator_r2;
-  o_errors(7 downto 5)  <= (others => '0');
-  o_errors(4)           <= error_tmp_bis(2); -- fifo rst error
-  o_errors(3 downto 2)  <= (others => '0');
+  o_errors(15 downto 5) <= (others => '0');
+  o_errors(4)           <= error_pulse_generator_r2;
+  o_errors(3)           <= '0';
+  o_errors(2)           <= error_tmp_bis(2); -- fifo rst error
   o_errors(1)           <= error_tmp_bis(1); -- fifo rd empty error
   o_errors(0)           <= error_tmp_bis(0); -- fifo wr full error
 
@@ -308,8 +307,8 @@ begin
   -- for simulation only
   ---------------------------------------------------------------------
   assert not (error_pulse_generator_r2 = '1') report "[sync_top] => detect a input pulse during the output pulse generation " severity error;
-  assert not (error_tmp_bis(2) = '1') report "[sync_top] => FIFO is used before the end of the initialization " severity error;
 
+  assert not (error_tmp_bis(2) = '1') report "[sync_top] => FIFO is used before the end of the initialization " severity error;
   assert not (error_tmp_bis(1) = '1') report "[sync_top] => FIFO read an empty FIFO" severity error;
   assert not (error_tmp_bis(0) = '1') report "[sync_top] => FIFO write a full FIFO" severity error;
 
