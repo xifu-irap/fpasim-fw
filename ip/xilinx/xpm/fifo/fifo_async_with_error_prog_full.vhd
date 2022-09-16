@@ -17,14 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   fifo_async.vhd 
+--!   @file                   fifo_async_with_error_prog_full.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                doc extract from the Xilinx IP
 --
--- This module instanciates a asynchronous fifo with empty, full and prog full flags
+-- This module instanciates an asynchronous fifo with empty, full and prog full flags
 -- This module detects 4 types of errors
 --   . detect a writting when the FIFO is full
 --   . detect a writting when the FIFO is in a reset state
@@ -541,10 +541,10 @@ entity fifo_async_with_error_prog_full is
     o_rd_rst_busy   : out std_logic;    -- Active-High indicator that the FIFO read domain is currently in a reset state
 
     ---------------------------------------------------------------------
-    -- resynchronized errors/status 
+    -- resynchronized errors/ empty status 
     ---------------------------------------------------------------------
-    o_errors_sync   : out std_logic_vector(3 downto 0);
-    o_empty_sync    : out std_logic
+    o_errors_sync   : out std_logic_vector(3 downto 0); -- output resynchronized errors
+    o_empty_sync    : out std_logic -- output resynchronized empty fifo status flag
   );
 end entity fifo_async_with_error_prog_full;
 

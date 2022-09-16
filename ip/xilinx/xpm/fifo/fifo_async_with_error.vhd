@@ -24,7 +24,7 @@
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                doc extract from the Xilinx IP
 --
--- This module instanciates a asynchronous fifo with empty, full flags
+-- This module instanciates an asynchronous fifo with empty, full flags
 -- This module detects 4 types of errors
 --   . detect a writting when the FIFO is full
 --   . detect a writting when the FIFO is in a reset state
@@ -544,8 +544,8 @@ entity fifo_async_with_error is
     ---------------------------------------------------------------------
     -- resynchronized errors/status 
     ---------------------------------------------------------------------
-    o_errors_sync        : out std_logic_vector(3 downto 0);
-    o_empty_sync        : out std_logic
+    o_errors_sync        : out std_logic_vector(3 downto 0); -- output resynchronized errors
+    o_empty_sync        : out std_logic -- output resynchronized empty fifo status flag
   );
 end entity fifo_async_with_error;
 

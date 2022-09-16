@@ -493,7 +493,7 @@ entity fifo_sync is
     o_wr_rst_busy   : out std_logic;    -- Active-High indicator that the FIFO write domain is currently in a reset state
 
     ---------------------------------------------------------------------
-    -- port B
+    -- read side
     ---------------------------------------------------------------------
     i_rd_en         : in  std_logic;    -- read enable (Must be held active-low when rd_rst_busy is active high)
     o_rd_dout_valid : out std_logic;    -- When asserted, this signal indicates that valid data is available on the output bus

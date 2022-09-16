@@ -24,7 +24,7 @@
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                doc extract from the Xilinx IP              
 --
--- This module intanciates a asynchronuous FIFO with the empty and full flags
+-- This module intanciates an asynchronuous FIFO with the empty and full flags
 -- -------------------------------------------------------------------------------------------------------------
 
 -- -------------------------------------------------------------------------------------------------------------
@@ -521,7 +521,7 @@ entity fifo_async is
     o_wr_rst_busy : out std_logic;  -- Active-High indicator that the FIFO write domain is currently in a reset state
 
     ---------------------------------------------------------------------
-    -- port B
+    -- read side
     ---------------------------------------------------------------------
     i_rd_clk        : in  std_logic;    -- read clock
     i_rd_en         : in  std_logic;  -- read enable (Must be held active-low when rd_rst_busy is active high)
