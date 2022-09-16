@@ -26,7 +26,6 @@
 -- This module intanciates a synchronuous FIFO with the empty and full flags
 -- -------------------------------------------------------------------------------------------------------------
 
-
 -- -------------------------------------------------------------------------------------------------------------
 -- XPM_FIFO instantiation template for Synchronous FIFO configurations
 -- Refer to the targeted device family architecture libraries guide for XPM_FIFO documentation

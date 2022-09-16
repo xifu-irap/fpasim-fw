@@ -544,7 +544,7 @@ entity fifo_async_with_error_prog_full is
     -- resynchronized errors/ empty status 
     ---------------------------------------------------------------------
     o_errors_sync   : out std_logic_vector(3 downto 0); -- output resynchronized errors
-    o_empty_sync    : out std_logic -- output resynchronized empty fifo status flag
+    o_empty_sync    : out std_logic     -- output resynchronized empty fifo status flag
   );
 end entity fifo_async_with_error_prog_full;
 

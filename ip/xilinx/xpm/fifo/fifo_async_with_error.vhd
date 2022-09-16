@@ -544,8 +544,8 @@ entity fifo_async_with_error is
     ---------------------------------------------------------------------
     -- resynchronized errors/status 
     ---------------------------------------------------------------------
-    o_errors_sync        : out std_logic_vector(3 downto 0); -- output resynchronized errors
-    o_empty_sync        : out std_logic -- output resynchronized empty fifo status flag
+    o_errors_sync   : out std_logic_vector(3 downto 0); -- output resynchronized errors
+    o_empty_sync    : out std_logic     -- output resynchronized empty fifo status flag
   );
 end entity fifo_async_with_error;
 
@@ -722,6 +722,6 @@ begin
   o_errors_sync(2) <= error_wr_rst_sync;
   o_errors_sync(1) <= error_empty_sync;
   o_errors_sync(0) <= error_full_sync;
-  o_empty_sync    <= empty_sync;
+  o_empty_sync     <= empty_sync;
 
 end architecture RTL;

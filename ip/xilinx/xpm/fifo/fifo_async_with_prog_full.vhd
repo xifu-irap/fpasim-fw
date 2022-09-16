@@ -26,10 +26,6 @@
 --  This module instanciates an asynchronous fifo with empty, full and prog full flags
 -- -------------------------------------------------------------------------------------------------------------
 
-
-
-
-
 -- -------------------------------------------------------------------------------------------------------------
 -- Parameter usage table, organized as follows:
 -- +---------------------------------------------------------------------------------------------------------------------+
@@ -584,7 +580,7 @@ begin
   -- xilinx template
   ---------------------------------------------------------------------
   inst_xpm_fifo_async : xpm_fifo_async
-    generic map( -- @suppress "The order of the associations is different from the declaration order"
+    generic map(                        -- @suppress "The order of the associations is different from the declaration order"
       CASCADE_HEIGHT      => 0,         -- DECIMAL
       CDC_SYNC_STAGES     => g_CDC_SYNC_STAGES, -- DECIMAL
       DOUT_RESET_VALUE    => "0",       -- String
@@ -594,7 +590,7 @@ begin
       FIFO_WRITE_DEPTH    => g_FIFO_WRITE_DEPTH, -- DECIMAL
       FULL_RESET_VALUE    => 0,         -- DECIMAL
       PROG_EMPTY_THRESH   => 10,        -- DECIMAL
-      PROG_FULL_THRESH    => g_PROG_FULL_THRESH,        -- DECIMAL
+      PROG_FULL_THRESH    => g_PROG_FULL_THRESH, -- DECIMAL
       RD_DATA_COUNT_WIDTH => 1,         -- DECIMAL
       READ_DATA_WIDTH     => g_READ_DATA_WIDTH, -- DECIMAL
       READ_MODE           => g_READ_MODE, -- String
@@ -605,7 +601,7 @@ begin
       WRITE_DATA_WIDTH    => g_WRITE_DATA_WIDTH, -- DECIMAL
       WR_DATA_COUNT_WIDTH => 1          -- DECIMAL
     )
-    port map( -- @suppress "The order of the associations is different from the declaration order"
+    port map(                           -- @suppress "The order of the associations is different from the declaration order"
       almost_empty  => open,            -- 1-bit output: Almost Empty : When asserted, this signal indicates that
       -- only one more read can be performed before the FIFO goes to empty.
 
