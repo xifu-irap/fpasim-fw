@@ -319,7 +319,7 @@ library fpasim;
 -- fifo asynchrone
 ---------------------------------------------------------------------
 entity fifo_sync_with_error is
-  generic (
+  generic(
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | CASCADE_HEIGHT       | Integer            | Range: 0 - 64. Default value = 0.                                       |
     -- |---------------------------------------------------------------------------------------------------------------------|
@@ -487,31 +487,31 @@ entity fifo_sync_with_error is
     -- g_WR_DATA_COUNT_WIDTH : integer := 1
 
   );
-  port (
+  port(
     ---------------------------------------------------------------------
     -- write side
     ---------------------------------------------------------------------
-    i_wr_clk        : in std_logic;                                         -- write clock
-    i_wr_rst        : in std_logic;                                         -- write reset 
-    i_wr_en         : in std_logic;                                         -- write enable
-    i_wr_din        : in std_logic_vector(g_WRITE_DATA_WIDTH - 1 downto 0); -- write data
-    o_wr_full       : out std_logic;                                        -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-    o_wr_rst_busy   : out std_logic;                                        -- Active-High indicator that the FIFO write domain is currently in a reset state
+    i_wr_clk        : in  std_logic;    -- write clock
+    i_wr_rst        : in  std_logic;    -- write reset 
+    i_wr_en         : in  std_logic;    -- write enable
+    i_wr_din        : in  std_logic_vector(g_WRITE_DATA_WIDTH - 1 downto 0); -- write data
+    o_wr_full       : out std_logic;    -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
+    o_wr_rst_busy   : out std_logic;    -- Active-High indicator that the FIFO write domain is currently in a reset state
 
     ---------------------------------------------------------------------
     -- read side
     ---------------------------------------------------------------------
-    i_rd_en         : in std_logic;                                         -- read enable (Must be held active-low when rd_rst_busy is active high)
-    o_rd_dout_valid : out std_logic;                                        -- When asserted, this signal indicates that valid data is available on the output bus
+    i_rd_en         : in  std_logic;    -- read enable (Must be held active-low when rd_rst_busy is active high)
+    o_rd_dout_valid : out std_logic;    -- When asserted, this signal indicates that valid data is available on the output bus
     o_rd_dout       : out std_logic_vector(g_READ_DATA_WIDTH - 1 downto 0);
-    o_rd_empty      : out std_logic; -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-    o_rd_rst_busy   : out std_logic; -- Active-High indicator that the FIFO read domain is currently in a reset state
-    
+    o_rd_empty      : out std_logic;    -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
+    o_rd_rst_busy   : out std_logic;    -- Active-High indicator that the FIFO read domain is currently in a reset state
+
     ---------------------------------------------------------------------
     --  errors/status 
     ---------------------------------------------------------------------
-    o_errors_sync        : out std_logic_vector(3 downto 0); -- output errors
-    o_empty_sync         : out std_logic                     -- output empty fifo status flag
+    o_errors_sync   : out std_logic_vector(3 downto 0); -- output errors
+    o_empty_sync    : out std_logic     -- output empty fifo status flag
   );
 end entity fifo_sync_with_error;
 
@@ -519,8 +519,8 @@ architecture RTL of fifo_sync_with_error is
   ---------------------------------------------------------------------
   -- fifo
   ---------------------------------------------------------------------
-  signal wr_full       : std_logic;
-  signal wr_rst_busy   : std_logic;
+  signal wr_full     : std_logic;
+  signal wr_rst_busy : std_logic;
 
   signal rd_dout_valid : std_logic;
   signal rd_dout       : std_logic_vector(o_rd_dout'range);
@@ -530,16 +530,16 @@ architecture RTL of fifo_sync_with_error is
   ---------------------------------------------------------------------
   -- error
   ---------------------------------------------------------------------
-  signal error_full    : std_logic;
-  signal error_wr_rst  : std_logic;
-  signal error_empty   : std_logic;
-  signal error_rd_rst  : std_logic;
+  signal error_full   : std_logic;
+  signal error_wr_rst : std_logic;
+  signal error_empty  : std_logic;
+  signal error_rd_rst : std_logic;
 
 begin
 
----------------------------------------------------------------------
--- instanciate fifo_sync
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
+  -- instanciate fifo_sync
+  ---------------------------------------------------------------------
   fifo_sync_INST : entity fpasim.fifo_sync
     generic map(
       g_FIFO_MEMORY_TYPE  => g_FIFO_MEMORY_TYPE,
@@ -553,47 +553,47 @@ begin
       ---------------------------------------------------------------------
       -- write side
       ---------------------------------------------------------------------
-      i_wr_clk        => i_wr_clk,      
-      i_wr_rst        => i_wr_rst,      
-      i_wr_en         => i_wr_en,       
-      i_wr_din        => i_wr_din,      
-      o_wr_full       => wr_full,       
-      o_wr_rst_busy   => wr_rst_busy,   
+      i_wr_clk        => i_wr_clk,
+      i_wr_rst        => i_wr_rst,
+      i_wr_en         => i_wr_en,
+      i_wr_din        => i_wr_din,
+      o_wr_full       => wr_full,
+      o_wr_rst_busy   => wr_rst_busy,
       ---------------------------------------------------------------------
       -- read side
       ---------------------------------------------------------------------
-      i_rd_en         => i_rd_en,       
-      o_rd_dout_valid => rd_dout_valid, 
+      i_rd_en         => i_rd_en,
+      o_rd_dout_valid => rd_dout_valid,
       o_rd_dout       => rd_dout,
-      o_rd_empty      => rd_empty,   
-      o_rd_rst_busy   => rd_rst_busy 
+      o_rd_empty      => rd_empty,
+      o_rd_rst_busy   => rd_rst_busy
     );
 
   ---------------------------------------------------------------------
   -- generate errors flag
   ---------------------------------------------------------------------
   error_wr_rst <= '1' when i_wr_en = '1' and wr_rst_busy = '1' else '0';
-  error_full <= '1' when i_wr_en = '1' and wr_full = '1' else '0';
+  error_full   <= '1' when i_wr_en = '1' and wr_full = '1' else '0';
   error_rd_rst <= '1' when i_rd_en = '1' and rd_rst_busy = '1' else '0';
-  error_empty <= '1' when i_rd_en = '1' and rd_empty = '1' else '0';
+  error_empty  <= '1' when i_rd_en = '1' and rd_empty = '1' else '0';
 
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
   -- fifo: write side
-  o_wr_full       <= full;
-  o_wr_rst_busy   <= wr_rst_busy;
+  o_wr_full     <= wr_full;
+  o_wr_rst_busy <= wr_rst_busy;
 
   -- fifo: read side
-  o_rd_dout_valid <= data_valid;
-  o_rd_dout       <= dout;
-  o_rd_empty      <= empty;
+  o_rd_dout_valid <= rd_dout_valid;
+  o_rd_dout       <= rd_dout;
+  o_rd_empty      <= rd_empty;
   o_rd_rst_busy   <= rd_rst_busy;
 
-  o_errors_sync(3)     <= error_rd_rst;
-  o_errors_sync(2)     <= error_wr_rst;
-  o_errors_sync(1)     <= error_empty;
-  o_errors_sync(0)     <= error_full;
-  o_empty_sync         <= empty_sync;
+  o_errors_sync(3) <= error_rd_rst;
+  o_errors_sync(2) <= error_wr_rst;
+  o_errors_sync(1) <= error_empty;
+  o_errors_sync(0) <= error_full;
+  o_empty_sync     <= rd_empty;
 
 end architecture RTL;

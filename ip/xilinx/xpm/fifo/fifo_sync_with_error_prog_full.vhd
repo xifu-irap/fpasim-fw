@@ -32,7 +32,6 @@
 --   . detect a reading when the FIFO is in a reset state
 -- -------------------------------------------------------------------------------------------------------------
 
-
 -- -------------------------------------------------------------------------------------------------------------
 -- XPM_FIFO instantiation template for Synchronous FIFO configurations
 -- Refer to the targeted device family architecture libraries guide for XPM_FIFO documentation
@@ -403,8 +402,7 @@ entity fifo_sync_with_error_prog_full is
     -- | If READ_MODE = "std", then READ_MODE_VAL = 0; Otherwise READ_MODE_VAL = 1.                                          |
     -- | NOTE: The default threshold value is dependent on default FIFO_WRITE_DEPTH value. If FIFO_WRITE_DEPTH value is      |
     -- | changed, ensure the threshold value is within the valid range though the programmable flags are not used.           |
-     g_PROG_FULL_THRESH : integer := 5;
-
+    g_PROG_FULL_THRESH  : integer := 5;
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | RD_DATA_COUNT_WIDTH  | Integer            | Range: 1 - 23. Default value = 1.                                       |
     -- |---------------------------------------------------------------------------------------------------------------------|
@@ -508,102 +506,99 @@ entity fifo_sync_with_error_prog_full is
     o_rd_dout_valid : out std_logic;    -- When asserted, this signal indicates that valid data is available on the output bus
     o_rd_dout       : out std_logic_vector(g_READ_DATA_WIDTH - 1 downto 0);
     o_rd_empty      : out std_logic;    -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-    o_rd_rst_busy   : out std_logic;   -- Active-High indicator that the FIFO read domain is currently in a reset state
+    o_rd_rst_busy   : out std_logic;    -- Active-High indicator that the FIFO read domain is currently in a reset state
     ---------------------------------------------------------------------
     -- errors/empty status 
     ---------------------------------------------------------------------
     o_errors_sync   : out std_logic_vector(3 downto 0); -- output errors
-    o_empty_sync    : out std_logic -- output empty fifo status flag 
+    o_empty_sync    : out std_logic     -- output empty fifo status flag 
   );
 end entity fifo_sync_with_error_prog_full;
 
 architecture RTL of fifo_sync_with_error_prog_full is
 
- 
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
   -- fifo: write side
-  signal wr_rst_busy : std_logic;
-  signal full        : std_logic;
-  signal prog_full        : std_logic;
+  signal wr_rst_busy   : std_logic;
+  signal wr_full       : std_logic;
+  signal wr_prog_full  : std_logic;
   -- fifo: read side
-  signal data_valid  : std_logic;
-  signal dout        : std_logic_vector(o_rd_dout'range);
-  signal empty       : std_logic;
-  signal rd_rst_busy : std_logic;
+  signal rd_dout_valid : std_logic;
+  signal rd_dout       : std_logic_vector(o_rd_dout'range);
+  signal rd_empty      : std_logic;
+  signal rd_rst_busy   : std_logic;
 
-    ---------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- error
   ---------------------------------------------------------------------
-  signal error_full    : std_logic;
-  signal error_wr_rst  : std_logic;
-  signal error_empty   : std_logic;
-  signal error_rd_rst  : std_logic;
-
+  signal error_full   : std_logic;
+  signal error_wr_rst : std_logic;
+  signal error_empty  : std_logic;
+  signal error_rd_rst : std_logic;
 
 begin
 
----------------------------------------------------------------------
--- instanciate fifo_sync_with_prog_full
----------------------------------------------------------------------
- inst_fifo_sync_with_prog_full: entity fpasim.fifo_sync_with_prog_full
-generic map(
-g_FIFO_MEMORY_TYPE => g_FIFO_MEMORY_TYPE,
-g_FIFO_READ_LATENCY => g_FIFO_READ_LATENCY,
-g_FIFO_WRITE_DEPTH => g_FIFO_WRITE_DEPTH,
-g_PROG_FULL_THRESH => g_PROG_FULL_THRESH,
-g_READ_DATA_WIDTH => g_READ_DATA_WIDTH,
-g_READ_MODE => g_READ_MODE,
-g_WRITE_DATA_WIDTH => g_WRITE_DATA_WIDTH
-)
-port map( 
-    ---------------------------------------------------------------------
-    -- write side
-    ---------------------------------------------------------------------
-i_wr_clk => i_wr_clk,     -- write clock
-i_wr_rst => i_wr_rst,     -- write reset 
-i_wr_en => i_wr_en,     -- write enable
-i_wr_din => i_wr_din,     -- write data
-o_wr_full => full,     -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-o_wr_prog_full => prog_full,     -- Programmable Full: This signal is asserted when the number of words in the FIFO is greater than or equal to the programmable full threshold value. It is de-asserted when the number of words in the FIFO is less than the programmable full threshold value.
-o_wr_rst_busy => r_rst_busy,     -- Active-High indicator that the FIFO write domain is currently in a reset state
-    ---------------------------------------------------------------------
-    -- read side
-    ---------------------------------------------------------------------
-i_rd_en => i_rd_en,     -- read enable (Must be held active-low when rd_rst_busy is active high)
-o_rd_dout_valid => data_valid,     -- When asserted, this signal indicates that valid data is available on the output bus
-o_rd_dout => dout,
-o_rd_empty => empty,     -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-o_rd_rst_busy => rd_rst_busy     -- Active-High indicator that the FIFO read domain is currently in a reset state
-);
+  ---------------------------------------------------------------------
+  -- instanciate fifo_sync_with_prog_full
+  ---------------------------------------------------------------------
+  inst_fifo_sync_with_prog_full : entity fpasim.fifo_sync_with_prog_full
+    generic map(
+      g_FIFO_MEMORY_TYPE  => g_FIFO_MEMORY_TYPE,
+      g_FIFO_READ_LATENCY => g_FIFO_READ_LATENCY,
+      g_FIFO_WRITE_DEPTH  => g_FIFO_WRITE_DEPTH,
+      g_PROG_FULL_THRESH  => g_PROG_FULL_THRESH,
+      g_READ_DATA_WIDTH   => g_READ_DATA_WIDTH,
+      g_READ_MODE         => g_READ_MODE,
+      g_WRITE_DATA_WIDTH  => g_WRITE_DATA_WIDTH
+    )
+    port map(
+      ---------------------------------------------------------------------
+      -- write side
+      ---------------------------------------------------------------------
+      i_wr_clk        => i_wr_clk,      -- write clock
+      i_wr_rst        => i_wr_rst,      -- write reset 
+      i_wr_en         => i_wr_en,       -- write enable
+      i_wr_din        => i_wr_din,      -- write data
+      o_wr_full       => wr_full,       -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
+      o_wr_prog_full  => wr_prog_full,  -- Programmable Full: This signal is asserted when the number of words in the FIFO is greater than or equal to the programmable full threshold value. It is de-asserted when the number of words in the FIFO is less than the programmable full threshold value.
+      o_wr_rst_busy   => wr_rst_busy,   -- Active-High indicator that the FIFO write domain is currently in a reset state
+      ---------------------------------------------------------------------
+      -- read side
+      ---------------------------------------------------------------------
+      i_rd_en         => i_rd_en,       -- read enable (Must be held active-low when rd_rst_busy is active high)
+      o_rd_dout_valid => rd_dout_valid, -- When asserted, this signal indicates that valid data is available on the output bus
+      o_rd_dout       => rd_dout,
+      o_rd_empty      => rd_empty,      -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
+      o_rd_rst_busy   => rd_rst_busy    -- Active-High indicator that the FIFO read domain is currently in a reset state
+    );
 
- ---------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- generate errors flag
   ---------------------------------------------------------------------
-  error_wr_rst <= '1' when i_wr_en = '1' and wr_rst_busy = '1' else '0';
-  error_full <= '1' when i_wr_en = '1' and wr_full = '1' else '0';
-  error_rd_rst <= '1' when i_rd_en = '1' and rd_rst_busy = '1' else '0';
-  error_empty <= '1' when i_rd_en = '1' and rd_empty = '1' else '0';
+  error_wr_rst   <= '1' when i_wr_en = '1' and wr_rst_busy = '1' else '0';
+  error_full     <= '1' when i_wr_en = '1' and wr_full = '1' else '0';
+  error_rd_rst   <= '1' when i_rd_en = '1' and rd_rst_busy = '1' else '0';
+  error_empty    <= '1' when i_rd_en = '1' and rd_empty = '1' else '0';
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
   -- fifo: write side
-  o_wr_full     <= full;
-  o_wr_prog_full     <= prog_full;
-  o_wr_rst_busy <= wr_rst_busy;
+  o_wr_full      <= wr_full;
+  o_wr_prog_full <= wr_prog_full;
+  o_wr_rst_busy  <= wr_rst_busy;
 
   -- fifo: read side
-  o_rd_dout_valid <= data_valid;
-  o_rd_dout       <= dout;
-  o_rd_empty      <= empty;
+  o_rd_dout_valid <= rd_dout_valid;
+  o_rd_dout       <= rd_dout;
+  o_rd_empty      <= rd_empty;
   o_rd_rst_busy   <= rd_rst_busy;
 
-  o_errors_sync(3)     <= error_rd_rst;
-  o_errors_sync(2)     <= error_wr_rst;
-  o_errors_sync(1)     <= error_empty;
-  o_errors_sync(0)     <= error_full;
-  o_empty_sync         <= empty_sync;
-
+  o_errors_sync(3) <= error_rd_rst;
+  o_errors_sync(2) <= error_wr_rst;
+  o_errors_sync(1) <= error_empty;
+  o_errors_sync(0) <= error_full;
+  o_empty_sync     <= rd_empty;
 
 end architecture RTL;
