@@ -36,8 +36,13 @@ use fpasim.pkg_fpasim.all;
 
 entity tes_top is
   generic(
+    -- pixel
+    g_PIXEL_FRAME_WIDTH : positive := 16;
     g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+    -- frame
+    g_FRAME_FRAME_WIDTH : positive := 16;
     g_FRAME_ID_WIDTH            : positive := pkg_FRAME_ID_WIDTH; -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+    -- output
     g_PIXEL_RESULT_OUTPUT_WIDTH : positive := pkg_TES_MULT_SUB_Q_WIDTH_S -- pixel output result bus width (expressed in bit). Possible values [1;max integer value[
   );
 
@@ -52,7 +57,10 @@ entity tes_top is
     -- input command: from the regdecode
     ---------------------------------------------------------------------
     i_en                      : in  std_logic; -- enable
-
+    i_pixel_frame_size : in std_logic_vector(g_PIXEL_FRAME_WIDTH - 1 downto 0);
+    i_frame_frame_size : in std_logic_vector(g_FRAME_FRAME_WIDTH - 1 downto 0);
+    
+    -- command
     i_cmd_valid               : in  std_logic; -- valid command
     i_cmd_pulse_height        : in  std_logic_vector(10 downto 0); -- pulse height command
     i_cmd_pixel_id            : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id command
@@ -158,7 +166,11 @@ begin
 
   inst_tes_signalling : entity fpasim.tes_signalling
     generic map(
+      -- pixel
+      g_PIXEL_FRAME_WIDTH => i_pixel_frame_size'length,
       g_PIXEL_ID_WIDTH => g_PIXEL_ID_WIDTH,
+      -- frame
+      g_FRAME_FRAME_WIDTH=> i_frame_frame_size'length,
       g_FRAME_ID_WIDTH => g_FRAME_ID_WIDTH
     )
     port map(
@@ -168,6 +180,8 @@ begin
       -- Commands
       ---------------------------------------------------------------------
       i_start       => i_en,
+      i_pixel_frame_size =>  i_pixel_frame_size,
+        i_frame_frame_size =>         i_frame_frame_size,
       ---------------------------------------------------------------------
       -- Input data
       ---------------------------------------------------------------------
