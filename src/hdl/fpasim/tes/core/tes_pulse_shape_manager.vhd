@@ -137,16 +137,16 @@ architecture RTL of tes_pulse_shape_manager is
   constant c_CMD_IDX2_H : integer := c_CMD_IDX2_L + i_cmd_pulse_height'length - 1;
 
   -- find the power of 2 superior to the g_DELAY
-  constant c_FIFO_DEPTH : integer := 16; --see IP
-  constant c_FIFO_WIDTH : integer := c_CMD_IDX2_H + 1; --see IP
+  constant c_FIFO_DEPTH0 : integer := 16; --see IP
+  constant c_FIFO_WIDTH0 : integer := c_CMD_IDX2_H + 1; --see IP
 
   signal wr_tmp0      : std_logic;
-  signal data_tmp0    : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
+  signal data_tmp0    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
   signal full0        : std_logic;
   signal wr_rst_busy0 : std_logic;
 
   signal rd1          : std_logic;
-  signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
+  signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
   signal empty1       : std_logic;
   signal rd_rst_busy1 : std_logic;
 
@@ -154,7 +154,9 @@ architecture RTL of tes_pulse_shape_manager is
   signal cmd_pixel_id1     : std_logic_vector(i_cmd_pixel_id'range);
   signal cmd_time_shift1   : std_logic_vector(i_cmd_time_shift'range);
 
-  signal error_status1 : std_logic_vector(1 downto 0);
+
+  signal error_sync : std_logic_vector(3 downto 0);
+  signal empty_sync : std_logic;
 
   ---------------------------------------------------------------------
   -- State machine
@@ -315,7 +317,7 @@ architecture RTL of tes_pulse_shape_manager is
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 3;
+  constant NB_ERRORS_c : integer := 5;
   signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
   signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
 
@@ -328,11 +330,11 @@ begin
   data_tmp0(c_CMD_IDX1_H downto c_CMD_IDX1_L) <= i_cmd_pixel_id;
   data_tmp0(c_CMD_IDX0_H downto c_CMD_IDX0_L) <= i_cmd_time_shift;
 
-  inst_fifo_sync_cmd : entity fpasim.fifo_sync
+  inst_fifo_sync_with_error_cmd : entity fpasim.fifo_sync_with_error
     generic map(
       g_FIFO_MEMORY_TYPE  => "auto",
       g_FIFO_READ_LATENCY => 1,
-      g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH,
+      g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH0,
       g_READ_DATA_WIDTH   => data_tmp0'length,
       g_READ_MODE         => "std",
       g_WRITE_DATA_WIDTH  => data_tmp0'length
@@ -354,7 +356,12 @@ begin
       o_rd_dout_valid => open,          -- When asserted, this signal indicates that valid data is available on the output bus
       o_rd_dout       => data_tmp1,
       o_rd_empty      => empty1,        -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_rd_rst_busy   => rd_rst_busy1   -- Active-High indicator that the FIFO read domain is currently in a reset state
+      o_rd_rst_busy   => rd_rst_busy1,   -- Active-High indicator that the FIFO read domain is currently in a reset state
+      ---------------------------------------------------------------------
+    --  errors/status 
+    ---------------------------------------------------------------------
+    o_errors_sync => errors_sync,
+    o_empty_sync  => empty_sync
     );
 
   rd1 <= cmd_rd_r1;
@@ -363,17 +370,6 @@ begin
   cmd_pixel_id1     <= data_tmp1(c_CMD_IDX1_H downto c_CMD_IDX1_L);
   cmd_time_shift1   <= data_tmp1(c_CMD_IDX0_H downto c_CMD_IDX0_L);
 
-  inst_cmd_fifo_two_errors : entity fpasim.fifo_two_errors
-    port map(                           -- @suppress "The order of the associations is different from the declaration order"
-      i_clk         => i_clk,
-      i_rst         => i_rst_status,
-      i_debug_pulse => i_debug_pulse,
-      i_fifo_cmd0   => wr_tmp0,
-      i_fifo_flag0  => full0,
-      i_fifo_cmd1   => rd1,
-      i_fifo_flag1  => empty1,
-      o_error       => error_status1
-    );
 
   ---------------------------------------------------------------------
   -- state machine
@@ -818,9 +814,11 @@ begin
   ---------------------------------------------------------------------
   -- Error latching
   ---------------------------------------------------------------------
-  error_tmp(2) <= steady_state_error;
-  error_tmp(1) <= pulse_shape_error;
-  error_tmp(0) <= (wr_rst_busy0 and wr_tmp0) or (rd_rst_busy1 and rd1);
+  error_tmp(4) <= steady_state_error;
+  error_tmp(3) <= pulse_shape_error;
+  error_tmp(2) <= error_sync(2) or error_sync(3); -- fifo rst error
+  error_tmp(1) <= error_sync(1); -- fifo rd empty error
+  error_tmp(0) <= error_sync(0); -- fifo wr full error
   gen_errors_latch : for i in error_tmp'range generate
     inst_one_error_latch : entity fpasim.one_error_latch
       port map(
@@ -833,23 +831,24 @@ begin
   end generate gen_errors_latch;
 
   o_errors(15 downto 7) <= (others => '0');
-  o_errors(6)           <= error_tmp_bis(2);
-  o_errors(5)           <= error_tmp_bis(1);
-  o_errors(4)           <= error_tmp_bis(0);
-  o_errors(3 downto 2)  <= (others => '0');
-  o_errors(1 downto 0)  <= error_status1;
+  o_errors(5)           <= error_tmp_bis(4);
+  o_errors(4)           <= error_tmp_bis(3);
+  o_errors(3)           <= '0';
+  o_errors(2)           <= error_tmp_bis(2); -- fifo rst error
+  o_errors(1)           <= error_tmp_bis(1); -- fifo rd empty error
+  o_errors(0)           <= error_tmp_bis(0); -- fifo wr full error
 
   o_status(7 downto 1) <= (others => '0');
-  o_status(0)          <= empty1;
+  o_status(0)          <= empty_sync; -- fifo empty
 
   ---------------------------------------------------------------------
   -- for simulation only
   ---------------------------------------------------------------------
-  assert not (error_tmp_bis(2) = '1') report "[tes_pulse_shape_manager] => steady state RAM wrong access " severity error;
-  assert not (error_tmp_bis(1) = '1') report "[tes_pulse_shape_manager] => pulse shape RAM wrong access " severity error;
-  assert not (error_tmp_bis(0) = '1') report "[tes_pulse_shape_manager] => FIFO01 is used before the end of the initialization " severity error;
+  assert not (error_tmp_bis(4) = '1') report "[tes_pulse_shape_manager] => RAM wrong access: steady state " severity error;
+  assert not (error_tmp_bis(3) = '1') report "[tes_pulse_shape_manager] => RAM wrong access: pulse shape" severity error;
 
-  assert not (error_status1(0) = '1') report "[tes_pulse_shape_manager] => FIFO01 write a full FIFO" severity error;
-  assert not (error_status1(1) = '1') report "[tes_pulse_shape_manager] => FIFO01 read an empty FIFO" severity error;
+  assert not (error_tmp_bis(2) = '1') report "[tes_pulse_shape_manager] => fifo is used before the end of the initialization " severity error;
+  assert not (error_tmp_bis(1) = '1') report "[tes_pulse_shape_manager] => fifo read an empty FIFO" severity error;
+  assert not (error_tmp_bis(0) = '1') report "[tes_pulse_shape_manager] => fifo write a full FIFO" severity error;
 
 end architecture RTL;
