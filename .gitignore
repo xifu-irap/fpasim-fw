@@ -12,6 +12,8 @@
 /project/vivado00/fpasim.ip_user_files/**/*
 /project/vivado00/fpasim.hw/**/*
 /project/vivado00/fpasim.cache/*
+/project/vivado00/fpasim.sim/*
+/project/vivado00/fpasim.srcs/*
 
 
 /doc/**/*
