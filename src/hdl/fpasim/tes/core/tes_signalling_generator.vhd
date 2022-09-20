@@ -27,17 +27,17 @@
 -- This module generates flags to tags
 --  . the first frame sample
 --  . the last frame sample
---  The frame length is defined by the i_frame_size input port
+--  The frame length is defined by the i_length input port
 -- And for each frame, an frame id is incremented until the i_id_size - 1 value.
 -- Then the frame id rolls back to 0
 
--- Example0: (frame_size = 4, id_size = 3) with continuous i_data_valid signal
+-- Example0: (length = 4, id_size = 3) with continuous i_data_valid signal
 -- data valid | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
 -- id         |            0  |          1    |      2        |   0           |
 -- sof        | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 |
 -- eof        | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 |
 --
--- Example1: (frame_size = 4, id_size = 3)  with non-continuous i_data_valid signal
+-- Example1: (length = 4, id_size = 3)  with non-continuous i_data_valid signal
 -- data valid | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 |
 -- id         |             0                 |          1                    |              2                |           0                   |
 -- sof        | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -53,9 +53,9 @@ library fpasim;
 
 entity tes_signalling_generator is
   generic(
-    g_FRAME_WIDTH : positive := 16; -- frame bus width (expressed in bits). Possible values: [1; integer max value[
-    g_ID_WIDTH    : positive := 11; -- ID bus width (expressed in bits). . Possible values: [1; integer max value[
-    g_LATENCY_OUT : natural := 0 -- add output latency. Possible values: [0; integer max value[
+    g_LENGTH_WIDTH : positive := 16;    -- frame bus width (expressed in bits). Possible values: [1; integer max value[
+    g_ID_WIDTH     : positive := 11;    -- ID bus width (expressed in bits). . Possible values: [1; integer max value[
+    g_LATENCY_OUT  : natural  := 0      -- add output latency. Possible values: [0; integer max value[
   );
   port(
     i_clk        : in  std_logic;       -- clock signal
@@ -64,7 +64,7 @@ entity tes_signalling_generator is
     -- Commands
     ---------------------------------------------------------------------
     i_start      : in  std_logic;       -- start the generation (pulse)
-    i_frame_size : in  std_logic_vector(g_FRAME_WIDTH - 1 downto 0); -- number of samples by frame
+    i_length     : in  std_logic_vector(g_LENGTH_WIDTH - 1 downto 0); -- number of samples by frame
     i_id_size    : in  std_logic_vector(g_ID_WIDTH - 1 downto 0); -- max id value
 
     ---------------------------------------------------------------------
@@ -101,11 +101,11 @@ architecture RTL of tes_signalling_generator is
   signal eof_next : std_logic;
   signal eof_r1   : std_logic;
 
-  signal cnt_frame_next : unsigned(i_frame_size'range) := (others => '0');
-  signal cnt_frame_r1   : unsigned(i_frame_size'range) := (others => '0');
+  signal cnt_frame_next : unsigned(i_length'range) := (others => '0');
+  signal cnt_frame_r1   : unsigned(i_length'range) := (others => '0');
 
-  signal cnt_frame_max_next : unsigned(i_frame_size'range);
-  signal cnt_frame_max_r1   : unsigned(i_frame_size'range) := (others => '0');
+  signal cnt_frame_max_next : unsigned(i_length'range);
+  signal cnt_frame_max_r1   : unsigned(i_length'range) := (others => '0');
 
   signal cnt_id_next : unsigned(i_id_size'range) := (others => '0');
   signal cnt_id_r1   : unsigned(i_id_size'range) := (others => '0');
@@ -135,7 +135,7 @@ architecture RTL of tes_signalling_generator is
 
 begin
 
-  p_decode_state : process(i_start, cnt_frame_max_r1, cnt_frame_r1, cnt_id_r1, i_frame_size, i_id_size, i_data_valid, sm_state_r1) is
+  p_decode_state : process(i_start, cnt_frame_max_r1, cnt_frame_r1, cnt_id_r1, i_length, i_id_size, i_data_valid, sm_state_r1) is
   begin
     -- default value
 
@@ -171,13 +171,13 @@ begin
           data_valid_next <= i_data_valid;
 
           sof_next       <= '1';
-          cnt_frame_next <= to_unsigned(0, i_frame_size'length);
+          cnt_frame_next <= to_unsigned(0, i_length'length);
           -- special case: frame of one sample
-          if unsigned(i_frame_size) = to_unsigned(0, i_frame_size'length) then
+          if unsigned(i_length) = to_unsigned(0, i_length'length) then
             eof_next      <= '1';
             sm_state_next <= E_START;
           else
-            cnt_frame_max_next <= unsigned(i_frame_size) - 1; --susbract - 1 to anticipate
+            cnt_frame_max_next <= unsigned(i_length) - 1; --susbract - 1 to anticipate
             sm_state_next      <= E_RUN;
           end if;
         else

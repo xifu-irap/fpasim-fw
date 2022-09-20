@@ -37,10 +37,10 @@ use fpasim.pkg_fpasim.all;
 entity tes_top is
   generic(
     -- pixel
-    g_PIXEL_FRAME_WIDTH : positive := 16;
-    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+    g_PIXEL_LENGTH_WIDTH        : positive := 16;
+    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
     -- frame
-    g_FRAME_FRAME_WIDTH : positive := 16;
+    g_FRAME_LENGTH_WIDTH        : positive := 16;
     g_FRAME_ID_WIDTH            : positive := pkg_FRAME_ID_WIDTH; -- frame id bus width (expressed in bits). Possible values [1;max integer value[
     -- output
     g_PIXEL_RESULT_OUTPUT_WIDTH : positive := pkg_TES_MULT_SUB_Q_WIDTH_S -- pixel output result bus width (expressed in bit). Possible values [1;max integer value[
@@ -57,9 +57,8 @@ entity tes_top is
     -- input command: from the regdecode
     ---------------------------------------------------------------------
     i_en                      : in  std_logic; -- enable
-    i_pixel_frame_size : in std_logic_vector(g_PIXEL_FRAME_WIDTH - 1 downto 0);
-    i_frame_frame_size : in std_logic_vector(g_FRAME_FRAME_WIDTH - 1 downto 0);
-    
+    i_pixel_length            : in  std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);
+    i_frame_length            : in  std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0);
     -- command
     i_cmd_valid               : in  std_logic; -- valid command
     i_cmd_pulse_height        : in  std_logic_vector(10 downto 0); -- pulse height command
@@ -164,40 +163,46 @@ architecture RTL of tes_top is
 
 begin
 
+  -------------------------------------------------------------------
+  -- Generate pixel and frame flags
+  -------------------------------------------------------------------
   inst_tes_signalling : entity fpasim.tes_signalling
     generic map(
       -- pixel
-      g_PIXEL_FRAME_WIDTH => i_pixel_frame_size'length,
-      g_PIXEL_ID_WIDTH => g_PIXEL_ID_WIDTH,
+      g_PIXEL_LENGTH_WIDTH => i_pixel_length'length,
+      g_PIXEL_ID_WIDTH     => g_PIXEL_ID_WIDTH,
       -- frame
-      g_FRAME_FRAME_WIDTH=> i_frame_frame_size'length,
-      g_FRAME_ID_WIDTH => g_FRAME_ID_WIDTH
+      g_FRAME_LENGTH_WIDTH => i_frame_length'length,
+      g_FRAME_ID_WIDTH     => g_FRAME_ID_WIDTH
     )
     port map(
-      i_clk         => i_clk,
-      i_rst         => i_rst,
+      i_clk          => i_clk,
+      i_rst          => i_rst,
       ---------------------------------------------------------------------
       -- Commands
       ---------------------------------------------------------------------
-      i_start       => i_en,
-      i_pixel_frame_size =>  i_pixel_frame_size,
-        i_frame_frame_size =>         i_frame_frame_size,
+      i_start        => i_en,
+      i_pixel_length => i_pixel_length,
+      i_frame_length => i_frame_length,
       ---------------------------------------------------------------------
       -- Input data
       ---------------------------------------------------------------------
-      i_data_valid  => i_data_valid,
+      i_data_valid   => i_data_valid,
       ---------------------------------------------------------------------
       -- Output data
       ---------------------------------------------------------------------
-      o_pixel_sof   => pixel_sof0,
-      o_pixel_eof   => pixel_eof0,
-      o_pixel_id    => pixel_id0,
-      o_pixel_valid => pixel_valid0,
-      o_frame_sof   => frame_sof0,
-      o_frame_eof   => frame_eof0,
-      o_frame_id    => frame_id0
+      o_pixel_sof    => pixel_sof0,
+      o_pixel_eof    => pixel_eof0,
+      o_pixel_id     => pixel_id0,
+      o_pixel_valid  => pixel_valid0,
+      o_frame_sof    => frame_sof0,
+      o_frame_eof    => frame_eof0,
+      o_frame_id     => frame_id0
     );
 
+  -----------------------------------------------------------------
+  -- tes computation
+  -----------------------------------------------------------------
   inst_tes_pulse_shape_manager : entity fpasim.tes_pulse_shape_manager
     generic map(
       g_FRAME_SIZE                => c_FRAME_SIZE,
@@ -223,18 +228,18 @@ begin
       i_pulse_shape_wr_rd_addr  => i_pulse_shape_wr_rd_addr, -- write address
       i_pulse_shape_wr_data     => i_pulse_shape_wr_data, -- write data
       -- rd
-      i_pulse_shape_rd_en       => i_pulse_shape_rd_en,
-      o_pulse_shape_rd_valid    => pulse_shape_rd_valid1,
-      o_pulse_shape_rd_data     => pulse_shape_rd_data1,
+      i_pulse_shape_rd_en       => i_pulse_shape_rd_en, -- read enable
+      o_pulse_shape_rd_valid    => pulse_shape_rd_valid1, -- read data valid
+      o_pulse_shape_rd_data     => pulse_shape_rd_data1, -- read data
       -- RAM:
       -- wr
       i_steady_state_wr_en      => i_steady_state_wr_en, -- write enable
       i_steady_state_wr_rd_addr => i_steady_state_wr_rd_addr, -- write address
       i_steady_state_wr_data    => i_steady_state_wr_data, -- write data
       -- rd
-      i_steady_state_rd_en      => i_steady_state_rd_en, -- write enable
-      o_steady_state_rd_valid   => steady_state_rd_valid1, -- write address
-      o_steady_state_rd_data    => steady_state_rd_data1, -- write data
+      i_steady_state_rd_en      => i_steady_state_rd_en, -- read enable
+      o_steady_state_rd_valid   => steady_state_rd_valid1, -- read data valid
+      o_steady_state_rd_data    => steady_state_rd_data1, -- read data
 
       ---------------------------------------------------------------------
       -- input data
