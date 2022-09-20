@@ -36,10 +36,20 @@ PACKAGE pkg_utils IS
   -- This function computes the minimal width bus necessary to represent a value
   --   res = ceil(log2(i_value))
   --   example:
+  --     i_value = 1 => res = 1 (particular case)
+  --     i_value = 2 => res = 1
   --     i_value = 16 => res = 4
   --     i_value = 8  => res = 3
   ---------------------------------------------------------------------
-  function pkg_width_from_value(i_value : in integer) return integer;
+  function pkg_width_from_value(i_value : in positive) return integer;
+
+  ---------------------------------------------------------------------
+  -- This function computes the width bus from 2 indexes
+  --   example:
+  --     i_idx_high = 15 and i_idx_low = 0 => res = (i_idx_high - i_idx_low) + 1
+  ---------------------------------------------------------------------
+  function pkg_width_from_indexes(i_idx_high : in integer; i_idx_low : in integer) return integer;
+
 
   ---------------------------------------------------------------------
   -- This function generates a integer random_by_range value
@@ -69,15 +79,33 @@ PACKAGE BODY pkg_utils IS
   -- This function computes the minimal width bus necessary to represent a value
   --   res = ceil(log2(i_value))
   --   example:
+  --     i_value = 1 => res = 1 (particular case)
+  --     i_value = 2 => res = 1
   --     i_value = 16 => res = 4
   --     i_value = 8  => res = 3
   ---------------------------------------------------------------------
-  function pkg_width_from_value(i_value : in integer) return integer is
+  function pkg_width_from_value(i_value : in positive) return integer is
     variable v_result : integer;
   begin
-    v_result := integer(ceil(log2(real(i_value))));
+    if i_value  = 1 then
+      v_result := 1;
+    else
+      v_result := integer(ceil(log2(real(i_value))));
+    end if;
     return v_result;
 end;
+
+  ---------------------------------------------------------------------
+  -- This function computes the width bus from 2 indexes
+  --   example:
+  --     i_idx_high = 15 and i_idx_low = 0 => res = (i_idx_high - i_idx_low) + 1
+  ---------------------------------------------------------------------
+  function pkg_width_from_indexes(i_idx_high : in integer; i_idx_low : in integer) return integer is
+    variable v_result : integer;
+  begin 
+    v_result := (i_idx_high - i_idx_low) + 1;
+    return v_result;
+  end;
 
 
   ---------------------------------------------------------------------
