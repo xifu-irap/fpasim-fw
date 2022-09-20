@@ -57,11 +57,13 @@ entity usb_opal_kelly is
 		i_usb_wireout_ra_delay        : in    std_logic_vector(31 downto 0);
 		i_usb_wireout_tes_conf        : in    std_logic_vector(31 downto 0);
 		i_usb_wireout_debug_ctrl      : in    std_logic_vector(31 downto 0);
+		i_usb_wireout_fpga_id         : in std_logic_vector(31 downto 0);    -- wire out fpga id
+        i_usb_wireout_fpga_version    : in std_logic_vector(31 downto 0);    -- wire out fpga version
 		-- errors/status
-		i_usb_wireout_errors0         : in    std_logic_vector(31 downto 0);
-		i_usb_wireout_errors1         : in    std_logic_vector(31 downto 0);
-		i_usb_wireout_status0         : in    std_logic_vector(31 downto 0);
-		i_usb_wireout_status1         : in    std_logic_vector(31 downto 0);
+		i_usb_wireout_errors         : in    std_logic_vector(31 downto 0);
+		i_usb_wireout_sel_errors         : in    std_logic_vector(31 downto 0);
+		i_usb_wireout_status         : in    std_logic_vector(31 downto 0);
+
 		---------------------------------------------------------------------
 		-- to the user @o_usb_clk
 		---------------------------------------------------------------------
@@ -80,14 +82,15 @@ entity usb_opal_kelly is
 		o_usb_wirein_error_delay     : out   std_logic_vector(31 downto 0);
 		o_usb_wirein_ra_delay        : out   std_logic_vector(31 downto 0);
 		o_usb_wirein_tes_conf        : out   std_logic_vector(31 downto 0);
-		o_usb_wirein_debug_ctrl      : out   std_logic_vector(31 downto 0)
+		o_usb_wirein_debug_ctrl      : out   std_logic_vector(31 downto 0);
+		o_usb_wirein_sel_errors       : out  std_logic_vector(31 downto 0)  -- wirein select errors/status
 	);
 end entity usb_opal_kelly;
 
 architecture RTL of usb_opal_kelly is
 
 	-- total number of wire out, pipe out, pipe in and trigger out
-	constant c_WIRE_PIPE_TRIG_NUMBER_OUT : integer := 17;
+	constant c_WIRE_PIPE_TRIG_NUMBER_OUT : integer := 18;
 
 	---- Opal Kelly signals ----
 	signal okClk : std_logic;           -- Opal Kelly Clock
@@ -111,6 +114,7 @@ architecture RTL of usb_opal_kelly is
 	signal ep06_wire : std_logic_vector(31 downto 0);
 	signal ep07_wire : std_logic_vector(31 downto 0);
 	signal ep08_wire : std_logic_vector(31 downto 0);
+	signal ep09_wire : std_logic_vector(31 downto 0);
 
 	-- wires out
 	signal ep20_wire : std_logic_vector(31 downto 0);
@@ -126,7 +130,9 @@ architecture RTL of usb_opal_kelly is
 	signal ep30_wire : std_logic_vector(31 downto 0);
 	signal ep31_wire : std_logic_vector(31 downto 0);
 	signal ep32_wire : std_logic_vector(31 downto 0);
-	signal ep33_wire : std_logic_vector(31 downto 0);
+
+	signal ep3E_wire : std_logic_vector(31 downto 0);
+	signal ep3F_wire : std_logic_vector(31 downto 0);
 
 	-- pipe in
 	signal ep80_pipe_valid : std_logic;
@@ -177,10 +183,12 @@ begin
 	ep27_wire           <= i_usb_wireout_tes_conf;
 	ep28_wire           <= i_usb_wireout_fifo_data_count;
 	ep29_wire           <= i_usb_wireout_debug_ctrl;
-	ep30_wire           <= i_usb_wireout_errors0;
-	ep31_wire           <= i_usb_wireout_errors1;
-	ep32_wire           <= i_usb_wireout_status0;
-	ep33_wire           <= i_usb_wireout_status1;
+	ep30_wire           <= i_usb_wireout_sel_errors;
+	ep31_wire           <= i_usb_wireout_errors;
+	ep32_wire           <= i_usb_wireout_status;
+
+	ep3E_wire           <= i_usb_wireout_fpga_id;
+	ep3F_wire           <= i_usb_wireout_fpga_version;
 	-- from/to pipe out
 	o_usb_pipeout_fifo_valid <= epA0_pipe_rd;
 	epA0_pipe           <= i_usb_pipeout_fifo_data;
@@ -250,6 +258,14 @@ begin
 			ep_addr    => x"08",        -- Endpoint adress
 			ep_dataout => ep08_wire     -- Endpoint data in 32 bits
 		);
+
+	inst_okwirein_ep09 : okWireIn
+		port map(
+			okHE       => okHE,
+			ep_addr    => x"09",        -- Endpoint adress
+			ep_dataout => ep09_wire     -- Endpoint data in 32 bits
+		);
+
 
 	----------------------------------------------------
 	--	Opal Kelly Wire out
@@ -358,21 +374,14 @@ begin
 			ep_datain => ep32_wire      -- Endpoint data out 32 bits
 		);
 
-	inst_okwireout_ep33 : okWireOut
-		port map(
-			okHE      => okHE,
-			okEH      => okEHx(14 * 65 - 1 downto 13 * 65),
-			ep_addr   => x"33",         -- Endpoint adress
-			ep_datain => ep33_wire      -- Endpoint data out 32 bits
-		);
-
+    
 	----------------------------------------------------
 	--	Opal Kelly Pipe in
 	----------------------------------------------------	
 	inst_okpipein_ep80 : okPipeIn
 		port map(
 			okHE       => okHE,
-			okEH       => okEHx(15 * 65 - 1 downto 14 * 65),
+			okEH       => okEHx(14 * 65 - 1 downto 13 * 65),
 			ep_addr    => x"80",
 			ep_write   => ep80_pipe_valid,
 			ep_dataout => ep80_pipe
@@ -384,7 +393,7 @@ begin
 	inst_okpipeout_epA0 : okPipeOut
 		port map(
 			okHE      => okHE,
-			okEH      => okEHx(16 * 65 - 1 downto 15 * 65),
+			okEH      => okEHx(15 * 65 - 1 downto 14 * 65),
 			ep_addr   => x"A0",
 			ep_read   => epA0_pipe_rd,
 			ep_datain => epA0_pipe
@@ -407,11 +416,33 @@ begin
 	ep60 : okTriggerOut
 		port map(
 			okHE       => okHE,
-			okEH       => okEHx(17 * 65 - 1 downto 16 * 65),
+			okEH       => okEHx(16 * 65 - 1 downto 15 * 65),
 			ep_addr    => x"60",
 			ep_clk     => okClk,
 			ep_trigger => ep60_trig
 		);
+
+
+    ---------------------------------------------------------------------
+    -- 
+    ---------------------------------------------------------------------
+    inst_okwireout_ep3E : okWireOut
+		port map(
+			okHE      => okHE,
+			okEH      => okEHx(17 * 65 - 1 downto 16 * 65),
+			ep_addr   => x"3E",         -- Endpoint adress
+			ep_datain => ep3E_wire      -- Endpoint data out 32 bits
+		);
+
+
+    inst_okwireout_ep3F : okWireOut
+		port map(
+			okHE      => okHE,
+			okEH      => okEHx(18 * 65 - 1 downto 17 * 65),
+			ep_addr   => x"3F",         -- Endpoint adress
+			ep_datain => ep3F_wire      -- Endpoint data out 32 bits
+		);
+
 
 	---------------------------------------------------------------------
 	-- output
@@ -435,5 +466,6 @@ begin
 	o_usb_wirein_ra_delay        <= ep06_wire;
 	o_usb_wirein_tes_conf        <= ep07_wire;
 	o_usb_wirein_debug_ctrl      <= ep08_wire;
+	o_usb_wirein_sel_errors      <= ep09_wire;
 
 end architecture RTL;
