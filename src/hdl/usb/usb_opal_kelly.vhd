@@ -34,10 +34,10 @@ use fpasim.FRONTPANEL.all;
 entity usb_opal_kelly is
 	port(
 		--	Opal Kelly inouts --
-		okUH                     : in    std_logic_vector(4 downto 0);
-		okHU                     : out   std_logic_vector(2 downto 0);
-		okUHU                    : inout std_logic_vector(31 downto 0);
-		okAA                     : inout std_logic;
+		okUH                          : in    std_logic_vector(4 downto 0);
+		okHU                          : out   std_logic_vector(2 downto 0);
+		okUHU                         : inout std_logic_vector(31 downto 0);
+		okAA                          : inout std_logic;
 		---------------------------------------------------------------------
 		-- from the user @o_usb_clk
 		---------------------------------------------------------------------
@@ -46,7 +46,7 @@ entity usb_opal_kelly is
 		i_usb_pipeout_fifo_data       : in    std_logic_vector(31 downto 0);
 		-- trig
 		i_usb_trigout_interrupt       : in    std_logic_vector(31 downto 0);
-        -- wire
+		-- wire
 		i_usb_wireout_fifo_data_count : in    std_logic_vector(31 downto 0);
 		i_usb_wireout_ctrl            : in    std_logic_vector(31 downto 0);
 		i_usb_wireout_make_pulse      : in    std_logic_vector(31 downto 0);
@@ -57,33 +57,32 @@ entity usb_opal_kelly is
 		i_usb_wireout_ra_delay        : in    std_logic_vector(31 downto 0);
 		i_usb_wireout_tes_conf        : in    std_logic_vector(31 downto 0);
 		i_usb_wireout_debug_ctrl      : in    std_logic_vector(31 downto 0);
-		i_usb_wireout_fpga_id         : in std_logic_vector(31 downto 0);    -- wire out fpga id
-        i_usb_wireout_fpga_version    : in std_logic_vector(31 downto 0);    -- wire out fpga version
+		i_usb_wireout_fpga_id         : in    std_logic_vector(31 downto 0); -- wire out fpga id
+		i_usb_wireout_fpga_version    : in    std_logic_vector(31 downto 0); -- wire out fpga version
 		-- errors/status
-		i_usb_wireout_errors         : in    std_logic_vector(31 downto 0);
-		i_usb_wireout_sel_errors         : in    std_logic_vector(31 downto 0);
-		i_usb_wireout_status         : in    std_logic_vector(31 downto 0);
-
+		i_usb_wireout_errors          : in    std_logic_vector(31 downto 0);
+		i_usb_wireout_sel_errors      : in    std_logic_vector(31 downto 0);
+		i_usb_wireout_status          : in    std_logic_vector(31 downto 0);
 		---------------------------------------------------------------------
 		-- to the user @o_usb_clk
 		---------------------------------------------------------------------
-		o_usb_clk                    : out   std_logic;
+		o_usb_clk                     : out   std_logic;
 		-- pipe
-		o_usb_pipein_fifo_valid      : out   std_logic;
-		o_usb_pipein_fifo            : out   std_logic_vector(31 downto 0);
+		o_usb_pipein_fifo_valid       : out   std_logic;
+		o_usb_pipein_fifo             : out   std_logic_vector(31 downto 0);
 		-- trig
-		o_usb_trigin_valid           : out   std_logic_vector(31 downto 0);
+		o_usb_trigin_valid            : out   std_logic_vector(31 downto 0);
 		-- wire
-		o_usb_wirein_ctrl            : out   std_logic_vector(31 downto 0);
-		o_usb_wirein_make_pulse      : out   std_logic_vector(31 downto 0);
-		o_usb_wirein_fpasim_gain     : out   std_logic_vector(31 downto 0);
-		o_usb_wirein_mux_sq_fb_delay : out   std_logic_vector(31 downto 0);
-		o_usb_wirein_amp_sq_of_delay : out   std_logic_vector(31 downto 0);
-		o_usb_wirein_error_delay     : out   std_logic_vector(31 downto 0);
-		o_usb_wirein_ra_delay        : out   std_logic_vector(31 downto 0);
-		o_usb_wirein_tes_conf        : out   std_logic_vector(31 downto 0);
-		o_usb_wirein_debug_ctrl      : out   std_logic_vector(31 downto 0);
-		o_usb_wirein_sel_errors       : out  std_logic_vector(31 downto 0)  -- wirein select errors/status
+		o_usb_wirein_ctrl             : out   std_logic_vector(31 downto 0);
+		o_usb_wirein_make_pulse       : out   std_logic_vector(31 downto 0);
+		o_usb_wirein_fpasim_gain      : out   std_logic_vector(31 downto 0);
+		o_usb_wirein_mux_sq_fb_delay  : out   std_logic_vector(31 downto 0);
+		o_usb_wirein_amp_sq_of_delay  : out   std_logic_vector(31 downto 0);
+		o_usb_wirein_error_delay      : out   std_logic_vector(31 downto 0);
+		o_usb_wirein_ra_delay         : out   std_logic_vector(31 downto 0);
+		o_usb_wirein_tes_conf         : out   std_logic_vector(31 downto 0);
+		o_usb_wirein_debug_ctrl       : out   std_logic_vector(31 downto 0);
+		o_usb_wirein_sel_errors       : out   std_logic_vector(31 downto 0) -- wirein select errors/status
 	);
 end entity usb_opal_kelly;
 
@@ -171,27 +170,27 @@ begin
 	-- inputs
 	---------------------------------------------------------------------
 	-- to trig out
-	ep60_trig           <= i_usb_trigout_interrupt;
+	ep60_trig <= i_usb_trigout_interrupt;
 	-- to wire out
-	ep20_wire           <= i_usb_wireout_ctrl;
-	ep21_wire           <= i_usb_wireout_make_pulse;
-	ep22_wire           <= i_usb_wireout_fpasim_gain;
-	ep23_wire           <= i_usb_wireout_mux_sq_fb_delay;
-	ep24_wire           <= i_usb_wireout_amp_sq_of_delay;
-	ep25_wire           <= i_usb_wireout_error_delay;
-	ep26_wire           <= i_usb_wireout_ra_delay;
-	ep27_wire           <= i_usb_wireout_tes_conf;
-	ep28_wire           <= i_usb_wireout_fifo_data_count;
-	ep29_wire           <= i_usb_wireout_debug_ctrl;
-	ep30_wire           <= i_usb_wireout_sel_errors;
-	ep31_wire           <= i_usb_wireout_errors;
-	ep32_wire           <= i_usb_wireout_status;
+	ep20_wire <= i_usb_wireout_ctrl;
+	ep21_wire <= i_usb_wireout_make_pulse;
+	ep22_wire <= i_usb_wireout_fpasim_gain;
+	ep23_wire <= i_usb_wireout_mux_sq_fb_delay;
+	ep24_wire <= i_usb_wireout_amp_sq_of_delay;
+	ep25_wire <= i_usb_wireout_error_delay;
+	ep26_wire <= i_usb_wireout_ra_delay;
+	ep27_wire <= i_usb_wireout_tes_conf;
+	ep28_wire <= i_usb_wireout_fifo_data_count;
+	ep29_wire <= i_usb_wireout_debug_ctrl;
+	ep30_wire <= i_usb_wireout_sel_errors;
+	ep31_wire <= i_usb_wireout_errors;
+	ep32_wire <= i_usb_wireout_status;
 
-	ep3E_wire           <= i_usb_wireout_fpga_id;
-	ep3F_wire           <= i_usb_wireout_fpga_version;
+	ep3E_wire                <= i_usb_wireout_fpga_id;
+	ep3F_wire                <= i_usb_wireout_fpga_version;
 	-- from/to pipe out
 	o_usb_pipeout_fifo_valid <= epA0_pipe_rd;
-	epA0_pipe           <= i_usb_pipeout_fifo_data;
+	epA0_pipe                <= i_usb_pipeout_fifo_data;
 
 	----------------------------------------------------
 	--	Opal Kelly Wire in
@@ -265,7 +264,6 @@ begin
 			ep_addr    => x"09",        -- Endpoint adress
 			ep_dataout => ep09_wire     -- Endpoint data in 32 bits
 		);
-
 
 	----------------------------------------------------
 	--	Opal Kelly Wire out
@@ -374,7 +372,6 @@ begin
 			ep_datain => ep32_wire      -- Endpoint data out 32 bits
 		);
 
-    
 	----------------------------------------------------
 	--	Opal Kelly Pipe in
 	----------------------------------------------------	
@@ -422,11 +419,10 @@ begin
 			ep_trigger => ep60_trig
 		);
 
-
-    ---------------------------------------------------------------------
-    -- 
-    ---------------------------------------------------------------------
-    inst_okwireout_ep3E : okWireOut
+	---------------------------------------------------------------------
+	-- 
+	---------------------------------------------------------------------
+	inst_okwireout_ep3E : okWireOut
 		port map(
 			okHE      => okHE,
 			okEH      => okEHx(17 * 65 - 1 downto 16 * 65),
@@ -434,8 +430,7 @@ begin
 			ep_datain => ep3E_wire      -- Endpoint data out 32 bits
 		);
 
-
-    inst_okwireout_ep3F : okWireOut
+	inst_okwireout_ep3F : okWireOut
 		port map(
 			okHE      => okHE,
 			okEH      => okEHx(18 * 65 - 1 downto 17 * 65),
@@ -443,12 +438,11 @@ begin
 			ep_datain => ep3F_wire      -- Endpoint data out 32 bits
 		);
 
-
 	---------------------------------------------------------------------
 	-- output
 	---------------------------------------------------------------------
 	-- from okhost
-	o_usb_clk           <= okClk;
+	o_usb_clk               <= okClk;
 	-- from pipe in
 	o_usb_pipein_fifo_valid <= ep80_pipe_valid;
 	o_usb_pipein_fifo       <= ep80_pipe;
