@@ -48,7 +48,7 @@ entity tes_pulse_shape_manager is
   generic(
     g_FRAME_SIZE                : positive := pkg_FRAME_SIZE; -- frame size value (expressed in bits). Possible values : [1; max integer value[
     g_FRAME_WIDTH               : positive := pkg_FRAME_WIDTH; -- frame bus width (expressed in bits). Possible values : [1; max integer value[
-    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[
+    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[
     g_PIXEL_RESULT_OUTPUT_WIDTH : positive := pkg_TES_MULT_SUB_Q_WIDTH_S -- pixel output result width (expressed in bits). Possible values : [1; max integer value[
   );
   port(
@@ -113,7 +113,9 @@ end entity tes_pulse_shape_manager;
 architecture RTL of tes_pulse_shape_manager is
   constant c_SHIFT_MAX : positive := 2 ** (i_cmd_time_shift'length) + 1;
 
-  constant c_RAM_RD_LATENCY           : natural  := pkg_TES_PULSE_MANAGER_RD_RAM_LATENCY;
+  constant c_TES_PULSE_SHAPE_RAM_RD_LATENCY : natural := pkg_TES_PULSE_SHAPE_RAM_RD_LATENCY;
+  constant c_TES_STD_STATE_RAM_RD_LATENCY   : natural := pkg_TES_STD_STATE_RAM_RD_LATENCY;
+
   constant c_MEMORY_SIZE_PULSE_SHAPE  : positive := (2 ** i_pulse_shape_wr_rd_addr'length) * i_pulse_shape_wr_data'length; -- memory size in bits
   constant c_MEMORY_SIZE_STEADY_STATE : positive := (2 ** i_steady_state_wr_rd_addr'length) * i_steady_state_wr_data'length; -- memory size in bits
 
@@ -140,23 +142,22 @@ architecture RTL of tes_pulse_shape_manager is
   constant c_FIFO_DEPTH0 : integer := 16; --see IP
   constant c_FIFO_WIDTH0 : integer := c_CMD_IDX2_H + 1; --see IP
 
-  signal wr_tmp0      : std_logic;
-  signal data_tmp0    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
-  signal full0        : std_logic;
-  signal wr_rst_busy0 : std_logic;
+  signal wr_tmp0   : std_logic;
+  signal data_tmp0 : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- signal full0        : std_logic;
+  -- signal wr_rst_busy0 : std_logic;
 
-  signal rd1          : std_logic;
-  signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
-  signal empty1       : std_logic;
-  signal rd_rst_busy1 : std_logic;
+  signal rd1       : std_logic;
+  signal data_tmp1 : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  signal empty1    : std_logic;
+  -- signal rd_rst_busy1 : std_logic;
 
   signal cmd_pulse_height1 : std_logic_vector(i_cmd_pulse_height'range);
   signal cmd_pixel_id1     : std_logic_vector(i_cmd_pixel_id'range);
   signal cmd_time_shift1   : std_logic_vector(i_cmd_time_shift'range);
 
-
-  signal error_sync : std_logic_vector(3 downto 0);
-  signal empty_sync : std_logic;
+  signal errors_sync : std_logic_vector(3 downto 0);
+  signal empty_sync  : std_logic;
 
   ---------------------------------------------------------------------
   -- State machine
@@ -255,7 +256,7 @@ architecture RTL of tes_pulse_shape_manager is
   -- sync with rd RAM output
   signal pulse_shape_rd_en_rz : std_logic;
   -- ram check
-  signal pulse_shape_error : std_logic;
+  signal pulse_shape_error    : std_logic;
 
   ---------------------------------------------------------------------
   -- tes_pulse_shape
@@ -278,8 +279,7 @@ architecture RTL of tes_pulse_shape_manager is
   -- sync with rd RAM output
   signal steady_state_rd_en_rz : std_logic;
   -- ram check
-  signal steady_state_error : std_logic;
-
+  signal steady_state_error    : std_logic;
 
   ---------------------------------------------------------------------
   -- sync with RAM outputs
@@ -322,6 +322,7 @@ architecture RTL of tes_pulse_shape_manager is
   signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
 
 begin
+
   ---------------------------------------------------------------------
   -- commands
   ---------------------------------------------------------------------
@@ -343,25 +344,25 @@ begin
       ---------------------------------------------------------------------
       -- write side
       ---------------------------------------------------------------------
-      i_wr_clk        => i_clk,         -- write clock
-      i_wr_rst        => i_rst,         -- write reset 
-      i_wr_en         => wr_tmp0,       -- write enable
-      i_wr_din        => data_tmp0,     -- write data
-      o_wr_full       => full0,         -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_wr_rst_busy   => wr_rst_busy0,  -- Active-High indicator that the FIFO write domain is currently in a reset state
+      i_wr_clk        => i_clk,
+      i_wr_rst        => i_rst,
+      i_wr_en         => wr_tmp0,
+      i_wr_din        => data_tmp0,
+      o_wr_full       => open,
+      o_wr_rst_busy   => open,
       ---------------------------------------------------------------------
       -- port B
       ---------------------------------------------------------------------
-      i_rd_en         => rd1,           -- read enable (Must be held active-low when rd_rst_busy is active high)
-      o_rd_dout_valid => open,          -- When asserted, this signal indicates that valid data is available on the output bus
+      i_rd_en         => rd1,
+      o_rd_dout_valid => open,
       o_rd_dout       => data_tmp1,
-      o_rd_empty      => empty1,        -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_rd_rst_busy   => rd_rst_busy1,   -- Active-High indicator that the FIFO read domain is currently in a reset state
+      o_rd_empty      => empty1,
+      o_rd_rst_busy   => open,
       ---------------------------------------------------------------------
-    --  errors/status 
-    ---------------------------------------------------------------------
-    o_errors_sync => errors_sync,
-    o_empty_sync  => empty_sync
+      --  errors/status 
+      ---------------------------------------------------------------------
+      o_errors_sync   => errors_sync,
+      o_empty_sync    => empty_sync
     );
 
   rd1 <= cmd_rd_r1;
@@ -369,7 +370,6 @@ begin
   cmd_pulse_height1 <= data_tmp1(c_CMD_IDX2_H downto c_CMD_IDX2_L);
   cmd_pixel_id1     <= data_tmp1(c_CMD_IDX1_H downto c_CMD_IDX1_L);
   cmd_time_shift1   <= data_tmp1(c_CMD_IDX0_H downto c_CMD_IDX0_L);
-
 
   ---------------------------------------------------------------------
   -- state machine
@@ -394,7 +394,7 @@ begin
         cnt_sample_pulse_shape_table_next <= (others => (others => '0'));
         pulse_heigth_table_next           <= (others => (others => '0'));
         time_shift_table_next             <= (others => (others => '0'));
-        sm_state_next                    <= E_WAIT;
+        sm_state_next                     <= E_WAIT;
 
       when E_WAIT =>
         pixel_valid_next <= i_pixel_valid;
@@ -412,7 +412,7 @@ begin
             time_shift_next   <= time_shift_table_r1(to_integer(unsigned(i_pixel_id)));
           end if;
           cnt_sample_pulse_shape_next <= cnt_sample_pulse_shape_table_r1(to_integer(unsigned(i_pixel_id)));
-          sm_state_next              <= E_RUN;
+          sm_state_next               <= E_RUN;
         else
           sm_state_next <= E_WAIT;
         end if;
@@ -488,13 +488,13 @@ begin
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
   inst_pipeliner_sync_with_pipe_and_computation_out : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => 2,                -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => data_pipe_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
+      g_NB_PIPES   => 2,
+      g_DATA_WIDTH => data_pipe_tmp0'length
     )
     port map(
-      i_clk  => i_clk,                  -- clock signal
-      i_data => data_pipe_tmp0,         -- input data
-      o_data => data_pipe_tmp1          -- output data with/without delay
+      i_clk  => i_clk,
+      i_data => data_pipe_tmp0,
+      o_data => data_pipe_tmp1
     );
 
   pixel_sof_r2 <= data_pipe_tmp1(c_IDX2_H);
@@ -520,14 +520,14 @@ begin
       g_WRITE_DATA_WIDTH_A => pulse_shape_dina'length,
       g_WRITE_MODE_A       => "no_change",
       g_READ_DATA_WIDTH_A  => pulse_shape_dina'length,
-      g_READ_LATENCY_A     => c_RAM_RD_LATENCY,
+      g_READ_LATENCY_A     => c_TES_PULSE_SHAPE_RAM_RD_LATENCY,
       -- port B
       g_ADDR_WIDTH_B       => pulse_shape_addra'length,
       g_BYTE_WRITE_WIDTH_B => pulse_shape_dina'length,
       g_WRITE_DATA_WIDTH_B => pulse_shape_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => pulse_shape_dina'length,
-      g_READ_LATENCY_B     => c_RAM_RD_LATENCY,
+      g_READ_LATENCY_B     => c_TES_PULSE_SHAPE_RAM_RD_LATENCY,
       -- others
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
@@ -570,13 +570,13 @@ begin
   -------------------------------------------------------------------
   inst_pipeliner_sync_with_tdpram_tes_pulse_shape_outa : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => c_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
+      g_NB_PIPES   => c_TES_PULSE_SHAPE_RAM_RD_LATENCY,
+      g_DATA_WIDTH => 1
     )
     port map(
-      i_clk     => i_clk,               -- clock signal
-      i_data(0) => i_pulse_shape_rd_en, -- input data
-      o_data(0) => pulse_shape_rd_en_rz -- output data with/without delay
+      i_clk     => i_clk,
+      i_data(0) => i_pulse_shape_rd_en,
+      o_data(0) => pulse_shape_rd_en_rz
     );
   ---------------------------------------------------------------------
   -- output
@@ -624,14 +624,14 @@ begin
       g_WRITE_DATA_WIDTH_A => steady_state_dina'length,
       g_WRITE_MODE_A       => "no_change",
       g_READ_DATA_WIDTH_A  => steady_state_dina'length,
-      g_READ_LATENCY_A     => c_RAM_RD_LATENCY,
+      g_READ_LATENCY_A     => c_TES_STD_STATE_RAM_RD_LATENCY,
       -- port B
       g_ADDR_WIDTH_B       => steady_state_addra'length,
       g_BYTE_WRITE_WIDTH_B => steady_state_dina'length,
       g_WRITE_DATA_WIDTH_B => steady_state_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => steady_state_dina'length,
-      g_READ_LATENCY_B     => c_RAM_RD_LATENCY,
+      g_READ_LATENCY_B     => c_TES_STD_STATE_RAM_RD_LATENCY,
       -- others
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
@@ -674,13 +674,13 @@ begin
   -------------------------------------------------------------------
   inst_pipeliner_sync_with_tdpram_tes_steady_state_outa : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => c_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
+      g_NB_PIPES   => c_TES_STD_STATE_RAM_RD_LATENCY,
+      g_DATA_WIDTH => 1
     )
     port map(
-      i_clk     => i_clk,               -- clock signal
-      i_data(0) => i_steady_state_rd_en, -- input data
-      o_data(0) => steady_state_rd_en_rz -- output data with/without delay
+      i_clk     => i_clk,
+      i_data(0) => i_steady_state_rd_en,
+      o_data(0) => steady_state_rd_en_rz
     );
   ---------------------------------------------------------------------
   -- output
@@ -714,6 +714,8 @@ begin
   -------------------------------------------------------------------
   -- sync with RAM output
   --------------------------------------------------------------------
+  assert not (c_TES_STD_STATE_RAM_RD_LATENCY = c_TES_PULSE_SHAPE_RAM_RD_LATENCY) report "[tes_pulse_shape_manager]: c_TES_STD_STATE_RD_RAM_LATENCY and c_TES_PULSE_SHAPE_RD_RAM_LATENCY must be equal. Otherwise, the user needs to update this design to equalize the output data path from each memory" severity error;
+
   data_pipe_tmp2(c_IDX4_H downto c_IDX4_L) <= pulse_heigth_r2;
   data_pipe_tmp2(c_IDX3_H)                 <= pixel_valid_r2;
   data_pipe_tmp2(c_IDX2_H)                 <= pixel_sof_r2;
@@ -721,13 +723,13 @@ begin
   data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_r2;
   inst_pipeliner_sync_with_rams_out : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => c_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => data_pipe_tmp2'length -- width of the input/output data.  Possibles values: [1, integer max value[
+      g_NB_PIPES   => c_TES_PULSE_SHAPE_RAM_RD_LATENCY,
+      g_DATA_WIDTH => data_pipe_tmp2'length
     )
     port map(
-      i_clk  => i_clk,                  -- clock signal
-      i_data => data_pipe_tmp2,         -- input data
-      o_data => data_pipe_tmp3          -- output data with/without delay
+      i_clk  => i_clk,
+      i_data => data_pipe_tmp2,
+      o_data => data_pipe_tmp3
     );
 
   pulse_heigth_rx <= data_pipe_tmp3(c_IDX4_H downto c_IDX4_L);
@@ -788,13 +790,13 @@ begin
   data_pipe_tmp4(c_IDX0_H downto c_IDX0_L) <= pixel_id_rx;
   inst_pipeliner_sync_with_mult_sub_sfixed_out : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => c_COMPUTATION_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => data_pipe_tmp4'length -- width of the input/output data.  Possibles values: [1, integer max value[
+      g_NB_PIPES   => c_COMPUTATION_LATENCY,
+      g_DATA_WIDTH => data_pipe_tmp4'length
     )
     port map(
-      i_clk  => i_clk,                  -- clock signal
-      i_data => data_pipe_tmp4,         -- input data
-      o_data => data_pipe_tmp5          -- output data with/without delay
+      i_clk  => i_clk,
+      i_data => data_pipe_tmp4,
+      o_data => data_pipe_tmp5
     );
 
   pixel_valid_ry <= data_pipe_tmp5(c_IDX3_H);
@@ -816,9 +818,9 @@ begin
   ---------------------------------------------------------------------
   error_tmp(4) <= steady_state_error;
   error_tmp(3) <= pulse_shape_error;
-  error_tmp(2) <= error_sync(2) or error_sync(3); -- fifo rst error
-  error_tmp(1) <= error_sync(1); -- fifo rd empty error
-  error_tmp(0) <= error_sync(0); -- fifo wr full error
+  error_tmp(2) <= errors_sync(2) or errors_sync(3); -- fifo rst error
+  error_tmp(1) <= errors_sync(1);       -- fifo rd empty error
+  error_tmp(0) <= errors_sync(0);       -- fifo wr full error
   gen_errors_latch : for i in error_tmp'range generate
     inst_one_error_latch : entity fpasim.one_error_latch
       port map(
@@ -831,15 +833,15 @@ begin
   end generate gen_errors_latch;
 
   o_errors(15 downto 7) <= (others => '0');
-  o_errors(5)           <= error_tmp_bis(4);
-  o_errors(4)           <= error_tmp_bis(3);
+  o_errors(5)           <= error_tmp_bis(4); -- steady state error
+  o_errors(4)           <= error_tmp_bis(3); -- pulse shape error
   o_errors(3)           <= '0';
   o_errors(2)           <= error_tmp_bis(2); -- fifo rst error
   o_errors(1)           <= error_tmp_bis(1); -- fifo rd empty error
   o_errors(0)           <= error_tmp_bis(0); -- fifo wr full error
 
   o_status(7 downto 1) <= (others => '0');
-  o_status(0)          <= empty_sync; -- fifo empty
+  o_status(0)          <= empty_sync;   -- fifo empty
 
   ---------------------------------------------------------------------
   -- for simulation only
