@@ -24,7 +24,10 @@
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
 --!   
---!   This module synchronizes a reset signal between 2 clock domain    
+--!   This modules synchronizes a reset signal from a source clock domain to a destination clock domain 
+--!   The architecture is as follows:
+--!        @src_clk clock domain(implicite)       |                     @ i_dest_clk clock domain
+--!        i_src_rst -------------------> xpm_cdc_sync_rst -----------> o_dest_rst
 --!   Note: the following header documentation is an extract of the associated XPM Xilinx header        
 -- -------------------------------------------------------------------------------------------------------------
 

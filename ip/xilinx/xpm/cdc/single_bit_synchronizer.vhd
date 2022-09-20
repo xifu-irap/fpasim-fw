@@ -24,7 +24,11 @@
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
 --!     
---!   This modules synchronizes a data bit between 2 clock domain   
+--!   This modules synchronizes a data bit from a source clock domain to a destination clock domain
+--!   The architecture is as follows:
+--!        @i_src_clk clock domain             |                    @ i_dest_clk clock domain
+--!        i_src ---------------------> xpm_cdc_single -----------> o_dest
+--!               
 --!   Note: the following header documentation is an extract of the associated XPM Xilinx header      
 -- ------------------------------------------------------------------------------------------------------------- 
 

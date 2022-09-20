@@ -24,7 +24,12 @@
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
 --!                
---!   This modules synchronizes a data bus between 2 clock domain
+--!   This modules synchronizes a data bus from a source clock domain to a destination clock domain
+--!   The architecture is as follows:
+--!        @i_src_clk clock domain               |                        @ i_dest_clk clock domain
+--!        i_src ---------------------> xpm_cdc_array_single -----------> o_dest
+--!                                                      
+--!   Note: The read back of the synchronized data bus allows to check the clock domain crossing integrity.
 --!   Note: the following header documentation is an extract of the associated XPM Xilinx header          
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -130,7 +135,7 @@ entity single_bit_array_synchronizer is
       ---------------------------------------------------------------------
       -- source
       ---------------------------------------------------------------------
-      i_src_clk  : in  std_logic;       -- source clock
+      i_src_clk  : in  std_logic;       -- source clock domain
       i_src      : in  std_logic_vector(g_WIDTH - 1 downto 0); -- input signal to be synchronized to dest_clk domain
       ---------------------------------------------------------------------
       -- destination
