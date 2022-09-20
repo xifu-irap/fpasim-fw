@@ -1,0 +1,495 @@
+-- -------------------------------------------------------------------------------------------------------------
+--                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
+-- -------------------------------------------------------------------------------------------------------------
+--                              This file is part of the ATHENA X-IFU DRE Focal Plane Assembly simulator.
+--
+--                              fpasim-fw is free software: you can redistribute it and/or modify
+--                              it under the terms of the GNU General Public License as published by
+--                              the Free Software Foundation, either version 3 of the License, or
+--                              (at your option) any later version.
+--
+--                              This program is distributed in the hope that it will be useful,
+--                              but WITHOUT ANY WARRANTY; without even the implied warranty of
+--                              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+--                              GNU General Public License for more details.
+--
+--                              You should have received a copy of the GNU General Public License
+--                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-- -------------------------------------------------------------------------------------------------------------
+--    email                   kenji.delarosa@alten.com
+--!   @file                   regdecode_pipe_rd_all.vhd 
+-- -------------------------------------------------------------------------------------------------------------
+--    Automatic Generation    No
+--    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
+-- -------------------------------------------------------------------------------------------------------------
+--!   @details                
+--
+--
+-- -------------------------------------------------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+library fpasim;
+
+entity regdecode_pipe_rd_all is
+  generic(
+    g_ADDR_WIDTH    : integer := 16;    -- define the address bus width
+    g_DATA_WIDTH    : integer := 16;    -- define the data bus width
+    -- resynchronized errors bits
+    g_DEST_SYNC_FF  : integer := 2;     -- Number of register stages used to synchronize signal in the destination clock domain.   
+    g_SRC_INPUT_REG : integer := 1      -- 0- Do not register input (src_in), 1- Register input (src_in) once using src_clk 
+  );
+  port(
+    i_clk              : in  std_logic; -- clock
+    i_rst              : in  std_logic; -- reset 
+
+    -- input0
+    o_fifo_rd0         : out std_logic; -- fifo read enable 
+    i_fifo_sof0        : in  std_logic; -- fifo first sample 
+    i_fifo_eof0        : in  std_logic; -- fifo last sample
+    i_fifo_data_valid0 : in  std_logic; -- fifo data valid
+    i_fifo_addr0       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
+    i_fifo_data0       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
+    i_fifo_empty0      : in  std_logic; -- fifo empty flag
+    -- input1
+    o_fifo_rd1         : out std_logic; -- fifo read enable
+    i_fifo_sof1        : in  std_logic; -- fifo first sample
+    i_fifo_eof1        : in  std_logic; -- fifo last sample
+    i_fifo_data_valid1 : in  std_logic; -- fifo data valid
+    i_fifo_addr1       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
+    i_fifo_data1       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
+    i_fifo_empty1      : in  std_logic; -- fifo empty flag
+    -- input2
+    o_fifo_rd2         : out std_logic; -- fifo read enable
+    i_fifo_sof2        : in  std_logic; -- fifo first sample
+    i_fifo_eof2        : in  std_logic; -- fifo last sample
+    i_fifo_data_valid2 : in  std_logic; -- fifo data valid
+    i_fifo_addr2       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
+    i_fifo_data2       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
+    i_fifo_empty2      : in  std_logic; -- fifo empty flag
+    -- input3
+    o_fifo_rd3         : out std_logic; -- fifo read enable
+    i_fifo_sof3        : in  std_logic; -- fifo first sample
+    i_fifo_eof3        : in  std_logic; -- fifo last sample
+    i_fifo_data_valid3 : in  std_logic; -- fifo data valid
+    i_fifo_addr3       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
+    i_fifo_data3       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
+    i_fifo_empty3      : in  std_logic; -- fifo empty flag
+    -- input4
+    o_fifo_rd4         : out std_logic; -- fifo read enable
+    i_fifo_sof4        : in  std_logic; -- fifo first sample
+    i_fifo_eof4        : in  std_logic; -- fifo last sample
+    i_fifo_data_valid4 : in  std_logic; -- fifo data valid
+    i_fifo_addr4       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
+    i_fifo_data4       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
+    i_fifo_empty4      : in  std_logic; -- fifo empty flag
+    ---------------------------------------------------------------------
+    -- to the pipe out: @i_clk
+    ---------------------------------------------------------------------
+    i_fifo_rd          : in  std_logic; -- fifo read enable
+    o_fifo_sof         : out std_logic; -- fifo first sample
+    o_fifo_eof         : out std_logic; -- fifo last sample
+    o_fifo_data_valid  : out std_logic; -- fifo data valid
+    o_fifo_addr        : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
+    o_fifo_data        : out std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
+    o_fifo_data_count  : out std_logic_vector(15 downto 0); -- data value
+    o_fifo_empty       : out std_logic; -- fifo empty flag
+    ---------------------------------------------------------------------
+    -- errors/status @i_out_clk
+    ---------------------------------------------------------------------
+    i_out_clk          : in  std_logic;
+    i_rst_status       : in  std_logic; -- reset error flag(s)
+    i_debug_pulse      : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    o_errors           : out std_logic_vector(15 downto 0); -- output errors
+    o_status           : out std_logic_vector(7 downto 0) -- output status
+  );
+end entity regdecode_pipe_rd_all;
+
+architecture RTL of regdecode_pipe_rd_all is
+
+  ---------------------------------------------------------------------
+  -- fsm
+  ---------------------------------------------------------------------
+  type t_state is (E_RST, E_WAIT, E_RUN0, E_RUN1, E_RUN2, E_RUN3, E_RUN4);
+  signal sm_state_next : t_state := E_RST;
+  signal sm_state_reg  : t_state := E_RST;
+
+  signal rd0_next : std_logic;
+  -- signal rd0_r1   : std_logic;
+
+  signal rd1_next : std_logic;
+  -- signal rd1_r1   : std_logic;
+
+  signal rd2_next : std_logic;
+  -- signal rd2_r1   : std_logic;
+
+  signal rd3_next : std_logic;
+  -- signal rd3_r1   : std_logic;
+
+  signal rd4_next : std_logic;
+  -- signal rd4_r1   : std_logic;
+
+  signal sel_next : std_logic_vector(2 downto 0);
+  signal sel_r1   : std_logic_vector(2 downto 0);
+
+  ---------------------------------------------------------------------
+  -- select the input path
+  ---------------------------------------------------------------------
+  signal sof_rx        : std_logic;
+  signal eof_rx        : std_logic;
+  signal data_valid_rx : std_logic;
+  signal addr_rx       : std_logic_vector(o_fifo_addr'range);
+  signal data_rx       : std_logic_vector(o_fifo_data'range);
+
+  ---------------------------------------------------------------------
+  -- output FIFO
+  ---------------------------------------------------------------------
+  constant c_FIFO_IDX0_L : integer := 0;
+  constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + o_fifo_data'length - 1;
+
+  constant c_FIFO_IDX1_L : integer := c_FIFO_IDX0_H + 1;
+  constant c_FIFO_IDX1_H : integer := c_FIFO_IDX1_L + o_fifo_addr'length - 1;
+
+  constant c_FIFO_IDX2_L : integer := c_FIFO_IDX1_H + 1;
+  constant c_FIFO_IDX2_H : integer := c_FIFO_IDX2_L + 1 - 1;
+
+  constant c_FIFO_IDX3_L : integer := c_FIFO_IDX2_H + 1;
+  constant c_FIFO_IDX3_H : integer := c_FIFO_IDX3_L + 1 - 1;
+
+  -- find the power of 2 superior to the g_DELAY
+  constant c_FIFO_DEPTH0          : integer := 16; --see IP
+  constant c_PROG_FULL_THRESH0    : integer := c_FIFO_DEPTH0 - 6; --see IP
+  constant c_FIFO_WIDTH0          : integer := c_FIFO_IDX3_H + 1; --see IP
+  constant c_WR_DATA_COUNT_WIDTH0 : integer := fpasim.pkg_utils.pkg_width_from_value(c_FIFO_DEPTH0) + 1; --see IP
+
+  signal wr_tmp0        : std_logic;
+  signal data_tmp0      : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  signal wr_data_count0 : std_logic_vector(c_WR_DATA_COUNT_WIDTH0 - 1 downto 0);
+  -- signal full0        : std_logic;
+  signal prog_full0     : std_logic;
+  -- signal wr_rst_busy0 : std_logic;
+
+  signal rd1         : std_logic;
+  signal data_tmp1   : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  signal empty1      : std_logic;
+  signal data_valid1 : std_logic;
+  -- signal rd_rst_busy1 : std_logic;
+
+  signal fifo_sof1  : std_logic;
+  signal fifo_eof1  : std_logic;
+  signal fifo_addr1 : std_logic_vector(o_fifo_addr'range);
+  signal fifo_data1 : std_logic_vector(o_fifo_data'range);
+
+  signal errors_sync : std_logic_vector(3 downto 0);
+  signal empty_sync  : std_logic;
+
+  ---------------------------------------------------------------------
+  -- resynchronized errors/empty on the i_out_clk
+  ---------------------------------------------------------------------
+  signal errors_resync : std_logic_vector(3 downto 0);
+  signal empty_resync  : std_logic;
+  ---------------------------------------------------------------------
+  -- error latching
+  ---------------------------------------------------------------------
+  constant NB_ERRORS_c : integer := 3;
+  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+
+begin
+
+  p_decode_state : process(i_fifo_data_valid0, i_fifo_data_valid1, i_fifo_data_valid2, i_fifo_data_valid3, i_fifo_data_valid4, i_fifo_empty0, i_fifo_empty1, i_fifo_empty2, i_fifo_empty3, i_fifo_empty4, i_fifo_eof0, i_fifo_eof1, i_fifo_eof2, i_fifo_eof3, i_fifo_eof4, prog_full0, sel_r1, sm_state_reg) is
+  begin
+    rd0_next <= '0';
+    rd1_next <= '0';
+    rd2_next <= '0';
+    rd3_next <= '0';
+    rd4_next <= '0';
+    sel_next <= sel_r1;
+    case sm_state_reg is
+      when E_RST =>
+        sm_state_next <= E_WAIT;
+
+      when E_WAIT =>
+        if i_fifo_empty0 = '0' and prog_full0 = '0' then
+          sel_next      <= std_logic_vector(to_unsigned(0, sel_next'length));
+          rd0_next      <= '1';
+          sm_state_next <= E_RUN0;
+        else
+          rd0_next      <= '0';
+          sm_state_next <= E_WAIT;
+        end if;
+
+      when E_RUN0 =>
+        if i_fifo_data_valid0 = '1' and i_fifo_eof0 = '1' then
+          sel_next      <= std_logic_vector(to_unsigned(1, sel_next'length));
+          sm_state_next <= E_RUN1;
+        else
+          sm_state_next <= E_RUN0;
+        end if;
+
+        if i_fifo_empty0 = '0' and prog_full0 = '0' then
+          rd0_next <= '1';
+        else
+          rd0_next <= '0';
+        end if;
+
+      when E_RUN1 =>
+        if i_fifo_data_valid1 = '1' and i_fifo_eof1 = '1' then
+          sel_next      <= std_logic_vector(to_unsigned(2, sel_next'length));
+          sm_state_next <= E_RUN2;
+        else
+          sm_state_next <= E_RUN1;
+        end if;
+
+        if i_fifo_empty1 = '0' and prog_full0 = '0' then
+          rd1_next <= '1';
+        else
+          rd1_next <= '0';
+        end if;
+
+      when E_RUN2 =>
+        if i_fifo_data_valid2 = '1' and i_fifo_eof2 = '1' then
+          sel_next      <= std_logic_vector(to_unsigned(3, sel_next'length));
+          sm_state_next <= E_RUN3;
+        else
+          sm_state_next <= E_RUN2;
+        end if;
+
+        if i_fifo_empty2 = '0' and prog_full0 = '0' then
+          rd2_next <= '1';
+        else
+          rd2_next <= '0';
+        end if;
+
+      when E_RUN3 =>
+        if i_fifo_data_valid3 = '1' and i_fifo_eof3 = '1' then
+          sel_next      <= std_logic_vector(to_unsigned(4, sel_next'length));
+          sm_state_next <= E_RUN4;
+        else
+          sm_state_next <= E_RUN3;
+        end if;
+
+        if i_fifo_empty3 = '0' and prog_full0 = '0' then
+          rd3_next <= '1';
+        else
+          rd3_next <= '0';
+        end if;
+
+      when E_RUN4 =>
+        if i_fifo_data_valid4 = '1' and i_fifo_eof4 = '1' then
+          sm_state_next <= E_WAIT;
+        else
+          sm_state_next <= E_RUN4;
+        end if;
+
+        if i_fifo_empty4 = '0' and prog_full0 = '0' then
+          rd4_next <= '1';
+        else
+          rd4_next <= '0';
+        end if;
+
+      when others =>                    -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        sm_state_next <= E_RST;
+    end case;
+  end process p_decode_state;
+
+  p_state : process(i_clk) is
+  begin
+    if rising_edge(i_clk) then
+      if i_rst = '1' then
+        sm_state_reg <= E_RST;
+      else
+        sm_state_reg <= sm_state_next;
+      end if;
+      -- rd0_r1 <= rd0_next;
+      -- rd1_r1 <= rd1_next;
+      -- rd2_r1 <= rd2_next;
+      -- rd3_r1 <= rd3_next;
+      -- rd4_r1 <= rd4_next;
+      sel_r1 <= sel_next;
+    end if;
+  end process p_state;
+
+  -- output
+  o_fifo_rd0 <= rd0_next;
+  o_fifo_rd1 <= rd1_next;
+  o_fifo_rd2 <= rd2_next;
+  o_fifo_rd3 <= rd3_next;
+  o_fifo_rd4 <= rd4_next;
+
+  ---------------------------------------------------------------------
+  -- select the input
+  ---------------------------------------------------------------------
+  p_select_input : process(i_clk) is
+  begin
+    if rising_edge(i_clk) then
+      case sel_r1 is
+        when "000" =>
+          sof_rx        <= i_fifo_sof0;
+          eof_rx        <= i_fifo_eof0;
+          data_valid_rx <= i_fifo_data_valid0;
+          addr_rx       <= i_fifo_addr0;
+          data_rx       <= i_fifo_data0;
+        when "001" =>
+          sof_rx        <= i_fifo_sof1;
+          eof_rx        <= i_fifo_eof1;
+          data_valid_rx <= i_fifo_data_valid1;
+          addr_rx       <= i_fifo_addr1;
+          data_rx       <= i_fifo_data1;
+        when "010" =>
+          sof_rx        <= i_fifo_sof2;
+          eof_rx        <= i_fifo_eof2;
+          data_valid_rx <= i_fifo_data_valid2;
+          addr_rx       <= i_fifo_addr2;
+          data_rx       <= i_fifo_data2;
+        when "011" =>
+          sof_rx        <= i_fifo_sof3;
+          eof_rx        <= i_fifo_eof3;
+          data_valid_rx <= i_fifo_data_valid3;
+          addr_rx       <= i_fifo_addr3;
+          data_rx       <= i_fifo_data3;
+        when "100" =>
+          sof_rx        <= i_fifo_sof4;
+          eof_rx        <= i_fifo_eof4;
+          data_valid_rx <= i_fifo_data_valid4;
+          addr_rx       <= i_fifo_addr4;
+          data_rx       <= i_fifo_data4;
+        when others =>
+          sof_rx        <= '0';
+          eof_rx        <= '0';
+          data_valid_rx <= '0';
+          addr_rx       <= addr_rx;
+          data_rx       <= data_rx;
+      end case;
+    end if;
+  end process p_select_input;
+
+  ---------------------------------------------------------------------
+  -- output FIFO
+  -- mandatory: the fifo read enable must arrive one clock cycle before the fifo read data
+  ---------------------------------------------------------------------
+  wr_tmp0                                       <= data_valid_rx;
+  data_tmp0(c_FIFO_IDX3_H)                      <= sof_rx;
+  data_tmp0(c_FIFO_IDX2_H)                      <= eof_rx;
+  data_tmp0(c_FIFO_IDX1_H downto c_FIFO_IDX1_L) <= addr_rx;
+  data_tmp0(c_FIFO_IDX0_H downto c_FIFO_IDX0_L) <= data_rx;
+
+  inst_fifo_sync_with_error_prog_full_wr_count : entity fpasim.fifo_sync_with_error_prog_full_wr_count
+    generic map(
+      g_FIFO_MEMORY_TYPE    => "auto",
+      g_FIFO_READ_LATENCY   => 1,
+      g_FIFO_WRITE_DEPTH    => c_FIFO_DEPTH0,
+      g_PROG_FULL_THRESH    => c_PROG_FULL_THRESH0,
+      g_READ_DATA_WIDTH     => data_tmp0'length,
+      g_READ_MODE           => "std",
+      g_WRITE_DATA_WIDTH    => data_tmp0'length,
+      g_WR_DATA_COUNT_WIDTH => c_WR_DATA_COUNT_WIDTH0
+    )
+    port map(
+      ---------------------------------------------------------------------
+      -- write side
+      ---------------------------------------------------------------------
+      i_wr_clk        => i_clk,
+      i_wr_rst        => i_rst,
+      i_wr_en         => wr_tmp0,
+      i_wr_din        => data_tmp0,
+      o_wr_full       => open,
+      o_wr_prog_full  => prog_full0,
+      o_wr_data_count => wr_data_count0,
+      o_wr_rst_busy   => open,
+      ---------------------------------------------------------------------
+      -- read side
+      ---------------------------------------------------------------------
+      i_rd_en         => rd1,
+      o_rd_dout_valid => data_valid1,
+      o_rd_dout       => data_tmp1,
+      o_rd_empty      => empty1,
+      o_rd_rst_busy   => open,
+      ---------------------------------------------------------------------
+      --  errors/status 
+      ---------------------------------------------------------------------
+      o_errors_sync   => errors_sync,
+      o_empty_sync    => empty_sync
+    );
+  rd1        <= i_fifo_rd;
+  fifo_sof1  <= data_tmp1(c_FIFO_IDX3_H);
+  fifo_eof1  <= data_tmp1(c_FIFO_IDX2_H);
+  fifo_addr1 <= data_tmp1(c_FIFO_IDX1_H downto c_FIFO_IDX1_L);
+  fifo_data1 <= data_tmp1(c_FIFO_IDX0_H downto c_FIFO_IDX0_L);
+
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
+  o_fifo_sof        <= fifo_sof1;
+  o_fifo_eof        <= fifo_eof1;
+  o_fifo_data_valid <= data_valid1;
+  o_fifo_addr       <= fifo_addr1;
+  o_fifo_data       <= fifo_data1;
+  o_fifo_empty      <= empty1;
+  o_fifo_data_count <= std_logic_vector(resize(unsigned(wr_data_count0), o_fifo_data_count'length));
+
+  ---------------------------------------------------------------------
+  -- Error latching
+  ---------------------------------------------------------------------
+  gen_bit_synchronizer : for i in 4 downto 0 generate
+    signal data_tmp      : std_logic_vector(4 downto 0);
+    signal data_tmp_sync : std_logic_vector(4 downto 0);
+  begin
+    data_tmp(4)          <= empty_sync;
+    data_tmp(3 downto 0) <= errors_sync;
+    inst_single_bit_synchronizer : entity fpasim.single_bit_synchronizer
+      generic map(
+        g_DEST_SYNC_FF  => g_DEST_SYNC_FF,
+        g_SRC_INPUT_REG => g_SRC_INPUT_REG
+      )
+      port map(
+        ---------------------------------------------------------------------
+        -- source
+        ---------------------------------------------------------------------
+        i_src_clk  => i_clk,            -- source clock
+        i_src      => data_tmp(i),      -- input signal to be synchronized to dest_clk domain
+        ---------------------------------------------------------------------
+        -- destination
+        ---------------------------------------------------------------------
+        i_dest_clk => i_out_clk,        -- destination clock domain
+        o_dest     => data_tmp_sync(i)  -- src_in synchronized to the destination clock domain. This output is registered.   
+      );
+    empty_resync  <= data_tmp_sync(4);
+    errors_resync <= data_tmp_sync(3 downto 0);
+  end generate gen_bit_synchronizer;
+
+  error_tmp(2) <= errors_resync(2) or errors_resync(3); -- fifo rst error
+  error_tmp(1) <= errors_resync(1);     -- fifo rd empty error
+  error_tmp(0) <= errors_resync(0);     -- fifo wr full error
+  gen_errors_latch : for i in error_tmp'range generate
+    inst_one_error_latch : entity fpasim.one_error_latch
+      port map(
+        i_clk         => i_out_clk,
+        i_rst         => i_rst_status,
+        i_debug_pulse => i_debug_pulse,
+        i_error       => error_tmp(i),
+        o_error       => error_tmp_bis(i)
+      );
+  end generate gen_errors_latch;
+
+  o_errors(15 downto 7) <= (others => '0');
+  o_errors(5)           <= '0';
+  o_errors(4)           <= '0';
+  o_errors(3)           <= '0';
+  o_errors(2)           <= error_tmp_bis(2); -- fifo rst error
+  o_errors(1)           <= error_tmp_bis(1); -- fifo rd empty error
+  o_errors(0)           <= error_tmp_bis(0); -- fifo wr full error
+
+  o_status(7 downto 1) <= (others => '0');
+  o_status(0)          <= empty_resync; -- fifo empty
+
+  ---------------------------------------------------------------------
+  -- for simulation only
+  ---------------------------------------------------------------------
+  assert not (error_tmp_bis(2) = '1') report "[regdecode_pipe_rd_all] => fifo is used before the end of the initialization " severity error;
+  assert not (error_tmp_bis(1) = '1') report "[regdecode_pipe_rd_all] => fifo read an empty FIFO" severity error;
+  assert not (error_tmp_bis(0) = '1') report "[regdecode_pipe_rd_all] => fifo write a full FIFO" severity error;
+
+end architecture RTL;

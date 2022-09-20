@@ -43,32 +43,32 @@ entity regdecode_wire_wr_rd is
     ---------------------------------------------------------------------
     -- from the regdecode: input @i_clk
     ---------------------------------------------------------------------
-    i_clk             : in  std_logic;
-    i_rst             : in  std_logic;
+    i_clk             : in  std_logic; -- clock
+    i_rst             : in  std_logic; -- rst
     -- data
-    i_data_valid      : in  std_logic;
-    i_data            : in  std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0);
+    i_data_valid      : in  std_logic; -- data valid
+    i_data            : in  std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0); -- data value
     ---------------------------------------------------------------------
     -- from/to the user:  @i_out_clk
     ---------------------------------------------------------------------
-    i_out_clk         : in  std_logic;
-    i_rst_status      : in  std_logic;
-    i_debug_pulse     : in  std_logic;
+    i_out_clk         : in  std_logic; -- output clock
+    i_rst_status      : in  std_logic; -- reset error flag(s)
+    i_debug_pulse     : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     -- ram: wr
-    o_data_valid      : out std_logic;
-    o_data            : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0);
+    o_data_valid      : out std_logic; -- data valid
+    o_data            : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0); -- data
     ---------------------------------------------------------------------
     -- to the regdecode: @i_clk
     ---------------------------------------------------------------------
-    i_fifo_rd         : in  std_logic;
-    o_fifo_data_valid : out std_logic;
-    o_fifo_data       : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0);
-    o_fifo_empty      : out std_logic;
+    i_fifo_rd         : in  std_logic; -- fifo read enable
+    o_fifo_data_valid : out std_logic; -- fifo data valid
+    o_fifo_data       : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0); -- fifo data
+    o_fifo_empty      : out std_logic; -- fifo empty flag
     ---------------------------------------------------------------------
     -- errors/status @ i_out_clk
     ---------------------------------------------------------------------
-    o_errors          : out std_logic_vector(15 downto 0);
-    o_status          : out std_logic_vector(7 downto 0)
+    o_errors          : out std_logic_vector(15 downto 0); -- output errors
+    o_status          : out std_logic_vector(7 downto 0) -- output status
   );
 end entity regdecode_wire_wr_rd;
 
@@ -87,22 +87,20 @@ architecture RTL of regdecode_wire_wr_rd is
   signal wr_rst_tmp0  : std_logic;
   signal wr_tmp0      : std_logic;
   signal data_tmp0    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
-  signal full0        : std_logic;
-  signal wr_rst_busy0 : std_logic;
+  -- signal full0        : std_logic;
+  -- signal wr_rst_busy0 : std_logic;
 
   signal rd1          : std_logic;
   signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
   signal empty1       : std_logic;
   signal data_valid1  : std_logic;
-  signal rd_rst_busy1 : std_logic;
+  -- signal rd_rst_busy1 : std_logic;
 
   signal data1 : std_logic_vector(i_data'range);
 
-  signal error_status1 : std_logic_vector(1 downto 0);
-
-  -- cross clock domain of error fifo flags : i_clk -> i_out_clk
-  signal errors_tmp0      : std_logic_vector(1 downto 0);
-  signal errors_tmp0_sync : std_logic_vector(1 downto 0);
+    -- synchronized errors
+  signal errors_sync1 : std_logic_vector(3 downto 0);
+  signal empty_sync1  : std_logic;
 
   ---------------------------------------------------------------------
   -- sync with the rd RAM output 
@@ -125,26 +123,24 @@ architecture RTL of regdecode_wire_wr_rd is
   constant c_FIFO_DEPTH2     : integer := 32; --see IP
   constant c_FIFO_WIDTH2     : integer := c_FIFO_IDX0_H + 1; --see IP
 
-
+  -- wr side
   signal wr_tmp2      : std_logic;
   signal data_tmp2    : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
-  signal full2        : std_logic;
-  signal wr_rst_busy2 : std_logic;
+  -- signal full2        : std_logic;
+  -- signal wr_rst_busy2 : std_logic;
 
+  -- synchronized errors
+  signal errors_sync2 : std_logic_vector(3 downto 0);
+  signal empty_sync2  : std_logic;
+
+  -- rd side
   signal rd3          : std_logic;
   signal data_tmp3    : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
   signal empty3       : std_logic;
   signal data_valid3  : std_logic;
-  signal rd_rst_busy3 : std_logic;
+  -- signal rd_rst_busy3 : std_logic;
 
   signal data3 : std_logic_vector(i_data'range);
-
-  signal error_status3 : std_logic_vector(1 downto 0);
-
-  -- cross clock domain of error fifo flags: i_clk -> i_out_clk
-  signal errors_tmp3      : std_logic_vector(2 downto 0);
-  signal errors_tmp3_sync : std_logic_vector(2 downto 0);
-
 
   ---------------------------------------------------------------------
   -- error latching
@@ -163,7 +159,7 @@ begin
   wr_tmp0                                       <= i_data_valid;
   data_tmp0(c_FIFO_IDX0_H downto c_FIFO_IDX0_L) <= i_data;
 
-  inst_fifo_async_regdecode_to_user : entity fpasim.fifo_async
+  inst_fifo_async_with_error_regdecode_to_user : entity fpasim.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
       g_FIFO_MEMORY_TYPE  => "auto",
@@ -172,58 +168,44 @@ begin
       g_READ_DATA_WIDTH   => data_tmp0'length,
       g_READ_MODE         => "std",
       g_RELATED_CLOCKS    => 0,
-      g_WRITE_DATA_WIDTH  => data_tmp0'length
+      g_WRITE_DATA_WIDTH  => data_tmp0'length,
+      ---------------------------------------------------------------------
+      -- resynchronization: fifo errors/empty flag
+      ---------------------------------------------------------------------
+      g_SYNC_SIDE         => "rd",      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
+      g_DEST_SYNC_FF      => 2,         -- Number of register stages used to synchronize signal in the destination clock domain.   
+      g_SRC_INPUT_REG     => 1          -- 0- Do not register input (src_in), 1- Register input (src_in) once using src_clk 
     )
     port map(
       ---------------------------------------------------------------------
       -- write side
       ---------------------------------------------------------------------
-      i_wr_clk        => i_clk,         -- write clock
-      i_wr_rst        => wr_rst_tmp0,   -- write reset 
-      i_wr_en         => wr_tmp0,       -- write enable
-      i_wr_din        => data_tmp0,     -- write data
-      o_wr_full       => full0,         -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_wr_rst_busy   => wr_rst_busy0,  -- Active-High indicator that the FIFO write domain is currently in a reset state
+      i_wr_clk        => i_clk,        
+      i_wr_rst        => wr_rst_tmp0,  
+      i_wr_en         => wr_tmp0,      
+      i_wr_din        => data_tmp0,    
+      o_wr_full       => open,         
+      o_wr_rst_busy   => open,  
       ---------------------------------------------------------------------
       -- read side
       ---------------------------------------------------------------------
       i_rd_clk        => i_out_clk,
-      i_rd_en         => rd1,           -- read enable (Must be held active-low when rd_rst_busy is active high)
-      o_rd_dout_valid => data_valid1,   -- When asserted, this signal indicates that valid data is available on the output bus
+      i_rd_en         => rd1,   
+      o_rd_dout_valid => data_valid1,
       o_rd_dout       => data_tmp1,
-      o_rd_empty      => empty1,        -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_rd_rst_busy   => rd_rst_busy1   -- Active-High indicator that the FIFO read domain is currently in a reset state
+      o_rd_empty      => empty1,     
+      o_rd_rst_busy   => open,   
+      ---------------------------------------------------------------------
+      -- resynchronized errors/status 
+      ---------------------------------------------------------------------
+      o_errors_sync   => errors_sync1,
+      o_empty_sync    => empty_sync1
     );
 
   rd1 <= '1' when empty1 = '0' else '0';
 
   data1 <= data_tmp1(c_FIFO_IDX0_H downto c_FIFO_IDX0_L);
 
-  ---------------------------------------------------------------------
-  -- synchronize error fifo flags: i_clk -> i_out_clk
-  ---------------------------------------------------------------------
-  errors_tmp0(1) <= '1' when wr_tmp0 = '1' and wr_rst_busy0 = '1' else '0';
-  errors_tmp0(0) <= '1' when wr_tmp0 = '1' and full0 = '1' else '0';
-  gen_errors_sync_fifo0 : for i in errors_tmp0'range generate
-    inst_single_bit_synchronizer_fifo0 : entity fpasim.single_bit_synchronizer
-      generic map(
-        g_DEST_SYNC_FF  => 2,
-        g_SRC_INPUT_REG => 1
-      )
-      port map(
-        ---------------------------------------------------------------------
-        -- source
-        ---------------------------------------------------------------------
-        i_src_clk  => i_clk,            -- source clock
-        i_src      => errors_tmp0(i),   -- input signal to be synchronized to dest_clk domain
-        ---------------------------------------------------------------------
-        -- destination
-        ---------------------------------------------------------------------
-        i_dest_clk => i_out_clk,        -- destination clock domain
-        o_dest     => errors_tmp0_sync(i) -- src_in synchronized to the destination clock domain. This output is registered.   
-      );
-
-  end generate gen_errors_sync_fifo0;
 
   ---------------------------------------------------------------------
   -- to the user: output
@@ -256,7 +238,7 @@ begin
   wr_tmp2                                       <= data_valid_sync_rx;
   data_tmp2(c_FIFO_IDX0_H downto c_FIFO_IDX0_L) <= data_sync_rx;
 
-  inst_fifo_async_user_to_regdecode : entity fpasim.fifo_async
+  inst_fifo_async_with_error_user_to_regdecode : entity fpasim.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
       g_FIFO_MEMORY_TYPE  => "auto",
@@ -265,60 +247,44 @@ begin
       g_READ_DATA_WIDTH   => data_tmp2'length,
       g_READ_MODE         => "std",
       g_RELATED_CLOCKS    => 0,
-      g_WRITE_DATA_WIDTH  => data_tmp2'length
+      g_WRITE_DATA_WIDTH  => data_tmp2'length,
+      ---------------------------------------------------------------------
+      -- resynchronization: fifo errors/empty flag
+      ---------------------------------------------------------------------
+      g_SYNC_SIDE         => "wr",      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
+      g_DEST_SYNC_FF      => 2,         -- Number of register stages used to synchronize signal in the destination clock domain.   
+      g_SRC_INPUT_REG     => 1          -- 0- Do not register input (src_in), 1- Register input (src_in) once using src_clk 
 
     )
     port map(
       ---------------------------------------------------------------------
       -- write side
       ---------------------------------------------------------------------
-      i_wr_clk        => i_out_clk,     -- write clock
-      i_wr_rst        => i_rst,         -- write reset 
-      i_wr_en         => wr_tmp2,       -- write enable
-      i_wr_din        => data_tmp2,     -- write data
-      o_wr_full       => full2,         -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_wr_rst_busy   => wr_rst_busy2,  -- Active-High indicator that the FIFO write domain is currently in a reset state
+      i_wr_clk        => i_out_clk,    
+      i_wr_rst        => i_rst,        
+      i_wr_en         => wr_tmp2,      
+      i_wr_din        => data_tmp2,    
+      o_wr_full       => open,        
+      o_wr_rst_busy   => open,  
       ---------------------------------------------------------------------
       -- read side
       ---------------------------------------------------------------------
       i_rd_clk        => i_clk,
-      i_rd_en         => rd3,           -- read enable (Must be held active-low when rd_rst_busy is active high)
-      o_rd_dout_valid => data_valid3,   -- When asserted, this signal indicates that valid data is available on the output bus
+      i_rd_en         => rd3,          
+      o_rd_dout_valid => data_valid3,  
       o_rd_dout       => data_tmp3,
-      o_rd_empty      => empty3,        -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_rd_rst_busy   => rd_rst_busy3   -- Active-High indicator that the FIFO read domain is currently in a reset state
-      
+      o_rd_empty      => empty3,       
+      o_rd_rst_busy   => open,   
+      ---------------------------------------------------------------------
+      -- resynchronized errors/status 
+      ---------------------------------------------------------------------
+      o_errors_sync   => errors_sync2,
+      o_empty_sync    => empty_sync2
     );
 
   rd3   <= i_fifo_rd;
   data3 <= data_tmp3(c_FIFO_IDX0_H downto c_FIFO_IDX0_L);
 
-  ---------------------------------------------------------------------
-  -- synchronize error fifo flags: i_clk -> i_out_clk
-  ---------------------------------------------------------------------
-  errors_tmp3(2) <= empty3;
-  errors_tmp3(1) <= '1' when rd3 = '1' and rd_rst_busy3 = '1' else '0';
-  errors_tmp3(0) <= '1' when rd3 = '1' and empty3 = '1' else '0';
-  gen_errors_sync_fifo2 : for i in errors_tmp3'range generate
-    inst_single_bit_synchronizer_fifo2 : entity fpasim.single_bit_synchronizer
-      generic map(
-        g_DEST_SYNC_FF  => 2,
-        g_SRC_INPUT_REG => 1
-      )
-      port map(
-        ---------------------------------------------------------------------
-        -- source
-        ---------------------------------------------------------------------
-        i_src_clk  => i_clk,            -- source clock
-        i_src      => errors_tmp3(i),   -- input signal to be synchronized to dest_clk domain
-        ---------------------------------------------------------------------
-        -- destination
-        ---------------------------------------------------------------------
-        i_dest_clk => i_out_clk,        -- destination clock domain
-        o_dest     => errors_tmp3_sync(i) -- src_in synchronized to the destination clock domain. This output is registered.   
-      );
-
-  end generate gen_errors_sync_fifo2;
 
   ---------------------------------------------------------------------
   -- to the regdecode: output
@@ -330,12 +296,12 @@ begin
   ---------------------------------------------------------------------
   -- Error latching
   ---------------------------------------------------------------------
-  error_tmp(5) <= errors_tmp3_sync(0);  -- fifo2: empty error
-  error_tmp(4) <= wr_tmp2 and full2;    -- fifo2: full error
-  error_tmp(3) <= (wr_tmp2 and wr_rst_busy2) or errors_tmp3_sync(1); -- fifo2: rst error
-  error_tmp(2) <= rd1 and empty1;       -- fifo0: error empty
-  error_tmp(1) <= errors_tmp0_sync(0);  -- fifo0: error full
-  error_tmp(0) <= errors_tmp0_sync(1) or (rd1 and rd_rst_busy1); -- fifo0: rst error
+  error_tmp(5) <= errors_sync2(2) or errors_sync2(3); -- fifo2: fifo rst error
+  error_tmp(4) <= errors_sync2(1);      -- fifo2: fifo rd empty
+  error_tmp(3) <= errors_sync2(0);      -- fifo2: fifo wr error
+  error_tmp(2) <= errors_sync1(2) or errors_sync1(3); -- fifo0: fifo rst error
+  error_tmp(1) <= errors_sync1(1);      -- fifo0: fifo rd empty
+  error_tmp(0) <= errors_sync1(0);      -- fifo0: fifo wr full
   gen_errors_latch : for i in error_tmp'range generate
     inst_one_error_latch : entity fpasim.one_error_latch
       port map(
@@ -347,35 +313,27 @@ begin
       );
   end generate gen_errors_latch;
 
-  -- error remapping
-  error_status3(1) <= error_tmp_bis(5); -- fifo2: empty error
-  error_status3(0) <= error_tmp_bis(4); -- fifo2: full error
-
-  error_status1(1) <= error_tmp_bis(2); -- fifo0: empty error
-  error_status1(0) <= error_tmp_bis(1); -- fifo0: full error
-
-  o_errors(15 downto 6) <= (others => '0');
-  o_errors(5)           <= error_tmp_bis(3); -- fifo2: rst error
-  o_errors(4)           <= error_tmp_bis(0); -- fifo0: rst error
-  o_errors(2)           <= error_status3(1); -- fifo2: empty error
-  o_errors(2)           <= error_status3(0); -- fifo2: full error
-  o_errors(1)           <= error_status1(1); -- fifo0: empty error
-  o_errors(0)           <= error_status1(0); -- fifo0: full error
+  o_errors(15 downto 7)  <= (others => '0');
+  o_errors(6)           <= error_tmp_bis(5); -- fifo2: rst error
+  o_errors(5)           <= error_tmp_bis(4); -- fifo2: fifo rd empty error
+  o_errors(4)           <= error_tmp_bis(3); -- fifo2: fifo wr full error
+  o_errors(3)           <= '0'; 
+  o_errors(2)           <= error_tmp_bis(2); -- fifo0: rst error
+  o_errors(1)           <= error_tmp_bis(1); -- fifo0: fifo rd empty error
+  o_errors(0)           <= error_tmp_bis(0); -- fifo0: fifo wr full error
 
   o_status(7 downto 2) <= (others => '0');
-  o_status(1)          <= errors_tmp3_sync(2); -- fifo2: empty
-  o_status(0)          <= empty1;
-
+  o_status(1)          <= empty_sync2;  -- fifo2: empty
+  o_status(0)          <= empty_sync1;  -- fifo0: empty
   ---------------------------------------------------------------------
   -- for simulation only
   ---------------------------------------------------------------------
-  assert not (error_tmp_bis(3) = '1') report "[regdecode_wire_wr_rd] => FIFO2 is used before the end of the initialization " severity error;
-  assert not (error_tmp_bis(0) = '1') report "[regdecode_wire_wr_rd] => FIFO0 is used before the end of the initialization " severity error;
+  assert not (error_tmp_bis(5) = '1') report "[regdecode_wire_wr_rd] => FIFO0 is used before the end of the initialization " severity error;
+  assert not (error_tmp_bis(4) = '1') report "[regdecode_wire_wr_rd] => FIFO2 read an empty FIFO" severity error;
+  assert not (error_tmp_bis(3) = '1') report "[regdecode_wire_wr_rd] => FIFO2 write a full FIFO" severity error;
 
-  assert not (error_status3(0) = '1') report "[regdecode_wire_wr_rd] => FIFO2 write a full FIFO" severity error;
-  assert not (error_status3(1) = '1') report "[regdecode_wire_wr_rd] => FIFO2 read an empty FIFO" severity error;
-
-  assert not (error_status1(0) = '1') report "[regdecode_wire_wr_rd] => FIFO0 write a full FIFO" severity error;
-  assert not (error_status1(1) = '1') report "[regdecode_wire_wr_rd] => FIFO0 read an empty FIFO" severity error;
+  assert not (error_tmp_bis(2) = '1') report "[regdecode_wire_wr_rd] => FIFO2 is used before the end of the initialization " severity error;
+  assert not (error_tmp_bis(1) = '1') report "[regdecode_wire_wr_rd] => FIFO0 read an empty FIFO" severity error;
+  assert not (error_tmp_bis(0) = '1') report "[regdecode_wire_wr_rd] => FIFO0 write a full FIFO" severity error;
 
 end architecture RTL;
