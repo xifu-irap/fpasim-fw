@@ -22,15 +22,24 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details               doc extract from the Xilinx IP     
---
--- This module intanciates a synchronuous FIFO with the empty and full flags
--- This module detects 4 types of errors
---   . detect a writting when the FIFO is full
---   . detect a writting when the FIFO is in a reset state
---   . detect a reading when the FIFO is empty
---   . detect a reading when the FIFO is in a reset state
--- -------------------------------------------------------------------------------------------------------------
+--!   @details                  
+--!
+--!   This module intanciates a synchronuous FIFO with the empty and full flags
+--!   This module generates 4 types of errors in the following cases:
+--!     . a writting when the FIFO is full
+--!     . a writting when the FIFO is in a reset state
+--!     . a reading when the FIFO is empty
+--!     . a reading when the FIFO is in a reset state
+--!   Note: the following header documentation is an extract of the associated XPM Xilinx header       
+-- -------------------------------------------------------------------------------------------------------------   
+
+
+--!
+--!   The module intanciates a synchronuous FIFO with the empty, full and prog full flags
+--!   The module is a wrapper of the Xilinx XPM fifo sync.
+--!   Note: the following header documentation is an extract of the associated XPM Xilinx header       
+-- -------------------------------------------------------------------------------------------------------------   
+-- 
 -- -------------------------------------------------------------------------------------------------------------
 -- XPM_FIFO instantiation template for Synchronous FIFO configurations
 -- Refer to the targeted device family architecture libraries guide for XPM_FIFO documentation

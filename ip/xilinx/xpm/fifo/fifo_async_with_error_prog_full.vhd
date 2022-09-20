@@ -22,18 +22,19 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                doc extract from the Xilinx IP
---
--- This module instanciates an asynchronous fifo with empty, full and prog full flags
--- This module detects 4 types of errors
---   . detect a writting when the FIFO is full
---   . detect a writting when the FIFO is in a reset state
---   . detect a reading when the FIFO is empty
---   . detect a reading when the FIFO is in a reset state
--- Via generics parameters, the user can select if the all errors flag and the empty is resynchronized in one of two clock domains
---  1. the write clock domain
---  2. or the read clock domain
--- -------------------------------------------------------------------------------------------------------------
+--!   @details                
+--!   
+--!   This module intanciates an asynchronuous FIFO with the empty, full and prog full flags
+--!   This module generates 4 types of errors in the following cases:
+--!     . a writting when the FIFO is full
+--!     . a writting when the FIFO is in a reset state
+--!     . a reading when the FIFO is empty
+--!     . a reading when the FIFO is in a reset state
+--!   Via generics parameters, the user can select in which clock domain the error/empty flags are resynchronized. I.e,
+--!       1. the write clock domain
+--!       2. or the read clock domain
+--!   Note: the following header documentation is an extract of the associated XPM Xilinx header       
+-- -------------------------------------------------------------------------------------------------------------   
 
 -- -------------------------------------------------------------------------------------------------------------
 -- Parameter usage table, organized as follows:
