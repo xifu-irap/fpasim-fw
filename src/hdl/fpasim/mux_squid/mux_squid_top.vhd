@@ -36,7 +36,7 @@ use fpasim.pkg_fpasim.all;
 
 entity mux_squid_top is
   generic(
-    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
+    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
     g_FRAME_ID_WIDTH            : positive := pkg_FRAME_ID_WIDTH; -- frame id bus width (expressed in bits). Possible values: [1; max integer value[
     g_PIXEL_RESULT_INPUT_WIDTH  : positive := pkg_TES_MULT_SUB_Q_WIDTH_S; -- pixel input result bus width (expressed in bits). Possible values: [1; max integer value[
     g_PIXEL_RESULT_OUTPUT_WIDTH : positive := pkg_MUX_SQUID_ADD_Q_WIDTH_S -- pixel output result bus width (expressed in bits). Possible values: [1; max integer value[

@@ -42,7 +42,7 @@ use fpasim.pkg_fpasim.all;
 
 entity mux_squid is
   generic(
-    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
+    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
     g_PIXEL_RESULT_INPUT_WIDTH  : positive := pkg_TES_MULT_SUB_Q_WIDTH_S; -- pixel input result bus width  (expressed in bits). Possible values: [1; max integer value[
     g_PIXEL_RESULT_OUTPUT_WIDTH : positive := pkg_MUX_SQUID_ADD_Q_WIDTH_S -- pixel output result bus width (expressed in bits). Possible values: [1; max integer value[
   );
@@ -102,7 +102,10 @@ entity mux_squid is
 end entity mux_squid;
 
 architecture RTL of mux_squid is
-  constant c_RAM_RD_LATENCY               : positive := pkg_MUX_SQUID_RD_RAM_LATENCY;
+  constant c_MUX_SQUID_SUB_LATENCY           : positive := pkg_MUX_SQUID_SUB_LATENCY;
+  constant c_MUX_SQUID_OFFSET_RAM_RD_LATENCY : positive := pkg_MUX_SQUID_OFFSET_RAM_RD_LATENCY;
+  constant c_MUX_SQUID_TF_RAM_RD_LATENCY     : positive := pkg_MUX_SQUID_TF_RAM_RD_LATENCY;
+
   constant c_MEMORY_SIZE_MUX_SQUID_OFFSET : positive := (2 ** (i_mux_squid_offset_wr_rd_addr'length)) * (i_mux_squid_offset_wr_data'length); -- memory size in bits
   constant c_MEMORY_SIZE_MUX_SQUID_TF     : positive := (2 ** (i_mux_squid_tf_wr_rd_addr'length)) * i_mux_squid_tf_wr_data'length; -- memory size in bits
 
@@ -276,7 +279,7 @@ begin
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
   inst_pipeliner_sync_with_sub_sfixed_mux_squid_out : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => pkg_MUX_SQUID_RD_RAM_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => c_MUX_SQUID_SUB_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -308,14 +311,14 @@ begin
       g_WRITE_DATA_WIDTH_A => mux_squid_offset_dina'length,
       g_WRITE_MODE_A       => "no_change",
       g_READ_DATA_WIDTH_A  => mux_squid_offset_dina'length,
-      g_READ_LATENCY_A     => c_RAM_RD_LATENCY,
+      g_READ_LATENCY_A     => c_MUX_SQUID_OFFSET_RAM_RD_LATENCY,
       -- port B
       g_ADDR_WIDTH_B       => mux_squid_offset_addra'length,
       g_BYTE_WRITE_WIDTH_B => mux_squid_offset_dina'length,
       g_WRITE_DATA_WIDTH_B => mux_squid_offset_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => mux_squid_offset_dina'length,
-      g_READ_LATENCY_B     => c_RAM_RD_LATENCY,
+      g_READ_LATENCY_B     => c_MUX_SQUID_OFFSET_RAM_RD_LATENCY,
       -- other
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
@@ -358,7 +361,7 @@ begin
   -------------------------------------------------------------------
   inst_pipeliner_sync_with_tdpram_mux_squid_offset_outa : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => c_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => c_MUX_SQUID_OFFSET_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -414,14 +417,14 @@ begin
       g_WRITE_DATA_WIDTH_A => mux_squid_tf_dina'length,
       g_WRITE_MODE_A       => "no_change",
       g_READ_DATA_WIDTH_A  => mux_squid_tf_dina'length,
-      g_READ_LATENCY_A     => c_RAM_RD_LATENCY,
+      g_READ_LATENCY_A     => c_MUX_SQUID_TF_RAM_RD_LATENCY,
       -- port B
       g_ADDR_WIDTH_B       => mux_squid_tf_addra'length,
       g_BYTE_WRITE_WIDTH_B => mux_squid_tf_dina'length,
       g_WRITE_DATA_WIDTH_B => mux_squid_tf_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => mux_squid_tf_dina'length,
-      g_READ_LATENCY_B     => c_RAM_RD_LATENCY,
+      g_READ_LATENCY_B     => c_MUX_SQUID_TF_RAM_RD_LATENCY,
       -- other
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
@@ -464,7 +467,7 @@ begin
   -------------------------------------------------------------------
   inst_pipeliner_sync_with_tdpram_mux_squid_tf_outa : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => c_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => c_MUX_SQUID_TF_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -510,7 +513,7 @@ begin
   data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_rx;
   inst_pipeliner_sync_with_sdpram_mux_squid_tf_out : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => c_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => c_MUX_SQUID_TF_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp2'length -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -524,14 +527,13 @@ begin
   pixel_eof_ry   <= data_pipe_tmp3(c_IDX1_H);
   pixel_id_ry    <= data_pipe_tmp3(c_IDX0_H downto c_IDX0_L);
 
-
   -----------------------------------------------------------------
   -- sync with sub_sfixed_mux_squid out
   -----------------------------------------------------------------
 
   inst_pipeliner_sync_with_sdpram_mux_squid_tf2_out : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => pkg_MUX_SQUID_RD_RAM_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_MUX_SQUID_TF_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => mux_squid_offset_doutb'length -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
