@@ -41,6 +41,51 @@ entity top_fpasim is
         i_adc_clk                         : in  std_logic; -- adc clock
         i_ref_clk                         : in  std_logic; -- reference clock
         i_dac_clk                         : in  std_logic; -- dac clock
+        i_usb_clk                         : in  std_logic; -- usb clock
+        ---------------------------------------------------------------------
+        -- from the usb @i_usb_clk
+        ---------------------------------------------------------------------
+        -- trig
+        i_usb_pipein_fifo_valid      : in   std_logic;
+        i_usb_pipein_fifo            : in   std_logic_vector(31 downto 0);
+        -- trig
+        i_usb_trigin_valid           : in   std_logic_vector(31 downto 0);
+        -- wire
+        i_usb_wirein_ctrl            : in   std_logic_vector(31 downto 0);
+        i_usb_wirein_make_pulse      : in   std_logic_vector(31 downto 0);
+        i_usb_wirein_fpasim_gain     : in   std_logic_vector(31 downto 0);
+        i_usb_wirein_mux_sq_fb_delay : in   std_logic_vector(31 downto 0);
+        i_usb_wirein_amp_sq_of_delay : in   std_logic_vector(31 downto 0);
+        i_usb_wirein_error_delay     : in   std_logic_vector(31 downto 0);
+        i_usb_wirein_ra_delay        : in   std_logic_vector(31 downto 0);
+        i_usb_wirein_tes_conf        : in   std_logic_vector(31 downto 0);
+        i_usb_wirein_debug_ctrl      : in   std_logic_vector(31 downto 0)
+
+        ---------------------------------------------------------------------
+        -- to the usb @o_usb_clk
+        ---------------------------------------------------------------------
+        -- pipe
+        i_usb_pipeout_fifo_valid      : in   std_logic;
+        o_usb_pipeout_fifo_data       : out  std_logic_vector(31 downto 0);
+        -- trig
+        o_usb_trigout_interrupt       : out  std_logic_vector(31 downto 0);
+
+        -- wire
+        o_usb_wireout_fifo_data_count : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_ctrl            : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_make_pulse      : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_fpasim_gain     : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_mux_sq_fb_delay : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_amp_sq_of_delay : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_error_delay     : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_ra_delay        : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_tes_conf        : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_debug_ctrl      : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_errors0         : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_errors1         : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_status0         : out  std_logic_vector(31 downto 0);
+        o_usb_wireout_status1         : out  std_logic_vector(31 downto 0);
+
         ---------------------------------------------------------------------
         -- from adc
         ---------------------------------------------------------------------
@@ -61,7 +106,7 @@ entity top_fpasim is
 end entity top_fpasim;
 
 architecture RTL of top_fpasim is
-    constant c_PIXEL_ID_WIDTH : integer := pkg_PIXEL_ID_WIDTH;
+    constant c_PIXEL_ID_WIDTH : integer := pkg_PIXEL_ID_WIDTH_MAX;
     constant c_FRAME_ID_WIDTH : integer := pkg_FRAME_ID_WIDTH;
 
     constant c_TES_TOP_LATENCY         : integer := pkg_TES_TOP_LATENCY;
@@ -69,6 +114,16 @@ architecture RTL of top_fpasim is
     constant c_SYNC_PULSE_DURATION     : integer := pkg_SYNC_PULSE_DURATION;
     constant c_MUX_SQUID_ADD_Q_WIDTH_S : integer := pkg_MUX_SQUID_ADD_Q_WIDTH_S;
     constant c_TES_MULT_SUB_Q_WIDTH_S  : integer := pkg_TES_MULT_SUB_Q_WIDTH_S;
+
+    ---------------------------------------------------------------------
+    -- regdecode
+    ---------------------------------------------------------------------
+    signal reg_errors0 : std_logic_vector(31 downto 0);
+    signal reg_status0 : std_logic_vector(31 downto 0);
+
+    signal reg_errors1 : std_logic_vector(31 downto 0);
+    signal reg_status1 : std_logic_vector(31 downto 0);
+
 
 
     ---------------------------------------------------------------------
@@ -83,6 +138,12 @@ architecture RTL of top_fpasim is
     ---------------------------------------------------------------------
     -- tes_top
     ---------------------------------------------------------------------
+    signal rd_pulse_shape_valid1 : std_logic;
+    signal rd_pulse_shape_data1 : std_logic_vector(15 downto 0);
+    
+    signal rd_steady_state_valid1 : std_logic;
+    signal rd_steady_state_data1 : std_logic_vector(15 downto 0);
+
     signal pixel_sof1    : std_logic;
     signal pixel_eof1    : std_logic;
     signal pixel_valid1  : std_logic;
@@ -159,6 +220,41 @@ architecture RTL of top_fpasim is
 
 begin
 
+---------------------------------------------------------------------
+-- RegDecode
+---------------------------------------------------------------------
+
+
+
+-- errors
+reg_errors2(31 downto 16) <= errors5; -- sync top
+reg_errors2(15 downto 0)  <= errors4; -- dac
+
+reg_errors1(31 downto 16) <= errors3; -- amp squid
+reg_errors1(15 downto 0)  <= errors2; -- mux squid
+
+reg_errors0(31 downto 16) <= errors1; -- tes
+reg_errors0(15 downto 0)  <= errors0; -- adc
+
+-- status
+reg_status2(31 downto 24)  <= (others => '0');
+reg_status2(23 downto 16) <= errors5; -- sync top
+reg_status2(15 downto 8)  <= (others => '0');
+reg_status2(7 downto 0)  <= errors4; -- dac
+
+reg_status2(31 downto 24)  <= (others => '0');
+reg_status1(23 downto 16) <= errors3; -- amp squid
+reg_status2(15 downto 8)  <= (others => '0');
+reg_status1(7 downto 0)  <= errors2; -- mux squid
+
+reg_status2(31 downto 24)  <= (others => '0');
+reg_status0(23 downto 16) <= errors1; -- tes
+reg_status2(15 downto 8)  <= (others => '0');
+reg_status0(7 downto 0)  <= errors0; -- adc
+
+
+
+
     ---------------------------------------------------------------------
     -- adc
     ---------------------------------------------------------------------
@@ -206,8 +302,15 @@ begin
     ---------------------------------------------------------------------
     inst_tes_top : entity fpasim.tes_top
         generic map(
+            -- pixel
+            g_PIXEL_LENGTH_WIDTH         => i_pixel_frame_size'length,
             g_PIXEL_ID_WIDTH            => pixel_id1'length,
+
+            -- frame
+            g_FRAME_FRAME_WIDTH         => i_frame_frame_size'length,
             g_FRAME_ID_WIDTH            => frame_id1'length,
+
+            -- output
             g_PIXEL_RESULT_OUTPUT_WIDTH => pixel_result1'length
         )
         port map(
@@ -219,20 +322,31 @@ begin
             -- input command: from the regdecode
             ---------------------------------------------------------------------
             i_en                   => i_en,
+            i_pixel_frame_size     => i_pixel_frame_size,
+            i_frame_frame_size     => i_frame_frame_size,
+            -- command
             i_cmd_valid            => i_cmd_valid,
             i_cmd_pulse_height     => i_cmd_pulse_height,
             i_cmd_pixel_id         => i_cmd_pixel_id,
             i_cmd_time_shift       => i_cmd_time_shift,
             -- RAM: pulse shape
             -- wr
-            i_wr_pulse_shape_en    => i_wr_pulse_shape_en,
-            i_wr_pulse_shape_addr  => i_wr_pulse_shape_addr,
-            i_wr_pulse_shape_data  => i_wr_pulse_shape_data,
+            i_pulse_shape_wr_en    => i_wr_pulse_shape_en,
+            i_pulse_shape_wr_rd_addr  => i_wr_pulse_shape_addr,
+            i_pulse_shape_wr_data  => i_wr_pulse_shape_data,
+            -- rd
+            i_pulse_shape_rd_en    => i_rd_pulse_shape_en,
+            o_pulse_shape_rd_valid => rd_pulse_shape_valid1, -- to connect
+            o_pulse_shape_rd_data  => rd_pulse_shape_data1, -- to connect
             -- RAM:
             -- wr
-            i_wr_steady_state_en   => i_wr_steady_state_en,
-            i_wr_steady_state_addr => i_wr_steady_state_addr,
-            i_wr_steady_state_data => i_wr_steady_state_data,
+            i_steady_state_wr_en   => i_wr_steady_state_en,
+            i_steady_state_wr_rd_addr => i_wr_steady_state_addr,
+            i_steady_state_wr_data => i_wr_steady_state_data,
+            -- rd
+            i_steady_state_rd_en    => i_rd_steady_state_en,
+            o_steady_state_rd_valid => rd_steady_state_valid1, -- to connect
+            o_steady_state_rd_data  => rd_steady_state_data1, -- to connect
             ---------------------------------------------------------------------
             -- from the adc
             ---------------------------------------------------------------------
@@ -292,14 +406,24 @@ begin
             ---------------------------------------------------------------------
             -- RAM: mux_squid_offset
             -- wr
-            i_wr_mux_squid_offset_en   => i_wr_mux_squid_offset_en,
-            i_wr_mux_squid_offset_addr => i_wr_mux_squid_offset_addr,
-            i_wr_mux_squid_offset_data => i_wr_mux_squid_offset_data,
+            i_mux_squid_offset_wr_en   => i_wr_mux_squid_offset_en,
+            i_mux_squid_offset_wr_rd_addr => i_wr_mux_squid_offset_addr,
+            i_mux_squid_offset_wr_data => i_wr_mux_squid_offset_data,
+            -- rd
+            i_mux_squid_offset_rd_en  => i_rd_mux_squid_offset_en,
+            o_mux_squid_offset_rd_valid => o_rd_mux_squid_offset_valid,
+            o_mux_squid_offset_rd_data => o_rd_mux_squid_offset_data,
+
             -- RAM: mux_squid_tf
             -- wr
-            i_wr_mux_squid_tf_en       => i_wr_mux_squid_tf_en,
-            i_wr_mux_squid_tf_addr     => i_wr_mux_squid_tf_addr,
-            i_wr_mux_squid_tf_data     => i_wr_mux_squid_tf_data,
+            i_mux_squid_tf_wr_en       => i_wr_mux_squid_tf_en,
+            i_mux_squid_tf_wr_rd_addr     => i_wr_mux_squid_tf_addr,
+            i_mux_squid_tf_wr_data     => i_wr_mux_squid_tf_data,
+            -- rd
+            i_mux_squid_tf_rd_en  => i_rd_mux_squid_tf_en,
+            o_mux_squid_tf_rd_valid => o_rd_mux_squid_tf_valid,
+            o_mux_squid_tf_rd_data => o_rd_mux_squid_tf_data,
+
             ---------------------------------------------------------------------
             -- input1
             ---------------------------------------------------------------------
@@ -366,9 +490,14 @@ begin
             ---------------------------------------------------------------------
             -- RAM: amp_squid_tf
             -- wr
-            i_wr_amp_squid_tf_en          => i_wr_amp_squid_tf_en, -- write enable
-            i_wr_amp_squid_tf_addr        => i_wr_amp_squid_tf_addr, -- write address
-            i_wr_amp_squid_tf_data        => i_wr_amp_squid_tf_data, -- write data
+            i_amp_squid_tf_wr_en          => i_wr_amp_squid_tf_en, -- write enable
+            i_amp_squid_tf_wr_rd_addr        => i_wr_amp_squid_tf_addr, -- write address
+            i_amp_squid_tf_wr_data        => i_wr_amp_squid_tf_data, -- write data
+            -- rd
+            i_amp_squid_tf_rd_en          => i_amp_squid_tf_rd_en,
+            o_amp_squid_tf_rd_valid          => o_amp_squid_tf_rd_valid,
+            o_amp_squid_tf_rd_data          => o_amp_squid_tf_rd_data,
+
             -- gain
             i_fpasim_gain                 => i_fpasim_gain, -- gain value
             ---------------------------------------------------------------------
