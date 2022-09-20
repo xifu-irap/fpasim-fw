@@ -41,7 +41,7 @@ use fpasim.pkg_fpasim.all;
 
 entity amp_squid is
   generic(
-    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values [1; max integer value[
+    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values [1; max integer value[
     g_PIXEL_RESULT_INPUT_WIDTH  : positive := pkg_AMP_SQUID_SUB_Q_WIDTH_A; -- pixel input result bus width (expressed in bits). Possible values [1; max integer value[
     g_PIXEL_RESULT_OUTPUT_WIDTH : positive := pkg_AMP_SQUID_MULT_Q_WIDTH -- pixel output result bus width (expressed in bits). Possible values [1; max integer value[
   );
@@ -92,8 +92,8 @@ entity amp_squid is
 end entity amp_squid;
 
 architecture RTL of amp_squid is
-  constant c_RAM_RD_LATENCY           : positive := pkg_AMP_SQUID_RD_RAM_LATENCY;
-  constant c_MEMORY_SIZE_AMP_SQUID_TF : positive := (2 ** (i_amp_squid_tf_wr_rd_addr'length)) * i_amp_squid_tf_wr_data'length; -- memory size in bits
+  constant c_AMP_SQUID_TF_RAM_RD_LATENCY : positive := pkg_AMP_SQUID_TF_RAM_RD_LATENCY;
+  constant c_MEMORY_SIZE_AMP_SQUID_TF    : positive := (2 ** (i_amp_squid_tf_wr_rd_addr'length)) * i_amp_squid_tf_wr_data'length; -- memory size in bits
 
   constant c_pkg_AMP_SQUID_SUB_Q_WIDTH_S : positive := pkg_AMP_SQUID_SUB_Q_WIDTH_S;
   constant c_AMP_SQUID_MULT_Q_WIDTH_A    : positive := pkg_AMP_SQUID_MULT_Q_WIDTH_A;
@@ -273,14 +273,14 @@ begin
       g_WRITE_DATA_WIDTH_A => amp_squid_tf_dina'length,
       g_WRITE_MODE_A       => "no_change",
       g_READ_DATA_WIDTH_A  => amp_squid_tf_dina'length,
-      g_READ_LATENCY_A     => c_RAM_RD_LATENCY,
+      g_READ_LATENCY_A     => c_AMP_SQUID_TF_RAM_RD_LATENCY,
       -- port B
       g_ADDR_WIDTH_B       => amp_squid_tf_addra'length,
       g_BYTE_WRITE_WIDTH_B => amp_squid_tf_dina'length,
       g_WRITE_DATA_WIDTH_B => amp_squid_tf_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => amp_squid_tf_dina'length,
-      g_READ_LATENCY_B     => c_RAM_RD_LATENCY,
+      g_READ_LATENCY_B     => c_AMP_SQUID_TF_RAM_RD_LATENCY,
       -- others
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
@@ -323,7 +323,7 @@ begin
   -------------------------------------------------------------------
   inst_pipeliner_sync_with_tdpram_amp_squid_tf_outa : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => c_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => c_AMP_SQUID_TF_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -369,7 +369,7 @@ begin
   data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_rx;
   inst_pipeliner_sync_with_sdpram_amp_squid_tf_out : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => c_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => c_AMP_SQUID_TF_RAM_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp2'length -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
