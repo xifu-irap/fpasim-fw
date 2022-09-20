@@ -257,7 +257,7 @@ begin
   p_select_error_status : process(i_out_clk) is
   begin
     if rising_edge(i_out_clk) then
-      for i in 0 to errors_tmp1'range loop
+      for i in errors_tmp1'range loop
         if i = to_integer(unsigned(i_error_sel)) then
           errors_r1 <= errors_tmp1(i);
           status_r1 <= status_tmp1(i);
