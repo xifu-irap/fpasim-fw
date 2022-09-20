@@ -49,6 +49,77 @@ PACKAGE pkg_fpasim IS
   -- hardcoded : latency of the dynamic shif register when its input delay is set to 0
   constant pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY : natural := 1;
 
+  -- pixel
+  -- user-defined: maximal number of pixels authorized by the design
+  constant pkg_MUX_FACT_MAX       : positive := 64;
+    -- parameter renaming
+  constant pkg_PIXEL_NB_MAX       : positive := pkg_MUX_FACT_MAX;
+  -- user-defined: maximum number of samples by pixel authorized by the design
+  --   IMPORTANT: this value depends on the adc sampling frequency. Here, ADC sampling frequency is @250 MHz
+  constant pkg_PIXEL_SIZE_MAX     : positive := 64;
+  -- auto-computed:  minimal bus width (expressed in bits) to represent the pkg_PIXEL_SIZE value
+  constant pkg_PIXEL_WIDTH_MAX    : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_PIXEL_SIZE_MAX);
+  -- user-defined: number of frames.
+  --   Note: This value is equal to the number of samples of a pulse shape
+  constant pkg_FRAME_NB       : positive := 2048;
+   -- user-defined: define the oversample factor of each word of the pulse shape memory
+   constant pkg_PULSE_SHAPE_OVERSAMPLE : natural := 16;
+
+
+   ---------------------------------------------------------------------
+   -- RAM
+   ---------------------------------------------------------------------
+   -- pulse shape
+   -- user-defined: read latency of the RAM. Possible values: [2; max integer value[
+   constant pkg_TES_PULSE_SHAPE_RAM_RD_LATENCY       : natural := 2;
+   -- auto-computed: number of words
+   constant pkg_TES_PULSE_SHAPE_RAM_NB_WORDS      : positive := pkg_PULSE_SHAPE_OVERSAMPLE*pkg_FRAME_NB; 
+   -- auto-computed: ram address bus width
+   constant pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH      : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_TES_PULSE_SHAPE_RAM_NB_WORDS); 
+  -- user-defined: ram data bus width
+   constant pkg_TES_PULSE_SHAPE_RAM_DATA_WIDTH      : positive := 16;
+   
+   -- std state
+   -- auto-computed: read latency of the RAM. Possible values: [2; max integer value[. Indeed, by design, memory are in parallel. So, we fixe the same latency
+  constant pkg_TES_STD_STATE_RAM_RD_LATENCY   : natural := pkg_TES_PULSE_SHAPE_RAM_RD_LATENCY;
+   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
+  constant pkg_TES_STD_STATE_RAM_NB_WORDS  : positive := pkg_PIXEL_NB_MAX;
+  -- auto-computed: ram address bus width
+  constant pkg_TES_STD_STATE_RAM_ADDR_WIDTH     : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_TES_STD_STATE_RAM_NB_WORDS);
+  -- user-defined: ram data bus width
+  constant pkg_TES_STD_STATE_RAM_DATA_WIDTH     : positive := 16;
+
+   -- mux squid offset
+   -- user-defined: read latency of the RAM. Possible values: [2; max integer value[
+   constant pkg_MUX_SQUID_OFFSET_RAM_RD_LATENCY       : natural := 2;
+   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
+   constant pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS      : positive := pkg_PIXEL_NB_MAX;
+   -- auto-computed: ram address bus width
+   constant pkg_MUX_SQUID_OFFSET_RAM_ADDR_WIDTH      : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_PIXEL_NB_MAX);
+   -- user-defined: data bus width
+   constant pkg_MUX_SQUID_OFFSET_RAM_DATA_WIDTH      : positive := 16;
+   
+   -- mux squid tf
+   -- user-defined: read latency of the RAM. Possible values: [2; max integer value[.
+  constant pkg_MUX_SQUID_TF_RAM_RD_LATENCY   : natural := 2;
+   -- user-defined: number of words.
+  constant pkg_MUX_SQUID_TF_RAM_NB_WORDS  : positive := 2**13;
+   -- auto-computed: ram address bus width
+  constant pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH  : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_MUX_SQUID_TF_RAM_NB_WORDS);
+   -- user-defined: ram data bus width
+  constant pkg_MUX_SQUID_TF_RAM_DATA_WIDTH  : positive := 16;
+
+   -- amp squid tf
+   -- user-defined: read latency of the RAM. Possible values: [2; max integer value[
+  constant pkg_AMP_SQUID_TF_RAM_RD_LATENCY   : natural := 2;
+   -- user-defined: number of words.
+  constant pkg_AMP_SQUID_TF_RAM_NB_WORDS  : natural := 2**14;
+   -- auto-computed: ram address bus width
+  constant pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH  : natural := fpasim.pkg_utils.pkg_width_from_value(pkg_AMP_SQUID_TF_RAM_NB_WORDS);
+   -- user-defined: ram data bus width
+  constant pkg_AMP_SQUID_TF_RAM_DATA_WIDTH  : natural := 16;
+
+
   ---------------------------------------------------------------------
   -- regdecode
   ---------------------------------------------------------------------
@@ -73,23 +144,11 @@ PACKAGE pkg_fpasim IS
 
   -- tes_signalling_generator parameters
   ----------------------------------------------------------------------
-  -- pixel
-  -- user-defined: maximal number of pixels authorized by the design
-  constant pkg_MUX_FACT_MAX       : positive := 64;
-  -- parameter renaming
-  constant pkg_PIXEL_NB_MAX       : positive := pkg_MUX_FACT_MAX;
+
   -- auto-computed:  minimal bus width (expressed in bits) to represent the c_MUX_FACT value
   constant pkg_PIXEL_ID_WIDTH_MAX : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_PIXEL_NB_MAX);
-  -- user-defined: maximum number of samples by pixel authorized by the design
-  --   IMPORTANT: this value depends on the adc sampling frequency. Here, ADC sampling frequency is @250 MHz
-  constant pkg_PIXEL_SIZE_MAX     : positive := 64;
-  -- auto-computed:  minimal bus width (expressed in bits) to represent the pkg_PIXEL_SIZE value
-  constant pkg_PIXEL_WIDTH_MAX    : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_PIXEL_SIZE_MAX);
 
   -- frame
-  -- user-defined: number of frames.
-  --   Note: This value is equal to the number of samples of a pulse shape
-  constant pkg_FRAME_NB       : positive := 2048;
   -- auto-computed:  minimal bus width (expressed in bits) to represent the pkg_FRAME_NB value
   constant pkg_FRAME_ID_WIDTH : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_FRAME_NB);
   -- auto-computed : number of samples by frame
@@ -107,21 +166,7 @@ PACKAGE pkg_fpasim IS
   -- auto-computed: latency of the "tes_signalling" module
   constant pkg_TES_SIGNALLING_LATENCY : natural := pkg_TES_SIGNALLING_GENERATOR_LATENCY;
 
-  -- tes RAMS
-  ---------------------------------------------------------------------
-   -- tes pulse shape
-   -- user-defined: define the oversample factor of each word of the pulse shape memory
-   constant pkg_TES_PULSE_SHAPE_OVERSAMPLE : natural := 16;
-   -- user-defined: read latency of the RAM. Possible values: [2; max integer value[
-   constant pkg_TES_PULSE_SHAPE_RAM_RD_LATENCY       : natural := 2;
-   -- user-defined: number of words
-   constant pkg_TES_PULSE_SHAPE_RAM_NB_WORDS      : natural := 2**15; -- this value should be a multiple of pkg_FRAME_NB*pkg_TES_PULSE_SHAPE_OVERSAMPLE
-   
-   -- tes std state
-   -- auto-computed: read latency of the RAM. Possible values: [2; max integer value[. Indeed, by design, memory are in parallel. So, we fixe the same latency
-  constant pkg_TES_STD_STATE_RAM_RD_LATENCY   : natural := pkg_TES_PULSE_SHAPE_RAM_RD_LATENCY;
-   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
-  constant pkg_TES_STD_STATE_RAM_NB_WORDS  : natural := pkg_PIXEL_NB_MAX;
+
 
   -- tes_pulse_manager
   ---------------------------------------------------------------------
@@ -180,21 +225,6 @@ PACKAGE pkg_fpasim IS
   ---------------------------------------------------------------------
   -- mux_squid
   ---------------------------------------------------------------------
-
-  --  RAMS
-  ---------------------------------------------------------------------
-   -- mux squid offset
-   -- user-defined: read latency of the RAM. Possible values: [2; max integer value[
-   constant pkg_MUX_SQUID_OFFSET_RAM_RD_LATENCY       : natural := 2;
-   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
-   constant pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS      : natural := pkg_PIXEL_NB_MAX; -- this value should be a multiple of pkg_FRAME_NB
-   
-   -- mux squid tf
-   -- auto-computed: read latency of the RAM. Possible values: [2; max integer value[.
-  constant pkg_MUX_SQUID_TF_RAM_RD_LATENCY   : natural := 2;
-   -- auto-computed: number of words.
-  constant pkg_MUX_SQUID_TF_RAM_NB_WORDS  : natural := 2**13;
-
 
   -- sub
   -- pixel_result
@@ -261,15 +291,6 @@ PACKAGE pkg_fpasim IS
   -- amp squid
   ---------------------------------------------------------------------
 
-  --  RAMS
-  ---------------------------------------------------------------------
-   -- amp squid tf
-   -- auto-computed: read latency of the RAM. Possible values: [2; max integer value[
-  constant pkg_AMP_SQUID_TF_RAM_RD_LATENCY   : natural := 2;
-   -- auto-computed: number of words.
-  constant pkg_AMP_SQUID_TF_RAM_NB_WORDS  : natural := 2**14;
-
-
   -- sub
   -- pixel_result
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
@@ -289,11 +310,11 @@ PACKAGE pkg_fpasim IS
 
   -- result: pixel_result - mux_squid_feedback
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_AMP_SQUID_SUB_Q_M_S     : positive := 13;
+  constant pkg_AMP_SQUID_SUB_Q_M_S     : positive := 14;
   -- user-defined: number of fraction bits
   constant pkg_AMP_SQUID_SUB_Q_N_S     : natural  := 0;
   -- auto-computed: bus width
-  constant pkg_AMP_SQUID_SUB_Q_WIDTH_S : positive := pkg_AMP_SQUID_SUB_Q_M_S + pkg_AMP_SQUID_SUB_Q_N_S; -- number of fraction bits
+  constant pkg_AMP_SQUID_SUB_Q_WIDTH_S : positive := pkg_AMP_SQUID_SUB_Q_M_S + pkg_AMP_SQUID_SUB_Q_N_S; 
 
   constant pkg_AMP_SQUID_SUB_LATENCY : natural := pkg_SUB_SFIXED_LATENCY;
 
@@ -304,7 +325,7 @@ PACKAGE pkg_fpasim IS
   -- user-defined: number of fraction bits
   constant pkg_AMP_SQUID_MULT_Q_N_A     : natural  := 0; -- user defined: number of fraction bits
   -- auto-computed: bus width
-  constant pkg_AMP_SQUID_MULT_Q_WIDTH_A : positive := pkg_AMP_SQUID_MULT_Q_M_A + pkg_AMP_SQUID_MULT_Q_N_A; -- user defined: number of fraction bits
+  constant pkg_AMP_SQUID_MULT_Q_WIDTH_A : positive := pkg_AMP_SQUID_MULT_Q_M_A + pkg_AMP_SQUID_MULT_Q_N_A;
 
   -- fpasim_gain
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
@@ -312,7 +333,7 @@ PACKAGE pkg_fpasim IS
   -- user-defined: number of fraction bits
   constant pkg_AMP_SQUID_MULT_Q_N_B     : natural  := 2;
   -- auto-computed: bus width
-  constant pkg_AMP_SQUID_MULT_Q_WIDTH_B : positive := pkg_AMP_SQUID_MULT_Q_M_B + pkg_AMP_SQUID_MULT_Q_N_B; -- user defined: number of fraction bits
+  constant pkg_AMP_SQUID_MULT_Q_WIDTH_B : positive := pkg_AMP_SQUID_MULT_Q_M_B + pkg_AMP_SQUID_MULT_Q_N_B;
 
   -- result
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
