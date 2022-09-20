@@ -22,8 +22,12 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                doc extract from the Xilinx IP              
-           
+--!   @details                
+--!   
+--!   This module synchronizes a reset signal between 2 clock domain    
+--!   Note: the following header documentation is an extract of the associated XPM Xilinx header        
+-- -------------------------------------------------------------------------------------------------------------
+
 -- -------------------------------------------------------------------------------------------------------------
 -- XPM_CDC instantiation template for Synchronous Reset Synchronizer configurations
 -- Refer to the targeted device family architecture libraries guide for XPM_CDC documentation
@@ -141,7 +145,7 @@ begin
          INIT_SYNC_FF   => 1,           -- DECIMAL; 0=disable simulation init values, 1=enable simulation init values
          SIM_ASSERT_CHK => 1            -- DECIMAL; 0=disable simulation messages, 1=enable simulation messages
       )
-      port map(
+      port map(                         -- @suppress "The order of the associations is different from the declaration order"
          dest_rst => dest_rst,          -- 1-bit output: src_rst synchronized to the destination clock domain. This output
                                         -- is registered.
 
@@ -150,4 +154,5 @@ begin
       );
 
    o_dest_rst <= dest_rst;
+
 end architecture RTL;

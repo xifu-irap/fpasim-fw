@@ -22,8 +22,11 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                doc extract from the Xilinx IP              
-
+--!   @details                
+--!     
+--!   This modules synchronizes a data bit between 2 clock domain   
+--!   Note: the following header documentation is an extract of the associated XPM Xilinx header      
+-- ------------------------------------------------------------------------------------------------------------- 
 
 -- -------------------------------------------------------------------------------------------------------------
 -- XPM_CDC instantiation template for Single-bit Synchronizer configurations
