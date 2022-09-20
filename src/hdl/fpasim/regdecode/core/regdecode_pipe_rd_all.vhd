@@ -22,9 +22,22 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
---
---
+--!   @details    
+--!               
+--!   This module multiplexes its 5 inputs into an output FIFO.
+--!                
+--! 
+--!   The architecture is as follows:
+--!
+--!        i_fifo_addr0/i_fifo_data0-------|
+--!        i_fifo_addr1/i_fifo_data1-------|
+--!        i_fifo_addr2/i_fifo_data2-------|--- FSM ----->  sync_fifo -----------> o_fifo_data
+--!        i_fifo_addr3/i_fifo_data3-------|
+--!        i_fifo_addr4/i_fifo_data4-------|
+--!        
+--!   Note: 
+--!     . each input path are fully read until the associated eof flags is reached before passing to the next input.
+--!     . the FSM manages the output data flow via the output fifo flag. So, the output data flow can be paused.
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;

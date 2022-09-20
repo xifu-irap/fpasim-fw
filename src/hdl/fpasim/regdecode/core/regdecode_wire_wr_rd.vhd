@@ -23,10 +23,18 @@
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
--- This module is used to drive a RAM. 2 modes are available according the value of the i_start_auto_rd and i_data_valid signals.
---   . to configure the RAM content
---   . to auto-generate the read address in order to read the RAM content
---
+--! 
+--!   This module synchronizes a data bus from a source clock domain (@i_clk) to a destination clock domain(@i_out_clk).
+--!   Then, the output synchronized data bus is read back from the destination clock domain to the source clock domain.
+--!
+--!   The architecture principle is as follows:
+--!        @i_clk clock domain        |                   @ i_out_clk clock domain
+--!        i_data ---------------> async_fifo -----------> o_data
+--!                                                      |
+--!        o_fifo_data <---------  async_fifo <---------- 
+--!
+--!   Note: The read back of the synchronized data bus allows to check the clock domain crossing integrity.
+--!
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -43,27 +51,27 @@ entity regdecode_wire_wr_rd is
     ---------------------------------------------------------------------
     -- from the regdecode: input @i_clk
     ---------------------------------------------------------------------
-    i_clk             : in  std_logic; -- clock
-    i_rst             : in  std_logic; -- rst
+    i_clk             : in  std_logic;  -- clock
+    i_rst             : in  std_logic;  -- rst
     -- data
-    i_data_valid      : in  std_logic; -- data valid
+    i_data_valid      : in  std_logic;  -- data valid
     i_data            : in  std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0); -- data value
     ---------------------------------------------------------------------
     -- from/to the user:  @i_out_clk
     ---------------------------------------------------------------------
-    i_out_clk         : in  std_logic; -- output clock
-    i_rst_status      : in  std_logic; -- reset error flag(s)
-    i_debug_pulse     : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    i_out_clk         : in  std_logic;  -- output clock
+    i_rst_status      : in  std_logic;  -- reset error flag(s)
+    i_debug_pulse     : in  std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     -- ram: wr
-    o_data_valid      : out std_logic; -- data valid
+    o_data_valid      : out std_logic;  -- data valid
     o_data            : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0); -- data
     ---------------------------------------------------------------------
     -- to the regdecode: @i_clk
     ---------------------------------------------------------------------
-    i_fifo_rd         : in  std_logic; -- fifo read enable
-    o_fifo_data_valid : out std_logic; -- fifo data valid
+    i_fifo_rd         : in  std_logic;  -- fifo read enable
+    o_fifo_data_valid : out std_logic;  -- fifo data valid
     o_fifo_data       : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0); -- fifo data
-    o_fifo_empty      : out std_logic; -- fifo empty flag
+    o_fifo_empty      : out std_logic;  -- fifo empty flag
     ---------------------------------------------------------------------
     -- errors/status @ i_out_clk
     ---------------------------------------------------------------------
@@ -84,21 +92,21 @@ architecture RTL of regdecode_wire_wr_rd is
   constant c_FIFO_DEPTH0 : integer := 16; --see IP
   constant c_FIFO_WIDTH0 : integer := c_FIFO_IDX0_H + 1; --see IP
 
-  signal wr_rst_tmp0  : std_logic;
-  signal wr_tmp0      : std_logic;
-  signal data_tmp0    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  signal wr_rst_tmp0 : std_logic;
+  signal wr_tmp0     : std_logic;
+  signal data_tmp0   : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
   -- signal full0        : std_logic;
   -- signal wr_rst_busy0 : std_logic;
 
-  signal rd1          : std_logic;
-  signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
-  signal empty1       : std_logic;
-  signal data_valid1  : std_logic;
+  signal rd1         : std_logic;
+  signal data_tmp1   : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  signal empty1      : std_logic;
+  signal data_valid1 : std_logic;
   -- signal rd_rst_busy1 : std_logic;
 
   signal data1 : std_logic_vector(i_data'range);
 
-    -- synchronized errors
+  -- synchronized errors
   signal errors_sync1 : std_logic_vector(3 downto 0);
   signal empty_sync1  : std_logic;
 
@@ -120,12 +128,12 @@ architecture RTL of regdecode_wire_wr_rd is
   ---------------------------------------------------------------------
   -- cross clock domain: user to regdecode
   ---------------------------------------------------------------------
-  constant c_FIFO_DEPTH2     : integer := 32; --see IP
-  constant c_FIFO_WIDTH2     : integer := c_FIFO_IDX0_H + 1; --see IP
+  constant c_FIFO_DEPTH2 : integer := 32; --see IP
+  constant c_FIFO_WIDTH2 : integer := c_FIFO_IDX0_H + 1; --see IP
 
   -- wr side
-  signal wr_tmp2      : std_logic;
-  signal data_tmp2    : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
+  signal wr_tmp2   : std_logic;
+  signal data_tmp2 : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
   -- signal full2        : std_logic;
   -- signal wr_rst_busy2 : std_logic;
 
@@ -134,10 +142,10 @@ architecture RTL of regdecode_wire_wr_rd is
   signal empty_sync2  : std_logic;
 
   -- rd side
-  signal rd3          : std_logic;
-  signal data_tmp3    : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
-  signal empty3       : std_logic;
-  signal data_valid3  : std_logic;
+  signal rd3         : std_logic;
+  signal data_tmp3   : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
+  signal empty3      : std_logic;
+  signal data_valid3 : std_logic;
   -- signal rd_rst_busy3 : std_logic;
 
   signal data3 : std_logic_vector(i_data'range);
@@ -153,7 +161,7 @@ begin
 
   ---------------------------------------------------------------------
   -- wr fifo: cross clock domain
-  --    .from the regdecode clock domain to the user clock domain
+  --    .from the i_clk clock domain to the i_out_clk domain
   ---------------------------------------------------------------------
   wr_rst_tmp0                                   <= i_rst;
   wr_tmp0                                       <= i_data_valid;
@@ -180,21 +188,21 @@ begin
       ---------------------------------------------------------------------
       -- write side
       ---------------------------------------------------------------------
-      i_wr_clk        => i_clk,        
-      i_wr_rst        => wr_rst_tmp0,  
-      i_wr_en         => wr_tmp0,      
-      i_wr_din        => data_tmp0,    
-      o_wr_full       => open,         
-      o_wr_rst_busy   => open,  
+      i_wr_clk        => i_clk,
+      i_wr_rst        => wr_rst_tmp0,
+      i_wr_en         => wr_tmp0,
+      i_wr_din        => data_tmp0,
+      o_wr_full       => open,
+      o_wr_rst_busy   => open,
       ---------------------------------------------------------------------
       -- read side
       ---------------------------------------------------------------------
       i_rd_clk        => i_out_clk,
-      i_rd_en         => rd1,   
+      i_rd_en         => rd1,
       o_rd_dout_valid => data_valid1,
       o_rd_dout       => data_tmp1,
-      o_rd_empty      => empty1,     
-      o_rd_rst_busy   => open,   
+      o_rd_empty      => empty1,
+      o_rd_rst_busy   => open,
       ---------------------------------------------------------------------
       -- resynchronized errors/status 
       ---------------------------------------------------------------------
@@ -205,7 +213,6 @@ begin
   rd1 <= '1' when empty1 = '0' else '0';
 
   data1 <= data_tmp1(c_FIFO_IDX0_H downto c_FIFO_IDX0_L);
-
 
   ---------------------------------------------------------------------
   -- to the user: output
@@ -233,7 +240,7 @@ begin
 
   ---------------------------------------------------------------------
   -- cross clock domain: 
-  --  from the user clock domain to the regdecode clock domain
+  --  from the i_out_clk clock domain to the i_clk clock domain
   ---------------------------------------------------------------------
   wr_tmp2                                       <= data_valid_sync_rx;
   data_tmp2(c_FIFO_IDX0_H downto c_FIFO_IDX0_L) <= data_sync_rx;
@@ -260,21 +267,21 @@ begin
       ---------------------------------------------------------------------
       -- write side
       ---------------------------------------------------------------------
-      i_wr_clk        => i_out_clk,    
-      i_wr_rst        => i_rst,        
-      i_wr_en         => wr_tmp2,      
-      i_wr_din        => data_tmp2,    
-      o_wr_full       => open,        
-      o_wr_rst_busy   => open,  
+      i_wr_clk        => i_out_clk,
+      i_wr_rst        => i_rst,
+      i_wr_en         => wr_tmp2,
+      i_wr_din        => data_tmp2,
+      o_wr_full       => open,
+      o_wr_rst_busy   => open,
       ---------------------------------------------------------------------
       -- read side
       ---------------------------------------------------------------------
       i_rd_clk        => i_clk,
-      i_rd_en         => rd3,          
-      o_rd_dout_valid => data_valid3,  
+      i_rd_en         => rd3,
+      o_rd_dout_valid => data_valid3,
       o_rd_dout       => data_tmp3,
-      o_rd_empty      => empty3,       
-      o_rd_rst_busy   => open,   
+      o_rd_empty      => empty3,
+      o_rd_rst_busy   => open,
       ---------------------------------------------------------------------
       -- resynchronized errors/status 
       ---------------------------------------------------------------------
@@ -284,7 +291,6 @@ begin
 
   rd3   <= i_fifo_rd;
   data3 <= data_tmp3(c_FIFO_IDX0_H downto c_FIFO_IDX0_L);
-
 
   ---------------------------------------------------------------------
   -- to the regdecode: output
@@ -313,11 +319,11 @@ begin
       );
   end generate gen_errors_latch;
 
-  o_errors(15 downto 7)  <= (others => '0');
+  o_errors(15 downto 7) <= (others => '0');
   o_errors(6)           <= error_tmp_bis(5); -- fifo2: rst error
   o_errors(5)           <= error_tmp_bis(4); -- fifo2: fifo rd empty error
   o_errors(4)           <= error_tmp_bis(3); -- fifo2: fifo wr full error
-  o_errors(3)           <= '0'; 
+  o_errors(3)           <= '0';
   o_errors(2)           <= error_tmp_bis(2); -- fifo0: rst error
   o_errors(1)           <= error_tmp_bis(1); -- fifo0: fifo rd empty error
   o_errors(0)           <= error_tmp_bis(0); -- fifo0: fifo wr full error

@@ -23,7 +23,11 @@
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
---
+--!
+--!   This modules outputs a write enable (ex: o_tes_pulse_shape_wr_en) for each expected RAM
+--!
+--!   Note:
+--!     . the o_addr/o_data are delayed in order to be aligned with the write enable generation. 
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;

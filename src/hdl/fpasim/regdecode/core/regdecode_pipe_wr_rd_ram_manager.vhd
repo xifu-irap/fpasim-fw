@@ -22,11 +22,24 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
--- This module is used to drive a RAM. 2 modes are available according the value of the i_start_auto_rd and i_data_valid signals.
---   . to configure the RAM content
---   . to auto-generate the read address in order to read the RAM content
---
+--!   @details
+--!                   
+--! This module is used to configure a RAM. 2 behaviour are managed by the FSM:
+--! 
+--!   This module analyses the field of the i_make_pulse register. 2 behaviour are managed by the FSM:
+--!       1. if i_start_auto_rd = '0' then no change is done. The input data are used to write the RAM content.
+--!       2. if i_start_auto_rd = '1', then the FSM will automatically generate read addresses in order to fully read the RAM.
+--!                
+--!   In all cases, the module manages the clock domain crossing.
+--! 
+--!   The architecture is as follows:
+--!        @i_clk source clock domain                           |                    @ i_out_clk destination clock domain
+--!        i_data/i_addr -----------------FSM ------------> async_fifo -----------> o_ram_wr_rd_addr/o_ram_wr_data
+--!                                                                                          |
+--!        o_fifo_addr/o_fifo_data <----------------------  async_fifo <------------- i_ram_rd_data
+--!   Note: 
+--!     . During the reading, the FSM manages the fifo data flow. So, the data flow can automatically be paused.
+--!     . i_addr_range_min is used to manage address offset during the read address generation.
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -38,11 +51,11 @@ library fpasim;
 entity regdecode_pipe_wr_rd_ram_manager is
   generic(
     -- RAM
-    g_RAM_NB_WORDS   : integer := 2048;
-    g_RAM_RD_LATENCY : integer  := 2;   -- define the RAM latency during the reading
+    g_RAM_NB_WORDS   : integer  := 2048; -- define the maximal number of words associated to the RAM
+    g_RAM_RD_LATENCY : integer  := 2;    -- define the read RAM latency
     -- input
     g_ADDR_WIDTH     : positive := 16;  -- define the input address bus width
-    g_DATA_WIDTH     : positive := 16  -- define the input data bus width
+    g_DATA_WIDTH     : positive := 16   -- define the input data bus width
 
   );
   port(
@@ -52,8 +65,8 @@ entity regdecode_pipe_wr_rd_ram_manager is
     i_clk             : in  std_logic;  -- clock
     i_rst             : in  std_logic;  -- reset
     -- command
-    i_start_auto_rd   : in  std_logic;  -- start the auto address generation for the reading of the RAM
-    i_addr_range_min  : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- minimal address range
+    i_start_auto_rd   : in  std_logic;  -- start the read address generation
+    i_addr_range_min  : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- minimal address range (address offset)
     -- data
     i_data_valid      : in  std_logic;  -- input data valid
     i_addr            : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- input address
@@ -92,14 +105,14 @@ end entity regdecode_pipe_wr_rd_ram_manager;
 
 architecture RTL of regdecode_pipe_wr_rd_ram_manager is
 
-  constant c_RAM_ADDR_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_value(g_RAM_NB_WORDS);
-  constant c_CNT_MAX   : unsigned(c_RAM_ADDR_WIDTH - 1 downto 0) := (others => '1');
+  constant c_RAM_ADDR_WIDTH : integer                                 := fpasim.pkg_utils.pkg_width_from_value(g_RAM_NB_WORDS);
+  constant c_CNT_MAX        : unsigned(c_RAM_ADDR_WIDTH - 1 downto 0) := (others => '1');
   ---------------------------------------------------------------------
   -- fsm
   ---------------------------------------------------------------------
   type t_state is (E_RST, E_WAIT, E_AUTO_RD);
-  signal sm_state_r1   : t_state;
-  signal sm_state_next : t_state;
+  signal sm_state_r1        : t_state;
+  signal sm_state_next      : t_state;
 
   signal sof_next : std_logic;
   signal sof_r1   : std_logic;
@@ -351,7 +364,7 @@ begin
 
   ---------------------------------------------------------------------
   -- wr fifo: cross clock domain
-  --    .from the regdecode clock domain to the user clock domain
+  --    .from the i_clk clock domain to the i_out_clk clock domain
   ---------------------------------------------------------------------
   wr_rst_tmp0                                   <= i_rst;
   wr_tmp0                                       <= data_valid_r1;
@@ -477,7 +490,7 @@ begin
   assert not (rd_sync_rx = i_ram_rd_valid) report "[regdecode_pipe_wr_rd_ram_manager]: the internal pipeliner latency is not identical to the rd RAM latency. Change the g_RD_RAM_LATENCY value." severity error;
   ---------------------------------------------------------------------
   -- cross clock domain: 
-  --  from the user clock domain to the regdecode clock domain
+  --  from the i_out_clk clock domain to the i_clk clock domain
   ---------------------------------------------------------------------
   wr_tmp2                                       <= i_ram_rd_valid;
   data_tmp2(c_FIFO_IDX3_H)                      <= sof_sync_rx;

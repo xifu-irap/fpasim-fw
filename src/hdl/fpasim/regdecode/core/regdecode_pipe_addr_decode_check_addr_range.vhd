@@ -23,8 +23,10 @@
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
---
--- This modules outputs a write enable if i_addr_min <= i_addr <= i_addr_range_max when i_data_valid = '1'
+--!
+--!   This modules outputs a write enable (o_data_valid) if i_addr_min <= i_addr <= i_addr_range_max when i_data_valid = '1'
+--!
+--!   Note:
 -- -------------------------------------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
