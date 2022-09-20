@@ -318,9 +318,6 @@ use ieee.numeric_std.all;
 library xpm;
 use xpm.vcomponents.all;
 
----------------------------------------------------------------------
--- fifo asynchrone
----------------------------------------------------------------------
 entity fifo_async is
   generic(
     -- +---------------------------------------------------------------------------------------------------------------------+
@@ -562,13 +559,13 @@ architecture RTL of fifo_async is
   -- output
   ---------------------------------------------------------------------
   -- fifo: write side
-  signal wr_rst_busy : std_logic;
-  signal full        : std_logic;
+  signal wr_rst_busy   : std_logic;
+  signal wr_full       : std_logic;
   -- fifo: read side
-  signal data_valid  : std_logic;
-  signal dout        : std_logic_vector(o_rd_dout'range);
-  signal empty       : std_logic;
-  signal rd_rst_busy : std_logic;
+  signal rd_dout_valid : std_logic;
+  signal rd_dout       : std_logic_vector(o_rd_dout'range);
+  signal rd_empty      : std_logic;
+  signal rd_rst_busy   : std_logic;
 
 begin
 
@@ -608,20 +605,20 @@ begin
       almost_full   => open,            -- 1-bit output: Almost Full: When asserted, this signal indicates that
       -- only one more write can be performed before the FIFO is full.
 
-      data_valid    => data_valid,      -- 1-bit output: Read Data Valid: When asserted, this signal indicates
+      data_valid    => rd_dout_valid,   -- 1-bit output: Read Data Valid: When asserted, this signal indicates
       -- that valid data is available on the output bus (dout).
 
       dbiterr       => open,            -- 1-bit output: Double Bit Error: Indicates that the ECC decoder
       -- detected a double-bit error and data in the FIFO core is corrupted.
 
-      dout          => dout,            -- READ_DATA_WIDTH-bit output: Read Data: The output data bus is driven
+      dout          => rd_dout,         -- READ_DATA_WIDTH-bit output: Read Data: The output data bus is driven
       -- when reading the FIFO.
 
-      empty         => empty,           -- 1-bit output: Empty Flag: When asserted, this signal indicates that
+      empty         => rd_empty,        -- 1-bit output: Empty Flag: When asserted, this signal indicates that
       -- the FIFO is empty. Read requests are ignored when the FIFO is empty,
       -- initiating a read while empty is not destructive to the FIFO.
 
-      full          => full,            -- 1-bit output: Full Flag: When asserted, this signal indicates that the
+      full          => wr_full,         -- 1-bit output: Full Flag: When asserted, this signal indicates that the
       -- FIFO is full. Write requests are ignored when the FIFO is full,
       -- initiating a write when the FIFO is full is not destructive to the
       -- contents of the FIFO.
@@ -700,13 +697,13 @@ begin
   -- output
   ---------------------------------------------------------------------
   -- fifo: write side
-  o_wr_full     <= full;
+  o_wr_full     <= wr_full;
   o_wr_rst_busy <= wr_rst_busy;
 
   -- fifo: read side
-  o_rd_dout_valid <= data_valid;
-  o_rd_dout       <= dout;
-  o_rd_empty      <= empty;
+  o_rd_dout_valid <= rd_dout_valid;
+  o_rd_dout       <= rd_dout;
+  o_rd_empty      <= rd_empty;
   o_rd_rst_busy   <= rd_rst_busy;
 
 end architecture RTL;

@@ -26,7 +26,6 @@
 -- This module intanciates a synchronuous FIFO with the empty , full and prog full flags
 -- -------------------------------------------------------------------------------------------------------------
 
-
 -- -------------------------------------------------------------------------------------------------------------
 -- XPM_FIFO instantiation template for Synchronous FIFO configurations
 -- Refer to the targeted device family architecture libraries guide for XPM_FIFO documentation
@@ -309,9 +308,6 @@ use ieee.numeric_std.all;
 library xpm;
 use xpm.vcomponents.all;
 
----------------------------------------------------------------------
--- fifo asynchrone
----------------------------------------------------------------------
 entity fifo_sync_with_prog_full is
   generic(
     -- +---------------------------------------------------------------------------------------------------------------------+
@@ -395,8 +391,7 @@ entity fifo_sync_with_prog_full is
     -- | If READ_MODE = "std", then READ_MODE_VAL = 0; Otherwise READ_MODE_VAL = 1.                                          |
     -- | NOTE: The default threshold value is dependent on default FIFO_WRITE_DEPTH value. If FIFO_WRITE_DEPTH value is      |
     -- | changed, ensure the threshold value is within the valid range though the programmable flags are not used.           |
-     g_PROG_FULL_THRESH : integer := 5;
-
+    g_PROG_FULL_THRESH  : integer := 5;
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | RD_DATA_COUNT_WIDTH  | Integer            | Range: 1 - 23. Default value = 1.                                       |
     -- |---------------------------------------------------------------------------------------------------------------------|
@@ -541,14 +536,14 @@ architecture RTL of fifo_sync_with_prog_full is
   -- output
   ---------------------------------------------------------------------
   -- fifo: write side
-  signal wr_rst_busy : std_logic;
-  signal full        : std_logic;
-  signal prog_full        : std_logic;
+  signal wr_rst_busy   : std_logic;
+  signal wr_full       : std_logic;
+  signal wr_prog_full  : std_logic;
   -- fifo: read side
-  signal data_valid  : std_logic;
-  signal dout        : std_logic_vector(o_rd_dout'range);
-  signal empty       : std_logic;
-  signal rd_rst_busy : std_logic;
+  signal rd_dout_valid : std_logic;
+  signal rd_dout       : std_logic_vector(o_rd_dout'range);
+  signal rd_empty      : std_logic;
+  signal rd_rst_busy   : std_logic;
 
 begin
 
@@ -569,7 +564,7 @@ begin
       FIFO_WRITE_DEPTH    => g_FIFO_WRITE_DEPTH, -- DECIMAL
       FULL_RESET_VALUE    => 0,         -- DECIMAL
       PROG_EMPTY_THRESH   => 10,        -- DECIMAL
-      PROG_FULL_THRESH    => g_PROG_FULL_THRESH,        -- DECIMAL
+      PROG_FULL_THRESH    => g_PROG_FULL_THRESH, -- DECIMAL
       RD_DATA_COUNT_WIDTH => 1,         -- DECIMAL
       READ_DATA_WIDTH     => g_READ_DATA_WIDTH, -- DECIMAL
       READ_MODE           => g_READ_MODE, -- String
@@ -586,23 +581,23 @@ begin
       almost_full   => open,            -- 1-bit output: Almost Full: When asserted, this signal indicates that
       -- only one more write can be performed before the FIFO is full.
 
-      data_valid    => data_valid,      -- 1-bit output: Read Data Valid: When asserted, this signal indicates
-                                        -- that valid data is available on the output bus (dout).
+      data_valid    => rd_dout_valid,   -- 1-bit output: Read Data Valid: When asserted, this signal indicates
+      -- that valid data is available on the output bus (dout).
 
       dbiterr       => open,            -- 1-bit output: Double Bit Error: Indicates that the ECC decoder
       -- detected a double-bit error and data in the FIFO core is corrupted.
 
-      dout          => dout,            -- READ_DATA_WIDTH-bit output: Read Data: The output data bus is driven
-                                        -- when reading the FIFO.
+      dout          => rd_dout,         -- READ_DATA_WIDTH-bit output: Read Data: The output data bus is driven
+      -- when reading the FIFO.
 
-      empty         => empty,           -- 1-bit output: Empty Flag: When asserted, this signal indicates that
-                                        -- the FIFO is empty. Read requests are ignored when the FIFO is empty,
-                                        -- initiating a read while empty is not destructive to the FIFO.
+      empty         => rd_empty,        -- 1-bit output: Empty Flag: When asserted, this signal indicates that
+      -- the FIFO is empty. Read requests are ignored when the FIFO is empty,
+      -- initiating a read while empty is not destructive to the FIFO.
 
-      full          => full,            -- 1-bit output: Full Flag: When asserted, this signal indicates that the
-                                        -- FIFO is full. Write requests are ignored when the FIFO is full,
-                                        -- initiating a write when the FIFO is full is not destructive to the
-                                        -- contents of the FIFO.
+      full          => wr_full,         -- 1-bit output: Full Flag: When asserted, this signal indicates that the
+      -- FIFO is full. Write requests are ignored when the FIFO is full,
+      -- initiating a write when the FIFO is full is not destructive to the
+      -- contents of the FIFO.
 
       overflow      => open,            -- 1-bit output: Overflow: This signal indicates that a write request
       -- (wren) during the prior clock cycle was rejected, because the FIFO is
@@ -614,7 +609,7 @@ begin
       -- empty threshold value. It is de-asserted when the number of words in
       -- the FIFO exceeds the programmable empty threshold value.
 
-      prog_full     => prog_full,            -- 1-bit output: Programmable Full: This signal is asserted when the
+      prog_full     => wr_prog_full,    -- 1-bit output: Programmable Full: This signal is asserted when the
       -- number of words in the FIFO is greater than or equal to the
       -- programmable full threshold value. It is de-asserted when the number
       -- of words in the FIFO is less than the programmable full threshold
@@ -675,14 +670,14 @@ begin
   -- output
   ---------------------------------------------------------------------
   -- fifo: write side
-  o_wr_full     <= full;
-  o_wr_prog_full     <= prog_full;
-  o_wr_rst_busy <= wr_rst_busy;
+  o_wr_full      <= wr_full;
+  o_wr_prog_full <= wr_prog_full;
+  o_wr_rst_busy  <= wr_rst_busy;
 
   -- fifo: read side
-  o_rd_dout_valid <= data_valid;
-  o_rd_dout       <= dout;
-  o_rd_empty      <= empty;
+  o_rd_dout_valid <= rd_dout_valid;
+  o_rd_dout       <= rd_dout;
+  o_rd_empty      <= rd_empty;
   o_rd_rst_busy   <= rd_rst_busy;
 
 end architecture RTL;
