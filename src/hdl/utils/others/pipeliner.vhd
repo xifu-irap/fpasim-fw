@@ -32,22 +32,21 @@ use ieee.std_logic_1164.all;
 
 entity pipeliner is
   generic(
-    g_NB_PIPES   : natural := 1;        -- number of consecutives registers. Possibles values: [0, integer max value[
-    g_DATA_WIDTH : positive := 1         -- width of the input/output data.  Possibles values: [1, integer max value[
-  );
+    g_NB_PIPES   : natural  := 1;  -- number of consecutives registers. Possibles values: [0, integer max value[
+    g_DATA_WIDTH : positive := 1  -- width of the input/output data.  Possibles values: [1, integer max value[
+    );
   port(
     i_clk  : in  std_logic;             -- clock signal
-    i_data : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- input data
-    o_data : out std_logic_vector(g_DATA_WIDTH - 1 downto 0) -- output data with/without delay
-  );
+    i_data : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- input data
+    o_data : out std_logic_vector(g_DATA_WIDTH - 1 downto 0)  -- output data with/without delay
+    );
 end entity pipeliner;
 
 architecture RTL of pipeliner is
 
-  type t_pipeline is array (g_NB_PIPES - 1 downto 0) of std_logic_vector(i_data'range);
-  signal data_pipe_r : t_pipeline                     := (others => (others => '0'));
-  signal data_r      : std_logic_vector(i_data'range) := (others => '0');
-  signal sync_tmp    : std_logic_vector(i_data'range) := (others => '0');
+
+  signal data_r   : std_logic_vector(i_data'range) := (others => '0');
+  signal sync_tmp : std_logic_vector(i_data'range) := (others => '0');
 
 begin
 
@@ -71,6 +70,8 @@ begin
 
   -- add 2 or more registers on the data path
   gen_multiple_pipeline : if g_NB_PIPES > 1 generate
+    type t_pipeline is array (g_NB_PIPES - 1 downto 0) of std_logic_vector(i_data'range);
+    signal data_pipe_r : t_pipeline := (others => (others => '0'));
   begin
     process(i_clk)
     begin
