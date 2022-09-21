@@ -46,68 +46,73 @@ use fpasim.pkg_fpasim.all;
 
 entity tes_pulse_shape_manager is
   generic(
-    g_FRAME_SIZE                : positive := pkg_FRAME_SIZE; -- frame size value (expressed in bits). Possible values : [1; max integer value[
-    g_FRAME_WIDTH               : positive := pkg_FRAME_WIDTH; -- frame bus width (expressed in bits). Possible values : [1; max integer value[
-    g_PIXEL_ID_WIDTH            : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[
-    g_PIXEL_RESULT_OUTPUT_WIDTH : positive := pkg_TES_MULT_SUB_Q_WIDTH_S -- pixel output result width (expressed in bits). Possible values : [1; max integer value[
-  );
+    -- frame
+    g_FRAME_SIZE                 : positive := pkg_FRAME_SIZE;  -- frame size value (expressed in bits). Possible values : [1; max integer value[
+    g_FRAME_WIDTH                : positive := pkg_FRAME_WIDTH;  -- frame bus width (expressed in bits). Possible values : [1; max integer value[
+    -- pixel
+    g_PIXEL_ID_WIDTH             : positive := pkg_PIXEL_ID_WIDTH_MAX;  -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[
+    -- addr
+    g_PULSE_SHAPE_RAM_ADDR_WIDTH : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
+    -- output 
+    g_PIXEL_RESULT_OUTPUT_WIDTH  : positive := pkg_TES_MULT_SUB_Q_WIDTH_S  -- pixel output result width (expressed in bits). Possible values : [1; max integer value[
+    );
   port(
-    i_clk                     : in  std_logic; -- clock 
-    i_rst                     : in  std_logic; -- reset 
-    i_rst_status              : in  std_logic; -- reset error flag(s)
-    i_debug_pulse             : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    i_clk         : in std_logic;       -- clock 
+    i_rst         : in std_logic;       -- reset 
+    i_rst_status  : in std_logic;       -- reset error flag(s)
+    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
-    i_cmd_valid               : in  std_logic; -- valid command
-    i_cmd_pulse_height        : in  std_logic_vector(10 downto 0); -- pulse height command
-    i_cmd_pixel_id            : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id command
-    i_cmd_time_shift          : in  std_logic_vector(3 downto 0); -- time shift command
+    i_cmd_valid        : in std_logic;  -- valid command
+    i_cmd_pulse_height : in std_logic_vector(10 downto 0);  -- pulse height command
+    i_cmd_pixel_id     : in std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id command
+    i_cmd_time_shift   : in std_logic_vector(3 downto 0);  -- time shift command
 
     -- RAM: pulse shape
     -- wr
-    i_pulse_shape_wr_en       : in  std_logic; -- write enable
-    i_pulse_shape_wr_rd_addr  : in  std_logic_vector(14 downto 0); -- write address
-    i_pulse_shape_wr_data     : in  std_logic_vector(15 downto 0); -- write data
+    i_pulse_shape_wr_en      : in  std_logic;  -- write enable
+    i_pulse_shape_wr_rd_addr : in  std_logic_vector(g_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0);  -- write address
+    i_pulse_shape_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
     -- rd
-    i_pulse_shape_rd_en       : in  std_logic; -- rd enable
-    o_pulse_shape_rd_valid    : out std_logic; -- rd data valid
-    o_pulse_shape_rd_data     : out std_logic_vector(15 downto 0); -- rd data
+    i_pulse_shape_rd_en      : in  std_logic;  -- rd enable
+    o_pulse_shape_rd_valid   : out std_logic;  -- rd data valid
+    o_pulse_shape_rd_data    : out std_logic_vector(15 downto 0);  -- rd data
 
     -- RAM:
     -- wr
-    i_steady_state_wr_en      : in  std_logic; -- write enable
-    i_steady_state_wr_rd_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- write address
-    i_steady_state_wr_data    : in  std_logic_vector(15 downto 0); -- write data
+    i_steady_state_wr_en      : in  std_logic;  -- write enable
+    i_steady_state_wr_rd_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- write address
+    i_steady_state_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
     -- rd
-    i_steady_state_rd_en      : in  std_logic; -- rd enable
-    o_steady_state_rd_valid   : out std_logic; -- rd data valid
-    o_steady_state_rd_data    : out std_logic_vector(15 downto 0); -- read data
+    i_steady_state_rd_en      : in  std_logic;  -- rd enable
+    o_steady_state_rd_valid   : out std_logic;  -- rd data valid
+    o_steady_state_rd_data    : out std_logic_vector(15 downto 0);  -- read data
 
     ---------------------------------------------------------------------
     -- input data
     ---------------------------------------------------------------------
-    i_pixel_sof               : in  std_logic; -- first pixel sample
-    i_pixel_eof               : in  std_logic; -- last pixel sample
-    i_pixel_id                : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id 
-    i_pixel_valid             : in  std_logic; -- valid pixel sample
+    i_pixel_sof   : in std_logic;       -- first pixel sample
+    i_pixel_eof   : in std_logic;       -- last pixel sample
+    i_pixel_id    : in std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id 
+    i_pixel_valid : in std_logic;       -- valid pixel sample
 
     ---------------------------------------------------------------------
     -- output data
     ---------------------------------------------------------------------
-    o_pixel_sof               : out std_logic; -- first pixel sample
-    o_pixel_eof               : out std_logic; -- last pixel sample
-    o_pixel_id                : out std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id
-    o_pixel_valid             : out std_logic; -- valid pixel result
-    o_pixel_result            : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0); -- pixel result
+    o_pixel_sof    : out std_logic;     -- first pixel sample
+    o_pixel_eof    : out std_logic;     -- last pixel sample
+    o_pixel_id     : out std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id
+    o_pixel_valid  : out std_logic;     -- valid pixel result
+    o_pixel_result : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0);  -- pixel result
 
     -----------------------------------------------------------------
     -- errors/status
     -----------------------------------------------------------------
-    o_errors                  : out std_logic_vector(15 downto 0); -- output errors
-    o_status                  : out std_logic_vector(7 downto 0) -- output status
-  );
+    o_errors : out std_logic_vector(15 downto 0);  -- output errors
+    o_status : out std_logic_vector(7 downto 0)    -- output status
+    );
 end entity tes_pulse_shape_manager;
 
 architecture RTL of tes_pulse_shape_manager is
@@ -116,8 +121,8 @@ architecture RTL of tes_pulse_shape_manager is
   constant c_TES_PULSE_SHAPE_RAM_RD_LATENCY : natural := pkg_TES_PULSE_SHAPE_RAM_RD_LATENCY;
   constant c_TES_STD_STATE_RAM_RD_LATENCY   : natural := pkg_TES_STD_STATE_RAM_RD_LATENCY;
 
-  constant c_MEMORY_SIZE_PULSE_SHAPE  : positive := (2 ** i_pulse_shape_wr_rd_addr'length) * i_pulse_shape_wr_data'length; -- memory size in bits
-  constant c_MEMORY_SIZE_STEADY_STATE : positive := (2 ** i_steady_state_wr_rd_addr'length) * i_steady_state_wr_data'length; -- memory size in bits
+  constant c_MEMORY_SIZE_PULSE_SHAPE  : positive := (2 ** i_pulse_shape_wr_rd_addr'length) * i_pulse_shape_wr_data'length;  -- memory size in bits
+  constant c_MEMORY_SIZE_STEADY_STATE : positive := (2 ** i_steady_state_wr_rd_addr'length) * i_steady_state_wr_data'length;  -- memory size in bits
 
   constant c_COMPUTATION_LATENCY : natural := pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY;
 
@@ -139,8 +144,8 @@ architecture RTL of tes_pulse_shape_manager is
   constant c_CMD_IDX2_H : integer := c_CMD_IDX2_L + i_cmd_pulse_height'length - 1;
 
   -- find the power of 2 superior to the g_DELAY
-  constant c_FIFO_DEPTH0 : integer := 16; --see IP
-  constant c_FIFO_WIDTH0 : integer := c_CMD_IDX2_H + 1; --see IP
+  constant c_FIFO_DEPTH0 : integer := 16;                --see IP
+  constant c_FIFO_WIDTH0 : integer := c_CMD_IDX2_H + 1;  --see IP
 
   signal wr_tmp0   : std_logic;
   signal data_tmp0 : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
@@ -339,7 +344,7 @@ begin
       g_READ_DATA_WIDTH   => data_tmp0'length,
       g_READ_MODE         => "std",
       g_WRITE_DATA_WIDTH  => data_tmp0'length
-    )
+      )
     port map(
       ---------------------------------------------------------------------
       -- write side
@@ -363,7 +368,7 @@ begin
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync,
       o_empty_sync    => empty_sync
-    );
+      );
 
   rd1 <= cmd_rd_r1;
 
@@ -440,7 +445,7 @@ begin
           sm_state_next <= E_RUN;
         end if;
 
-      when others =>                    -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -490,12 +495,12 @@ begin
     generic map(
       g_NB_PIPES   => 2,
       g_DATA_WIDTH => data_pipe_tmp0'length
-    )
+      )
     port map(
       i_clk  => i_clk,
       i_data => data_pipe_tmp0,
       o_data => data_pipe_tmp1
-    );
+      );
 
   pixel_sof_r2 <= data_pipe_tmp1(c_IDX2_H);
   pixel_eof_r2 <= data_pipe_tmp1(c_IDX1_H);
@@ -534,7 +539,7 @@ begin
       g_MEMORY_SIZE        => c_MEMORY_SIZE_PULSE_SHAPE,
       g_MEMORY_INIT_FILE   => "none",
       g_MEMORY_INIT_PARAM  => "0"
-    )
+      )
     port map(
       ---------------------------------------------------------------------
       -- port A
@@ -558,7 +563,7 @@ begin
       i_dinb   => pulse_shape_dinb,
       i_regceb => pulse_shape_regceb,
       o_doutb  => pulse_shape_doutb
-    );
+      );
   pulse_shape_web    <= '0';
   pulse_shape_dinb   <= (others => '0');
   pulse_shape_enb    <= pixel_valid_r2;
@@ -572,12 +577,12 @@ begin
     generic map(
       g_NB_PIPES   => c_TES_PULSE_SHAPE_RAM_RD_LATENCY,
       g_DATA_WIDTH => 1
-    )
+      )
     port map(
       i_clk     => i_clk,
       i_data(0) => i_pulse_shape_rd_en,
       o_data(0) => pulse_shape_rd_en_rz
-    );
+      );
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
@@ -591,7 +596,7 @@ begin
     generic map(
       g_WR_ADDR_WIDTH => pulse_shape_addra'length,
       g_RD_ADDR_WIDTH => pulse_shape_addrb'length
-    )
+      )
     port map(
       i_clk         => i_clk,
       ---------------------------------------------------------------------
@@ -605,7 +610,7 @@ begin
       -- Errors
       ---------------------------------------------------------------------
       o_error_pulse => pulse_shape_error
-    );
+      );
 
   ---------------------------------------------------------------------
   -- RAM: tes_std_state
@@ -638,7 +643,7 @@ begin
       g_MEMORY_SIZE        => c_MEMORY_SIZE_STEADY_STATE,
       g_MEMORY_INIT_FILE   => "none",
       g_MEMORY_INIT_PARAM  => "0"
-    )
+      )
     port map(
       ---------------------------------------------------------------------
       -- port A
@@ -662,7 +667,7 @@ begin
       i_dinb   => steady_state_dinb,
       i_regceb => steady_state_regceb,
       o_doutb  => steady_state_doutb
-    );
+      );
   steady_state_web    <= '0';
   steady_state_dinb   <= (others => '0');
   steady_state_enb    <= pixel_valid_r2;
@@ -676,12 +681,12 @@ begin
     generic map(
       g_NB_PIPES   => c_TES_STD_STATE_RAM_RD_LATENCY,
       g_DATA_WIDTH => 1
-    )
+      )
     port map(
       i_clk     => i_clk,
       i_data(0) => i_steady_state_rd_en,
       o_data(0) => steady_state_rd_en_rz
-    );
+      );
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
@@ -695,7 +700,7 @@ begin
     generic map(
       g_WR_ADDR_WIDTH => steady_state_addra'length,
       g_RD_ADDR_WIDTH => steady_state_addrb'length
-    )
+      )
     port map(
       i_clk         => i_clk,
       ---------------------------------------------------------------------
@@ -709,7 +714,7 @@ begin
       -- Errors
       ---------------------------------------------------------------------
       o_error_pulse => steady_state_error
-    );
+      );
 
   -------------------------------------------------------------------
   -- sync with RAM output
@@ -725,12 +730,12 @@ begin
     generic map(
       g_NB_PIPES   => c_TES_PULSE_SHAPE_RAM_RD_LATENCY,
       g_DATA_WIDTH => data_pipe_tmp2'length
-    )
+      )
     port map(
       i_clk  => i_clk,
       i_data => data_pipe_tmp2,
       o_data => data_pipe_tmp3
-    );
+      );
 
   pulse_heigth_rx <= data_pipe_tmp3(c_IDX4_H downto c_IDX4_L);
   pixel_valid_rx  <= data_pipe_tmp3(c_IDX3_H);
@@ -764,7 +769,7 @@ begin
       g_Q_M_S  => pkg_TES_MULT_SUB_Q_M_S,
       g_Q_N_S  => pkg_TES_MULT_SUB_Q_N_S,
       g_SIM_EN => pkg_TES_PULSE_MANAGER_COMPUTATION_SIM_EN
-    )
+      )
     port map(
       i_clk => i_clk,
       --------------------------------------------------------------
@@ -777,7 +782,7 @@ begin
       -- output : S = C - A*B
       --------------------------------------------------------------
       o_s   => result_ry
-    );
+      );
 
   assert not (result_ry'length /= c_TES_MULT_SUB_Q_WIDTH_S) report "[tes_pulse_shape_manager]: result => output result width and sfixed package definition width doesn't match." severity error;
 
@@ -792,12 +797,12 @@ begin
     generic map(
       g_NB_PIPES   => c_COMPUTATION_LATENCY,
       g_DATA_WIDTH => data_pipe_tmp4'length
-    )
+      )
     port map(
       i_clk  => i_clk,
       i_data => data_pipe_tmp4,
       o_data => data_pipe_tmp5
-    );
+      );
 
   pixel_valid_ry <= data_pipe_tmp5(c_IDX3_H);
   pixel_sof_ry   <= data_pipe_tmp5(c_IDX2_H);
@@ -818,9 +823,9 @@ begin
   ---------------------------------------------------------------------
   error_tmp(4) <= steady_state_error;
   error_tmp(3) <= pulse_shape_error;
-  error_tmp(2) <= errors_sync(2) or errors_sync(3); -- fifo rst error
-  error_tmp(1) <= errors_sync(1);       -- fifo rd empty error
-  error_tmp(0) <= errors_sync(0);       -- fifo wr full error
+  error_tmp(2) <= errors_sync(2) or errors_sync(3);  -- fifo rst error
+  error_tmp(1) <= errors_sync(1);                    -- fifo rd empty error
+  error_tmp(0) <= errors_sync(0);                    -- fifo wr full error
   gen_errors_latch : for i in error_tmp'range generate
     inst_one_error_latch : entity fpasim.one_error_latch
       port map(
@@ -829,16 +834,16 @@ begin
         i_debug_pulse => i_debug_pulse,
         i_error       => error_tmp(i),
         o_error       => error_tmp_bis(i)
-      );
+        );
   end generate gen_errors_latch;
 
   o_errors(15 downto 7) <= (others => '0');
-  o_errors(5)           <= error_tmp_bis(4); -- steady state error
-  o_errors(4)           <= error_tmp_bis(3); -- pulse shape error
+  o_errors(5)           <= error_tmp_bis(4);  -- steady state error
+  o_errors(4)           <= error_tmp_bis(3);  -- pulse shape error
   o_errors(3)           <= '0';
-  o_errors(2)           <= error_tmp_bis(2); -- fifo rst error
-  o_errors(1)           <= error_tmp_bis(1); -- fifo rd empty error
-  o_errors(0)           <= error_tmp_bis(0); -- fifo wr full error
+  o_errors(2)           <= error_tmp_bis(2);  -- fifo rst error
+  o_errors(1)           <= error_tmp_bis(1);  -- fifo rd empty error
+  o_errors(0)           <= error_tmp_bis(0);  -- fifo wr full error
 
   o_status(7 downto 1) <= (others => '0');
   o_status(0)          <= empty_sync;   -- fifo empty
