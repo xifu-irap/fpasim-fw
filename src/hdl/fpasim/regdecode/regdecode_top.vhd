@@ -126,7 +126,7 @@ entity regdecode_top is
     -- to the usb @o_usb_clk
     ---------------------------------------------------------------------
     -- pipe
-    i_usb_pipeout_fifo_valid          : in  std_logic; -- pipe out valid
+    i_usb_pipeout_fifo_rd             : in  std_logic; -- pipe out fifo rd
     o_usb_pipeout_fifo_data           : out std_logic_vector(31 downto 0); -- pipe out data
     -- trig
     o_usb_trigout_data                : out std_logic_vector(31 downto 0); -- trig out value
@@ -145,9 +145,9 @@ entity regdecode_top is
     o_usb_wireout_fpga_id             : out std_logic_vector(31 downto 0); -- wire out fpga id
     o_usb_wireout_fpga_version        : out std_logic_vector(31 downto 0); -- wire out fpga version
 
-    o_usb_wireout_sel_errors          : out std_logic_vector(31 downto 0); -- wire out selected errors
-    o_usb_wireout_errors              : out std_logic_vector(31 downto 0); -- wire out selected errors
-    o_usb_wireout_status              : out std_logic_vector(31 downto 0); -- wire out selected status
+    o_usb_wireout_sel_errors          : out std_logic_vector(31 downto 0); -- wire out select errors
+    o_usb_wireout_errors              : out std_logic_vector(31 downto 0); -- wire out errors
+    o_usb_wireout_status              : out std_logic_vector(31 downto 0); -- wire out status
     ---------------------------------------------------------------------
     -- from/to the user: @i_out_clk
     ---------------------------------------------------------------------
@@ -229,23 +229,23 @@ entity regdecode_top is
     -- to the usb 
     ---------------------------------------------------------------------
     -- errors
-    i_reg_wire_errors7                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors6                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors5                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors4                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors3                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors2                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors1                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors0                : in  std_logic_vector(31 downto 0);
+    i_reg_wire_errors7                : in  std_logic_vector(31 downto 0); -- errors7 register
+    i_reg_wire_errors6                : in  std_logic_vector(31 downto 0); -- errors6 register
+    i_reg_wire_errors5                : in  std_logic_vector(31 downto 0); -- errors5 register
+    i_reg_wire_errors4                : in  std_logic_vector(31 downto 0); -- errors4 register
+    i_reg_wire_errors3                : in  std_logic_vector(31 downto 0); -- errors3 register
+    i_reg_wire_errors2                : in  std_logic_vector(31 downto 0); -- errors2 register
+    i_reg_wire_errors1                : in  std_logic_vector(31 downto 0); -- errors1 register
+    i_reg_wire_errors0                : in  std_logic_vector(31 downto 0); -- errors0 register
     -- status
-    i_reg_wire_status7                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status6                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status5                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status4                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status3                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status2                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status1                : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status0                : in  std_logic_vector(31 downto 0);
+    i_reg_wire_status7                : in  std_logic_vector(31 downto 0); -- status7 register
+    i_reg_wire_status6                : in  std_logic_vector(31 downto 0); -- status6 register
+    i_reg_wire_status5                : in  std_logic_vector(31 downto 0); -- status5 register
+    i_reg_wire_status4                : in  std_logic_vector(31 downto 0); -- status4 register
+    i_reg_wire_status3                : in  std_logic_vector(31 downto 0); -- status3 register
+    i_reg_wire_status2                : in  std_logic_vector(31 downto 0); -- status2 register
+    i_reg_wire_status1                : in  std_logic_vector(31 downto 0); -- status1 register
+    i_reg_wire_status0                : in  std_logic_vector(31 downto 0); -- status0 register
     -- to the user: errors/status
     ---------------------------------------------------------------------
     -- pipe errors
@@ -531,7 +531,7 @@ begin
       -- to the pipe out: @i_clk
       ---------------------------------------------------------------------
 
-      i_fifo_rd                         => i_usb_pipeout_fifo_valid,
+      i_fifo_rd                         => i_usb_pipeout_fifo_rd,
       o_fifo_sof                        => pipeout_sof,
       o_fifo_eof                        => pipeout_eof,
       o_fifo_data_valid                 => pipeout_valid,
@@ -979,7 +979,7 @@ o_wire_status => wire_status
         probe0(1)            => trig_make_pulse_valid,
         probe0(0)            => trig_reg_valid,
         -- probe1
-        probe1(5)            => i_usb_pipeout_fifo_valid,
+        probe1(5)            => i_usb_pipeout_fifo_rd,
         probe1(4)            => pipeout_sof,
         probe1(3)            => pipeout_eof,
         probe1(2)            => pipeout_valid,
