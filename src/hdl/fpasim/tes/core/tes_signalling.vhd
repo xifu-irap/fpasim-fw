@@ -48,11 +48,11 @@ use fpasim.pkg_fpasim.all;
 entity tes_signalling is
     generic(
         -- pixel
-        g_PIXEL_LENGTH_WIDTH : positive := 16;
+        g_PIXEL_LENGTH_WIDTH : positive := 6; -- bus width in order to define the number of samples by pixel
         g_PIXEL_ID_WIDTH     : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
 
         -- frame
-        g_FRAME_LENGTH_WIDTH : positive := 16;
+        g_FRAME_LENGTH_WIDTH : positive := 11; -- bus width in order to define the number of samples by frame
         g_FRAME_ID_WIDTH     : positive := pkg_FRAME_ID_WIDTH -- frame id bus width (expressed in bits). Possible values [1;max integer value[
     );
     port(
