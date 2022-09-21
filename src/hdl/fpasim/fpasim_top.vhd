@@ -47,65 +47,64 @@ entity top_fpasim is
     -- from the usb @i_usb_clk
     ---------------------------------------------------------------------
     -- trig
-    i_usb_pipein_fifo_valid      : in std_logic;
-    i_usb_pipein_fifo            : in std_logic_vector(31 downto 0);
+    i_usb_pipein_fifo_valid      : in std_logic;  -- pipe in data valid
+    i_usb_pipein_fifo            : in std_logic_vector(31 downto 0);  -- pipe in data
     -- trig
-    i_usb_trigin_data            : in std_logic_vector(31 downto 0);
+    i_usb_trigin_data            : in std_logic_vector(31 downto 0);  -- trigin value
     -- wire
-    i_usb_wirein_ctrl            : in std_logic_vector(31 downto 0);
-    i_usb_wirein_make_pulse      : in std_logic_vector(31 downto 0);
-    i_usb_wirein_fpasim_gain     : in std_logic_vector(31 downto 0);
-    i_usb_wirein_mux_sq_fb_delay : in std_logic_vector(31 downto 0);
-    i_usb_wirein_amp_sq_of_delay : in std_logic_vector(31 downto 0);
-    i_usb_wirein_error_delay     : in std_logic_vector(31 downto 0);
-    i_usb_wirein_ra_delay        : in std_logic_vector(31 downto 0);
-    i_usb_wirein_tes_conf        : in std_logic_vector(31 downto 0);
-    i_usb_wirein_debug_ctrl      : in std_logic_vector(31 downto 0);
-
-    i_usb_wirein_sel_errors : in std_logic_vector(31 downto 0);
+    i_usb_wirein_ctrl            : in std_logic_vector(31 downto 0);  -- wirein ctrl value
+    i_usb_wirein_make_pulse      : in std_logic_vector(31 downto 0);  -- wirein make_pulse value
+    i_usb_wirein_fpasim_gain     : in std_logic_vector(31 downto 0);  -- wirein fpasim_gain value
+    i_usb_wirein_mux_sq_fb_delay : in std_logic_vector(31 downto 0);  -- wirein mux_sq_fb_delay value
+    i_usb_wirein_amp_sq_of_delay : in std_logic_vector(31 downto 0);  -- wirein amp_sq_of_delay value
+    i_usb_wirein_error_delay     : in std_logic_vector(31 downto 0);  -- wirein error_delay value
+    i_usb_wirein_ra_delay        : in std_logic_vector(31 downto 0);  -- wirein ra_delay value
+    i_usb_wirein_tes_conf        : in std_logic_vector(31 downto 0);  -- wirein tes_conf value
+    i_usb_wirein_debug_ctrl      : in std_logic_vector(31 downto 0);  -- wirein debug_ctrl value
+    i_usb_wirein_sel_errors      : in std_logic_vector(31 downto 0);  -- wirein select errors/status
 
     ---------------------------------------------------------------------
     -- to the usb @o_usb_clk
     ---------------------------------------------------------------------
     -- pipe
-    i_usb_pipeout_fifo_valid : in  std_logic;
-    o_usb_pipeout_fifo_data  : out std_logic_vector(31 downto 0);
+    i_usb_pipeout_fifo_rd         : in  std_logic;  -- pipe out fifo rd
+    o_usb_pipeout_fifo_data       : out std_logic_vector(31 downto 0);  -- pipe out data
+    o_usb_wireout_fifo_data_count : out std_logic_vector(31 downto 0);  -- wire out fifo data count (necessary for the pipe out)
     -- trig
-    o_usb_trigout_data       : out std_logic_vector(31 downto 0);
+    o_usb_trigout_data            : out std_logic_vector(31 downto 0);  -- trig out value
 
     -- wire
-    o_usb_wireout_fifo_data_count : out std_logic_vector(31 downto 0);
-    o_usb_wireout_ctrl            : out std_logic_vector(31 downto 0);
-    o_usb_wireout_make_pulse      : out std_logic_vector(31 downto 0);
-    o_usb_wireout_fpasim_gain     : out std_logic_vector(31 downto 0);
-    o_usb_wireout_mux_sq_fb_delay : out std_logic_vector(31 downto 0);
-    o_usb_wireout_amp_sq_of_delay : out std_logic_vector(31 downto 0);
-    o_usb_wireout_error_delay     : out std_logic_vector(31 downto 0);
-    o_usb_wireout_ra_delay        : out std_logic_vector(31 downto 0);
-    o_usb_wireout_tes_conf        : out std_logic_vector(31 downto 0);
-    o_usb_wireout_debug_ctrl      : out std_logic_vector(31 downto 0);
-    o_usb_wireout_fpga_id         : out std_logic_vector(31 downto 0);
-    o_usb_wireout_fpga_version    : out std_logic_vector(31 downto 0);
-    o_usb_wireout_sel_errors      : out std_logic_vector(31 downto 0);
-    o_usb_wireout_errors          : out std_logic_vector(31 downto 0);
-    o_usb_wireout_status          : out std_logic_vector(31 downto 0);
+    o_usb_wireout_ctrl            : out std_logic_vector(31 downto 0);  -- wire out ctrl value
+    o_usb_wireout_make_pulse      : out std_logic_vector(31 downto 0);  -- wire out make_pulse value
+    o_usb_wireout_fpasim_gain     : out std_logic_vector(31 downto 0);  -- wire out fpasim_gain value
+    o_usb_wireout_mux_sq_fb_delay : out std_logic_vector(31 downto 0);  -- wire out mux_sq_fb_delay value
+    o_usb_wireout_amp_sq_of_delay : out std_logic_vector(31 downto 0);  -- wire out amp_sq_of_delay value
+    o_usb_wireout_error_delay     : out std_logic_vector(31 downto 0);  -- wire out error_delay value
+    o_usb_wireout_ra_delay        : out std_logic_vector(31 downto 0);  -- wire out ra_delay value
+    o_usb_wireout_tes_conf        : out std_logic_vector(31 downto 0);  -- wire out tes_conf value
+    o_usb_wireout_debug_ctrl      : out std_logic_vector(31 downto 0);  -- wire out debug_ctrl value
+    o_usb_wireout_fpga_id         : out std_logic_vector(31 downto 0);  -- wire out fpga id
+    o_usb_wireout_fpga_version    : out std_logic_vector(31 downto 0);  -- wire out fpga version
+    o_usb_wireout_sel_errors      : out std_logic_vector(31 downto 0);  -- wire out select errors/status
+    o_usb_wireout_errors          : out std_logic_vector(31 downto 0);  -- wire out errors
+    o_usb_wireout_status          : out std_logic_vector(31 downto 0);  -- wire out status
 
     ---------------------------------------------------------------------
     -- from adc
     ---------------------------------------------------------------------
-    i_adc_valid                       : in  std_logic;
-    i_adc_amp_squid_offset_correction : in  std_logic_vector(13 downto 0);
-    i_adc_mux_squid_feedback          : in  std_logic_vector(13 downto 0);
+    i_adc_valid                       : in  std_logic;  -- adc valid
+    i_adc_amp_squid_offset_correction : in  std_logic_vector(13 downto 0);  -- adc_amp_squid_offset_correction value
+    i_adc_mux_squid_feedback          : in  std_logic_vector(13 downto 0);  -- adc_mux_squid_feedback value
     ---------------------------------------------------------------------
     -- output sync @clk_ref
     ---------------------------------------------------------------------
-    o_sync                            : out std_logic;
+    o_sync                            : out std_logic;  -- synchronization signal (pulse)
     ---------------------------------------------------------------------
     -- output dac @i_clk_dac
     ---------------------------------------------------------------------
-    o_dac_valid                       : out std_logic;
-    o_dac_frame                       : out std_logic;
-    o_dac                             : out std_logic_vector(15 downto 0)
+    o_dac_valid                       : out std_logic;  -- dac valid
+    o_dac_frame                       : out std_logic;  -- dac frame
+    o_dac                             : out std_logic_vector(15 downto 0)  -- dac data
     );
 end entity top_fpasim;
 
@@ -486,7 +485,7 @@ begin
       -- to the usb @o_usb_clk
       ---------------------------------------------------------------------
       -- pipe
-      i_usb_pipeout_fifo_valid      => i_usb_pipeout_fifo_valid,  -- pipe out valid
+      i_usb_pipeout_fifo_rd         => i_usb_pipeout_fifo_rd,  -- rd pipe out 
       o_usb_pipeout_fifo_data       => o_usb_pipeout_fifo_data,  -- pipe out data
       -- trig
       o_usb_trigout_data            => o_usb_trigout_data,  -- trig out value
