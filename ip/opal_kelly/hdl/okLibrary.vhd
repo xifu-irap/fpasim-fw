@@ -4,7 +4,7 @@
 --FrontPanel Library Module Declarations (VHDL)
 -- XEM7350
 --
--- Copyright (c) 2004-2011 Opal Kelly Incorporated
+-- Copyright (c) 2004-2022 Opal Kelly Incorporated
 -- $Rev: 980 $ $Date: 2011-08-19 14:17:52 -0500 (Fri, 19 Aug 2011) $
 ------------------------------------------------------------------------
 library IEEE;
