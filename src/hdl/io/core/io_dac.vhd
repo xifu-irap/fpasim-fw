@@ -151,7 +151,7 @@ begin
 
    inst_OBUFDS_dac_frame : OBUFDS
       generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
-         IOSTANDARD => "DEFAULT",       -- Specify the output I/O standard
+         IOSTANDARD => "LVDS",       -- Specify the output I/O standard
          SLEW       => "SLOW")          -- Specify the output slew rate
       port map(
          O  => dac_frame_p_tmp3,        -- Diff_p output (connect directly to top-level port)
@@ -183,7 +183,7 @@ begin
 
    inst_OBUFDS_clk : OBUFDS
       generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
-         IOSTANDARD => "DEFAULT",       -- Specify the output I/O standard
+         IOSTANDARD => "LVDS",       -- Specify the output I/O standard
          SLEW       => "SLOW")          -- Specify the output slew rate
       port map(
          O  => dac_clk_p_tmp3,          -- Diff_p output (connect directly to top-level port)
@@ -217,7 +217,7 @@ begin
 
       inst_OBUFDS_dac : OBUFDS
          generic map(                   -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
-            IOSTANDARD => "DEFAULT",    -- Specify the output I/O standard
+            IOSTANDARD => "LVDS",    -- Specify the output I/O standard
             SLEW       => "SLOW")       -- Specify the output slew rate
          port map(
             O  => dac_p_tmp3(i),        -- Diff_p output (connect directly to top-level port)

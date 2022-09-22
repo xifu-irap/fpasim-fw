@@ -76,7 +76,7 @@ begin
          generic map(                   -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE, DQS_BIAS, IBUF_DELAY_VALUE, IFD_DELAY_VALUE"
             DIFF_TERM    => FALSE,      -- Differential Termination 
             IBUF_LOW_PWR => FALSE,      -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
-            IOSTANDARD   => "DEFAULT")
+            IOSTANDARD   => "LVDS")
          port map(
             O  => adc_tmp0(i),          -- Buffer output
             I  => i_adc_p(i),           -- Diff_p buffer input (connect directly to top-level port)
