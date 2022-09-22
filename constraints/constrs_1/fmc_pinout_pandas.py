@@ -35,6 +35,7 @@ if __name__ == "__main__":
     df = df.sort_values(by="fmc_loc",ascending=True)
     # replace Na value by empty string
     df = df.fillna("")
+
     # retrieve each column
     fmc_loc_list = df["fmc_loc"]
     fmc_pin_name_list = df["fmc_pin_name"]
@@ -47,10 +48,10 @@ if __name__ == "__main__":
             cmt = ""
         else:
             cmt = " # " + fmc_pin_name
-            
+       
         str0 =  "# FMC-"+ fmc_loc
         str1 = "set_property PACKAGE_PIN "+fpga_pin+ " [get_ports {"+fpga_port_name+"}]" + cmt
-        str2 = "set_property IOSTANDARD "+fmc_io_standard+ " [get_ports {"+fpga_port_name+"}]" + cmt
+        str2 = "set_property IOSTANDARD " + fmc_io_standard + " [get_ports {"+fpga_port_name+"}]" + cmt
         lines.append(str0)
         lines.append(str1)
         lines.append(str2)
