@@ -186,6 +186,7 @@ begin
     data_valid_next   <= '0';
     pixel_id_max_next <= pixel_id_max_r1;
     pixel_id_next     <= pixel_id_r1;
+    error_next        <= '0';
 
     case sm_state_r1 is
       when E_RST =>
