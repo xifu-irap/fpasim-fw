@@ -30,7 +30,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library fpasim;
 
 
 entity clocking_top is
@@ -55,12 +54,26 @@ end entity clocking_top;
 
 architecture RTL of clocking_top is
 
+component fpasim_clk_wiz_0
+port
+ (-- Clock in ports
+  -- Clock out ports
+  clk_out1          : out    std_logic;
+  clk_out2          : out    std_logic;
+  clk_out3          : out    std_logic;
+  clk_out4          : out    std_logic;
+  -- Status and control signals
+  locked            : out    std_logic;
+  clk_in1_p         : in     std_logic;
+  clk_in1_n         : in     std_logic
+ );
+end component;
 
   signal locked : std_logic;
 
 begin
 
-  inst_fpasim_clk_wiz_0 : fpasim.fpasim_clk_wiz_0
+  inst_fpasim_clk_wiz_0 : fpasim_clk_wiz_0
     port map(
       -- Clock out ports  
       clk_out1  => o_adc_clk,           -- output clock @250MHz
