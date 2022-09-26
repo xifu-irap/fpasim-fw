@@ -37,6 +37,10 @@
 -- -------------------------------------------------------------------------------------------------------------   
 
 -- -------------------------------------------------------------------------------------------------------------
+-- XPM_FIFO instantiation template for Synchronous FIFO configurations
+-- Refer to the targeted device family architecture libraries guide for XPM_FIFO documentation
+-- =======================================================================================================================
+
 -- Parameter usage table, organized as follows:
 -- +---------------------------------------------------------------------------------------------------------------------+
 -- | Parameter name       | Data type          | Restrictions, if applicable                                             |
@@ -184,7 +188,7 @@
 -- |                                                                                                                     |
 -- | NOTE:                                                                                                               |
 -- |                                                                                                                     |
--- |   WRITE_DATA_WIDTH should be equal to READ_DATA_WIDTH if FIFO_MEMORY_TYPE is set to "auto". Violating this may result incorrect behavior. |
+-- |   WRITE_DATA_WIDTH should be equal to READ_DATA_WIDTH if FIFO_MEMORY_TYPE is set to "auto". Violating this may result incorrect behavior.|
 -- |   The maximum FIFO size (width x depth) is limited to 150-Megabits.                                                 |
 -- +---------------------------------------------------------------------------------------------------------------------+
 -- | WR_DATA_COUNT_WIDTH  | Integer            | Range: 1 - 23. Default value = 1.                                       |
@@ -539,7 +543,7 @@ entity fifo_async_with_error is
     o_rd_rst_busy   : out std_logic;    -- Active-High indicator that the FIFO read domain is currently in a reset state
 
     ---------------------------------------------------------------------
-    -- resynchronized errors/status 
+    -- resynchronized errors/ empty status 
     ---------------------------------------------------------------------
     o_errors_sync   : out std_logic_vector(3 downto 0); -- output resynchronized errors
     o_empty_sync    : out std_logic     -- output resynchronized empty fifo status flag
@@ -547,35 +551,72 @@ entity fifo_async_with_error is
 end entity fifo_async_with_error;
 
 architecture RTL of fifo_async_with_error is
-
+  constant c_DELAY_FLAG : integer := 1;
+  constant c_DELAY_OUT  : integer := 0;
   ---------------------------------------------------------------------
   -- fifo
   ---------------------------------------------------------------------
-  signal wr_full     : std_logic;
-  signal wr_rst_busy : std_logic;
+  -- fifo: write side
+  signal wr_full        : std_logic;
+  signal wr_rst_busy    : std_logic;
 
+  -- fifo: read side
   signal rd_dout_valid : std_logic;
   signal rd_dout       : std_logic_vector(o_rd_dout'range);
   signal rd_empty      : std_logic;
   signal rd_rst_busy   : std_logic;
 
   ---------------------------------------------------------------------
+  -- add delay to flags
+  ---------------------------------------------------------------------
+  signal data_wr_tmp0 : std_logic_vector(2 downto 0);
+  signal data_wr_tmp1 : std_logic_vector(2 downto 0);
+
+  signal wr_en_rx       : std_logic;
+  signal wr_rst_busy_rx : std_logic;
+  signal wr_full_rx     : std_logic;
+
+  signal data_rd_tmp0 : std_logic_vector(2 downto 0);
+  signal data_rd_tmp1 : std_logic_vector(2 downto 0);
+
+  signal rd_en_rx       : std_logic;
+  signal rd_rst_busy_rx : std_logic;
+  signal rd_empty_rx    : std_logic;
+
+  ---------------------------------------------------------------------
   -- error
   ---------------------------------------------------------------------
-  signal error_full   : std_logic;
-  signal error_wr_rst : std_logic;
-  signal error_empty  : std_logic;
-  signal error_rd_rst : std_logic;
+  signal error_wr_full_ry  : std_logic;
+  signal error_wr_rst_ry   : std_logic;
+  signal error_rd_empty_ry : std_logic;
+  signal error_rd_rst_ry   : std_logic;
+  signal rd_empty_ry       : std_logic;
 
   ---------------------------------------------------------------------
   -- resync errors and empty fifo status flag
   ---------------------------------------------------------------------
-  signal error_wr_rst_sync : std_logic;
-  signal error_full_sync   : std_logic;
-  signal error_rd_rst_sync : std_logic;
-  signal error_empty_sync  : std_logic;
+  signal error_wr_rst_sync  : std_logic;
+  signal error_wr_full_sync : std_logic;
 
-  signal empty_sync : std_logic;
+  signal error_rd_rst_sync   : std_logic;
+  signal error_rd_empty_sync : std_logic;
+  signal rd_empty_sync       : std_logic;
+
+  ---------------------------------------------------------------------
+  -- add output delay
+  ---------------------------------------------------------------------
+  signal data_wr_out_tmp0 : std_logic_vector(1 downto 0);
+  signal data_wr_out_tmp1 : std_logic_vector(1 downto 0);
+
+  signal error_wr_rst_rz  : std_logic;
+  signal error_wr_full_rz : std_logic;
+
+  signal data_rd_out_tmp0 : std_logic_vector(2 downto 0);
+  signal data_rd_out_tmp1 : std_logic_vector(2 downto 0);
+
+  signal rd_empty_rz       : std_logic;
+  signal error_rd_rst_rz   : std_logic;
+  signal error_rd_empty_rz : std_logic;
 
 begin
 
@@ -597,30 +638,97 @@ begin
       ---------------------------------------------------------------------
       -- write side
       ---------------------------------------------------------------------
-      i_wr_clk        => i_wr_clk,      -- write clock
-      i_wr_rst        => i_wr_rst,      -- write reset 
-      i_wr_en         => i_wr_en,       -- write enable
-      i_wr_din        => i_wr_din,      -- write data
-      o_wr_full       => wr_full,       -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_wr_rst_busy   => wr_rst_busy,   -- Active-High indicator that the FIFO write domain is currently in a reset state
+      i_wr_clk        => i_wr_clk,
+      i_wr_rst        => i_wr_rst,
+      i_wr_en         => i_wr_en,
+      i_wr_din        => i_wr_din,
+      o_wr_full       => wr_full,
+      o_wr_rst_busy   => wr_rst_busy,
       ---------------------------------------------------------------------
       -- read side
       ---------------------------------------------------------------------
-      i_rd_clk        => i_rd_clk,      -- read clock
-      i_rd_en         => i_rd_en,       -- read enable (Must be held active-low when rd_rst_busy is active high)
-      o_rd_dout_valid => rd_dout_valid, -- When asserted, this signal indicates that valid data is available on the output bus
+      i_rd_clk        => i_rd_clk,
+      i_rd_en         => i_rd_en,
+      o_rd_dout_valid => rd_dout_valid,
       o_rd_dout       => rd_dout,
-      o_rd_empty      => rd_empty,      -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_rd_rst_busy   => rd_rst_busy    -- Active-High indicator that the FIFO read domain is currently in a reset state
+      o_rd_empty      => rd_empty,
+      o_rd_rst_busy   => rd_rst_busy
     );
+
+  ---------------------------------------------------------------------
+  -- add delay on flags/commands
+  ---------------------------------------------------------------------
+  data_wr_tmp0(2) <= wr_rst_busy;
+  data_wr_tmp0(1) <= wr_full;
+  data_wr_tmp0(0) <= i_wr_en;
+  inst_pipeliner_wr : entity fpasim.pipeliner
+    generic map(
+      g_NB_PIPES   => c_DELAY_FLAG,
+      g_DATA_WIDTH => data_wr_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
+    )
+    port map(
+      i_clk  => i_wr_clk,               -- clock signal
+      i_data => data_wr_tmp0,           -- input data
+      o_data => data_wr_tmp1            -- output data with/without delay
+    );
+  wr_rst_busy_rx <= data_wr_tmp1(2);
+  wr_full_rx     <= data_wr_tmp1(1);
+  wr_en_rx       <= data_wr_tmp1(0);
+
+  data_rd_tmp0(2) <= rd_rst_busy;
+  data_rd_tmp0(1) <= rd_empty;
+  data_rd_tmp0(0) <= i_rd_en;
+  inst_pipeliner_rd : entity fpasim.pipeliner
+    generic map(
+      g_NB_PIPES   => c_DELAY_FLAG,
+      g_DATA_WIDTH => data_rd_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
+    )
+    port map(
+      i_clk  => i_rd_clk,               -- clock signal
+      i_data => data_rd_tmp0,           -- input data
+      o_data => data_rd_tmp1            -- output data with/without delay
+    );
+  rd_rst_busy_rx <= data_rd_tmp1(2);
+  rd_empty_rx    <= data_rd_tmp1(1);
+  rd_en_rx       <= data_rd_tmp1(0);
 
   ---------------------------------------------------------------------
   -- generate errors flag
   ---------------------------------------------------------------------
-  error_wr_rst <= '1' when i_wr_en = '1' and wr_rst_busy = '1' else '0';
-  error_full   <= '1' when i_wr_en = '1' and wr_full = '1' else '0';
-  error_rd_rst <= '1' when i_rd_en = '1' and rd_rst_busy = '1' else '0';
-  error_empty  <= '1' when i_rd_en = '1' and rd_empty = '1' else '0';
+  p_wr_error : process(i_wr_clk) is
+  begin
+    if rising_edge(i_wr_clk) then
+      if wr_en_rx = '1' and wr_rst_busy_rx = '1' then
+        error_wr_rst_ry <= '1';
+      else
+        error_wr_rst_ry <= '0';
+      end if;
+      if wr_en_rx = '1' and wr_full_rx = '1' then
+        error_wr_full_ry <= '1';
+      else
+        error_wr_full_ry <= '0';
+      end if;
+
+    end if;
+  end process p_wr_error;
+
+  p_rd_error : process(i_rd_clk) is
+  begin
+    if rising_edge(i_rd_clk) then
+      if rd_en_rx = '1' and rd_rst_busy_rx = '1' then
+        error_rd_rst_ry <= '1';
+      else
+        error_rd_rst_ry <= '0';
+      end if;
+
+      if rd_en_rx = '1' and rd_empty_rx = '1' then
+        error_rd_empty_ry <= '1';
+      else
+        error_rd_empty_ry <= '0';
+      end if;
+      rd_empty_ry <= rd_empty_rx;
+    end if;
+  end process p_rd_error;
 
   ---------------------------------------------------------------------
   -- resynchronize all errors/status flag on the same clock domain: write or read
@@ -630,9 +738,9 @@ begin
     signal data_tmp_sync : std_logic_vector(2 downto 0);
   begin
 
-    data_tmp(2) <= rd_empty;
-    data_tmp(1) <= error_rd_rst;
-    data_tmp(0) <= error_empty;
+    data_tmp(2) <= rd_empty_ry;
+    data_tmp(1) <= error_rd_rst_ry;
+    data_tmp(0) <= error_rd_empty_ry;
 
     gen_bit_synchronizer : for i in data_tmp'range generate
       inst_single_bit_synchronizer : entity fpasim.single_bit_synchronizer
@@ -655,12 +763,49 @@ begin
 
     end generate gen_bit_synchronizer;
 
-    error_wr_rst_sync <= error_wr_rst;
-    error_full_sync   <= error_full;
+    error_wr_rst_sync   <= error_wr_rst_ry;
+    error_wr_full_sync  <= error_wr_full_ry;
     -- resync
-    error_rd_rst_sync <= data_tmp_sync(1);
-    error_empty_sync  <= data_tmp_sync(0);
-    empty_sync        <= data_tmp_sync(2);
+    error_rd_rst_sync   <= data_tmp_sync(1);
+    error_rd_empty_sync <= data_tmp_sync(0);
+    rd_empty_sync       <= data_tmp_sync(2);
+
+    ---------------------------------------------------------------------
+    -- add output delay
+    ---------------------------------------------------------------------
+    data_wr_out_tmp0(1) <= error_wr_rst_sync;
+    data_wr_out_tmp0(0) <= error_wr_full_sync;
+    inst_pipeliner_wr_out : entity fpasim.pipeliner
+      generic map(
+        g_NB_PIPES   => c_DELAY_OUT,
+        g_DATA_WIDTH => data_wr_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
+      port map(
+        i_clk  => i_wr_clk,             -- clock signal
+        i_data => data_wr_out_tmp0,     -- input data
+        o_data => data_wr_out_tmp1      -- output data with/without delay
+      );
+
+    error_wr_rst_rz  <= data_wr_out_tmp1(1);
+    error_wr_full_rz <= data_wr_out_tmp1(0);
+
+    data_rd_out_tmp0(2) <= rd_empty_sync;
+    data_rd_out_tmp0(1) <= error_rd_rst_sync;
+    data_rd_out_tmp0(0) <= error_rd_empty_sync;
+    inst_pipeliner_rd_out : entity fpasim.pipeliner
+      generic map(
+        g_NB_PIPES   => c_DELAY_OUT,
+        g_DATA_WIDTH => data_rd_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
+      port map(
+        i_clk  => i_wr_clk,             -- clock signal
+        i_data => data_rd_out_tmp0,     -- input data
+        o_data => data_rd_out_tmp1      -- output data with/without delay
+      );
+
+    rd_empty_rz       <= data_rd_out_tmp1(2);
+    error_rd_rst_rz   <= data_rd_out_tmp1(1);
+    error_rd_empty_rz <= data_rd_out_tmp1(0);
 
   end generate gen_sync_wr_clock_domain;
 
@@ -670,8 +815,8 @@ begin
 
   begin
 
-    data_tmp(1) <= error_wr_rst;
-    data_tmp(0) <= error_full;
+    data_tmp(1) <= error_wr_rst_ry;
+    data_tmp(0) <= error_wr_full_ry;
 
     gen_bit_synchronizer : for i in data_tmp'range generate
       inst_single_bit_synchronizer : entity fpasim.single_bit_synchronizer
@@ -683,24 +828,61 @@ begin
           ---------------------------------------------------------------------
           -- source
           ---------------------------------------------------------------------
-          i_src_clk  => i_rd_clk,       -- source clock
+          i_src_clk  => i_wr_clk,       -- source clock
           i_src      => data_tmp(i),    -- input signal to be synchronized to dest_clk domain
           ---------------------------------------------------------------------
           -- destination
           ---------------------------------------------------------------------
-          i_dest_clk => i_wr_clk,       -- destination clock domain
+          i_dest_clk => i_rd_clk,       -- destination clock domain
           o_dest     => data_tmp_sync(i) -- src_in synchronized to the destination clock domain. This output is registered.   
         );
 
     end generate gen_bit_synchronizer;
 
-    error_wr_rst_sync <= data_tmp_sync(1);
-    error_full_sync   <= data_tmp_sync(0);
+    error_wr_rst_sync  <= data_tmp_sync(1);
+    error_wr_full_sync <= data_tmp_sync(0);
 
-    error_rd_rst_sync <= error_rd_rst;
-    error_empty_sync  <= error_empty;
+    error_rd_rst_sync   <= error_rd_rst_ry;
+    error_rd_empty_sync <= error_rd_empty_ry;
 
-    empty_sync <= rd_empty;
+    rd_empty_sync <= rd_empty_ry;
+
+    ---------------------------------------------------------------------
+    -- add output delay
+    ---------------------------------------------------------------------
+    data_wr_out_tmp0(1) <= error_wr_rst_sync;
+    data_wr_out_tmp0(0) <= error_wr_full_sync;
+    inst_pipeliner_wr_out : entity fpasim.pipeliner
+      generic map(
+        g_NB_PIPES   => c_DELAY_OUT,
+        g_DATA_WIDTH => data_wr_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
+      port map(
+        i_clk  => i_rd_clk,             -- clock signal
+        i_data => data_wr_out_tmp0,     -- input data
+        o_data => data_wr_out_tmp1      -- output data with/without delay
+      );
+
+    error_wr_rst_rz  <= data_wr_out_tmp1(1);
+    error_wr_full_rz <= data_wr_out_tmp1(0);
+
+    data_rd_out_tmp0(2) <= rd_empty_sync;
+    data_rd_out_tmp0(1) <= error_rd_rst_sync;
+    data_rd_out_tmp0(0) <= error_rd_empty_sync;
+    inst_pipeliner_rd_out : entity fpasim.pipeliner
+      generic map(
+        g_NB_PIPES   => c_DELAY_OUT,
+        g_DATA_WIDTH => data_rd_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
+      port map(
+        i_clk  => i_rd_clk,             -- clock signal
+        i_data => data_rd_out_tmp0,     -- input data
+        o_data => data_rd_out_tmp1      -- output data with/without delay
+      );
+
+    rd_empty_rz       <= data_rd_out_tmp1(2);
+    error_rd_rst_rz   <= data_rd_out_tmp1(1);
+    error_rd_empty_rz <= data_rd_out_tmp1(0);
 
   end generate gen_sync_rd_clock_domain;
 
@@ -715,10 +897,10 @@ begin
   o_rd_empty      <= rd_empty;
   o_rd_rst_busy   <= rd_rst_busy;
 
-  o_errors_sync(3) <= error_rd_rst_sync;
-  o_errors_sync(2) <= error_wr_rst_sync;
-  o_errors_sync(1) <= error_empty_sync;
-  o_errors_sync(0) <= error_full_sync;
-  o_empty_sync     <= empty_sync;
+  o_errors_sync(3) <= error_rd_rst_rz;
+  o_errors_sync(2) <= error_wr_rst_rz;
+  o_errors_sync(1) <= error_rd_empty_rz;
+  o_errors_sync(0) <= error_wr_full_rz;
+  o_empty_sync     <= rd_empty_rz;
 
 end architecture RTL;
