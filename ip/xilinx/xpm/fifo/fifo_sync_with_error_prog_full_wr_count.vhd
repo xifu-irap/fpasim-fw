@@ -22,7 +22,7 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details               
+--!   @details                  
 --!
 --!   This module intanciates a synchronuous FIFO with the empty, full, prog full and wr data count flags/signals
 --!   This module generates 4 types of errors in the following cases:
@@ -32,7 +32,6 @@
 --!     . a reading when the FIFO is in a reset state
 --!   Note: the following header documentation is an extract of the associated XPM Xilinx header       
 -- -------------------------------------------------------------------------------------------------------------   
-
 
 -- -------------------------------------------------------------------------------------------------------------
 -- XPM_FIFO instantiation template for Synchronous FIFO configurations
@@ -497,6 +496,7 @@ entity fifo_sync_with_error_prog_full_wr_count is
     o_wr_prog_full  : out std_logic;    -- Programmable Full: This signal is asserted when the number of words in the FIFO is greater than or equal to the programmable full threshold value. It is de-asserted when the number of words in the FIFO is less than the programmable full threshold value.
     o_wr_data_count : out std_logic_vector(g_WR_DATA_COUNT_WIDTH - 1 downto 0);
     o_wr_rst_busy   : out std_logic;    -- Active-High indicator that the FIFO write domain is currently in a reset state
+
     ---------------------------------------------------------------------
     -- read side
     ---------------------------------------------------------------------
@@ -505,37 +505,75 @@ entity fifo_sync_with_error_prog_full_wr_count is
     o_rd_dout       : out std_logic_vector(g_READ_DATA_WIDTH - 1 downto 0);
     o_rd_empty      : out std_logic;    -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
     o_rd_rst_busy   : out std_logic;    -- Active-High indicator that the FIFO read domain is currently in a reset state
+
     ---------------------------------------------------------------------
     -- errors/empty status 
     ---------------------------------------------------------------------
     o_errors_sync   : out std_logic_vector(3 downto 0); -- output errors
-    o_empty_sync    : out std_logic     -- output empty fifo status flag 
+    o_empty_sync    : out std_logic     -- output empty fifo status flag
   );
 end entity fifo_sync_with_error_prog_full_wr_count;
 
 architecture RTL of fifo_sync_with_error_prog_full_wr_count is
-
+  constant c_DELAY_FLAG : integer := 1;
+  constant c_DELAY_OUT  : integer := 0;
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
   -- fifo: write side
-  signal wr_rst_busy   : std_logic;
-  signal wr_full       : std_logic;
+  signal wr_full        : std_logic;
+  signal wr_rst_busy    : std_logic;
+
   signal wr_prog_full  : std_logic;
   signal wr_data_count : std_logic_vector(g_WR_DATA_COUNT_WIDTH - 1 downto 0);
+
   -- fifo: read side
   signal rd_dout_valid : std_logic;
   signal rd_dout       : std_logic_vector(o_rd_dout'range);
   signal rd_empty      : std_logic;
   signal rd_rst_busy   : std_logic;
 
-    ---------------------------------------------------------------------
+  ---------------------------------------------------------------------
+  -- add delay to flags
+  ---------------------------------------------------------------------
+  signal data_wr_tmp0 : std_logic_vector(2 downto 0);
+  signal data_wr_tmp1 : std_logic_vector(2 downto 0);
+
+  signal wr_en_rx       : std_logic;
+  signal wr_rst_busy_rx : std_logic;
+  signal wr_full_rx     : std_logic;
+
+  signal data_rd_tmp0 : std_logic_vector(2 downto 0);
+  signal data_rd_tmp1 : std_logic_vector(2 downto 0);
+
+  signal rd_en_rx       : std_logic;
+  signal rd_rst_busy_rx : std_logic;
+  signal rd_empty_rx    : std_logic;
+
+  ---------------------------------------------------------------------
   -- error
   ---------------------------------------------------------------------
-  signal error_full   : std_logic;
-  signal error_wr_rst : std_logic;
-  signal error_empty  : std_logic;
-  signal error_rd_rst : std_logic;
+  signal error_wr_full_ry  : std_logic;
+  signal error_wr_rst_ry   : std_logic;
+  signal error_rd_empty_ry : std_logic;
+  signal error_rd_rst_ry   : std_logic;
+  signal rd_empty_ry       : std_logic;
+
+  ---------------------------------------------------------------------
+  -- add output delay
+  ---------------------------------------------------------------------
+  signal data_wr_out_tmp0 : std_logic_vector(1 downto 0);
+  signal data_wr_out_tmp1 : std_logic_vector(1 downto 0);
+
+  signal error_wr_full_rz : std_logic;
+  signal error_wr_rst_rz  : std_logic;
+
+  signal data_rd_out_tmp0 : std_logic_vector(2 downto 0);
+  signal data_rd_out_tmp1 : std_logic_vector(2 downto 0);
+
+  signal error_rd_empty_rz : std_logic;
+  signal error_rd_rst_rz   : std_logic;
+  signal rd_empty_rz       : std_logic;
 
 begin
 
@@ -557,31 +595,135 @@ begin
       ---------------------------------------------------------------------
       -- write side
       ---------------------------------------------------------------------
-      i_wr_clk        => i_wr_clk,      -- write clock
-      i_wr_rst        => i_wr_rst,      -- write reset 
-      i_wr_en         => i_wr_en,       -- write enable
-      i_wr_din        => i_wr_din,      -- write data
-      o_wr_full       => wr_full,       -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_wr_prog_full  => wr_prog_full,  -- Programmable Full: This signal is asserted when the number of words in the FIFO is greater than or equal to the programmable full threshold value. It is de-asserted when the number of words in the FIFO is less than the programmable full threshold value.
+      i_wr_clk        => i_wr_clk,
+      i_wr_rst        => i_wr_rst,
+      i_wr_en         => i_wr_en,
+      i_wr_din        => i_wr_din,
+      o_wr_full       => wr_full,
+      o_wr_prog_full  => wr_prog_full,
       o_wr_data_count => wr_data_count,
-      o_wr_rst_busy   => wr_rst_busy,   -- Active-High indicator that the FIFO write domain is currently in a reset state
+      o_wr_rst_busy   => wr_rst_busy,
       ---------------------------------------------------------------------
       -- read side
       ---------------------------------------------------------------------
-      i_rd_en         => i_rd_en,       -- read enable (Must be held active-low when rd_rst_busy is active high)
-      o_rd_dout_valid => rd_dout_valid, -- When asserted, this signal indicates that valid data is available on the output bus
+      i_rd_en         => i_rd_en,
+      o_rd_dout_valid => rd_dout_valid,
       o_rd_dout       => rd_dout,
-      o_rd_empty      => rd_empty,      -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
-      o_rd_rst_busy   => rd_rst_busy    -- Active-High indicator that the FIFO read domain is currently in a reset state
+      o_rd_empty      => rd_empty,
+      o_rd_rst_busy   => rd_rst_busy
     );
+
+  ---------------------------------------------------------------------
+  -- add delay on flags/commands
+  ---------------------------------------------------------------------
+  data_wr_tmp0(2) <= wr_rst_busy;
+  data_wr_tmp0(1) <= wr_full;
+  data_wr_tmp0(0) <= i_wr_en;
+  inst_pipeliner_wr : entity fpasim.pipeliner
+    generic map(
+      g_NB_PIPES   => c_DELAY_FLAG,
+      g_DATA_WIDTH => data_wr_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
+    )
+    port map(
+      i_clk  => i_wr_clk,               -- clock signal
+      i_data => data_wr_tmp0,           -- input data
+      o_data => data_wr_tmp1            -- output data with/without delay
+    );
+  wr_rst_busy_rx <= data_wr_tmp1(2);
+  wr_full_rx     <= data_wr_tmp1(1);
+  wr_en_rx       <= data_wr_tmp1(0);
+
+  data_rd_tmp0(2) <= rd_rst_busy;
+  data_rd_tmp0(1) <= rd_empty;
+  data_rd_tmp0(0) <= i_rd_en;
+  inst_pipeliner_rd : entity fpasim.pipeliner
+    generic map(
+      g_NB_PIPES   => c_DELAY_FLAG,
+      g_DATA_WIDTH => data_rd_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
+    )
+    port map(
+      i_clk  => i_wr_clk,               -- clock signal
+      i_data => data_rd_tmp0,           -- input data
+      o_data => data_rd_tmp1            -- output data with/without delay
+    );
+  rd_rst_busy_rx <= data_rd_tmp1(2);
+  rd_empty_rx    <= data_rd_tmp1(1);
+  rd_en_rx       <= data_rd_tmp1(0);
 
   ---------------------------------------------------------------------
   -- generate errors flag
   ---------------------------------------------------------------------
-  error_wr_rst <= '1' when i_wr_en = '1' and wr_rst_busy = '1' else '0';
-  error_full   <= '1' when i_wr_en = '1' and wr_full = '1' else '0';
-  error_rd_rst <= '1' when i_rd_en = '1' and rd_rst_busy = '1' else '0';
-  error_empty  <= '1' when i_rd_en = '1' and rd_empty = '1' else '0';
+  p_wr_error : process(i_wr_clk) is
+  begin
+    if rising_edge(i_wr_clk) then
+      if wr_en_rx = '1' and wr_rst_busy_rx = '1' then
+        error_wr_rst_ry <= '1';
+      else
+        error_wr_rst_ry <= '0';
+      end if;
+      if wr_en_rx = '1' and wr_full_rx = '1' then
+        error_wr_full_ry <= '1';
+      else
+        error_wr_full_ry <= '0';
+      end if;
+
+    end if;
+  end process p_wr_error;
+
+  p_rd_error : process(i_wr_clk) is
+  begin
+    if rising_edge(i_wr_clk) then
+      if rd_en_rx = '1' and rd_rst_busy_rx = '1' then
+        error_rd_rst_ry <= '1';
+      else
+        error_rd_rst_ry <= '0';
+      end if;
+
+      if rd_en_rx = '1' and rd_empty_rx = '1' then
+        error_rd_empty_ry <= '1';
+      else
+        error_rd_empty_ry <= '0';
+      end if;
+      rd_empty_ry <= rd_empty_rx;
+    end if;
+  end process p_rd_error;
+
+  ---------------------------------------------------------------------
+  -- add output delay
+  ---------------------------------------------------------------------
+  data_wr_out_tmp0(1) <= error_wr_rst_ry;
+  data_wr_out_tmp0(0) <= error_wr_full_ry;
+  inst_pipeliner_wr_out : entity fpasim.pipeliner
+    generic map(
+      g_NB_PIPES   => c_DELAY_OUT,
+      g_DATA_WIDTH => data_wr_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
+    )
+    port map(
+      i_clk  => i_wr_clk,               -- clock signal
+      i_data => data_wr_out_tmp0,       -- input data
+      o_data => data_wr_out_tmp1        -- output data with/without delay
+    );
+
+  error_wr_rst_rz  <= data_wr_out_tmp1(1);
+  error_wr_full_rz <= data_wr_out_tmp1(0);
+
+  data_rd_out_tmp0(2) <= rd_empty_ry;
+  data_rd_out_tmp0(1) <= error_rd_rst_ry;
+  data_rd_out_tmp0(0) <= error_rd_empty_ry;
+  inst_pipeliner_rd_out : entity fpasim.pipeliner
+    generic map(
+      g_NB_PIPES   => c_DELAY_OUT,
+      g_DATA_WIDTH => data_rd_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
+    )
+    port map(
+      i_clk  => i_wr_clk,               -- clock signal
+      i_data => data_rd_out_tmp0,       -- input data
+      o_data => data_rd_out_tmp1        -- output data with/without delay
+    );
+
+  rd_empty_rz       <= data_rd_out_tmp1(2);
+  error_rd_rst_rz   <= data_rd_out_tmp1(1);
+  error_rd_empty_rz <= data_rd_out_tmp1(0);
 
   ---------------------------------------------------------------------
   -- output
@@ -598,10 +740,10 @@ begin
   o_rd_empty      <= rd_empty;
   o_rd_rst_busy   <= rd_rst_busy;
 
-  o_errors_sync(3) <= error_rd_rst;
-  o_errors_sync(2) <= error_wr_rst;
-  o_errors_sync(1) <= error_empty;
-  o_errors_sync(0) <= error_full;
-  o_empty_sync     <= rd_empty;
+  o_errors_sync(3) <= error_rd_rst_rz;
+  o_errors_sync(2) <= error_wr_rst_rz;
+  o_errors_sync(1) <= error_rd_empty_rz;
+  o_errors_sync(0) <= error_wr_full_rz;
+  o_empty_sync     <= rd_empty_rz;
 
 end architecture RTL;
