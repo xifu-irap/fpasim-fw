@@ -1063,7 +1063,6 @@ begin
       i_rst_status  => rst_status,
       i_debug_pulse => debug_pulse,
       i_en          => en,
-      i_endianess   => '0',
       i_dac_delay   => dac_delay,
       -- input data 
       ---------------------------------------------------------------------
