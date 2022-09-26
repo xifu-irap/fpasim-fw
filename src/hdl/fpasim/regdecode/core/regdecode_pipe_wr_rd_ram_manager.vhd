@@ -429,9 +429,9 @@ begin
   ---------------------------------------------------------------------
   -- generate output
   ---------------------------------------------------------------------
-  p_compute_flag : process(i_clk) is
+  p_compute_flag : process(i_out_clk) is
   begin
-    if rising_edge(i_clk) then
+    if rising_edge(i_out_clk) then
       sof_sync_r1  <= sof1;
       eof_sync_r1  <= eof1;
       -- generate flag
@@ -618,7 +618,7 @@ begin
   gen_errors_latch : for i in error_tmp'range generate
     inst_one_error_latch : entity fpasim.one_error_latch
       port map(
-        i_clk         => i_clk,
+        i_clk         => i_out_clk,
         i_rst         => i_rst_status,
         i_debug_pulse => i_debug_pulse,
         i_error       => error_tmp(i),

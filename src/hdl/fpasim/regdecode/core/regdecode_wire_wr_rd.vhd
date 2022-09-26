@@ -311,7 +311,7 @@ begin
   gen_errors_latch : for i in error_tmp'range generate
     inst_one_error_latch : entity fpasim.one_error_latch
       port map(
-        i_clk         => i_clk,
+        i_clk         => i_out_clk,
         i_rst         => i_rst_status,
         i_debug_pulse => i_debug_pulse,
         i_error       => error_tmp(i),
