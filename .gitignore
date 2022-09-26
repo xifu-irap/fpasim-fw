@@ -14,6 +14,22 @@
 /project/vivado00/fpasim.cache/*
 /project/vivado00/fpasim.sim/*
 /project/vivado00/fpasim.srcs/*
+/project/vivado00/fpasim.runs/impl_1/*.pb
+/project/vivado00/fpasim.runs/impl_1/*.txt
+/project/vivado00/fpasim.runs/impl_1/*.js
+/project/vivado00/fpasim.runs/impl_1/*.sh
+/project/vivado00/fpasim.runs/impl_1/*.wdf
+/project/vivado00/fpasim.runs/impl_1/*.bat
+/project/vivado00/fpasim.runs/impl_1/*.log
+/project/vivado00/fpasim.runs/impl_1/*.jou
+/project/vivado00/fpasim.runs/impl_1/*.dcp
+/project/vivado00/fpasim.runs/impl_1/*.rpt
+/project/vivado00/fpasim.runs/impl_1/*.rpw
+/project/vivado00/fpasim.runs/impl_1/*.xml
+/project/vivado00/fpasim.runs/impl_1/*.rst
+/project/vivado00/fpasim.runs/impl_1/*.tcl
+/project/vivado00/fpasim.runs/impl_1/*.vdi
+/project/vivado00/fpasim.runs/impl_1/*.rpx
 
 
 /doc/**/*
