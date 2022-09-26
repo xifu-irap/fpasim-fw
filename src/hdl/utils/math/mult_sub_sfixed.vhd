@@ -35,6 +35,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.fixed_pkg.all;
+use ieee.fixed_float_types.all;
 
 
 entity mult_sub_sfixed is
@@ -134,7 +135,7 @@ begin
     -- conversion:
     --   extract range from sfixed vector
     -----------------------------------------------------------------
-    res_tmp4 <= resize(res_r3, res_tmp4'high, res_tmp4'low);
+    res_tmp4 <= resize(res_r3, res_tmp4'high, res_tmp4'low,overflow_style=> FIXED_WRAP,round_style=> FIXED_TRUNCATE);
 
     -----------------------------------------------------------------
     -- output
