@@ -57,7 +57,6 @@ entity dac_top is
     i_rst_status  : in  std_logic;      -- reset error flag(s)
     i_debug_pulse : in  std_logic;      -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     i_en          : in  std_logic;      -- enable
-    i_endianess   : in  std_logic;      -- endianess ('0': do nothing, '1':swap bytes)
     i_dac_delay   : in  std_logic_vector(g_DAC_DELAY_WIDTH - 1 downto 0); -- delay to apply on the data path.
     -- input data 
     ---------------------------------------------------------------------
@@ -85,13 +84,6 @@ architecture RTL of dac_top is
   -- cross clock domain
   -------------------------------------------------------------------
   signal rst_sync : std_logic;
-
-  ---------------------------------------------------------------------
-  -- endianness
-  ---------------------------------------------------------------------
-  signal dac_tmp0 : std_logic_vector(i_dac'range);
-  signal dac_tmp1 : std_logic_vector(i_dac'range);
-  signal dac_tmp  : std_logic_vector(i_dac'range);
 
   ---------------------------------------------------------------------
   -- apply delay
@@ -135,16 +127,6 @@ begin
       o_dest_rst => rst_sync            -- src_rst synchronized to the destination clock domain. This output is registered.
     );
 
-  ---------------------------------------------------------------------
-  -- endianness
-  ---------------------------------------------------------------------
-  -- no change of endianness
-  dac_tmp0              <= i_dac;
-  -- endianness change
-  dac_tmp1(15 downto 8) <= i_dac(7 downto 0);
-  dac_tmp1(7 downto 0)  <= i_dac(15 downto 8);
-
-  dac_tmp <= dac_tmp0 when i_endianess = '0' else dac_tmp1;
 
   ---------------------------------------------------------------------
   -- apply a dynamic delay on the data path
@@ -153,12 +135,12 @@ begin
   inst_dynamic_shift_register_dac : entity work.dynamic_shift_register
     generic map(
       g_ADDR_WIDTH => i_dac_delay'length, -- width of the address. Possibles values: [2, integer max value[ 
-      g_DATA_WIDTH => dac_tmp'length    -- width of the input/output data.  Possibles values: [1, integer max value[
+      g_DATA_WIDTH => i_dac'length    -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
       i_clk        => i_clk,            -- clock signal
       i_data_valid => i_dac_valid,      -- input data valid
-      i_data       => dac_tmp,          -- input data
+      i_data       => i_dac,          -- input data
       i_addr       => i_dac_delay,      -- input address (dynamically select the depth of the pipeline)
       o_data       => dac_rx            -- output data with/without delay
     );
