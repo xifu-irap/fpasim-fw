@@ -35,6 +35,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.fixed_pkg.all;
+use ieee.fixed_float_types.all;
 
 
 entity mult_sfixed is
@@ -78,17 +79,25 @@ architecture RTL of mult_sfixed is
     signal b_r1    : sfixed(b_tmp'high downto b_tmp'low);
 
     ---------------------------------------------------------------------
-    -- step3:
-    --   res_r2 = a_r1 * b_r1
+    -- step2:
+    --   mult_r2 = a_r1 * b_r1
     ---------------------------------------------------------------------
-    signal res_r2 : sfixed(sfixed_high(a_r1, '*', b_r1) downto sfixed_low(a_r1, '*', b_r1));
+    signal mult_r2 : sfixed(sfixed_high(a_r1, '*', b_r1) downto sfixed_low(a_r1, '*', b_r1));
+
+    ---------------------------------------------------------------------
+    -- step3
+    -- p_r3 = mult_r2
+    ---------------------------------------------------------------------
+    signal p_r3 : sfixed(mult_r2'range);
+
+    signal p_r4 : sfixed(mult_r2'range);
 
     -----------------------------------------------------------------
     -- truncate: 
     --   extract sfixed range
     --   sfixed -> ufixed conversion
     -----------------------------------------------------------------
-    signal res_tmp3 : sfixed(g_Q_M_S - 1 downto -g_Q_N_S);
+    signal p_tmp5 : sfixed(g_Q_M_S - 1 downto -g_Q_N_S);
 
 begin
 
@@ -108,18 +117,26 @@ begin
           -------------------------------------------------------------
           -- step2
           -------------------------------------------------------------
-          res_r2  <= a_r1 * b_r1;
+          mult_r2  <= a_r1 * b_r1;
+
+          ---------------------------------------------------------------------
+          -- step3
+          ---------------------------------------------------------------------
+          p_r3 <= mult_r2;
+
+          p_r4 <= p_r3;
+
       end if;
   end process p_computation;
   -----------------------------------------------------------------
   -- conversion:
   --   extract range from sfixed vector
   -----------------------------------------------------------------
-  res_tmp3 <= resize(res_r2, res_tmp3'high, res_tmp3'low);
+  p_tmp5 <= resize(p_r4, p_tmp5'high, p_tmp5'low,overflow_style=> FIXED_WRAP,round_style=> FIXED_TRUNCATE);
 
   -------------------------------------------------------------------
   -- output
   -------------------------------------------------------------------
-  o_s <= to_slv(res_tmp3);
+  o_s <= to_slv(p_tmp5);
 
 end architecture RTL;
