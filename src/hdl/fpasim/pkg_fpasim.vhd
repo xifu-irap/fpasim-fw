@@ -43,7 +43,7 @@ PACKAGE pkg_fpasim IS
   -- hardcoded : latency of the "add_sfixed" module
   constant pkg_ADD_SFIXED_LATENCY                         : natural := 2;
   -- hardcoded : latency of the "mult_sfixed" module
-  constant pkg_MULT_SFIXED_LATENCY                        : natural := 2;
+  constant pkg_MULT_SFIXED_LATENCY                        : natural := 4;
   -- hardcoded : latency of the "mult_sfixed" module
   constant pkg_MULT_SUB_SFIXED_LATENCY                    : natural := 3;
   -- hardcoded : latency of the dynamic shif register when its input delay is set to 0
@@ -397,11 +397,11 @@ PACKAGE pkg_fpasim IS
   -- IOs
   -------------------------------------------------------------------
   -- user-defined: add latency after the input IOs. Possible values: [0;max integer value[
-  constant pkg_IO_ADC_LATENCY  : natural := 0;
+  constant pkg_IO_ADC_LATENCY  : natural := 1;
   -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
-  constant pkg_IO_DAC_LATENCY  : natural := 0;
+  constant pkg_IO_DAC_LATENCY  : natural := 1;
   -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
-  constant pkg_IO_SYNC_LATENCY : natural := 0;
+  constant pkg_IO_SYNC_LATENCY : natural := 1;
 
 END pkg_fpasim;
 
