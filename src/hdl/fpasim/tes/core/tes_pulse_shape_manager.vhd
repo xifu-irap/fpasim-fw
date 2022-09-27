@@ -134,11 +134,15 @@ architecture RTL of tes_pulse_shape_manager is
   constant c_TES_MULT_SUB_Q_WIDTH_C : positive := pkg_TES_MULT_SUB_Q_WIDTH_C;
   constant c_TES_MULT_SUB_Q_WIDTH_S : positive := pkg_TES_MULT_SUB_Q_WIDTH_S;
 
+  constant c_MULT_ADD_UFIXED_LATENCY : natural := pkg_MULT_ADD_UFIXED_LATENCY;
+
+  -- add 1 bit to the i_cmd_time_shift length to be able to represente the c_SHIFT_MAX value
+  constant c_SHIFT_MAX_VECTOR : std_logic_vector(i_cmd_time_shift'length downto 0) := std_logic_vector(to_unsigned(c_SHIFT_MAX, i_cmd_time_shift'length + 1));
   ---------------------------------------------------------------------
   -- FIFO cmd
   ---------------------------------------------------------------------
-  constant c_CMD_IDX0_L : integer := 0;
-  constant c_CMD_IDX0_H : integer := c_CMD_IDX0_L + i_cmd_time_shift'length - 1;
+  constant c_CMD_IDX0_L       : integer                                            := 0;
+  constant c_CMD_IDX0_H       : integer                                            := c_CMD_IDX0_L + i_cmd_time_shift'length - 1;
 
   constant c_CMD_IDX1_L : integer := c_CMD_IDX0_H + 1;
   constant c_CMD_IDX1_H : integer := c_CMD_IDX1_L + i_cmd_pixel_id'length - 1;
@@ -233,15 +237,24 @@ architecture RTL of tes_pulse_shape_manager is
   signal data_pipe_tmp0 : std_logic_vector(c_IDX2_H downto 0);
   signal data_pipe_tmp1 : std_logic_vector(c_IDX2_H downto 0);
 
-  signal pixel_sof_r2 : std_logic;
-  signal pixel_eof_r2 : std_logic;
-  signal pixel_id_r2  : std_logic_vector(i_pixel_id'range);
+  signal pixel_sof_rc : std_logic;
+  signal pixel_eof_rc : std_logic;
+  signal pixel_id_rc  : std_logic_vector(i_pixel_id'range);
 
-  signal pulse_heigth_r2 : std_logic_vector(i_cmd_pulse_height'range);
+  signal pulse_heigth_rc : std_logic_vector(i_cmd_pulse_height'range);
 
   -- address computation
-  signal pixel_valid_r2      : std_logic;
-  signal addr_pulse_shape_r2 : unsigned(i_pulse_shape_wr_rd_addr'range);
+  signal pixel_valid_rc      : std_logic;
+  signal addr_pulse_shape_rc : std_logic_vector(i_pulse_shape_wr_rd_addr'range);
+
+  constant c_MULT_IDX0_L : integer := 0;
+  constant c_MULT_IDX0_H : integer := c_MULT_IDX0_L + i_cmd_pulse_height'length - 1;
+
+  constant c_MULT_IDX1_L : integer := c_MULT_IDX0_H + 1;
+  constant c_MULT_IDX1_H : integer := c_MULT_IDX1_L + 1 - 1;
+
+  signal data_pipe_mult_tmp0 : std_logic_vector(c_MULT_IDX1_H downto 0);
+  signal data_pipe_mult_tmp1 : std_logic_vector(c_MULT_IDX1_H downto 0);
 
   ---------------------------------------------------------------------
   -- tes_pulse_shape
@@ -477,26 +490,60 @@ begin
   ---------------------------------------------------------------------
   -- compute the tes_pulse_shape ram addr
   -- if the frame_size = 2048 and the step = max_shift = 16
-  --  => addr_pulse_shape_r2 = i*step + pixel_shift with i=[0,2047]
+  --  => addr_pulse_shape_rc = i*step + pixel_shift with i=[0,2047]
   ---------------------------------------------------------------------
-  p_pipe_and_computation : process(i_clk) is
-  begin
-    if rising_edge(i_clk) then
-      pixel_valid_r2  <= pixel_valid_r1;
-      pulse_heigth_r2 <= std_logic_vector(pulse_heigth_r1);
 
-      -- ram: pulse_shape
-      addr_pulse_shape_r2 <= resize((cnt_sample_pulse_shape_r1 * c_SHIFT_MAX) + time_shift_r1, addr_pulse_shape_r2'length);
+  data_pipe_mult_tmp0(c_MULT_IDX1_H)                 <= pixel_valid_r1;
+  data_pipe_mult_tmp0(c_MULT_IDX0_H downto c_MULT_IDX0_L) <= std_logic_vector(pulse_heigth_r1);
+  inst_pipeliner_sync_with_mult_add_ufixed_out0 : entity fpasim.pipeliner
+    generic map(
+      g_NB_PIPES   => c_MULT_ADD_UFIXED_LATENCY,
+      g_DATA_WIDTH => data_pipe_mult_tmp0'length
+    )
+    port map(
+      i_clk  => i_clk,
+      i_data => data_pipe_mult_tmp0,
+      o_data => data_pipe_mult_tmp1
+    );
 
-    end if;
-  end process p_pipe_and_computation;
+  pixel_valid_rc  <= data_pipe_mult_tmp1(c_MULT_IDX1_H);
+  pulse_heigth_rc <= data_pipe_mult_tmp1(c_MULT_IDX0_H downto c_MULT_IDX0_L);
+
+  inst_mult_add_ufixed : entity fpasim.mult_add_ufixed
+    generic map(
+      -- port A: AMD Q notation (fixed point)
+      g_UQ_M_A => cnt_sample_pulse_shape_r1'length,
+      g_UQ_N_A => 0,
+      -- port B: AMD Q notation (fixed point)
+      g_UQ_M_B => c_SHIFT_MAX_VECTOR'length,
+      g_UQ_N_B => 0,
+      -- port C: AMC Q notation (fixed point)
+      g_UQ_M_C => time_shift_r1'length,
+      g_UQ_N_C => 0,
+      -- port S: AMD Q notation (fixed point)
+      g_UQ_M_S => addr_pulse_shape_rc'length,
+      g_UQ_N_S => 0
+    )
+    port map(
+      i_clk => i_clk,
+      --------------------------------------------------------------
+      -- input
+      --------------------------------------------------------------
+      i_a   => std_logic_vector(cnt_sample_pulse_shape_r1),
+      i_b   => c_SHIFT_MAX_VECTOR,
+      i_c   => std_logic_vector(time_shift_r1),
+      --------------------------------------------------------------
+      -- output : S = C + A*B
+      --------------------------------------------------------------
+      o_s   => addr_pulse_shape_rc
+    );
 
   data_pipe_tmp0(c_IDX2_H)                 <= i_pixel_sof;
   data_pipe_tmp0(c_IDX1_H)                 <= i_pixel_eof;
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
-  inst_pipeliner_sync_with_pipe_and_computation_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_mult_add_ufixed_out1 : entity fpasim.pipeliner
     generic map(
-      g_NB_PIPES   => 2,
+      g_NB_PIPES   => c_MULT_ADD_UFIXED_LATENCY + 1,
       g_DATA_WIDTH => data_pipe_tmp0'length
     )
     port map(
@@ -505,9 +552,9 @@ begin
       o_data => data_pipe_tmp1
     );
 
-  pixel_sof_r2 <= data_pipe_tmp1(c_IDX2_H);
-  pixel_eof_r2 <= data_pipe_tmp1(c_IDX1_H);
-  pixel_id_r2  <= data_pipe_tmp1(c_IDX0_H downto c_IDX0_L);
+  pixel_sof_rc <= data_pipe_tmp1(c_IDX2_H);
+  pixel_eof_rc <= data_pipe_tmp1(c_IDX1_H);
+  pixel_id_rc  <= data_pipe_tmp1(c_IDX0_H downto c_IDX0_L);
 
   ---------------------------------------------------------------------
   -- RAM: tes_pulse_shape
@@ -569,9 +616,9 @@ begin
     );
   pulse_shape_web    <= '0';
   pulse_shape_dinb   <= (others => '0');
-  pulse_shape_enb    <= pixel_valid_r2;
-  pulse_shape_addrb  <= std_logic_vector(addr_pulse_shape_r2);
-  pulse_shape_regceb <= pixel_valid_r2;
+  pulse_shape_enb    <= pixel_valid_rc;
+  pulse_shape_addrb  <= addr_pulse_shape_rc;
+  pulse_shape_regceb <= pixel_valid_rc;
 
   -------------------------------------------------------------------
   -- sync with rd ram out
@@ -673,9 +720,9 @@ begin
     );
   steady_state_web    <= '0';
   steady_state_dinb   <= (others => '0');
-  steady_state_enb    <= pixel_valid_r2;
-  steady_state_addrb  <= pixel_id_r2;
-  steady_state_regceb <= pixel_valid_r2;
+  steady_state_enb    <= pixel_valid_rc;
+  steady_state_addrb  <= pixel_id_rc;
+  steady_state_regceb <= pixel_valid_rc;
 
   -------------------------------------------------------------------
   -- sync with rd RAM output
@@ -724,11 +771,11 @@ begin
   --------------------------------------------------------------------
   assert not (c_TES_STD_STATE_RAM_B_RD_LATENCY = c_TES_PULSE_SHAPE_RAM_B_RD_LATENCY) report "[tes_pulse_shape_manager]: c_TES_STD_STATE_RD_RAM_LATENCY and c_TES_PULSE_SHAPE_RD_RAM_LATENCY must be equal. Otherwise, the user needs to update this design to equalize the output data path from each memory" severity error;
 
-  data_pipe_tmp2(c_IDX4_H downto c_IDX4_L) <= pulse_heigth_r2;
-  data_pipe_tmp2(c_IDX3_H)                 <= pixel_valid_r2;
-  data_pipe_tmp2(c_IDX2_H)                 <= pixel_sof_r2;
-  data_pipe_tmp2(c_IDX1_H)                 <= pixel_eof_r2;
-  data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_r2;
+  data_pipe_tmp2(c_IDX4_H downto c_IDX4_L) <= pulse_heigth_rc;
+  data_pipe_tmp2(c_IDX3_H)                 <= pixel_valid_rc;
+  data_pipe_tmp2(c_IDX2_H)                 <= pixel_sof_rc;
+  data_pipe_tmp2(c_IDX1_H)                 <= pixel_eof_rc;
+  data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_rc;
   inst_pipeliner_sync_with_rams_out : entity fpasim.pipeliner
     generic map(
       g_NB_PIPES   => c_TES_PULSE_SHAPE_RAM_B_RD_LATENCY,
