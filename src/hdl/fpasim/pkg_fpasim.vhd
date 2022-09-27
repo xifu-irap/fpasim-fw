@@ -44,8 +44,10 @@ PACKAGE pkg_fpasim IS
   constant pkg_ADD_SFIXED_LATENCY                         : natural := 2;
   -- hardcoded : latency of the "mult_sfixed" module
   constant pkg_MULT_SFIXED_LATENCY                        : natural := 4;
-  -- hardcoded : latency of the "mult_sfixed" module
+  -- hardcoded : latency of the "mult_sub_sfixed" module
   constant pkg_MULT_SUB_SFIXED_LATENCY                    : natural := 3;
+  -- hardcoded : latency of the "mult_add_ufixed" module
+  constant pkg_MULT_ADD_UFIXED_LATENCY                    : natural := 3;
   -- hardcoded : latency of the dynamic shif register when its input delay is set to 0
   constant pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY : natural := 1;
 
@@ -178,8 +180,8 @@ PACKAGE pkg_fpasim IS
   ---------------------------------------------------------------------
   -- hardcoded: latency of the fsm of the "tes_pulse_manager" module
   constant pkg_TES_PULSE_MANAGER_FSM_LATENCY          : natural := 1;
-  -- hardcoded: latency of the address computation of the "tes_pulse_manager" module
-  constant pkg_TES_PULSE_MANAGER_ADDR_COMPUTE_LATENCY : natural := 1;
+  -- auto-computed: latency of the address computation of the "tes_pulse_manager" module
+  constant pkg_TES_PULSE_MANAGER_ADDR_COMPUTE_LATENCY : natural := pkg_MULT_ADD_UFIXED_LATENCY;
 
   -- tes_pulse_manager_computation parameters
   ---------------------------------------------------------------------
