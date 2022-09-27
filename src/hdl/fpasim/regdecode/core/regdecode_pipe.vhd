@@ -163,32 +163,32 @@ end entity regdecode_pipe;
 
 architecture RTL of regdecode_pipe is
   -- tes_pulse_shape
-  constant c_TES_PULSE_SHAPE_RAM_NB_WORDS   : integer := pkg_TES_PULSE_SHAPE_RAM_NB_WORDS;
-  constant c_TES_PULSE_SHAPE_RAM_RD_LATENCY : integer := pkg_TES_PULSE_SHAPE_RAM_RD_LATENCY;
+  constant c_TES_PULSE_SHAPE_RAM_NB_WORDS     : integer := pkg_TES_PULSE_SHAPE_RAM_NB_WORDS;
+  constant c_TES_PULSE_SHAPE_RAM_A_RD_LATENCY : integer := pkg_TES_PULSE_SHAPE_RAM_A_RD_LATENCY;
 
   constant c_TES_PULSE_SHAPE_ADDR_RANGE_MIN : std_logic_vector(pkg_TES_PULSE_SHAPE_ADDR_RANGE_MIN'range) := pkg_TES_PULSE_SHAPE_ADDR_RANGE_MIN;
 
   -- amp_squid_tf
-  constant c_AMP_SQUID_TF_RAM_NB_WORDS   : integer := pkg_AMP_SQUID_TF_RAM_NB_WORDS;
-  constant c_AMP_SQUID_TF_RAM_RD_LATENCY : integer := pkg_AMP_SQUID_TF_RAM_RD_LATENCY;
+  constant c_AMP_SQUID_TF_RAM_NB_WORDS     : integer := pkg_AMP_SQUID_TF_RAM_NB_WORDS;
+  constant c_AMP_SQUID_TF_RAM_A_RD_LATENCY : integer := pkg_AMP_SQUID_TF_RAM_A_RD_LATENCY;
 
   constant c_AMP_SQUID_TF_ADDR_RANGE_MIN : std_logic_vector(pkg_AMP_SQUID_TF_ADDR_RANGE_MIN'range) := pkg_AMP_SQUID_TF_ADDR_RANGE_MIN;
 
   -- mux_squid_tf
-  constant c_MUX_SQUID_TF_RAM_NB_WORDS   : integer := pkg_MUX_SQUID_TF_RAM_NB_WORDS;
-  constant c_MUX_SQUID_TF_RAM_RD_LATENCY : integer := pkg_MUX_SQUID_TF_RAM_RD_LATENCY;
+  constant c_MUX_SQUID_TF_RAM_NB_WORDS     : integer := pkg_MUX_SQUID_TF_RAM_NB_WORDS;
+  constant c_MUX_SQUID_TF_RAM_A_RD_LATENCY : integer := pkg_MUX_SQUID_TF_RAM_A_RD_LATENCY;
 
   constant c_MUX_SQUID_TF_ADDR_RANGE_MIN : std_logic_vector(pkg_MUX_SQUID_TF_ADDR_RANGE_MIN'range) := pkg_MUX_SQUID_TF_ADDR_RANGE_MIN;
 
   -- tes_std_state
-  constant c_TES_STD_STATE_RAM_NB_WORDS   : integer := pkg_TES_STD_STATE_RAM_NB_WORDS;
-  constant c_TES_STD_STATE_RAM_RD_LATENCY : integer := pkg_TES_STD_STATE_RAM_RD_LATENCY;
+  constant c_TES_STD_STATE_RAM_NB_WORDS     : integer := pkg_TES_STD_STATE_RAM_NB_WORDS;
+  constant c_TES_STD_STATE_RAM_A_RD_LATENCY : integer := pkg_TES_STD_STATE_RAM_A_RD_LATENCY;
 
   constant c_TES_STD_STATE_ADDR_RANGE_MIN : std_logic_vector(pkg_TES_STD_STATE_ADDR_RANGE_MIN'range) := pkg_TES_STD_STATE_ADDR_RANGE_MIN;
 
   -- mux_squid_offset
-  constant c_MUX_SQUID_OFFSET_RAM_NB_WORDS   : integer := pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS;
-  constant c_MUX_SQUID_OFFSET_RAM_RD_LATENCY : integer := pkg_MUX_SQUID_OFFSET_RAM_RD_LATENCY;
+  constant c_MUX_SQUID_OFFSET_RAM_NB_WORDS     : integer := pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS;
+  constant c_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY : integer := pkg_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY;
 
   constant c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN : std_logic_vector(pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN'range) := pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN;
 
@@ -380,7 +380,7 @@ begin
     generic map(
       -- RAM
       g_RAM_NB_WORDS   => c_TES_PULSE_SHAPE_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_TES_PULSE_SHAPE_RAM_RD_LATENCY, -- define the RAM latency during the reading
+      g_RAM_RD_LATENCY => c_TES_PULSE_SHAPE_RAM_A_RD_LATENCY, -- define the RAM latency during the reading
       -- input
       g_ADDR_WIDTH     => addr0'length, -- define the input address bus width
       g_DATA_WIDTH     => data0'length  -- define the input data bus width
@@ -447,7 +447,7 @@ begin
     generic map(
       -- RAM
       g_RAM_NB_WORDS   => c_AMP_SQUID_TF_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_AMP_SQUID_TF_RAM_RD_LATENCY, -- define the RAM latency during the reading
+      g_RAM_RD_LATENCY => c_AMP_SQUID_TF_RAM_A_RD_LATENCY, -- define the RAM latency during the reading
       -- input
       g_ADDR_WIDTH     => addr0'length, -- define the input address bus width
       g_DATA_WIDTH     => data0'length  -- define the input data bus width
@@ -514,7 +514,7 @@ begin
     generic map(
       -- RAM
       g_RAM_NB_WORDS   => c_MUX_SQUID_TF_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_MUX_SQUID_TF_RAM_RD_LATENCY, -- define the RAM latency during the reading
+      g_RAM_RD_LATENCY => c_MUX_SQUID_TF_RAM_A_RD_LATENCY, -- define the RAM latency during the reading
       -- input
       g_ADDR_WIDTH     => addr0'length, -- define the input address bus width
       g_DATA_WIDTH     => data0'length
@@ -581,7 +581,7 @@ begin
     generic map(
       -- RAM
       g_RAM_NB_WORDS   => c_TES_STD_STATE_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_TES_STD_STATE_RAM_RD_LATENCY, -- define the RAM latency during the reading
+      g_RAM_RD_LATENCY => c_TES_STD_STATE_RAM_A_RD_LATENCY, -- define the RAM latency during the reading
       -- input
       g_ADDR_WIDTH     => addr0'length, -- define the input address bus width
       g_DATA_WIDTH     => data0'length
@@ -648,7 +648,7 @@ begin
     generic map(
       -- RAM
       g_RAM_NB_WORDS   => c_MUX_SQUID_OFFSET_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_MUX_SQUID_OFFSET_RAM_RD_LATENCY, -- define the RAM latency during the reading
+      g_RAM_RD_LATENCY => c_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY, -- define the RAM latency during the reading
       -- input
       g_ADDR_WIDTH     => addr0'length, -- define the input address bus width
       g_DATA_WIDTH     => data0'length
