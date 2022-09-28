@@ -63,26 +63,8 @@ set_property PACKAGE_PIN E26 [get_ports {okUHU[31]}]
 set_property SLEW FAST [get_ports {okUHU[*]}]
 set_property IOSTANDARD LVCMOS18 [get_ports {okUHU[*]}]
 
-set_property PACKAGE_PIN R26 [get_ports {okAA}]
-set_property IOSTANDARD LVCMOS33 [get_ports {okAA}]
-
-
-create_clock -name okUH0 -period 9.920 [get_ports {okUH[0]}]
-create_clock -name virt_okUH0 -period 9.920
-
-set_clock_groups -name async-mmcm-user-virt -asynchronous -group {mmcm0_clk0} -group {virt_okUH0}
-
-set_input_delay -add_delay -max -clock [get_clocks {virt_okUH0}]  8.000 [get_ports {okUH[*]}]
-set_input_delay -add_delay -min -clock [get_clocks {virt_okUH0}]  0.000 [get_ports {okUH[*]}]
-
-set_input_delay -add_delay -max -clock [get_clocks {virt_okUH0}]  8.000 [get_ports {okUHU[*]}]
-set_input_delay -add_delay -min -clock [get_clocks {virt_okUH0}]  2.000 [get_ports {okUHU[*]}]
-
-set_output_delay -add_delay -max -clock [get_clocks {okUH0}]  2.000 [get_ports {okHU[*]}]
-set_output_delay -add_delay -min -clock [get_clocks {okUH0}]  -0.500 [get_ports {okHU[*]}]
-
-set_output_delay -add_delay -max -clock [get_clocks {okUH0}]  2.000 [get_ports {okUHU[*]}]
-set_output_delay -add_delay -min -clock [get_clocks {okUH0}]  -0.500 [get_ports {okUHU[*]}]
+set_property PACKAGE_PIN R26 [get_ports okAA]
+set_property IOSTANDARD LVCMOS33 [get_ports okAA]
 
 
 ############################################################################
@@ -94,7 +76,7 @@ set_output_delay -add_delay -min -clock [get_clocks {okUH0}]  -0.500 [get_ports 
 # set_property IOSTANDARD LVDS [get_ports {sys_clkn}]
 # set_property PACKAGE_PIN AC3 [get_ports {sys_clkn}]
 
-# create_clock -name sys_clk -period 5 [get_ports sys_clkp]
+
 
 ############################################################################
 ## User Reset
@@ -1397,4 +1379,17 @@ set_property IOSTANDARD LVCMOS33 [get_ports o_sync];
 # OnBoard 100Mhz MGTREFCLK #################################################
 # set_property PACKAGE_PIN K6 [get_ports {mgtrefclk_p}]
 # set_property PACKAGE_PIN K5 [get_ports {mgtrefclk_n}]
+
+
+
+
+
+
+
+
+
+
+
+
+
 
