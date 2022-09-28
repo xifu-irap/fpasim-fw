@@ -40,7 +40,7 @@ library fpasim;
 
 entity io_dac is
    generic(
-      g_OUTPUT_LATENCY : natural := 0 -- add latency before the output IO. Possible values: [0; max integer value[
+      g_OUTPUT_LATENCY : natural := 0   -- add latency before the output IO. Possible values: [0; max integer value[
    );
    port(
       i_clk         : in  std_logic;    -- clock
@@ -104,8 +104,8 @@ architecture RTL of io_dac is
    signal dac_frame_p_tmp3 : std_logic;
    signal dac_frame_n_tmp3 : std_logic;
 
-   signal dac_p_tmp1 : std_logic_vector(c_DAC_OUTPUT_WIDTH - 1 downto 0);
-   signal dac_n_tmp1 : std_logic_vector(c_DAC_OUTPUT_WIDTH - 1 downto 0);
+   --signal dac_p_tmp1 : std_logic_vector(c_DAC_OUTPUT_WIDTH - 1 downto 0);
+   --signal dac_n_tmp1 : std_logic_vector(c_DAC_OUTPUT_WIDTH - 1 downto 0);
    signal dac_tmp2   : std_logic_vector(c_DAC_OUTPUT_WIDTH - 1 downto 0);
    signal dac_p_tmp3 : std_logic_vector(c_DAC_OUTPUT_WIDTH - 1 downto 0);
    signal dac_n_tmp3 : std_logic_vector(c_DAC_OUTPUT_WIDTH - 1 downto 0);
@@ -134,97 +134,132 @@ begin
    ---------------------------------------------------------------------
    -- oddr: dac frame
    ---------------------------------------------------------------------
-   inst_ODDR_dac_frame : ODDR
-      generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
-         DDR_CLK_EDGE => "SAME_EDGE",   -- "OPPOSITE_EDGE" or "SAME_EDGE" 
-         INIT         => '0',           -- Initial value for Q port ('1' or '0')
-         SRTYPE       => "SYNC")        -- Reset Type ("ASYNC" or "SYNC")
-      port map(
-         Q  => dac_frame_tmp2,          -- 1-bit DDR output
-         C  => i_clk,                   -- 1-bit clock input
-         CE => '1',                     -- 1-bit clock enable input
-         D1 => dac_frame1,              -- 1-bit data input (positive edge)
-         D2 => dac_frame1,              -- 1-bit data input (negative edge)
-         R  => '0',                     -- 1-bit reset input
-         S  => '0'                      -- 1-bit set input
-      );
+   --inst_ODDR_dac_frame : ODDR
+   --   generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
+   --      DDR_CLK_EDGE => "SAME_EDGE",   -- "OPPOSITE_EDGE" or "SAME_EDGE" 
+   --      INIT         => '0',           -- Initial value for Q port ('1' or '0')
+   --      SRTYPE       => "SYNC")        -- Reset Type ("ASYNC" or "SYNC")
+   --   port map(
+   --      Q  => dac_frame_tmp2,          -- 1-bit DDR output
+   --      C  => i_clk,                   -- 1-bit clock input
+   --      CE => '1',                     -- 1-bit clock enable input
+   --      D1 => dac_frame1,              -- 1-bit data input (positive edge)
+   --      D2 => dac_frame1,              -- 1-bit data input (negative edge)
+   --      R  => '0',                     -- 1-bit reset input
+   --      S  => '0'                      -- 1-bit set input
+   --   );
 
-   inst_OBUFDS_dac_frame : OBUFDS
-      generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
-         IOSTANDARD => "LVDS",       -- Specify the output I/O standard
-         SLEW       => "SLOW")          -- Specify the output slew rate
-      port map(
-         O  => dac_frame_p_tmp3,        -- Diff_p output (connect directly to top-level port)
-         OB => dac_frame_n_tmp3,        -- Diff_n output (connect directly to top-level port)
-         I  => dac_frame_tmp2           -- Buffer input 
-      );
+   --inst_OBUFDS_dac_frame : OBUFDS
+   --   generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
+   --      IOSTANDARD => "LVDS",       -- Specify the output I/O standard
+   --      SLEW       => "FAST")          -- Specify the output slew rate
+   --   port map(
+   --      O  => dac_frame_p_tmp3,        -- Diff_p output (connect directly to top-level port)
+   --      OB => dac_frame_n_tmp3,        -- Diff_n output (connect directly to top-level port)
+   --      I  => dac_frame_tmp2           -- Buffer input 
+   --   );
 
    ---------------------------------------------------------------------
    -- oddr : dac clk
    ---------------------------------------------------------------------
    -- dac_clk
    -- add oddr on clock to have the same logic on the FPGA pads as the data path
-   inst_ODDR_clk : ODDR
-      generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
-         DDR_CLK_EDGE => "SAME_EDGE",   -- "OPPOSITE_EDGE" or "SAME_EDGE" 
-         INIT         => '0',           -- Initial value for Q port ('1' or '0')
-         SRTYPE       => "SYNC")        -- Reset Type ("ASYNC" or "SYNC")
-      port map(
-         Q  => dac_clk_tmp2,            -- 1-bit DDR output
-         C  => i_clk,                   -- 1-bit clock input
-         CE => '1',                     -- 1-bit clock enable input
+   --inst_ODDR_clk : ODDR
+   --   generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
+   --      DDR_CLK_EDGE => "SAME_EDGE",   -- "OPPOSITE_EDGE" or "SAME_EDGE" 
+   --      INIT         => '0',           -- Initial value for Q port ('1' or '0')
+   --      SRTYPE       => "SYNC")        -- Reset Type ("ASYNC" or "SYNC")
+   --   port map(
+   --      Q  => dac_clk_tmp2,            -- 1-bit DDR output
+   --      C  => i_clk,                   -- 1-bit clock input
+   --      CE => '1',                     -- 1-bit clock enable input
 
-         D1 => '1',                     -- 1-bit data input (positive edge)
-         D2 => '0',                     -- 1-bit data input (negative edge)
+   --      D1 => '1',                     -- 1-bit data input (positive edge)
+   --      D2 => '0',                     -- 1-bit data input (negative edge)
 
-         R  => '0',                     -- 1-bit reset input
-         S  => '0'                      -- 1-bit set input
-      );
+   --      R  => '0',                     -- 1-bit reset input
+   --      S  => '0'                      -- 1-bit set input
+   --   );
 
-   inst_OBUFDS_clk : OBUFDS
-      generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
-         IOSTANDARD => "LVDS",       -- Specify the output I/O standard
-         SLEW       => "SLOW")          -- Specify the output slew rate
-      port map(
-         O  => dac_clk_p_tmp3,          -- Diff_p output (connect directly to top-level port)
-         OB => dac_clk_n_tmp3,          -- Diff_n output (connect directly to top-level port)
-         I  => dac_clk_tmp2             -- Buffer input 
-      );
+   --inst_OBUFDS_clk : OBUFDS
+   --   generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
+   --      IOSTANDARD => "LVDS",       -- Specify the output I/O standard
+   --      SLEW       => "FAST")          -- Specify the output slew rate
+   --   port map(
+   --      O  => dac_clk_p_tmp3,          -- Diff_p output (connect directly to top-level port)
+   --      OB => dac_clk_n_tmp3,          -- Diff_n output (connect directly to top-level port)
+   --      I  => dac_clk_tmp2             -- Buffer input 
+   --   );
 
    ---------------------------------------------------------------------
    -- oddr: dac
    ---------------------------------------------------------------------
-   dac_p_tmp1 <= dac1(15 downto 8);
-   dac_n_tmp1 <= dac1(7 downto 0);
-   gen_dac_oddr : for i in dac_p_tmp1'range generate
+   -- dac_p_tmp1 <= dac1(15 downto 8);
+   -- dac_n_tmp1 <= dac1(7 downto 0);
+   --gen_dac_oddr : for i in dac_p_tmp1'range generate
 
-      inst_ODDR_dac : ODDR
-         generic map(                   -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
-            DDR_CLK_EDGE => "SAME_EDGE", -- "OPPOSITE_EDGE" or "SAME_EDGE" 
-            INIT         => '0',        -- Initial value for Q port ('1' or '0')
-            SRTYPE       => "SYNC")     -- Reset Type ("ASYNC" or "SYNC")
+   --   inst_ODDR_dac : ODDR
+   --      generic map(                   -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
+   --         DDR_CLK_EDGE => "SAME_EDGE", -- "OPPOSITE_EDGE" or "SAME_EDGE" 
+   --         INIT         => '0',        -- Initial value for Q port ('1' or '0')
+   --         SRTYPE       => "SYNC")     -- Reset Type ("ASYNC" or "SYNC")
+   --      port map(
+   --         Q  => dac_tmp2(i),          -- 1-bit DDR output
+   --         C  => i_clk,                -- 1-bit clock input
+   --         CE => '1',                  -- 1-bit clock enable input
+
+   --         D1 => dac_p_tmp1(i),        -- 1-bit data input (positive edge)
+   --         D2 => dac_n_tmp1(i),        -- 1-bit data input (negative edge)
+
+   --         R  => '0',                  -- 1-bit reset input
+   --         S  => '0'                   -- 1-bit set input
+   --      );
+
+   --   inst_OBUFDS_dac : OBUFDS
+   --      generic map(                   -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
+   --         IOSTANDARD => "LVDS",    -- Specify the output I/O standard
+   --         SLEW       => "FAST")       -- Specify the output slew rate
+   --      port map(
+   --         O  => dac_p_tmp3(i),        -- Diff_p output (connect directly to top-level port)
+   --         OB => dac_n_tmp3(i),        -- Diff_n output (connect directly to top-level port)
+   --         I  => dac_tmp2(i)           -- Buffer input 
+   --      );
+   --end generate gen_dac_oddr;
+
+   ---------------------------------------------------------------------
+   -- bit remapping : see the selectio_wiz_dac_sim_netlist.vhdl from Xilinx ip compilation.
+   -- data_out_to_pins_p(0) <= data_out_from_device(0); -- pos edge
+   -- data_out_to_pins_n(0) <= data_out_from_device(9); -- neg edge
+   -- data_out_to_pins_p(1) <= data_out_from_device(1); -- pos edge
+   -- data_out_to_pins_n(1) <= data_out_from_device(10); -- neg edge
+   -- and so on
+   ---------------------------------------------------------------------
+   gen_io_dac : if true generate
+      signal dac_tmp0   : std_logic_vector(17 downto 0);
+      signal dac_p_tmp1 : std_logic_vector(8 downto 0);
+      signal dac_n_tmp1 : std_logic_vector(8 downto 0);
+   begin
+      dac_tmp0(17)          <= dac_frame1;
+      dac_tmp0(16 downto 9) <= dac1(15 downto 8);
+      dac_tmp0(8)           <= dac_frame1;
+      dac_tmp0(7 downto 0)  <= dac1(7 downto 0);
+      inst_selectio_wiz_dac : entity fpasim.selectio_wiz_dac
          port map(
-            Q  => dac_tmp2(i),          -- 1-bit DDR output
-            C  => i_clk,                -- 1-bit clock input
-            CE => '1',                  -- 1-bit clock enable input
-
-            D1 => dac_p_tmp1(i),        -- 1-bit data input (positive edge)
-            D2 => dac_n_tmp1(i),        -- 1-bit data input (negative edge)
-
-            R  => '0',                  -- 1-bit reset input
-            S  => '0'                   -- 1-bit set input
+            data_out_from_device => dac_tmp0,
+            data_out_to_pins_p   => dac_p_tmp1,
+            data_out_to_pins_n   => dac_n_tmp1,
+            clk_to_pins_p        => dac_clk_p_tmp3,
+            clk_to_pins_n        => dac_clk_n_tmp3,
+            clk_in               => i_clk,
+            clk_reset            => '0',
+            io_reset             => '0'
          );
+      dac_frame_p_tmp3      <= dac_p_tmp1(8);
+      dac_p_tmp3            <= dac_p_tmp1(7 downto 0);
 
-      inst_OBUFDS_dac : OBUFDS
-         generic map(                   -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
-            IOSTANDARD => "LVDS",    -- Specify the output I/O standard
-            SLEW       => "SLOW")       -- Specify the output slew rate
-         port map(
-            O  => dac_p_tmp3(i),        -- Diff_p output (connect directly to top-level port)
-            OB => dac_n_tmp3(i),        -- Diff_n output (connect directly to top-level port)
-            I  => dac_tmp2(i)           -- Buffer input 
-         );
-   end generate gen_dac_oddr;
+      dac_frame_n_tmp3 <= dac_n_tmp1(8);
+      dac_n_tmp3       <= dac_n_tmp1(7 downto 0);
+   end generate gen_io_dac;
 
    ---------------------------------------------------------------------
    -- output
