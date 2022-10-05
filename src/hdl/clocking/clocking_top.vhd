@@ -46,7 +46,7 @@ entity clocking_top is
     o_adc_clk : out std_logic;          -- adc output clock @250 MHz
     o_ref_clk : out std_logic;          -- ref output clock @62.5 MHz
     o_dac_clk : out std_logic;          -- dac output clock @500 MHz
-    o_clk     : out std_logic;          -- sys output clock @500 MHz
+    o_clk     : out std_logic;          -- sys output clock @333.33333 MHz
 
     o_locked : out std_logic
   );
@@ -69,6 +69,10 @@ port
  );
 end component;
 
+  signal adc_clk : std_logic;
+  signal ref_clk : std_logic;
+  signal dac_clk : std_logic;
+  signal clk : std_logic;
   signal locked : std_logic;
 
 begin
@@ -76,16 +80,19 @@ begin
   inst_fpasim_clk_wiz_0 : fpasim_clk_wiz_0
     port map(
       -- Clock out ports  
-      clk_out1  => o_adc_clk,           -- output clock @250MHz
-      clk_out2  => o_ref_clk,           -- output clock @250MHz
-      clk_out3  => o_dac_clk,           -- output clock @500MHz
-      clk_out4  => o_clk,               -- output clock @500MHz
+      clk_out1  => adc_clk,           -- output clock @250MHz
+      clk_out2  => ref_clk,           -- output clock @62.5MHz
+      clk_out3  => dac_clk,           -- output clock @500MHz
+      clk_out4  => clk,               -- output clock @333.33333MHz
       -- Status and control signals                
       locked    => locked,
       -- Clock in ports
       clk_in1_p => i_clk_p,
       clk_in1_n => i_clk_n
     );
-
+    o_adc_clk <= adc_clk;
+    o_ref_clk <= ref_clk;
+    o_dac_clk <= dac_clk;
+    o_clk <= clk;
     o_locked <= locked;
 end architecture RTL;
