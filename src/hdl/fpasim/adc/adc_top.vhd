@@ -71,7 +71,6 @@ entity adc_top is
     i_clk         : in  std_logic;      -- output clock
     -- from regdecode
     -----------------------------------------------------------------
-    i_rst         : in  std_logic;      -- reset
     i_rst_status  : in  std_logic;      -- reset error flag(s)
     i_debug_pulse : in  std_logic;      -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     i_en          : in  std_logic;      -- enable
@@ -93,11 +92,6 @@ end entity adc_top;
 architecture RTL of adc_top is
 
   constant c_FIFO_READ_LATENCY : natural := fpasim.pkg_fpasim.pkg_ADC_FIFO_READ_LATENCY;
-  ---------------------------------------------------------------------
-  -- synchronize commands: @i_clk -> i_adc_clk
-  ---------------------------------------------------------------------
-  signal en_sync               : std_logic;
-  signal rst_sync              : std_logic;
 
   ---------------------------------------------------------------------
   -- FIFO
@@ -133,6 +127,7 @@ architecture RTL of adc_top is
   ---------------------------------------------------------------------
   -- apply delay
   ---------------------------------------------------------------------
+  signal data_valid1   : std_logic;
   signal data_valid_r1 : std_logic;
   signal adc1_rx       : std_logic_vector(o_adc1'range);
   signal adc0_rx       : std_logic_vector(o_adc0'range);
@@ -145,52 +140,12 @@ architecture RTL of adc_top is
   signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
 
 begin
-  ---------------------------------------------------------------------
-  -- synchronize commands: @i_clk -> @i_adc_clk
-  ---------------------------------------------------------------------
 
-  inst_single_bit_synchronizer_cmd : entity fpasim.single_bit_synchronizer
-    generic map(
-      g_DEST_SYNC_FF  => 2,
-      g_SRC_INPUT_REG => 1
-    )
-    port map(
-      ---------------------------------------------------------------------
-      -- source
-      ---------------------------------------------------------------------
-      i_src_clk  => i_clk,
-      i_src      => i_en,
-      ---------------------------------------------------------------------
-      -- destination
-      ---------------------------------------------------------------------
-      i_dest_clk => i_adc_clk,
-      o_dest     => en_sync
-    );
 
-  inst_synchronous_reset_synchronizer_rst_adc : entity fpasim.synchronous_reset_synchronizer
-    generic map(
-      g_DEST_SYNC_FF => 2,
-      g_INIT         => 1
-    )
-    port map(
-      ---------------------------------------------------------------------
-      -- source
-      ---------------------------------------------------------------------
-      i_src_rst  => i_rst,              -- Source reset signal
-      ---------------------------------------------------------------------
-      -- destination
-      ---------------------------------------------------------------------
-      i_dest_clk => i_adc_clk,          -- Destination clock.
-      o_dest_rst => rst_sync            -- src_rst synchronized to the destination clock domain. This output is registered.
-    );
-
-  ---------------------------------------------------------------------
-  -- clock domain crossing
-  ---------------------------------------------------------------------
-  wr_tmp0                             <= i_adc_valid and en_sync;
+   wr_tmp0                            <= i_adc_valid;
   data_tmp0(c_IDX1_H downto c_IDX1_L) <= i_adc1;
   data_tmp0(c_IDX0_H downto c_IDX0_L) <= i_adc0;
-  wr_rst_tmp0                         <= rst_sync;
+  wr_rst_tmp0                         <= '0';
   inst_fifo_async_with_error : entity fpasim.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
@@ -243,7 +198,6 @@ begin
   ---------------------------------------------------------------------
   -- apply a different delay on each adc data
   ---------------------------------------------------------------------
-
   inst_dynamic_shift_register_adc0 : entity fpasim.dynamic_shift_register
     generic map(
       g_ADDR_WIDTH => i_adc0_delay'length,
@@ -257,6 +211,7 @@ begin
       o_data       => adc0_rx
     );
 
+
   inst_dynamic_shift_register_adc1 : entity fpasim.dynamic_shift_register
     generic map(
       g_ADDR_WIDTH => i_adc1_delay'length, -- width of the address. Possibles values: [2, integer max value[ 
@@ -264,12 +219,15 @@ begin
     )
     port map(
       i_clk        => i_clk,            -- clock signal
-      i_data_valid => data_valid_tmp1,  -- input data valid
+      i_data_valid => data_valid_tmp1,      -- input data valid
       i_data       => adc1_tmp1,        -- input data
       i_addr       => i_adc1_delay,     -- input address (dynamically select the depth of the pipeline)
       o_data       => adc1_rx           -- output data with/without delay
     );
 
+-- synchronize with the dynamic_shift_register output when i_adc0/1_delay = 0
+---------------------------------------------------------------------
+data_valid1 <= data_valid_tmp1 and i_en;
   inst_pipeliner_sync_with_dynamic_shift_register_when_delay_eq_0 : entity fpasim.pipeliner
     generic map(
       g_NB_PIPES   => 1,                -- number of consecutives registers. Possibles values: [0, integer max value[
@@ -277,7 +235,7 @@ begin
     )
     port map(
       i_clk     => i_clk,               -- clock signal
-      i_data(0) => data_valid_tmp1,     -- input data
+      i_data(0) => data_valid1,     -- input data
       o_data(0) => data_valid_r1        -- output data with/without delay
     );
 
