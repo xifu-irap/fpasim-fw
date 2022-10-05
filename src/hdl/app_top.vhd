@@ -202,7 +202,7 @@ begin
       o_adc_clk => adc_clk,             -- adc output clock @250 MHz
       o_ref_clk => ref_clk,             -- ref output clock @62.5 MHz
       o_dac_clk => dac_clk,             -- dac output clock @500 MHz
-      o_clk     => clk,                 -- sys output clock @500 MHz
+      o_clk     => clk,                 -- sys output clock @333.33333 MHz
       o_locked  => locked               -- not connected
     );
 
