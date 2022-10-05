@@ -196,6 +196,30 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   signal data_sync_r1 : std_logic_vector(i_data'range);
 
   ---------------------------------------------------------------------
+  -- add an optional output delay
+  ---------------------------------------------------------------------
+  constant c_IDX0_L : integer := 0;
+  constant c_IDX0_H : integer := c_IDX0_L + i_data'length - 1;
+
+  constant c_IDX1_L : integer := c_IDX0_H + 1;
+  constant c_IDX1_H : integer := c_IDX1_L + i_addr'length - 1;
+
+  constant c_IDX2_L : integer := c_IDX1_H + 1;
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+
+  constant c_IDX3_L : integer := c_IDX2_H + 1;
+  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;
+
+  signal data_pipe_tmp2 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp3 : std_logic_vector(c_IDX3_H downto 0);
+
+  signal wr_sync_ry   : std_logic;
+  signal rd_sync_ry   : std_logic;
+  signal addr_sync_ry : std_logic_vector(i_addr'range);
+  signal data_sync_ry : std_logic_vector(i_data'range);
+
+
+  ---------------------------------------------------------------------
   -- sync with the rd RAM output 
   ---------------------------------------------------------------------
   constant c_PIPE_IDX0_L : integer := 0;
@@ -453,12 +477,37 @@ begin
     end if;
   end process p_compute_flag;
   ---------------------------------------------------------------------
+  -- to the user: add optional delay
+  ---------------------------------------------------------------------
+  data_pipe_tmp2(c_IDX3_H)                      <= wr_sync_r1;
+  data_pipe_tmp2(c_IDX2_H)                      <= rd_sync_r1;
+  data_pipe_tmp2(c_IDX1_H downto c_IDX1_L)                      <= addr_sync_r1;
+  data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= data_sync_r1;
+
+  inst_pipeliner_add_delay_out : entity work.pipeliner
+    generic map(
+      g_NB_PIPES   => 1,
+      g_DATA_WIDTH => data_pipe_tmp2'length
+    )
+    port map(
+      i_clk  => i_out_clk,
+      i_data => data_pipe_tmp2,
+      o_data => data_pipe_tmp3
+    );
+
+  wr_sync_ry  <= data_pipe_tmp3(c_IDX3_H);
+  rd_sync_ry  <= data_pipe_tmp3(c_IDX2_H);
+  addr_sync_ry   <= data_pipe_tmp3(c_IDX1_H downto c_IDX1_L);
+  data_sync_ry <= data_pipe_tmp3(c_IDX0_H downto c_IDX0_L);
+
+
+  ---------------------------------------------------------------------
   -- to the user: output
   ---------------------------------------------------------------------
-  o_ram_wr_en      <= wr_sync_r1;
-  o_ram_rd_en      <= rd_sync_r1;
-  o_ram_wr_rd_addr <= addr_sync_r1;
-  o_ram_wr_data    <= data_sync_r1;
+  o_ram_wr_en      <= wr_sync_ry;
+  o_ram_rd_en      <= rd_sync_ry;
+  o_ram_wr_rd_addr <= addr_sync_ry;
+  o_ram_wr_data    <= data_sync_ry;
 
   ---------------------------------------------------------------------
   -- sync with the Reading of the RAM output
