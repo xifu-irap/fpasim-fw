@@ -766,7 +766,6 @@ begin
       i_clk         => i_clk,
       -- from regdecode
       -----------------------------------------------------------------
-      i_rst         => rst,
       i_rst_status  => rst_status,
       i_debug_pulse => debug_pulse,
       i_en          => en,
