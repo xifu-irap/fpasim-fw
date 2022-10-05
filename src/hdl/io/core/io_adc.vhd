@@ -61,7 +61,6 @@ end entity io_adc;
 
 architecture RTL of io_adc is
 
-   --signal adc_tmp0 : std_logic_vector(i_adc_p'range);
    signal adc_tmp0 : std_logic_vector(o_adc'range);
    signal adc_tmp1 : std_logic_vector(o_adc'range);
 
@@ -71,38 +70,6 @@ architecture RTL of io_adc is
    signal adc_tmp2 : std_logic_vector(o_adc'range);
 
 begin
-
-   --gen_adc_io : for i in i_adc_p'range generate
-   --   inst_IBUFDS_adc : IBUFDS
-   --      generic map(                   -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE, DQS_BIAS, IBUF_DELAY_VALUE, IFD_DELAY_VALUE"
-   --         DIFF_TERM    => FALSE,      -- Differential Termination 
-   --         IBUF_LOW_PWR => FALSE,      -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
-   --         IOSTANDARD   => "LVDS")
-   --      port map(
-   --         O  => adc_tmp0(i),          -- Buffer output
-   --         I  => i_adc_p(i),           -- Diff_p buffer input (connect directly to top-level port)
-   --         IB => i_adc_n(i)            -- Diff_n buffer input (connect directly to top-level port)
-   --      );
-
-   --   -- In the SAME_EDGE_PIPELINED mode, the data is presented into the FPGA logic on the same clock edge.
-   --   inst_IDDR_adc : IDDR
-   --      generic map(                   -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D_INVERTED"
-   --         DDR_CLK_EDGE => "SAME_EDGE_PIPELINED", -- "OPPOSITE_EDGE", "SAME_EDGE" 
-   --         -- or "SAME_EDGE_PIPELINED" 
-   --         INIT_Q1      => '0',        -- Initial value of Q1: '0' or '1'
-   --         INIT_Q2      => '0',        -- Initial value of Q2: '0' or '1'
-   --         SRTYPE       => "SYNC")     -- Set/Reset type: "SYNC" or "ASYNC" 
-   --      port map(
-   --         Q1 => adc_tmp1(2 * i),      -- 1-bit output for positive edge of clock 
-   --         Q2 => adc_tmp1(2 * i + 1),  -- 1-bit output for negative edge of clock
-   --         C  => i_clk,                -- 1-bit clock input
-   --         CE => '1',                  -- 1-bit clock enable input
-   --         D  => adc_tmp0(i),          -- 1-bit DDR data input
-   --         R  => '0',                  -- 1-bit reset
-   --         S  => '0'                   -- 1-bit set
-   --      );
-
-   --end generate gen_adc_io;
 
    inst_selectio_wiz_adc : entity fpasim.selectio_wiz_adc
       port map(
@@ -115,6 +82,7 @@ begin
       );
 
    ---------------------------------------------------------------------
+   -- I/O interface:
    -- bit remapping : see the selectio_wiz_adc_sim_netlist.vhdl from Xilinx ip compilation.
    -- adc_tmp1(0) <= adc_tmp0(0); -- pos edge
    -- adc_tmp1(1) <= adc_tmp0(7); -- neg edge

@@ -86,38 +86,8 @@ begin
       );
 
    ---------------------------------------------------------------------
-   -- oddr
+   -- I/O interface
    ---------------------------------------------------------------------
-   --inst_ODDR_sync : ODDR
-   --   generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
-   --      DDR_CLK_EDGE => "SAME_EDGE",   -- "OPPOSITE_EDGE" or "SAME_EDGE" 
-   --      INIT         => '0',           -- Initial value for Q port ('1' or '0')
-   --      SRTYPE       => "SYNC")        -- Reset Type ("ASYNC" or "SYNC")
-   --   port map(
-   --      Q  => sync_tmp,                -- 1-bit DDR output
-   --      C  => i_clk,                   -- 1-bit clock input
-   --      CE => '1',                     -- 1-bit clock enable input
-   --      D1 => sync_rx,                 -- 1-bit data input (positive edge)
-   --      D2 => sync_rx,                 -- 1-bit data input (negative edge)
-   --      R  => '0',                     -- 1-bit reset input
-   --      S  => '0'                      -- 1-bit set input
-   --   );
-
-   ---- add oddr on clock to have the same logic on the FPGA pads as the data path
-   --inst_ODDR_clk : ODDR
-   --   generic map(                      -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
-   --      DDR_CLK_EDGE => "SAME_EDGE",   -- "OPPOSITE_EDGE" or "SAME_EDGE" 
-   --      INIT         => '0',           -- Initial value for Q port ('1' or '0')
-   --      SRTYPE       => "SYNC")        -- Reset Type ("ASYNC" or "SYNC")
-   --   port map(
-   --      Q  => clk_tmp,                 -- 1-bit DDR output
-   --      C  => i_clk,                   -- 1-bit clock input
-   --      CE => '1',                     -- 1-bit clock enable input
-   --      D1 => '1',                     -- 1-bit data input (positive edge)
-   --      D2 => '0',                     -- 1-bit data input (negative edge)
-   --      R  => '0',                     -- 1-bit reset input
-   --      S  => '0'                      -- 1-bit set input
-   --   );
    gen_io_sync : if true generate
       signal data_tmp0 : std_logic_vector(0 downto 0);
       signal data_tmp1 : std_logic_vector(0 downto 0);
