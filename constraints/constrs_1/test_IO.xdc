@@ -36,8 +36,8 @@ create_generated_clock -name clk -source [get_pins inst_clocking_top/inst_fpasim
 #########################################
 # ODDR : forward clock
 #########################################
-create_generated_clock -name gen_dac_clk_out -multiply_by 1 -source [get_pins inst_io_top/inst_io_dac/gen_io_dac.inst_selectio_wiz_dac/oddr_inst/C] [get_ports {o_dac_clk_p}]
-create_generated_clock -name gen_sync_clk_out -multiply_by 1 -source [get_pins inst_io_top/inst_io_sync/gen_io_sync.inst_selectio_wiz_sync/oddr_inst/C] [get_ports {o_ref_clk}]
+create_generated_clock -name gen_dac_clk_out -multiply_by 1 -source [get_pins inst_io_top/inst_io_dac/gen_io_dac.inst_selectio_wiz_dac/inst/oddr_inst/C] [get_ports {o_dac_clk_p}]
+create_generated_clock -name gen_sync_clk_out -multiply_by 1 -source [get_pins inst_io_top/inst_io_sync/gen_io_sync.inst_selectio_wiz_sync/inst/oddr_inst/C] [get_ports {o_ref_clk}]
 
 # Center-Aligned Double Data Rate Source Synchronous Inputs 
 #
