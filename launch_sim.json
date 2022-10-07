@@ -1,0 +1,209 @@
+{
+    "description":
+    [
+        "The Continuous Integration (VHDL simulation) can be launched on any computer. So, the path must be dynamically computed by the python script from this file path",
+        "This json file define the tree structure of the source file for the simulation",
+        "This file will be an input of the associated launch_sim.py python script",
+        "From this file, the lauch_sim.py python script will generated an intermadiary output file (launch_sim_processed.json) will some fields which will be automatically filled",
+        "This output file will be used by the python script associated to the simulation of the VHDL module to get the path to the directory where source files are",
+        "Prerequisite:",
+        "  .Before running simulation, on the simulation runner computer, Vivado must be installed. Its Xilinx library should be compiled with Modelsim and/or Questa",
+        "  Then, some environnement variables should be defined:",
+        "    . MODELSIM_PATH: path to root directory of the modelsim.exe",
+        "    . QUESTA_PATH: path to root directory of the questasim.exe",
+        "    . MODELSIM_XILINX_COMPIL_LIB_PATH: path to root directory of the xilinx IP compiled by the modelsim simulator",
+        "    . QUESTA_XILINX_COMPIL_LIB_PATH: path to root directory of the xilinx IP compiled by the questa simulator"
+    ],
+    "launch_sim_path":
+    {
+        "description": [
+                        "The path parameter will be automatically filled by the launch_sim.py python script",
+                        "The launch_sim.py python and the launch_sim.json should be placed at the git repository root"
+                        ],
+        "path":""
+
+    },
+    "vunit_path": 
+    {
+        "description":
+        [
+            "On the simulation runner computer, the user must define an environnement variable called VUNIT_PATH",
+            "The value of the environnement variable should be the path to the vunit directory",
+            "The path parameter will be automatically filled by the launch_sim.py python script with the environnement variable value"
+        ],
+        "path":""
+    },
+
+    "modelsim_path": 
+    {
+        "description":
+        [
+            "On the simulation runner computer, the user must define an environnement variable called MODELSIM_PATH (if the modelsim VHDL simulator is used)",
+            "The value of the environnement variable should be the path to the modelsim.exe",
+            "The path parameter will be automatically filled by the launch_sim.py python script with the environnement variable value"
+        ],
+        "path":""
+    },
+    "questa_path":
+    {
+        "description":[
+            "On the simulation runner computer, the user must define an environnement variable called QUESTA_PATH (if the questa VHDL simulator is used)",
+            "The value of the environnement variable should be the path to the modelsim.exe",
+            "The path parameter will be automatically filled by the launch_sim.py python script with the environnement variable value"
+        ],
+        "path":""
+    },
+
+    "modelsim_xilinx_compil_lib_path": 
+    {
+        "description":[
+            "On the simulation runner computer, the user must define an environnement variable called MODELSIM_XILINX_COMPIL_LIB_PATH (if the modelsim VHDL simulator is used)",
+            "The value of the environnement variable should be the path to the xilinx library compiled by the modelsim simulator",
+            "The path parameter will be automatically filled by the launch_sim.py python script with the environnement variable value"
+        ],
+        "path":""
+    },
+    "questa_xilinx_compil_lib_path": 
+    {
+        "description":[
+            "On the simulation runner computer, the user must define an environnement variable called QUESTA_XILINX_COMPIL_LIB_PATH (if the questa VHDL simulator is used)",
+            "The value of the environnement variable should be the path to the xilinx library compiled by the questa simulator",
+            "The path parameter will be automatically filled by the launch_sim.py python script with the environnement variable value"
+        ],
+        "path":""
+    },
+
+    "lib": 
+    {
+        "description":
+        [
+            ""
+        ],
+        "vhdl": 
+        [
+            {   
+                "description":
+                [
+                    ""
+                ],
+                "name": "csv",
+                "filename_list": [""],
+                "path": "@launch_sim_path/simu/lib/vhdl2008/vhdl-csv-file-reader/hdl",
+                "compile_lib": "csv_lib"
+            },
+            {
+                "description":
+                [
+                    ""
+                ],
+                "name": "vhdl_simu",
+                "filename_list": [""],
+                "path": "@launch_sim_path/simu/lib/vhdl2008/vhdl_simu/hdl",
+                "compile_lib": "vhdl_simu_lib"
+            },
+            {
+                "description":
+                [
+                    ""
+                ],
+                "name": "vunit",
+                "filename_list": [""],
+                "path": "@launch_sim_path/simu/lib/python/vunit/hdl/vhdl",
+                "compile_lib": "vunit_lib"
+            },
+            {
+                "description":
+                [
+                    ""
+                ],
+                "name": "vhdl_opal_kelly",
+                "filename_list": [""],
+                "path": "@launch_sim_path/simu/lib/vhdl2008/vhdl_opal_kelly/hdl",
+                "compile_lib": "opal_kelly_lib"
+            }
+        ],
+        "python":
+        [
+            {
+                "description":
+                [
+                    ""
+                ],
+                "name": "vunit",
+                "filename_list":[""],
+                "path": "@launch_sim_path/simu/lib/python/vunit",
+                "library_name":"vunit"
+            },
+            {
+                "description":
+                [
+                    ""
+                ],
+                "name": "vhdl_simu",
+                "filename_list":[""],
+                "path": "@launch_sim_path/simu/lib/vhdl2008/vhdl_simu/python",
+                "library_name":"utils"
+            }
+
+
+
+        ]
+
+    },
+    "test_list": [
+        {
+            "description":
+                [
+                    ""
+                ],
+            "name": "adc_tb_test1",
+            "conf": {
+                "json_filepath_list": 
+                [
+                    "@launch_sim_path/simu/conf/fpasim/adc/blabla.json",
+                    "@launch_sim_path/simu/conf/fpasim/adc/blabla.json"
+                ]
+            },
+            "vunit": {
+                "filepath": "@launch_sim_path/simu/vunit/tmp_test/run_tmp.py",
+                "basepath_output": "@launch_sim_path/vunit_output/fpasim/adc"
+            }
+        },
+        {
+            "description":
+                [
+                    ""
+                ],
+            "name": "adc_tb_test2",
+            "conf": {
+                "json_filepath_list": 
+                [
+                    "@launch_sim_path/simu/conf/fpasim/adc/blabla.json"
+                ]
+            },
+            "vunit": {
+                "filepath": "@launch_sim_path/simu/vunit/tmp_test/run_tmp.py",
+                "basepath_output": "@launch_sim_path/vunit_output/fpasim/adc"
+            }
+        },
+        {
+            "description":
+                [
+                    ""
+                ],
+            "name": "test_tmp",
+            "conf": {
+                "json_filepath_list": 
+                [
+                    ""
+                ]
+            },
+            "vunit": {
+                "filepath": "@launch_sim_path/simu/vunit/tmp_test/run_sim.py",
+                "basepath_output": "@launch_sim_path/vunit_output/tmp_test"
+            }
+        }
+    ]
+    
+    
+}
