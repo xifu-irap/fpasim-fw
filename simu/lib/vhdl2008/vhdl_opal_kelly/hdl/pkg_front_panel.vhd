@@ -35,42 +35,105 @@ use ieee.numeric_std.all;
 use ieee.math_real.all;
 use IEEE.std_logic_textio.all;
 
-library STD;
 use std.textio.all;
 
 library opal_kelly_lib;
 use opal_kelly_lib.parameters.all;
 
-
-
 package pkg_front_panel is
-    generic (
-     BlockDelayStates : integer := 5;    -- REQUIRED: # of clocks between blocks of pipe data
-     ReadyCheckDelay  : integer := 5;    -- REQUIRED: # of clocks before block transfer before                                            --    host interface checks for ready (0-255)
-     PostReadyDelay   : integer := 5;    -- REQUIRED: # of clocks after ready is asserted and
-                                         --    check that the block transfer begins (0-255)
-     pipeInSize       : integer := 1024; -- REQUIRED: byte (must be even) length of default
-                                          --    PipeIn; Integer 0-2^32
-     pipeOutSize      : integer := 1024; -- REQUIRED: byte (must be even) length of default
-                                        
-                                         --    PipeOut; Integer 0-2^32
-     registerSetSize  : integer := 32   -- Size of array for register set commands.
-
-           );
-
 
     type t_void is (VOID);
 
+    ------------------------------------------------------
+    -- this procedure allows to wait a number of rising edge
+    -- then a margin is applied, if any
+    ------------------------------------------------------
+    procedure wait_nb_rising_edge_plus_margin(
+        signal   i_clk            : in std_logic;
+        constant i_nb_rising_edge : in natural;
+        constant i_margin         : in time
+    );
 
-    type t_front_panel is protected
-        procedure okHost_driver(
-                                signal i_clk : in std_logic;
-                                signal okUH  : out    STD_LOGIC_VECTOR (4  downto 0);
-                                signal okHU  : in   STD_LOGIC_VECTOR (2  downto 0);
-                                signal okUHU : inout STD_LOGIC_VECTOR (31 downto 0)
-                                );
+    type t_internal_if is record
+        hi_drive   : std_logic;
+        hi_cmd     : std_logic_vector(2 downto 0);
+        hi_busy    : std_logic;
+        hi_datain  : std_logic_vector(31 downto 0);
+        hi_dataout : std_logic_vector(31 downto 0);
 
-        -----------------------------------------------------------------------
+    end record t_internal_if;
+
+
+    constant DNOP                  : std_logic_vector(2 downto 0) := "000";
+    constant DReset                : std_logic_vector(2 downto 0) := "001";
+    constant DWires                : std_logic_vector(2 downto 0) := "010";
+    constant DUpdateWireIns        : std_logic_vector(2 downto 0) := "001";
+    constant DUpdateWireOuts       : std_logic_vector(2 downto 0) := "010";
+    constant DTriggers             : std_logic_vector(2 downto 0) := "011";
+    constant DActivateTriggerIn    : std_logic_vector(2 downto 0) := "001";
+    constant DUpdateTriggerOuts    : std_logic_vector(2 downto 0) := "010";
+    constant DPipes                : std_logic_vector(2 downto 0) := "100";
+    constant DWriteToPipeIn        : std_logic_vector(2 downto 0) := "001";
+    constant DReadFromPipeOut      : std_logic_vector(2 downto 0) := "010";
+    constant DWriteToBlockPipeIn   : std_logic_vector(2 downto 0) := "011";
+    constant DReadFromBlockPipeOut : std_logic_vector(2 downto 0) := "100";
+    constant DRegisters            : std_logic_vector(2 downto 0) := "101";
+    constant DWriteRegister        : std_logic_vector(2 downto 0) := "001";
+    constant DReadRegister         : std_logic_vector(2 downto 0) := "010";
+    constant DWriteRegisterSet     : std_logic_vector(2 downto 0) := "011";
+    constant DReadRegisterSet      : std_logic_vector(2 downto 0) := "100";
+
+    type PIPEIN_ARRAY is array (integer range <>) of std_logic_vector(7 downto 0);
+    type PIPEOUT_ARRAY is array (integer range <>) of std_logic_vector(7 downto 0);
+    type STD_ARRAY is array (integer range <>) of std_logic_vector(31 downto 0);
+    type REGISTER_ARRAY is array (integer range <>) of std_logic_vector(31 downto 0);
+    
+    type t_front_panel_conf is record
+        pipeIn           : PIPEIN_ARRAY;
+
+        pipeOut          : PIPEOUT_ARRAY;
+
+        WireIns          : STD_ARRAY;   -- 32x32 array storing WireIn values
+        WireOuts         : STD_ARRAY;   -- 32x32 array storing WireOut values 
+        Triggered        : STD_ARRAY;   -- 32x32 array storing IsTriggered values
+
+        u32Address       : REGISTER_ARRAY;
+        u32Data          : REGISTER_ARRAY;
+        u32Count         : std_logic_vector(31 downto 0);
+        ReadRegisterData : std_logic_vector(31 downto 0);
+
+        PostReadyDelay   : integer;
+        ReadyCheckDelay  : integer;
+        BlockDelayStates : integer;
+
+    end record t_front_panel_conf;
+
+
+
+
+    -----------------------------------------------------------------------
+    -- init_front_panel_conf
+    -----------------------------------------------------------------------
+    impure function init_front_panel_conf(
+         BlockDelayStates : in integer := 5; -- REQUIRED: # of clocks between blocks of pipe data
+         ReadyCheckDelay  : in integer := 5; -- REQUIRED: # of clocks before block transfer before host interface checks for ready (0-255)
+         PostReadyDelay   : in integer := 5; -- REQUIRED: # of clocks after ready is asserted and check that the block transfer begins (0-255)
+         pipeInSize       : in integer := 1024; -- REQUIRED: byte (must be even) length of default PipeIn; Integer 0-2^32
+         pipeOutSize      : in integer := 1024; -- REQUIRED: byte (must be even) length of default PipeOut; Integer 0-2^32
+         registerSetSize  : in integer := 32 -- Size of array for register set commands.
+    ) return t_front_panel_conf;
+
+    impure function init_internal_if( dummy : in integer) return t_internal_if;
+
+    procedure okHost_driver(
+        signal i_clk : in std_logic;
+        signal okUH      : out STD_LOGIC_VECTOR (4  downto 0);
+        signal okHU      : in STD_LOGIC_VECTOR (2  downto 0);
+        signal okUHU     : inout STD_LOGIC_VECTOR (31 downto 0);
+        signal internal_if : inout t_internal_if
+    );
+
+    -----------------------------------------------------------------------
     -- Available User Task and Function Calls:
     --    FrontPanelReset;              -- Always start routine with FrontPanelReset;
     --    SetWireInValue(ep, val, mask);
@@ -97,269 +160,371 @@ package pkg_front_panel is
     -----------------------------------------------------------------------
     -- FrontPanelReset
     -----------------------------------------------------------------------
-    procedure FrontPanelReset(constant dummy:in t_void:= VOID);
+    procedure FrontPanelReset(signal i_clk : in std_logic; variable front_panel_conf : inout t_front_panel_conf; signal internal_if : inout t_internal_if);
 
     -----------------------------------------------------------------------
     -- SetWireInValue
     -----------------------------------------------------------------------
-    procedure SetWireInValue (
-        ep   : in  std_logic_vector(7 downto 0);
-        val  : in  std_logic_vector(31 downto 0);
-        mask : in  std_logic_vector(31 downto 0)
-                            );
+    procedure SetWireInValue(
+        ep                   : in std_logic_vector(7 downto 0);
+        val                  : in std_logic_vector(31 downto 0);
+        mask                 : in std_logic_vector(31 downto 0);
+        variable front_panel_conf : inout t_front_panel_conf
+    );
 
     -----------------------------------------------------------------------
     -- GetWireOutValue
     -----------------------------------------------------------------------
-    impure function GetWireOutValue (
-        ep : std_logic_vector) return std_logic_vector;
+    impure function GetWireOutValue(
+        ep          : std_logic_vector;
+        front_panel_conf : in t_front_panel_conf) return std_logic_vector;
 
     -----------------------------------------------------------------------
     -- IsTriggered
     -----------------------------------------------------------------------
-    impure function IsTriggered (
-        ep   : std_logic_vector;
-        mask : std_logic_vector(31 downto 0)) return boolean;
+    impure function IsTriggered(
+        ep          : std_logic_vector;
+        mask        : std_logic_vector(31 downto 0);
+        front_panel_conf : t_front_panel_conf
+    ) return boolean;
 
     -----------------------------------------------------------------------
     -- UpdateWireIns
     -----------------------------------------------------------------------
-    procedure UpdateWireIns(constant dummy:in t_void:= VOID);
+    procedure UpdateWireIns(signal   i_clk   : in std_logic;
+                            variable front_panel_conf : inout t_front_panel_conf;
+                            signal   internal_if   : inout t_internal_if
+                           );
 
     -----------------------------------------------------------------------
     -- UpdateWireOuts
     -----------------------------------------------------------------------
-    procedure UpdateWireOuts(constant dummy:in t_void:= VOID); 
+    procedure UpdateWireOuts(
+        signal   i_clk   : in std_logic;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if
+    );
 
     -----------------------------------------------------------------------
     -- ActivateTriggerIn
     -----------------------------------------------------------------------
-    procedure ActivateTriggerIn (
-        ep  : in  std_logic_vector(7 downto 0);
-        bit : in  integer);
+    procedure ActivateTriggerIn(
+        signal i_clk : in std_logic;
+        ep               : in std_logic_vector(7 downto 0);
+        bit              : in integer;
+        signal internal_if : inout t_internal_if);
 
     -----------------------------------------------------------------------
     -- UpdateTriggerOuts
     -----------------------------------------------------------------------
-    procedure UpdateTriggerOuts(constant dummy:in t_void:= VOID);
+    procedure UpdateTriggerOuts(
+        signal   i_clk   : in std_logic;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if
+    );
 
     -----------------------------------------------------------------------
     -- WriteToPipeIn
     -----------------------------------------------------------------------
-    procedure WriteToPipeIn (
-        ep      : in  std_logic_vector(7 downto 0);
-        length  : in  integer);
+    procedure WriteToPipeIn(
+        signal   i_clk   : in std_logic;
+        ep                   : in std_logic_vector(7 downto 0);
+        length               : in integer;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if
+    );
 
-
-
-  -----------------------------------------------------------------------
+    -----------------------------------------------------------------------
     -- ReadFromPipeOut
     -----------------------------------------------------------------------
-    procedure ReadFromPipeOut (
-        ep     : in  std_logic_vector(7 downto 0);
-        length : in  integer);
+    procedure ReadFromPipeOut(
+        signal   i_clk   : in std_logic;
+        ep                   : in std_logic_vector(7 downto 0);
+        length               : in integer;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if
+    );
 
     -----------------------------------------------------------------------
     -- WriteToBlockPipeIn
     -----------------------------------------------------------------------
-    procedure WriteToBlockPipeIn (
-        ep          : in std_logic_vector(7 downto 0);
-        blockLength : in integer;
-        length      : in integer);
+    procedure WriteToBlockPipeIn(
+        signal   i_clk   : in std_logic;
+        ep                   : in std_logic_vector(7 downto 0);
+        blockLength          : in integer;
+        length               : in integer;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if);
 
     -----------------------------------------------------------------------
     -- ReadFromBlockPipeOut
     -----------------------------------------------------------------------
-    procedure ReadFromBlockPipeOut (
-        ep          : in std_logic_vector(7 downto 0);
-        blockLength : in integer;
-        length      : in integer);
-    
-        -----------------------------------------------------------------------
+    procedure ReadFromBlockPipeOut(
+        signal   i_clk   : in std_logic;
+        ep                   : in std_logic_vector(7 downto 0);
+        blockLength          : in integer;
+        length               : in integer;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if);
+
+    -----------------------------------------------------------------------
     -- WriteRegister
     -----------------------------------------------------------------------
-    procedure WriteRegister (
-        address  : in  std_logic_vector(31 downto 0);
-        data     : in  std_logic_vector(31 downto 0));
+    procedure WriteRegister(
+        signal i_clk : in std_logic;
+        address          : in std_logic_vector(31 downto 0);
+        data             : in std_logic_vector(31 downto 0);
+        signal internal_if : inout t_internal_if);
 
     -----------------------------------------------------------------------
     -- ReadRegister
     -----------------------------------------------------------------------
-    procedure ReadRegister (
-        address  : in  std_logic_vector(31 downto 0);
-        data     : out std_logic_vector(31 downto 0));
+    procedure ReadRegister(
+        signal i_clk : in std_logic;
+        address          : in std_logic_vector(31 downto 0);
+        data             : out std_logic_vector(31 downto 0);
+        signal internal_if : inout t_internal_if
+    );
 
     -----------------------------------------------------------------------
     -- WriteRegisterSet
     -----------------------------------------------------------------------
-    procedure WriteRegisterSet(constant dummy:in t_void:= VOID);
+    procedure WriteRegisterSet(
+        signal   i_clk   : in std_logic;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if
+    );
 
     -----------------------------------------------------------------------
     -- ReadRegisterSet
     -----------------------------------------------------------------------
-    procedure ReadRegisterSet(constant dummy:in t_void:= VOID);
-    
+    procedure ReadRegisterSet(
+        signal   i_clk   : in std_logic;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if);
 
-  ------------------------------------------------------
-  -- this procedure allows to wait a number of rising edge
-  -- then a margin is applied, if any
-  ------------------------------------------------------
-  procedure wait_nb_rising_edge_plus_margin (
-    signal i_clk               : in std_logic;
-    constant i_nb_rising_edge : in natural;
-    constant i_margin          : in time
-    );
-
-
-   
-
-    end protected;
 end;
 
 package body pkg_front_panel is
 
-    type t_front_panel is protected body
-    
+    ------------------------------------------------------
+    -- this procedure allows to wait a number of rising edge
+    -- then a margin is applied, if any
+    ------------------------------------------------------
+    procedure wait_nb_rising_edge_plus_margin(
+        signal   i_clk            : in std_logic;
+        constant i_nb_rising_edge : in natural;
+        constant i_margin         : in time
+    ) is
+    begin
+        -- Wait for number of rising edges
+        --   if the number of rising edges = 0 => only the margin is applied, if any
+        if i_nb_rising_edge /= 0 then
+            for i in 1 to i_nb_rising_edge loop
+                wait until rising_edge(i_clk);
+            end loop;
+        end if;
+        -- Wait for i_margin time, if any
+        wait for i_margin;
+    end procedure;
 
-        signal   hi_clk     : std_logic;
-        signal   hi_drive   : std_logic := '0';
-        signal   hi_cmd     : std_logic_vector(2 downto 0) := "000";
-        signal   hi_busy    : std_logic;
-        signal   hi_datain  : std_logic_vector(31 downto 0) := x"00000000";
-        signal   hi_dataout : std_logic_vector(31 downto 0) := x"00000000";
+    --type t_front_panel is protected body
 
-        -----------------------------------------------------------------------
+    --variable  hi_drive   : std_logic := '0';
+    --variable  hi_cmd     : std_logic_vector(2 downto 0) := "000";
+    --variable  hi_busy    : std_logic;
+    --variable  hi_datain  : std_logic_vector(31 downto 0) := x"00000000";
+    --variable  hi_dataout : std_logic_vector(31 downto 0) := x"00000000";
+
+    -----------------------------------------------------------------------
     -- Required data for procedures and functions
     -----------------------------------------------------------------------
     -- If you require multiple pipe arrays, you may create more arrays here
     -- duplicate the desired pipe procedures as required, change the names
     -- of the duplicated procedure to a unique identifiers, and alter the
     -- pipe array in that procedure to your newly generated arrays here.
-    type PIPEIN_ARRAY is array (0 to pipeInSize - 1) of std_logic_vector(7 downto 0);
-    variable pipeIn   : PIPEIN_ARRAY;
+    --type PIPEIN_ARRAY is array (0 to pipeInSize - 1) of std_logic_vector(7 downto 0);
+    --variable pipeIn   : PIPEIN_ARRAY;
 
-    type PIPEOUT_ARRAY is array (0 to pipeOutSize - 1) of std_logic_vector(7 downto 0);
-    variable pipeOut  : PIPEOUT_ARRAY;
+    --type PIPEOUT_ARRAY is array (0 to pipeOutSize - 1) of std_logic_vector(7 downto 0);
+    --variable pipeOut  : PIPEOUT_ARRAY;
 
-    type STD_ARRAY is array (0 to 31) of std_logic_vector(31 downto 0);
-    variable WireIns    :  STD_ARRAY; -- 32x32 array storing WireIn values
-    variable WireOuts   :  STD_ARRAY; -- 32x32 array storing WireOut values 
-    variable Triggered  :  STD_ARRAY; -- 32x32 array storing IsTriggered values
-    
-    type REGISTER_ARRAY is array (0 to registerSetSize - 1) of std_logic_vector(31 downto 0);
-    variable u32Address  : REGISTER_ARRAY;
-    variable u32Data     : REGISTER_ARRAY;
-    variable u32Count    : std_logic_vector(31 downto 0);
-    variable ReadRegisterData    : std_logic_vector(31 downto 0);
-    
-    constant DNOP                  : std_logic_vector(2 downto 0) := "000";
-    constant DReset                : std_logic_vector(2 downto 0) := "001";
-    constant DWires                : std_logic_vector(2 downto 0) := "010";
-    constant DUpdateWireIns        : std_logic_vector(2 downto 0) := "001";
-    constant DUpdateWireOuts       : std_logic_vector(2 downto 0) := "010";
-    constant DTriggers             : std_logic_vector(2 downto 0) := "011";
-    constant DActivateTriggerIn    : std_logic_vector(2 downto 0) := "001";
-    constant DUpdateTriggerOuts    : std_logic_vector(2 downto 0) := "010";
-    constant DPipes                : std_logic_vector(2 downto 0) := "100";
-    constant DWriteToPipeIn        : std_logic_vector(2 downto 0) := "001";
-    constant DReadFromPipeOut      : std_logic_vector(2 downto 0) := "010";
-    constant DWriteToBlockPipeIn   : std_logic_vector(2 downto 0) := "011";
-    constant DReadFromBlockPipeOut : std_logic_vector(2 downto 0) := "100";
-    constant DRegisters            : std_logic_vector(2 downto 0) := "101";
-    constant DWriteRegister        : std_logic_vector(2 downto 0) := "001";
-    constant DReadRegister         : std_logic_vector(2 downto 0) := "010";
-    constant DWriteRegisterSet     : std_logic_vector(2 downto 0) := "011";
-    constant DReadRegisterSet      : std_logic_vector(2 downto 0) := "100";
+    --type STD_ARRAY is array (0 to 31) of std_logic_vector(31 downto 0);
+    --variable WireIns    :  STD_ARRAY; -- 32x32 array storing WireIn values
+    --variable WireOuts   :  STD_ARRAY; -- 32x32 array storing WireOut values 
+    --variable Triggered  :  STD_ARRAY; -- 32x32 array storing IsTriggered values
 
+    --type REGISTER_ARRAY is array (0 to registerSetSize - 1) of std_logic_vector(31 downto 0);
+    --variable u32Address  : REGISTER_ARRAY;
+    --variable u32Data     : REGISTER_ARRAY;
+    --variable u32Count    : std_logic_vector(31 downto 0);
+    --variable ReadRegisterData    : std_logic_vector(31 downto 0);
 
-        procedure okHost_driver(
-                                signal i_usb_clk : in std_logic;
-                                signal okUH  : out    STD_LOGIC_VECTOR (4  downto 0);
-                                signal okHU  : in   STD_LOGIC_VECTOR (2  downto 0);
-                                signal okUHU : inout STD_LOGIC_VECTOR (31 downto 0)
-                                ) is
+    --constant DNOP                  : std_logic_vector(2 downto 0) := "000";
+    --constant DReset                : std_logic_vector(2 downto 0) := "001";
+    --constant DWires                : std_logic_vector(2 downto 0) := "010";
+    --constant DUpdateWireIns        : std_logic_vector(2 downto 0) := "001";
+    --constant DUpdateWireOuts       : std_logic_vector(2 downto 0) := "010";
+    --constant DTriggers             : std_logic_vector(2 downto 0) := "011";
+    --constant DActivateTriggerIn    : std_logic_vector(2 downto 0) := "001";
+    --constant DUpdateTriggerOuts    : std_logic_vector(2 downto 0) := "010";
+    --constant DPipes                : std_logic_vector(2 downto 0) := "100";
+    --constant DWriteToPipeIn        : std_logic_vector(2 downto 0) := "001";
+    --constant DReadFromPipeOut      : std_logic_vector(2 downto 0) := "010";
+    --constant DWriteToBlockPipeIn   : std_logic_vector(2 downto 0) := "011";
+    --constant DReadFromBlockPipeOut : std_logic_vector(2 downto 0) := "100";
+    --constant DRegisters            : std_logic_vector(2 downto 0) := "101";
+    --constant DWriteRegister        : std_logic_vector(2 downto 0) := "001";
+    --constant DReadRegister         : std_logic_vector(2 downto 0) := "010";
+    --constant DWriteRegisterSet     : std_logic_vector(2 downto 0) := "011";
+    --constant DReadRegisterSet      : std_logic_vector(2 downto 0) := "100";
 
-        variable v_test : boolean := true;
+    procedure okHost_driver(
+        signal i_clk : in std_logic;
+        signal okUH      : out STD_LOGIC_VECTOR (4  downto 0);
+        signal okHU      : in STD_LOGIC_VECTOR (2  downto 0);
+        signal okUHU     : inout STD_LOGIC_VECTOR (31 downto 0);
+        signal internal_if : inout t_internal_if
+    ) is
 
-        begin
-            while v_test = True loop
-                hi_clk  <= i_usb_clk;
-                -- okHostCalls Simulation okHostCall<->okHost Mapping  --------------------------------------
-                okUH(0)          <= i_usb_clk;
-                okUH(0)          <= hi_clk;
-                okUH(1)          <= hi_drive;
-                okUH(4 downto 2) <= hi_cmd; 
-                hi_datain        <= okUHU;
-                hi_busy          <= okHU(0); 
-                okUHU            <= hi_dataout when (hi_drive = '1') else (others => 'Z');
-                wait_nb_rising_edge_plus_margin(i_clk=> i_usb_clk,i_nb_rising_edge=> 1,i_margin=> 12 ps);
-           end loop;
-        end okHost_driver;
+        --variable v_test : boolean := true;
 
-        -----------------------------------------------------------------------
+    begin
+        --while v_test = True loop
+        -- okHostCalls Simulation okHostCall<->okHost Mapping  --------------------------------------
+        okUH(0)             <= i_clk;
+        okUH(1)             <= internal_if.hi_drive;
+        okUH(4 downto 2)    <= internal_if.hi_cmd;
+        internal_if.hi_datain <= okUHU;
+        internal_if.hi_busy   <= okHU(0);
+        okUHU               <= internal_if.hi_dataout when (internal_if.hi_drive = '1') else (others => 'Z');
+        --end loop;
+    end okHost_driver;
+
+    -----------------------------------------------------------------------
     -- FrontPanelReset
     -----------------------------------------------------------------------
-    procedure FrontPanelReset(constant dummy:in t_void:= VOID) is
-        variable i : integer := 0;
-        variable msg_line           : line;
+    procedure FrontPanelReset(signal i_clk : in std_logic; variable front_panel_conf : inout t_front_panel_conf; signal internal_if : inout t_internal_if) is
+        variable i        : integer := 0;
+        variable msg_line : line;
     begin
-            for i in 31 downto 0 loop
-                WireIns(i) := (others => '0');
-                WireOuts(i) := (others => '0');
-                Triggered(i) := (others => '0');
-            end loop;
-            wait until (rising_edge(hi_clk)); hi_cmd <= DReset;
-            wait until (rising_edge(hi_clk)); hi_cmd <= DNOP;
-            wait until (hi_busy = '0');
+        for i in 31 downto 0 loop
+            front_panel_conf.WireIns(i)   := (others => '0');
+            front_panel_conf.WireOuts(i)  := (others => '0');
+            front_panel_conf.Triggered(i) := (others => '0');
+        end loop;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd <= DReset;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd <= DNOP;
+        wait until (internal_if.hi_busy = '0');
     end procedure FrontPanelReset;
 
+    -----------------------------------------------------------------------
+    -- init_front_panel_record
+    -----------------------------------------------------------------------
+    impure function init_front_panel_conf(
+         BlockDelayStates : in integer := 5; -- REQUIRED: # of clocks between blocks of pipe data
+         ReadyCheckDelay  : in integer := 5; -- REQUIRED: # of clocks before block transfer before host interface checks for ready (0-255)
+         PostReadyDelay   : in integer := 5; -- REQUIRED: # of clocks after ready is asserted and check that the block transfer begins (0-255)
+         pipeInSize       : in integer := 1024; -- REQUIRED: byte (must be even) length of default PipeIn; Integer 0-2^32
+         pipeOutSize      : in integer := 1024; -- REQUIRED: byte (must be even) length of default PipeOut; Integer 0-2^32
+         registerSetSize  : in integer := 32 -- Size of array for register set commands.
+    ) return t_front_panel_conf is
+
+        variable result : t_front_panel_conf(
+            pipeIn(0 to pipeInSize - 1),
+            pipeOut(0 to pipeOutSize - 1),
+            WireIns(0 to 31),
+            WireOuts(0 to 31),
+            Triggered(0 to 31),
+            u32Address(0 to registerSetSize - 1),
+            u32Data(0 to registerSetSize - 1)
+        );
+
+    begin
+        result.PostReadyDelay   := PostReadyDelay;
+        result.ReadyCheckDelay  := ReadyCheckDelay;
+        result.BlockDelayStates := BlockDelayStates;
+        result.pipeIn := (others => (others => '0'));
+        result.pipeOut := (others => (others => '0'));
+        result.WireIns := (others => (others => '0'));
+        result.WireOuts := (others => (others => '0'));
+        result.Triggered := (others => (others => '0'));
+
+        return result;
+    end function;
+
+    -----------------------------------------------------------------------
+    -- init_internal_if
+    -----------------------------------------------------------------------
+    impure function init_internal_if(
+         dummy : in integer
+    ) return t_internal_if is
+
+        variable result : t_internal_if;
+    begin
+        result.hi_drive   := '0';
+        result.hi_cmd  := (others => '0');
+        result.hi_busy := '0';
+        result.hi_datain := (others => '0');
+        result.hi_dataout := (others => '0');
+
+        return result;
+    end function;
 
     -----------------------------------------------------------------------
     -- SetWireInValue
     -----------------------------------------------------------------------
-    procedure SetWireInValue (
-        ep   : in  std_logic_vector(7 downto 0);
-        val  : in  std_logic_vector(31 downto 0);
-        mask : in  std_logic_vector(31 downto 0)) is
-        
-        variable tmp_slv32 :     std_logic_vector(31 downto 0);
-        variable tmpI      :     integer;
+    procedure SetWireInValue(
+        ep                   : in std_logic_vector(7 downto 0);
+        val                  : in std_logic_vector(31 downto 0);
+        mask                 : in std_logic_vector(31 downto 0);
+        variable front_panel_conf : inout t_front_panel_conf
+    ) is
+
+        variable tmp_slv32 : std_logic_vector(31 downto 0);
+        variable tmpI      : integer;
     begin
-        tmpI := to_integer(unsigned(ep));
-        tmp_slv32 := WireIns(tmpI) and (not mask);
-        WireIns(tmpI) := (tmp_slv32 or (val and mask));
+        tmpI                      := to_integer(unsigned(ep));
+        tmp_slv32                 := front_panel_conf.WireIns(tmpI) and (not mask);
+        front_panel_conf.WireIns(tmpI) := (tmp_slv32 or (val and mask));
     end procedure SetWireInValue;
 
     -----------------------------------------------------------------------
     -- GetWireOutValue
     -----------------------------------------------------------------------
-    impure function GetWireOutValue (
-        ep : std_logic_vector) return std_logic_vector is
-        
+    impure function GetWireOutValue(
+        ep          : std_logic_vector;
+        front_panel_conf : in t_front_panel_conf)
+    return std_logic_vector is
+
         variable tmp_slv32 : std_logic_vector(31 downto 0);
         variable tmpI      : integer;
     begin
-        tmpI := to_integer(unsigned(ep));
-        tmp_slv32 := WireOuts(tmpI - 16#20#);
+        tmpI      := to_integer(unsigned(ep));
+        tmp_slv32 := front_panel_conf.WireOuts(tmpI - 16#20#);
         return (tmp_slv32);
     end GetWireOutValue;
 
     -----------------------------------------------------------------------
     -- IsTriggered
     -----------------------------------------------------------------------
-    impure function IsTriggered (
-        ep   : std_logic_vector;
-        mask : std_logic_vector(31 downto 0)) return BOOLEAN is
-        
-        variable tmp_slv32   : std_logic_vector(31 downto 0);
-        variable tmpI        : integer;
-        variable msg_line    : line;
-    begin
-        tmpI := to_integer(unsigned(ep));
-        tmp_slv32 := (Triggered(tmpI - 16#60#) and mask);
+    impure function IsTriggered(
+        ep          : std_logic_vector;
+        mask        : std_logic_vector(31 downto 0);
+        front_panel_conf : t_front_panel_conf
+    ) return boolean is
 
-        if (tmp_slv32 >= 0) then
-            if (tmp_slv32 = 0) then
+        variable tmp_slv32 : std_logic_vector(front_panel_conf.Triggered(0)'range);
+        variable tmpI      : integer;
+        variable msg_line  : line;
+    begin
+        tmpI      := to_integer(unsigned(ep));
+        tmp_slv32 := (front_panel_conf.Triggered(tmpI - 16#60#) and mask);
+
+        if (tmp_slv32 >= std_logic_vector(to_unsigned(0, tmp_slv32'length))) then
+            if (tmp_slv32 = std_logic_vector(to_unsigned(0, tmp_slv32'length))) then
                 return FALSE;
             else
                 return TRUE;
@@ -369,459 +534,482 @@ package body pkg_front_panel is
             hwrite(msg_line, mask);
             write(msg_line, STRING'(" covers unused Triggers"));
             writeline(output, msg_line);
-            return FALSE;        
-        end if;     
+            return FALSE;
+        end if;
     end IsTriggered;
 
     -----------------------------------------------------------------------
     -- UpdateWireIns
     -----------------------------------------------------------------------
-    procedure UpdateWireIns(constant dummy:in t_void:= VOID) is
+    procedure UpdateWireIns(signal   i_clk   : in std_logic;
+                            variable front_panel_conf : inout t_front_panel_conf;
+                            signal   internal_if   : inout t_internal_if) is
         variable i : integer := 0;
     begin
-        wait until (rising_edge(hi_clk));
-           hi_cmd <= DWires; 
-        wait until (rising_edge(hi_clk)); 
-          hi_cmd <= DUpdateWireIns; 
-        wait until (rising_edge(hi_clk));
-        hi_drive <= '1'; 
-        wait until (rising_edge(hi_clk)); 
-        hi_cmd <= DNOP; 
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_cmd   <= DWires;
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_cmd   <= DUpdateWireIns;
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_drive <= '1';
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_cmd   <= DNOP;
         for i in 0 to 31 loop
-            hi_dataout <= WireIns(i);  wait until (rising_edge(hi_clk)); 
+            internal_if.hi_dataout <= front_panel_conf.WireIns(i);
+            wait until (rising_edge(i_clk));
+        wait for 12 ps;
         end loop;
-        wait until (hi_busy = '0');  
+        wait until (internal_if.hi_busy = '0');
     end procedure UpdateWireIns;
 
     -----------------------------------------------------------------------
     -- UpdateWireOuts
     -----------------------------------------------------------------------
-    procedure UpdateWireOuts(constant dummy:in t_void:= VOID) is
+    procedure UpdateWireOuts(
+        signal   i_clk   : in std_logic;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if
+    ) is
         variable i : integer := 0;
     begin
-        wait until (rising_edge(hi_clk)); 
-        hi_cmd <= DWires; 
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DUpdateWireOuts; 
-        wait until (rising_edge(hi_clk));
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DNOP; 
-        wait until (rising_edge(hi_clk)); 
-        hi_drive <= '0'; 
-        wait until (rising_edge(hi_clk)); 
-        wait until (rising_edge(hi_clk)); 
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_cmd   <= DWires;
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_cmd   <= DUpdateWireOuts;
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_cmd   <= DNOP;
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_drive <= '0';
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
         for i in 0 to 31 loop
-            wait until (rising_edge(hi_clk)); WireOuts(i) := hi_datain; 
+            wait until (rising_edge(i_clk));
+            wait for 12 ps;
+            front_panel_conf.WireOuts(i) := internal_if.hi_datain;
         end loop;
-        wait until (hi_busy = '0'); 
+        wait until (internal_if.hi_busy = '0');
     end procedure UpdateWireOuts;
 
     -----------------------------------------------------------------------
     -- ActivateTriggerIn
     -----------------------------------------------------------------------
-    procedure ActivateTriggerIn (
-        ep  : in  std_logic_vector(7 downto 0);
-        bit : in  integer) is 
-        
-        variable tmp_slv5 :     std_logic_vector(4 downto 0);
+    procedure ActivateTriggerIn(
+        signal i_clk : in std_logic;
+        ep               : in std_logic_vector(7 downto 0);
+        bit              : in integer;
+        signal internal_if : inout t_internal_if) is
+
+        variable tmp_slv5 : std_logic_vector(4 downto 0);
+        variable c_ONE    : unsigned(31 downto 0) := x"00000001";
     begin
-        tmp_slv5 := std_logic_vector(to_unsigned(bit, tmp_slv5'length));
-        wait until (rising_edge(hi_clk)); 
-        hi_cmd <= DTriggers;
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DActivateTriggerIn;
-        wait until (rising_edge(hi_clk));
-        hi_drive <= '1';
-        hi_dataout <= (x"000000" & ep);
-        wait until (rising_edge(hi_clk));
-         --hi_dataout <= SHL(x"00000001", tmp_slv5); 
-         hi_dataout <= unsigned(x"00000001") sll to_integer(unsigned(tmp_slv5)); -- TODO
-        hi_cmd <= DNOP;
-        wait until (rising_edge(hi_clk));
-         hi_dataout <= x"00000000";
-        wait until (hi_busy = '0');
+        tmp_slv5             := std_logic_vector(to_unsigned(bit, tmp_slv5'length));
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_cmd     <= DTriggers;
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_cmd     <= DActivateTriggerIn;
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_drive   <= '1';
+        internal_if.hi_dataout <= (x"000000" & ep);
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        --hi_dataout <= SHL(x"00000001", tmp_slv5); 
+        internal_if.hi_dataout <= std_logic_vector(c_ONE sll to_integer(unsigned(tmp_slv5))); -- TODO
+        internal_if.hi_cmd     <= DNOP;
+        wait until (rising_edge(i_clk));
+        wait for 12 ps;
+        internal_if.hi_dataout <= x"00000000";
+        wait until (internal_if.hi_busy = '0');
     end procedure ActivateTriggerIn;
 
     -----------------------------------------------------------------------
     -- UpdateTriggerOuts
     -----------------------------------------------------------------------
-    procedure UpdateTriggerOuts(constant dummy:in t_void:= VOID) is
+    procedure UpdateTriggerOuts(
+        signal   i_clk   : in std_logic;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if
+    ) is
     begin
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DTriggers;
-        wait until (rising_edge(hi_clk)); 
-        hi_cmd <= DUpdateTriggerOuts;
-        wait until (rising_edge(hi_clk));
-        wait until (rising_edge(hi_clk)); 
-        hi_cmd <= DNOP;
-        wait until (rising_edge(hi_clk)); 
-        hi_drive <= '0';
-        wait until (rising_edge(hi_clk)); 
-        wait until (rising_edge(hi_clk));
-        wait until (rising_edge(hi_clk));
-        
-        for i in 0 to (UPDATE_TO_READOUT_CLOCKS-1) loop
-                wait until (rising_edge(hi_clk));  
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd   <= DTriggers;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd   <= DUpdateTriggerOuts;
+        wait until (rising_edge(i_clk));
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd   <= DNOP;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive <= '0';
+        wait until (rising_edge(i_clk));
+        wait until (rising_edge(i_clk));
+        wait until (rising_edge(i_clk));
+
+        for i in 0 to (UPDATE_TO_READOUT_CLOCKS - 1) loop
+            wait until (rising_edge(i_clk));
         end loop;
-        
+
         for i in 0 to 31 loop
-            wait until (rising_edge(hi_clk));
-             Triggered(i) := hi_datain;
+            wait until (rising_edge(i_clk));
+            front_panel_conf.Triggered(i) := internal_if.hi_datain;
         end loop;
-        wait until (hi_busy = '0');
+        wait until (internal_if.hi_busy = '0');
     end procedure UpdateTriggerOuts;
-   
-   -----------------------------------------------------------------------
+
+    -----------------------------------------------------------------------
     -- WriteToPipeIn
     -----------------------------------------------------------------------
-    procedure WriteToPipeIn (
-        ep      : in  std_logic_vector(7 downto 0);
-        length  : in  integer) is
+    procedure WriteToPipeIn(
+        signal   i_clk   : in std_logic;
+        ep                   : in std_logic_vector(7 downto 0);
+        length               : in integer;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if) is
 
         variable len, i, j, k, blockSize : integer;
         variable tmp_slv8                : std_logic_vector(7 downto 0);
         variable tmp_slv32               : std_logic_vector(31 downto 0);
     begin
-        len := (length / 4);
-        j := 0;
-        k := 0;
-        blockSize := 1024;
-        tmp_slv8 := std_logic_vector(to_unsigned(BlockDelayStates, tmp_slv8'length));
-        tmp_slv32 := std_logic_vector(to_unsigned(len, tmp_slv32'length));
-        
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DPipes;
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DWriteToPipeIn;
-        wait until (rising_edge(hi_clk)); 
-        hi_drive <= '1';
-        hi_dataout <= (x"0000" & tmp_slv8 & ep);
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DNOP;
-        hi_dataout <= tmp_slv32;
+        len                  := (length / 4);
+        j                    := 0;
+        k                    := 0;
+        blockSize            := 1024;
+        tmp_slv8             := std_logic_vector(to_unsigned(front_panel_conf.BlockDelayStates, tmp_slv8'length));
+        tmp_slv32            := std_logic_vector(to_unsigned(len, tmp_slv32'length));
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DPipes;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DWriteToPipeIn;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive   <= '1';
+        internal_if.hi_dataout <= (x"0000" & tmp_slv8 & ep);
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DNOP;
+        internal_if.hi_dataout <= tmp_slv32;
         for i in 0 to len - 1 loop
-            wait until (rising_edge(hi_clk));
-            hi_dataout(7 downto 0) <= pipeIn(i*4);
-            hi_dataout(15 downto 8) <= pipeIn((i*4)+1);
-            hi_dataout(23 downto 16) <= pipeIn((i*4)+2);
-            hi_dataout(31 downto 24) <= pipeIn((i*4)+3);
-            j := j + 4;
+            wait until (rising_edge(i_clk));
+            internal_if.hi_dataout(7 downto 0)   <= front_panel_conf.pipeIn(i * 4);
+            internal_if.hi_dataout(15 downto 8)  <= front_panel_conf.pipeIn((i * 4) + 1);
+            internal_if.hi_dataout(23 downto 16) <= front_panel_conf.pipeIn((i * 4) + 2);
+            internal_if.hi_dataout(31 downto 24) <= front_panel_conf.pipeIn((i * 4) + 3);
+            j                                  := j + 4;
             if (j = blockSize) then
-                for k in 0 to BlockDelayStates - 1 loop
-                    wait until (rising_edge(hi_clk));
+                for k in 0 to front_panel_conf.BlockDelayStates - 1 loop
+                    wait until (rising_edge(i_clk));
                 end loop;
                 j := 0;
             end if;
         end loop;
-        wait until (hi_busy = '0');
+        wait until (internal_if.hi_busy = '0');
     end procedure WriteToPipeIn;
 
     -----------------------------------------------------------------------
     -- ReadFromPipeOut
     -----------------------------------------------------------------------
-    procedure ReadFromPipeOut (
-        ep     : in  std_logic_vector(7 downto 0);
-        length : in  integer) is
-        
+    procedure ReadFromPipeOut(
+        signal   i_clk   : in std_logic;
+        ep                   : in std_logic_vector(7 downto 0);
+        length               : in integer;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if
+    ) is
+
         variable len, i, j, k, blockSize : integer;
         variable tmp_slv8                : std_logic_vector(7 downto 0);
         variable tmp_slv32               : std_logic_vector(31 downto 0);
     begin
-        len := (length / 4); j := 0; 
-        blockSize := 1024;
-        tmp_slv8 := std_logic_vector(to_unsigned(BlockDelayStates, tmp_slv8'length));
-        tmp_slv32 := std_logic_vector(to_unsigned(len, tmp_slv32'length));
-        
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DPipes;
-        wait until (rising_edge(hi_clk)); 
-        hi_cmd <= DReadFromPipeOut;
-        wait until (rising_edge(hi_clk));
-        hi_drive <= '1';
-        hi_dataout <= (x"0000" & tmp_slv8 & ep);
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DNOP;
-        hi_dataout <= tmp_slv32;
-        wait until (rising_edge(hi_clk));
-        hi_drive <= '0';
+        len                  := (length / 4);
+        j                    := 0;
+        blockSize            := 1024;
+        tmp_slv8             := std_logic_vector(to_unsigned(front_panel_conf.BlockDelayStates, tmp_slv8'length));
+        tmp_slv32            := std_logic_vector(to_unsigned(len, tmp_slv32'length));
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DPipes;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DReadFromPipeOut;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive   <= '1';
+        internal_if.hi_dataout <= (x"0000" & tmp_slv8 & ep);
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DNOP;
+        internal_if.hi_dataout <= tmp_slv32;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive   <= '0';
         for i in 0 to len - 1 loop
-            wait until (rising_edge(hi_clk));
-            pipeOut(i*4) := hi_datain(7 downto 0);
-            pipeOut((i*4)+1) := hi_datain(15 downto 8);
-            pipeOut((i*4)+2) := hi_datain(23 downto 16);
-            pipeOut((i*4)+3) := hi_datain(31 downto 24);
-            j := j + 4;
+            wait until (rising_edge(i_clk));
+            front_panel_conf.pipeOut(i * 4)       := internal_if.hi_datain(7 downto 0);
+            front_panel_conf.pipeOut((i * 4) + 1) := internal_if.hi_datain(15 downto 8);
+            front_panel_conf.pipeOut((i * 4) + 2) := internal_if.hi_datain(23 downto 16);
+            front_panel_conf.pipeOut((i * 4) + 3) := internal_if.hi_datain(31 downto 24);
+            j                                := j + 4;
             if (j = blockSize) then
-                for k in 0 to BlockDelayStates - 1 loop
-                    wait until (rising_edge(hi_clk));
+                for k in 0 to front_panel_conf.BlockDelayStates - 1 loop
+                    wait until (rising_edge(i_clk));
                 end loop;
                 j := 0;
             end if;
         end loop;
-        wait until (hi_busy = '0');
+        wait until (internal_if.hi_busy = '0');
     end procedure ReadFromPipeOut;
 
     -----------------------------------------------------------------------
     -- WriteToBlockPipeIn
     -----------------------------------------------------------------------
-    procedure WriteToBlockPipeIn (
-        ep          : in std_logic_vector(7 downto 0);
-        blockLength : in integer;
-        length      : in integer) is
-        
+    procedure WriteToBlockPipeIn(
+        signal   i_clk   : in std_logic;
+        ep                   : in std_logic_vector(7 downto 0);
+        blockLength          : in integer;
+        length               : in integer;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if) is
+
         variable len, i, j, k, blockSize, blockNum : integer;
         variable tmp_slv8                          : std_logic_vector(7 downto 0);
         variable tmp_slv16                         : std_logic_vector(15 downto 0);
         variable tmp_slv32                         : std_logic_vector(31 downto 0);
     begin
-        len := (length/4); 
-        blockSize := (blockLength/4); 
-        j := 0;
-         k := 0;
-        blockNum := (len/blockSize);
-        tmp_slv8 := std_logic_vector(to_unsigned(BlockDelayStates, tmp_slv8'length));
+        len       := (length / 4);
+        blockSize := (blockLength / 4);
+        j         := 0;
+        k         := 0;
+        blockNum  := (len / blockSize);
+        tmp_slv8  := std_logic_vector(to_unsigned(front_panel_conf.BlockDelayStates, tmp_slv8'length));
         tmp_slv16 := std_logic_vector(to_unsigned(blockSize, tmp_slv16'length));
         tmp_slv32 := std_logic_vector(to_unsigned(len, tmp_slv32'length));
-        
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DPipes;
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DWriteToBlockPipeIn;
-        wait until (rising_edge(hi_clk));
-        hi_drive <= '1';
-        hi_dataout <= (x"0000" & tmp_slv8 & ep);
-        wait until (rising_edge(hi_clk)); hi_cmd <= DNOP;
-        hi_dataout <= tmp_slv32;
-        wait until (rising_edge(hi_clk));
-         hi_dataout <= x"0000" & tmp_slv16;
-        wait until (rising_edge(hi_clk));
-        tmp_slv16(15 downto 8) := std_logic_vector(to_unsigned(PostReadyDelay, 8));
-        tmp_slv16(7 downto 0) := std_logic_vector(to_unsigned(ReadyCheckDelay, 8));
-        hi_dataout <= x"0000" & tmp_slv16;
+
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd       <= DPipes;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd       <= DWriteToBlockPipeIn;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive     <= '1';
+        internal_if.hi_dataout   <= (x"0000" & tmp_slv8 & ep);
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd       <= DNOP;
+        internal_if.hi_dataout   <= tmp_slv32;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_dataout   <= x"0000" & tmp_slv16;
+        wait until (rising_edge(i_clk));
+        tmp_slv16(15 downto 8) := std_logic_vector(to_unsigned(front_panel_conf.PostReadyDelay, 8));
+        tmp_slv16(7 downto 0)  := std_logic_vector(to_unsigned(front_panel_conf.ReadyCheckDelay, 8));
+        internal_if.hi_dataout   <= x"0000" & tmp_slv16;
         for i in 1 to blockNum loop
-            while (hi_busy = '1') loop 
-                wait until (rising_edge(hi_clk));
-             end loop;
-            while (hi_busy = '0') loop
-               wait until (rising_edge(hi_clk));
-             end loop;
-            wait until (rising_edge(hi_clk)); 
-            wait until (rising_edge(hi_clk));
-            for j in 1 to blockSize loop
-                hi_dataout(7 downto 0) <= pipeIn(k);
-                hi_dataout(15 downto 8) <= pipeIn(k+1);
-                hi_dataout(23 downto 16) <= pipeIn(k+2);
-                hi_dataout(31 downto 24) <= pipeIn(k+3);
-                wait until (rising_edge(hi_clk));
-             k:=k+4;
+            while (internal_if.hi_busy = '1') loop
+                wait until (rising_edge(i_clk));
             end loop;
-            for j in 1 to BlockDelayStates loop 
-                wait until (rising_edge(hi_clk)); 
+            while (internal_if.hi_busy = '0') loop
+                wait until (rising_edge(i_clk));
+            end loop;
+            wait until (rising_edge(i_clk));
+            wait until (rising_edge(i_clk));
+            for j in 1 to blockSize loop
+                internal_if.hi_dataout(7 downto 0)   <= front_panel_conf.pipeIn(k);
+                internal_if.hi_dataout(15 downto 8)  <= front_panel_conf.pipeIn(k + 1);
+                internal_if.hi_dataout(23 downto 16) <= front_panel_conf.pipeIn(k + 2);
+                internal_if.hi_dataout(31 downto 24) <= front_panel_conf.pipeIn(k + 3);
+                wait until (rising_edge(i_clk));
+                k                                  := k + 4;
+            end loop;
+            for j in 1 to front_panel_conf.BlockDelayStates loop
+                wait until (rising_edge(i_clk));
             end loop;
         end loop;
-        wait until (hi_busy = '0');
+        wait until (internal_if.hi_busy = '0');
     end procedure WriteToBlockPipeIn;
 
-   -----------------------------------------------------------------------
+    -----------------------------------------------------------------------
     -- ReadFromBlockPipeOut
     -----------------------------------------------------------------------
-    procedure ReadFromBlockPipeOut (
-        ep          : in std_logic_vector(7 downto 0);
-        blockLength : in integer;
-        length      : in integer) is
-        
+    procedure ReadFromBlockPipeOut(
+        signal   i_clk   : in std_logic;
+        ep                   : in std_logic_vector(7 downto 0);
+        blockLength          : in integer;
+        length               : in integer;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if) is
+
         variable len, i, j, k, blockSize, blockNum : integer;
         variable tmp_slv8                          : std_logic_vector(7 downto 0);
         variable tmp_slv16                         : std_logic_vector(15 downto 0);
         variable tmp_slv32                         : std_logic_vector(31 downto 0);
     begin
-        len := (length/4);
-        blockSize := (blockLength/4);
-        j := 0;
-        k := 0;
-        blockNum := (len/blockSize);
-        tmp_slv8 := std_logic_vector(to_unsigned(BlockDelayStates, tmp_slv8'length));
-        tmp_slv16 := std_logic_vector(to_unsigned(blockSize, tmp_slv16'length));
-        tmp_slv32 := std_logic_vector(to_unsigned(len, tmp_slv32'length));
-        
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DPipes;
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DReadFromBlockPipeOut;
-        wait until (rising_edge(hi_clk));
-        hi_drive <= '1';
-        hi_dataout <= (x"0000" & tmp_slv8 & ep);
-        wait until (rising_edge(hi_clk)); 
-        hi_cmd <= DNOP;
-        hi_dataout <= tmp_slv32;
-        wait until (rising_edge(hi_clk)); 
-        hi_dataout <= x"0000" & tmp_slv16;
-        wait until (rising_edge(hi_clk));
-        tmp_slv16(15 downto 8) := std_logic_vector(to_unsigned(PostReadyDelay, 8));
-        tmp_slv16(7 downto 0) := std_logic_vector(to_unsigned(ReadyCheckDelay, 8));
-        hi_dataout <= x"0000" & tmp_slv16;
-        wait until (rising_edge(hi_clk)); 
-        hi_drive <= '0';
+        len                    := (length / 4);
+        blockSize              := (blockLength / 4);
+        j                      := 0;
+        k                      := 0;
+        blockNum               := (len / blockSize);
+        tmp_slv8               := std_logic_vector(to_unsigned(front_panel_conf.BlockDelayStates, tmp_slv8'length));
+        tmp_slv16              := std_logic_vector(to_unsigned(blockSize, tmp_slv16'length));
+        tmp_slv32              := std_logic_vector(to_unsigned(len, tmp_slv32'length));
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd       <= DPipes;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd       <= DReadFromBlockPipeOut;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive     <= '1';
+        internal_if.hi_dataout   <= (x"0000" & tmp_slv8 & ep);
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd       <= DNOP;
+        internal_if.hi_dataout   <= tmp_slv32;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_dataout   <= x"0000" & tmp_slv16;
+        wait until (rising_edge(i_clk));
+        tmp_slv16(15 downto 8) := std_logic_vector(to_unsigned(front_panel_conf.PostReadyDelay, 8));
+        tmp_slv16(7 downto 0)  := std_logic_vector(to_unsigned(front_panel_conf.ReadyCheckDelay, 8));
+        internal_if.hi_dataout   <= x"0000" & tmp_slv16;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive     <= '0';
         for i in 1 to blockNum loop
-            while (hi_busy = '1') loop 
-            wait until (rising_edge(hi_clk)); 
+            while (internal_if.hi_busy = '1') loop
+                wait until (rising_edge(i_clk));
             end loop;
-            while (hi_busy = '0') loop 
-            wait until (rising_edge(hi_clk)); 
+            while (internal_if.hi_busy = '0') loop
+                wait until (rising_edge(i_clk));
             end loop;
-            wait until (rising_edge(hi_clk)); 
-            wait until (rising_edge(hi_clk));
+            wait until (rising_edge(i_clk));
+            wait until (rising_edge(i_clk));
             for j in 1 to blockSize loop
-                pipeOut(k) := hi_datain(7 downto 0); 
-                pipeOut(k+1) := hi_datain(15 downto 8);
-                pipeOut(k+2) := hi_datain(23 downto 16);
-                pipeOut(k+3) := hi_datain(31 downto 24);
-                wait until (rising_edge(hi_clk));
-                 k:=k+4;
+                front_panel_conf.pipeOut(k)     := internal_if.hi_datain(7 downto 0);
+                front_panel_conf.pipeOut(k + 1) := internal_if.hi_datain(15 downto 8);
+                front_panel_conf.pipeOut(k + 2) := internal_if.hi_datain(23 downto 16);
+                front_panel_conf.pipeOut(k + 3) := internal_if.hi_datain(31 downto 24);
+                wait until (rising_edge(i_clk));
+                k                          := k + 4;
             end loop;
-            for j in 1 to BlockDelayStates loop 
-            wait until (rising_edge(hi_clk));
-             end loop;
+            for j in 1 to front_panel_conf.BlockDelayStates loop
+                wait until (rising_edge(i_clk));
+            end loop;
         end loop;
-        wait until (hi_busy = '0');
+        wait until (internal_if.hi_busy = '0');
     end procedure ReadFromBlockPipeOut;
-    
+
     -----------------------------------------------------------------------
     -- WriteRegister
     -----------------------------------------------------------------------
-    procedure WriteRegister (
-        address  : in  std_logic_vector(31 downto 0);
-        data     : in  std_logic_vector(31 downto 0)) is
+    procedure WriteRegister(
+        signal i_clk : in std_logic;
+        address          : in std_logic_vector(31 downto 0);
+        data             : in std_logic_vector(31 downto 0);
+        signal internal_if : inout t_internal_if) is
     begin
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DRegisters;
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DWriteRegister;
-        wait until (rising_edge(hi_clk));
-        hi_drive <= '1';
-        hi_cmd <= DNOP;
-        wait until (rising_edge(hi_clk));
-         hi_dataout <= address; 
-        wait until (rising_edge(hi_clk));
-         hi_dataout <= data;
-        wait until (hi_busy = '0');
-         hi_drive <= '0';  
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DRegisters;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DWriteRegister;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive   <= '1';
+        internal_if.hi_cmd     <= DNOP;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_dataout <= address;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_dataout <= data;
+        wait until (internal_if.hi_busy = '0');
+        internal_if.hi_drive   <= '0';
     end procedure WriteRegister;
 
     -----------------------------------------------------------------------
     -- ReadRegister
     -----------------------------------------------------------------------
-    procedure ReadRegister (
-        address  : in  std_logic_vector(31 downto 0);
-        data     : out std_logic_vector(31 downto 0)) is
+    procedure ReadRegister(
+        signal i_clk : in std_logic;
+        address          : in std_logic_vector(31 downto 0);
+        data             : out std_logic_vector(31 downto 0);
+        signal internal_if : inout t_internal_if) is
     begin
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DRegisters;
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DReadRegister;
-        wait until (rising_edge(hi_clk));
-        hi_drive <= '1';
-        hi_cmd <= DNOP;
-        wait until (rising_edge(hi_clk)); 
-        hi_dataout <= address; 
-        wait until (rising_edge(hi_clk));
-         hi_drive <= '0';
-        wait until (rising_edge(hi_clk));
-        wait until (rising_edge(hi_clk)); 
-        data := hi_datain;
-        wait until (hi_busy = '0');
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DRegisters;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DReadRegister;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive   <= '1';
+        internal_if.hi_cmd     <= DNOP;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_dataout <= address;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive   <= '0';
+        wait until (rising_edge(i_clk));
+        wait until (rising_edge(i_clk));
+        data                 := internal_if.hi_datain;
+        wait until (internal_if.hi_busy = '0');
     end procedure ReadRegister;
 
     -----------------------------------------------------------------------
     -- WriteRegisterSet
     -----------------------------------------------------------------------
-    procedure WriteRegisterSet(constant dummy:in t_void:= VOID) is
-        variable i             :     integer;
-        variable u32Count_int  :     integer;
+    procedure WriteRegisterSet(
+        signal   i_clk   : in std_logic;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if) is
+        variable i            : integer;
+        variable u32Count_int : integer;
     begin
-      u32Count_int := to_integer(unsigned(u32Count));
-        wait until (rising_edge(hi_clk)); 
-        hi_cmd <= DRegisters;
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DWriteRegisterSet;
-        wait until (rising_edge(hi_clk));
-        hi_drive <= '1';
-        hi_cmd <= DNOP;
-        wait until (rising_edge(hi_clk));
-         hi_dataout <= u32Count; 
+        u32Count_int         := to_integer(unsigned(front_panel_conf.u32Count));
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DRegisters;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DWriteRegisterSet;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive   <= '1';
+        internal_if.hi_cmd     <= DNOP;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_dataout <= front_panel_conf.u32Count;
         for i in 1 to u32Count_int loop
-            wait until (rising_edge(hi_clk)); 
-            hi_dataout <= u32Address(i-1);
-            wait until (rising_edge(hi_clk)); 
-            hi_dataout <= u32Data(i-1);
-            wait until (rising_edge(hi_clk));
-             wait until (rising_edge(hi_clk));
+            wait until (rising_edge(i_clk));
+            internal_if.hi_dataout <= front_panel_conf.u32Address(i - 1);
+            wait until (rising_edge(i_clk));
+            internal_if.hi_dataout <= front_panel_conf.u32Data(i - 1);
+            wait until (rising_edge(i_clk));
+            wait until (rising_edge(i_clk));
         end loop;
-        wait until (hi_busy = '0'); 
-        hi_drive <= '0';  
+        wait until (internal_if.hi_busy = '0');
+        internal_if.hi_drive   <= '0';
     end procedure WriteRegisterSet;
 
     -----------------------------------------------------------------------
     -- ReadRegisterSet
     -----------------------------------------------------------------------
-    procedure ReadRegisterSet(constant dummy:in t_void:= VOID) is
-        variable i             :     integer;
-        variable u32Count_int  :     integer;
-    begin
-      u32Count_int := to_integer(unsigned(u32Count);
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DRegisters;
-        wait until (rising_edge(hi_clk));
-         hi_cmd <= DReadRegisterSet;
-        wait until (rising_edge(hi_clk));
-        hi_drive <= '1';
-        hi_cmd <= DNOP;
-        wait until (rising_edge(hi_clk));
-         hi_dataout <= u32Count; 
-        for i in 1 to u32Count_int loop
-            wait until (rising_edge(hi_clk));
-             hi_dataout <= u32Address(i-1);
-            wait until (rising_edge(hi_clk));
-             hi_drive <= '0'; 
-            wait until (rising_edge(hi_clk)); 
-            wait until (rising_edge(hi_clk)); 
-            u32Data(i-1) := hi_datain;
-            hi_drive <= '1';
-        end loop;
-        wait until (hi_busy = '0');
-    end procedure ReadRegisterSet;
-    
-
-
-
-
-
-
-        ------------------------------------------------------
-  -- this procedure allows to wait a number of rising edge
-  -- then a margin is applied, if any
-  ------------------------------------------------------
-procedure wait_nb_rising_edge_plus_margin (
-    signal i_clk               : in std_logic;
-    constant i_nb_rising_edge : in natural;
-    constant i_margin          : in time
+    procedure ReadRegisterSet(
+        signal   i_clk   : in std_logic;
+        variable front_panel_conf : inout t_front_panel_conf;
+        signal   internal_if   : inout t_internal_if
     ) is
-  begin
-    -- Wait for number of rising edges
-    --   if the number of rising edges = 0 => only the margin is applied, if any
-    if i_nb_rising_edge /= 0 then
-      for i in 1 to i_nb_rising_edge loop
-        wait until rising_edge(i_clk);
-      end loop;
-    end if;
-    -- Wait for i_margin time, if any
-    wait for i_margin;
-  end procedure;
-
-
-       
-
-
-    end protected body;
+        variable i            : integer;
+        variable u32Count_int : integer;
+    begin
+        u32Count_int         := to_integer(unsigned(front_panel_conf.u32Count));
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DRegisters;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_cmd     <= DReadRegisterSet;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_drive   <= '1';
+        internal_if.hi_cmd     <= DNOP;
+        wait until (rising_edge(i_clk));
+        internal_if.hi_dataout <= front_panel_conf.u32Count;
+        for i in 1 to u32Count_int loop
+            wait until (rising_edge(i_clk));
+            internal_if.hi_dataout       <= front_panel_conf.u32Address(i - 1);
+            wait until (rising_edge(i_clk));
+            internal_if.hi_drive         <= '0';
+            wait until (rising_edge(i_clk));
+            wait until (rising_edge(i_clk));
+            front_panel_conf.u32Data(i - 1) := internal_if.hi_datain;
+            internal_if.hi_drive         <= '1';
+        end loop;
+        wait until (internal_if.hi_busy = '0');
+    end procedure ReadRegisterSet;
 
 end;
