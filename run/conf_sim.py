@@ -79,9 +79,6 @@ root_path, _ = find_file_in_hierarchy()
 path = str(Path(root_path,'lib/common'))
 sys.path.append(path)
 from common import ConsoleColors
-# Enable the coloring in the console
-os.system("")
-
 
 class Env():
     def __init__(self,env_name_p,mandatory_p=1):
@@ -206,23 +203,86 @@ if __name__ == '__main__':
     ############################################
     # get script name_p
     script_name = str(Path(__file__).stem)
+
+
+    # lib path (python/VHDL)
+    ############################################
     # csv lib
     relpath = './lib/csv'
-    csv_lib_base_path = str(Path(root_path,relpath).resolve())
-    csv_lib_base_path_vhdl = str(Path(csv_lib_base_path,'csv/vhdl/src').resolve())
+    lib_csv_base_path_py = str(Path(root_path,relpath).resolve())
+    lib_csv_base_path_vhdl = str(Path(lib_csv_base_path_py,'csv/vhdl/src').resolve())
 
     # vhdl_simu_lib
     relpath = './lib/vhdl_simu'
-    vhdl_simu_lib_base_path = str(Path(root_path,relpath).resolve())
-    vhdl_simu_lib_base_path_vhdl = str(Path(vhdl_simu_lib_base_path,'vhdl_simu/vhdl/src').resolve())
+    lib_vhdl_simu_base_path_py = str(Path(root_path,relpath).resolve())
+    lib_vhdl_simu_base_path_vhdl = str(Path(lib_vhdl_simu_base_path_py,'vhdl_simu/vhdl/src').resolve())
+
+    # vhdl_simu_lib
+    relpath = './lib/common'
+    lib_common_base_path_py = str(Path(root_path,relpath).resolve())
+
 
     # opal_kelly_lib
     relpath = './lib/vhdl_opal_kelly'
-    opal_kelly_lib_base_path = str(Path(root_path,relpath).resolve())
-    opal_kelly_lib_base_path_vhdl = str(Path(opal_kelly_lib_base_path,'vhdl_opal_kelly/vhdl/src').resolve())
+    lib_opal_kelly_base_path_py = str(Path(root_path,relpath).resolve())
+    lib_opal_kelly_base_path_vhdl = str(Path(lib_opal_kelly_base_path_py,'vhdl_opal_kelly/vhdl/src').resolve())
     # coregen
     relpath = './ip/xilinx/coregen'
-    xilinx_coregen_path = str(Path(root_path,relpath).resolve())
+    ip_xilinx_coregen_base_path_vhdl = str(Path(root_path,relpath).resolve())
+
+    # vhdl path (python/VHDL)
+    ############################################
+    # hdl functions path
+    relpath = './src/hdl'
+    hdl_base_path = str(Path(root_path,relpath).resolve())
+
+    # clocking function
+    relpath = './src/hdl/clocking'
+    hdl_clocking_base_path = str(Path(root_path,relpath).resolve())
+
+    # fpasim function
+    relpath = './src/hdl/fpasim'
+    hdl_fpasim_base_path = str(Path(root_path,relpath).resolve())
+
+    # fpasim/adc function
+    relpath = './src/hdl/fpasim/adc'
+    hdl_fpasim_adc_base_path = str(Path(root_path,relpath).resolve())
+
+    # fpasim/amp_squid function
+    relpath = './src/hdl/fpasim/amp_squid'
+    hdl_fpasim_amp_squid_base_path = str(Path(root_path,relpath).resolve())
+
+    # fpasim/dac function
+    relpath = './src/hdl/fpasim/dac'
+    hdl_fpasim_dac_base_path = str(Path(root_path,relpath).resolve())
+
+    # fpasim/mux_squid function
+    relpath = './src/hdl/fpasim/mux_squid'
+    hdl_fpasim_mux_squid_base_path = str(Path(root_path,relpath).resolve())
+
+    # fpasim/sync function
+    relpath = './src/hdl/fpasim/sync'
+    hdl_fpasim_sync_base_path = str(Path(root_path,relpath).resolve())
+
+    # fpasim/tes function
+    relpath = './src/hdl/fpasim/tes'
+    hdl_fpasim_tes_base_path = str(Path(root_path,relpath).resolve())
+
+    # fpasim/regdecode function
+    relpath = './src/hdl/fpasim/regdecode'
+    hdl_fpasim_regdecode_base_path = str(Path(root_path,relpath).resolve())
+
+    # io function
+    relpath = './src/hdl/io'
+    hdl_io_base_path = str(Path(root_path,relpath).resolve())
+
+    # usb function
+    relpath = './src/hdl/usb'
+    hdl_usb_base_path = str(Path(root_path,relpath).resolve())
+
+    # utils function
+    relpath = './src/hdl/utils'
+    hdl_utils_base_path = str(Path(root_path,relpath).resolve())
 
 
 
@@ -296,7 +356,7 @@ if __name__ == '__main__':
     ##############################################
     vhdl_lib_dic = {}
     # csv_lib
-    path = csv_lib_base_path
+    path = lib_csv_base_path_py
     name = 'csv'
     vhld_lib0 = Library()
     vhld_lib0.add_description(text_p="")
@@ -309,7 +369,7 @@ if __name__ == '__main__':
     vhdl_lib_dic[name] = vhdl_dic0
 
     # vhdl_simu_lib
-    path = vhdl_simu_lib_base_path_vhdl
+    path = lib_vhdl_simu_base_path_vhdl
     name = 'vhdl_simu'
     vhld_lib0 = Library()
     vhld_lib0.add_description(text_p="")
@@ -322,7 +382,7 @@ if __name__ == '__main__':
     vhdl_lib_dic[name] = vhdl_dic0
 
     # opal_kelly_lib
-    path = opal_kelly_lib_base_path_vhdl
+    path = lib_opal_kelly_base_path_vhdl
     name = 'vhdl_opal_kelly'
     vhld_lib0 = Library()
     vhld_lib0.add_description(text_p="")
@@ -364,13 +424,17 @@ if __name__ == '__main__':
     vhdl_lib_dic[name] = vhdl_dic0
 
     # coregen
-    path = xilinx_coregen_path
+    path = ip_xilinx_coregen_base_path_vhdl
     name = 'coregen'
     vhld_lib0 = Library()
     vhld_lib0.add_description(text_p="")
     vhld_lib0.set_name(name_p=name)
     vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_adc_selectio_wiz.v")
     vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_adc.v")
+    vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_sync_selectio_wiz.v")
+    vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_sync.v")
+    vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_dac_selectio_wiz.v")
+    vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_dac.v")
     vhld_lib0.add_filename(name_p="fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v")
     vhld_lib0.add_filename(name_p="fpasim_clk_wiz_0/fpasim_clk_wiz_0.v")
     vhld_lib0.add_filename(name_p="fpasim_top_ila_0/sim/fpasim_top_ila_0.vhd")
@@ -392,19 +456,31 @@ if __name__ == '__main__':
     py_lib0.set_name(name_p=name)
     py_lib0.add_filename(name_p="")
     py_lib0.set_path(path_p=path)
-    py_lib0.set_compile_lib(name_p="vunit")
+    py_lib0.set_compile_lib(name_p="")
     py_dic0 = py_lib0.get_dic()
     py_lib_dic[name] = py_dic0
 
     # utils
-    path = vhdl_simu_lib_base_path
+    path = lib_vhdl_simu_base_path_py
     name = "vhdl_simu"
     py_lib0 = Library()
     py_lib0.add_description(text_p="")
     py_lib0.set_name(name_p=name)
     py_lib0.add_filename(name_p="")
     py_lib0.set_path(path_p=path)
-    py_lib0.set_compile_lib(name_p="utils")
+    py_lib0.set_compile_lib(name_p="")
+    py_dic0 = py_lib0.get_dic()
+    py_lib_dic[name] = py_dic0
+
+    # utils
+    path = lib_common_base_path_py
+    name = "common"
+    py_lib0 = Library()
+    py_lib0.add_description(text_p="")
+    py_lib0.set_name(name_p=name)
+    py_lib0.add_filename(name_p="")
+    py_lib0.set_path(path_p=path)
+    py_lib0.set_compile_lib(name_p="")
     py_dic0 = py_lib0.get_dic()
     py_lib_dic[name] = py_dic0
 
