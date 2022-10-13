@@ -90,7 +90,7 @@ begin
             gain_r1 <= to_sfixed(2, gain_r1);
           when "110" =>                 -- 6 
             gain_r1 <= to_sfixed(3, gain_r1);
-          when "111" =>                 -- 7 
+          when others =>                 -- 7 
             gain_r1 <= to_sfixed(4, gain_r1);
         end case;
       end if;
