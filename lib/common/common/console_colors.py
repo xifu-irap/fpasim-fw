@@ -25,6 +25,9 @@
 #    @details                
 #    This script defines console print colors
 # -------------------------------------------------------------------------------------------------------------
+import os
+# Enable the coloring in the console
+os.system("")
 
 class ConsoleColors(object):
     '''
