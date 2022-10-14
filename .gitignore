@@ -35,6 +35,8 @@
 /project/vivado00/fpasim.runs/**/*.vds
 /project/vivado00/fpasim.runs/**/__synthesis_is_complete__
 
+/lib/common/common/__pycache__
+
 
 /doc/**/*
 /.vscode/*
