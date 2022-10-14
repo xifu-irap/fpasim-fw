@@ -1,6 +1,34 @@
-'''
-  This script is the main point entry for the simulation.
-'''
+# -------------------------------------------------------------------------------------------------------------
+#                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
+# -------------------------------------------------------------------------------------------------------------
+#                              This file is part of the ATHENA X-IFU DRE Focal Plane Assembly simulator.
+#
+#                              fpasim-fw is free software: you can redistribute it and/or modify
+#                              it under the terms of the GNU General Public License as published by
+#                              the Free Software Foundation, either version 3 of the License, or
+#                              (at your option) any later version.
+#
+#                              This program is distributed in the hope that it will be useful,
+#                              but WITHOUT ANY WARRANTY; without even the implied warranty of
+#                              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#                              GNU General Public License for more details.
+#
+#                              You should have received a copy of the GNU General Public License
+#                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# -------------------------------------------------------------------------------------------------------------
+#    email                   kenji.delarosa@alten.com
+#!   @file                   launch_sim.py
+# -------------------------------------------------------------------------------------------------------------
+#    Automatic Generation    No
+#    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
+# -------------------------------------------------------------------------------------------------------------
+#!   @details                
+# This module is the fpga top level
+# -------------------------------------------------------------------------------------------------------------
+
+
+
+
 # standard library
 import sys
 import argparse
@@ -24,7 +52,7 @@ if __name__ == '__main__':
 	# add an optional argument with limited choices
 	parser.add_argument('--simulator','-s', default='questa', choices = ['modelsim','questa'],  help='Specify the VHDL simulator to use (must be VHDL 2008 compatible).')
 	# add an optional argument with a list of values
-	parser.add_argument('--test_name_list','-t', default='',metavar = 'test_name_list',  nargs = '+', help='define a list of test_list name to simulate. These test_list names are defined in the launch_sim.json file')
+	parser.add_argument('--test_name_list','-t', default='test_tmp',metavar = 'test_name_list',  nargs = '*', help='define a list of test_list name to simulate. These test_list names are defined in the launch_sim.json file')
 	# add an optional argument 
 	parser.add_argument('-gui', default='false',choices = ['true','false'], help='Specify if the simulator is in gui mode or not. Possible values: true or false')
 	# add an optional argument
