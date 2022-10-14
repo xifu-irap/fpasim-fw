@@ -113,7 +113,8 @@ class Library():
     def __init__(self):
         self.description_list = []
         self.name = ""
-        self.filename_list = []
+        self.filepath_list = []
+        self.directory_path_list = []
         self.path = ""
         self.compile_lib = ""
         self.version = '2008'
@@ -121,10 +122,15 @@ class Library():
         self.description_list.append(text_p)
     def set_name(self,name_p):
         self.name = name_p
-    def add_filename(self,name_p):
-        self.filename_list.append(name_p)
-    def set_path(self,path_p):
-        self.path = str(Path(path_p))
+    def add_filepath(self,filepath_p):
+        filepath = str(Path(filename_p).resolve())
+        self.filepath_list.append(filepath)
+    def add_directory_path(self,base_path_p):
+        path = str(Path(base_path_p).resolve())
+        self.directory_path_list.append(path)
+    def add_filepath(self,base_path_p,name_p):
+        filepath = str(Path(base_path_p,name_p).resolve())
+        self.filepath_list.append(filepath)
     def set_version(self,value_p):
         self.version = value_p
     def set_compile_lib(self,name_p):
@@ -134,8 +140,8 @@ class Library():
         dic = {}
         dic["description"] = self.description_list
         dic["name"] = self.name
-        dic["filename_list"] = self.filename_list
-        dic["path"] = self.path
+        dic["filepath_list"] = self.filepath_list
+        dic["directory_path_list"] = self.directory_path_list
         dic["compile_lib"] = self.compile_lib
         dic["version"] = self.version
         return dic
@@ -153,13 +159,17 @@ class DUT():
     def set_name(self,name_p):
         self.name = name_p
     def add_json_filepath(self,path_p):
-        self.filepath_list.append(path_p)
+        path = str(Path(path_p).resolve())
+        self.filepath_list.append(path)
     def set_run_filepath(self,path_p):
-        self.run_filepath = str(Path(path_p))
+        path = str(Path(path_p).resolve())
+        self.run_filepath = path
     def set_out_path(self,path_p):
-        self.out_path = str(Path(path_p))
+        path = str(Path(path_p).resolve())
+        self.out_path = path
     def set_wave_filepath(self,path_p):
-        self.wave_filepath = str(Path(path_p))
+        path = str(Path(path_p).resolve())
+        self.wave_filepath = path
 
     def get_dic(self):
         dic_conf = {}
@@ -217,7 +227,7 @@ if __name__ == '__main__':
     lib_vhdl_simu_base_path_py = str(Path(root_path,relpath).resolve())
     lib_vhdl_simu_base_path_vhdl = str(Path(lib_vhdl_simu_base_path_py,'vhdl_simu/vhdl/src').resolve())
 
-    # vhdl_simu_lib
+    # common
     relpath = './lib/common'
     lib_common_base_path_py = str(Path(root_path,relpath).resolve())
 
@@ -226,9 +236,20 @@ if __name__ == '__main__':
     relpath = './lib/vhdl_opal_kelly'
     lib_opal_kelly_base_path_py = str(Path(root_path,relpath).resolve())
     lib_opal_kelly_base_path_vhdl = str(Path(lib_opal_kelly_base_path_py,'vhdl_opal_kelly/vhdl/src').resolve())
+
+    # ip path (python/VHDL)
+    ############################################
     # coregen
     relpath = './ip/xilinx/coregen'
     ip_xilinx_coregen_base_path_vhdl = str(Path(root_path,relpath).resolve())
+
+    # opal kelly
+    relpath = './ip/opal_kelly/simu'
+    ip_opal_kelly_base_path_vhdl = str(Path(root_path,relpath).resolve())
+
+    # xpm
+    relpath = './ip/xilinx/xpm'
+    ip_user_xpm_base_path_vhdl = str(Path(root_path,relpath).resolve())
 
     # vhdl path (python/VHDL)
     ############################################
@@ -349,79 +370,35 @@ if __name__ == '__main__':
     json_data[env_name.lower()] = env.get_dic()
 
     ####################################################
-    # define the lib section
+    # define the ip section
     ####################################################
-
-    # define the vhdl library
-    ##############################################
-    vhdl_lib_dic = {}
-    # csv_lib
-    path = lib_csv_base_path_py
-    name = 'csv'
-    vhld_lib0 = Library()
-    vhld_lib0.add_description(text_p="")
-    vhld_lib0.set_name(name_p=name)
-    vhld_lib0.add_filename(name_p="")
-    vhld_lib0.set_path(path_p=path)
-    vhld_lib0.set_version(value_p='2008')
-    vhld_lib0.set_compile_lib(name_p="csv_lib")
-    vhdl_dic0 = vhld_lib0.get_dic()
-    vhdl_lib_dic[name] = vhdl_dic0
-
-    # vhdl_simu_lib
-    path = lib_vhdl_simu_base_path_vhdl
-    name = 'vhdl_simu'
-    vhld_lib0 = Library()
-    vhld_lib0.add_description(text_p="")
-    vhld_lib0.set_name(name_p=name)
-    vhld_lib0.add_filename(name_p="")
-    vhld_lib0.set_path(path_p=path)
-    vhld_lib0.set_version(value_p='2008')
-    vhld_lib0.set_compile_lib(name_p="vhdl_simu_lib")
-    vhdl_dic0 = vhld_lib0.get_dic()
-    vhdl_lib_dic[name] = vhdl_dic0
-
-    # opal_kelly_lib
-    path = lib_opal_kelly_base_path_vhdl
-    name = 'vhdl_opal_kelly'
-    vhld_lib0 = Library()
-    vhld_lib0.add_description(text_p="")
-    vhld_lib0.set_name(name_p=name)
-    vhld_lib0.add_filename(name_p="")
-    vhld_lib0.set_path(path_p=path)
-    vhld_lib0.set_version(value_p='2008')
-    vhld_lib0.set_compile_lib(name_p="opal_kelly_lib")
-    vhdl_dic0 = vhld_lib0.get_dic()
-    vhdl_lib_dic[name] = vhdl_dic0
-
-    # vunit_lib
-    path = str(Path(vunit_path,"vunit/vhdl"))
-    name = 'vunit'
-    vhld_lib0 = Library()
-    vhld_lib0.add_description(text_p="")
-    vhld_lib0.set_name(name_p=name)
-    vhld_lib0.add_filename(name_p="")
-    vhld_lib0.set_path(path_p=path)
-    vhld_lib0.set_version(value_p='2008')
-    vhld_lib0.set_compile_lib(name_p="vunit_lib")
-    vhdl_dic0 = vhld_lib0.get_dic()
-    vhdl_lib_dic[name] = vhdl_dic0
-
-    # xpm
+    ip_vhdl_dic = {}
+     # xpm
     path = str(Path(vivado_path,"data/ip/xpm"))
     name = 'xpm'
     vhld_lib0 = Library()
     vhld_lib0.add_description(text_p="")
     vhld_lib0.set_name(name_p=name)
-    vhld_lib0.add_filename(name_p="xpm_cdc/hdl/xpm_cdc.sv")
-    vhld_lib0.add_filename(name_p="xpm_memory/hdl/xpm_memory.sv")
-    vhld_lib0.add_filename(name_p="xpm_fifo/hdl/xpm_fifo.sv")
-    vhld_lib0.add_filename(name_p="xpm_VCOMP.vhd")
-    vhld_lib0.set_path(path_p=path)
+    vhld_lib0.add_filepath(base_path_p=path,name_p="xpm_cdc/hdl/xpm_cdc.sv")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="xpm_memory/hdl/xpm_memory.sv")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="xpm_fifo/hdl/xpm_fifo.sv")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="xpm_VCOMP.vhd")
     vhld_lib0.set_version(value_p='93')
     vhld_lib0.set_compile_lib(name_p="xpm")
     vhdl_dic0 = vhld_lib0.get_dic()
-    vhdl_lib_dic[name] = vhdl_dic0
+    ip_vhdl_dic[name] = vhdl_dic0
+
+    # user xpm
+    path = ip_user_xpm_base_path_vhdl
+    name = 'user_xpm'
+    vhld_lib0 = Library()
+    vhld_lib0.add_description(text_p="")
+    vhld_lib0.set_name(name_p=name)
+    vhld_lib0.add_directory_path(base_path_p=path)
+    vhld_lib0.set_version(value_p='2008')
+    vhld_lib0.set_compile_lib(name_p="fpasim")
+    vhdl_dic0 = vhld_lib0.get_dic()
+    ip_vhdl_dic[name] = vhdl_dic0
 
     # coregen
     path = ip_xilinx_coregen_base_path_vhdl
@@ -429,36 +406,114 @@ if __name__ == '__main__':
     vhld_lib0 = Library()
     vhld_lib0.add_description(text_p="")
     vhld_lib0.set_name(name_p=name)
-    vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_adc_selectio_wiz.v")
-    vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_adc.v")
-    vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_sync_selectio_wiz.v")
-    vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_sync.v")
-    vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_dac_selectio_wiz.v")
-    vhld_lib0.add_filename(name_p="selectio_wiz_adc/selectio_wiz_dac.v")
-    vhld_lib0.add_filename(name_p="fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v")
-    vhld_lib0.add_filename(name_p="fpasim_clk_wiz_0/fpasim_clk_wiz_0.v")
-    vhld_lib0.add_filename(name_p="fpasim_top_ila_0/sim/fpasim_top_ila_0.vhd")
-    vhld_lib0.add_filename(name_p="fpasim_regdecode_top_ila_0/sim/fpasim_regdecode_top_ila_0.vhd")
-    vhld_lib0.set_path(path_p=path)
+    vhld_lib0.add_filepath(base_path_p=path,name_p="selectio_wiz_adc/selectio_wiz_adc_selectio_wiz.v")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="selectio_wiz_adc/selectio_wiz_adc.v")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="selectio_wiz_sync/selectio_wiz_sync_selectio_wiz.v")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="selectio_wiz_sync/selectio_wiz_sync.v")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="selectio_wiz_dac/selectio_wiz_dac_selectio_wiz.v")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="selectio_wiz_dac/selectio_wiz_dac.v")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="fpasim_clk_wiz_0/fpasim_clk_wiz_0.v")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="fpasim_top_ila_0/sim/fpasim_top_ila_0.vhd")
+    vhld_lib0.add_filepath(base_path_p=path,name_p="fpasim_regdecode_top_ila_0/sim/fpasim_regdecode_top_ila_0.vhd")
     vhld_lib0.set_version(value_p='2008')
     vhld_lib0.set_compile_lib(name_p="fpasim")
     vhdl_dic0 = vhld_lib0.get_dic()
-    vhdl_lib_dic[name] = vhdl_dic0
+    ip_vhdl_dic[name] = vhdl_dic0
+
+    # coregen
+    path = ip_opal_kelly_base_path_vhdl
+    name = 'opal_kelly'
+    vhld_lib0 = Library()
+    vhld_lib0.add_description(text_p="")
+    vhld_lib0.set_name(name_p=name)
+    vhld_lib0.add_directory_path(base_path_p=path)
+    vhld_lib0.set_version(value_p='2008')
+    vhld_lib0.set_compile_lib(name_p="fpasim")
+    vhdl_dic0 = vhld_lib0.get_dic()
+    ip_vhdl_dic[name] = vhdl_dic0
+
+
+
+     # ip description
+    #################################
+    description_list = []
+    description_list.append("")
+    dic = {}
+    dic['description'] = description_list
+    dic['vhdl'] = ip_vhdl_dic
+    json_data["ip"] = dic
+
+    ####################################################
+    # define the lib section
+    ####################################################
+
+    # define the vhdl library
+    ##############################################
+    lib_vhdl_dic = {}
+    # csv_lib
+    path = lib_csv_base_path_py
+    name = 'csv'
+    vhld_lib0 = Library()
+    vhld_lib0.add_description(text_p="")
+    vhld_lib0.set_name(name_p=name)
+    vhld_lib0.add_directory_path(base_path_p=path)
+    vhld_lib0.set_version(value_p='2008')
+    vhld_lib0.set_compile_lib(name_p="csv_lib")
+    vhdl_dic0 = vhld_lib0.get_dic()
+    lib_vhdl_dic[name] = vhdl_dic0
+
+    # vhdl_simu_lib
+    path = lib_vhdl_simu_base_path_vhdl
+    name = 'vhdl_simu'
+    vhld_lib0 = Library()
+    vhld_lib0.add_description(text_p="")
+    vhld_lib0.set_name(name_p=name)
+    vhld_lib0.add_directory_path(base_path_p=path)
+    vhld_lib0.set_version(value_p='2008')
+    vhld_lib0.set_compile_lib(name_p="vhdl_simu_lib")
+    vhdl_dic0 = vhld_lib0.get_dic()
+    lib_vhdl_dic[name] = vhdl_dic0
+
+    # opal_kelly_lib
+    path = lib_opal_kelly_base_path_vhdl
+    name = 'vhdl_opal_kelly'
+    vhld_lib0 = Library()
+    vhld_lib0.add_description(text_p="")
+    vhld_lib0.set_name(name_p=name)
+    vhld_lib0.add_directory_path(base_path_p=path)
+    vhld_lib0.set_version(value_p='2008')
+    vhld_lib0.set_compile_lib(name_p="opal_kelly_lib")
+    vhdl_dic0 = vhld_lib0.get_dic()
+    lib_vhdl_dic[name] = vhdl_dic0
+
+    # vunit_lib
+    path = str(Path(vunit_path,"vunit/vhdl"))
+    name = 'vunit'
+    vhld_lib0 = Library()
+    vhld_lib0.add_description(text_p="")
+    vhld_lib0.set_name(name_p=name)
+    vhld_lib0.add_directory_path(base_path_p=path)
+    vhld_lib0.set_version(value_p='2008')
+    vhld_lib0.set_compile_lib(name_p="vunit_lib")
+    vhdl_dic0 = vhld_lib0.get_dic()
+    lib_vhdl_dic[name] = vhdl_dic0
+
+   
 
     # define the python library
     ##############################################
-    py_lib_dic = {}
+    lib_py_dic = {}
     # vunit_lib
     path = str(Path(vunit_path,""))
     name = "vunit"
     py_lib0 = Library()
     py_lib0.add_description(text_p="")
     py_lib0.set_name(name_p=name)
-    py_lib0.add_filename(name_p="")
-    py_lib0.set_path(path_p=path)
+    py_lib0.add_directory_path(base_path_p=path)
     py_lib0.set_compile_lib(name_p="")
     py_dic0 = py_lib0.get_dic()
-    py_lib_dic[name] = py_dic0
+    lib_py_dic[name] = py_dic0
 
     # utils
     path = lib_vhdl_simu_base_path_py
@@ -466,11 +521,10 @@ if __name__ == '__main__':
     py_lib0 = Library()
     py_lib0.add_description(text_p="")
     py_lib0.set_name(name_p=name)
-    py_lib0.add_filename(name_p="")
-    py_lib0.set_path(path_p=path)
+    py_lib0.add_directory_path(base_path_p=path)
     py_lib0.set_compile_lib(name_p="")
     py_dic0 = py_lib0.get_dic()
-    py_lib_dic[name] = py_dic0
+    lib_py_dic[name] = py_dic0
 
     # utils
     path = lib_common_base_path_py
@@ -478,11 +532,10 @@ if __name__ == '__main__':
     py_lib0 = Library()
     py_lib0.add_description(text_p="")
     py_lib0.set_name(name_p=name)
-    py_lib0.add_filename(name_p="")
-    py_lib0.set_path(path_p=path)
+    py_lib0.add_directory_path(base_path_p=path)
     py_lib0.set_compile_lib(name_p="")
     py_dic0 = py_lib0.get_dic()
-    py_lib_dic[name] = py_dic0
+    lib_py_dic[name] = py_dic0
 
 
     # lib description
@@ -491,8 +544,8 @@ if __name__ == '__main__':
     description_list.append("")
     dic = {}
     dic['description'] = description_list
-    dic['vhdl'] = vhdl_lib_dic
-    dic['python'] = py_lib_dic
+    dic['vhdl'] = lib_vhdl_dic
+    dic['python'] = lib_py_dic
     json_data["lib"] = dic
 
 
