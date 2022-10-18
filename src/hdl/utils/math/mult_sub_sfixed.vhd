@@ -142,17 +142,5 @@ begin
     -----------------------------------------------------------------
     o_s <= to_slv(res_tmp4);
 
-    ---------------------------------------------------------------------
-    -- for simulation only
-    --   detect an overflow on the MSB bits of res_r3.
-    --     => Theses bits are not used by the output signal
-    ---------------------------------------------------------------------
-    GEN_SIM : if g_SIM_EN generate
-        signal overflow_tmp4 : sfixed(res_r3'high downto res_tmp4'high + 1);
-    begin
-        overflow_tmp4 <= resize(res_r3, overflow_tmp4'high, overflow_tmp4'low);
-        assert not unsigned(to_slv(overflow_tmp4)) = to_unsigned(0, overflow_tmp4'length) report "[mult_sub_sfixed] => overflow detection" severity error;
-
-    end generate GEN_SIM;
 
 end architecture RTL;
