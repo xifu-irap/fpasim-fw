@@ -74,9 +74,10 @@ entity io_top is
     i_db12_p      : in  std_logic;
     i_db12_n      : in  std_logic;
     -- to user : adc_a
+    o_adc_valid   : out std_logic;
     o_adc_a       : out std_logic_vector(13 downto 0);
-    -- to user : adc_b
     o_adc_b       : out std_logic_vector(13 downto 0);
+    
     ---------------------------------------------------------------------
     -- sync
     ---------------------------------------------------------------------
@@ -222,6 +223,8 @@ begin
       o_adc   => adc_b_tmp1
     );
   o_adc_b <= adc_b_tmp1;
+
+  o_adc_valid <= '1';
 
   ---------------------------------------------------------------------
   -- sync
