@@ -37,151 +37,222 @@
 --
 -- -------------------------------------------------------------------------------------------------------------
 
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+library fpasim;
 
 entity ram_check is
-  generic (
+  generic(
     g_WR_ADDR_WIDTH : positive := 16;
     g_RD_ADDR_WIDTH : positive := 16
-    );
-  port (
-    i_clk : in std_logic;
-
+  );
+  port(
+    i_clk         : in  std_logic;
     ---------------------------------------------------------------------
     -- input
     ---------------------------------------------------------------------
-    i_wr      : in std_logic;
-    i_wr_addr : in std_logic_vector(g_WR_ADDR_WIDTH - 1 downto 0);
-
-    i_rd      : in std_logic;
-    i_rd_addr : in std_logic_vector(g_RD_ADDR_WIDTH - 1 downto 0);
-
+    i_wr          : in  std_logic;
+    i_wr_addr     : in  std_logic_vector(g_WR_ADDR_WIDTH - 1 downto 0);
+    i_rd          : in  std_logic;
+    i_rd_addr     : in  std_logic_vector(g_RD_ADDR_WIDTH - 1 downto 0);
     ---------------------------------------------------------------------
     -- Errors
     ---------------------------------------------------------------------
     o_error_pulse : out std_logic
-    );
+  );
 end entity ram_check;
 
 architecture RTL of ram_check is
-constant c_SHIFT_ADDR0 : integer := g_WR_ADDR_WIDTH - g_RD_ADDR_WIDTH;
-constant c_SHIFT_ADDR1 : integer := g_RD_ADDR_WIDTH - g_WR_ADDR_WIDTH;
+  constant c_SHIFT_ADDR0 : integer := g_WR_ADDR_WIDTH - g_RD_ADDR_WIDTH;
+  constant c_SHIFT_ADDR1 : integer := g_RD_ADDR_WIDTH - g_WR_ADDR_WIDTH;
 
--- length(wr_addr) = length(rd_addr)
-signal wr_addr_tmp : unsigned(i_wr_addr'range);
-signal rd_addr_tmp : unsigned(i_rd_addr'range);
+  ---------------------------------------------------------------------
+  -- pipeline
+  ---------------------------------------------------------------------
+  constant c_IDX0_L : integer := 0;
+  constant c_IDX0_H : integer := c_IDX0_L + i_wr_addr'length - 1;
 
--- length(wr_addr) < length(rd_addr)
-signal rd_addr_tmp0 : unsigned(i_wr_addr'range);
--- length(wr_addr) > length(rd_addr)
-signal wr_addr_tmp0 : unsigned(i_rd_addr'range);
+  constant c_IDX1_L : integer := c_IDX0_H + 1;
+  constant c_IDX1_H : integer := c_IDX1_L + i_rd_addr'length - 1;
 
----------------------------------------------------------------------
--- p_check_addr
----------------------------------------------------------------------
-  signal wr_r         : std_logic:= '0';
-  signal rd_r         : std_logic:= '0';
-  signal error_addr_r : std_logic := '0';
+  constant c_IDX2_L : integer := c_IDX1_H + 1;
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
 
----------------------------------------------------------------------
--- p_error
----------------------------------------------------------------------
+  constant c_IDX3_L : integer := c_IDX2_H + 1;
+  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;
+
+  signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0);
+
+  signal wr1      : std_logic;
+  signal wr_addr1 : std_logic_vector(i_wr_addr'range);
+
+  signal rd1      : std_logic;
+  signal rd_addr1 : std_logic_vector(i_rd_addr'range);
+
+  ---------------------------------------------------------------------
+  -- p_error
+  ---------------------------------------------------------------------
   signal error_r2 : std_logic := '0';
 
 begin
----------------------------------------------------------------------
--- RAM: symetric address on the write and read side
----------------------------------------------------------------------
-gen_sym_addr_width: if g_WR_ADDR_WIDTH = g_RD_ADDR_WIDTH generate
-  wr_addr_tmp <= unsigned(i_wr_addr);
-  rd_addr_tmp <= unsigned(i_rd_addr);
 
-  p_check_addr : process (i_clk) is
+  data_pipe_tmp0(c_IDX3_H)                 <= i_rd;
+  data_pipe_tmp0(c_IDX2_H)                 <= i_wr;
+  data_pipe_tmp0(c_IDX1_H downto c_IDX1_L) <= i_rd_addr;
+  data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_wr_addr;
+  inst_pipeliner : entity fpasim.pipeliner
+    generic map(
+      g_NB_PIPES   => 1,
+      g_DATA_WIDTH => data_pipe_tmp0'length
+    )
+    port map(
+      i_clk  => i_clk,
+      i_data => data_pipe_tmp0,
+      o_data => data_pipe_tmp1
+    );
+
+  rd1      <= data_pipe_tmp1(c_IDX3_H);
+  wr1      <= data_pipe_tmp1(c_IDX2_H);
+  rd_addr1 <= data_pipe_tmp1(c_IDX1_H downto c_IDX1_L);
+  wr_addr1 <= data_pipe_tmp1(c_IDX0_H downto c_IDX0_L);
+
+  ---------------------------------------------------------------------
+  -- RAM: symetric address on the write and read side
+  ---------------------------------------------------------------------
+  gen_sym_addr_width : if g_WR_ADDR_WIDTH = g_RD_ADDR_WIDTH generate
+    signal wr_addr_tmp : unsigned(i_wr_addr'range);
+    signal rd_addr_tmp : unsigned(i_rd_addr'range);
+
+    signal wr_addr_r : unsigned(i_wr_addr'range):= (others => '0');
+    signal rd_addr_r : unsigned(i_rd_addr'range):= (others => '0');
+
+    signal trig_r : std_logic := '0';
   begin
-    if rising_edge(i_clk) then
-      wr_r <= i_wr;
-      rd_r <= i_rd;
+    wr_addr_tmp <= unsigned(wr_addr1);
+    rd_addr_tmp <= unsigned(rd_addr1);
 
-      if wr_addr_tmp = rd_addr_tmp then
-        error_addr_r <= '1';
-      else
-        error_addr_r <= '0';
+    p_check_addr : process(i_clk) is
+    begin
+      if rising_edge(i_clk) then
+        trig_r <= wr1 and rd1;
+        if wr1 = '1' then
+          wr_addr_r <= wr_addr_tmp;
+        end if;
+        if rd1 = '1' then
+          rd_addr_r <= rd_addr_tmp;
+        end if;
       end if;
-    end if;
-  end process p_check_addr;
-end generate gen_sym_addr_width;
+    end process p_check_addr;
 
----------------------------------------------------------------------
--- RAM : asymetric address on the write and the read side
---       g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH 
----------------------------------------------------------------------
-gen_asym_wr_addr_inf_rd_addr_width_g: if g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH generate
-  wr_addr_tmp <= unsigned(i_wr_addr);
-  rd_addr_tmp0 <= resize(unsigned(i_rd_addr) srl c_SHIFT_ADDR1, wr_addr_tmp'length);
+    p_error : process(i_clk) is
+    begin
+      if rising_edge(i_clk) then
+        if wr_addr_r = rd_addr_r then
+          error_r2 <= trig_r;
+        else
+          error_r2 <= '0';
+        end if;
+      end if;
+    end process p_error;
 
-  p_check_addr : process (i_clk) is
+  end generate gen_sym_addr_width;
+
+  ---------------------------------------------------------------------
+  -- RAM : asymetric address on the write and the read side
+  --       g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH 
+  ---------------------------------------------------------------------
+  gen_asym_wr_addr_inf_rd_addr_width_g : if g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH generate
+    signal wr_addr_tmp : unsigned(i_wr_addr'range);
+    signal rd_addr_tmp : unsigned(i_wr_addr'range);
+
+    signal wr_addr_r : unsigned(i_wr_addr'range):= (others => '0');
+    signal rd_addr_r : unsigned(i_wr_addr'range):= (others => '0');
+
+    signal trig_r : std_logic := '0';
+
   begin
-    if rising_edge(i_clk) then
-      wr_r <= i_wr;
-      rd_r <= i_rd;
+    wr_addr_tmp <= unsigned(wr_addr1);
+    rd_addr_tmp <= resize(unsigned(rd_addr1) srl c_SHIFT_ADDR1, wr_addr_tmp'length);
 
-      if wr_addr_tmp = rd_addr_tmp0 then
-        error_addr_r <= '1';
-      else
-        error_addr_r <= '0';
+    p_check_addr : process(i_clk) is
+    begin
+      if rising_edge(i_clk) then
+        trig_r <= wr1 and rd1;
+        if wr1 = '1' then
+          wr_addr_r <= wr_addr_tmp;
+        end if;
+        if rd1 = '1' then
+          rd_addr_r <= rd_addr_tmp;
+        end if;
       end if;
-    end if;
-  end process p_check_addr;
-end generate gen_asym_wr_addr_inf_rd_addr_width_g;
+    end process p_check_addr;
 
----------------------------------------------------------------------
--- RAM : asymetric address on the write and the read side
---       g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH
----------------------------------------------------------------------
-gen_asym_wr_addr_sup_rd_addr_width: if g_WR_ADDR_WIDTH > g_RD_ADDR_WIDTH generate
-  wr_addr_tmp0 <= resize(unsigned(i_wr_addr) srl c_SHIFT_ADDR0,rd_addr_tmp'length);
-  rd_addr_tmp  <= unsigned(i_rd_addr);
-  
-  p_check_addr : process (i_clk) is
+    p_error : process(i_clk) is
+    begin
+      if rising_edge(i_clk) then
+        if wr_addr_r = rd_addr_r then
+          error_r2 <= trig_r;
+        else
+          error_r2 <= '0';
+        end if;
+      end if;
+    end process p_error;
+
+  end generate gen_asym_wr_addr_inf_rd_addr_width_g;
+
+  ---------------------------------------------------------------------
+  -- RAM : asymetric address on the write and the read side
+  --       g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH
+  ---------------------------------------------------------------------
+  gen_asym_wr_addr_sup_rd_addr_width : if g_WR_ADDR_WIDTH > g_RD_ADDR_WIDTH generate
+    signal wr_addr_tmp : unsigned(i_rd_addr'range);
+    signal rd_addr_tmp : unsigned(i_rd_addr'range);
+
+    signal wr_addr_r : unsigned(i_rd_addr'range):= (others => '0');
+    signal rd_addr_r : unsigned(i_rd_addr'range):= (others => '0');
+
+    signal trig_r : std_logic := '0';
   begin
-    if rising_edge(i_clk) then
-      wr_r <= i_wr;
-      rd_r <= i_rd;
+    wr_addr_tmp <= resize(unsigned(wr_addr1) srl c_SHIFT_ADDR0, rd_addr_tmp'length);
+    rd_addr_tmp <= unsigned(rd_addr1);
 
-      if wr_addr_tmp0 = rd_addr_tmp then
-        error_addr_r <= '1';
-      else
-        error_addr_r <= '0';
+    p_check_addr : process(i_clk) is
+    begin
+      if rising_edge(i_clk) then
+        trig_r <= wr1 and rd1;
+        if wr1 = '1' then
+          wr_addr_r <= wr_addr_tmp;
+        end if;
+        if rd1 = '1' then
+          rd_addr_r <= rd_addr_tmp;
+        end if;
       end if;
-    end if;
-  end process p_check_addr;
-end generate gen_asym_wr_addr_sup_rd_addr_width;
+    end process p_check_addr;
 
----------------------------------------------------------------------
--- p_error
----------------------------------------------------------------------
-  p_error : process (i_clk) is
-  begin
-    if rising_edge(i_clk) then
-      if wr_r = '1' and rd_r = '1' and error_addr_r = '1' then
-        error_r2 <= '1';
-      else
-        error_r2 <= '0';
+    p_error : process(i_clk) is
+    begin
+      if rising_edge(i_clk) then
+        if wr_addr_r = rd_addr_r then
+          error_r2 <= trig_r;
+        else
+          error_r2 <= '0';
+        end if;
       end if;
-    end if;
-  end process p_error;
+    end process p_error;
 
+  end generate gen_asym_wr_addr_sup_rd_addr_width;
+
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
   o_error_pulse <= error_r2;
 
----------------------------------------------------------------------
--- for simulation only
----------------------------------------------------------------------
-  assert not(error_r2 = '1') report "[ram_check] => possible data corruption" severity error;
-
-
+  ---------------------------------------------------------------------
+  -- for simulation only
+  ---------------------------------------------------------------------
+  assert not (error_r2 = '1') report "[ram_check] => possible data corruption" severity error;
 
 end architecture RTL;
