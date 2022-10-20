@@ -38,7 +38,7 @@ entity regdecode_pipe_addr_decode_check_addr_range is
     g_ADDR_WIDTH       : integer := 16  -- input address bus width
   );
   port(
-    i_clk            : in  std_logic; -- clock
+    i_clk            : in  std_logic;   -- clock
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
@@ -79,7 +79,7 @@ begin
   -- check configuration
   ---------------------------------------------------------------------
 
-  assert not (g_ADDR_WIDTH >= g_ADDR_RANGE_WIDTH) report "[regdecode_pipe_addr_decode_check_addr_range]: address range width should be inferior to equal to the input address bus width" severity error;
+  --assert not (g_ADDR_WIDTH >= g_ADDR_RANGE_WIDTH) report "[regdecode_pipe_addr_decode_check_addr_range]: address range width should be inferior to equal to the input address bus width" severity error;
 
   ---------------------------------------------------------------------
   -- if g_ADDR_RANGE_WIDTH < g_ADDR_WIDTH then we assume the MSB bits are used to define a range which will be compared to i_addr_range_min and i_addr_range_max.
@@ -99,15 +99,23 @@ begin
   begin
     if rising_edge(i_clk) then
       -- wr_en_low = 1 if i_addr_range_min <= i_addr
-      if unsigned(i_addr_range_min) <= unsigned(addr_tmp) then
-        data_valid_low_r1 <= i_data_valid;
+      if i_data_valid = '1' then
+        if unsigned(i_addr_range_min) <= unsigned(addr_tmp) then
+          data_valid_low_r1 <= '1';
+        else
+          data_valid_low_r1 <= '0';
+        end if;
       else
         data_valid_low_r1 <= '0';
       end if;
 
       -- wr_en_high = 1 if  i_addr <= i_addr_range_max
-      if unsigned(addr_tmp) <= unsigned(i_addr_range_max) then
-        data_valid_high_r1 <= i_data_valid;
+      if i_data_valid = '1' then
+        if unsigned(addr_tmp) <= unsigned(i_addr_range_max) then
+          data_valid_high_r1 <= '1';
+        else
+          data_valid_high_r1 <= '0';
+        end if;
       else
         data_valid_high_r1 <= '0';
       end if;
