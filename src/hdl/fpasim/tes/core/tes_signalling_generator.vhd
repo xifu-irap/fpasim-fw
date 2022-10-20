@@ -99,15 +99,15 @@ architecture RTL of tes_signalling_generator is
   signal sof_r1   : std_logic := '0';
 
   signal eof_next : std_logic;
-  signal eof_r1   : std_logic;
+  signal eof_r1   : std_logic := '0';
 
-  signal cnt_frame_next : unsigned(i_length'range) := (others => '0');
+  signal cnt_frame_next : unsigned(i_length'range);
   signal cnt_frame_r1   : unsigned(i_length'range) := (others => '0');
 
   signal cnt_frame_max_next : unsigned(i_length'range);
   signal cnt_frame_max_r1   : unsigned(i_length'range) := (others => '0');
 
-  signal cnt_id_next : unsigned(i_id_size'range) := (others => '0');
+  signal cnt_id_next : unsigned(i_id_size'range);
   signal cnt_id_r1   : unsigned(i_id_size'range) := (others => '0');
 
   ---------------------------------------------------------------------
@@ -131,7 +131,7 @@ architecture RTL of tes_signalling_generator is
   signal data_valid1 : std_logic := '0';
   signal sof1        : std_logic := '0';
   signal eof1        : std_logic := '0';
-  signal id1         : std_logic_vector(i_id_size'range);
+  signal id1         : std_logic_vector(i_id_size'range):= (others => '0');
 
 begin
 
