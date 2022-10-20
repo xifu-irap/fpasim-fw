@@ -246,8 +246,8 @@ begin
   -------------------------------------------------------------------
   -- sub_sfixed_mux_squid_out
   -------------------------------------------------------------------
-  assert not (pixel_result_tmp'length /= i_pixel_result'length - 1) report "[mux_squid]: pixel result => input port width and sfixed package definition width doesn't match." severity error;
-  assert not (mux_squid_feedback_tmp'length /= i_mux_squid_feedback'length - 1) report "[mux_squid]: mux_squid_feedback => input port width and sfixed package definition width doesn't match." severity error;
+  --assert not (pixel_result_tmp'length /= i_pixel_result'length - 1) report "[mux_squid]: pixel result => input port width and sfixed package definition width doesn't match." severity error;
+  --assert not (mux_squid_feedback_tmp'length /= i_mux_squid_feedback'length - 1) report "[mux_squid]: mux_squid_feedback => input port width and sfixed package definition width doesn't match." severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
   pixel_result_tmp       <= std_logic_vector(resize(unsigned(i_pixel_result), pixel_result_tmp'length));
   mux_squid_feedback_tmp <= std_logic_vector(resize(unsigned(i_mux_squid_feedback), mux_squid_feedback_tmp'length));
@@ -553,8 +553,8 @@ begin
   ---------------------------------------------------------------------
   -- add mux_squid_offset + mux_squid_tf
   ---------------------------------------------------------------------
-  assert not (mux_squid_tf_tmp'length /= mux_squid_tf_doutb'length - 1) report "[mux_squid]: mux_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
-  assert not (mux_squid_offset_tmp'length /= mux_squid_offset_ry'length) report "[mux_squid]: mux_squid_offset_tmp => port width and sfixed package definition width doesn't match." severity error;
+  --assert not (mux_squid_tf_tmp'length = mux_squid_tf_doutb'length - 1) report "[mux_squid]: mux_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
+  --assert not (mux_squid_offset_tmp'length /= mux_squid_offset_ry'length) report "[mux_squid]: mux_squid_offset_tmp => port width and sfixed package definition width doesn't match." severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
   mux_squid_tf_tmp     <= std_logic_vector(resize(unsigned(mux_squid_tf_doutb), mux_squid_tf_tmp'length));
   -- no conversion => width unchanged
