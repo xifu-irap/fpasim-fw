@@ -80,7 +80,7 @@ architecture RTL of dynamic_shift_register is
   type t_array_slv is array (g_DATA_WIDTH-1 downto 0) of std_logic_vector(2**i_addr'length-1 downto 0);
   signal shift_r : t_array_slv:= (others => (others => '0'));
 
-  signal srl_r2 : std_logic_vector(o_data'range);
+  signal srl_r2 : std_logic_vector(o_data'range):= (others => '0');
   
   -- fpga specific attribute
   attribute shreg_extract : string;
