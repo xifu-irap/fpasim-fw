@@ -116,16 +116,16 @@ architecture RTL of dac_data_insert is
   signal sm_state_next : t_state;
 
   signal rd_next : std_logic;
-  signal rd_r1   : std_logic;
+  signal rd_r1   : std_logic:= '0';
 
   signal dac_valid_next : std_logic;
-  signal dac_valid_r1   : std_logic;
+  signal dac_valid_r1   : std_logic:= '0';
 
   signal dac_frame_next : std_logic;
-  signal dac_frame_r1   : std_logic;
+  signal dac_frame_r1   : std_logic:= '0';
 
   signal dac_next : std_logic_vector(o_dac'range);
-  signal dac_r1   : std_logic_vector(o_dac'range);
+  signal dac_r1   : std_logic_vector(o_dac'range):= (others => '0');
 
   ---------------------------------------------------------------------
   -- error latching
@@ -156,9 +156,7 @@ begin
       ---------------------------------------------------------------------
       -- resynchronization: fifo errors/empty flag
       ---------------------------------------------------------------------
-      g_SYNC_SIDE         => "wr",      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
-      g_DEST_SYNC_FF      => 2,         -- Number of register stages used to synchronize signal in the destination clock domain.   
-      g_SRC_INPUT_REG     => 1
+      g_SYNC_SIDE         => "wr"      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
     )
     port map(
       ---------------------------------------------------------------------
