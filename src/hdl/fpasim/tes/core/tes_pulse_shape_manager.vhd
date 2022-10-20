@@ -179,38 +179,38 @@ architecture RTL of tes_pulse_shape_manager is
   type t_time_shift_array is array (0 to i_pixel_id'length - 1) of unsigned(i_cmd_time_shift'range);
 
   type t_state is (E_RST, E_WAIT, E_RUN);
-  signal sm_state_r1   : t_state;
   signal sm_state_next : t_state;
+  signal sm_state_r1   : t_state:= E_RST;
 
   signal cmd_rd_next : std_logic;
-  signal cmd_rd_r1   : std_logic;
+  signal cmd_rd_r1   : std_logic := '0';
 
   signal cnt_sample_pulse_shape_next : unsigned(g_FRAME_WIDTH - 1 downto 0);
-  signal cnt_sample_pulse_shape_r1   : unsigned(g_FRAME_WIDTH - 1 downto 0);
+  signal cnt_sample_pulse_shape_r1   : unsigned(g_FRAME_WIDTH - 1 downto 0):= (others => '0');
 
   signal cnt_sample_pulse_shape_table_next : t_addr_pulse_shape_array;
-  signal cnt_sample_pulse_shape_table_r1   : t_addr_pulse_shape_array;
+  signal cnt_sample_pulse_shape_table_r1   : t_addr_pulse_shape_array := (others => (others => '0'));
 
   signal en_table_next : std_logic_vector(i_pixel_id'range);
-  signal en_table_r1   : std_logic_vector(i_pixel_id'range);
+  signal en_table_r1   : std_logic_vector(i_pixel_id'range):= (others => '0');
 
   signal pulse_heigth_next : unsigned(i_cmd_pulse_height'range);
-  signal pulse_heigth_r1   : unsigned(i_cmd_pulse_height'range);
+  signal pulse_heigth_r1   : unsigned(i_cmd_pulse_height'range):= (others => '0');
 
   signal pulse_heigth_table_next : t_pulse_height_array;
-  signal pulse_heigth_table_r1   : t_pulse_height_array;
+  signal pulse_heigth_table_r1   : t_pulse_height_array:= (others => (others => '0'));
 
   signal time_shift_next : unsigned(i_cmd_time_shift'range);
-  signal time_shift_r1   : unsigned(i_cmd_time_shift'range);
+  signal time_shift_r1   : unsigned(i_cmd_time_shift'range):= (others => '0');
 
   signal time_shift_table_next : t_time_shift_array;
-  signal time_shift_table_r1   : t_time_shift_array;
+  signal time_shift_table_r1   : t_time_shift_array:= (others => (others => '0'));
 
   signal en_next : std_logic;
-  signal en_r1   : std_logic;
+  signal en_r1   : std_logic:= '0';
 
   signal pixel_valid_next : std_logic;
-  signal pixel_valid_r1   : std_logic;
+  signal pixel_valid_r1   : std_logic:= '0';
 
   -------------------------------------------------------------------
   -- compute pipe indexes
@@ -354,7 +354,7 @@ begin
 
   inst_fifo_sync_with_error_cmd : entity fpasim.fifo_sync_with_error
     generic map(
-      g_FIFO_MEMORY_TYPE  => "auto",
+      g_FIFO_MEMORY_TYPE  => "distributed",
       g_FIFO_READ_LATENCY => 1,
       g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH0,
       g_READ_DATA_WIDTH   => data_tmp0'length,
@@ -769,7 +769,7 @@ begin
   -------------------------------------------------------------------
   -- sync with RAM output
   --------------------------------------------------------------------
-  assert not (c_TES_STD_STATE_RAM_B_RD_LATENCY = c_TES_PULSE_SHAPE_RAM_B_RD_LATENCY) report "[tes_pulse_shape_manager]: c_TES_STD_STATE_RD_RAM_LATENCY and c_TES_PULSE_SHAPE_RD_RAM_LATENCY must be equal. Otherwise, the user needs to update this design to equalize the output data path from each memory" severity error;
+  --assert not (c_TES_STD_STATE_RAM_B_RD_LATENCY = c_TES_PULSE_SHAPE_RAM_B_RD_LATENCY) report "[tes_pulse_shape_manager]: c_TES_STD_STATE_RD_RAM_LATENCY and c_TES_PULSE_SHAPE_RD_RAM_LATENCY must be equal. Otherwise, the user needs to update this design to equalize the output data path from each memory" severity error;
 
   data_pipe_tmp2(c_IDX4_H downto c_IDX4_L) <= pulse_heigth_rc;
   data_pipe_tmp2(c_IDX3_H)                 <= pixel_valid_rc;
@@ -796,9 +796,9 @@ begin
   ---------------------------------------------------------------------
   -- TES computation
   ---------------------------------------------------------------------
-  assert not (pulse_shape_doutb'length /= pulse_shape_tmp'length - 1) report "[tes_pulse_shape_manager]: pulse shape => register/command width and sfixed package definition width doesn't match." severity error;
-  assert not (pulse_heigth_rx'length /= pulse_heigth_tmp'length - 1) report "[tes_pulse_shape_manager]: pulse heigth => register/command width and sfixed package definition width doesn't match." severity error;
-  assert not (steady_state_doutb'length /= steady_state_tmp'length - 1) report "[tes_pulse_shape_manager]: steady state => register/command width and sfixed package definition width doesn't match." severity error;
+  --assert not (pulse_shape_doutb'length /= pulse_shape_tmp'length - 1) report "[tes_pulse_shape_manager]: pulse shape => register/command width and sfixed package definition width doesn't match." severity error;
+  --assert not (pulse_heigth_rx'length /= pulse_heigth_tmp'length - 1) report "[tes_pulse_shape_manager]: pulse heigth => register/command width and sfixed package definition width doesn't match." severity error;
+  --assert not (steady_state_doutb'length /= steady_state_tmp'length - 1) report "[tes_pulse_shape_manager]: steady state => register/command width and sfixed package definition width doesn't match." severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
   pulse_shape_tmp  <= std_logic_vector(resize(unsigned(pulse_shape_doutb), pulse_shape_tmp'length));
   pulse_heigth_tmp <= std_logic_vector(resize(unsigned(pulse_heigth_rx), pulse_heigth_tmp'length));
@@ -887,7 +887,7 @@ begin
       );
   end generate gen_errors_latch;
 
-  o_errors(15 downto 7) <= (others => '0');
+  o_errors(15 downto 6) <= (others => '0');
   o_errors(5)           <= error_tmp_bis(4); -- steady state error
   o_errors(4)           <= error_tmp_bis(3); -- pulse shape error
   o_errors(3)           <= '0';
