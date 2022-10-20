@@ -1,0 +1,177 @@
+onerror {resume}
+quietly WaveActivateNextPane {} 0
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/i_adc_clk
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/i_adc_valid
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/i_adc1
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/i_adc0
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/i_clk
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/i_rst_status
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/i_debug_pulse
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/i_en
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/i_adc1_delay
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/i_adc0_delay
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/o_adc_valid
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/o_adc1
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/o_adc0
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/o_errors
+add wave -noupdate -group adc_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_adc_top/o_status
+add wave -noupdate -expand -group tes -group tes_signalling /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/i_clk
+add wave -noupdate -expand -group tes -group tes_signalling /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/i_rst
+add wave -noupdate -expand -group tes -group tes_signalling /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/i_start
+add wave -noupdate -expand -group tes -group tes_signalling /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/i_pixel_length
+add wave -noupdate -expand -group tes -group tes_signalling /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/i_frame_length
+add wave -noupdate -expand -group tes -group tes_signalling /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/i_data_valid
+add wave -noupdate -expand -group tes -group tes_signalling /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/o_pixel_sof
+add wave -noupdate -expand -group tes -group tes_signalling /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/o_pixel_eof
+add wave -noupdate -expand -group tes -group tes_signalling -radix unsigned /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/o_pixel_id
+add wave -noupdate -expand -group tes -group tes_signalling /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/o_pixel_valid
+add wave -noupdate -expand -group tes -group tes_signalling /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/o_frame_sof
+add wave -noupdate -expand -group tes -group tes_signalling /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/o_frame_eof
+add wave -noupdate -expand -group tes -group tes_signalling -radix unsigned /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_signalling/o_frame_id
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_clk
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_rst
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_rst_status
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_debug_pulse
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_cmd_valid
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_cmd_pulse_height
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_cmd_pixel_id
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_cmd_time_shift
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_pulse_shape_wr_en
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_pulse_shape_wr_rd_addr
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_pulse_shape_wr_data
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_pulse_shape_rd_en
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/o_pulse_shape_rd_valid
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/o_pulse_shape_rd_data
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_steady_state_wr_en
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_steady_state_wr_rd_addr
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_steady_state_wr_data
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_steady_state_rd_en
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/o_steady_state_rd_valid
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/o_steady_state_rd_data
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_pixel_sof
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_pixel_eof
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_pixel_id
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/i_pixel_valid
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/o_pixel_sof
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/o_pixel_eof
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/o_pixel_id
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/o_pixel_valid
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/o_pixel_result
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/o_errors
+add wave -noupdate -expand -group tes -group tes_pulse_shape_manager /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_tes_top/inst_tes_pulse_shape_manager/o_status
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_clk
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_rst
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_start_auto_rd
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_addr_range_min
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_data_valid
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_addr
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_data
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_out_clk
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_rst_status
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_debug_pulse
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_ram_wr_en
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_ram_wr_rd_addr
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_ram_wr_data
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_ram_rd_en
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_ram_rd_valid
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_ram_rd_data
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/i_fifo_rd
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_fifo_sof
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_fifo_eof
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_fifo_data_valid
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_fifo_addr
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_fifo_data
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_fifo_empty
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_errors
+add wave -noupdate -group regdecode_tes_pulse_shape /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape/o_status
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/i_clk
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/i_rst
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/i_rst_status
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/i_debug_pulse
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/i_en
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/i_dac_delay
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/i_dac_valid
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/i_dac
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/i_dac_clk
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/o_dac_valid
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/o_dac_frame
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/o_dac
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/o_errors
+add wave -noupdate -group dac_top /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/o_status
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/i_clk
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/i_rst
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/i_rst_status
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/i_debug_pulse
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/i_dac_valid
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/i_dac_frame
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/i_dac
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/i_dac_clk
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/i_dac_rst
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/o_dac_valid
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/o_dac_frame
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/o_dac
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/o_errors
+add wave -noupdate -group dac_insert /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_dac_top/inst_dac_data_insert/o_status
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_clk
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_errors7
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_errors6
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_errors5
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_errors4
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_errors3
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_errors2
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_errors1
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_errors0
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_status7
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_status6
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_status5
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_status4
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_status3
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_status2
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_status1
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_reg_wire_status0
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_out_clk
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/i_error_sel
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/o_wire_errors_valid
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/o_wire_errors
+add wave -noupdate -group regdecode_wire_errors /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_errors/o_wire_status
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_clk
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_rst_status
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_debug_pulse
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_amp_squid_tf_wr_en
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_amp_squid_tf_wr_rd_addr
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_amp_squid_tf_wr_data
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_amp_squid_tf_rd_en
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/o_amp_squid_tf_rd_valid
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/o_amp_squid_tf_rd_data
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_fpasim_gain
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_pixel_sof
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_pixel_eof
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_pixel_valid
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_pixel_id
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_pixel_result
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/i_amp_squid_offset_correction
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/o_pixel_sof
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/o_pixel_eof
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/o_pixel_valid
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/o_pixel_id
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/o_pixel_result
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/o_errors
+add wave -noupdate -group amp_squid /tb_system_fpasim/top_fpasim_system_INST/inst_top_fpasim/inst_amp_squid_top/inst_amp_squid/o_status
+TreeUpdate [SetDefaultTree]
+WaveRestoreCursors {{Cursor 1} {386810 ps} 0}
+quietly wave cursor active 1
+configure wave -namecolwidth 227
+configure wave -valuecolwidth 100
+configure wave -justifyvalue left
+configure wave -signalnamewidth 1
+configure wave -snapdistance 10
+configure wave -datasetprefix 0
+configure wave -rowmargin 4
+configure wave -childrowmargin 2
+configure wave -gridoffset 0
+configure wave -gridperiod 1
+configure wave -griddelta 40
+configure wave -timeline 0
+configure wave -timelineunits ns
+update
+WaveRestoreZoom {362075 ps} {406394 ps}
