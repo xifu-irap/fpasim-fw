@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------------------
 #                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
 # -------------------------------------------------------------------------------------------------------------
@@ -18,65 +18,81 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   console_colors.py
+#    @file                   FilepathListBuilder.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
-#    @details                
-#    This script search files in a root directory and its sub-directory in order to build the corresponding filepath
+#    @details
+#    This script defines the FilepathListBuilder class.
+#    This class provides methods to search files in a root directory and its subdirectory
 #    The searched files are filtered by file_extension.
 # -------------------------------------------------------------------------------------------------------------
+
 import os
 from pathlib import Path
 
-class FilepathListBuilder():
-    '''
-    
-    '''
+
+class FilepathListBuilder:
+    """
+    This class provides methods to search files in directory and subdirectories
+    Note:
+        The searched files can be filtered by file extension
+        Method name starting by '_' are local to the class (ex:def _toto(...)).
+        It should not be usually used by the user
+    """
     def __init__(self):
+        """
+        This method initializes the class instance
+        """
         # default authorized file extensions
-        self.file_extension_list = ['.vhd','.v','.sv','.vh']
+        self.file_extension_list = ['.vhd', '.v', '.sv', '.vh']
         self.filepath_list = []
-    def set_file_extension(self,file_extension_list_p):
-        '''
-        This method overwrites the authorized file extension list
-        :param file_extension_list_p: (string list) list of the authorized file extension  :return:
-        '''
+
+    def set_file_extension(self, file_extension_list_p):
+        """
+        This method set the authorized file extension
+        :param file_extension_list_p: (list of string) list of the authorized file extension
+        ex: file_extension_list_p=['.vhd','.v']
+        :return: None
+        """
         self.file_extension_list = file_extension_list_p
-    def add_basepath(self,basepath_p,requirement_filename_p=''):
-        '''
+        return None
+
+    def add_basepath(self, basepath_p, requirement_filename_p=''):
+        """
         This method has 2 modes:
             . if the requirement_filename_p isn't an empty string then
-                1. searchs all requirement_filename_p files in the root directory (defined by basepath_p) and its sub-directories
+                1. search all requirement_filename_p files in the root directory (defined by basepath_p) and its subdirectories
                 2. in each requirement_filename_p files, extracts the list of filename (with extension)
                 3. build the corresponding filepaths
                 Note: in a directory, a requirement_filename_p file lists only the authorized file of this directory
             . if the requirement_filename_p is an empty string then
-                1. search all files in the root directory (defined by basepath_p) and its sub-directories
+                1. search all files in the root directory (defined by basepath_p) and its subdirectories
                 2. filter files by extensions
                 3. build the corresponding filepaths
-        :param basepath_p: (string) search path of the root directory
-        :param requirement_filename_p: (string)
-        :return:
-        '''
+        :param basepath_p: (string) search path
+        :param requirement_filename_p: (string) filename
+        :return: None
+        """
+
         file_extension_list = self.file_extension_list
         tmp_list = []
         for (root, dirs, file) in os.walk(basepath_p):
             if requirement_filename_p in file:
-            #####################################
-            # The requirement_filename exists
-            #   1. extract only filenames of this file
-            #   2. build its corresponding filepaths
-                fid = open(requirement_filename_p,'r')
+                #####################################
+                # The requirement_filename exists
+                #   1. extract only filenames of this file
+                #   2. build its corresponding filepaths
+                fid = open(requirement_filename_p, 'r')
                 filename_list = fid.readlines()
                 fid.close()
                 for f in filename_list:
-                    tmp_list.append(str(Path(root,f).resolve()))
+                    tmp_list.append(str(Path(root, f).resolve()))
 
             else:
                 #####################################
-                # The requirement_filename doesn' exist
+                # The requirement_filename doesn't exist
                 #   1. add all filenames of the directory
                 #   2. build its corresponding filepaths
                 for f in file:
@@ -85,26 +101,71 @@ class FilepathListBuilder():
                         tmp_list.append(str(Path(root,f).resolve()))
         self.filepath_list.extend(tmp_list)
 
-    def add_filepath(self,basepath_p,filename_p):
-        '''
-        This method adds an individual filepath
-        :param basepath_p:(string) base path of the file
-        :param filename_p:(string) filename
-        :return:
-        '''
-        self.filepath_list.append(str(Path(basepath_p,filename_p).resolve()))
+        return None
 
-    def add_filepath(self,filepath_p):
-        '''
+    def add_filepath(self, basepath_p, filename_p):
+        """
         This method adds an individual filepath
-        :param filepath_p:(string) filepath to add
-        :return:
-        '''
+        :param basepath_p: (string) base path of the file
+        :param filename_p: (string) filename
+        :return: None
+        """
+        self.filepath_list.append(str(Path(basepath_p, filename_p).resolve()))
+        return None
+
+    def add_filepath(self, filepath_p):
+        """
+        This method adds an individual filepath
+        :param filepath_p: (string) filepath to add
+        :return: None
+        """
         self.filepath_list.append(str(Path(filepath_p).resolve()))
+        return None
 
     def get_filepath_list(self):
-        '''
+        """
         This method returns the computed filepath list
-        :return: (string list) list of computed filepath
-        '''
-        return self.filepath_list       
+        :return: (list of string) list of filepath
+        """
+        return self.filepath_list   
+
+    def get_filepath_by_filename(self, basepath_p, filename_p):
+        """
+        This method search in the directory defined by basepath_p as well as its subdirectories a file with
+        the filename_p name
+        Note: the search stops at the first match
+        :param basepath_p: (string) define the search base path
+        :param filename_p: (string) filename to search
+        :return: (string/None)
+           If the filename_p is found then the filepath is returned. Otherwise, None
+        """
+
+        file_extension_list = self.file_extension_list
+        base_path = str(Path(basepath_p).resolve())
+
+        tmp_filepath_list = []
+        for (root, dirs, file) in os.walk(base_path):
+            #####################################
+            # The requirement_filename doesn't exist
+            #   1. add all filenames of the directory and its subdirectories
+            #   2. build its corresponding filepaths
+            for f in file:
+                extension = str(Path(f).suffix)
+                if extension in file_extension_list:
+                    tmp_filepath_list.append(str(Path(root, f).resolve()))
+
+        tmp_filepath = None
+        for filepath in tmp_filepath_list:
+            filename = Path(filepath).name
+            if filename == filename_p:
+                tmp_filepath = filepath
+                break
+
+        if tmp_filepath is None:
+            # TODO: print an error
+            pass
+        
+        return tmp_filepath
+
+
+
