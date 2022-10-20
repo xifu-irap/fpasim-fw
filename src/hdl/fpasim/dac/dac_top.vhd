@@ -110,7 +110,7 @@ begin
   -------------------------------------------------------------------
   -- cross clock domain
   -------------------------------------------------------------------
-  inst_synchronous_reset_synchronizer_rst_dac : entity work.synchronous_reset_synchronizer
+  inst_synchronous_reset_synchronizer_rst_dac : entity fpasim.synchronous_reset_synchronizer
     generic map(
       g_DEST_SYNC_FF => 2,
       g_INIT         => 1
@@ -132,7 +132,7 @@ begin
   -- apply a dynamic delay on the data path
   --   . the latency is 1 clock cycle when i_dac_delay = 0
   ---------------------------------------------------------------------
-  inst_dynamic_shift_register_dac : entity work.dynamic_shift_register
+  inst_dynamic_shift_register_dac : entity fpasim.dynamic_shift_register
     generic map(
       g_ADDR_WIDTH => i_dac_delay'length, -- width of the address. Possibles values: [2, integer max value[ 
       g_DATA_WIDTH => i_dac'length    -- width of the input/output data.  Possibles values: [1, integer max value[

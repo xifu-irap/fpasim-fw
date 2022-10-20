@@ -96,7 +96,7 @@ architecture RTL of dac_frame_generator is
 begin
 
   -- check generic range
-  assert not (g_FRAME_SIZE >= 2) report "[dac_frame_generator]: the g_FRAME_SIZE generic port value must be >= 2" severity error;
+  assert not (g_FRAME_SIZE < 2) report "[dac_frame_generator]: the g_FRAME_SIZE generic port value must be >= 2" severity error;
 
   -------------------------------------------------------------------
   -- fsm
