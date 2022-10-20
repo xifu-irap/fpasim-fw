@@ -170,7 +170,7 @@ begin
   inst_fifo_async_with_error_regdecode_to_user : entity fpasim.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
-      g_FIFO_MEMORY_TYPE  => "auto",
+      g_FIFO_MEMORY_TYPE  => "distributed",
       g_FIFO_READ_LATENCY => 1,
       g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH0,
       g_READ_DATA_WIDTH   => data_tmp0'length,
@@ -180,9 +180,7 @@ begin
       ---------------------------------------------------------------------
       -- resynchronization: fifo errors/empty flag
       ---------------------------------------------------------------------
-      g_SYNC_SIDE         => "rd",      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
-      g_DEST_SYNC_FF      => 2,         -- Number of register stages used to synchronize signal in the destination clock domain.   
-      g_SRC_INPUT_REG     => 1          -- 0- Do not register input (src_in), 1- Register input (src_in) once using src_clk 
+      g_SYNC_SIDE         => "rd"      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
     )
     port map(
       ---------------------------------------------------------------------
@@ -248,7 +246,7 @@ begin
   inst_fifo_async_with_error_user_to_regdecode : entity fpasim.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
-      g_FIFO_MEMORY_TYPE  => "auto",
+      g_FIFO_MEMORY_TYPE  => "distributed",
       g_FIFO_READ_LATENCY => 1,
       g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH2,
       g_READ_DATA_WIDTH   => data_tmp2'length,
@@ -258,9 +256,7 @@ begin
       ---------------------------------------------------------------------
       -- resynchronization: fifo errors/empty flag
       ---------------------------------------------------------------------
-      g_SYNC_SIDE         => "wr",      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
-      g_DEST_SYNC_FF      => 2,         -- Number of register stages used to synchronize signal in the destination clock domain.   
-      g_SRC_INPUT_REG     => 1          -- 0- Do not register input (src_in), 1- Register input (src_in) once using src_clk 
+      g_SYNC_SIDE         => "wr"      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
 
     )
     port map(

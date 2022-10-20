@@ -52,7 +52,7 @@ entity regdecode_pipe_wr_rd_ram_manager is
   generic(
     -- RAM
     g_RAM_NB_WORDS   : integer  := 2048; -- define the maximal number of words associated to the RAM
-    g_RAM_RD_LATENCY : integer  := 2;    -- define the read RAM latency
+    g_RAM_RD_LATENCY : integer  := 2;   -- define the read RAM latency
     -- input
     g_ADDR_WIDTH     : positive := 16;  -- define the input address bus width
     g_DATA_WIDTH     : positive := 16   -- define the input data bus width
@@ -115,32 +115,32 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   signal sm_state_next      : t_state;
 
   signal sof_next : std_logic;
-  signal sof_r1   : std_logic;
+  signal sof_r1   : std_logic := '0';
 
   signal eof_next : std_logic;
-  signal eof_r1   : std_logic;
+  signal eof_r1   : std_logic := '0';
 
   signal wr_next : std_logic;
-  signal wr_r1   : std_logic;
+  signal wr_r1   : std_logic := '0';
 
   signal data_valid_next : std_logic;
-  signal data_valid_r1   : std_logic;
+  signal data_valid_r1   : std_logic := '0';
 
   signal cnt_next : unsigned(c_RAM_ADDR_WIDTH - 1 downto 0);
-  signal cnt_r1   : unsigned(c_RAM_ADDR_WIDTH - 1 downto 0);
+  signal cnt_r1   : unsigned(c_RAM_ADDR_WIDTH - 1 downto 0) := (others => '0');
 
   signal addr_next : unsigned(i_addr'range);
-  signal addr_r1   : unsigned(i_addr'range);
+  signal addr_r1   : unsigned(i_addr'range) := (others => '0');
 
   signal error_next : std_logic;
-  signal error_r1   : std_logic;
+  signal error_r1   : std_logic := '0';
 
   -- sync with fsm out
   ---------------------------------------------------------------------
-  signal data_r1 : std_logic_vector(i_data'range);
+  signal data_r1 : std_logic_vector(i_data'range) := (others => '0');
 
   -- cross clock domain of error fifo flags : i_clk -> i_out_clk
-  signal error_sync : std_logic;
+  signal error_sync : std_logic := '0';
 
   ---------------------------------------------------------------------
   -- cross clock domain: redecode to user
@@ -188,12 +188,12 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   ---------------------------------------------------------------------
   -- compute flag
   ---------------------------------------------------------------------
-  signal sof_sync_r1  : std_logic;
-  signal eof_sync_r1  : std_logic;
-  signal wr_sync_r1   : std_logic;
-  signal rd_sync_r1   : std_logic;
-  signal addr_sync_r1 : std_logic_vector(i_addr'range);
-  signal data_sync_r1 : std_logic_vector(i_data'range);
+  signal sof_sync_r1  : std_logic                      := '0';
+  signal eof_sync_r1  : std_logic                      := '0';
+  signal wr_sync_r1   : std_logic                      := '0';
+  signal rd_sync_r1   : std_logic                      := '0';
+  signal addr_sync_r1 : std_logic_vector(i_addr'range) := (others => '0');
+  signal data_sync_r1 : std_logic_vector(i_data'range) := (others => '0');
 
   ---------------------------------------------------------------------
   -- add an optional output delay
@@ -217,7 +217,6 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   signal rd_sync_ry   : std_logic;
   signal addr_sync_ry : std_logic_vector(i_addr'range);
   signal data_sync_ry : std_logic_vector(i_data'range);
-
 
   ---------------------------------------------------------------------
   -- sync with the rd RAM output 
@@ -401,7 +400,7 @@ begin
   inst_fifo_async_with_error_regdecode_to_user : entity fpasim.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
-      g_FIFO_MEMORY_TYPE  => "auto",
+      g_FIFO_MEMORY_TYPE  => "distributed",
       g_FIFO_READ_LATENCY => 1,
       g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH0,
       g_READ_DATA_WIDTH   => data_tmp0'length,
@@ -411,10 +410,7 @@ begin
       ---------------------------------------------------------------------
       -- resynchronization: fifo errors/empty flag
       ---------------------------------------------------------------------
-
-      g_SYNC_SIDE         => "rd",      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
-      g_DEST_SYNC_FF      => 2,         -- Number of register stages used to synchronize signal in the destination clock domain.   
-      g_SRC_INPUT_REG     => 1          -- 0- Do not register input (src_in), 1- Register input (src_in) once using src_clk 
+      g_SYNC_SIDE         => "rd"       -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
     )
     port map(
       ---------------------------------------------------------------------
@@ -479,9 +475,9 @@ begin
   ---------------------------------------------------------------------
   -- to the user: add optional delay
   ---------------------------------------------------------------------
-  data_pipe_tmp2(c_IDX3_H)                      <= wr_sync_r1;
-  data_pipe_tmp2(c_IDX2_H)                      <= rd_sync_r1;
-  data_pipe_tmp2(c_IDX1_H downto c_IDX1_L)                      <= addr_sync_r1;
+  data_pipe_tmp2(c_IDX3_H)                 <= wr_sync_r1;
+  data_pipe_tmp2(c_IDX2_H)                 <= rd_sync_r1;
+  data_pipe_tmp2(c_IDX1_H downto c_IDX1_L) <= addr_sync_r1;
   data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= data_sync_r1;
 
   inst_pipeliner_add_delay_out : entity work.pipeliner
@@ -495,11 +491,10 @@ begin
       o_data => data_pipe_tmp3
     );
 
-  wr_sync_ry  <= data_pipe_tmp3(c_IDX3_H);
-  rd_sync_ry  <= data_pipe_tmp3(c_IDX2_H);
-  addr_sync_ry   <= data_pipe_tmp3(c_IDX1_H downto c_IDX1_L);
+  wr_sync_ry   <= data_pipe_tmp3(c_IDX3_H);
+  rd_sync_ry   <= data_pipe_tmp3(c_IDX2_H);
+  addr_sync_ry <= data_pipe_tmp3(c_IDX1_H downto c_IDX1_L);
   data_sync_ry <= data_pipe_tmp3(c_IDX0_H downto c_IDX0_L);
-
 
   ---------------------------------------------------------------------
   -- to the user: output
@@ -536,7 +531,7 @@ begin
   ---------------------------------------------------------------------
   -- check the path latency
   ---------------------------------------------------------------------
-  assert not (rd_sync_rx = i_ram_rd_valid) report "[regdecode_pipe_wr_rd_ram_manager]: the internal pipeliner latency is not identical to the rd RAM latency. Change the g_RD_RAM_LATENCY value." severity error;
+  --assert not (rd_sync_rx = i_ram_rd_valid) report "[regdecode_pipe_wr_rd_ram_manager]: the internal pipeliner latency is not identical to the rd RAM latency. Change the g_RD_RAM_LATENCY value." severity error;
   ---------------------------------------------------------------------
   -- cross clock domain: 
   --  from the i_out_clk clock domain to the i_clk clock domain
@@ -550,7 +545,7 @@ begin
   inst_fifo_async_with_error_prog_full_user_to_regdecode : entity fpasim.fifo_async_with_error_prog_full
     generic map(
       g_CDC_SYNC_STAGES   => 2,
-      g_FIFO_MEMORY_TYPE  => "auto",
+      g_FIFO_MEMORY_TYPE  => "distributed",
       g_FIFO_READ_LATENCY => 1,
       g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH2,
       g_PROG_FULL_THRESH  => c_FIFO_PROG_FULL2,
@@ -561,9 +556,9 @@ begin
       ---------------------------------------------------------------------
       -- resynchronization: fifo errors/empty flag
       ---------------------------------------------------------------------
-      g_SYNC_SIDE         => "wr",      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
-      g_DEST_SYNC_FF      => 2,         -- Number of register stages used to synchronize signal in the destination clock domain.   
-      g_SRC_INPUT_REG     => 1          -- 0- Do not register input (src_in), 1- Register input (src_in) once using src_clk 
+
+      g_SYNC_SIDE         => "wr"       -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
+
     )
     port map(
       ---------------------------------------------------------------------

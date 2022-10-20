@@ -391,7 +391,7 @@ begin
 
   inst_fifo_sync_with_error_prog_full_wr_count : entity fpasim.fifo_sync_with_error_prog_full_wr_count
     generic map(
-      g_FIFO_MEMORY_TYPE    => "auto",
+      g_FIFO_MEMORY_TYPE    => "distributed",
       g_FIFO_READ_LATENCY   => 1,
       g_FIFO_WRITE_DEPTH    => c_FIFO_DEPTH0,
       g_PROG_FULL_THRESH    => c_PROG_FULL_THRESH0,
@@ -487,7 +487,7 @@ begin
       );
   end generate gen_errors_latch;
 
-  o_errors(15 downto 7) <= (others => '0');
+  o_errors(15 downto 6) <= (others => '0');
   o_errors(5)           <= '0';
   o_errors(4)           <= '0';
   o_errors(3)           <= '0';
