@@ -89,13 +89,13 @@ end entity regdecode_wire_errors;
 architecture RTL of regdecode_wire_errors is
 
   constant c_NB_ERRORS : integer := 8;
-  type t_errors is array (0 to c_NB_ERRORS - 1) of std_logic_vector(i_reg_wire_errors0'range);
-  signal errors_tmp0   : t_errors;
-  signal errors_tmp1   : t_errors;
+  type t_errors is array (integer range <>) of std_logic_vector(i_reg_wire_errors0'range);
+  signal errors_tmp0   : t_errors(0 to c_NB_ERRORS - 1);
+  signal errors_tmp1   : t_errors(0 to c_NB_ERRORS - 1);
 
-  type t_status is array (0 to c_NB_ERRORS - 1) of std_logic_vector(i_reg_wire_status0'range);
-  signal status_tmp0 : t_status;
-  signal status_tmp1 : t_status;
+  type t_status is array (integer range <>) of std_logic_vector(i_reg_wire_status0'range);
+  signal status_tmp0 : t_status(0 to c_NB_ERRORS - 1);
+  signal status_tmp1 : t_status(0 to c_NB_ERRORS - 1);
 
   ---------------------------------------------------------------------
   -- select output error and 
@@ -144,50 +144,70 @@ begin
   errors_tmp0(0) <= i_reg_wire_errors0;
 
   gen_synchronisateur_error : for i in errors_tmp0'range generate
-    inst_single_bit_array_synchronizer_error : entity work.single_bit_array_synchronizer
+    signal data_r : t_errors(errors_tmp0'range)         := (others => (others => '0'));
+    signal wr_r   : std_logic_vector(errors_tmp0'range) := (others => '0');
+
+    signal wr_en_flag       : std_logic_vector(errors_tmp0'range);
+    signal wr_din_flag      : t_errors(errors_tmp0'range);
+    -- signal wr_full_flag     : std_logic_vector(errors_tmp0'range);
+    signal wr_rst_busy_flag : std_logic_vector(errors_tmp0'range);
+    signal rd_en_flag       : std_logic_vector(errors_tmp0'range);
+    signal rd_dout_flag     : t_errors(errors_tmp0'range);
+    signal rd_empty_flag    : std_logic_vector(errors_tmp0'range);
+    signal rd_rst_busy_flag : std_logic_vector(errors_tmp0'range);
+
+  begin
+
+    p_detect_change : process(i_clk) is
+    begin
+      if rising_edge(i_clk) then
+        data_r(i) <= errors_tmp0(i);
+        if data_r(i) /= errors_tmp0(i) then
+          wr_r(i) <= '1';
+        else
+          wr_r(i) <= '0';
+        end if;
+      end if;
+    end process p_detect_change;
+
+    wr_en_flag(i)  <= '1' when wr_r(i) = '1' and wr_rst_busy_flag(i) = '0' else '0';
+    wr_din_flag(i) <= data_r(i);
+
+    inst_fifo_async_flag : entity fpasim.fifo_async
       generic map(
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | DEST_SYNC_FF         | Integer            | Range: 2 - 10. Default value = 4.                                       |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | Number of register stages used to synchronize signal in the destination clock domain.                               |
-        g_DEST_SYNC_FF  => 4,
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | INIT_SYNC_FF         | Integer            | Allowed values: 0, 1. Default value = 0.                                |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | 0- Disable behavioral simulation initialization value(s) on synchronization registers.                              |
-        -- | 1- Enable behavioral simulation initialization value(s) on synchronization registers.                               |
-        -- g_INIT_SYNC_FF : integer := 4;
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | SIM_ASSERT_CHK       | Integer            | Allowed values: 0, 1. Default value = 0.                                |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | 0- Disable simulation message reporting. Messages related to potential misuse will not be reported.                 |
-        -- | 1- Enable simulation message reporting. Messages related to potential misuse will be reported.                      |
-        --g_SIM_ASSERT_CHK : integer := 0;
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | SRC_INPUT_REG        | Integer            | Allowed values: 1, 0. Default value = 1.                                |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | 0- Do not register input (src_in)                                                                                   |
-        -- | 1- Register input (src_in) once using src_clk                                                                       |
-        g_SRC_INPUT_REG => 1,
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | WIDTH                | Integer            | Range: 1 - 1024. Default value = 2.                                     |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | Width of single-bit array (src_in) that will be synchronized to destination clock domain.                           |
-        -- +-----
-        g_WIDTH         => errors_tmp0(i)'length
+        g_CDC_SYNC_STAGES   => 2,
+        g_FIFO_MEMORY_TYPE  => "distributed",
+        g_FIFO_READ_LATENCY => 1,
+        g_FIFO_WRITE_DEPTH  => 16,
+        g_READ_DATA_WIDTH   => wr_din_flag(i)'length,
+        g_READ_MODE         => "std",
+        g_RELATED_CLOCKS    => 0,
+        g_WRITE_DATA_WIDTH  => wr_din_flag(i)'length
       )
       port map(
         ---------------------------------------------------------------------
-        -- source
+        -- write side
         ---------------------------------------------------------------------
-        i_src_clk  => i_clk,            -- source clock
-        i_src      => errors_tmp0(i),   -- input signal to be synchronized to dest_clk domain
+        i_wr_clk        => i_clk,
+        i_wr_rst        => '0',
+        i_wr_en         => wr_en_flag(i),
+        i_wr_din        => wr_din_flag(i),
+        o_wr_full       => open,
+        o_wr_rst_busy   => wr_rst_busy_flag(i),
         ---------------------------------------------------------------------
-        -- destination
+        -- read side
         ---------------------------------------------------------------------
-        i_dest_clk => i_out_clk,        -- destination clock domain
-        o_dest     => errors_tmp1(i)
+        i_rd_clk        => i_out_clk,
+        i_rd_en         => rd_en_flag(i),
+        o_rd_dout_valid => open,
+        o_rd_dout       => rd_dout_flag(i),
+        o_rd_empty      => rd_empty_flag(i),
+        o_rd_rst_busy   => rd_rst_busy_flag(i)
       );
+
+    rd_en_flag(i) <= '1' when rd_empty_flag(i) = '0' and rd_rst_busy_flag(i) = '0' else '0';
+
+    errors_tmp1(i) <= rd_dout_flag(i);
 
   end generate gen_synchronisateur_error;
 
@@ -203,50 +223,71 @@ begin
   status_tmp0(0) <= i_reg_wire_status0;
 
   gen_synchronisateur_status : for i in status_tmp0'range generate
-    inst_single_bit_array_synchronizer_status : entity work.single_bit_array_synchronizer
+
+    signal data_r : t_status(status_tmp0'range)         := (others => (others => '0'));
+    signal wr_r   : std_logic_vector(status_tmp0'range) := (others => '0');
+
+    signal wr_en_flag       : std_logic_vector(status_tmp0'range);
+    signal wr_din_flag      : t_status(status_tmp0'range);
+    -- signal wr_full_flag     : std_logic_vector(status_tmp0'range);
+    signal wr_rst_busy_flag : std_logic_vector(status_tmp0'range);
+    signal rd_en_flag       : std_logic_vector(status_tmp0'range);
+    signal rd_dout_flag     : t_status(status_tmp0'range);
+    signal rd_empty_flag    : std_logic_vector(status_tmp0'range);
+    signal rd_rst_busy_flag : std_logic_vector(status_tmp0'range);
+
+  begin
+
+    p_detect_change : process(i_clk) is
+    begin
+      if rising_edge(i_clk) then
+        data_r(i) <= status_tmp0(i);
+        if data_r(i) /= status_tmp0(i) then
+          wr_r(i) <= '1';
+        else
+          wr_r(i) <= '0';
+        end if;
+      end if;
+    end process p_detect_change;
+
+    wr_en_flag(i)  <= '1' when wr_r(i) = '1' and wr_rst_busy_flag(i) = '0' else '0';
+    wr_din_flag(i) <= data_r(i);
+
+    inst_fifo_async_flag : entity fpasim.fifo_async
       generic map(
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | DEST_SYNC_FF         | Integer            | Range: 2 - 10. Default value = 4.                                       |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | Number of register stages used to synchronize signal in the destination clock domain.                               |
-        g_DEST_SYNC_FF  => 4,
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | INIT_SYNC_FF         | Integer            | Allowed values: 0, 1. Default value = 0.                                |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | 0- Disable behavioral simulation initialization value(s) on synchronization registers.                              |
-        -- | 1- Enable behavioral simulation initialization value(s) on synchronization registers.                               |
-        -- g_INIT_SYNC_FF : integer := 4;
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | SIM_ASSERT_CHK       | Integer            | Allowed values: 0, 1. Default value = 0.                                |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | 0- Disable simulation message reporting. Messages related to potential misuse will not be reported.                 |
-        -- | 1- Enable simulation message reporting. Messages related to potential misuse will be reported.                      |
-        --g_SIM_ASSERT_CHK : integer := 0;
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | SRC_INPUT_REG        | Integer            | Allowed values: 1, 0. Default value = 1.                                |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | 0- Do not register input (src_in)                                                                                   |
-        -- | 1- Register input (src_in) once using src_clk                                                                       |
-        g_SRC_INPUT_REG => 1,
-        -- +---------------------------------------------------------------------------------------------------------------------+
-        -- | WIDTH                | Integer            | Range: 1 - 1024. Default value = 2.                                     |
-        -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | Width of single-bit array (src_in) that will be synchronized to destination clock domain.                           |
-        -- +-----
-        g_WIDTH         => status_tmp0(i)'length
+        g_CDC_SYNC_STAGES   => 2,
+        g_FIFO_MEMORY_TYPE  => "distributed",
+        g_FIFO_READ_LATENCY => 1,
+        g_FIFO_WRITE_DEPTH  => 16,
+        g_READ_DATA_WIDTH   => wr_din_flag(i)'length,
+        g_READ_MODE         => "std",
+        g_RELATED_CLOCKS    => 0,
+        g_WRITE_DATA_WIDTH  => wr_din_flag(i)'length
       )
       port map(
         ---------------------------------------------------------------------
-        -- source
+        -- write side
         ---------------------------------------------------------------------
-        i_src_clk  => i_clk,            -- source clock
-        i_src      => status_tmp0(i),   -- input signal to be synchronized to dest_clk domain
+        i_wr_clk        => i_clk,
+        i_wr_rst        => '0',
+        i_wr_en         => wr_en_flag(i),
+        i_wr_din        => wr_din_flag(i),
+        o_wr_full       => open, 
+        o_wr_rst_busy   => wr_rst_busy_flag(i),
         ---------------------------------------------------------------------
-        -- destination
+        -- read side
         ---------------------------------------------------------------------
-        i_dest_clk => i_out_clk,        -- destination clock domain
-        o_dest     => status_tmp1(i)
+        i_rd_clk        => i_out_clk,
+        i_rd_en         => rd_en_flag(i),
+        o_rd_dout_valid => open,
+        o_rd_dout       => rd_dout_flag(i),
+        o_rd_empty      => rd_empty_flag(i),
+        o_rd_rst_busy   => rd_rst_busy_flag(i)
       );
+
+    rd_en_flag(i) <= '1' when rd_empty_flag(i) = '0' and rd_rst_busy_flag(i) = '0' else '0';
+
+    status_tmp1(i) <= rd_dout_flag(i);
 
   end generate gen_synchronisateur_status;
 
@@ -302,9 +343,9 @@ begin
     end if;
   end process p_detect_rising_edge_of_common_error;
 
----------------------------------------------------------------------
--- sync with the p_detect_rising_edge_of_common_error out
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
+  -- sync with the p_detect_rising_edge_of_common_error out
+  ---------------------------------------------------------------------
   data_pipe_tmp0(c_IDX1_H downto c_IDX1_L) <= status_r1;
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= errors_r1;
 
@@ -318,7 +359,7 @@ begin
       i_data => data_pipe_tmp0,         -- input data
       o_data => data_pipe_tmp1          -- output data with/without delay
     );
-    
+
   status_r5 <= data_pipe_tmp1(c_IDX1_H downto c_IDX1_L);
   errors_r5 <= data_pipe_tmp1(c_IDX0_H downto c_IDX0_L);
 
