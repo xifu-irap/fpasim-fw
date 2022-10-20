@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------------------
 #                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
 # -------------------------------------------------------------------------------------------------------------
@@ -29,24 +30,22 @@ import os
 # Enable the coloring in the console
 os.system("")
 
-class ConsoleColors(object):
-    '''
-    This class define a set of colors (class attribute) with its associated string color code
-    If used in a python print function ( at the beginning of a string message), it colors the message
-    '''
-    black = '\033[30m'
-    red = '\033[31m'
-    green = '\033[32m'
-    orange = '\033[33m'
-    blue = '\033[34m'
-    purple = '\033[35m'
-    cyan = '\033[36m'
-    lightgrey = '\033[37m'
-    darkgrey = '\033[90m'
-    lightred = '\033[91m'
-    lightgreen = '\033[92m'
-    yellow = '\033[93m'
-    lightblue = '\033[94m'
-    pink = '\033[95m'
-    lightcyan = '\033[96m'
-    reset = '\033[0m'
+
+colors = {}
+colors['black'] = '\033[30m'
+colors['red'] = '\033[31m'
+colors['green'] = '\033[32m'
+colors['orange'] = '\033[33m'
+colors['blue'] = '\033[34m'
+colors['purple'] = '\033[35m'
+colors['cyan'] = '\033[36m'
+colors['lightgrey'] = '\033[37m'
+colors['darkgrey'] = '\033[90m'
+colors['lightred'] = '\033[91m'
+colors['lightgreen'] = '\033[92m'
+colors['yellow'] = '\033[93m'
+colors['lightblue'] = '\033[94m'
+colors['pink'] = '\033[95m'
+colors['lightcyan'] = '\033[96m'
+colors['reset'] = '\033[0m'
+
