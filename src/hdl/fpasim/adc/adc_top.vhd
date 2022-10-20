@@ -109,12 +109,12 @@ architecture RTL of adc_top is
   signal wr_tmp0     : std_logic;
   signal data_tmp0   : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
   --signal full0        : std_logic;
-  --signal wr_rst_busy0 : std_logic;
+  signal wr_rst_busy0 : std_logic;
 
   signal rd1       : std_logic;
   signal data_tmp1 : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
   signal empty1    : std_logic;
-  --signal rd_rst_busy1 : std_logic;
+  signal rd_rst_busy1 : std_logic;
 
   signal data_valid_tmp1 : std_logic;
 
@@ -142,14 +142,14 @@ architecture RTL of adc_top is
 begin
 
 
-   wr_tmp0                            <= i_adc_valid;
+   wr_tmp0                            <= i_adc_valid and not(wr_rst_busy0);
   data_tmp0(c_IDX1_H downto c_IDX1_L) <= i_adc1;
   data_tmp0(c_IDX0_H downto c_IDX0_L) <= i_adc0;
   wr_rst_tmp0                         <= '0';
   inst_fifo_async_with_error : entity fpasim.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
-      g_FIFO_MEMORY_TYPE  => "auto",
+      g_FIFO_MEMORY_TYPE  => "distributed",
       g_FIFO_READ_LATENCY => c_FIFO_READ_LATENCY,
       g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH,
       g_READ_DATA_WIDTH   => data_tmp0'length,
@@ -159,10 +159,7 @@ begin
       ---------------------------------------------------------------------
       -- resynchronization: fifo errors/empty flag
       ---------------------------------------------------------------------
-      g_SYNC_SIDE         => "rd",      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
-      g_DEST_SYNC_FF      => 2,         -- Number of register stages used to synchronize signal in the destination clock domain.   
-      g_SRC_INPUT_REG     => 1          -- 0- Do not register input (src_in), 1- Register input (src_in) once using src_clk 
-
+      g_SYNC_SIDE         => "rd"      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
     )
     port map(
       ---------------------------------------------------------------------
@@ -173,7 +170,7 @@ begin
       i_wr_en         => wr_tmp0,
       i_wr_din        => data_tmp0,
       o_wr_full       => open,          -- not connected
-      o_wr_rst_busy   => open,          -- not connected
+      o_wr_rst_busy   => wr_rst_busy0, 
       ---------------------------------------------------------------------
       -- read side
       ---------------------------------------------------------------------
@@ -182,7 +179,7 @@ begin
       o_rd_dout_valid => data_valid_tmp1,
       o_rd_dout       => data_tmp1,
       o_rd_empty      => empty1,
-      o_rd_rst_busy   => open,          -- not connected
+      o_rd_rst_busy   => rd_rst_busy1,          -- not connected
       ---------------------------------------------------------------------
       -- resynchronized errors/status 
       ---------------------------------------------------------------------
@@ -190,7 +187,7 @@ begin
       o_empty_sync    => empty_sync1
     );
 
-  rd1 <= '1' when empty1 = '0' else '0';
+  rd1 <= '1' when empty1 = '0' and rd_rst_busy1 = '0' else '0';
 
   adc1_tmp1 <= data_tmp1(c_IDX1_H downto c_IDX1_L);
   adc0_tmp1 <= data_tmp1(c_IDX0_H downto c_IDX0_L);
