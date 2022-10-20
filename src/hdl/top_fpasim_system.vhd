@@ -337,7 +337,6 @@ begin
       o_dac                             => dac
     );
 
-  adc_valid                       <= '1';
   adc_amp_squid_offset_correction <= adc_a;
   adc_mux_squid_feedback          <= adc_b;
 
@@ -382,9 +381,11 @@ begin
       i_db10_n      => i_db10_n,
       i_db12_p      => i_db12_p,
       i_db12_n      => i_db12_n,
-      -- to user : adc_a
+
+
+      -- to user :
+      o_adc_valid   => adc_valid,
       o_adc_a       => adc_a,
-      -- to user : adc_b
       o_adc_b       => adc_b,
       ---------------------------------------------------------------------
       -- sync
