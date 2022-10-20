@@ -37,6 +37,10 @@
 
 /lib/common/common/__pycache__
 
+/simu/vunit/tmp_test
+/vunit_out
+/ip/opal_kelly
+
 
 /doc/**/*
 /.vscode/*
