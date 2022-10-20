@@ -516,9 +516,9 @@ entity fifo_async_with_error_prog_full is
     ---------------------------------------------------------------------
     -- resynchronization: fifo errors/empty flag
     ---------------------------------------------------------------------
-    g_SYNC_SIDE         : string  := "wr"; -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
-    g_DEST_SYNC_FF      : integer := 2; -- Number of register stages used to synchronize signal in the destination clock domain.   
-    g_SRC_INPUT_REG     : integer := 1  -- 0- Do not register input (src_in), 1- Register input (src_in) once using src_clk 
+    g_SYNC_SIDE         : string  := "wr" -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
+
+
 
   );
   port(
@@ -738,41 +738,79 @@ begin
   -- resynchronize all errors/status flag on the same clock domain: write or read
   ---------------------------------------------------------------------
   gen_sync_wr_clock_domain : if g_SYNC_SIDE = "wr" generate
-    signal data_tmp      : std_logic_vector(2 downto 0);
-    signal data_tmp_sync : std_logic_vector(2 downto 0);
+    signal data_tmp : std_logic_vector(2 downto 0);
+    signal wr_r     : std_logic                    := '0';
+    signal data_r   : std_logic_vector(2 downto 0) := (others => '0');
+
+    signal wr_en_flag       : std_logic;
+    signal wr_din_flag      : std_logic_vector(2 downto 0);
+    -- signal wr_full_flag     : std_logic;
+    signal wr_rst_busy_flag : std_logic;
+    signal rd_en_flag       : std_logic;
+    signal rd_dout_flag     : std_logic_vector(2 downto 0);
+    signal rd_empty_flag    : std_logic;
+    signal rd_rst_busy_flag : std_logic;
   begin
 
     data_tmp(2) <= rd_empty_ry;
     data_tmp(1) <= error_rd_rst_ry;
     data_tmp(0) <= error_rd_empty_ry;
 
-    gen_bit_synchronizer : for i in data_tmp'range generate
-      inst_single_bit_synchronizer : entity fpasim.single_bit_synchronizer
-        generic map(
-          g_DEST_SYNC_FF  => g_DEST_SYNC_FF,
-          g_SRC_INPUT_REG => g_SRC_INPUT_REG
-        )
-        port map(
-          ---------------------------------------------------------------------
-          -- source
-          ---------------------------------------------------------------------
-          i_src_clk  => i_rd_clk,       -- source clock
-          i_src      => data_tmp(i),    -- input signal to be synchronized to dest_clk domain
-          ---------------------------------------------------------------------
-          -- destination
-          ---------------------------------------------------------------------
-          i_dest_clk => i_wr_clk,       -- destination clock domain
-          o_dest     => data_tmp_sync(i) -- src_in synchronized to the destination clock domain. This output is registered.   
-        );
+    p_detect_change : process(i_rd_clk) is
+    begin
+      if rising_edge(i_rd_clk) then
+        data_r <= data_tmp;
+        if data_r /= data_tmp then
+          wr_r <= '1';
+        else
+          wr_r <= '0';
+        end if;
+      end if;
+    end process p_detect_change;
 
-    end generate gen_bit_synchronizer;
+    wr_en_flag  <= '1' when wr_r = '1' and wr_rst_busy_flag = '0' else '0';
+    wr_din_flag <= data_r;
+
+    inst_fifo_async_flag : entity fpasim.fifo_async
+      generic map(
+        g_CDC_SYNC_STAGES   => g_CDC_SYNC_STAGES,
+        g_FIFO_MEMORY_TYPE  => "distributed",
+        g_FIFO_READ_LATENCY => 1,
+        g_FIFO_WRITE_DEPTH  => 16,
+        g_READ_DATA_WIDTH   => wr_din_flag'length,
+        g_READ_MODE         => "std",
+        g_RELATED_CLOCKS    => 0,
+        g_WRITE_DATA_WIDTH  => wr_din_flag'length
+      )
+      port map(
+        ---------------------------------------------------------------------
+        -- write side
+        ---------------------------------------------------------------------
+        i_wr_clk        => i_rd_clk,
+        i_wr_rst        => '0',
+        i_wr_en         => wr_en_flag,
+        i_wr_din        => wr_din_flag,
+        o_wr_full       => open,
+        o_wr_rst_busy   => wr_rst_busy_flag,
+        ---------------------------------------------------------------------
+        -- read side
+        ---------------------------------------------------------------------
+        i_rd_clk        => i_wr_clk,
+        i_rd_en         => rd_en_flag,
+        o_rd_dout_valid => open,
+        o_rd_dout       => rd_dout_flag,
+        o_rd_empty      => rd_empty_flag,
+        o_rd_rst_busy   => rd_rst_busy_flag
+      );
+
+    rd_en_flag <= '1' when rd_empty_flag = '0' and rd_rst_busy_flag = '0' else '0';
 
     error_wr_rst_sync   <= error_wr_rst_ry;
     error_wr_full_sync  <= error_wr_full_ry;
     -- resync
-    error_rd_rst_sync   <= data_tmp_sync(1);
-    error_rd_empty_sync <= data_tmp_sync(0);
-    rd_empty_sync       <= data_tmp_sync(2);
+    error_rd_rst_sync   <= rd_dout_flag(1);
+    error_rd_empty_sync <= rd_dout_flag(0);
+    rd_empty_sync       <= rd_dout_flag(2);
 
     ---------------------------------------------------------------------
     -- add output delay
@@ -814,37 +852,76 @@ begin
   end generate gen_sync_wr_clock_domain;
 
   gen_sync_rd_clock_domain : if g_SYNC_SIDE = "rd" generate
-    signal data_tmp      : std_logic_vector(1 downto 0);
-    signal data_tmp_sync : std_logic_vector(1 downto 0);
+    signal data_tmp : std_logic_vector(1 downto 0);
+
+    signal wr_r   : std_logic                    := '0';
+    signal data_r : std_logic_vector(1 downto 0) := (others => '0');
+
+    signal wr_en_flag       : std_logic;
+    signal wr_din_flag      : std_logic_vector(1 downto 0);
+    -- signal wr_full_flag     : std_logic;
+    signal wr_rst_busy_flag : std_logic;
+    signal rd_en_flag       : std_logic;
+    signal rd_dout_flag     : std_logic_vector(1 downto 0);
+    signal rd_empty_flag    : std_logic;
+    signal rd_rst_busy_flag : std_logic;
 
   begin
 
     data_tmp(1) <= error_wr_rst_ry;
     data_tmp(0) <= error_wr_full_ry;
 
-    gen_bit_synchronizer : for i in data_tmp'range generate
-      inst_single_bit_synchronizer : entity fpasim.single_bit_synchronizer
-        generic map(
-          g_DEST_SYNC_FF  => g_DEST_SYNC_FF,
-          g_SRC_INPUT_REG => g_SRC_INPUT_REG
-        )
-        port map(
-          ---------------------------------------------------------------------
-          -- source
-          ---------------------------------------------------------------------
-          i_src_clk  => i_wr_clk,       -- source clock
-          i_src      => data_tmp(i),    -- input signal to be synchronized to dest_clk domain
-          ---------------------------------------------------------------------
-          -- destination
-          ---------------------------------------------------------------------
-          i_dest_clk => i_rd_clk,       -- destination clock domain
-          o_dest     => data_tmp_sync(i) -- src_in synchronized to the destination clock domain. This output is registered.   
-        );
+    p_detect_change : process(i_wr_clk) is
+    begin
+      if rising_edge(i_wr_clk) then
+        data_r <= data_tmp;
+        if data_r /= data_tmp then
+          wr_r <= '1';
+        else
+          wr_r <= '0';
+        end if;
+      end if;
+    end process p_detect_change;
 
-    end generate gen_bit_synchronizer;
+    wr_en_flag  <= '1' when wr_r = '1' and wr_rst_busy_flag = '0' else '0';
+    wr_din_flag <= data_r;
 
-    error_wr_rst_sync  <= data_tmp_sync(1);
-    error_wr_full_sync <= data_tmp_sync(0);
+    inst_fifo_async_flag : entity fpasim.fifo_async
+      generic map(
+        g_CDC_SYNC_STAGES   => g_CDC_SYNC_STAGES,
+        g_FIFO_MEMORY_TYPE  => "distributed",
+        g_FIFO_READ_LATENCY => 1,
+        g_FIFO_WRITE_DEPTH  => 16,
+        g_READ_DATA_WIDTH   => wr_din_flag'length,
+        g_READ_MODE         => "std",
+        g_RELATED_CLOCKS    => 0,
+        g_WRITE_DATA_WIDTH  => wr_din_flag'length
+      )
+      port map(
+        ---------------------------------------------------------------------
+        -- write side
+        ---------------------------------------------------------------------
+        i_wr_clk        => i_wr_clk,
+        i_wr_rst        => '0',
+        i_wr_en         => wr_en_flag,
+        i_wr_din        => wr_din_flag,
+        o_wr_full       => open,
+        o_wr_rst_busy   => wr_rst_busy_flag,
+        ---------------------------------------------------------------------
+        -- read side
+        ---------------------------------------------------------------------
+        i_rd_clk        => i_rd_clk,
+        i_rd_en         => rd_en_flag,
+        o_rd_dout_valid => open,
+        o_rd_dout       => rd_dout_flag,
+        o_rd_empty      => rd_empty_flag,
+        o_rd_rst_busy   => rd_rst_busy_flag
+      );
+
+    rd_en_flag <= '1' when rd_empty_flag = '0' and rd_rst_busy_flag = '0' else '0';
+
+    error_wr_rst_sync  <= rd_dout_flag(1);
+    error_wr_full_sync <= rd_dout_flag(0);
 
     error_rd_rst_sync   <= error_rd_rst_ry;
     error_rd_empty_sync <= error_rd_empty_ry;
