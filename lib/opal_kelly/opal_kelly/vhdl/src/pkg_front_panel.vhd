@@ -37,8 +37,8 @@ use IEEE.std_logic_textio.all;
 
 use std.textio.all;
 
-library opal_kelly_lib;
-use opal_kelly_lib.parameters.all;
+library fpasim;
+use fpasim.parameters.all;
 
 package pkg_front_panel is
 
