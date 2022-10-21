@@ -31,6 +31,7 @@
 
 import os
 from pathlib import Path
+from common.display import *
 
 
 class FilepathListBuilder:
@@ -48,6 +49,32 @@ class FilepathListBuilder:
         # default authorized file extensions
         self.file_extension_list = ['.vhd', '.v', '.sv', '.vh']
         self.filepath_list = []
+        # display object
+        self.obj_display = Display()
+        # set indentation level (integer >=0)
+        self.level = 0
+
+    def set_indentation_level(self, level_p):
+        """
+        This method set the indentation level of the print message
+        :param level_p: (integer >= 0) define the level of indentation of the message to print
+        :return: None
+        """
+        self.level = level_p
+        return None
+
+    def _get_indentation_level(self, level_p):
+        """
+        This method select the indentation level to use.
+        If level_p is None, the class attribute is used. Otherwise, the level_p method argument is used
+        :param level_p: (integer >= 0) define the level of indentation of the message to print
+        :return: (integer >=0) level of indentation of the message to print
+        """
+        level = level_p
+        if level is None:
+            return self.level
+        else:
+            return level
 
     def set_file_extension(self, file_extension_list_p):
         """
@@ -129,7 +156,7 @@ class FilepathListBuilder:
         """
         return self.filepath_list   
 
-    def get_filepath_by_filename(self, basepath_p, filename_p):
+    def get_filepath_by_filename(self, basepath_p, filename_p, level_p=None):
         """
         This method search in the directory defined by basepath_p as well as its subdirectories a file with
         the filename_p name
@@ -141,6 +168,10 @@ class FilepathListBuilder:
         """
 
         file_extension_list = self.file_extension_list
+        obj_display         = self.obj_display
+        file_extension_list = self.file_extension_list
+        level0 = self._get_indentation_level(level_p=level_p)
+
         base_path = str(Path(basepath_p).resolve())
 
         tmp_filepath_list = []
@@ -162,7 +193,12 @@ class FilepathListBuilder:
                 break
 
         if tmp_filepath is None:
-            # TODO: print an error
+            str0 = "ERROR: FilepathListBuilder.get_filepath_by_filename:"
+            str1 = "  searched file_extension_list_p="+' '.join(file_extension_list)
+            str2 = "  the filename_p=" + filename_p + " is not found in the director/subdirectories of " + basepath_p
+            obj_display.display(msg_p=str0,color_p='red',level_p=level0)
+            obj_display.display(msg_p=str1,color_p='red',level_p=level0)
+            obj_display.display(msg_p=str2,color_p='red',level_p=level0)
             pass
         
         return tmp_filepath
