@@ -254,6 +254,7 @@ class DUT:
         self.tb_filename = ""
         self.vunit_outpath = ""
         self.wave_filename = ""
+        self.script_filename = ""
         self.obj_display = Display()
 
     def add_description(self, text_p):
@@ -292,6 +293,16 @@ class DUT:
         :return: None
         """
         self.tb_filename = filename_p
+        return None
+
+    def set_script(self, filename_p):
+        """
+        This method set a python script filename (with extension)
+        Example: tb_XXX.py
+        :param filename_p: (string) python script filename
+        :return: None
+        """
+        self.script_filename = filename_p
         return None
 
     def set_vunit_run_filepath(self, filepath_p, level_p=0):
@@ -355,6 +366,7 @@ class DUT:
         dic_vunit["run_filepath"] = self.run_filepath
         dic_vunit["vunit_outpath"] = self.vunit_outpath
         dic_vunit["wave_filename"] = self.wave_filename
+        dic_vunit["script_filename"] = self.script_filename
 
         dic = {}
         dic["description"] = self.description_list
