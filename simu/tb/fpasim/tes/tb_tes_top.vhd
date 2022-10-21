@@ -26,12 +26,13 @@
 --
 -- -------------------------------------------------------------------------------------------------------------
 
-library IEEE;
-use IEEE.std_logic_1164.all;
-use IEEE.std_logic_textio.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+--use IEEE.std_logic_textio.all;
 
-library std;  -- @suppress "Superfluous library clause: access to library 'std' is implicit"
-use std.textio.all;
+--library std;  -- @suppress "Superfluous library clause: access to library 'std' is implicit"
+--use std.textio.all;
 
 library fpasim;
 use fpasim.pkg_fpasim.all;
@@ -42,12 +43,17 @@ use opal_kelly_lib.pkg_front_panel;
 library vunit_lib;
 context vunit_lib.vunit_context;
 
+library csv_lib;
+use csv_lib.pkg_csv_file;
+
+library utility_lib;
+context utility_lib.utility_context;
+
 entity tb_tes_top is
   generic(
 
     runner_cfg : string := runner_cfg_default;  -- don't touch
-    input_basepath_g  : string := "C:/Project/fpasim-fw-hardware/Inputs/";
-    output_basepath_g : string := "C:/Project/fpasim-fw-hardware/Outputs/";
+    output_path: string:= "C:/Project/fpasim-fw-hardware/";
     ---------------------------------------------------------------------
     -- User generic
     ---------------------------------------------------------------------
@@ -65,14 +71,17 @@ entity tb_tes_top is
     ---------------------------------------------------------------------
     -- simulation parameter
     ---------------------------------------------------------------------
-    VUNIT_DEBUG_g  : boolean := true;
-    TEST_NAME_g    : string  := "";
-    ENABLE_CHECK_g : boolean := true;
-    ENABLE_LOG_g   : boolean := true
+    g_VUNIT_DEBUG  : boolean := true;
+    g_TEST_NAME    : string  := "";
+    g_ENABLE_CHECK : boolean := true;
+    g_ENABLE_LOG   : boolean := true
     );
 end tb_tes_top;
 
 architecture simulate of tb_tes_top is
+
+   constant c_INPUT_BASEPATH : string := output_path&"inputs/";
+   constant c_OUTPUT_BASEPATH : string := output_path&"outputs/";
 
   ---------------------------------------------------------------------
   -- module input signals
@@ -136,37 +145,74 @@ architecture simulate of tb_tes_top is
   ---------------------------------------------------------------------
   constant c_CLK_PERIOD0    : time := 4 ns;
 
+   ---------------------------------------------------------------------
+  -- Generate reading sequence
+  ---------------------------------------------------------------------
+  -- Cmd
+  signal reg_rd_valid       : std_logic := '0';
+  signal i_reg_start_data : std_logic := '0';
+  signal reg_gen_finish     : std_logic := '0';
+  signal reg_data_valid     : std_logic;
+
+  -- Cmd
+  signal cmd_rd_valid       : std_logic := '0';
+  signal cmd_start_data_inp : std_logic := '0';
+  signal cmd_gen_finish     : std_logic := '0';
+  signal cmd_data_valid     : std_logic;
+
+
+  -- ADC
+  signal data_rd_valid          : std_logic := '0';
+  signal data_start_inp         : std_logic := '0';
+  signal data_gen_finish        : std_logic := '0';
+  signal data_count_in          : std_logic_vector(31 downto 0);
+  signal data_count_overflow_in : std_logic;
+
+  -- check
+  signal data_count_out          : std_logic_vector(31 downto 0);
+  signal data_count_overflow_out : std_logic;
+  signal data_error_out          : std_logic_vector(1 downto 0);
+
+
   ---------------------------------------------------------------------
   -- filepath definition
   ---------------------------------------------------------------------
---  constant c_CSV_SEPARATOR             : character := ';';
---  constant c_PY_FILENAME_SUFFIX        : string    := "py_";
---  constant c_MATLAB_FILENAME_SUFFIX    : string    := "matlab_";
---  constant c_MATLAB_PY_FILENAME_SUFFIX : string    := "matlab_py_";
---  constant c_VHDL_FILENAME_SUFFIX      : string    := "vhdl_";
+  constant c_CSV_SEPARATOR             : character := ';';
+  constant c_PY_FILENAME_SUFFIX        : string    := "py_";
+  constant c_MATLAB_FILENAME_SUFFIX    : string    := "matlab_";
+  constant c_MATLAB_PY_FILENAME_SUFFIX : string    := "matlab_py_";
+  constant c_VHDL_FILENAME_SUFFIX      : string    := "vhdl_";
 
 
---  -- input register generation
---  constant c_FILENAME_VALID_REG_IN : string := TEST_NAME_g & c_PY_FILENAME_SUFFIX & "valid_sequencer_reg_in.csv";
---  constant c_FILEPATH_VALID_REG_IN : string := input_basepath_g & c_FILENAME_VALID_REG_IN;
+  -- input register generation
+  constant c_FILENAME_VALID_REG_IN : string := c_PY_FILENAME_SUFFIX & "valid_sequencer_reg_in.csv";
+  constant c_FILEPATH_VALID_REG_IN : string := c_INPUT_BASEPATH & c_FILENAME_VALID_REG_IN;
 
---  constant c_FILENAME_REG_IN : string := TEST_NAME_g & c_PY_FILENAME_SUFFIX & "register_sequence_in.csv";
---  constant c_FILEPATH_REG_IN : string := input_basepath_g & c_FILENAME_REG_IN;
+  constant c_FILENAME_REG_IN : string := c_PY_FILENAME_SUFFIX & "register_sequence_in.csv";
+  constant c_FILEPATH_REG_IN : string := c_INPUT_BASEPATH & c_FILENAME_REG_IN;
+
+  -- input cmd generation
+  constant c_FILENAME_VALID_CMD_IN : string := c_PY_FILENAME_SUFFIX & "valid_sequencer_reg_in.csv";
+  constant c_FILEPATH_VALID_CMD_IN : string := c_INPUT_BASEPATH & c_FILENAME_VALID_CMD_IN;
+
+  constant c_FILENAME_CMD_IN : string := c_PY_FILENAME_SUFFIX & "register_sequence_in.csv";
+  constant c_FILEPATH_CMD_IN : string := c_INPUT_BASEPATH & c_FILENAME_CMD_IN;
+
 
 ---- input data generation
---  constant c_FILENAME_VALID_DATA_IN : string := TEST_NAME_g & c_PY_FILENAME_SUFFIX & "valid_sequencer_data_in.csv";
---  constant c_FILEPATH_VALID_DATA_IN : string := input_basepath_g & c_FILENAME_VALID_DATA_IN;
+--  constant c_FILENAME_VALID_DATA_IN : string := c_PY_FILENAME_SUFFIX & "valid_sequencer_data_in.csv";
+--  constant c_FILEPATH_VALID_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_VALID_DATA_IN;
 
---  constant c_FILENAME_DATA_IN : string := TEST_NAME_g & c_MATLAB_FILENAME_SUFFIX & "data_in.csv";
---  constant c_FILEPATH_DATA_IN : string := input_basepath_g & c_FILENAME_DATA_IN;
+--  constant c_FILENAME_DATA_IN : string := c_MATLAB_FILENAME_SUFFIX & "data_in.csv";
+--  constant c_FILEPATH_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_IN;
 
 --  -- output data log
---  constant c_FILENAME_DATA_OUT : string := TEST_NAME_g & c_VHDL_FILENAME_SUFFIX & "data_out.csv";
---  constant c_FILEPATH_DATA_OUT : string := output_basepath_g & c_FILENAME_DATA_OUT;
+--  constant c_FILENAME_DATA_OUT : string := c_VHDL_FILENAME_SUFFIX & "data_out.csv";
+--  constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT;
 
 --  -- check output data
---  constant c_FILENAME_DATA_OUT_REF : string := TEST_NAME_g & c_MATLAB_FILENAME_SUFFIX & "data_out_ref.csv";
---  constant c_FILEPATH_DATA_OUT_REF : string := input_basepath_g & c_FILENAME_DATA_OUT_REF;
+--  constant c_FILENAME_DATA_OUT_REF : string := c_MATLAB_FILENAME_SUFFIX & "data_out_ref.csv";
+--  constant c_FILEPATH_DATA_OUT_REF : string := c_INPUT_BASEPATH & c_FILENAME_DATA_OUT_REF;
 
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
@@ -194,24 +240,228 @@ begin
     wait for c_CLK_PERIOD0/2;
   end process p_i_clk_gen;
 
-  -- Simulation Process
-  sim_process : process is
+  ---------------------------------------------------------------------
+  -- master fsm
+  ---------------------------------------------------------------------
+  p_master_fsm : process is
+
+  variable val_v : integer := 0;
 
   begin
     if runner_cfg'length > 0 then
       test_runner_setup(runner, runner_cfg);
     end if;
-    wait for 1 ns;
+
+    ---------------------------------------------------------------------
+    -- VUNIT - Scoreboard object : Visibility definition
+    ---------------------------------------------------------------------
+    if g_VUNIT_DEBUG = true then
+      -- the simulator doesn't stop on errors
+      set_stop_level(failure);
+    end if;
+    --show(get_logger("check:data_I"), display_handler, pass); 
+    --show(get_logger("check:data_Q"), display_handler, pass); 
+    show(get_logger("check:errors"), display_handler, pass);
+    show(get_logger("log:sim"), display_handler, pass);
+    show(get_logger("check"), display_handler, pass);
+    wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    info("c_INPUT_BASEPATH = "&c_INPUT_BASEPATH);
+    info("c_OUTPUT_BASEPATH = "&c_OUTPUT_BASEPATH);
+    info("c_FILEPATH_VALID_REG_IN = "&c_FILEPATH_VALID_REG_IN);
+    info("g_TEST_NAME = "&g_TEST_NAME);
+    info("output_path = "&output_path);
+    
+    ---------------------------------------------------------------------
+    -- initial reset
+    ---------------------------------------------------------------------
+    info("Enable the reset");
+    i_rst <= '1';
+    i_rst_status <= '1';
+    i_debug_pulse <= '0';
+    wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    info("Disable the reset");
+    i_rst <= '0';
+    i_rst_status <= '0';
+    i_debug_pulse <= '0';
+    wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    ---------------------------------------------------------------------
+    -- generate register values
+    ---------------------------------------------------------------------
+    info("Start Register configuration");
+    i_reg_start_data <= '1';
+    -- wait until all data from the input file are read
+    --wait until reg_gen_finish = '1';
+    -- set timeout for the vunit.watchdog
+    --set_timeout(runner, 2 ms);
+
+    ---------------------------------------------------------------------
+    -- generate commands
+    ---------------------------------------------------------------------
+    info("Start command configuration");
+    cmd_start_data_inp <= '1';
+    -- wait until all data from the input file are read
+    --wait until cmd_gen_finish = '1';
 
 
 
-    wait for 10 us;
+    ---------------------------------------------------------------------
+    -- Ending the simulation
+    ---------------------------------------------------------------------
+    -- to allow some time for completion
+    info("Wait end of simulation");
+    wait for 4096*c_CLK_PERIOD0;      
+    wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    ---------------------------------------------------------------------
+    -- VUNIT - checking errors and summary
+    ---------------------------------------------------------------------
+    -- errors checking
+    info("Check results:");
+    val_v := to_integer(unsigned(o_errors));
+    check_equal(CHECKER_ERRORS_c, 0, val_v, result("checker output errors"));
+
+    -- summary
+    info(LOGGER_SUMMARY_c, "===Summary==="
+         & LF & "CHECKER_DATA_I_c: " & to_string(get_checker_stat(CHECKER_DATA_I_c))
+         & LF & "CHECKER_DATA_Q_c: " & to_string(get_checker_stat(CHECKER_DATA_Q_c))
+         & LF & "CHECKER_ERRORS_c: " & to_string(get_checker_stat(CHECKER_ERRORS_c))
+         --& LF & "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(CHECKER_DATA_COUNT_c))
+         );
+
+    wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
     if runner_cfg'length > 0 then
       test_runner_cleanup(runner);      -- Simulation ends here
     else
       std.env.stop;
     end if;
   end process;
+
+--test_runner_watchdog(runner, 10 ms);
+---------------------------------------------------------------------
+-- register input - valid sequence
+---------------------------------------------------------------------
+--  reg_valid_sequence : valid_sequencer(
+--    i_clk => i_clk,
+--    i_en  => i_reg_start_data,
+
+--    ---------------------------------------------------------------------
+--    -- input file
+--    ---------------------------------------------------------------------
+--    i_filepath      => c_FILEPATH_VALID_REG_IN,
+--    i_csv_separator => c_CSV_SEPARATOR,
+
+--    ---------------------------------------------------------------------
+--    -- command
+--    ---------------------------------------------------------------------
+--    o_valid => reg_rd_valid
+--    );
+
+
+-----------------------------------------------------------------------
+---- register input - data generation
+-----------------------------------------------------------------------
+--  gen_reg : if true generate
+--    signal sig_vect : std_logic_vector(0 downto 0);
+--  begin
+--    inst_reg_data_generator : data_generator3(
+--      i_clk   => i_clk,
+--      i_start => i_reg_start_data,
+
+--      ---------------------------------------------------------------------
+--      -- input file
+--      ---------------------------------------------------------------------
+--      i_filepath         => c_FILEPATH_REG_IN,
+--      i_csv_separator    => c_CSV_SEPARATOR,
+--      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
+--      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
+--      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
+--      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
+--      i_DATA0_COMMON_TYP => "UINT",
+--      i_DATA1_COMMON_TYP => "UINT",
+--      i_DATA2_COMMON_TYP => "UINT",
+
+--      ---------------------------------------------------------------------
+--      -- command
+--      ---------------------------------------------------------------------
+--      i_ready           => reg_rd_valid,
+--      o_data_valid     => reg_data_valid,  -- not connected
+--      o_data0_std_vect => sig_vect,
+--      o_data1_std_vect => i_pixel_length,
+--      o_data2_std_vect => i_frame_length,
+
+--      ---------------------------------------------------------------------
+--      -- status
+--      ---------------------------------------------------------------------
+--      o_finish => reg_gen_finish
+--      );
+--    i_en <= sig_vect(0);
+--  end generate gen_reg;
+
+
+-----------------------------------------------------------------------
+---- cmd input - valid sequence
+-----------------------------------------------------------------------
+--  cmd_valid_sequence : valid_sequencer(
+--    i_clk => i_clk,
+--    i_en  => cmd_start_data_inp,
+
+--    ---------------------------------------------------------------------
+--    -- input file
+--    ---------------------------------------------------------------------
+--    i_filepath      => c_FILEPATH_VALID_CMD_IN,
+--    i_csv_separator => c_CSV_SEPARATOR,
+
+--    ---------------------------------------------------------------------
+--    -- command
+--    ---------------------------------------------------------------------
+--    o_valid => cmd_rd_valid
+--    );
+
+
+-----------------------------------------------------------------------
+---- cmd input - data generation
+-----------------------------------------------------------------------
+--  gen_cmd : if true generate
+    
+--  begin
+--    inst_cmd_data_generator : data_generator3(
+--      i_clk   => i_clk,
+--      i_start => cmd_start_data_inp,
+
+--      ---------------------------------------------------------------------
+--      -- input file
+--      ---------------------------------------------------------------------
+--      i_filepath         => c_FILEPATH_CMD_IN,
+--      i_csv_separator    => c_CSV_SEPARATOR,
+--      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
+--      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
+--      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
+--      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
+--      i_DATA0_COMMON_TYP => "UINT",
+--      i_DATA1_COMMON_TYP => "UINT",
+--      i_DATA2_COMMON_TYP => "UINT",
+
+--      ---------------------------------------------------------------------
+--      -- command
+--      ---------------------------------------------------------------------
+--      i_ready           => cmd_rd_valid,
+--      o_data_valid     => i_cmd_valid, 
+--      o_data0_std_vect => i_cmd_pulse_height,
+--      o_data1_std_vect => i_cmd_pixel_id,
+--      o_data2_std_vect => i_cmd_time_shift,
+
+--      ---------------------------------------------------------------------
+--      -- status
+--      ---------------------------------------------------------------------
+--      o_finish => cmd_gen_finish
+--      );
+
+--  end generate gen_cmd;
+
 
 ---------------------------------------------------------------------
 -- DUT
