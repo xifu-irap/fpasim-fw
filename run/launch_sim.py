@@ -165,13 +165,14 @@ if __name__ == '__main__':
             tb_filename = str(Path(dic['vunit']['tb_filename']))
             wave_filename = str(Path(dic['vunit']['wave_filename']))
             conf_filename_list = dic['conf']['filename_list']
+            name = dic['name']
+
+            json_key_path = test_name + '/' + name
 
             msg_list = []
             msg_list.append('vunit_file_path: ' + vunit_file_path)
             msg_list.append('output_path    : ' + output_path)
             msg_list.append('report_path    : ' + report_path)
-            msg_list.append('tb_filename    : ' + tb_filename)
-            msg_list.append('wave_filename  : ' + wave_filename)
 
             for msg in msg_list:
                 obj_display.display(msg_p=msg, level_p=level2, color_p='green')
@@ -197,20 +198,8 @@ if __name__ == '__main__':
             cmd.append('--display')
             cmd.append(display)
 
-            # specify the testbench name
-            cmd.append('--tb_filename')
-            cmd.append(tb_filename)
-            # specify the waveform name
-            cmd.append('--wave_filename')
-            cmd.append(wave_filename)
-
-            # If the conf_filename_list has values
-            #   => generate the command line
-            if conf_filename_list != []:
-                str0 = ' '.join(conf_filename_list)
-                cmd.append('--conf_filename_list')
-                cmd.append(str0)
-
+            cmd.append('--json_key_path')
+            cmd.append(json_key_path)
 
             cmd.append('-o')
             cmd.append(output_path)
