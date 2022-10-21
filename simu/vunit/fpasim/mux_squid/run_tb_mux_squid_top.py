@@ -17,7 +17,7 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   run_tb_system_fpasim.py
+#    @file                   run_tb_mux_squid_top.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    
@@ -104,7 +104,6 @@ json_filepath = str(Path(root_path,'./launch_sim_processed.json').resolve())
 path_list = get_python_library_from_json_file(filepath_p=json_filepath)
 if path_list != None:
     for path in path_list:
-        print(path)
         sys.path.append(path)
 
 
@@ -119,27 +118,26 @@ if __name__ == '__main__':
     # Add custom command line argument to standard CLI
     # Beware of conflicts with existing arguments
     cli = VUnitCLI()
+
     help0 = 'Specify the VHDL simulator to use (mixed language (vhdl, verilog,system verilog) + VHDL 2008 compatible).'
     cli.parser.add_argument('--simulator','-s', default='questa',help=help0)
+
     help0 = 'Specify if the simulator is in gui mode or not.'
     cli.parser.add_argument('--display', default='False',choices = ['True','False'], help=help0)
+
     help0 = 'Specify the verbosity level. Possible values (uint): 0 to 2'
     cli.parser.add_argument('--verbosity', default=0,choices = [0,1,2], type = int, help=help0)
-    help0 = 'Specify the filename of the simulator waveform'
-    cli.parser.add_argument('--wave_filename', default='wave_tb_system_fpasim.do', help=help0)
-    help0 = 'Specify the testbench filename'
-    cli.parser.add_argument('--tb_filename', default='tb_system_fpasim.vhd', help=help0)
-    help0 = 'Specify a string of conf_filename separated by space character'
-    cli.parser.add_argument('--conf_filename_list', default=[], nargs='*',help=help0)
+
+    help0 = 'Specify the json key path'
+    cli.parser.add_argument('--json_key_path', default='test0_tb_tes_top/tb_tes_top',help=help0)
+
     args = cli.parse_args()
 
     # retrieve the command line arguments
     simulator     = args.simulator
     display       = args.display
     verbosity     = args.verbosity
-    wave_filename = args.wave_filename
-    tb_filename   = args.tb_filename
-    conf_filename_list   = args.conf_filename_list
+    json_key_path   = args.json_key_path
 
 
     ###########################################################
@@ -163,26 +161,17 @@ if __name__ == '__main__':
     msg0 = 'Start Python Script: '+__file__
     obj_display.display_title(msg_p=msg0,level_p=0)
 
-
-    #####################################################
-    # testbench name
-    # set "testbench entity name" = "filename" (without extension)
-    #####################################################
-    tb_name = str(Path(tb_filename).stem)
-
-   
-
     #####################################################
     # Order matter:
-    # some environment variable need to be set before
-    # creating the VUNIT instance
+    # Some Vunit environment variables need to be set before
+    # creating the VUNIT class instance
     # So, the following steps need to be followed:
-    #  1. Create the VunitConf instance
+    #  1. Create the VunitConf class instance
     #  2. Call the VunitConf.set_vunit_simulator instance method
-    #  3. create the VUNIT instance
+    #  3. create the VUNIT class instance
     #  4. call the VunitConf.set_vunit instance method
     #####################################################
-    obj = VunitConf( json_filepath_p =json_filepath,script_name_p = script_name)
+    obj = VunitConf( json_filepath_p =json_filepath,script_name_p = script_name, json_key_path_p = json_key_path)
     obj.set_vunit_simulator(name_p = simulator,level_p=level1)
 
     VU = VUnit.from_args(args=args)
@@ -226,53 +215,63 @@ if __name__ == '__main__':
     #####################################################
     # add testbench file
     #####################################################
-    obj.compile_tb(filename_p=tb_filename,tb_name_p=tb_name,level_p=level1)
+    obj.compile_tb(level_p=level1)
 
-    ####################################
+    #####################################################
     # simulator configuration
-    ####################################
+    #####################################################
     # Set the simulator options
-    obj.set_waveform(filename_p=wave_filename,level_p=level1)
+    obj.set_waveform(level_p=level1)
 
-    VU.set_sim_option("modelsim.vsim_flags", ["-stats=-cmd,-time",'-t','ps','-voptargs=+acc','fpasim.glbl','-title',__file__.replace('\\','/')])
+    #####################################################
+    # Set the simulation options
+    #####################################################
+    VU.set_sim_option("modelsim.vsim_flags", ["-stats=-cmd,-time",'-c','-t','ps','-voptargs=+acc','-title',__file__.replace('\\','/')])
 
-    #####################################
-    # Testbench configuration builder
-    #####################################
+    ######################################################
+    # get the list of conf_filepath (if any)
+    ######################################################
+    conf_filepath_list = obj.get_conf_filepath(level_p=level1)
+
+    
+    ######################################################
+    # get the Vunit testbench object + testbench name
+    ######################################################
     tb = obj.get_testbench(level_p=level1)
+    tb_name = obj.get_testbench_name()
 
-    # Build the configuration list
-    # for scenario in scenario_list :
-    #     json_conf_filename = tb_name + '_' + scenario + '.json'
-    #     json_conf_filename = json_conf_filename.lower() 
-    #     json_conf_filepath = json_conf_basepath + json_conf_filename
+    # loop on all configuration files
+    for conf_filepath in conf_filepath_list :
 
-    #     utils.display_filepath(filepath=json_conf_filepath,script_name=script_name,debug=debug,description="json_conf_filepath: ")
+        str0 = 'Start the Test'
+        obj_display.display_title(msg_p=str0, level_p=level1)
+        str0 = 'conf_filepath='+conf_filepath   
+        obj_display.display(msg_p=str0, level_p=level2)
+        str0 = 'tb_name='+tb_name   
+        obj_display.display(msg_p=str0, level_p=level2)
+
+        conf_filename = str(Path(conf_filepath).stem)
+
+        name = conf_filename
+        test_name = tb_name + "." + name
         
-        #####################################################################
+        ####################################################################
         # generate the input command/data files and others actions before launching the simulator
-        #####################################################################
+        ####################################################################
 
-        # vunit_conf.set_script(python_script_path=tb_script_path,
-        #                   tb_input_basepath =tb_input_basepath,
-        #                   tb_output_basepath=tb_output_basepath,
-        #                   json_conf_filepath = json_conf_filepath,
-        #                   debug = debug)
+        obj.set_script(conf_filepath_p=conf_filepath)
 
-        #######################################
+        #####################################################
         # Mandatory: The simulator modelsim/Questa wants generics filepaths in the Linux format
-        #######################################
-        # linux = 1
-        # tb_input_basepath = utils.clean_path(path=tb_input_basepath,linux=linux)
-        # tb_output_basepath = utils.clean_path(path=tb_output_basepath,linux=linux)
-        # tb.add_config(
-        #               name=scenario,
-        #               pre_config=vunit_conf.pre_config,
-        #               generics = {
-        #                 "input_basepath_g":tb_input_basepath,
-        #                 "output_basepath_g" : tb_output_basepath
-        #                 }
-        #                 )
+        #####################################################
+        tb.add_config(
+                      name=test_name,
+                      pre_config=obj.pre_config,
+                      generics = 
+                        {
+                        "g_TEST_NAME":name
+                        }
+                        )
 
 
     VU.main()
