@@ -484,8 +484,8 @@ architecture RTL of regdecode_top is
   signal error_sel : std_logic_vector(c_ERROR_SEL_WIDTH - 1 downto 0);
 
   signal wire_errors_valid : std_logic;
-  signal wire_errors : std_logic_vector(i_reg_wire_errors0'range);
-  signal wire_status : std_logic_vector(i_reg_wire_status0'range);
+  signal wire_errors       : std_logic_vector(i_reg_wire_errors0'range);
+  signal wire_status       : std_logic_vector(i_reg_wire_status0'range);
 
 begin
   ---------------------------------------------------------------------
@@ -921,40 +921,40 @@ begin
   ---------------------------------------------------------------------
   -- errors register
   ---------------------------------------------------------------------
-  error_sel      <= i_usb_wirein_sel_errors(c_ERROR_SEL_IDX_H downto c_ERROR_SEL_IDX_L);
-  inst_regdecode_wire_errors: entity fpasim.regdecode_wire_errors
-generic map(
-g_ERROR_SEL_WIDTH => error_sel'length
-)
-port map( 
-i_clk => i_out_clk,
-     -- errors
-i_reg_wire_errors7 => i_reg_wire_errors7,
-i_reg_wire_errors6 => i_reg_wire_errors6,
-i_reg_wire_errors5 => i_reg_wire_errors5,
-i_reg_wire_errors4 => i_reg_wire_errors4,
-i_reg_wire_errors3 => i_reg_wire_errors3,
-i_reg_wire_errors2 => i_reg_wire_errors2,
-i_reg_wire_errors1 => i_reg_wire_errors1,
-i_reg_wire_errors0 => i_reg_wire_errors0,
-    -- status
-i_reg_wire_status7 => i_reg_wire_status7,
-i_reg_wire_status6 => i_reg_wire_status6,
-i_reg_wire_status5 => i_reg_wire_status5,
-i_reg_wire_status4 => i_reg_wire_status4,
-i_reg_wire_status3 => i_reg_wire_status3,
-i_reg_wire_status2 => i_reg_wire_status2,
-i_reg_wire_status1 => i_reg_wire_status1,
-i_reg_wire_status0 => i_reg_wire_status0,
-    ---------------------------------------------------------------------
-    -- output
-    ---------------------------------------------------------------------
-i_out_clk => i_clk,
-i_error_sel => error_sel,
-o_wire_errors_valid => wire_errors_valid,
-o_wire_errors => wire_errors,
-o_wire_status => wire_status
-);
+  error_sel <= i_usb_wirein_sel_errors(c_ERROR_SEL_IDX_H downto c_ERROR_SEL_IDX_L);
+  inst_regdecode_wire_errors : entity fpasim.regdecode_wire_errors
+    generic map(
+      g_ERROR_SEL_WIDTH => error_sel'length
+    )
+    port map(
+      i_clk               => i_out_clk,
+      -- errors
+      i_reg_wire_errors7  => i_reg_wire_errors7,
+      i_reg_wire_errors6  => i_reg_wire_errors6,
+      i_reg_wire_errors5  => i_reg_wire_errors5,
+      i_reg_wire_errors4  => i_reg_wire_errors4,
+      i_reg_wire_errors3  => i_reg_wire_errors3,
+      i_reg_wire_errors2  => i_reg_wire_errors2,
+      i_reg_wire_errors1  => i_reg_wire_errors1,
+      i_reg_wire_errors0  => i_reg_wire_errors0,
+      -- status
+      i_reg_wire_status7  => i_reg_wire_status7,
+      i_reg_wire_status6  => i_reg_wire_status6,
+      i_reg_wire_status5  => i_reg_wire_status5,
+      i_reg_wire_status4  => i_reg_wire_status4,
+      i_reg_wire_status3  => i_reg_wire_status3,
+      i_reg_wire_status2  => i_reg_wire_status2,
+      i_reg_wire_status1  => i_reg_wire_status1,
+      i_reg_wire_status0  => i_reg_wire_status0,
+      ---------------------------------------------------------------------
+      -- output
+      ---------------------------------------------------------------------
+      i_out_clk           => i_clk,
+      i_error_sel         => error_sel,
+      o_wire_errors_valid => wire_errors_valid,
+      o_wire_errors       => wire_errors,
+      o_wire_status       => wire_status
+    );
 
   -- output: to usb 
   ---------------------------------------------------------------------
@@ -962,8 +962,8 @@ o_wire_status => wire_status
   o_usb_wireout_errors     <= wire_errors;
   o_usb_wireout_status     <= wire_status;
 
-  o_usb_trigout_data(31 downto 1)    <= (others => '0');
-  o_usb_trigout_data(0)    <= wire_errors_valid;
+  o_usb_trigout_data(31 downto 1) <= (others => '0');
+  o_usb_trigout_data(0)           <= wire_errors_valid;
 
   ---------------------------------------------------------------------
   -- debug
