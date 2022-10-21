@@ -51,26 +51,6 @@ PACKAGE pkg_utils IS
   function pkg_width_from_indexes(i_idx_high : in integer; i_idx_low : in integer) return integer;
 
 
-  ---------------------------------------------------------------------
-  -- This function generates a integer random_by_range value
-  --  between i_min_value and i_max_value
-  ---------------------------------------------------------------------
-  function pkg_random_by_range(
-    constant i_min_value : in integer;
-    constant i_max_value : in integer
-  ) return integer;
-
-  ---------------------------------------------------------------------
-  -- this function generates an uniform random value between min_value and max_value
-  ---------------------------------------------------------------------
-  procedure pkg_random_uniform_by_range(
-    constant i_min_value : in integer;
-    constant i_max_value : in integer;
-    variable v_seed1     : inout positive;
-    variable v_seed2     : inout positive;
-    variable v_result    : inout integer
-  );
-
 END pkg_utils;
 
 PACKAGE BODY pkg_utils IS
@@ -107,39 +87,5 @@ end;
     return v_result;
   end;
 
-
-  ---------------------------------------------------------------------
-  -- This function generates an integer random value
-  --  between i_min_value and i_max_value
-  ---------------------------------------------------------------------
-  function pkg_random_by_range (
-    constant i_min_value : in integer;
-    constant i_max_value : in integer
-    ) return integer is
-    variable v_rand_result : integer;
-    variable v_seed1       : positive := 10;
-    variable v_seed2       : positive := 1000;
-  begin
-    pkg_random_uniform_by_range(i_min_value, i_max_value, v_seed1, v_seed2, v_rand_result);
-    return v_rand_result;
-  end;
-
-  ---------------------------------------------------------------------
-  -- this function generates an uniform random value between min_value and max_value
-  ---------------------------------------------------------------------
-  procedure pkg_random_uniform_by_range (
-    constant i_min_value : in integer;
-    constant i_max_value : in integer;
-    variable v_seed1   : inout positive;
-    variable v_seed2   : inout positive;
-    variable v_result  : inout integer
-    ) is
-    variable v_rand : real;
-  begin
-    -- generate a uniform real random_uniform_by_range value between [0;1.0]
-    uniform(v_seed1, v_seed2, v_rand);
-    -- Scale to a random_uniform_by_range integer between min_value and max_value
-    v_result := integer(real(i_min_value) + trunc(v_rand*(1.0+real(i_max_value)-real(i_min_value))));
-  end;
 
 END pkg_utils;
