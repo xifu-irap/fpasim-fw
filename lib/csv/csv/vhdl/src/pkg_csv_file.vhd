@@ -17,7 +17,7 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   csv_file_reader_pkg.vhd 
+--    @file                   pkg_csv_file.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
@@ -27,10 +27,14 @@
 --    But, new functionnalities was added
 --
 -- How to use this package:
---    1. Create a csv_file_reader object:               variable v_csv: csv_file_reader_type;
---    2. Open a csv file and define the csv separator:  v_csv.initialize("c:\file.csv",';');
---    3. Read one line at a time:                       csv.readline();
---    4. Read the first column (integer value)          v_my_integer := csv.read_integer();
+--    1. Create a csv_file_reader object:               
+--         variable v_csv: t_csv_file_reader;
+--    2. Open a csv file and define the csv separator:  
+--         v_csv.initialize("c:\file.csv",';');
+--    3. Read one line at a time:                       
+--         csv.readline();
+--    4. Read the first column (integer value)          
+--         v_my_integer := csv.read_integer();
 --    5. To read more values in the same line, call any of the read_* functions
 --    6. To move to the next line, call csv.readline() again
 --
