@@ -24,9 +24,9 @@
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
 --!   
---!   The module intanciates an asynchronuous FIFO with the empty, full and prog full flags
---!   The module is a wrapper of the Xilinx XPM fifo sync.
---!   Note: the following header documentation is an extract of the associated XPM Xilinx header       
+--!   The module intanciates an asynchronuous FIFO with the empty, full and prog full flags.
+--!   The module is a wrapper of the Xilinx XPM async fifo.
+--!   Note: the following header documentation is an extract of the associated XPM Xilinx header.     
 -- -------------------------------------------------------------------------------------------------------------  
 
 -- -------------------------------------------------------------------------------------------------------------

@@ -24,16 +24,16 @@
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
 --!
---!   This module intanciates an asynchronuous FIFO with the empty and full flags
+--!   This module intanciates an asynchronuous FIFO with the empty and full flags.
 --!   This module generates 4 types of errors in the following cases:
---!     . a writting when the FIFO is full
---!     . a writting when the FIFO is in a reset state
---!     . a reading when the FIFO is empty
---!     . a reading when the FIFO is in a reset state
+--!     . a writting when the FIFO is full.
+--!     . a writting when the FIFO is in a reset state.
+--!     . a reading when the FIFO is empty.
+--!     . a reading when the FIFO is in a reset state.
 --!   Via generics parameters, the user can select in which clock domain the error/empty flags are resynchronized. I.e,
---!       1. the write clock domain
---!       2. or the read clock domain
---!   Note: the following header documentation is an extract of the associated XPM Xilinx header       
+--!       1. the write clock domain.
+--!       2. or the read clock domain.
+--!   Note: the following header documentation is an extract of the associated XPM Xilinx header.
 -- -------------------------------------------------------------------------------------------------------------   
 
 -- -------------------------------------------------------------------------------------------------------------
@@ -512,12 +512,11 @@ entity fifo_async_with_error is
     -- | Specifies the width of wr_data_count. To reflect the correct value, the width should be log2(FIFO_WRITE_DEPTH)+1.   |
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- g_WR_DATA_COUNT_WIDTH : integer := 1
-    
+
     ---------------------------------------------------------------------
     -- resynchronization: fifo errors/empty flag
     ---------------------------------------------------------------------
     g_SYNC_SIDE         : string  := "wr" -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
-
 
   );
   port(

@@ -26,14 +26,14 @@
 --!
 --!   This module intanciates an asynchronuous FIFO with the empty, full and prog full flags
 --!   This module generates 4 types of errors in the following cases:
---!     . a writting when the FIFO is full
---!     . a writting when the FIFO is in a reset state
---!     . a reading when the FIFO is empty
---!     . a reading when the FIFO is in a reset state
+--!     . a writting when the FIFO is full.
+--!     . a writting when the FIFO is in a reset state.
+--!     . a reading when the FIFO is empty.
+--!     . a reading when the FIFO is in a reset state.
 --!   Via generics parameters, the user can select in which clock domain the error/empty flags are resynchronized. I.e,
---!       1. the write clock domain
---!       2. or the read clock domain
---!   Note: the following header documentation is an extract of the associated XPM Xilinx header       
+--!       1. the write clock domain.
+--!       2. or the read clock domain.
+--!   Note: the following header documentation is an extract of the associated XPM Xilinx header.       
 -- -------------------------------------------------------------------------------------------------------------   
 
 -- -------------------------------------------------------------------------------------------------------------
@@ -424,7 +424,6 @@ entity fifo_async_with_error_prog_full is
     -- | NOTE: The default threshold value is dependent on default FIFO_WRITE_DEPTH value. If FIFO_WRITE_DEPTH value is      |
     -- | changed, ensure the threshold value is within the valid range though the programmable flags are not used.           |
     g_PROG_FULL_THRESH  : integer := 5;
-
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | RD_DATA_COUNT_WIDTH  | Integer            | Range: 1 - 23. Default value = 1.                                       |
     -- |---------------------------------------------------------------------------------------------------------------------|
@@ -517,8 +516,6 @@ entity fifo_async_with_error_prog_full is
     -- resynchronization: fifo errors/empty flag
     ---------------------------------------------------------------------
     g_SYNC_SIDE         : string  := "wr" -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
-
-
 
   );
   port(
