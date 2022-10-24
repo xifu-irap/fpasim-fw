@@ -23,7 +23,7 @@
 #    Code Rules Reference    N/A
 ###############################################################################################################
 #    @details                
-#    This file set timing constraints on the top_level I/O ports
+#    This file set the timing constraints on the top_level I/O ports
 #    
 # 
 ###############################################################################################################

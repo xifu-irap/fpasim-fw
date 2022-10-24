@@ -26,10 +26,10 @@
 #
 #   This scrips processes few input csv files which describes the relationship
 #   between fpga and fmc parameters (name, pin location,..) in order to generate
-#   an output xdc file associated to the fmc port definition.
+#   an output xdc file.
 #
 #   Note:
-#      . Each input csv files are associated to a column of the FMC connector.
+#      . Each input csv files are associated to a FMC connector column.
 #      . Tested with python : 3.10.7
 #
 # -------------------------------------------------------------------------------------------------------------
