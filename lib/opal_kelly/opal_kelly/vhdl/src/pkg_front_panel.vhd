@@ -24,7 +24,17 @@
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
 --
+--    This VHDL package is based on the "Opal Kelly\FrontPanelUSB\Samples\Simulation\USB3\VHDL example\sim_tf.vhd" example design.
+--    It allows to control USB port signals.
+--    It redefines the functions/procedures in a package instead of a plain text in the VHDL testbench.
+--    The objective is to facilitate readability but also to facilitate the possibility of controlling several different USB ports.
 --
+--  Note: 
+--    . The functions/procedures are almost identical to the sim_tf.vhd file. Except, the 2 new added arguments:
+--       1. variable front_panel_conf : inout t_front_panel_conf
+--       2. signal internal_if : inout t_internal_if
+--    . This script needs the simulation files (USB3) profided by the Opal Kelly company. In particular, the
+--      parameters file needs to be compiled in the fpasim library.
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
