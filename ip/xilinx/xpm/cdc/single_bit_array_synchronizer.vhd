@@ -29,7 +29,6 @@
 --!        @i_src_clk clock domain               |                        @ i_dest_clk clock domain
 --!        i_src ---------------------> xpm_cdc_array_single -----------> o_dest
 --!                                                      
---!   Note: The read back of the synchronized data bus allows to check the clock domain crossing integrity.
 --!   Note: the following header documentation is an extract of the associated XPM Xilinx header          
 -- -------------------------------------------------------------------------------------------------------------
 
