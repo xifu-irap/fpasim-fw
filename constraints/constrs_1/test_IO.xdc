@@ -1,11 +1,43 @@
-#######################################
+###############################################################################################################
+#                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
+###############################################################################################################
+#                              This file is part of the ATHENA X-IFU DRE Focal Plane Assembly simulator.
+#
+#                              fpasim-fw is free software: you can redistribute it and/or modify
+#                              it under the terms of the GNU General Public License as published by
+#                              the Free Software Foundation, either version 3 of the License, or
+#                              (at your option) any later version.
+#
+#                              This program is distributed in the hope that it will be useful,
+#                              but WITHOUT ANY WARRANTY; without even the implied warranty of
+#                              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#                              GNU General Public License for more details.
+#
+#                              You should have received a copy of the GNU General Public License
+#                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
+###############################################################################################################
+#    email                   kenji.delarosa@alten.com
+#    @file                   test_IO.xdc
+###############################################################################################################
+#    Automatic Generation    No
+#    Code Rules Reference    N/A
+###############################################################################################################
+#    @details                
+#    This file set timing constraints on the top_level I/O ports (temporary)
+#    
+# 
+###############################################################################################################
+
+
+
+###############################################################################################################
 # xem7350 : system clock
-######################################
+###############################################################################################################
 # create_clock -name sys_clk -period 5 [get_ports sys_clkp]
 
-########################################
+###############################################################################################################
 # usb
-#######################################
+###############################################################################################################
 create_clock -period 9.920 -name okUH0 [get_ports {okUH[0]}]
 # create_clock -period 9.920 -name virt_okUH0
 
@@ -24,18 +56,18 @@ set_output_delay -clock [get_clocks mmcm0_clk0] -max -add_delay 2.000 [get_ports
 set_output_delay -clock [get_clocks mmcm0_clk0] -min -add_delay -0.500 [get_ports {okUHU[*]}]
 
 
-#######################################
+###############################################################################################################
 # rename auto-derived clock
-######################################
+###############################################################################################################
 create_generated_clock -name adc_clk -source [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKIN1] -master_clock [get_clocks i_adc_clk_p] [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT0]
 create_generated_clock -name ref_clk -source [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKIN1] -master_clock [get_clocks i_adc_clk_p] [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT1]
 create_generated_clock -name dac_clk -source [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKIN1] -master_clock [get_clocks i_adc_clk_p] [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT2]
 create_generated_clock -name clk -source [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKIN1] -master_clock [get_clocks i_adc_clk_p] [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT3]
 # create_generated_clock -name usb_clk -source [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKIN1] -master_clock [get_clocks i_adc_clk_p] [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT3]
 
-#########################################
+###############################################################################################################
 # ODDR : forward clock
-#########################################
+###############################################################################################################
 create_generated_clock -name gen_dac_clk_out -multiply_by 1 -source [get_pins inst_io_top/inst_io_dac/gen_io_dac.inst_selectio_wiz_dac/inst/oddr_inst/C] [get_ports {o_dac_clk_p}]
 create_generated_clock -name gen_sync_clk_out -multiply_by 1 -source [get_pins inst_io_top/inst_io_sync/gen_io_sync.inst_selectio_wiz_sync/inst/oddr_inst/C] [get_ports {o_ref_clk}]
 
