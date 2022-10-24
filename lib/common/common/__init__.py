@@ -23,11 +23,13 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details                
-#    This scripts 
+#    This python script imports python module.
 #    Note:
-#      This is the first file to be loaded in a module.
-#      So you can use it to execute code that you want to run each time a module is loaded, or specify the submodules to be exported.
+#      This is the first file to be loaded.
+#      So you can use it to execute code that you want to run each time a module is loaded, 
+#      or specify the submodules to be exported.
 # -------------------------------------------------------------------------------------------------------------
+
 import os
 # Enable the coloring in the console
 os.system("")

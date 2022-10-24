@@ -18,22 +18,23 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   console_colors.py
+#    @file                   vunit_conf.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details
-#    This script defines the VunitConf class.
-#    This class defines methods to compile VHDL files (source files, testbench)
+#    This python script defines the VunitConf class.
+#    This class defines methods to compile VHDL files (source files, testbench).
 #    These methods hide as much as possible the project tree to the user.
 #    
 #    Note:
-#    If new path need to be added, update _build_path method with the new path. So, the user can create a new method
-#    by copying an existing method code in order to use this new path
+#       . This script is aware of the project tree structure
+#       . If a new path need to be added, update VunitConf._build_path method with the new path.
+#        Then, the user can create a new method by copying an existing method code in order to use the new added path
 # -------------------------------------------------------------------------------------------------------------
-# standard library
 
+# standard library
 import os
 
 from shutil import copy

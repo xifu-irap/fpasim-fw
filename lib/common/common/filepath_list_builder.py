@@ -24,9 +24,10 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details
-#    This script defines the FilepathListBuilder class.
-#    This class provides methods to search files in a root directory and its subdirectory
-#    The searched files are filtered by file_extension.
+#    This python script defines the FilepathListBuilder class.
+#    This class provides methods to search files in a root directory and its subdirectory.
+#    The searched files are filtered by user-defined file extension.
+#
 # -------------------------------------------------------------------------------------------------------------
 
 import os

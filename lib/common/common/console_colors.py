@@ -24,12 +24,13 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details                
-#    This script defines console print colors
+#    This python script defines the console print colors
+#
 # -------------------------------------------------------------------------------------------------------------
+
 import os
 # Enable the coloring in the console
 os.system("")
-
 
 colors = {}
 colors['black'] = '\033[30m'

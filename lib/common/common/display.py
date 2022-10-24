@@ -24,8 +24,8 @@
 #    Code Rules Reference    
 # -------------------------------------------------------------------------------------------------------------
 #    @details                
-#    This script defines the Display class.
-#    This class provides methods to print in the console (coloring, indentation, ...)
+#    This python script defines the Display class.
+#    This class provides methods to print in the console (coloring, indentation, ...).
 #
 # -------------------------------------------------------------------------------------------------------------
 
