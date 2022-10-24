@@ -17,13 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   utility_context.vhd 
+--    @file                   utility_context.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
---
+--    @details                
+--    This file defines a context.
+--    It's used to define a set of library and package use clauses into a single unit that can be reused
 -- -------------------------------------------------------------------------------------------------------------
 
 

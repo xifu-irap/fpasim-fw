@@ -23,8 +23,12 @@
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
 --    @details                
+--    This VHDL package defines commonly used simulaton VHDL functions/procedures.
+--    
+--    Note: This package should be compiled into the utility_lib.
+--    Dependencies:
+--      . csv_lib.pkg_csv_file
 --
--- Note: This package should be compiled into the utility_lib
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -43,7 +47,7 @@ package pkg_common is
   -- this procedure allows to wait a number of rising edge
   -- then a margin is applied, if any
   ------------------------------------------------------
-  procedure wait_nb_rising_edge_plus_margin (
+  procedure pkg_wait_nb_rising_edge_plus_margin (
     signal i_clk               : in std_logic;
     constant i_nb_rising_edge : in natural;
     constant i_margin          : in time
@@ -54,7 +58,7 @@ package pkg_common is
 ---------------------------------------------------------------------
 -- This function allows to convert a std_logic signal into an integer
 ---------------------------------------------------------------------
-  function to_integer(s : std_logic) return integer;
+  function pkg_to_integer(s : std_logic) return integer;
 
     ---------------------------------------------------------------------
   -- This function generates a integer random_by_range value
@@ -81,7 +85,7 @@ package pkg_common is
 -- This function allows to count the duration (expressed in clock cycles) of the i_data_valid signal
 -- Note: this is a modulo counter
 ---------------------------------------------------------------------
-  procedure data_valid_counter(
+  procedure pkg_data_valid_counter(
     signal i_clk        : in  std_logic;
     -- input
     signal i_start      : in  std_logic;
@@ -95,7 +99,7 @@ package pkg_common is
 -- frame_flags_builder_file
 -- This function allows allows to generate (sof, eof) flags
 ---------------------------------------------------------------------
-  procedure frame_flags_builder (
+  procedure pkg_frame_flags_builder (
     signal i_clk        : in  std_logic;
     signal i_start      : in  std_logic;
     signal i_data_valid : in  std_logic;
@@ -111,7 +115,7 @@ package pkg_common is
 -- frame_flags_builder_cst
 -- This function allows allows to generate (sof, eof) flags
 ---------------------------------------------------------------------
-  procedure frame_flags_builder (
+  procedure pkg_frame_flags_builder (
     signal i_clk          : in  std_logic;
     signal i_start        : in  std_logic;
     signal i_data_valid   : in  std_logic;
@@ -133,7 +137,7 @@ package body pkg_common is
   -- this procedure allows to wait a number of rising edge
   -- then a margin is applied, if any
   ------------------------------------------------------
-procedure wait_nb_rising_edge_plus_margin (
+procedure pkg_wait_nb_rising_edge_plus_margin (
     signal i_clk               : in std_logic;
     constant i_nb_rising_edge : in natural;
     constant i_margin          : in time
@@ -157,7 +161,7 @@ procedure wait_nb_rising_edge_plus_margin (
 ---------------------------------------------------------------------
 -- This function allows to convert a std_logic signal into an integer
 ---------------------------------------------------------------------
-  function to_integer(s : std_logic) return integer is
+  function pkg_to_integer(s : std_logic) return integer is
   begin
     if s = '1' then
       return 1;
@@ -205,7 +209,7 @@ procedure wait_nb_rising_edge_plus_margin (
 -- This function allows to count the duration (expressed in clock cycles) of the i_data_valid signal
 -- Note: this is a modulo counter
 ---------------------------------------------------------------------
-  procedure data_valid_counter(signal i_clk        : in  std_logic;
+  procedure pkg_data_valid_counter(signal i_clk        : in  std_logic;
                                -- input
                                signal i_start      : in  std_logic;
                                signal i_data_valid :     std_logic;
@@ -262,9 +266,9 @@ procedure wait_nb_rising_edge_plus_margin (
       o_overflow <= v_overflow;
       o_count    <= std_logic_vector(v_cnt(o_count'range));
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 0 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 0 ps);
     end loop;
-  end procedure data_valid_counter;
+  end procedure pkg_data_valid_counter;
 
   
 
@@ -272,7 +276,7 @@ procedure wait_nb_rising_edge_plus_margin (
 -- frame_flags_builder_file
 -- This function allows allows to generate (sof, eof) flags
 ---------------------------------------------------------------------
-  procedure frame_flags_builder (
+  procedure pkg_frame_flags_builder (
     signal i_clk        : in  std_logic;
     signal i_start      : in  std_logic;
     signal i_data_valid : in  std_logic;
@@ -394,16 +398,16 @@ procedure wait_nb_rising_edge_plus_margin (
       o_index  <= v_index;
       o_finish <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure frame_flags_builder;
+  end procedure pkg_frame_flags_builder;
 
   ---------------------------------------------------------------------
   -- frame_flags_builder_cst
 -- This function allows allows to generate (sof, eof) flags
 ---------------------------------------------------------------------
-  procedure frame_flags_builder (
+  procedure pkg_frame_flags_builder (
     signal i_clk          : in std_logic;
     signal i_start        : in std_logic;
     signal i_data_valid   : in std_logic;
@@ -496,10 +500,10 @@ procedure wait_nb_rising_edge_plus_margin (
       o_index  <= v_index;
       o_finish <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure frame_flags_builder;
+  end procedure pkg_frame_flags_builder;
 
 
 end package body pkg_common;

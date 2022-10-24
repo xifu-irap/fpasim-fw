@@ -22,9 +22,15 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
+--    This simulation VHDL package defines VHDL functions/procedures in order to
+--      . generate a sequence of pulse.
 --
--- Note: This package should be compiled into the utility_lib
+--    Note: This package should be compiled into the utility_lib
+--    Dependencies: 
+--      . csv_lib.pkg_csv_file
+--      . utility_lib.pkg_common
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -68,7 +74,7 @@ package pkg_sequence is
 --       :param max_value2: define a min value for the negative pulse
 --       :param num_rising_edge_before_pulse_gen: define a starting offset before generating pulses
 ---------------------------------------------------------------------
-  procedure valid_sequencer(signal i_clk    : in  std_logic;
+  procedure pkg_valid_sequencer(signal i_clk    : in  std_logic;
                             signal i_en     : in  std_logic;
                             i_filepath      : in  string;
                             i_csv_separator : in  character;
@@ -100,7 +106,7 @@ package pkg_sequence is
 --       :param min_value2: define a min value for the negative pulse
 --       :param max_value2: define a min value for the negative pulse
 --       :param num_rising_edge_before_pulse_gen: define a starting offset before generating pulses
-  procedure valid_sequencer(signal i_clk : in std_logic;
+  procedure pkg_valid_sequencer(signal i_clk : in std_logic;
                             signal i_en  : in std_logic;
 
                             constant i_ctrl                             : in integer := 0;
@@ -145,7 +151,7 @@ package body pkg_sequence is
 --       :param max_value2: define a min value for the negative pulse
 --       :param num_rising_edge_before_pulse_gen: define a starting offset before generating pulses
 ---------------------------------------------------------------------
-  procedure valid_sequencer(signal i_clk    : in  std_logic;
+  procedure pkg_valid_sequencer(signal i_clk    : in  std_logic;
                             signal i_en     : in  std_logic;
                             i_filepath      : in  string;
                             i_csv_separator : in  character;
@@ -290,9 +296,9 @@ package body pkg_sequence is
 
       o_valid <= v_valid;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 0 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 0 ps);
     end loop;
-  end procedure valid_sequencer;
+  end procedure pkg_valid_sequencer;
 
 ---------------------------------------------------------------------
 -- this function allows to generate a output valid signal from input parameters. Several method are
@@ -320,7 +326,7 @@ package body pkg_sequence is
 --       :param max_value2: define a min value for the negative pulse
 --       :param num_rising_edge_before_pulse_gen: define a starting offset before generating pulses
 ---------------------------------------------------------------------
-  procedure valid_sequencer(signal i_clk : in std_logic;
+  procedure pkg_valid_sequencer(signal i_clk : in std_logic;
                             signal i_en  : in std_logic;
 
                             constant i_ctrl                             : in integer := 0;
@@ -466,9 +472,9 @@ package body pkg_sequence is
 
       o_valid <= v_valid;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 0 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 0 ps);
     end loop;
-  end procedure valid_sequencer;
+  end procedure pkg_valid_sequencer;
 
 
 

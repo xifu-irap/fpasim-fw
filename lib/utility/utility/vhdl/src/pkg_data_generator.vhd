@@ -17,14 +17,20 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---   @file                   pkg_data_generator.vhd 
+--    @file                   pkg_data_generator.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---   @details                
+--   @details        
+--   This simulation VHDL package defines VHDL functions/procedures in order to
+--      . generate data from an input csv file.
 --
--- Note: This package should be compiled into the utility_lib
+--   Note: This package should be compiled into the utility_lib
+--   Dependencies: 
+--      . csv_lib.pkg_csv_file
+--      . utility_lib.pkg_common
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -43,9 +49,9 @@ package pkg_data_generator is
 
 
   ---------------------------------------------------------------------
-  -- data_generator1
+  -- pkg_data_generator_1
   ---------------------------------------------------------------------
-  procedure data_generator1(
+  procedure pkg_data_generator_1(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -73,9 +79,9 @@ package pkg_data_generator is
     );
 
   ---------------------------------------------------------------------
-  -- data_generator2
+  -- pkg_data_generator_2
   ---------------------------------------------------------------------
-  procedure data_generator2(
+  procedure pkg_data_generator_2(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -105,9 +111,9 @@ package pkg_data_generator is
     );
 
   ---------------------------------------------------------------------
-  -- data_generator3
+  -- pkg_data_generator_3
   ---------------------------------------------------------------------
-  procedure data_generator3(
+  procedure pkg_data_generator_3(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -140,9 +146,9 @@ package pkg_data_generator is
     );
 
   ---------------------------------------------------------------------
-  -- data_generator4
+  -- pkg_data_generator_4
   ---------------------------------------------------------------------
-  procedure data_generator4(
+  procedure pkg_data_generator_4(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -179,9 +185,9 @@ package pkg_data_generator is
     );
 
   ---------------------------------------------------------------------
-  -- data_generator5
+  -- pkg_data_generator_5
   ---------------------------------------------------------------------
-  procedure data_generator5(
+  procedure pkg_data_generator_5(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -218,9 +224,9 @@ package pkg_data_generator is
     );
 
   ---------------------------------------------------------------------
-  -- data_generator6
+  -- pkg_data_generator_6
   ---------------------------------------------------------------------
-  procedure data_generator6(
+  procedure pkg_data_generator_6(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -259,10 +265,10 @@ package pkg_data_generator is
     );
 
   ---------------------------------------------------------------------
-  -- data_generator8
+  -- pkg_data_generator_8
   ---------------------------------------------------------------------
 
-  procedure data_generator8(
+  procedure pkg_data_generator_8(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -305,9 +311,9 @@ package pkg_data_generator is
     );
 
   ---------------------------------------------------------------------
-  -- data_generator9
+  -- pkg_data_generator_9
   ---------------------------------------------------------------------
-  procedure data_generator9(
+  procedure pkg_data_generator_9(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -352,9 +358,9 @@ package pkg_data_generator is
     );
 
   ---------------------------------------------------------------------
-  -- data_generator10
+  -- pkg_data_generator_10
   ---------------------------------------------------------------------
-  procedure data_generator10(
+  procedure pkg_data_generator_10(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -401,9 +407,9 @@ package pkg_data_generator is
     );
 
   ---------------------------------------------------------------------
-  -- data_generator11
+  -- pkg_data_generator_11
   ---------------------------------------------------------------------
-  procedure data_generator11(
+  procedure pkg_data_generator_11(
     signal i_clk                 : in std_logic;
     signal i_start               : in std_logic;
     ---------------------------------------------------------------------
@@ -452,9 +458,9 @@ package pkg_data_generator is
     );
 
   ---------------------------------------------------------------------
-  -- data_generator13
+  -- pkg_data_generator_13
   ---------------------------------------------------------------------
-  procedure data_generator13(
+  procedure pkg_data_generator_13(
     signal i_clk                 : in std_logic;
     signal i_start               : in std_logic;
     ---------------------------------------------------------------------
@@ -516,10 +522,10 @@ package body pkg_data_generator is
 
 
 ---------------------------------------------------------------------
-  -- data_generator1
+  -- pkg_data_generator_1
   -- this function allows retrieving from file (*.csv) an input data I and Q
   ---------------------------------------------------------------------
-  procedure data_generator1(
+  procedure pkg_data_generator_1(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -621,15 +627,15 @@ package body pkg_data_generator is
       o_data0_std_vect <= v_data0;
       o_finish         <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure data_generator1;
+  end procedure pkg_data_generator_1;
 
 ---------------------------------------------------------------------
-  -- data_generator2
+  -- pkg_data_generator_2
   ---------------------------------------------------------------------
-  procedure data_generator2(
+  procedure pkg_data_generator_2(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -736,15 +742,15 @@ package body pkg_data_generator is
       o_data1_std_vect <= v_data1;
       o_finish         <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure data_generator2;
+  end procedure pkg_data_generator_2;
 
   ---------------------------------------------------------------------
-  -- data_generator3
+  -- pkg_data_generator_3
   ---------------------------------------------------------------------
-  procedure data_generator3(
+  procedure pkg_data_generator_3(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -857,15 +863,15 @@ package body pkg_data_generator is
       o_data2_std_vect <= v_data2;
       o_finish         <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure data_generator3;
+  end procedure pkg_data_generator_3;
 
   ---------------------------------------------------------------------
-  -- data_generator4
+  -- pkg_data_generator_4
   ---------------------------------------------------------------------
-  procedure data_generator4(
+  procedure pkg_data_generator_4(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -982,15 +988,15 @@ package body pkg_data_generator is
       o_data3_std_vect <= v_data3;
       o_finish         <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure data_generator4;
+  end procedure pkg_data_generator_4;
 
   ---------------------------------------------------------------------
-  -- data_generator5
+  -- pkg_data_generator_5
   ---------------------------------------------------------------------
-  procedure data_generator5(
+  procedure pkg_data_generator_5(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -1110,15 +1116,15 @@ package body pkg_data_generator is
       o_data4_std_vect <= v_data4;
       o_finish         <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure data_generator5;
+  end procedure pkg_data_generator_5;
 
   ---------------------------------------------------------------------
-  -- data_generator6
+  -- pkg_data_generator_6
   ---------------------------------------------------------------------
-  procedure data_generator6(
+  procedure pkg_data_generator_6(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -1246,15 +1252,15 @@ package body pkg_data_generator is
 
       o_finish <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure data_generator6;
+  end procedure pkg_data_generator_6;
 
   ---------------------------------------------------------------------
-  -- data_generator8
+  -- pkg_data_generator_8
   ---------------------------------------------------------------------
-  procedure data_generator8(
+  procedure pkg_data_generator_8(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -1390,15 +1396,15 @@ package body pkg_data_generator is
       o_data7_std_vect <= v_data7;
       o_finish         <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure data_generator8;
+  end procedure pkg_data_generator_8;
 
   ---------------------------------------------------------------------
-  -- data_generator9
+  -- pkg_data_generator_9
   ---------------------------------------------------------------------
-  procedure data_generator9(
+  procedure pkg_data_generator_9(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -1545,16 +1551,16 @@ package body pkg_data_generator is
 
       o_finish <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure data_generator9;
+  end procedure pkg_data_generator_9;
 
 
   ---------------------------------------------------------------------
-  -- data_generator10
+  -- pkg_data_generator_10
   ---------------------------------------------------------------------
-  procedure data_generator10(
+  procedure pkg_data_generator_10(
     signal i_clk                : in std_logic;
     signal i_start              : in std_logic;
     ---------------------------------------------------------------------
@@ -1706,16 +1712,16 @@ package body pkg_data_generator is
 
       o_finish <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure data_generator10;
+  end procedure pkg_data_generator_10;
 
 
   ---------------------------------------------------------------------
-  -- data_generator11
+  -- pkg_data_generator_11
   ---------------------------------------------------------------------
-  procedure data_generator11(
+  procedure pkg_data_generator_11(
     signal i_clk                 : in std_logic;
     signal i_start               : in std_logic;
     ---------------------------------------------------------------------
@@ -1869,15 +1875,15 @@ package body pkg_data_generator is
       o_data10_std_vect <= v_data10;
       o_finish          <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure data_generator11;
+  end procedure pkg_data_generator_11;
 
   ---------------------------------------------------------------------
-  -- data_generator13
+  -- pkg_data_generator_13
   ---------------------------------------------------------------------
-  procedure data_generator13(
+  procedure pkg_data_generator_13(
     signal i_clk                 : in std_logic;
     signal i_start               : in std_logic;
     ---------------------------------------------------------------------
@@ -2043,10 +2049,10 @@ package body pkg_data_generator is
 
       o_finish <= v_finish;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure data_generator13;
+  end procedure pkg_data_generator_13;
 
 
 end package body pkg_data_generator;

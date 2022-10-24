@@ -23,8 +23,15 @@
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
 --    @details  
+--    This simulation VHDL package defines VHDL functions/procedures in order to:
+--       . compare VHDL testbench data with data from an input csv file (by using Vunit checker_t object).
 --              
--- Note: This package should be compiled into the utility_lib
+--    Note: This package should be compiled into the utility_lib
+--    Dependencies: 
+--      . csv_lib.pkg_csv_file
+--      . utility_lib.pkg_common
+--      . context vunit_lib.vunit_context
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 
@@ -46,10 +53,10 @@ package pkg_data_checker is
 
 
 
-  --------------------------------------------------------------------
--- vunit_data_checker_1
+--------------------------------------------------------------------
+-- pkg_vunit_data_checker_1
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_1(
+  procedure pkg_vunit_data_checker_1(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -85,9 +92,9 @@ package pkg_data_checker is
     );
 
   --------------------------------------------------------------------
--- vunit_data_checker_2
+-- pkg_vunit_data_checker_2
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_2(
+  procedure pkg_vunit_data_checker_2(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -128,9 +135,9 @@ package pkg_data_checker is
     );
 
   --------------------------------------------------------------------
--- vunit_data_checker_3
+-- pkg_vunit_data_checker_3
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_3(
+  procedure pkg_vunit_data_checker_3(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -175,9 +182,9 @@ package pkg_data_checker is
     );
 
 --------------------------------------------------------------------
--- vunit_data_checker_4
+-- pkg_vunit_data_checker_4
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_4(
+  procedure pkg_vunit_data_checker_4(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -226,9 +233,9 @@ package pkg_data_checker is
     );
 
 --------------------------------------------------------------------
--- vunit_data_checker_5
+-- pkg_vunit_data_checker_5
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_5(
+  procedure pkg_vunit_data_checker_5(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -281,9 +288,9 @@ package pkg_data_checker is
     );
 
   --------------------------------------------------------------------
--- vunit_data_checker_10
+-- pkg_vunit_data_checker_10
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_10(
+  procedure pkg_vunit_data_checker_10(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -355,9 +362,9 @@ package pkg_data_checker is
     signal o_error_std_vect : out std_logic_vector(9 downto 0)
     );
 --------------------------------------------------------------------
--- vunit_data_checker_13
+-- pkg_vunit_data_checker_13
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_13(
+  procedure pkg_vunit_data_checker_13(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -449,9 +456,9 @@ package body pkg_data_checker is
 
 
 --------------------------------------------------------------------
--- vunit_data_checker_1
+-- pkg_vunit_data_checker_1
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_1(
+  procedure pkg_vunit_data_checker_1(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -549,15 +556,15 @@ package body pkg_data_checker is
 
       o_error_std_vect <= v_error;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure vunit_data_checker_1;
+  end procedure pkg_vunit_data_checker_1;
 
   --------------------------------------------------------------------
--- vunit_data_checker_2
+-- pkg_vunit_data_checker_2
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_2(
+  procedure pkg_vunit_data_checker_2(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -669,16 +676,16 @@ package body pkg_data_checker is
 
       o_error_std_vect <= v_error;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure vunit_data_checker_2;
+  end procedure pkg_vunit_data_checker_2;
 
 
   --------------------------------------------------------------------
--- vunit_data_checker_3
+-- pkg_vunit_data_checker_3
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_3(
+  procedure pkg_vunit_data_checker_3(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -804,15 +811,15 @@ package body pkg_data_checker is
       end case;
       o_error_std_vect <= v_error;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure vunit_data_checker_3;
+  end procedure pkg_vunit_data_checker_3;
 
   --------------------------------------------------------------------
--- vunit_data_checker_4
+-- pkg_vunit_data_checker_4
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_4(
+  procedure pkg_vunit_data_checker_4(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -950,15 +957,15 @@ package body pkg_data_checker is
       end case;
       o_error_std_vect <= v_error;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure vunit_data_checker_4;
+  end procedure pkg_vunit_data_checker_4;
 
 --------------------------------------------------------------------
--- vunit_data_checker_5
+-- pkg_vunit_data_checker_5
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_5(
+  procedure pkg_vunit_data_checker_5(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -1111,15 +1118,15 @@ package body pkg_data_checker is
 
       o_error_std_vect <= v_error;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure vunit_data_checker_5;
+  end procedure pkg_vunit_data_checker_5;
 
   --------------------------------------------------------------------
--- vunit_data_checker_10
+-- pkg_vunit_data_checker_10
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_10(
+  procedure pkg_vunit_data_checker_10(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -1334,15 +1341,15 @@ package body pkg_data_checker is
 
       o_error_std_vect <= v_error;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure vunit_data_checker_10;
+  end procedure pkg_vunit_data_checker_10;
 
   --------------------------------------------------------------------
--- vunit_data_checker_13
+-- pkg_vunit_data_checker_13
 ---------------------------------------------------------------------
-  procedure vunit_data_checker_13(
+  procedure pkg_vunit_data_checker_13(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -1599,10 +1606,10 @@ package body pkg_data_checker is
       end case;
       o_error_std_vect <= v_error;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure vunit_data_checker_13;
+  end procedure pkg_vunit_data_checker_13;
 
 
 end package body pkg_data_checker;

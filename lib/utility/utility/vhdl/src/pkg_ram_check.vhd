@@ -22,9 +22,18 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details             
+--    This simulation VHDL package defines VHDL functions/procedures in order to
+--      . write and check RAM-like content (RAM/Register)
+--        . An input csv file is used to write the RAM-like content
+--        . An another csv file is used to check the RAM-like content.
 --
--- Note: This package should be compiled into the utility_lib
+--    Note: This package should be compiled into the utility_lib
+--    Dependencies: 
+--      . csv_lib.pkg_csv_file
+--      . utility_lib.pkg_common
+--      . context vunit_lib.vunit_context
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -46,9 +55,9 @@ package pkg_ram_check is
 
 
   ---------------------------------------------------------------------
-  -- memory_wr_and_check
+  -- pkg_memory_wr_and_check
   ---------------------------------------------------------------------
-  procedure memory_wr_and_check(
+  procedure pkg_memory_wr_and_check(
     signal i_clk      : in std_logic;
     signal i_start_wr : in std_logic;
     signal i_start_rd : in std_logic;
@@ -103,9 +112,9 @@ package pkg_ram_check is
 
 
   ---------------------------------------------------------------------
-  -- memory_wr_tdpram_and_check
+  -- pkg_memory_wr_tdpram_and_check
   ---------------------------------------------------------------------
-  procedure memory_wr_tdpram_and_check(
+  procedure pkg_memory_wr_tdpram_and_check(
     signal i_clk      : in std_logic;
     signal i_start_wr : in std_logic;
     signal i_start_rd : in std_logic;
@@ -163,9 +172,9 @@ package body pkg_ram_check is
 
 
   ---------------------------------------------------------------------
-  -- memory_wr_and_check
+  -- pkg_memory_wr_and_check
   ---------------------------------------------------------------------
-  procedure memory_wr_and_check(
+  procedure pkg_memory_wr_and_check(
     signal i_clk      : in std_logic;
     signal i_start_wr : in std_logic;
     signal i_start_rd : in std_logic;
@@ -390,17 +399,17 @@ package body pkg_ram_check is
       o_rd_finish <= v_rd_finish;
       o_error     <= v_error;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure memory_wr_and_check;
+  end procedure pkg_memory_wr_and_check;
 
 
 
   ---------------------------------------------------------------------
-  -- memory_wr_tdpram_and_check
+  -- pkg_memory_wr_tdpram_and_check
   ---------------------------------------------------------------------
-  procedure memory_wr_tdpram_and_check(
+  procedure pkg_memory_wr_tdpram_and_check(
     signal i_clk      : in std_logic;
     signal i_start_wr : in std_logic;
     signal i_start_rd : in std_logic;
@@ -620,10 +629,10 @@ package body pkg_ram_check is
       o_rd_finish <= v_rd_finish;
       o_error     <= v_error;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure memory_wr_tdpram_and_check;
+  end procedure pkg_memory_wr_tdpram_and_check;
 
 
   

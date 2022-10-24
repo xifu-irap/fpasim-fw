@@ -22,9 +22,15 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details  
+--    This simulation VHDL package defines VHDL functions/procedures in order to
+--      . save data in an output csv file.              
 --
--- Note: This package should be compiled into the utility_lib
+--    Note: This package should be compiled into the utility_lib
+--    Dependencies: 
+--      . csv_lib.pkg_csv_file
+--      . utility_lib.pkg_common
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -49,13 +55,13 @@ package pkg_log is
  --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
  --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
  --  common typ = "STD_VEC" => the std_logic_vector value is not converted
-  function column_name(constant i_NAME  : in string; constant i_DATA_COMMON_TYP  : in string := "INT") return string;
+  function pkg_column_name(constant i_NAME  : in string; constant i_DATA_COMMON_TYP  : in string := "INT") return string;
 
 
----------------------------------------------------------------------
-  -- log_data_in_file1
   ---------------------------------------------------------------------
-  procedure log_data_in_file1(
+  -- pkg_log_data_in_file_1
+  ---------------------------------------------------------------------
+  procedure pkg_log_data_in_file_1(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -81,9 +87,9 @@ package pkg_log is
 
 
   ---------------------------------------------------------------------
-  -- log_data_in_file2
+  -- pkg_log_data_in_file_2
   ---------------------------------------------------------------------
-  procedure log_data_in_file2(
+  procedure pkg_log_data_in_file_2(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -110,9 +116,9 @@ package pkg_log is
     );
 
 ---------------------------------------------------------------------
-  -- log_data_in_file3
+  -- pkg_log_data_in_file_3
   ---------------------------------------------------------------------
-  procedure log_data_in_file3(
+  procedure pkg_log_data_in_file_3(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -143,9 +149,9 @@ package pkg_log is
     );
 
 ---------------------------------------------------------------------
-  -- log_data_in_file4
+  -- pkg_log_data_in_file_4
   ---------------------------------------------------------------------
-  procedure log_data_in_file4(
+  procedure pkg_log_data_in_file_4(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -180,9 +186,9 @@ package pkg_log is
 
 
 ---------------------------------------------------------------------
-  -- log_data_in_file5
+  -- pkg_log_data_in_file_5
   ---------------------------------------------------------------------
-  procedure log_data_in_file5(
+  procedure pkg_log_data_in_file_5(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -219,9 +225,9 @@ package pkg_log is
     );
 
 ---------------------------------------------------------------------
-  -- log_data_in_file6
+  -- pkg_log_data_in_file_6
   ---------------------------------------------------------------------
-  procedure log_data_in_file6(
+  procedure pkg_log_data_in_file_6(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -261,9 +267,9 @@ package pkg_log is
     );
 
   ---------------------------------------------------------------------
-  -- log_data_in_file7
+  -- pkg_log_data_in_file_7
   ---------------------------------------------------------------------
-  procedure log_data_in_file7(
+  procedure pkg_log_data_in_file_7(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -306,9 +312,9 @@ package pkg_log is
     );
 
   ---------------------------------------------------------------------
-  -- log_data_in_file8
+  -- pkg_log_data_in_file_8
   ---------------------------------------------------------------------
-  procedure log_data_in_file8(
+  procedure pkg_log_data_in_file_8(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -354,9 +360,9 @@ package pkg_log is
     );
 
 ---------------------------------------------------------------------
-  -- log_data_in_file10
+  -- pkg_log_data_in_file_10
   ---------------------------------------------------------------------
-  procedure log_data_in_file10(
+  procedure pkg_log_data_in_file_10(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -408,9 +414,9 @@ package pkg_log is
     );
 
 ---------------------------------------------------------------------
-  -- log_data_in_file11
+  -- pkg_log_data_in_file_11
   ---------------------------------------------------------------------
-  procedure log_data_in_file11(
+  procedure pkg_log_data_in_file_11(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -467,9 +473,9 @@ package pkg_log is
 
 
 ---------------------------------------------------------------------
-  -- log_data_in_file13
+  -- pkg_log_data_in_file_13
   ---------------------------------------------------------------------
-  procedure log_data_in_file13(
+  procedure pkg_log_data_in_file_13(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -544,7 +550,7 @@ package body pkg_log is
  --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
  --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
  --  common typ = "STD_VEC" => the std_logic_vector value is not converted
-  function column_name(constant i_NAME  : in string; constant i_DATA_COMMON_TYP  : in string := "INT") return string is
+  function pkg_column_name(constant i_NAME  : in string; constant i_DATA_COMMON_TYP  : in string := "INT") return string is
   begin
     return i_NAME & "_(" & i_DATA_COMMON_TYP & ")";
   end function;
@@ -552,9 +558,9 @@ package body pkg_log is
 
 
   ---------------------------------------------------------------------
-  -- log_data_in_file1
+  -- pkg_log_data_in_file_1
   ---------------------------------------------------------------------
-  procedure log_data_in_file1(
+  procedure pkg_log_data_in_file_1(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -588,7 +594,7 @@ package body pkg_log is
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
     constant c_TEST  : boolean   := true;
-    constant c_NAME0 : string :=  column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP); 
+    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP); 
 
   begin
 
@@ -645,15 +651,15 @@ package body pkg_log is
           v_fsm_state := E_RST;
       end case;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure log_data_in_file1;
+  end procedure pkg_log_data_in_file_1;
 
   ---------------------------------------------------------------------
-  -- log_data_in_file2
+  -- pkg_log_data_in_file_2
   ---------------------------------------------------------------------
-  procedure log_data_in_file2(
+  procedure pkg_log_data_in_file_2(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -689,8 +695,8 @@ package body pkg_log is
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
     constant c_TEST  : boolean   := true;
-    constant c_NAME0 : string :=  column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
+    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
 
   begin
 
@@ -750,16 +756,16 @@ package body pkg_log is
           v_fsm_state := E_RST;
       end case;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure log_data_in_file2;
+  end procedure pkg_log_data_in_file_2;
 
 
 ---------------------------------------------------------------------
-  -- log_data_in_file3
+  -- pkg_log_data_in_file_3
   ---------------------------------------------------------------------
-  procedure log_data_in_file3(
+  procedure pkg_log_data_in_file_3(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -797,9 +803,9 @@ package body pkg_log is
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
     constant c_TEST  : boolean   := true;
-    constant c_NAME0 : string :=  column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
+    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
 
   begin
 
@@ -858,15 +864,15 @@ package body pkg_log is
           v_fsm_state := E_RST;
       end case;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure log_data_in_file3;
+  end procedure pkg_log_data_in_file_3;
 
 ---------------------------------------------------------------------
-  -- log_data_in_file4
+  -- pkg_log_data_in_file_4
   ---------------------------------------------------------------------
-  procedure log_data_in_file4(
+  procedure pkg_log_data_in_file_4(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -908,10 +914,10 @@ package body pkg_log is
     variable v_fsm_state : t_state := E_RST;
     constant c_TEST  : boolean   := true;
 
-    constant c_NAME0 : string :=  column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
+    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
 
   begin
 
@@ -972,15 +978,15 @@ package body pkg_log is
           v_fsm_state := E_RST;
       end case;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure log_data_in_file4;
+  end procedure pkg_log_data_in_file_4;
 
 ---------------------------------------------------------------------
-  -- log_data_in_file5
+  -- pkg_log_data_in_file_5
   ---------------------------------------------------------------------
-  procedure log_data_in_file5(
+  procedure pkg_log_data_in_file_5(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -1026,11 +1032,11 @@ package body pkg_log is
     variable v_fsm_state : t_state := E_RST;
     constant c_TEST  : boolean   := true;
 
-    constant c_NAME0 : string :=  column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
+    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
 
   begin
 
@@ -1093,15 +1099,15 @@ package body pkg_log is
           v_fsm_state := E_RST;
       end case;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure log_data_in_file5;
+  end procedure pkg_log_data_in_file_5;
 
 ---------------------------------------------------------------------
-  -- log_data_in_file6
+  -- pkg_log_data_in_file_6
   ---------------------------------------------------------------------
-  procedure log_data_in_file6(
+  procedure pkg_log_data_in_file_6(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -1150,12 +1156,12 @@ package body pkg_log is
     variable v_fsm_state : t_state := E_RST;
     constant c_TEST  : boolean   := true;
 
-    constant c_NAME0 : string :=  column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
+    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
+    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
 
   begin
 
@@ -1220,15 +1226,15 @@ package body pkg_log is
           v_fsm_state := E_RST;
       end case;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure log_data_in_file6;
+  end procedure pkg_log_data_in_file_6;
 
 ---------------------------------------------------------------------
-  -- log_data_in_file7
+  -- pkg_log_data_in_file_7
   ---------------------------------------------------------------------
-  procedure log_data_in_file7(
+  procedure pkg_log_data_in_file_7(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -1280,13 +1286,13 @@ package body pkg_log is
     variable v_fsm_state : t_state := E_RST;
     constant c_TEST  : boolean   := true;
 
-    constant c_NAME0 : string :=  column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
-    constant c_NAME6 : string :=  column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
+    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
+    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
+    constant c_NAME6 : string :=  pkg_column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
 
   begin
 
@@ -1353,15 +1359,15 @@ package body pkg_log is
           v_fsm_state := E_RST;
       end case;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure log_data_in_file7;
+  end procedure pkg_log_data_in_file_7;
 
 ---------------------------------------------------------------------
-  -- log_data_in_file8
+  -- pkg_log_data_in_file_8
   ---------------------------------------------------------------------
-  procedure log_data_in_file8(
+  procedure pkg_log_data_in_file_8(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -1416,14 +1422,14 @@ package body pkg_log is
     variable v_fsm_state : t_state := E_RST;
     constant c_TEST  : boolean   := true;
 
-    constant c_NAME0 : string :=  column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
-    constant c_NAME6 : string :=  column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
-    constant c_NAME7 : string :=  column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
+    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
+    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
+    constant c_NAME6 : string :=  pkg_column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
+    constant c_NAME7 : string :=  pkg_column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
 
   begin
 
@@ -1492,15 +1498,15 @@ package body pkg_log is
           v_fsm_state := E_RST;
       end case;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure log_data_in_file8;
+  end procedure pkg_log_data_in_file_8;
 
 ---------------------------------------------------------------------
-  -- log_data_in_file10
+  -- pkg_log_data_in_file_10
   ---------------------------------------------------------------------
-  procedure log_data_in_file10(
+  procedure pkg_log_data_in_file_10(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -1561,16 +1567,16 @@ package body pkg_log is
     variable v_fsm_state : t_state := E_RST;
     constant c_TEST  : boolean   := true;
 
-    constant c_NAME0 : string :=  column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
-    constant c_NAME6 : string :=  column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
-    constant c_NAME7 : string :=  column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
-    constant c_NAME8 : string :=  column_name(i_NAME=> i_NAME8, i_DATA_COMMON_TYP=> i_DATA8_COMMON_TYP);
-    constant c_NAME9 : string :=  column_name(i_NAME=> i_NAME9, i_DATA_COMMON_TYP=> i_DATA9_COMMON_TYP);
+    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
+    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
+    constant c_NAME6 : string :=  pkg_column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
+    constant c_NAME7 : string :=  pkg_column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
+    constant c_NAME8 : string :=  pkg_column_name(i_NAME=> i_NAME8, i_DATA_COMMON_TYP=> i_DATA8_COMMON_TYP);
+    constant c_NAME9 : string :=  pkg_column_name(i_NAME=> i_NAME9, i_DATA_COMMON_TYP=> i_DATA9_COMMON_TYP);
 
   begin
 
@@ -1646,15 +1652,15 @@ package body pkg_log is
           v_fsm_state := E_RST;
       end case;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure log_data_in_file10;
+  end procedure pkg_log_data_in_file_10;
 
 ---------------------------------------------------------------------
-  -- log_data_in_file11
+  -- pkg_log_data_in_file_11
   ---------------------------------------------------------------------
-  procedure log_data_in_file11(
+  procedure pkg_log_data_in_file_11(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -1719,17 +1725,17 @@ package body pkg_log is
     variable v_fsm_state : t_state := E_RST;
     constant c_TEST  : boolean   := true;
 
-    constant c_NAME0 : string :=  column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
-    constant c_NAME6 : string :=  column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
-    constant c_NAME7 : string :=  column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
-    constant c_NAME8 : string :=  column_name(i_NAME=> i_NAME8, i_DATA_COMMON_TYP=> i_DATA8_COMMON_TYP);
-    constant c_NAME9 : string :=  column_name(i_NAME=> i_NAME9, i_DATA_COMMON_TYP=> i_DATA9_COMMON_TYP);
-    constant c_NAME10 : string :=  column_name(i_NAME=> i_NAME10, i_DATA_COMMON_TYP=> i_DATA10_COMMON_TYP);
+    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
+    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
+    constant c_NAME6 : string :=  pkg_column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
+    constant c_NAME7 : string :=  pkg_column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
+    constant c_NAME8 : string :=  pkg_column_name(i_NAME=> i_NAME8, i_DATA_COMMON_TYP=> i_DATA8_COMMON_TYP);
+    constant c_NAME9 : string :=  pkg_column_name(i_NAME=> i_NAME9, i_DATA_COMMON_TYP=> i_DATA9_COMMON_TYP);
+    constant c_NAME10 : string :=  pkg_column_name(i_NAME=> i_NAME10, i_DATA_COMMON_TYP=> i_DATA10_COMMON_TYP);
 
   begin
 
@@ -1805,16 +1811,16 @@ package body pkg_log is
           v_fsm_state := E_RST;
       end case;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure log_data_in_file11;
+  end procedure pkg_log_data_in_file_11;
 
 
 ---------------------------------------------------------------------
-  -- log_data_in_file13
+  -- pkg_log_data_in_file_13
   ---------------------------------------------------------------------
-  procedure log_data_in_file13(
+  procedure pkg_log_data_in_file_13(
     signal i_clk   : in std_logic;
     signal i_start : in std_logic;
 
@@ -1885,19 +1891,19 @@ package body pkg_log is
     variable v_fsm_state : t_state := E_RST;
     constant c_TEST  : boolean   := true;
 
-    constant c_NAME0 : string :=  column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
-    constant c_NAME6 : string :=  column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
-    constant c_NAME7 : string :=  column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
-    constant c_NAME8 : string :=  column_name(i_NAME=> i_NAME8, i_DATA_COMMON_TYP=> i_DATA8_COMMON_TYP);
-    constant c_NAME9 : string :=  column_name(i_NAME=> i_NAME9, i_DATA_COMMON_TYP=> i_DATA9_COMMON_TYP);
-    constant c_NAME10 : string :=  column_name(i_NAME=> i_NAME10, i_DATA_COMMON_TYP=> i_DATA10_COMMON_TYP);
-    constant c_NAME11 : string :=  column_name(i_NAME=> i_NAME11, i_DATA_COMMON_TYP=> i_DATA11_COMMON_TYP);
-    constant c_NAME12 : string :=  column_name(i_NAME=> i_NAME12, i_DATA_COMMON_TYP=> i_DATA12_COMMON_TYP);
+    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
+    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
+    constant c_NAME6 : string :=  pkg_column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
+    constant c_NAME7 : string :=  pkg_column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
+    constant c_NAME8 : string :=  pkg_column_name(i_NAME=> i_NAME8, i_DATA_COMMON_TYP=> i_DATA8_COMMON_TYP);
+    constant c_NAME9 : string :=  pkg_column_name(i_NAME=> i_NAME9, i_DATA_COMMON_TYP=> i_DATA9_COMMON_TYP);
+    constant c_NAME10 : string :=  pkg_column_name(i_NAME=> i_NAME10, i_DATA_COMMON_TYP=> i_DATA10_COMMON_TYP);
+    constant c_NAME11 : string :=  pkg_column_name(i_NAME=> i_NAME11, i_DATA_COMMON_TYP=> i_DATA11_COMMON_TYP);
+    constant c_NAME12 : string :=  pkg_column_name(i_NAME=> i_NAME12, i_DATA_COMMON_TYP=> i_DATA12_COMMON_TYP);
 
   begin
 
@@ -1979,10 +1985,10 @@ package body pkg_log is
           v_fsm_state := E_RST;
       end case;
 
-      wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-  end procedure log_data_in_file13;
+  end procedure pkg_log_data_in_file_13;
 
 
  
