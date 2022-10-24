@@ -264,7 +264,7 @@ begin
     show(get_logger("check:errors"), display_handler, pass);
     show(get_logger("log:sim"), display_handler, pass);
     show(get_logger("check"), display_handler, pass);
-    wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     info("c_INPUT_BASEPATH = "&c_INPUT_BASEPATH);
     info("c_OUTPUT_BASEPATH = "&c_OUTPUT_BASEPATH);
@@ -279,13 +279,13 @@ begin
     i_rst <= '1';
     i_rst_status <= '1';
     i_debug_pulse <= '0';
-    wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     info("Disable the reset");
     i_rst <= '0';
     i_rst_status <= '0';
     i_debug_pulse <= '0';
-    wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- generate register values
@@ -313,7 +313,7 @@ begin
     -- to allow some time for completion
     info("Wait end of simulation");
     wait for 4096*c_CLK_PERIOD0;      
-    wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- VUNIT - checking errors and summary
@@ -331,7 +331,7 @@ begin
          --& LF & "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(CHECKER_DATA_COUNT_c))
          );
 
-    wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     if runner_cfg'length > 0 then
       test_runner_cleanup(runner);      -- Simulation ends here
