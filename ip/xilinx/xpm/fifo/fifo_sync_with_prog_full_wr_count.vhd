@@ -25,8 +25,8 @@
 --!   @details                 
 --!
 --!   The module intanciates a synchronuous FIFO with the empty, full, prog full and wr_data_count flags/signals.
---!   The module is a wrapper of the Xilinx XPM fifo sync.
---!   Note: the following header documentation is an extract of the associated XPM Xilinx header       
+--!   The module is a wrapper of the Xilinx XPM sync fifo.
+--!   Note: the following header documentation is an extract of the associated XPM Xilinx header.    
 -- -------------------------------------------------------------------------------------------------------------   
 
 -- -------------------------------------------------------------------------------------------------------------

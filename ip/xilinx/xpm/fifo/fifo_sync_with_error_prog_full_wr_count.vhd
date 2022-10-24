@@ -26,11 +26,11 @@
 --!
 --!   This module intanciates a synchronuous FIFO with the empty, full, prog full and wr data count flags/signals
 --!   This module generates 4 types of errors in the following cases:
---!     . a writting when the FIFO is full
---!     . a writting when the FIFO is in a reset state
---!     . a reading when the FIFO is empty
---!     . a reading when the FIFO is in a reset state
---!   Note: the following header documentation is an extract of the associated XPM Xilinx header       
+--!     . a writting when the FIFO is full.
+--!     . a writting when the FIFO is in a reset state.
+--!     . a reading when the FIFO is empty.
+--!     . a reading when the FIFO is in a reset state.
+--!   Note: the following header documentation is an extract of the associated XPM Xilinx header.       
 -- -------------------------------------------------------------------------------------------------------------   
 
 -- -------------------------------------------------------------------------------------------------------------
