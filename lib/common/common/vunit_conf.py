@@ -173,7 +173,7 @@ class VunitConf:
         base_path_dic['ip_opal_kelly_simu_path'] = str(Path(root_path, 'ip/opal_kelly/simu'))
         base_path_dic['lib_opal_kelly_simu_path'] = str(Path(root_path, 'lib/opal_kelly/opal_kelly/vhdl/src'))
         base_path_dic['lib_csv_path'] = str(Path(root_path, 'lib/csv/csv/vhdl/src'))
-        base_path_dic['lib_utility_path'] = str(Path(root_path, 'lib/utility/utility/vhdl/src'))
+        base_path_dic['lib_common_path'] = str(Path(root_path, 'lib/common/common/vhdl/src'))
 
         base_path_dic['src_path'] = str(Path(root_path, 'src/hdl'))
         base_path_dic['src_system_path'] = str(Path(root_path, 'src/hdl'))
@@ -187,6 +187,7 @@ class VunitConf:
         base_path_dic['wave_path'] = str(Path(root_path, 'simu/wave'))
         base_path_dic['script_path'] = str(Path(root_path, 'simu/script'))
         base_path_dic['conf_path'] = str(Path(root_path, 'simu/conf'))
+        base_path_dic['data_path'] = str(Path(root_path, 'simu/data'))
 
         base_path_dic['vivado_glbl_path'] = str(Path(vivado_path, 'data/verilog/src'))
 
@@ -585,7 +586,7 @@ class VunitConf:
 
         return None
 
-    def compile_utility_lib(self, name_p='utility_lib', library_name_p='utility_lib', version_p='2008', level_p=None):
+    def compile_common_lib(self, name_p='common_lib', library_name_p='common_lib', version_p='2008', level_p=None):
         """
         This method compiles the user-defined files associated to the vhdl utility lib
         :param name_p: (string) name to print in the console
@@ -596,7 +597,7 @@ class VunitConf:
         """
 
         base_path_dic = self.base_path_dic
-        base_path = base_path_dic['lib_utility_path']
+        base_path = base_path_dic['lib_common_path']
 
         library_name = library_name_p
         level0   = self._get_indentation_level(level_p=level_p)
@@ -814,6 +815,36 @@ class VunitConf:
         
         return filepath_list
 
+    def get_data_filepath(self, level_p=None):
+        """
+        This method returns a list of data filepath
+        :param level_p: (integer >= 0) define the level of indentation of the message to print
+        :return: (list of string) list of filepath
+        """
+        base_path_dic = self.base_path_dic
+        base_path = base_path_dic['data_path']
+        display_obj = self.display_obj
+        filename_list = self.conf_filename_list
+        level0 = self._get_indentation_level(level_p=level_p)
+        level1 = level0 + 1
+        level2 = level0 + 2
+
+        str0 = "VunitConf.get_data_filepath"
+        display_obj.display_title(msg_p=str0, level_p=level0)
+        str0 = 'Search in base_path='+base_path
+        display_obj.display(msg_p=str0, level_p=level1)
+
+        obj = FilepathListBuilder()
+        obj.set_file_extension(file_extension_list_p=['.json'])
+        filepath_list = []
+        for filename in filename_list:
+            str0 = 'Searched filename='+filename
+            display_obj.display(msg_p=str0,level_p=level2)
+            filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
+            filepath_list.append(filepath)
+        
+        return filepath_list
+
     def _get_script_filepath(self, filename_p, level_p=None):
         """
         This method returns the filepath of the filename_p
@@ -908,18 +939,37 @@ class VunitConf:
 
         return None
 
-    def set_script(self, conf_filepath_p):
+    def set_script(self, conf_filepath_p, level_p=None):
         """
         This method set the current conf_filepath
         Note: This function must be called before the VunitConf.pre_config method
         :param conf_filepath_p: (string) -> filepath to the json file
-        :return:
+        :return: None
         """
         
-        self.conf_filepath = conf_filepath_p
+        level0        = self._get_indentation_level(level_p=level_p)
+        level1        = level0 + 1
+        level2        = level0 + 2
+        conf_filepath = conf_filepath_p
+        display_obj   = self.display_obj
+
+        str0 = "VunitConf.set_script"
+        display_obj.display_title(msg_p=str0, level_p=level0)
+        str0 = 'Set conf_filepath='+conf_filepath
+        display_obj.display(msg_p=str0, level_p=level1)
 
         script_filename = self.script_filename
-        self.script_filepath = self._get_script_filepath(filename_p=script_filename, level_p=level0)
+        script_filepath = self._get_script_filepath(filename_p=script_filename, level_p=level0)
+
+        if script_filepath is not None:
+            str0 = 'Set script_filepath='+script_filepath
+            display_obj.display(msg_p=str0, level_p=level1)
+
+
+        self.conf_filepath = conf_filepath
+        self.script_filepath = script_filepath
+
+        return None
 
     def pre_config(self, output_path):
         """
@@ -940,39 +990,49 @@ class VunitConf:
         level0      = self.level
         level1      = level0 + 1
 
-        ################################
-        # create directories (if not exist) for the VHDL testbench
-        #  .input directory  for the input data/command files
-        #  .output directory for the output data files
+        str0 = "VunitConf.pre_config"
+        display_obj.display_title(msg_p=str0, level_p=level0)
+
+        ###############################
+        #create directories (if not exist) for the VHDL testbench
+        # .input directory  for the input data/command files
+        # .output directory for the output data files
         tb_input_base_path = str(Path(output_path,'inputs').resolve())
         tb_output_base_path = str(Path(output_path,'outputs').resolve())
         self.create_directory(path_p=tb_input_base_path,level_p = level1)
         self.create_directory(path_p=tb_output_base_path,level_p =level1)
 
         # launch a python script to generate data and commands
-        # cmd = []
-        # # set the python
-        # cmd.append('python')
-        # # set the script path to call
-        # cmd.append(script_filepath)
-        # # set the --conf_filepath
-        # cmd.append('--conf_filepath')
-        # cmd.append(conf_filepath)
-        # # set the tb_input_base_path
-        # cmd.append('--tb_input_base_path')
-        # cmd.append(tb_input_base_path)
-        # # set the tb_output_base_path
-        # cmd.append('--tb_output_base_path')
-        # cmd.append(tb_output_base_path)
-        # # set the verbosity
-        # cmd.append('--verbosity')
-        # cmd.append(verbosity)
+        if script_filepath is not None:
+            cmd = []
+            # set the python
+            cmd.append('python')
+            # set the script path to call
+            cmd.append(script_filepath)
+            # set the --conf_filepath
+            cmd.append('--conf_filepath')
+            cmd.append(conf_filepath)
+            # set the tb_input_base_path
+            cmd.append('--tb_input_base_path')
+            cmd.append(tb_input_base_path)
+            # set the tb_output_base_path
+            cmd.append('--tb_output_base_path')
+            cmd.append(tb_output_base_path)
+            # set the verbosity
+            cmd.append('--verbosity')
+            cmd.append(str(verbosity))
 
-        # subprocess.run(cmd, stderr=subprocess.PIPE)
+            result = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+            result.wait()
+
+            if verbosity >= 1:
+                str0 = "VunitConf.pre_config: command: "+ " ".join(cmd)
+                display_obj.display_title(msg_p=str0, level_p=level1)
+
 
         # copy the mif files into the Vunit simulation directory
         if self.filepath_list_mif is not None:
-            self._copy_mif_files(output_path_p=output_path, debug_p=debug_p)
+            self._copy_mif_files(output_path_p=output_path, debug_p='true')
 
         # return True is mandatory for Vunit
         return True
