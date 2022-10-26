@@ -275,14 +275,14 @@ class DUT:
         self.name = name_p
         return None
 
-    def add_conf_filepath(self, path_p):
+    def add_conf_filename(self, filename_p):
         """
-        This method adds a configuration filepath
-        :param path_p: (string) path to add
+        This method adds a configuration filename
+        :param filename_p: (string) filename
         :return: None
         """
-        path_tmp = str(Path(path_p).resolve())
-        self.conf_filename_list.append(path_tmp)
+
+        self.conf_filename_list.append(filename_p)
         return None
 
     def set_tb_filename(self, filename_p):
@@ -295,7 +295,7 @@ class DUT:
         self.tb_filename = filename_p
         return None
 
-    def set_script(self, filename_p):
+    def set_script_filename(self, filename_p):
         """
         This method set a python script filename (with extension)
         Example: tb_XXX.py
@@ -429,10 +429,6 @@ if __name__ == '__main__':
     # lib path (python/VHDL)
     ############################################################################
 
-    # vhdl_simu_lib
-    relpath = './lib/vhdl_simu'
-    lib_vhdl_simu_base_path_py = str(Path(root_path, relpath).resolve())
-
     # common
     relpath = './lib/common'
     lib_common_base_path_py = str(Path(root_path, relpath).resolve())
@@ -553,17 +549,7 @@ if __name__ == '__main__':
     py_dic0 = py_lib0.get_dic(level_p=level2)
     lib_py_dic[name] = py_dic0
 
-    # utils
-    path = lib_vhdl_simu_base_path_py
-    name = "vhdl_simu"
-    py_lib0 = PyLibrary()
-    py_lib0.add_description(text_p="")
-    py_lib0.set_name(name_p=name)
-    py_lib0.add_directory_path(base_path_p=path)
-    py_dic0 = py_lib0.get_dic(level_p=level2)
-    lib_py_dic[name] = py_dic0
-
-    # utils
+    # common
     path = lib_common_base_path_py
     name = "common"
     py_lib0 = PyLibrary()
@@ -601,10 +587,9 @@ if __name__ == '__main__':
     test0 = DUT()
     test0.add_description(text_p="")
     test0.set_name(name_p=tb_name)
-    # for relfilepath in relfilepath_list:
-    #     path = str(Path(root_path,relfilepath))
-    #     test0.add_conf_filepath(path_p=path)
+    # test0.add_conf_filename(filename_p="")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    test0.set_script_filename(filename_p="")
     test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
@@ -625,9 +610,8 @@ if __name__ == '__main__':
     test0 = DUT()
     test0.add_description(text_p="")
     test0.set_name(name_p=tb_name)
-    # for relfilepath in relfilepath_list:
-    #     path = str(Path(root_path,relfilepath))
-    #     test0.add_conf_filepath(path_p=path)
+    test0.add_conf_filename(filename_p="tb_tes_top_conf.json")
+    test0.set_script_filename(filename_p="tb_tes_top.py")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
     test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
@@ -649,9 +633,7 @@ if __name__ == '__main__':
     test0 = DUT()
     test0.add_description(text_p="")
     test0.set_name(name_p=tb_name)
-    # for relfilepath in relfilepath_list:
-    #     path = str(Path(root_path,relfilepath))
-    #     test0.add_conf_filepath(path_p=path)
+    #test0.add_conf_filename(filename_p="")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
     test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
@@ -673,9 +655,7 @@ if __name__ == '__main__':
     test0 = DUT()
     test0.add_description(text_p="")
     test0.set_name(name_p=tb_name)
-    # for relfilepath in relfilepath_list:
-    #     path = str(Path(root_path,relfilepath))
-    #     test0.add_conf_filepath(path_p=path)
+    #test0.add_conf_filename(filename_p="")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
     test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
