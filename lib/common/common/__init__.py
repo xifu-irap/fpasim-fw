@@ -17,7 +17,7 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   conf_sim.py
+#    @file                   __init__.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
@@ -38,6 +38,7 @@ from common.console_colors import *
 from common.filepath_list_builder import *
 from common.display import *
 from common.vunit_conf import *
+from common.valid_sequencer import *
 
 
 
