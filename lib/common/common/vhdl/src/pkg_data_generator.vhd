@@ -26,10 +26,10 @@
 --   This simulation VHDL package defines VHDL functions/procedures in order to
 --      . generate data from an input csv file.
 --
---   Note: This package should be compiled into the utility_lib
+--   Note: This package should be compiled into the common_lib
 --   Dependencies: 
 --      . csv_lib.pkg_csv_file
---      . utility_lib.pkg_common
+--      . common_lib.pkg_common
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -37,8 +37,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library utility_lib;
-use utility_lib.pkg_common.all;
+library common_lib;
+use common_lib.pkg_common.all;
 
 library csv_lib;
 use csv_lib.pkg_csv_file.all;

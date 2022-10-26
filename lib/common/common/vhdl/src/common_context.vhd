@@ -17,7 +17,7 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   utility_context.vhd 
+--    @file                   common_context.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
@@ -28,13 +28,13 @@
 -- -------------------------------------------------------------------------------------------------------------
 
 
-context utility_context is
-  library utility_lib;
-  use utility_lib.pkg_common.all;
-  use utility_lib.pkg_data_checker.all;
-  use utility_lib.pkg_data_generator.all;
-  use utility_lib.pkg_log.all;
-  use utility_lib.pkg_ram_check.all;
-  use utility_lib.pkg_sequence.all;
+context common_context is
+  library common_lib;
+  use common_lib.pkg_common.all;
+  use common_lib.pkg_data_checker.all;
+  use common_lib.pkg_data_generator.all;
+  use common_lib.pkg_log.all;
+  use common_lib.pkg_ram_check.all;
+  use common_lib.pkg_sequence.all;
 
 end context;

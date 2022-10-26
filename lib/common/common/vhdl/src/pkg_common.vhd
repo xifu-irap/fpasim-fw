@@ -25,7 +25,7 @@
 --    @details                
 --    This VHDL package defines commonly used simulaton VHDL functions/procedures.
 --    
---    Note: This package should be compiled into the utility_lib.
+--    Note: This package should be compiled into the common_lib.
 --    Dependencies:
 --      . csv_lib.pkg_csv_file
 --

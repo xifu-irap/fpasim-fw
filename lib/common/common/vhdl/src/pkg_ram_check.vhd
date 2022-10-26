@@ -28,10 +28,10 @@
 --        . An input csv file is used to write the RAM-like content
 --        . An another csv file is used to check the RAM-like content.
 --
---    Note: This package should be compiled into the utility_lib
+--    Note: This package should be compiled into the common_lib
 --    Dependencies: 
 --      . csv_lib.pkg_csv_file
---      . utility_lib.pkg_common
+--      . common_lib.pkg_common
 --      . context vunit_lib.vunit_context
 --
 -- -------------------------------------------------------------------------------------------------------------
@@ -46,8 +46,8 @@ use csv_lib.pkg_csv_file.all;
 library vunit_lib;
 context vunit_lib.vunit_context;
 
-library utility_lib;
-use utility_lib.pkg_common.all;
+library common_lib;
+use common_lib.pkg_common.all;
 
 
 package pkg_ram_check is

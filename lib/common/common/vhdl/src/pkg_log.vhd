@@ -26,10 +26,10 @@
 --    This simulation VHDL package defines VHDL functions/procedures in order to
 --      . save data in an output csv file.              
 --
---    Note: This package should be compiled into the utility_lib
+--    Note: This package should be compiled into the common_lib
 --    Dependencies: 
 --      . csv_lib.pkg_csv_file
---      . utility_lib.pkg_common
+--      . common_lib.pkg_common
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -40,8 +40,8 @@ use ieee.numeric_std.all;
 library csv_lib;
 use csv_lib.pkg_csv_file.all;
 
-library utility_lib;
-use utility_lib.pkg_common.all;
+library common_lib;
+use common_lib.pkg_common.all;
 
 
 package pkg_log is
