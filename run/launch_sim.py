@@ -98,7 +98,7 @@ if __name__ == '__main__':
     parser.add_argument('--display', default='False', choices=['True', 'False'],
                         help='Specify if the simulator is in gui mode or not. Possible values: true or false')
     # add an optional argument
-    parser.add_argument('-v', default=0, choices=[0, 1, 2], type=int,
+    parser.add_argument('--verbosity','-v', default=0, choices=[0, 1, 2], type=int,
                         help='Specify the verbosity level. Possible values (uint): 0 to 2')
 
     args = parser.parse_args()
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     simulator = args.simulator
     test_name_list = args.test_name_list
     display = args.display
-    verbosity = args.v
+    verbosity = args.verbosity
 
     ############################################################################
     # Search the Project Base Path: root of the git repository
