@@ -1,12 +1,7 @@
-*.pdf
-
-
-/ip/xilinx/coregen/*/*.*
-/ip/xilinx/coregen/*/**/*.*
-!/ip/xilinx/coregen/*/*.xdc
-!/ip/xilinx/coregen/*/*.xci
-!/ip/xilinx/coregen/*/*.mif
-
+#########################################################
+# untracked temporary directories/files
+#########################################################
+# Untracked no necessary project files
 /project/vivado00/fpasim.runs/.jobs/**/*
 /project/vivado00/fpasim.runs/synth_1/**/*
 /project/vivado00/fpasim.ip_user_files/**/*
@@ -34,17 +29,27 @@
 /project/vivado00/fpasim.runs/**/*.xdc
 /project/vivado00/fpasim.runs/**/*.vds
 /project/vivado00/fpasim.runs/**/__synthesis_is_complete__
+# Untracked no necessary Xilinx IP Files
+/ip/xilinx/coregen/*/*.*
+/ip/xilinx/coregen/*/**/*.*
 
-/lib/common/common/__pycache__
+# Track essential Xilinx IP files
+!/ip/xilinx/coregen/*/*.xdc
+!/ip/xilinx/coregen/*/*.xci
+!/ip/xilinx/coregen/*/*.mif
 
-/simu/vunit/tmp_test
+# Untracked python compiled files
+/lib/common/**/__pycache__
+# Untracked output simulation directory
 /vunit_out
+# Untracked vendor Opal Kelly Source file directory
 /ip/opal_kelly
-
-
+# Untracked temporary vhdl source files
+/src/hdl/fmc
+# Untracked documentation
 /doc/**/*
+# Untracked vscode editor files
 /.vscode/*
-
 external_libraries.json
 language_version.json
 library_mapping.json
