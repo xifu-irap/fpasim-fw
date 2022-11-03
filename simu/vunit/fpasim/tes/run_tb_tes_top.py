@@ -111,7 +111,8 @@ if path_list != None:
 # import specific library
 #################################################################
 from vunit import VUnit, VUnitCLI
-from common import FilepathListBuilder, Display, VunitConf
+from common import Display, VunitConf
+from common import TesTopDataGen
      
 
 if __name__ == '__main__':
@@ -173,7 +174,7 @@ if __name__ == '__main__':
     #####################################################
     obj = VunitConf( json_filepath_p =json_filepath,script_name_p = script_name, json_key_path_p = json_key_path)
     obj.set_vunit_simulator(name_p = simulator,level_p=level1)
-
+    obj.set_verbosity(verbosity_p = verbosity)
     VU = VUnit.from_args(args=args)
     obj.set_vunit(vunit_object_p = VU)
     #####################################################
@@ -202,7 +203,7 @@ if __name__ == '__main__':
     obj.compile_xilinx_xpm_ip(level_p=level1)
     obj.compile_opal_kelly_lib(level_p=level1)
     obj.compile_csv_lib(level_p=level1)
-    obj.compile_utility_lib(level_p=level1)
+    obj.compile_common_lib(level_p=level1)
     
     #####################################################
     # add source files
@@ -255,24 +256,30 @@ if __name__ == '__main__':
         conf_filename = str(Path(conf_filepath).stem)
 
         name = conf_filename
-        test_name = tb_name + "." + name
+        test_name = tb_name
         
         ####################################################################
         # generate the input command/data files and others actions before launching the simulator
         ####################################################################
+        data_gen_obj = TesTopDataGen()
+        data_gen_obj.set_indentation_level(level_p= level1)
+        data_gen_obj.set_conf_filepath(conf_filepath_p= conf_filepath)
+        data_gen_obj.set_vunit_conf_obj(obj_p= obj)
 
-        obj.set_script(conf_filepath_p=conf_filepath)
-
+        # get a dictionnary of generics parameter
+        generic_dic = data_gen_obj.get_generic_dic()
         #####################################################
         # Mandatory: The simulator modelsim/Questa wants generics filepaths in the Linux format
         #####################################################
         tb.add_config(
                       name=test_name,
-                      pre_config=obj.pre_config,
-                      generics = 
-                        {
-                        "g_TEST_NAME":name
-                        }
+        
+                      # pre_config=obj.pre_config,
+                      pre_config=data_gen_obj.pre_config,
+                      generics = generic_dic
+                        # {
+                        # "g_TEST_NAME":name
+                        # }
                         )
 
 

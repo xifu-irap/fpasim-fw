@@ -29,31 +29,21 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
---use IEEE.std_logic_textio.all;
-
---library std;  -- @suppress "Superfluous library clause: access to library 'std' is implicit"
---use std.textio.all;
 
 library fpasim;
 use fpasim.pkg_fpasim.all;
 
-library opal_kelly_lib;
-use opal_kelly_lib.pkg_front_panel;
-
 library vunit_lib;
 context vunit_lib.vunit_context;
 
-library csv_lib;
-use csv_lib.pkg_csv_file;
-
-library utility_lib;
-context utility_lib.utility_context;
+library common_lib;
+context common_lib.common_context;
 
 entity tb_tes_top is
   generic(
 
-    runner_cfg : string := runner_cfg_default;  -- don't touch
-    output_path: string:= "C:/Project/fpasim-fw-hardware/";
+    runner_cfg                   : string   := runner_cfg_default;  -- don't touch
+    output_path                  : string   := "C:/Project/fpasim-fw-hardware/";
     ---------------------------------------------------------------------
     -- User generic
     ---------------------------------------------------------------------
@@ -68,33 +58,39 @@ entity tb_tes_top is
     -- output
     g_PIXEL_RESULT_OUTPUT_WIDTH  : positive := pkg_TES_MULT_SUB_Q_WIDTH_S;
 
+    g_NB_PIXEL_BY_FRAME : positive := 1;
+    g_NB_FRAME_BY_SERIE : positive := pkg_FRAME_NB;
+
     ---------------------------------------------------------------------
     -- simulation parameter
     ---------------------------------------------------------------------
     g_VUNIT_DEBUG  : boolean := true;
     g_TEST_NAME    : string  := "";
     g_ENABLE_CHECK : boolean := true;
-    g_ENABLE_LOG   : boolean := true
+    g_ENABLE_LOG   : boolean := true;
+    g_CHECK_RAM1   : boolean := true;
+    g_CHECK_RAM2   : boolean := true
     );
 end tb_tes_top;
 
 architecture simulate of tb_tes_top is
 
-   constant c_INPUT_BASEPATH : string := output_path&"inputs/";
-   constant c_OUTPUT_BASEPATH : string := output_path&"outputs/";
+  constant c_INPUT_BASEPATH  : string := output_path&"inputs/";
+  constant c_OUTPUT_BASEPATH : string := output_path&"outputs/";
 
   ---------------------------------------------------------------------
   -- module input signals
   ---------------------------------------------------------------------
-  signal i_clk                     : std_logic;
-  signal i_rst                     : std_logic;
-  signal i_rst_status              : std_logic;
-  signal i_debug_pulse             : std_logic;
+  signal i_clk         : std_logic := '0';
+  signal i_rst         : std_logic := '0';
+  signal i_rst_status  : std_logic := '0';
+  signal i_debug_pulse : std_logic := '0';
 
   -- input command: from the regdecode
   ---------------------------------------------------------------------
   signal i_en                      : std_logic;
   signal i_pixel_length            : std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);
+  signal i_pixel_nb                : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);
   signal i_frame_length            : std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0);
   -- command
   signal i_cmd_valid               : std_logic;
@@ -122,56 +118,78 @@ architecture simulate of tb_tes_top is
 
   -- from the adc
   ---------------------------------------------------------------------
-  signal i_data_valid              : std_logic;
+  signal i_data_valid : std_logic;
 
   -- output
   ---------------------------------------------------------------------
-  signal o_pixel_sof               : std_logic;
-  signal o_pixel_eof               : std_logic;
-  signal o_pixel_valid             : std_logic;
-  signal o_pixel_id                : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);
-  signal o_pixel_result            : std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0);
-  signal o_frame_sof               : std_logic;
-  signal o_frame_eof               : std_logic;
-  signal o_frame_id                : std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0);
+  signal o_pixel_sof    : std_logic;
+  signal o_pixel_eof    : std_logic;
+  signal o_pixel_valid  : std_logic;
+  signal o_pixel_id     : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);
+  signal o_pixel_result : std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0);
+  signal o_frame_sof    : std_logic;
+  signal o_frame_eof    : std_logic;
+  signal o_frame_id     : std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0);
 
   -- errors/status
   ---------------------------------------------------------------------
-  signal o_errors                  : std_logic_vector(15 downto 0);
-  signal o_status                  : std_logic_vector(7 downto 0);
+  signal o_errors : std_logic_vector(15 downto 0);
+  signal o_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- Clock definition
   ---------------------------------------------------------------------
-  constant c_CLK_PERIOD0    : time := 4 ns;
+  constant c_CLK_PERIOD0 : time := 4 ns;
 
-   ---------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- Generate reading sequence
   ---------------------------------------------------------------------
-  -- Cmd
-  signal reg_rd_valid       : std_logic := '0';
-  signal i_reg_start_data : std_logic := '0';
-  signal reg_gen_finish     : std_logic := '0';
-  signal reg_data_valid     : std_logic;
+  -- reg
+  signal reg_start      : std_logic := '0';
+  signal reg_rd_valid   : std_logic := '0';
+  signal reg_gen_finish : std_logic := '0';
+  signal reg_valid      : std_logic;
 
   -- Cmd
-  signal cmd_rd_valid       : std_logic := '0';
-  signal cmd_start_data_inp : std_logic := '0';
-  signal cmd_gen_finish     : std_logic := '0';
-  signal cmd_data_valid     : std_logic;
+  signal cmd_start      : std_logic := '0';
+  signal cmd_rd_valid   : std_logic := '0';
+  signal cmd_gen_finish : std_logic := '0';
 
-
-  -- ADC
+  -- data
+  signal data_start             : std_logic := '0';
   signal data_rd_valid          : std_logic := '0';
-  signal data_start_inp         : std_logic := '0';
   signal data_gen_finish        : std_logic := '0';
+  signal data_valid             : std_logic := '0';
   signal data_count_in          : std_logic_vector(31 downto 0);
   signal data_count_overflow_in : std_logic;
+
+
+  -- ram tes pulse shape
+  signal ram_tes_pulse_shape_wr_start          : std_logic                    := '0';
+  signal ram_tes_pulse_shape_rd_start          : std_logic                    := '0';
+  signal ram_tes_pulse_shape_rd_valid          : std_logic                    := '0';
+  signal ram_tes_pulse_shape_wr_gen_finish     : std_logic                    := '0';
+  signal ram_tes_pulse_shape_rd_gen_finish     : std_logic                    := '0';
+  signal ram_tes_pulse_shape_error             : std_logic_vector(0 downto 0) := (others => '0');
+  signal ram_tes_pulse_shape_count_in          : std_logic_vector(31 downto 0);
+  signal ram_tes_pulse_shape_count_overflow_in : std_logic;
+
+  -- ram tes steady state
+  signal ram_tes_steady_state_wr_start          : std_logic                    := '0';
+  signal ram_tes_steady_state_rd_start          : std_logic                    := '0';
+  signal ram_tes_steady_state_rd_valid          : std_logic                    := '0';
+  signal ram_tes_steady_state_wr_gen_finish     : std_logic                    := '0';
+  signal ram_tes_steady_state_rd_gen_finish     : std_logic                    := '0';
+  signal ram_tes_steady_state_error             : std_logic_vector(0 downto 0) := (others => '0');
+  signal ram_tes_steady_state_count_in          : std_logic_vector(31 downto 0);
+  signal ram_tes_steady_state_count_overflow_in : std_logic;
 
   -- check
   signal data_count_out          : std_logic_vector(31 downto 0);
   signal data_count_overflow_out : std_logic;
   signal data_error_out          : std_logic_vector(1 downto 0);
+
+  signal data_stop : std_logic:= '0';
 
 
   ---------------------------------------------------------------------
@@ -185,30 +203,44 @@ architecture simulate of tb_tes_top is
 
 
   -- input register generation
-  constant c_FILENAME_VALID_REG_IN : string := c_PY_FILENAME_SUFFIX & "valid_sequencer_reg_in.csv";
-  constant c_FILEPATH_VALID_REG_IN : string := c_INPUT_BASEPATH & c_FILENAME_VALID_REG_IN;
+  constant c_FILENAME_REG_VALID_IN : string := c_PY_FILENAME_SUFFIX & "reg_valid_sequencer_in.csv";
+  constant c_FILEPATH_REG_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_REG_VALID_IN;
 
-  constant c_FILENAME_REG_IN : string := c_PY_FILENAME_SUFFIX & "register_sequence_in.csv";
+  constant c_FILENAME_REG_IN : string := c_PY_FILENAME_SUFFIX & "reg_in.csv";
   constant c_FILEPATH_REG_IN : string := c_INPUT_BASEPATH & c_FILENAME_REG_IN;
 
   -- input cmd generation
-  constant c_FILENAME_VALID_CMD_IN : string := c_PY_FILENAME_SUFFIX & "valid_sequencer_reg_in.csv";
-  constant c_FILEPATH_VALID_CMD_IN : string := c_INPUT_BASEPATH & c_FILENAME_VALID_CMD_IN;
+  constant c_FILENAME_CMD_VALID_IN : string := c_PY_FILENAME_SUFFIX & "cmd_valid_sequencer_in.csv";
+  constant c_FILEPATH_CMD_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_CMD_VALID_IN;
 
-  constant c_FILENAME_CMD_IN : string := c_PY_FILENAME_SUFFIX & "register_sequence_in.csv";
+  constant c_FILENAME_CMD_IN : string := c_PY_FILENAME_SUFFIX & "cmd_in.csv";
   constant c_FILEPATH_CMD_IN : string := c_INPUT_BASEPATH & c_FILENAME_CMD_IN;
 
+-- input data generation
+  constant c_FILENAME_DATA_VALID_IN : string := c_PY_FILENAME_SUFFIX & "data_valid_sequencer_in.csv";
+  constant c_FILEPATH_DATA_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_VALID_IN;
 
----- input data generation
---  constant c_FILENAME_VALID_DATA_IN : string := c_PY_FILENAME_SUFFIX & "valid_sequencer_data_in.csv";
---  constant c_FILEPATH_VALID_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_VALID_DATA_IN;
+  constant c_FILENAME_DATA_IN : string := c_PY_FILENAME_SUFFIX & "data_in.csv";
+  constant c_FILEPATH_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_IN;
 
---  constant c_FILENAME_DATA_IN : string := c_MATLAB_FILENAME_SUFFIX & "data_in.csv";
---  constant c_FILEPATH_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_IN;
 
---  -- output data log
---  constant c_FILENAME_DATA_OUT : string := c_VHDL_FILENAME_SUFFIX & "data_out.csv";
---  constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT;
+  -- input ram tes pulse shape
+  constant c_FILENAME_RAM_TES_PULSE_SHAPE_VALID_IN : string := c_PY_FILENAME_SUFFIX & "ram_tes_shape_valid_sequencer_in.csv";
+  constant c_FILEPATH_RAM_TES_PULSE_SHAPE_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM_TES_PULSE_SHAPE_VALID_IN;
+
+  constant c_FILENAME_RAM_TES_PULSE_SHAPE_IN : string := c_PY_FILENAME_SUFFIX & "ram_tes_shape.csv";
+  constant c_FILEPATH_RAM_TES_PULSE_SHAPE_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM_TES_PULSE_SHAPE_IN;
+
+  -- input ram tes steady state
+  constant c_FILENAME_RAM_TES_STEADY_STATE_VALID_IN : string := c_PY_FILENAME_SUFFIX & "ram_tes_steady_state_valid_sequencer_in.csv";
+  constant c_FILEPATH_RAM_TES_STEADY_STATE_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM_TES_STEADY_STATE_VALID_IN;
+
+  constant c_FILENAME_RAM_TES_PULSE_STEADY_STATE_IN : string := c_PY_FILENAME_SUFFIX & "ram_tes_steady_state.csv";
+  constant c_FILEPATH_RAM_TES_PULSE_STEADY_STATE_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM_TES_PULSE_STEADY_STATE_IN;
+
+  -- output data log
+  constant c_FILENAME_DATA_OUT : string := c_VHDL_FILENAME_SUFFIX & "data_out.csv";
+  --constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT;
 
 --  -- check output data
 --  constant c_FILENAME_DATA_OUT_REF : string := c_MATLAB_FILENAME_SUFFIX & "data_out_ref.csv";
@@ -218,12 +250,13 @@ architecture simulate of tb_tes_top is
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers 
-  constant LOGGER_SUMMARY_c     : logger_t  := get_logger("log:summary");
+  constant c_LOGGER_SUMMARY               : logger_t  := get_logger("log:summary");
   -- checkers
-  constant CHECKER_DATA_I_c     : checker_t := new_checker("check:data_I");
-  constant CHECKER_DATA_Q_c     : checker_t := new_checker("check:data_Q");
-  constant CHECKER_ERRORS_c     : checker_t := new_checker("check:errors");
-  constant CHECKER_DATA_COUNT_c : checker_t := new_checker("check:data_count");
+  constant c_CHECKER_RAM_TES_PULSE_SHAPE  : checker_t := new_checker("check:ram_tes_pulse_shape");
+  constant c_CHECKER_RAM_TES_STEADY_STATE : checker_t := new_checker("check:ram_tes_steady_state");
+  constant c_CHECKER_ERRORS               : checker_t := new_checker("check:errors");
+  constant c_CHECKER_DATA_COUNT           : checker_t := new_checker("check:data_count");
+
 
 
 
@@ -245,7 +278,7 @@ begin
   ---------------------------------------------------------------------
   p_master_fsm : process is
 
-  variable val_v : integer := 0;
+    variable val_v : integer := 0;
 
   begin
     if runner_cfg'length > 0 then
@@ -266,53 +299,132 @@ begin
     show(get_logger("check"), display_handler, pass);
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
-    info("c_INPUT_BASEPATH = "&c_INPUT_BASEPATH);
-    info("c_OUTPUT_BASEPATH = "&c_OUTPUT_BASEPATH);
-    info("c_FILEPATH_VALID_REG_IN = "&c_FILEPATH_VALID_REG_IN);
-    info("g_TEST_NAME = "&g_TEST_NAME);
-    info("output_path = "&output_path);
-    
+    info("Test bench: Generic parameter values");
+    info("    output_path = " & output_path);
+    info("    g_PIXEL_LENGTH_WIDTH = " & to_string(g_PIXEL_LENGTH_WIDTH));
+    info("    g_PIXEL_ID_WIDTH = " & to_string(g_PIXEL_ID_WIDTH));
+    info("    g_FRAME_LENGTH_WIDTH = " & to_string(g_FRAME_LENGTH_WIDTH));
+    info("    g_FRAME_ID_WIDTH = " & to_string(g_FRAME_ID_WIDTH));
+    info("    g_PULSE_SHAPE_RAM_ADDR_WIDTH = " & to_string(g_PULSE_SHAPE_RAM_ADDR_WIDTH));
+    info("    g_PIXEL_RESULT_OUTPUT_WIDTH = " & to_string(g_PIXEL_RESULT_OUTPUT_WIDTH));
+    info("    g_NB_PIXEL_BY_FRAME = " & to_string(g_NB_PIXEL_BY_FRAME));
+    info("    g_NB_FRAME_BY_SERIE = " & to_string(g_NB_FRAME_BY_SERIE));
+    info("    g_VUNIT_DEBUG = " & to_string(g_VUNIT_DEBUG));
+    info("    g_TEST_NAME = " & g_TEST_NAME );
+    info("    g_ENABLE_CHECK = " & to_string(g_ENABLE_CHECK));
+    info("    g_ENABLE_LOG = " & to_string(g_ENABLE_LOG));
+    info("    g_CHECK_RAM1 = " & to_string(g_CHECK_RAM1));
+    info("    g_CHECK_RAM2 = " & to_string(g_CHECK_RAM2));
+    info("Test bench: input files");
+    info("    c_FILEPATH_REG_VALID_IN = " & c_FILEPATH_REG_VALID_IN);
+    info("    c_FILEPATH_REG_IN = " & c_FILEPATH_REG_IN);
+    info("    c_FILEPATH_CMD_VALID_IN = " & c_FILEPATH_CMD_VALID_IN);
+    info("    c_FILEPATH_CMD_IN = " & c_FILEPATH_CMD_IN);
+    info("    c_FILEPATH_DATA_VALID_IN = " & c_FILEPATH_DATA_VALID_IN);
+    info("    c_FILEPATH_DATA_IN = " & c_FILEPATH_DATA_IN);
+    info("    c_FILEPATH_RAM_TES_PULSE_SHAPE_VALID_IN = " & c_FILEPATH_RAM_TES_PULSE_SHAPE_VALID_IN);
+    info("    c_FILEPATH_RAM_TES_PULSE_SHAPE_IN = " & c_FILEPATH_RAM_TES_PULSE_SHAPE_IN);
+    info("    c_FILEPATH_RAM_TES_STEADY_STATE_VALID_IN = " & c_FILEPATH_RAM_TES_STEADY_STATE_VALID_IN);
+    info("    c_FILEPATH_RAM_TES_PULSE_STEADY_STATE_IN = " & c_FILEPATH_RAM_TES_PULSE_STEADY_STATE_IN);
+
     ---------------------------------------------------------------------
-    -- initial reset
+    -- reset
     ---------------------------------------------------------------------
     info("Enable the reset");
-    i_rst <= '1';
-    i_rst_status <= '1';
+    i_rst         <= '1';
+    i_rst_status  <= '1';
     i_debug_pulse <= '0';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     info("Disable the reset");
-    i_rst <= '0';
-    i_rst_status <= '0';
+    i_rst         <= '0';
+    i_rst_status  <= '0';
     i_debug_pulse <= '0';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
-    -- generate register values
+    -- Register Configuration
     ---------------------------------------------------------------------
     info("Start Register configuration");
-    i_reg_start_data <= '1';
+    reg_start <= '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     -- wait until all data from the input file are read
-    --wait until reg_gen_finish = '1';
+    wait until rising_edge(i_clk) and reg_gen_finish = '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     -- set timeout for the vunit.watchdog
     --set_timeout(runner, 2 ms);
 
     ---------------------------------------------------------------------
-    -- generate commands
+    -- RAM Configuration: tes pulse shape
+    ---------------------------------------------------------------------
+    info("Start RAM configuration (wr): tes pulse shape");
+    ram_tes_pulse_shape_wr_start <= '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    wait until rising_edge(i_clk) and ram_tes_pulse_shape_wr_gen_finish = '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+
+    ---------------------------------------------------------------------
+    -- RAM Configuration: tes steady state
+    ---------------------------------------------------------------------
+    info("Start RAM configuration (wr): tes steady state");
+    ram_tes_steady_state_wr_start <= '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    wait until rising_edge(i_clk) and ram_tes_steady_state_wr_gen_finish = '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+
+    ---------------------------------------------------------------------
+    -- Command Configuration
     ---------------------------------------------------------------------
     info("Start command configuration");
-    cmd_start_data_inp <= '1';
-    -- wait until all data from the input file are read
-    --wait until cmd_gen_finish = '1';
-
-
+    cmd_start <= '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    wait until rising_edge(i_clk) and cmd_gen_finish = '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
-    -- Ending the simulation
+    -- Data Generation
     ---------------------------------------------------------------------
-    -- to allow some time for completion
+    info("Start data Generation");
+    data_start <= '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    ---------------------------------------------------------------------
+    -- RAM Check: RAM1
+    ---------------------------------------------------------------------
+    if g_CHECK_RAM1 = true then
+       info("Start RAM reading: tes pulse shape RAM");
+       ram_tes_pulse_shape_rd_start <= '1';
+       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+       info("wait RAM reading");
+       wait until rising_edge(i_clk) and ram_tes_pulse_shape_rd_gen_finish = '1';
+    end if;
+
+    ---------------------------------------------------------------------
+    -- RAM Check: RAM2
+    ---------------------------------------------------------------------
+    if g_CHECK_RAM2 = true then
+       info("Start RAM reading: tes steady state");
+       ram_tes_steady_state_rd_start <= '1';
+       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+       info("wait RAM reading");
+       wait until rising_edge(i_clk) and ram_tes_steady_state_rd_gen_finish = '1';
+    end if;
+
+    ---------------------------------------------------------------------
+    -- Wait end of input data generation
+    ---------------------------------------------------------------------
+    info("wait end of data generation");
+    wait until rising_edge(i_clk) and data_gen_finish = '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    ---------------------------------------------------------------------
+    -- End of simulation: wait few more clock cycles
+    ---------------------------------------------------------------------
     info("Wait end of simulation");
-    wait for 4096*c_CLK_PERIOD0;      
+    wait for 4096*c_CLK_PERIOD0;
+    data_stop <= '1';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
@@ -321,14 +433,16 @@ begin
     -- errors checking
     info("Check results:");
     val_v := to_integer(unsigned(o_errors));
-    check_equal(CHECKER_ERRORS_c, 0, val_v, result("checker output errors"));
+
+    check_equal(c_CHECKER_ERRORS, 0, val_v, result("checker output errors"));
+    check_equal(c_CHECKER_DATA_COUNT, data_count_in, data_count_out, result("checker input/output data count"));
 
     -- summary
-    info(LOGGER_SUMMARY_c, "===Summary==="
-         & LF & "CHECKER_DATA_I_c: " & to_string(get_checker_stat(CHECKER_DATA_I_c))
-         & LF & "CHECKER_DATA_Q_c: " & to_string(get_checker_stat(CHECKER_DATA_Q_c))
-         & LF & "CHECKER_ERRORS_c: " & to_string(get_checker_stat(CHECKER_ERRORS_c))
-         --& LF & "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(CHECKER_DATA_COUNT_c))
+    info(c_LOGGER_SUMMARY, "===Summary==="
+         & LF & "c_CHECKER_RAM_TES_PULSE_SHAPE: " & to_string(get_checker_stat(c_CHECKER_RAM_TES_PULSE_SHAPE))
+         & LF & "c_CHECKER_RAM_TES_STEADY_STATE: " & to_string(get_checker_stat(c_CHECKER_RAM_TES_STEADY_STATE))
+         & LF & "c_CHECKER_ERRORS: " & to_string(get_checker_stat(c_CHECKER_ERRORS))
+     & LF & "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(c_CHECKER_DATA_COUNT))
          );
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
@@ -341,139 +455,375 @@ begin
   end process;
 
 --test_runner_watchdog(runner, 10 ms);
----------------------------------------------------------------------
--- register input - valid sequence
----------------------------------------------------------------------
---  reg_valid_sequence : valid_sequencer(
---    i_clk => i_clk,
---    i_en  => i_reg_start_data,
 
---    ---------------------------------------------------------------------
---    -- input file
---    ---------------------------------------------------------------------
---    i_filepath      => c_FILEPATH_VALID_REG_IN,
---    i_csv_separator => c_CSV_SEPARATOR,
-
---    ---------------------------------------------------------------------
---    -- command
---    ---------------------------------------------------------------------
---    o_valid => reg_rd_valid
---    );
+  ---------------------------------------------------------------------
+  -- Input: Register Configuration
+  ---------------------------------------------------------------------
+  gen_reg : if true generate
+    signal sig_vect : std_logic_vector(0 downto 0);
 
 
------------------------------------------------------------------------
----- register input - data generation
------------------------------------------------------------------------
---  gen_reg : if true generate
---    signal sig_vect : std_logic_vector(0 downto 0);
---  begin
---    inst_reg_data_generator : data_generator3(
---      i_clk   => i_clk,
---      i_start => i_reg_start_data,
+  begin
 
---      ---------------------------------------------------------------------
---      -- input file
---      ---------------------------------------------------------------------
---      i_filepath         => c_FILEPATH_REG_IN,
---      i_csv_separator    => c_CSV_SEPARATOR,
---      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
---      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
---      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
---      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
---      i_DATA0_COMMON_TYP => "UINT",
---      i_DATA1_COMMON_TYP => "UINT",
---      i_DATA2_COMMON_TYP => "UINT",
+    -- valid sequence
+    ---------------------------------------------------------------------
+    inst_pkg_valid_sequencer : pkg_valid_sequencer(
+      i_clk => i_clk,
+      i_en  => reg_start,
 
---      ---------------------------------------------------------------------
---      -- command
---      ---------------------------------------------------------------------
---      i_ready           => reg_rd_valid,
---      o_data_valid     => reg_data_valid,  -- not connected
---      o_data0_std_vect => sig_vect,
---      o_data1_std_vect => i_pixel_length,
---      o_data2_std_vect => i_frame_length,
+      ---------------------------------------------------------------------
+      -- input file
+      ---------------------------------------------------------------------
+      i_filepath      => c_FILEPATH_REG_VALID_IN,
+      i_csv_separator => c_CSV_SEPARATOR,
 
---      ---------------------------------------------------------------------
---      -- status
---      ---------------------------------------------------------------------
---      o_finish => reg_gen_finish
---      );
---    i_en <= sig_vect(0);
---  end generate gen_reg;
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      o_valid => reg_rd_valid
+      );
 
 
------------------------------------------------------------------------
----- cmd input - valid sequence
------------------------------------------------------------------------
---  cmd_valid_sequence : valid_sequencer(
---    i_clk => i_clk,
---    i_en  => cmd_start_data_inp,
+    -- data generation
+    ---------------------------------------------------------------------
+    inst_pkg_data_generator : pkg_data_generator_4(
+      i_clk   => i_clk,
+      i_start => reg_start,
 
---    ---------------------------------------------------------------------
---    -- input file
---    ---------------------------------------------------------------------
---    i_filepath      => c_FILEPATH_VALID_CMD_IN,
---    i_csv_separator => c_CSV_SEPARATOR,
+      ---------------------------------------------------------------------
+      -- input file
+      ---------------------------------------------------------------------
+      i_filepath         => c_FILEPATH_REG_IN,
+      i_csv_separator    => c_CSV_SEPARATOR,
+      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
+      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
+      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
+      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
+      i_DATA0_COMMON_TYP => "UINT",
+      i_DATA1_COMMON_TYP => "UINT",
+      i_DATA2_COMMON_TYP => "UINT",
+      i_DATA3_COMMON_TYP => "UINT",
 
---    ---------------------------------------------------------------------
---    -- command
---    ---------------------------------------------------------------------
---    o_valid => cmd_rd_valid
---    );
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      i_ready          => reg_rd_valid,
+      o_data_valid     => reg_valid,    -- not connected
+      o_data0_std_vect => sig_vect,
+      o_data1_std_vect => i_pixel_length,
+      o_data2_std_vect => i_pixel_nb,
+      o_data3_std_vect => i_frame_length,
+
+      ---------------------------------------------------------------------
+      -- status
+      ---------------------------------------------------------------------
+      o_finish => reg_gen_finish
+      );
+    i_en <= sig_vect(0);
+  end generate gen_reg;
+
+  ---------------------------------------------------------------------
+  -- Input: Command Configuration
+  ---------------------------------------------------------------------
+  gen_cmd : if true generate
+
+  begin
+
+    --  valid sequence
+    ---------------------------------------------------------------------
+    inst_pkg_valid_sequencer : pkg_valid_sequencer(
+      i_clk => i_clk,
+      i_en  => cmd_start,
+
+      ---------------------------------------------------------------------
+      -- input file
+      ---------------------------------------------------------------------
+      i_filepath      => c_FILEPATH_CMD_VALID_IN,
+      i_csv_separator => c_CSV_SEPARATOR,
+
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      o_valid => cmd_rd_valid
+      );
 
 
------------------------------------------------------------------------
----- cmd input - data generation
------------------------------------------------------------------------
---  gen_cmd : if true generate
-    
---  begin
---    inst_cmd_data_generator : data_generator3(
---      i_clk   => i_clk,
---      i_start => cmd_start_data_inp,
+    --  data generation
+    ---------------------------------------------------------------------
+    inst_pkg_data_generator : pkg_data_generator_3(
+      i_clk   => i_clk,
+      i_start => cmd_start,
 
---      ---------------------------------------------------------------------
---      -- input file
---      ---------------------------------------------------------------------
---      i_filepath         => c_FILEPATH_CMD_IN,
---      i_csv_separator    => c_CSV_SEPARATOR,
---      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
---      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
---      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
---      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
---      i_DATA0_COMMON_TYP => "UINT",
---      i_DATA1_COMMON_TYP => "UINT",
---      i_DATA2_COMMON_TYP => "UINT",
+      ---------------------------------------------------------------------
+      -- input file
+      ---------------------------------------------------------------------
+      i_filepath         => c_FILEPATH_CMD_IN,
+      i_csv_separator    => c_CSV_SEPARATOR,
+      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
+      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
+      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
+      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
+      i_DATA0_COMMON_TYP => "UINT",
+      i_DATA1_COMMON_TYP => "UINT",
+      i_DATA2_COMMON_TYP => "UINT",
 
---      ---------------------------------------------------------------------
---      -- command
---      ---------------------------------------------------------------------
---      i_ready           => cmd_rd_valid,
---      o_data_valid     => i_cmd_valid, 
---      o_data0_std_vect => i_cmd_pulse_height,
---      o_data1_std_vect => i_cmd_pixel_id,
---      o_data2_std_vect => i_cmd_time_shift,
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      i_ready          => cmd_rd_valid,
+      o_data_valid     => i_cmd_valid,
+      o_data0_std_vect => i_cmd_pulse_height,
+      o_data1_std_vect => i_cmd_pixel_id,
+      o_data2_std_vect => i_cmd_time_shift,
 
---      ---------------------------------------------------------------------
---      -- status
---      ---------------------------------------------------------------------
---      o_finish => cmd_gen_finish
---      );
+      ---------------------------------------------------------------------
+      -- status
+      ---------------------------------------------------------------------
+      o_finish => cmd_gen_finish
+      );
 
---  end generate gen_cmd;
+  end generate gen_cmd;
+
+  ---------------------------------------------------------------------
+  -- Input: RAM Configuration (tes pulse shape)
+  ---------------------------------------------------------------------
+  gen_ram_tes_pulse_shape : if true generate
+
+  begin
+
+    -- valid sequence
+    ---------------------------------------------------------------------
+    inst_pkg_valid_sequencer : pkg_valid_sequencer(
+      i_clk => i_clk,
+      i_en  => ram_tes_pulse_shape_wr_start,
+
+      ---------------------------------------------------------------------
+      -- input file
+      ---------------------------------------------------------------------
+      i_filepath      => c_FILEPATH_RAM_TES_PULSE_SHAPE_VALID_IN,
+      i_csv_separator => c_CSV_SEPARATOR,
+
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      o_valid => ram_tes_pulse_shape_rd_valid
+      );
+
+    -- Data RAM Generation
+    ---------------------------------------------------------------------
+    inst_pkg_memory_wr_tdpram_and_check : pkg_memory_wr_tdpram_and_check(
+      i_clk      => i_clk,
+      i_start_wr => ram_tes_pulse_shape_wr_start,
+      i_start_rd => ram_tes_pulse_shape_rd_start,
+
+      ---------------------------------------------------------------------
+      -- input file
+      ---------------------------------------------------------------------
+      i_filepath_wr   => c_FILEPATH_RAM_TES_PULSE_SHAPE_IN,
+      i_filepath_rd   => c_FILEPATH_RAM_TES_PULSE_SHAPE_IN,
+      i_csv_separator => c_CSV_SEPARATOR,
+
+      i_RD_NAME1 => "RAM_TES_PULSE_SHAPE",
+
+      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
+      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
+      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
+      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
+      i_WR_RD_ADDR_COMMON_TYP => "UINT",
+      i_WR_DATA_COMMON_TYP    => "UINT",
+      i_RD_DATA_COMMON_TYP    => "UINT",
+      ---------------------------------------------------------------------
+      -- Vunit Scoreboard objects
+      ---------------------------------------------------------------------
+      i_data_sb               => c_CHECKER_RAM_TES_PULSE_SHAPE,
+
+      i_rd_ready        => ram_tes_pulse_shape_rd_valid,
+      i_wr_ready        => ram_tes_pulse_shape_rd_valid,
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      o_wr_data_valid   => i_pulse_shape_wr_en,
+      o_rd_data_valid   => i_pulse_shape_rd_en,
+      o_wr_rd_addr_vect => i_pulse_shape_wr_rd_addr,
+      o_wr_data_vect    => i_pulse_shape_wr_data,
+
+      -- read value
+      i_rd_data_valid => o_pulse_shape_rd_valid,
+      i_rd_data_vect  => o_pulse_shape_rd_data,
+
+      ---------------------------------------------------------------------
+      -- status
+      ---------------------------------------------------------------------
+      o_wr_finish => ram_tes_pulse_shape_wr_gen_finish,
+      o_rd_finish => ram_tes_pulse_shape_rd_gen_finish,
+      o_error     => ram_tes_pulse_shape_error
+      );
+
+  end generate gen_ram_tes_pulse_shape;
+
+
+  ---------------------------------------------------------------------
+  -- Input: RAM Configuration (tes steady state)
+  ---------------------------------------------------------------------
+  gen_ram_tes_steady_state : if true generate
+
+  begin
+
+    -- valid sequence generation
+    ---------------------------------------------------------------------
+    inst_pkg_valid_sequencer : pkg_valid_sequencer(
+      i_clk => i_clk,
+      i_en  => ram_tes_steady_state_wr_start,
+
+      ---------------------------------------------------------------------
+      -- input file
+      ---------------------------------------------------------------------
+      i_filepath      => c_FILEPATH_RAM_TES_STEADY_STATE_VALID_IN,
+      i_csv_separator => c_CSV_SEPARATOR,
+
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      o_valid => ram_tes_steady_state_rd_valid
+      );
+
+    -- Data RAM generation
+    ---------------------------------------------------------------------
+    inst_pkg_memory_wr_tdpram_and_check : pkg_memory_wr_tdpram_and_check(
+      i_clk      => i_clk,
+      i_start_wr => ram_tes_steady_state_wr_start,
+      i_start_rd => ram_tes_steady_state_rd_start,
+
+      ---------------------------------------------------------------------
+      -- input file
+      ---------------------------------------------------------------------
+      i_filepath_wr   => c_FILEPATH_RAM_TES_PULSE_STEADY_STATE_IN,
+      i_filepath_rd   => c_FILEPATH_RAM_TES_PULSE_STEADY_STATE_IN,
+      i_csv_separator => c_CSV_SEPARATOR,
+
+      i_RD_NAME1 => "RAM_TES_STEADY_STATE",
+
+      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
+      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
+      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
+      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
+      i_WR_RD_ADDR_COMMON_TYP => "UINT",
+      i_WR_DATA_COMMON_TYP    => "UINT",
+      i_RD_DATA_COMMON_TYP    => "UINT",
+      ---------------------------------------------------------------------
+      -- Vunit Scoreboard objects
+      ---------------------------------------------------------------------
+      i_data_sb               => c_CHECKER_RAM_TES_STEADY_STATE,
+
+      i_rd_ready        => ram_tes_steady_state_rd_valid,
+      i_wr_ready        => ram_tes_steady_state_rd_valid,
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      o_wr_data_valid   => i_steady_state_wr_en,
+      o_rd_data_valid   => i_steady_state_rd_en,
+      o_wr_rd_addr_vect => i_steady_state_wr_rd_addr,
+      o_wr_data_vect    => i_steady_state_wr_data,
+
+      -- read value
+      i_rd_data_valid => o_steady_state_rd_valid,
+      i_rd_data_vect  => o_steady_state_rd_data,
+
+      ---------------------------------------------------------------------
+      -- status
+      ---------------------------------------------------------------------
+      o_wr_finish => ram_tes_steady_state_wr_gen_finish,
+      o_rd_finish => ram_tes_steady_state_rd_gen_finish,
+      o_error     => ram_tes_steady_state_error
+      );
+
+  end generate gen_ram_tes_steady_state;
+
+
+  ---------------------------------------------------------------------
+  -- Input: data generation
+  ---------------------------------------------------------------------
+  gen_data : if true generate
+    signal vect_tmp : std_logic_vector(0 downto 0);
+  begin
+
+    -- valid sequence generation
+    ---------------------------------------------------------------------
+    inst_pkg_valid_sequencer : pkg_valid_sequencer(
+      i_clk => i_clk,
+      i_en  => data_start,
+
+      ---------------------------------------------------------------------
+      -- input file
+      ---------------------------------------------------------------------
+      i_filepath      => c_FILEPATH_DATA_VALID_IN,
+      i_csv_separator => c_CSV_SEPARATOR,
+
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      o_valid => data_rd_valid
+      );
+
+    -- data generation
+    ---------------------------------------------------------------------
+    inst_pkg_data_generator : pkg_data_generator_1(
+      i_clk   => i_clk,
+      i_start => data_start,
+
+      ---------------------------------------------------------------------
+      -- input file
+      ---------------------------------------------------------------------
+      i_filepath         => c_FILEPATH_DATA_IN,
+      i_csv_separator    => c_CSV_SEPARATOR,
+      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
+      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
+      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
+      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
+      i_DATA0_COMMON_TYP => "UINT",
+
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      i_ready          => data_rd_valid,
+      o_data_valid     => data_valid,
+      o_data0_std_vect => vect_tmp,     -- not connected
+
+      ---------------------------------------------------------------------
+      -- status
+      ---------------------------------------------------------------------
+      o_finish => data_gen_finish
+      );
+
+    i_data_valid <= data_valid;
+
+    -- count input data
+    ---------------------------------------------------------------------
+    inst_pkg_data_valid_counter_in : pkg_data_valid_counter(
+      i_clk        => i_clk,
+      -- input
+      i_start      => data_start,
+      i_data_valid => data_valid,
+      -- output
+      o_count      => data_count_in,
+      o_overflow   => data_count_overflow_in
+      );
+
+  end generate gen_data;
 
 
 ---------------------------------------------------------------------
 -- DUT
 ---------------------------------------------------------------------
-  inst_tes_top : entity fpasim.tes_top
+  inst_dut_tes_top : entity fpasim.tes_top
     generic map(
       -- pixel
       g_PIXEL_LENGTH_WIDTH         => g_PIXEL_LENGTH_WIDTH,  -- bus width in order to define the number of samples by pixel
-      g_PIXEL_ID_WIDTH             => g_PIXEL_ID_WIDTH,  -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+      g_PIXEL_ID_WIDTH             => o_pixel_id'length,  -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
       -- frame
       g_FRAME_LENGTH_WIDTH         => g_FRAME_LENGTH_WIDTH,  -- bus width in order to define the number of samples by frame
-      g_FRAME_ID_WIDTH             => g_FRAME_ID_WIDTH,  -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+      g_FRAME_ID_WIDTH             => o_frame_id'length,  -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+      g_FRAME_NB                   => g_NB_FRAME_BY_SERIE,  -- frame id bus width (expressed in bits). Possible values [1;max integer value[
       -- addr
       g_PULSE_SHAPE_RAM_ADDR_WIDTH => g_PULSE_SHAPE_RAM_ADDR_WIDTH,  -- address bus width (expressed in bits)
       -- output
@@ -489,6 +839,7 @@ begin
       ---------------------------------------------------------------------
       i_en                      => i_en,           -- enable
       i_pixel_length            => i_pixel_length,
+      i_pixel_nb                => i_pixel_nb,
       i_frame_length            => i_frame_length,
       -- command
       i_cmd_valid               => i_cmd_valid,    -- valid command
@@ -497,20 +848,20 @@ begin
       i_cmd_time_shift          => i_cmd_time_shift,    -- time shift command
       -- RAM: pulse shape
       -- wr
-      i_pulse_shape_wr_en       => i_pulse_shape_wr_en,  -- write enable
+      i_pulse_shape_wr_en       => i_pulse_shape_wr_en,   -- write enable
       i_pulse_shape_wr_rd_addr  => i_pulse_shape_wr_rd_addr,   -- write address
       i_pulse_shape_wr_data     => i_pulse_shape_wr_data,    -- write data
       -- rd
-      i_pulse_shape_rd_en       => i_pulse_shape_rd_en,  -- rd enable
+      i_pulse_shape_rd_en       => i_pulse_shape_rd_en,   -- rd enable
       o_pulse_shape_rd_valid    => o_pulse_shape_rd_valid,   -- rd data valid
       o_pulse_shape_rd_data     => o_pulse_shape_rd_data,    -- rd data
       -- RAM:
       -- wr
-      i_steady_state_wr_en      => i_steady_state_wr_en,     -- write enable
+      i_steady_state_wr_en      => i_steady_state_wr_en,  -- write enable
       i_steady_state_wr_rd_addr => i_steady_state_wr_rd_addr,  -- write address
       i_steady_state_wr_data    => i_steady_state_wr_data,   -- write data
       -- rd
-      i_steady_state_rd_en      => i_steady_state_rd_en,     -- rd enable
+      i_steady_state_rd_en      => i_steady_state_rd_en,  -- rd enable
       o_steady_state_rd_valid   => o_steady_state_rd_valid,  -- rd data valid
       o_steady_state_rd_data    => o_steady_state_rd_data,   -- read data
       ---------------------------------------------------------------------
@@ -523,17 +874,98 @@ begin
       o_pixel_sof               => o_pixel_sof,    -- first pixel sample
       o_pixel_eof               => o_pixel_eof,    -- last pixel sample
       o_pixel_valid             => o_pixel_valid,  -- valid pixel sample
-      o_pixel_id                => o_pixel_id,     -- output pixel id
-      o_pixel_result            => o_pixel_result,      -- output pixel result
+      o_pixel_id                => o_pixel_id,     --  pixel id
+      o_pixel_result            => o_pixel_result,      --  pixel result
       o_frame_sof               => o_frame_sof,    -- first frame sample
       o_frame_eof               => o_frame_eof,    -- last frame sample
-      o_frame_id                => o_frame_id,     -- output frame id
+      o_frame_id                => o_frame_id,     --  frame id
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------
       o_errors                  => o_errors,       -- output errors
       o_status                  => o_status        -- output status
       );
+
+  -- count output data
+  ---------------------------------------------------------------------
+  inst_pkg_data_valid_counter_out : pkg_data_valid_counter(
+    i_clk        => i_clk,
+    -- input
+    i_start      => data_start,
+    i_data_valid => o_pixel_valid,
+    -- output
+    o_count      => data_count_out,
+    o_overflow   => data_count_overflow_out
+    );
+
+
+
+---------------------------------------------------------------------
+-- log: data out
+---------------------------------------------------------------------
+  gen_log : if g_ENABLE_LOG = true generate
+    signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
+    signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
+    signal frame_sof_vect_tmp : std_logic_vector(0 downto 0);
+    signal frame_eof_vect_tmp : std_logic_vector(0 downto 0);
+  begin
+    pixel_sof_vect_tmp(0) <= o_pixel_sof;
+    pixel_eof_vect_tmp(0) <= o_pixel_eof;
+    frame_sof_vect_tmp(0) <= o_frame_sof;
+    frame_eof_vect_tmp(0) <= o_frame_eof;
+
+    gen_log_by_id: for i in 0 to g_NB_PIXEL_BY_FRAME - 1 generate
+      constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & c_VHDL_FILENAME_SUFFIX & "data_out" & to_string(i) & ".csv";
+      signal data_valid : std_logic;
+    begin
+        data_valid <= o_pixel_valid when to_integer(unsigned(o_pixel_id)) = i else '0';
+
+        inst_pkg_log_data_in_file : pkg_log_data_in_file_7(
+          i_clk   => i_clk,
+          i_start => data_start,
+          i_stop  => data_stop,
+
+          ---------------------------------------------------------------------
+          -- output file
+          ---------------------------------------------------------------------
+          i_filepath      => c_FILEPATH_DATA_OUT,
+          i_csv_separator => c_CSV_SEPARATOR,
+
+          i_NAME0            => "pixel_sof",
+          i_NAME1            => "pixel_eof",
+          i_NAME2            => "pixel_id",
+          i_NAME3            => "pixel_result",
+          i_NAME4            => "frame_sof",
+          i_NAME5            => "frame_eof",
+          i_NAME6            => "frame_id",
+          --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
+          --  common typ = "INT" => the std_logic_vector value is converted into signed int representation
+          --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
+          --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
+          --  common typ = "STD_VEC" => the std_logic_vector value is not converted
+          i_DATA0_COMMON_TYP => "UINT",
+          i_DATA1_COMMON_TYP => "UINT",
+          i_DATA2_COMMON_TYP => "UINT",
+          i_DATA3_COMMON_TYP => "UINT",
+          i_DATA4_COMMON_TYP => "UINT",
+          i_DATA5_COMMON_TYP => "UINT",
+          i_DATA6_COMMON_TYP => "UINT",
+          ---------------------------------------------------------------------
+          -- signals to log
+          ---------------------------------------------------------------------
+          i_data_valid       => data_valid,
+          i_data0_std_vect   => pixel_sof_vect_tmp,
+          i_data1_std_vect   => pixel_eof_vect_tmp,
+          i_data2_std_vect   => o_pixel_id,
+          i_data3_std_vect   => o_pixel_result,
+          i_data4_std_vect   => frame_sof_vect_tmp,
+          i_data5_std_vect   => frame_eof_vect_tmp,
+          i_data6_std_vect   => o_frame_id
+          );
+       
+    end generate gen_log_by_id;
+
+  end generate gen_log;
 
 
 end simulate;

@@ -26,9 +26,6 @@
 # 
 # -------------------------------------------------------------------------------------------------------------
 
-
-
-
 import os
 # Enable the coloring in the console
 os.system("")
@@ -112,7 +109,139 @@ if path_list != None:
 # import specific library
 #################################################################
 from vunit import VUnit, VUnitCLI
-from common import FilepathListBuilder, Display, VunitConf
+from common import FilepathListBuilder, Display, VunitConf, ValidSequencer
+
+
+class TesSignallingModel:
+    def __init__(self):
+        self.nb_sample_by_pixel = None
+        self.nb_frame_by_serie = None
+        self.nb_pixel_by_frame = None
+        self.nb_serie = None
+
+        self.pixel_sof_list = []
+        self.pixel_eof_list = []
+        self.pixel_id_list = []
+        self.frame_sof_list = []
+        self.frame_eof_list = []
+        self.frame_id_list = []
+
+    def set_conf(self,nb_sample_by_pixel_p,nb_pixel_by_frame_p,nb_frame_by_serie_p,nb_serie_p):
+        self.nb_sample_by_pixel = nb_sample_by_pixel_p
+        self.nb_frame_by_serie = nb_frame_by_serie_p
+        self.nb_pixel_by_frame = nb_pixel_by_frame_p
+        self.nb_serie = nb_serie_p
+        self._compute()
+
+    def _oversample(self,data_list_p,oversample_p):
+        res = []
+
+        for data in data_list_p:
+            for i in range(oversample_p):
+                res.append(data)
+        return res
+    def _compute_flags(self,data_list_p,length_p):
+
+        sof_list = []
+        eof_list = []
+        cnt = 1
+        for data in data_list_p:
+            if cnt == 1:
+                sof_list.append(1)
+            else:
+                sof_list.append(0)
+            if cnt == length_p:
+                eof_list.append(1)
+            else:
+                eof_list.append(0)
+            if cnt == length_p:
+                cnt = 1
+            else:
+                cnt = cnt + 1
+        return sof_list,eof_list
+    def _compute(self):
+        nb_sample_by_pixel = self.nb_sample_by_pixel
+        nb_pixel_by_frame   = self.nb_pixel_by_frame
+        nb_frame_by_serie  = self.nb_frame_by_serie
+        nb_serie           = self.nb_serie
+
+        nb_sample_by_frame = nb_pixel_by_frame * nb_sample_by_pixel
+
+        # compute id
+        pixel_id_list = list(range(0,nb_pixel_by_frame-1))
+        frame_id_list = list(range(0,nb_frame_by_serie-1))
+
+        # oversample
+        pixel_id_oversample_list = self._oversample(data_list_p=pixel_id_list,oversample_p=nb_sample_by_pixel)
+        frame_id_oversample_list = self._oversample(data_list_p=frame_id_list,oversample_p=nb_sample_by_frame)
+
+        # duplicate
+        pixel_id_oversample_list = pixel_id_oversample_list * nb_serie * nb_frame_by_serie
+        frame_id_oversample_list = frame_id_oversample_list * nb_serie
+        # compute flags
+        pixel_sof_list,pixel_eof_list = self._compute_flags(data_list_p=pixel_id_oversample_list,length_p=nb_sample_by_pixel)
+        frame_sof_list,frame_eof_list = self._compute_flags(data_list_p=frame_id_oversample_list,length_p=nb_sample_by_frame)
+
+        self.pixel_sof_list = pixel_sof_list
+        self.pixel_eof_list = pixel_eof_list
+        self.pixel_id_list = pixel_id_oversample_list
+
+        self.frame_sof_list = frame_sof_list
+        self.frame_eof_list = frame_eof_list
+        self.frame_id_list = frame_id_oversample_list
+
+
+
+    def save(self,filepath_p,csv_separator_p=';'):
+
+
+        pixel_sof_list = self.pixel_sof_list
+        pixel_eof_list = self.pixel_eof_list
+        pixel_id_list = self.pixel_id_list
+
+        frame_sof_list = self.frame_sof_list
+        frame_eof_list = self.frame_eof_list
+        frame_id_list = self.frame_id_list
+
+
+        filepath = filepath_p
+        csv_separator = csv_separator_p
+
+        fid = open(filepath,'w')
+        #############################################
+        # write header
+        #############################################
+        fid.write('pixel_sof_uint_t')
+        fid.write(csv_separator)
+        fid.write('pixel_eof_uint_t')
+        fid.write(csv_separator)
+        fid.write('pixel_id_uint_t')
+        fid.write(csv_separator)
+        fid.write('frame_sof_uint_t')
+        fid.write(csv_separator)
+        fid.write('frame_eof_uint_t')
+        fid.write(csv_separator)
+        fid.write('frame_id_uint_t')
+        fid.write('\n')
+        index_max = len(pixel_sof_list) - 1
+        #############################################
+        index = 0
+        for pixel_sof,pixel_eof,pixel_id,frame_sof,frame_eof,frame_id in zip(pixel_sof_list,pixel_eof_list,pixel_id_list,frame_sof_list,frame_eof_list,frame_id_list):
+            fid.write(str(pixel_sof))
+            fid.write(csv_separator)
+            fid.write(str(pixel_eof))
+            fid.write(csv_separator)
+            fid.write(str(pixel_id))
+            fid.write(csv_separator)
+            fid.write(str(frame_sof))
+            fid.write(csv_separator)
+            fid.write(str(frame_eof))
+            fid.write(csv_separator)
+            fid.write(str(frame_id))
+            if index != index_max:
+                fid.write('\n')
+            index = index + 1
+        fid.close()
      
 
 if __name__ == '__main__':
@@ -162,26 +291,82 @@ if __name__ == '__main__':
 
     # returns JSON object as
     # a dictionary
-    self.json_data = json.load(fid_in)
+    json_data = json.load(fid_in)
 
     # Closing file
     fid_in.close()
 
-    register_list = json_data["register"]["value"]
-    en_list = []
-    pixel_length_list = []
-    frame_length_list = []
-    for reg in register_list:
-        en = reg["en"]
-        pixel_length = reg["pixel_length"]
-        frame_length = reg["frame_length"]
-        en_list.append(en)
-        pixel_length_list.append(pixel_length)
-        frame_length_list.append(frame_length)
 
-        print("en",en)
-        print("pixel_length",pixel_length)
-        print("frame_length",frame_length)
+    ################################################
+    # process all sequences
+    ################################################
+    csv_separator = ';'
+    msg0 = 'write sequence file'
+    obj_display.display_subtitle(msg_p=msg0,level_p=level0)
+
+    dic_sequence = []
+    dic_sequence.append(json_data["register"]["sequence"])
+    dic_sequence.append(json_data["cmd"]["sequence"])
+
+    for dic in dic_sequence:
+        filename = dic["filename"]
+        filepath   = str(Path(tb_input_base_path,filename).resolve())
+        
+        ctrl       = str(dic["ctrl"])
+        min_value1 = str(dic["min_value1"])
+        max_value1 = str(dic["max_value1"])
+        min_value2 = str(dic["min_value2"])
+        max_value2 = str(dic["max_value2"])
+        max_value2 = str(dic["max_value2"])
+        time_shift = str(dic["time_shift"])
+
+        seq = ValidSequencer(name_p = filename)
+        seq.set_verbosity(verbosity_p=verbosity)
+        seq.set_sequence(ctrl_p=ctrl, 
+                         min_value1_p=min_value1,
+                         max_value1_p=max_value1,
+                         min_value2_p=min_value2,
+                         max_value2_p=max_value2,
+                         time_shift_p=time_shift)
+        seq.save(filepath_p=filepath,csv_separator_p=csv_separator)
+
+        msg0 = 'write filepath='+filepath
+        obj_display.display(msg_p=msg0,level_p=level1)
+
+
+    ####################################################
+    # process register
+    ####################################################
+    msg0 = 'write register file'
+    obj_display.display_subtitle(msg_p=msg0,level_p=level0)
+
+    filename     = json_data["register"]["value"]["filename"]
+    en           = int(json_data["register"]["value"]["en"])
+    nb_sample_by_pixel = int(json_data["register"]["value"]["nb_sample_by_pixel"])
+    nb_pixel_by_frame  = int(json_data["register"]["value"]["nb_pixel_by_frame"])
+    nb_frame_by_serie  = int(json_data["register"]["value"]["nb_frame_by_serie"])
+    nb_serie           = int(json_data["register"]["value"]["nb_serie"])
+
+    pixel_length = nb_sample_by_pixel
+    frame_length = nb_sample_by_pixel * nb_pixel_by_frame
+
+    filepath     = str(Path(tb_input_base_path,filename))
+    fid = open(filepath,'w')
+    # header
+    fid.write('en_uint1_t')
+    fid.write(csv_separator)
+    fid.write('pixel_length_uint')
+    fid.write(csv_separator)
+    fid.write('frame_length_uint')
+    fid.write('\n')
+    fid.write(str(en))
+    fid.write(csv_separator)
+    fid.write(str(pixel_length))
+    fid.write(csv_separator)
+    fid.write(str(frame_length))
+
+    msg0 = 'write filepath='+filepath
+    obj_display.display(msg_p=msg0,level_p=level1)
 
 
 
