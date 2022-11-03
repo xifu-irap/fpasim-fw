@@ -53,64 +53,6 @@ use common_lib.pkg_common.all;
 package pkg_ram_check is
 
 
-
-  ---------------------------------------------------------------------
-  -- pkg_memory_wr_and_check
-  ---------------------------------------------------------------------
-  procedure pkg_memory_wr_and_check(
-    signal i_clk      : in std_logic;
-    signal i_start_wr : in std_logic;
-    signal i_start_rd : in std_logic;
-
-    ---------------------------------------------------------------------
-    -- input file
-    ---------------------------------------------------------------------
-    i_filepath_wr   : in string;
-    i_filepath_rd   : in string;
-    i_csv_separator : in character;
-
-    constant i_RD_NAME1 : in string;
-
-    --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
-    --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
-    --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
-    --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
-    constant i_WR_DATA0_COMMON_TYP : in string := "HEX";
-    constant i_WR_DATA1_COMMON_TYP : in string := "HEX";
-
-    constant i_RD_DATA0_COMMON_TYP : in string := "HEX";
-    constant i_RD_DATA1_COMMON_TYP : in string := "HEX";  -- value to read value
-    ---------------------------------------------------------------------
-    -- Vunit Scoreboard objects
-    ---------------------------------------------------------------------
-    constant i_data_sb             : in checker_t;
-
-    ---------------------------------------------------------------------
-    -- command
-    ---------------------------------------------------------------------
-    signal i_wr_ready       : in  std_logic;
-    signal o_wr_data_valid : out std_logic;
-    signal o_wr_data0_vect : out std_logic_vector;
-    signal o_wr_data1_vect : out std_logic_vector;
-
-    -- address to read
-    signal i_rd_ready       : in  std_logic;
-    signal o_rd_data_valid : out std_logic;
-    signal o_rd_data0_vect : out std_logic_vector;
-
-    -- read value
-    signal i_rd_data_valid : in std_logic;
-    signal i_rd_data_vect1 : in std_logic_vector;
-
-    ---------------------------------------------------------------------
-    -- status
-    ---------------------------------------------------------------------
-    signal o_wr_finish : out std_logic;
-    signal o_rd_finish : out std_logic;
-    signal o_error     : out std_logic_vector(0 downto 0)
-    );
-
-
   ---------------------------------------------------------------------
   -- pkg_memory_wr_tdpram_and_check
   ---------------------------------------------------------------------
@@ -171,242 +113,7 @@ package body pkg_ram_check is
 
 
 
-  ---------------------------------------------------------------------
-  -- pkg_memory_wr_and_check
-  ---------------------------------------------------------------------
-  procedure pkg_memory_wr_and_check(
-    signal i_clk      : in std_logic;
-    signal i_start_wr : in std_logic;
-    signal i_start_rd : in std_logic;
-
-    ---------------------------------------------------------------------
-    -- input file
-    ---------------------------------------------------------------------
-    i_filepath_wr   : in string;
-    i_filepath_rd   : in string;
-    i_csv_separator : in character;
-
-    constant i_RD_NAME1 : in string;
-
-    --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
-    --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
-    --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
-    --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
-    constant i_WR_DATA0_COMMON_TYP : in string := "HEX";
-    constant i_WR_DATA1_COMMON_TYP : in string := "HEX";
-
-    constant i_RD_DATA0_COMMON_TYP : in string := "HEX";
-    constant i_RD_DATA1_COMMON_TYP : in string := "HEX";
-
-    ---------------------------------------------------------------------
-    -- Vunit Scoreboard objects
-    ---------------------------------------------------------------------
-    constant i_data_sb : in checker_t;
-
-    ---------------------------------------------------------------------
-    -- command
-    ---------------------------------------------------------------------
-    signal i_wr_ready       : in  std_logic;
-    signal o_wr_data_valid : out std_logic;
-    signal o_wr_data0_vect : out std_logic_vector;
-    signal o_wr_data1_vect : out std_logic_vector;
-
-    -- address to read
-    signal i_rd_ready       : in  std_logic;
-    signal o_rd_data_valid : out std_logic;
-    signal o_rd_data0_vect : out std_logic_vector;
-
-    -- read value
-    signal i_rd_data_valid : in std_logic;
-    signal i_rd_data_vect1 : in std_logic_vector;
-
-    ---------------------------------------------------------------------
-    -- status
-    ---------------------------------------------------------------------
-    signal o_wr_finish : out std_logic;
-    signal o_rd_finish : out std_logic;
-    signal o_error     : out std_logic_vector(0 downto 0)
-   --signal o_error : out integer
-    )is
-    variable v_csv_file : t_csv_file_reader;
-
-    type t_state is (E_RST, E_WAIT_WR, E_RUN_WR, E_WAIT_RD, E_RUN_RD0, E_RUN_RD1, E_END);
-    variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
-
-    variable v_wr_data_valid : std_logic                                  := '0';
-    variable v_wr_data0      : std_logic_vector(o_wr_data0_vect'range) := (others => '0');
-    variable v_wr_data1      : std_logic_vector(o_wr_data1_vect'range) := (others => '0');
-    variable v_wr_finish     : std_logic                                  := '0';
-
-    variable v_rd_data_valid : std_logic                                  := '0';
-    variable v_rd_data0      : std_logic_vector(o_rd_data0_vect'range) := (others => '0');
-    variable v_rd_data1      : std_logic_vector(i_rd_data_vect1'range)  := (others => '0');
-    variable v_rd_finish     : std_logic                                  := '0';
-
-    --variable v_error : integer := 0;
-    variable v_error : std_logic_vector(o_error'range) := (others => '0');
-
-  begin
-
-    while c_TEST loop
-
-      case v_fsm_state is
-
-        when E_RST =>
-
-          v_wr_data_valid := '0';
-          v_wr_finish     := '0';
-          v_rd_data_valid := '0';
-          v_rd_finish     := '0';
-          --v_error     := 0;
-          v_error         := (others => '0');
-          v_fsm_state         := E_WAIT_WR;
-
-        when E_WAIT_WR =>
-
-          if i_start_wr = '1' then
-
-            v_csv_file.initialize(i_filepath_wr, csv_separator => i_csv_separator);
-            -- skip the header
-            v_csv_file.readline(void);
-
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
-              v_wr_finish := '1';
-              v_csv_file.dispose(void);
-              v_fsm_state     := E_WAIT_RD;
-            else
-              v_wr_finish := '0';
-              v_fsm_state     := E_RUN_WR;
-            end if;
-          else
-            v_fsm_state := E_WAIT_WR;
-          end if;
-
-        when E_RUN_WR =>
-
-          if i_wr_ready = '1' then
-            v_csv_file.readline(void);
-            v_wr_data_valid := '1';
-            v_wr_data0      := v_csv_file.read_common_typ_as_std_vec(length => v_wr_data0'length, common_typ => i_WR_DATA0_COMMON_TYP);
-            v_wr_data1      := v_csv_file.read_common_typ_as_std_vec(length => v_wr_data1'length, common_typ => i_WR_DATA1_COMMON_TYP);
-
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
-              v_wr_finish     := '1';
-              v_wr_data_valid := '0';
-              v_csv_file.dispose(void);
-              v_fsm_state         := E_WAIT_RD;
-            else
-              v_wr_finish := '0';
-              v_fsm_state     := E_RUN_WR;
-            end if;
-          else
-
-            v_wr_data_valid := '0';
-            v_fsm_state         := E_RUN_WR;
-          end if;
-
-        when E_WAIT_RD =>
-
-
-          if i_start_rd = '1' then
-
-            v_csv_file.initialize(i_filepath_rd, csv_separator => i_csv_separator);
-            -- skip the header
-            v_csv_file.readline(void);
-
-            v_rd_data_valid := '0';
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
-              v_rd_finish := '1';
-              v_csv_file.dispose(void);
-              v_fsm_state     := E_END;
-            else
-              v_rd_finish := '0';
-              v_fsm_state     := E_RUN_RD0;
-            end if;
-          else
-            v_fsm_state := E_WAIT_RD;
-          end if;
-
-
-        when E_RUN_RD0 =>
-
-          if i_rd_ready = '1' then
-            v_csv_file.readline(void);
-            v_rd_data_valid := '1';
-            v_rd_data0      := v_csv_file.read_common_typ_as_std_vec(length => v_rd_data0'length, common_typ => i_RD_DATA0_COMMON_TYP);
-            v_rd_data1      := v_csv_file.read_common_typ_as_std_vec(length => v_rd_data1'length, common_typ => i_RD_DATA1_COMMON_TYP);
-            v_fsm_state         := E_RUN_RD1;
-          else
-
-            v_rd_data_valid := '0';
-            v_fsm_state         := E_RUN_RD0;
-          end if;
-
-        when E_RUN_RD1 =>
-
-          if i_rd_data_valid = '1' then
-
-            if v_rd_data1 /= i_rd_data_vect1 then
-              --v_error := 1;
-              v_error(0) := '1';
-            else
-              --v_error := 0;
-              v_error(0) := '0';
-            end if;
-            check_equal(i_data_sb, v_rd_data1, i_rd_data_vect1, result(i_RD_NAME1 &" (Matlab) : " & to_string(v_rd_data1) & ", " & i_RD_NAME1 & " (VHDL) : "& to_string(i_rd_data_vect1)));
-
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
-              v_rd_finish := '1';
-              v_csv_file.dispose(void);
-              v_fsm_state     := E_END;
-            else
-              v_rd_finish := '0';
-              v_fsm_state     := E_RUN_RD0;
-            end if;
-          else
-            v_fsm_state := E_RUN_RD1;
-          end if;
-
-        when E_END =>
-
-          v_wr_data_valid := '0';
-          v_rd_data_valid := '0';
-          v_wr_finish     := '1';
-          v_rd_finish     := '1';
-          v_fsm_state         := E_END;
-
-
-
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
-          v_fsm_state := E_RST;
-
-
-      end case;
-
-      o_wr_data_valid <= v_wr_data_valid;
-      o_wr_data0_vect <= v_wr_data0;
-      o_wr_data1_vect <= v_wr_data1;
-
-      --
-      o_rd_data_valid <= v_rd_data_valid;
-      o_rd_data0_vect <= v_rd_data0;
-
-      ---------------------------------------------------------------------
-      -- status
-      ---------------------------------------------------------------------
-      o_wr_finish <= v_wr_finish;
-      o_rd_finish <= v_rd_finish;
-      o_error     <= v_error;
-
-      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-    end loop;
-
-  end procedure pkg_memory_wr_and_check;
-
-
-
-  ---------------------------------------------------------------------
+   ---------------------------------------------------------------------
   -- pkg_memory_wr_tdpram_and_check
   ---------------------------------------------------------------------
   procedure pkg_memory_wr_tdpram_and_check(
@@ -475,6 +182,8 @@ package body pkg_ram_check is
     variable v_rd_data       : std_logic_vector(i_rd_data_vect'range) := (others => '0');
     variable v_rd_finish     : std_logic                                  := '0';
 
+    variable v_cnt : integer := 0;
+
     --variable v_error : integer := 0;
     variable v_error : std_logic_vector(o_error'range) := (others => '0');
 
@@ -524,7 +233,6 @@ package body pkg_ram_check is
 
             if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
               v_wr_finish     := '1';
-              v_wr_data_valid := '0';
               v_csv_file.dispose(void);
               v_fsm_state         := E_WAIT_RD;
             else
@@ -539,6 +247,7 @@ package body pkg_ram_check is
 
         when E_WAIT_RD =>
 
+              v_wr_data_valid := '0';
 
           if i_start_rd = '1' then
 
@@ -575,7 +284,7 @@ package body pkg_ram_check is
           end if;
 
         when E_RUN_RD1 =>
-
+          v_rd_data_valid := '0';
           if i_rd_data_valid = '1' then
 
             if v_rd_data /= i_rd_data_vect then
@@ -585,8 +294,8 @@ package body pkg_ram_check is
               --v_error := 0;
               v_error(0) := '0';
             end if;
-            check_equal(i_data_sb, v_rd_data, i_rd_data_vect, result(i_RD_NAME1 &" (Matlab) : " & to_string(v_rd_data) & ", " & i_RD_NAME1 & " (VHDL) : "& to_string(i_rd_data_vect)));
-
+            check_equal(i_data_sb, v_rd_data, i_rd_data_vect, result(i_RD_NAME1 & ", index:" & to_string(v_cnt) & ", (file) : " & to_string(v_rd_data) & ", " & i_RD_NAME1 & " (VHDL) : "& to_string(i_rd_data_vect)));
+            v_cnt := v_cnt + 1;
             if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
               v_rd_finish := '1';
               v_csv_file.dispose(void);
