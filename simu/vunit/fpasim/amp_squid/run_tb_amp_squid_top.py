@@ -111,7 +111,7 @@ if path_list != None:
 # import specific library
 #################################################################
 from vunit import VUnit, VUnitCLI
-from common import FilepathListBuilder, Display, VunitConf
+from common import Display, VunitConf
      
 
 if __name__ == '__main__':
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     #####################################################
     obj = VunitConf( json_filepath_p =json_filepath,script_name_p = script_name, json_key_path_p = json_key_path)
     obj.set_vunit_simulator(name_p = simulator,level_p=level1)
-
+    obj.set_verbosity(verbosity_p = verbosity)
     VU = VUnit.from_args(args=args)
     obj.set_vunit(vunit_object_p = VU)
     #####################################################
@@ -253,13 +253,13 @@ if __name__ == '__main__':
         conf_filename = str(Path(conf_filepath).stem)
 
         name = conf_filename
-        test_name = tb_name + "." + name
+        test_name = tb_name
         
         ####################################################################
         # generate the input command/data files and others actions before launching the simulator
         ####################################################################
 
-        obj.set_script(conf_filepath_p=conf_filepath)
+        obj.set_script(conf_filepath_p=conf_filepath, level_p=level1)
 
         #####################################################
         # Mandatory: The simulator modelsim/Questa wants generics filepaths in the Linux format
