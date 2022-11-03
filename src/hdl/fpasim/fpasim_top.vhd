@@ -29,6 +29,8 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
 library fpasim;
 use fpasim.pkg_fpasim.all;
 use fpasim.pkg_regdecode.all;
@@ -111,6 +113,7 @@ end entity top_fpasim;
 architecture RTL of top_fpasim is
   constant c_PIXEL_ID_WIDTH : integer := pkg_PIXEL_ID_WIDTH_MAX;
   constant c_FRAME_ID_WIDTH : integer := pkg_FRAME_ID_WIDTH;
+  constant c_FRAME_NB : integer := pkg_FRAME_NB;
 
   constant c_TES_TOP_LATENCY                : integer  := pkg_TES_TOP_LATENCY;
   constant c_MUX_SQUID_TOP_LATENCY          : integer  := pkg_MUX_SQUID_TOP_LATENCY;
@@ -182,6 +185,10 @@ architecture RTL of top_fpasim is
 
 -- tes_conf 
 ---------------------------------------------------------------------
+  constant c_TES_CONF_PIXEL_NB_IDX_H : integer := pkg_TES_CONF_PIXEL_NB_IDX_H;
+  constant c_TES_CONF_PIXEL_NB_IDX_L : integer := pkg_TES_CONF_PIXEL_NB_IDX_L;
+  constant c_TES_CONF_PIXEL_NB_WIDTH : integer := pkg_TES_CONF_PIXEL_NB_WIDTH;
+
   constant c_TES_CONF_PIXEL_LENGTH_IDX_H : integer := pkg_TES_CONF_PIXEL_LENGTH_IDX_H;
   constant c_TES_CONF_PIXEL_LENGTH_IDX_L : integer := pkg_TES_CONF_PIXEL_LENGTH_IDX_L;
   constant c_TES_CONF_PIXEL_LENGTH_WIDTH : integer := pkg_TES_CONF_PIXEL_LENGTH_WIDTH;
@@ -224,6 +231,7 @@ architecture RTL of top_fpasim is
   signal sync_delay : std_logic_vector(c_RA_DELAY_WIDTH - 1 downto 0);
 
   -- tes_conf register
+  signal pixel_nb     : std_logic_vector(c_TES_CONF_PIXEL_NB_WIDTH - 1 downto 0);
   signal pixel_length : std_logic_vector(c_TES_CONF_PIXEL_LENGTH_WIDTH - 1 downto 0);
   signal frame_length : std_logic_vector(c_TES_CONF_FRAME_LENGTH_WIDTH - 1 downto 0);
 
@@ -664,6 +672,7 @@ begin
   sync_delay <= reg_ra_delay(c_RA_DELAY_IDX_H downto c_RA_DELAY_IDX_L);
 
 -- extract fields from the tes_conf
+  pixel_nb     <= reg_tes_conf(c_TES_CONF_PIXEL_NB_IDX_H downto c_TES_CONF_PIXEL_NB_IDX_L);
   pixel_length <= reg_tes_conf(c_TES_CONF_PIXEL_LENGTH_IDX_H downto c_TES_CONF_PIXEL_LENGTH_IDX_L);
   frame_length <= reg_tes_conf(c_TES_CONF_FRAME_LENGTH_IDX_H downto c_TES_CONF_FRAME_LENGTH_IDX_L);
 
@@ -799,6 +808,7 @@ begin
       -- frame
       g_FRAME_LENGTH_WIDTH => frame_length'length,
       g_FRAME_ID_WIDTH     => frame_id1'length,
+      g_FRAME_NB           => c_FRAME_NB,
 
       -- addr
       g_PULSE_SHAPE_RAM_ADDR_WIDTH => tes_pulse_shape_ram_wr_rd_addr_tmp'length,
@@ -817,6 +827,7 @@ begin
       i_en          => en,
 
       i_pixel_length            => pixel_length,
+      i_pixel_nb                => pixel_nb,
       i_frame_length            => frame_length,
       -- command
       i_cmd_valid               => cmd_valid,

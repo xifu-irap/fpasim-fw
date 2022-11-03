@@ -30,6 +30,8 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
 
 library fpasim;
 use fpasim.pkg_fpasim.all;
@@ -42,6 +44,7 @@ entity tes_top is
     -- frame
     g_FRAME_LENGTH_WIDTH         : positive := 11; -- bus width in order to define the number of samples by frame
     g_FRAME_ID_WIDTH             : positive := pkg_FRAME_ID_WIDTH;  -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+    g_FRAME_NB                   : positive := pkg_FRAME_NB;
     -- addr
     g_PULSE_SHAPE_RAM_ADDR_WIDTH : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- output
@@ -60,6 +63,7 @@ entity tes_top is
     ---------------------------------------------------------------------
     i_en               : in std_logic;  -- enable
     i_pixel_length     : in std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);
+    i_pixel_nb         : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1    downto 0);     -- number of pixel
     i_frame_length     : in std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0);
     -- command
     i_cmd_valid        : in std_logic;  -- valid command
@@ -114,6 +118,8 @@ end entity tes_top;
 architecture RTL of tes_top is
   constant c_FRAME_SIZE  : positive := pkg_FRAME_SIZE;
   constant c_FRAME_WIDTH : positive := pkg_FRAME_WIDTH;
+  constant c_FRAME_NB    : positive := g_FRAME_NB;
+  constant c_FRAME_ID_SIZE : std_logic_vector(o_frame_id'range) := std_logic_vector(to_unsigned(g_FRAME_NB - 1, o_frame_id'length));
   ---------------------------------------------------------------------
   -- tes_signalling
   ---------------------------------------------------------------------
@@ -175,7 +181,7 @@ begin
       g_PIXEL_ID_WIDTH     => g_PIXEL_ID_WIDTH,
       -- frame
       g_FRAME_LENGTH_WIDTH => i_frame_length'length,
-      g_FRAME_ID_WIDTH     => g_FRAME_ID_WIDTH
+      g_FRAME_ID_WIDTH     => frame_id0'length
       )
     port map(
       i_clk          => i_clk,
@@ -185,7 +191,9 @@ begin
       ---------------------------------------------------------------------
       i_start        => i_en,
       i_pixel_length => i_pixel_length,
+      i_pixel_nb     => i_pixel_nb,
       i_frame_length => i_frame_length,
+      i_frame_nb     => c_FRAME_ID_SIZE,
       ---------------------------------------------------------------------
       -- Input data
       ---------------------------------------------------------------------
@@ -208,7 +216,7 @@ begin
   inst_tes_pulse_shape_manager : entity fpasim.tes_pulse_shape_manager
     generic map(
       -- frame
-      g_FRAME_SIZE                 => c_FRAME_SIZE,
+      g_FRAME_NB                   => c_FRAME_NB,
       g_FRAME_WIDTH                => c_FRAME_WIDTH,
       -- pixel
       g_PIXEL_ID_WIDTH             => pixel_id0'length,

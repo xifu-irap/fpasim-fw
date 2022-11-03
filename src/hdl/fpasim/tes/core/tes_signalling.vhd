@@ -63,8 +63,10 @@ entity tes_signalling is
         -- Commands
         ---------------------------------------------------------------------
         i_start        : in  std_logic; -- start the signalling generation
-        i_pixel_length : in  std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);
-        i_frame_length : in  std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0);
+        i_pixel_length : in  std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0); -- number of samples by pixel
+        i_pixel_nb     : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);     -- number of pixel
+        i_frame_length : in  std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0); -- number of samples by frame
+        i_frame_nb     : in std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0); -- number of frames by series
         ---------------------------------------------------------------------
         -- Input data
         ---------------------------------------------------------------------
@@ -85,10 +87,8 @@ entity tes_signalling is
 end entity tes_signalling;
 
 architecture RTL of tes_signalling is
-    -- pixel
-    constant c_PIXEL_ID_SIZE : std_logic_vector(o_pixel_id'range) := std_logic_vector(to_unsigned(pkg_MUX_FACT_MAX, o_pixel_id'length));
     -- frame
-    constant c_FRAME_ID_SIZE : std_logic_vector(o_frame_id'range) := std_logic_vector(to_unsigned(pkg_FRAME_NB, o_frame_id'length));
+    
     constant c_NB_PIPES_OUT  : integer                            := pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY;
     ---------------------------------------------------------------------
     -- pixel signalling
@@ -113,7 +113,7 @@ begin
     inst_tes_signalling_pixel : entity fpasim.tes_signalling_generator
         generic map(
             g_LENGTH_WIDTH => i_pixel_length'length,
-            g_ID_WIDTH     => c_PIXEL_ID_SIZE'length,
+            g_ID_WIDTH     => i_pixel_nb'length,
             -- number of the output registers
             g_LATENCY_OUT  => c_NB_PIPES_OUT
         )
@@ -125,7 +125,7 @@ begin
             ---------------------------------------------------------------------
             i_start      => i_start,
             i_length     => i_pixel_length,
-            i_id_size    => c_PIXEL_ID_SIZE,
+            i_id_size    => i_pixel_nb,
             ---------------------------------------------------------------------
             -- Input data
             ---------------------------------------------------------------------
@@ -145,7 +145,7 @@ begin
     inst_tes_signalling_frame : entity fpasim.tes_signalling_generator
         generic map(
             g_LENGTH_WIDTH => i_frame_length'length,
-            g_ID_WIDTH     => c_FRAME_ID_SIZE'length,
+            g_ID_WIDTH     => i_frame_nb'length,
             -- number of the output registers
             g_LATENCY_OUT  => c_NB_PIPES_OUT
         )
@@ -157,7 +157,7 @@ begin
             ---------------------------------------------------------------------
             i_start      => i_start,
             i_length     => i_frame_length,
-            i_id_size    => c_FRAME_ID_SIZE,
+            i_id_size    => i_frame_nb,
             ---------------------------------------------------------------------
             -- Input data
             ---------------------------------------------------------------------
