@@ -81,19 +81,40 @@ package pkg_common is
   );
 
 
-  ---------------------------------------------------------------------
--- This function allows to count the duration (expressed in clock cycles) of the i_data_valid signal
--- Note: this is a modulo counter
+---------------------------------------------------------------------
+-- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
+-- Note: 
+--   . The last counter bit is used to detect an overflow.
 ---------------------------------------------------------------------
   procedure pkg_data_valid_counter(
     signal i_clk        : in  std_logic;
     -- input
     signal i_start      : in  std_logic;
-    signal i_data_valid :     std_logic;
+    signal i_data_valid : in  std_logic;
     -- output
     signal o_count     : out std_logic_vector;
     signal o_overflow  : out std_logic
     );
+
+
+  ---------------------------------------------------------------------
+-- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
+-- if the i_load is set to '1', then i_load_data is load in the counter
+-- Note: 
+--   . The last counter bit is used to detect an overflow.
+---------------------------------------------------------------------
+  procedure pkg_data_valid_counter_with_load(
+    signal i_clk        : in  std_logic;
+    -- input
+    signal i_start      : in  std_logic;
+    signal i_data_valid : in  std_logic;
+    signal i_load       : in std_logic;
+    signal i_load_data  : in std_logic_vector;
+    -- output
+    signal o_count     : out std_logic_vector;
+    signal o_overflow  : out std_logic
+    );
+
 
   ---------------------------------------------------------------------
 -- frame_flags_builder_file
@@ -206,16 +227,18 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
 
  
 ---------------------------------------------------------------------
--- This function allows to count the duration (expressed in clock cycles) of the i_data_valid signal
--- Note: this is a modulo counter
+-- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
+-- Note: 
+--   . The last counter bit is used to detect an overflow.
 ---------------------------------------------------------------------
-  procedure pkg_data_valid_counter(signal i_clk        : in  std_logic;
-                               -- input
-                               signal i_start      : in  std_logic;
-                               signal i_data_valid :     std_logic;
-                               -- output
-                               signal o_count     : out std_logic_vector;
-                               signal o_overflow  : out std_logic
+   procedure pkg_data_valid_counter(
+                signal i_clk        : in  std_logic;
+                   -- input
+                   signal i_start      : in  std_logic;
+                   signal i_data_valid : in std_logic;
+                   -- output
+                   signal o_count     : out std_logic_vector;
+                   signal o_overflow  : out std_logic
                                ) is
     type t_state is (E_RST, E_WAIT, E_RUN);
     variable v_fsm_state : t_state := E_RST;
@@ -269,6 +292,81 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 0 ps);
     end loop;
   end procedure pkg_data_valid_counter;
+
+
+  ---------------------------------------------------------------------
+-- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
+-- if the i_load is set to '1', then i_load_data is load in the counter
+-- Note: 
+--   . The last counter bit is used to detect an overflow.
+---------------------------------------------------------------------
+  procedure pkg_data_valid_counter_with_load(
+                               signal i_clk        : in  std_logic;
+                               -- input
+                               signal i_start      : in  std_logic;
+                               signal i_data_valid : in std_logic;
+                               signal i_load       : in std_logic;
+                               signal i_load_data  : in std_logic_vector;
+                               -- output
+                               signal o_count     : out std_logic_vector;
+                               signal o_overflow  : out std_logic
+                               ) is
+    type t_state is (E_RST, E_WAIT, E_RUN);
+    variable v_fsm_state : t_state := E_RST;
+    constant c_TEST  : boolean   := true;
+
+    variable v_cnt          : unsigned(o_count'high + 1 downto 0) := (others => '0');  -- add 1 to detect an overflow
+    variable v_MSB_bit_last : std_logic                              := '0';
+    variable v_MSB_bit      : std_logic                              := '0';
+    variable v_overflow     : std_logic                              := '0';
+  begin
+    while c_TEST loop
+      case v_fsm_state is
+        when E_RST =>
+
+          v_cnt          := (others => '0');
+          v_overflow     := '0';
+          v_MSB_bit      := '0';
+          v_MSB_bit_last := '0';
+          v_fsm_state        := E_WAIT;
+
+        when E_WAIT =>
+          ---------------------------------------------------------------------
+          -- wait to be sure: uvvm object are correctly initialized
+          ---------------------------------------------------------------------
+          if i_start = '1' then
+            v_fsm_state := E_RUN;
+          else
+            v_fsm_state := E_WAIT;
+          end if;
+
+        when E_RUN =>
+
+          if i_data_valid = '1' then
+            if i_load = '1' then
+              v_cnt := unsigned(i_load_data);
+            else
+              v_cnt := v_cnt + 1;
+            end if;
+          end if;
+          -- 
+          v_MSB_bit := v_cnt(v_cnt'high);
+          if v_MSB_bit /= v_MSB_bit_last then
+            v_overflow := '1';
+          end if;
+          v_MSB_bit_last := v_MSB_bit;
+
+          v_fsm_state := E_RUN;
+
+        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+          v_fsm_state := E_RST;
+      end case;
+      o_overflow <= v_overflow;
+      o_count    <= std_logic_vector(v_cnt(o_count'range));
+
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 0 ps);
+    end loop;
+  end procedure pkg_data_valid_counter_with_load;
 
   
 
