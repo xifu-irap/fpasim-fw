@@ -36,6 +36,7 @@ from pathlib import Path
 import subprocess
 # Json lib
 import json
+import shutil
 
 
 # retrieve all python library path in order to import them
@@ -434,7 +435,7 @@ if __name__ == '__main__':
     lib_common_base_path_py = str(Path(root_path, relpath).resolve())
 
     json_data = {}
-    ############################################################################
+
     # Define main description_list keys
     ############################################################################
     description_list = []
@@ -467,6 +468,10 @@ if __name__ == '__main__':
     json_data["description_list"] = description_list
 
     ############################################################################
+    # Section1: get environment variable
+    #   => set the values in the output file
+    ############################################################################
+
     # get the VUNIT_PATH environment variable
     ############################################################################
     env_name = "VUNIT_PATH"
@@ -476,7 +481,6 @@ if __name__ == '__main__':
     json_data[env_name.lower()] = env.get_dic()
     vunit_path = env.path
 
-    ############################################################################
     # get the VUNIT_VIVADO_PATH environment variable
     ############################################################################
     env_name = "VUNIT_VIVADO_PATH"
@@ -486,7 +490,6 @@ if __name__ == '__main__':
     json_data[env_name.lower()] = env.get_dic()
     vivado_path = env.path
 
-    ############################################################################
     # get the VUNIT_MODELSIM_PATH environment variable
     ############################################################################
     env_name = "VUNIT_MODELSIM_PATH"
@@ -495,7 +498,6 @@ if __name__ == '__main__':
         text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
     json_data[env_name.lower()] = env.get_dic()
 
-    ############################################################################
     # get the VUNIT_QUESTA_PATH environment variable
     ############################################################################
     env_name = "VUNIT_QUESTA_PATH"
@@ -504,7 +506,6 @@ if __name__ == '__main__':
         text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
     json_data[env_name.lower()] = env.get_dic()
 
-    ############################################################################
     # get the VUNIT_MODELSIM_COMPILE_LIB_PATH environment variable
     ############################################################################
     env_name = "VUNIT_MODELSIM_COMPILE_LIB_PATH"
@@ -513,7 +514,6 @@ if __name__ == '__main__':
         text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
     json_data[env_name.lower()] = env.get_dic()
 
-    ############################################################################
     # get the VUNIT_QUESTA_COMPILE_LIB_PATH environment variable
     ############################################################################
     env_name = "VUNIT_QUESTA_COMPILE_LIB_PATH"
@@ -522,8 +522,34 @@ if __name__ == '__main__':
         text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
     json_data[env_name.lower()] = env.get_dic()
 
+    # get the VUNIT_QUESTA_COMPILE_LIB_PATH environment variable
     ############################################################################
-    # set root path
+    env_name = "VUNIT_OPAL_KELLY_PATH"
+    env = Env(env_name_p=env_name, mandatory_p=1, level_p=level1)
+    env.add_description(
+        text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
+    json_data[env_name.lower()] = env.get_dic()
+    opal_kelly_path = env.path
+
+    
+
+    ############################################################################
+    # Section2: copy the vendor opal kelly files defined by the environment variable
+    #      in the @root_project_path/ip/opal_kelly directory
+    ############################################################################
+    relpath = 'ip/opal_kelly'
+    dst_path = str(Path(root_path,relpath))
+    shutil.copytree(src=opal_kelly_path, dst=dst_path, dirs_exist_ok=True)
+
+    msg0 = 'Info : Copy Opal Kelly IP files:'
+    obj_display.display(msg_p=msg0, level_p=level1, color_p='green')
+    msg0 = 'from the directory: '+opal_kelly_path
+    obj_display.display(msg_p=msg0, level_p=level2, color_p='green')
+    msg0 = 'to the project directory: '+dst_path
+    obj_display.display(msg_p=msg0, level_p=level2, color_p='green')
+
+    ############################################################################
+    # Section3: set root path
     ############################################################################
     dic = {}
     description_list = []
@@ -532,8 +558,9 @@ if __name__ == '__main__':
     dic['path'] = root_path
     json_data['root_path'] = dic
 
+
     ############################################################################
-    # define the lib section
+    # Section4: Define the python library paths
     ############################################################################
 
     # define the python library
@@ -569,7 +596,7 @@ if __name__ == '__main__':
     json_data["lib"] = dic
 
     ############################################################################
-    # define every individual test
+    # Section5: Define each individual test
     ############################################################################
     # dictionary of individual test (the key name must be unique)
     solo_test_dic = {}
@@ -578,6 +605,7 @@ if __name__ == '__main__':
     ############################################################################
     # search run python script file
     tb_name = 'tb_system_fpasim'
+    test_name = tb_name
     obj = FilepathListBuilder()
     obj.set_file_extension(file_extension_list_p=['.py'])
     vunit_basepath = str(Path(root_path, 'simu/vunit'))
@@ -595,12 +623,13 @@ if __name__ == '__main__':
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[tb_name] = test_dic0
+    solo_test_dic[test_name] = test_dic0
 
     # 1: individual test
     ############################################################################
     # search run python script file
     tb_name = 'tb_tes_top'
+    test_name = tb_name
     obj = FilepathListBuilder()
     obj.set_file_extension(file_extension_list_p=['.py'])
     vunit_basepath = str(Path(root_path, 'simu/vunit'))
@@ -618,12 +647,13 @@ if __name__ == '__main__':
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[tb_name] = test_dic0
+    solo_test_dic[test_name] = test_dic0
 
     # 2: individual test
     ############################################################################
     # search run python script file
     tb_name = 'tb_amp_squid_top'
+    test_name = tb_name
     obj = FilepathListBuilder()
     obj.set_file_extension(file_extension_list_p=['.py'])
     vunit_basepath = str(Path(root_path, 'simu/vunit'))
@@ -640,12 +670,13 @@ if __name__ == '__main__':
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[tb_name] = test_dic0
+    solo_test_dic[test_name] = test_dic0
 
     # 3: individual test
     ############################################################################
     # search run python script file
     tb_name = 'tb_mux_squid_top'
+    test_name = tb_name
     obj = FilepathListBuilder()
     obj.set_file_extension(file_extension_list_p=['.py'])
     vunit_basepath = str(Path(root_path, 'simu/vunit'))
@@ -662,19 +693,44 @@ if __name__ == '__main__':
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[tb_name] = test_dic0
+    solo_test_dic[test_name] = test_dic0
+
+    # 4: individual test
+    ############################################################################
+    # search run python script file
+    tb_name = 'tb_tes_top'
+    test_name = 'tb_tes_top_debug'
+    obj = FilepathListBuilder()
+    obj.set_file_extension(file_extension_list_p=['.py'])
+    vunit_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    # generate individual test
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
+    test0 = DUT()
+    test0.add_description(text_p="")
+    test0.set_name(name_p=tb_name)
+    test0.add_conf_filename(filename_p="tb_tes_top_conf_debug.json")
+    test0.set_script_filename(filename_p="tb_tes_top.py")
+    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_outpath(path_p=vunit_outpath)
+    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test_dic0 = test0.get_dic(level_p=level2)
+    # save the individual test for further use (sequence building)
+    solo_test_dic[test_name] = test_dic0
 
     ############################################################################
-    # Define 1 or several sequence of individual tests
+    # Section6 : Define 1 or several list of individual tests
     ############################################################################
     # 0: first sequence of individual tests
     json_data["test0_tb_system_fpasim"] = [solo_test_dic['tb_system_fpasim']]
     json_data["test0_tb_tes_top"] = [solo_test_dic['tb_tes_top']]
     json_data["test0_tb_amp_squid_top"] = [solo_test_dic['tb_amp_squid_top']]
     json_data["test0_tb_mux_squid_top"] = [solo_test_dic['tb_mux_squid_top']]
+    json_data["test0_tb_tes_top_debug"] = [solo_test_dic['tb_tes_top_debug']]
 
     ############################################################################
-    # output the processed json file with updated address path
+    # Section7: Output the result in an output json file
     ############################################################################
     # Serializing then json dictionary
     json_object = json.dumps(json_data, indent=4)
