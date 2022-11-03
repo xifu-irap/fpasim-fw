@@ -815,19 +815,22 @@ class VunitConf:
         
         return filepath_list
 
-    def get_data_filepath(self, level_p=None):
+    def get_data_filepath(self,filename_p, level_p=None):
         """
         This method returns a list of data filepath
         :param level_p: (integer >= 0) define the level of indentation of the message to print
+        :param filename_p: (string) filename to search
         :return: (list of string) list of filepath
         """
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['data_path']
         display_obj = self.display_obj
-        filename_list = self.conf_filename_list
+        filename = filename_p
         level0 = self._get_indentation_level(level_p=level_p)
         level1 = level0 + 1
         level2 = level0 + 2
+        # get file extension
+        ext = str(Path(filename).suffix)
 
         str0 = "VunitConf.get_data_filepath"
         display_obj.display_title(msg_p=str0, level_p=level0)
@@ -835,15 +838,13 @@ class VunitConf:
         display_obj.display(msg_p=str0, level_p=level1)
 
         obj = FilepathListBuilder()
-        obj.set_file_extension(file_extension_list_p=['.json'])
-        filepath_list = []
-        for filename in filename_list:
-            str0 = 'Searched filename='+filename
-            display_obj.display(msg_p=str0,level_p=level2)
-            filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
-            filepath_list.append(filepath)
+        obj.set_file_extension(file_extension_list_p=[ext])
+        str0 = 'Searched filename='+filename
+        display_obj.display(msg_p=str0,level_p=level2)
+        filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
+       
         
-        return filepath_list
+        return filepath
 
     def _get_script_filepath(self, filename_p, level_p=None):
         """
