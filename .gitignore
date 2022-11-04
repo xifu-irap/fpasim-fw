@@ -40,6 +40,8 @@
 
 # Untracked python compiled files
 /lib/common/**/__pycache__
+# Untracked python unitary tes output files
+/lib/common/**/__output__
 # Untracked output simulation directory
 /vunit_out
 # Untracked vendor Opal Kelly Source file directory
