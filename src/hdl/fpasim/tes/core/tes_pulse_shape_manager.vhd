@@ -47,10 +47,11 @@ use fpasim.pkg_fpasim.all;
 entity tes_pulse_shape_manager is
   generic(
     -- frame
-   
-    g_FRAME_NB                   : positive := pkg_FRAME_NB;
+
+    g_FRAME_NB_BY_PULSE          : positive := pkg_FRAME_NB_BY_PULSE;
     g_FRAME_WIDTH                : positive := pkg_FRAME_WIDTH; -- frame bus width (expressed in bits). Possible values : [1; max integer value[
     -- pixel
+    g_PIXEL_NB_MAX               : positive := pkg_PIXEL_NB_MAX; -- number max of pixel by frame authorised by the design
     g_PIXEL_ID_WIDTH             : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[
     -- addr
     g_PULSE_SHAPE_RAM_ADDR_WIDTH : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
@@ -117,7 +118,8 @@ entity tes_pulse_shape_manager is
 end entity tes_pulse_shape_manager;
 
 architecture RTL of tes_pulse_shape_manager is
-  constant c_PIXEL_NB_MAX           : positive := pkg_PIXEL_NB_MAX;
+  constant c_FRAME_NB_BY_PULSE : positive := g_FRAME_NB_BY_PULSE;
+  constant c_PIXEL_NB_MAX      : positive := g_PIXEL_NB_MAX;
 
   constant c_SHIFT_MAX : positive := 2 ** (i_cmd_time_shift'length);
 
@@ -145,8 +147,8 @@ architecture RTL of tes_pulse_shape_manager is
   ---------------------------------------------------------------------
   -- FIFO cmd
   ---------------------------------------------------------------------
-  constant c_CMD_IDX0_L       : integer := 0;
-  constant c_CMD_IDX0_H       : integer := c_CMD_IDX0_L + i_cmd_time_shift'length - 1;
+  constant c_CMD_IDX0_L : integer := 0;
+  constant c_CMD_IDX0_H : integer := c_CMD_IDX0_L + i_cmd_time_shift'length - 1;
 
   constant c_CMD_IDX1_L : integer := c_CMD_IDX0_H + 1;
   constant c_CMD_IDX1_H : integer := c_CMD_IDX1_L + i_cmd_pixel_id'length - 1;
@@ -184,7 +186,7 @@ architecture RTL of tes_pulse_shape_manager is
 
   type t_state is (E_RST, E_WAIT, E_RUN);
   signal sm_state_next : t_state;
-  signal sm_state_r1   : t_state:= E_RST;
+  signal sm_state_r1   : t_state := E_RST;
 
   signal cmd_rd_next : std_logic;
   signal cmd_rd_r1   : std_logic := '0';
@@ -196,25 +198,25 @@ architecture RTL of tes_pulse_shape_manager is
   signal cnt_sample_pulse_shape_table_r1   : t_addr_pulse_shape_array := (others => (others => '0'));
 
   signal en_table_next : std_logic_vector(c_PIXEL_NB_MAX - 1 downto 0);
-  signal en_table_r1   : std_logic_vector(c_PIXEL_NB_MAX - 1 downto 0):= (others => '0');
+  signal en_table_r1   : std_logic_vector(c_PIXEL_NB_MAX - 1 downto 0) := (others => '0');
 
   signal pulse_heigth_next : unsigned(i_cmd_pulse_height'range);
-  signal pulse_heigth_r1   : unsigned(i_cmd_pulse_height'range):= (others => '0');
+  signal pulse_heigth_r1   : unsigned(i_cmd_pulse_height'range) := (others => '0');
 
   signal pulse_heigth_table_next : t_pulse_height_array;
-  signal pulse_heigth_table_r1   : t_pulse_height_array:= (others => (others => '0'));
+  signal pulse_heigth_table_r1   : t_pulse_height_array := (others => (others => '0'));
 
   signal time_shift_next : unsigned(i_cmd_time_shift'range);
-  signal time_shift_r1   : unsigned(i_cmd_time_shift'range):= (others => '0');
+  signal time_shift_r1   : unsigned(i_cmd_time_shift'range) := (others => '0');
 
   signal time_shift_table_next : t_time_shift_array;
-  signal time_shift_table_r1   : t_time_shift_array:= (others => (others => '0'));
+  signal time_shift_table_r1   : t_time_shift_array := (others => (others => '0'));
 
   signal en_next : std_logic;
-  signal en_r1   : std_logic:= '0';
+  signal en_r1   : std_logic := '0';
 
   signal pixel_valid_next : std_logic;
-  signal pixel_valid_r1   : std_logic:= '0';
+  signal pixel_valid_r1   : std_logic := '0';
 
   -------------------------------------------------------------------
   -- compute pipe indexes
@@ -399,11 +401,7 @@ begin
   ---------------------------------------------------------------------
   -- state machine
   ---------------------------------------------------------------------
-  p_decode_state : process(cnt_sample_pulse_shape_r1, cmd_pixel_id1, 
-                          cmd_pulse_height1, cmd_time_shift1, cnt_sample_pulse_shape_table_r1,
-                          empty1, en_r1, en_table_r1, sm_state_r1, i_pixel_eof, i_pixel_id,
-                          i_pixel_sof, i_pixel_valid, pulse_heigth_r1, pulse_heigth_table_r1,
-                          time_shift_r1, time_shift_table_r1) is
+  p_decode_state : process(cnt_sample_pulse_shape_r1, cmd_pixel_id1, cmd_pulse_height1, cmd_time_shift1, cnt_sample_pulse_shape_table_r1, empty1, en_r1, en_table_r1, sm_state_r1, i_pixel_eof, i_pixel_id, i_pixel_sof, i_pixel_valid, pulse_heigth_r1, pulse_heigth_table_r1, time_shift_r1, time_shift_table_r1) is
   begin
     cmd_rd_next                       <= '0';
     cnt_sample_pulse_shape_table_next <= cnt_sample_pulse_shape_table_r1;
@@ -449,7 +447,7 @@ begin
       when E_RUN =>
         pixel_valid_next <= i_pixel_valid;
         if i_pixel_eof = '1' and i_pixel_valid = '1' then
-          if cnt_sample_pulse_shape_r1 = to_unsigned(g_FRAME_NB - 1, cnt_sample_pulse_shape_r1'length) then
+          if cnt_sample_pulse_shape_r1 = to_unsigned(c_FRAME_NB_BY_PULSE - 1, cnt_sample_pulse_shape_r1'length) then
             -- last samples of the pulse shape
             --  => disable the pixel
             --      => init the cnt_sample of the pulse shape ram
@@ -462,9 +460,9 @@ begin
               pulse_heigth_table_next(to_integer(unsigned(i_pixel_id))) <= (others => '0');
             end if;
           else
-            en_table_next(to_integer(unsigned(i_pixel_id)))           <= en_r1;
-            time_shift_table_next(to_integer(unsigned(i_pixel_id)))   <= time_shift_r1;
-            pulse_heigth_table_next(to_integer(unsigned(i_pixel_id))) <= pulse_heigth_r1;
+            en_table_next(to_integer(unsigned(i_pixel_id)))                     <= en_r1;
+            time_shift_table_next(to_integer(unsigned(i_pixel_id)))             <= time_shift_r1;
+            pulse_heigth_table_next(to_integer(unsigned(i_pixel_id)))           <= pulse_heigth_r1;
             cnt_sample_pulse_shape_table_next(to_integer(unsigned(i_pixel_id))) <= cnt_sample_pulse_shape_r1 + 1;
           end if;
           sm_state_next <= E_WAIT;
@@ -504,7 +502,7 @@ begin
   --  => addr_pulse_shape_rc = i*step + pixel_shift with i=[0,2047]
   ---------------------------------------------------------------------
 
-  data_pipe_mult_tmp0(c_MULT_IDX1_H)                 <= pixel_valid_r1;
+  data_pipe_mult_tmp0(c_MULT_IDX1_H)                      <= pixel_valid_r1;
   data_pipe_mult_tmp0(c_MULT_IDX0_H downto c_MULT_IDX0_L) <= std_logic_vector(pulse_heigth_r1);
   inst_pipeliner_sync_with_mult_add_ufixed_out0 : entity fpasim.pipeliner
     generic map(
@@ -571,10 +569,10 @@ begin
   -- RAM: tes_pulse_shape
   ---------------------------------------------------------------------
 
-  pulse_shape_ena   <= i_pulse_shape_wr_en or i_pulse_shape_rd_en;
-  pulse_shape_wea   <= i_pulse_shape_wr_en;
-  pulse_shape_addra <= i_pulse_shape_wr_rd_addr;
-  pulse_shape_dina  <= i_pulse_shape_wr_data;
+  pulse_shape_ena    <= i_pulse_shape_wr_en or i_pulse_shape_rd_en;
+  pulse_shape_wea    <= i_pulse_shape_wr_en;
+  pulse_shape_addra  <= i_pulse_shape_wr_rd_addr;
+  pulse_shape_dina   <= i_pulse_shape_wr_data;
   pulse_shape_regcea <= '1';
 
   inst_tdpram_tes_pulse_shape : entity fpasim.tdpram

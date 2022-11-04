@@ -113,7 +113,7 @@ end entity top_fpasim;
 architecture RTL of top_fpasim is
   constant c_PIXEL_ID_WIDTH : integer := pkg_PIXEL_ID_WIDTH_MAX;
   constant c_FRAME_ID_WIDTH : integer := pkg_FRAME_ID_WIDTH;
-  constant c_FRAME_NB : integer := pkg_FRAME_NB;
+  constant c_FRAME_NB_BY_PULSE : integer := pkg_FRAME_NB_BY_PULSE;
 
   constant c_TES_TOP_LATENCY                : integer  := pkg_TES_TOP_LATENCY;
   constant c_MUX_SQUID_TOP_LATENCY          : integer  := pkg_MUX_SQUID_TOP_LATENCY;
@@ -808,7 +808,7 @@ begin
       -- frame
       g_FRAME_LENGTH_WIDTH => frame_length'length,
       g_FRAME_ID_WIDTH     => frame_id1'length,
-      g_FRAME_NB           => c_FRAME_NB,
+      g_FRAME_NB_BY_PULSE  => c_FRAME_NB_BY_PULSE,
 
       -- addr
       g_PULSE_SHAPE_RAM_ADDR_WIDTH => tes_pulse_shape_ram_wr_rd_addr_tmp'length,
