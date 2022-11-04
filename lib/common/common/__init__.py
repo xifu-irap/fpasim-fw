@@ -36,9 +36,14 @@ os.system("")
 
 from common.console_colors import *
 from common.filepath_list_builder import *
-from common.display import *
-from common.test.vunit_conf import *
-from common.valid_sequencer import *
+from common.display import Display
+#########################################
+# the following import order is important to
+# avoid circular import
+#########################################
+from common.test.valid_sequencer import *
+from common.test.vunit_conf import VunitConf
+from common.test.tes_top_data_gen import TesTopDataGen
 
 
 
