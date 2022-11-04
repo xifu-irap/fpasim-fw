@@ -41,38 +41,44 @@ context common_lib.common_context;
 
 entity tb_mux_squid_top is
   generic(
-
-    runner_cfg                   : string   := runner_cfg_default;  -- don't touch
-    output_path                  : string   := "C:/Project/fpasim-fw-hardware/";
+    runner_cfg                    : string   := runner_cfg_default; -- vunit generic: don't touch
+    output_path                   : string   := "C:/Project/fpasim-fw-hardware/"; -- vunit generic: don't touch
     ---------------------------------------------------------------------
-    -- User generic
+    -- DUT generic
     ---------------------------------------------------------------------
     -- pixel
-    g_PIXEL_ID_WIDTH              : positive := pkg_PIXEL_ID_WIDTH_MAX;  -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
+    g_PIXEL_ID_WIDTH              : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
     -- frame
-    g_FRAME_ID_WIDTH              : positive := pkg_FRAME_ID_WIDTH;  -- frame id bus width (expressed in bits). Possible values: [1; max integer value[
+    g_FRAME_ID_WIDTH              : positive := pkg_FRAME_ID_WIDTH; -- frame id bus width (expressed in bits). Possible values: [1; max integer value[
     -- address
-    g_MUX_SQUID_TF_RAM_ADDR_WIDTH : positive := pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
+    g_MUX_SQUID_TF_RAM_ADDR_WIDTH : positive := pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
     -- computation
-    g_PIXEL_RESULT_INPUT_WIDTH    : positive := pkg_TES_MULT_SUB_Q_WIDTH_S;  -- pixel input result bus width (expressed in bits). Possible values: [1; max integer value[
+    g_PIXEL_RESULT_INPUT_WIDTH    : positive := pkg_TES_MULT_SUB_Q_WIDTH_S; -- pixel input result bus width (expressed in bits). Possible values: [1; max integer value[
     g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_MUX_SQUID_ADD_Q_WIDTH_S;
-
     ---------------------------------------------------------------------
-    -- simulation parameter
+    -- simulation parameters
     ---------------------------------------------------------------------
-    g_VUNIT_DEBUG  : boolean := true;
-    g_TEST_NAME    : string  := "";
-    g_ENABLE_CHECK : boolean := true;
-    g_ENABLE_LOG   : boolean := true;
-    g_CHECK_RAM1   : boolean := true;
-    g_CHECK_RAM2   : boolean := true
-    );
+    g_NB_PIXEL_BY_FRAME          : positive := 1;
+    
+    g_VUNIT_DEBUG                 : boolean  := true;
+    g_TEST_NAME                   : string   := "";
+    g_ENABLE_CHECK                : boolean  := true;
+    g_ENABLE_LOG                  : boolean  := true;
+    -- RAM1
+    g_RAM1_NAME                   : string   := "mux_squid_offset";
+    g_RAM1_CHECK                  : boolean  := true;
+    g_RAM1_VERBOSITY              : integer  := 0;
+    -- RAM2
+    g_RAM2_NAME                   : string   := "mux_squid_tf";
+    g_RAM2_CHECK                  : boolean  := true;
+    g_RAM2_VERBOSITY              : integer  := 0
+  );
 end tb_mux_squid_top;
 
 architecture simulate of tb_mux_squid_top is
 
-  constant c_INPUT_BASEPATH  : string := output_path&"inputs/";
-  constant c_OUTPUT_BASEPATH : string := output_path&"outputs/";
+  constant c_INPUT_BASEPATH  : string := output_path & "inputs/";
+  constant c_OUTPUT_BASEPATH : string := output_path & "outputs/";
 
   ---------------------------------------------------------------------
   -- module input signals
@@ -142,7 +148,6 @@ architecture simulate of tb_mux_squid_top is
   -- Generate reading sequence
   ---------------------------------------------------------------------
 
-
   -- data
   signal data_start             : std_logic := '0';
   signal data_rd_valid          : std_logic := '0';
@@ -151,87 +156,69 @@ architecture simulate of tb_mux_squid_top is
   signal data_count_in          : std_logic_vector(31 downto 0);
   signal data_count_overflow_in : std_logic;
 
-
   -- ram tes pulse shape
-  signal ram_mux_squid_offset_wr_start          : std_logic                    := '0';
-  signal ram_mux_squid_offset_rd_start          : std_logic                    := '0';
-  signal ram_mux_squid_offset_rd_valid          : std_logic                    := '0';
-  signal ram_mux_squid_offset_wr_gen_finish     : std_logic                    := '0';
-  signal ram_mux_squid_offset_rd_gen_finish     : std_logic                    := '0';
-  signal ram_mux_squid_offset             : std_logic_vector(0 downto 0) := (others => '0');
-  signal ram_tes_pulse_shape_count_in          : std_logic_vector(31 downto 0);
-  signal ram_tes_pulse_shape_count_overflow_in : std_logic;
+  signal ram1_wr_start      : std_logic                    := '0';
+  signal ram1_rd_start      : std_logic                    := '0';
+  signal ram1_rd_valid      : std_logic                    := '0';
+  signal ram1_wr_gen_finish : std_logic                    := '0';
+  signal ram1_rd_gen_finish : std_logic                    := '0';
+  signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0');
 
   -- ram tes steady state
-  signal ram_mux_squid_tf_wr_start          : std_logic                    := '0';
-  signal ram_mux_squid_tf_rd_start          : std_logic                    := '0';
-  signal ram_mux_squid_tf_rd_valid          : std_logic                    := '0';
-  signal ram_mux_squid_tf_wr_gen_finish     : std_logic                    := '0';
-  signal ram_mux_squid_tf_rd_gen_finish     : std_logic                    := '0';
-  signal ram_mux_squid_tf_error             : std_logic_vector(0 downto 0) := (others => '0');
-  signal ram_tes_steady_state_count_in          : std_logic_vector(31 downto 0);
-  signal ram_tes_steady_state_count_overflow_in : std_logic;
+  signal ram2_wr_start      : std_logic                    := '0';
+  signal ram2_rd_start      : std_logic                    := '0';
+  signal ram2_rd_valid      : std_logic                    := '0';
+  signal ram2_wr_gen_finish : std_logic                    := '0';
+  signal ram2_rd_gen_finish : std_logic                    := '0';
+  signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0');
 
   -- check
   signal data_count_out          : std_logic_vector(31 downto 0);
   signal data_count_overflow_out : std_logic;
   signal data_error_out          : std_logic_vector(1 downto 0);
 
-  signal data_stop : std_logic:= '0';
-
+  signal data_stop : std_logic := '0';
 
   ---------------------------------------------------------------------
   -- filepath definition
   ---------------------------------------------------------------------
   constant c_CSV_SEPARATOR             : character := ';';
-  constant c_PY_FILENAME_SUFFIX        : string    := "py_";
-  constant c_MATLAB_FILENAME_SUFFIX    : string    := "matlab_";
-  constant c_MATLAB_PY_FILENAME_SUFFIX : string    := "matlab_py_";
-  constant c_VHDL_FILENAME_SUFFIX      : string    := "vhdl_";
 
--- input data generation
-  constant c_FILENAME_DATA_VALID_IN : string := c_PY_FILENAME_SUFFIX & "data_valid_sequencer_in.csv";
+  -- input data generation
+  constant c_FILENAME_DATA_VALID_IN : string := "py_data_valid_sequencer_in.csv";
   constant c_FILEPATH_DATA_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_VALID_IN;
 
-  constant c_FILENAME_DATA_IN : string := c_PY_FILENAME_SUFFIX & "data_in.csv";
+  constant c_FILENAME_DATA_IN : string := "py_data_in.csv";
   constant c_FILEPATH_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_IN;
 
-
   -- input ram tes pulse shape
-  constant c_FILENAME_RAM_MUX_SQUID_OFFSET_VALID_IN : string := c_PY_FILENAME_SUFFIX & "ram_mux_squid_offset_valid_sequencer_in.csv";
-  constant c_FILEPATH_RAM_MUX_SQUID_OFFSET_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM_MUX_SQUID_OFFSET_VALID_IN;
+  constant c_FILENAME_RAM1_VALID_IN : string := "py_ram_mux_squid_offset_valid_sequencer_in.csv";
+  constant c_FILEPATH_RAM1_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM1_VALID_IN;
 
-  constant c_FILENAME_RAM_MUX_SQUID_OFFSET_IN : string := c_PY_FILENAME_SUFFIX & "ram_mux_squid_offset.csv";
-  constant c_FILEPATH_RAM_MUX_SQUID_OFFSET_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM_MUX_SQUID_OFFSET_IN;
+  constant c_FILENAME_RAM1_IN : string := "py_ram_mux_squid_offset.csv";
+  constant c_FILEPATH_RAM1_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM1_IN;
 
   -- input ram tes steady state
-  constant c_FILENAME_RAM_MUX_SQUID_TF_VALID_IN : string := c_PY_FILENAME_SUFFIX & "ram_mux_squid_tf_valid_sequencer_in.csv";
-  constant c_FILEPATH_RAM_MUX_SQUID_TF_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM_MUX_SQUID_TF_VALID_IN;
+  constant c_FILENAME_RAM2_VALID_IN : string := "py_ram_mux_squid_tf_valid_sequencer_in.csv";
+  constant c_FILEPATH_RAM2_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM2_VALID_IN;
 
-  constant c_FILENAME_RAM_MUX_SQUID_TF_IN : string := c_PY_FILENAME_SUFFIX & "ram_mux_squid_tf.csv";
-  constant c_FILEPATH_RAM_MUX_SQUID_TF_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM_MUX_SQUID_TF_IN;
+  constant c_FILENAME_RAM2_IN : string := "py_ram_mux_squid_tf.csv";
+  constant c_FILEPATH_RAM2_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM2_IN;
 
   -- output data log
-  constant c_FILENAME_DATA_OUT : string := c_VHDL_FILENAME_SUFFIX & "data_out.csv";
+  constant c_FILENAME_DATA_OUT : string := "vhdl_data_out.csv";
   --constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT;
-
---  -- check output data
---  constant c_FILENAME_DATA_OUT_REF : string := c_MATLAB_FILENAME_SUFFIX & "data_out_ref.csv";
---  constant c_FILEPATH_DATA_OUT_REF : string := c_INPUT_BASEPATH & c_FILENAME_DATA_OUT_REF;
 
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers 
-  constant c_LOGGER_SUMMARY               : logger_t  := get_logger("log:summary");
+  constant c_LOGGER_SUMMARY     : logger_t  := get_logger("log:summary");
   -- checkers
-  constant c_CHECKER_RAM_MUX_SQUID_OFFSET  : checker_t := new_checker("check:ram_mux_squid_offset");
-  constant C_CHECKER_RAM_MUX_SQUID_TF     : checker_t := new_checker("check:ram_mux_squid_tf");
-  constant c_CHECKER_ERRORS               : checker_t := new_checker("check:errors");
-  constant c_CHECKER_DATA_COUNT           : checker_t := new_checker("check:data_count");
-
-
-
+  constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors");
+  constant c_CHECKER_DATA_COUNT : checker_t := new_checker("check:data_count");
+  constant c_CHECKER_RAM1       : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME);
+  constant c_CHECKER_RAM2       : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME);
 
 begin
 
@@ -241,16 +228,15 @@ begin
   p_i_clk_gen : process is
   begin
     i_clk <= '0';
-    wait for c_CLK_PERIOD0/2;
+    wait for c_CLK_PERIOD0 / 2;
     i_clk <= '1';
-    wait for c_CLK_PERIOD0/2;
+    wait for c_CLK_PERIOD0 / 2;
   end process p_i_clk_gen;
 
   ---------------------------------------------------------------------
   -- master fsm
   ---------------------------------------------------------------------
   p_master_fsm : process is
-
     variable val_v : integer := 0;
 
   begin
@@ -262,81 +248,86 @@ begin
     -- VUNIT - Scoreboard object : Visibility definition
     ---------------------------------------------------------------------
     if g_VUNIT_DEBUG = true then
-      -- the simulator doesn't stop on errors
+      -- the simulator doesn't stop on errors => stop on failure
       set_stop_level(failure);
     end if;
-    --show(get_logger("check:data_I"), display_handler, pass); 
-    --show(get_logger("check:data_Q"), display_handler, pass); 
+
+    show(get_logger("log:summary"), display_handler, pass);
+    show(get_logger("check:data_count"), display_handler, pass);
     show(get_logger("check:errors"), display_handler, pass);
-    show(get_logger("log:sim"), display_handler, pass);
-    show(get_logger("check"), display_handler, pass);
+    if g_RAM1_VERBOSITY > 0 then
+      show(get_logger("check:ram1"), display_handler, pass);
+    end if;
+    if g_RAM2_VERBOSITY > 0 then
+      show(get_logger("check:ram2"), display_handler, pass);
+    end if;
+
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     info("Test bench: Generic parameter values");
     info("    output_path = " & output_path);
+    ---------------------------------------------------------------------
+    -- DUT GENERIC
+    ---------------------------------------------------------------------
     info("    g_PIXEL_ID_WIDTH = " & to_string(g_PIXEL_ID_WIDTH));
     info("    g_FRAME_ID_WIDTH = " & to_string(g_FRAME_ID_WIDTH));
     info("    g_MUX_SQUID_TF_RAM_ADDR_WIDTH = " & to_string(g_MUX_SQUID_TF_RAM_ADDR_WIDTH));
     info("    g_PIXEL_RESULT_INPUT_WIDTH = " & to_string(g_PIXEL_RESULT_INPUT_WIDTH));
     info("    g_PIXEL_RESULT_OUTPUT_WIDTH = " & to_string(g_PIXEL_RESULT_OUTPUT_WIDTH));
 
+    -- simulator paramters
     info("    g_VUNIT_DEBUG = " & to_string(g_VUNIT_DEBUG));
-    info("    g_TEST_NAME = " & g_TEST_NAME );
+    info("    g_TEST_NAME = " & g_TEST_NAME);
     info("    g_ENABLE_CHECK = " & to_string(g_ENABLE_CHECK));
     info("    g_ENABLE_LOG = " & to_string(g_ENABLE_LOG));
-    info("    g_CHECK_RAM1 = " & to_string(g_CHECK_RAM1));
-    info("    g_CHECK_RAM2 = " & to_string(g_CHECK_RAM2));
+    -- RAM1
+    info("    g_RAM1_NAME = " & g_RAM1_NAME);
+    info("    g_RAM1_CHECK = " & to_string(g_RAM1_CHECK));
+    info("    g_RAM1_VERBOSITY = " & to_string(g_RAM1_VERBOSITY));
+    -- RAM2
+    info("    g_RAM2_NAME = " & g_RAM2_NAME);
+    info("    g_RAM2_CHECK = " & to_string(g_RAM2_CHECK));
+    info("    g_RAM2_VERBOSITY = " & to_string(g_RAM2_VERBOSITY));
+
     info("Test bench: input files");
     info("    c_FILEPATH_DATA_VALID_IN = " & c_FILEPATH_DATA_VALID_IN);
     info("    c_FILEPATH_DATA_IN = " & c_FILEPATH_DATA_IN);
-    info("    c_FILEPATH_RAM_MUX_SQUID_OFFSET_VALID_IN = " & c_FILEPATH_RAM_MUX_SQUID_OFFSET_VALID_IN);
-    info("    c_FILEPATH_RAM_MUX_SQUID_OFFSET_IN = " & c_FILEPATH_RAM_MUX_SQUID_OFFSET_IN);
-    info("    c_FILEPATH_RAM_MUX_SQUID_TF_IN = " & c_FILEPATH_RAM_MUX_SQUID_TF_IN);
-    info("    c_FILEPATH_RAM_MUX_SQUID_TF_IN = " & c_FILEPATH_RAM_MUX_SQUID_TF_IN);
+    info("    c_FILEPATH_RAM1_VALID_IN = " & c_FILEPATH_RAM1_VALID_IN);
+    info("    c_FILEPATH_RAM1_IN = " & c_FILEPATH_RAM1_IN);
+    info("    c_FILEPATH_RAM2_VALID_IN = " & c_FILEPATH_RAM2_VALID_IN);
+    info("    c_FILEPATH_RAM2_IN = " & c_FILEPATH_RAM2_IN);
 
     ---------------------------------------------------------------------
     -- reset
     ---------------------------------------------------------------------
     info("Enable the reset");
-    i_rst         <= '1';
     i_rst_status  <= '1';
     i_debug_pulse <= '0';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     info("Disable the reset");
-    i_rst         <= '0';
     i_rst_status  <= '0';
     i_debug_pulse <= '0';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
-    -- RAM Configuration: mux squid offset
+    -- RAM1 Configuration
     ---------------------------------------------------------------------
-    info("Start RAM configuration (wr): mux squid offset");
-    ram_mux_squid_offset_wr_start <= '1';
+    info("Start RAM configuration (wr): " & g_RAM1_NAME);
+    ram1_wr_start <= '1';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-    wait until rising_edge(i_clk) and ram_mux_squid_offset_wr_gen_finish = '1';
+    wait until rising_edge(i_clk) and ram1_wr_gen_finish = '1';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
+    ---------------------------------------------------------------------
+    -- RAM2 Configuration
+    ---------------------------------------------------------------------
+    info("Start RAM configuration (wr): " & g_RAM2_NAME);
+    ram2_wr_start <= '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    wait until rising_edge(i_clk) and ram2_wr_gen_finish = '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
-    ---------------------------------------------------------------------
-    -- RAM Configuration: mux squid tf
-    ---------------------------------------------------------------------
-    info("Start RAM configuration (wr): mux squid tf");
-    ram_mux_squid_tf_wr_start <= '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-    wait until rising_edge(i_clk) and ram_mux_squid_tf_wr_gen_finish = '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-
-
-    ---------------------------------------------------------------------
-    -- Command Configuration
-    ---------------------------------------------------------------------
-    info("Start command configuration");
-    cmd_start <= '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-    wait until rising_edge(i_clk) and cmd_gen_finish = '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- Data Generation
@@ -348,23 +339,23 @@ begin
     ---------------------------------------------------------------------
     -- RAM Check: RAM1
     ---------------------------------------------------------------------
-    if g_CHECK_RAM1 = true then
-       info("Start RAM reading:  mux squid offset");
-       ram_mux_squid_offset_rd_start <= '1';
-       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-       info("wait RAM reading");
-       wait until rising_edge(i_clk) and ram_mux_squid_offset_rd_gen_finish = '1';
+    if g_RAM1_CHECK = true then
+      info("Start RAM reading: " & g_RAM1_NAME);
+      ram1_rd_start <= '1';
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      info("wait RAM reading");
+      wait until rising_edge(i_clk) and ram1_rd_gen_finish = '1';
     end if;
 
     ---------------------------------------------------------------------
     -- RAM Check: RAM2
     ---------------------------------------------------------------------
-    if g_CHECK_RAM2 = true then
-       info("Start RAM reading: mux squid tf ");
-       ram_mux_squid_tf_rd_start <= '1';
-       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-       info("wait RAM reading");
-    wait until rising_edge(i_clk) and ram_mux_squid_tf_rd_gen_finish = '1';
+    if g_RAM2_CHECK = true then
+      info("Start RAM reading: " & g_RAM2_NAME);
+      ram2_rd_start <= '1';
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      info("wait RAM reading");
+      wait until rising_edge(i_clk) and ram2_rd_gen_finish = '1';
     end if;
 
     ---------------------------------------------------------------------
@@ -378,7 +369,7 @@ begin
     -- End of simulation: wait few more clock cycles
     ---------------------------------------------------------------------
     info("Wait end of simulation");
-    wait for 4096*c_CLK_PERIOD0;
+    wait for 4096 * c_CLK_PERIOD0;
     data_stop <= '1';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
@@ -393,12 +384,8 @@ begin
     check_equal(c_CHECKER_DATA_COUNT, data_count_in, data_count_out, result("checker input/output data count"));
 
     -- summary
-    info(c_LOGGER_SUMMARY, "===Summary==="
-         & LF & "c_CHECKER_RAM_MUX_SQUID_OFFSET: " & to_string(get_checker_stat(c_CHECKER_RAM_MUX_SQUID_OFFSET))
-         & LF & "C_CHECKER_RAM_MUX_SQUID_TF: " & to_string(get_checker_stat(C_CHECKER_RAM_MUX_SQUID_TF))
-         & LF & "c_CHECKER_ERRORS: " & to_string(get_checker_stat(c_CHECKER_ERRORS))
-     & LF & "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(c_CHECKER_DATA_COUNT))
-         );
+    info(c_LOGGER_SUMMARY, "===Summary===" & LF & "c_CHECKER_RAM1: " & to_string(get_checker_stat(c_CHECKER_RAM1)) & LF & "c_CHECKER_RAM2: " & to_string(get_checker_stat(c_CHECKER_RAM2)) & LF & "c_CHECKER_ERRORS: " & to_string(get_checker_stat(c_CHECKER_ERRORS)) & LF & "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(c_CHECKER_DATA_COUNT))
+    );
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
@@ -409,50 +396,44 @@ begin
     end if;
   end process;
 
---test_runner_watchdog(runner, 10 ms);
-
+  --test_runner_watchdog(runner, 10 ms);
 
   ---------------------------------------------------------------------
-  -- Input: RAM Configuration (mux squid offset)
+  -- Input: RAM1 Configuration
   ---------------------------------------------------------------------
-  gen_ram_mux_squid_offset : if true generate
+  gen_ram1 : if true generate
 
   begin
 
     -- valid sequence
     ---------------------------------------------------------------------
     inst_pkg_valid_sequencer : pkg_valid_sequencer(
-      i_clk => i_clk,
-      i_en  => ram_mux_squid_offset_wr_start,
-
+      i_clk           => i_clk,
+      i_en            => ram1_wr_start,
       ---------------------------------------------------------------------
       -- input file
       ---------------------------------------------------------------------
-      i_filepath      => c_FILEPATH_RAM_MUX_SQUID_OFFSET_VALID_IN,
+      i_filepath      => c_FILEPATH_RAM1_VALID_IN,
       i_csv_separator => c_CSV_SEPARATOR,
-
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      o_valid => ram_mux_squid_offset_rd_valid
-      );
+      o_valid         => ram1_rd_valid
+    );
 
     -- Data RAM Generation
     ---------------------------------------------------------------------
     inst_pkg_memory_wr_tdpram_and_check : pkg_memory_wr_tdpram_and_check(
-      i_clk      => i_clk,
-      i_start_wr => ram_mux_squid_offset_wr_start,
-      i_start_rd => ram_mux_squid_offset_rd_start,
-
+      i_clk                   => i_clk,
+      i_start_wr              => ram1_wr_start,
+      i_start_rd              => ram1_rd_start,
       ---------------------------------------------------------------------
       -- input file
       ---------------------------------------------------------------------
-      i_filepath_wr   => c_FILEPATH_RAM_MUX_SQUID_OFFSET_IN,
-      i_filepath_rd   => c_FILEPATH_RAM_MUX_SQUID_OFFSET_IN,
-      i_csv_separator => c_CSV_SEPARATOR,
-
-      i_RD_NAME1 => "RAM_MUX_SQUID_OFFSET",
-
+      i_filepath_wr           => c_FILEPATH_RAM1_IN,
+      i_filepath_rd           => c_FILEPATH_RAM1_IN,
+      i_csv_separator         => c_CSV_SEPARATOR,
+      i_RD_NAME1              => "ram_" & g_RAM1_NAME,
       --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
       --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
       --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
@@ -463,74 +444,65 @@ begin
       ---------------------------------------------------------------------
       -- Vunit Scoreboard objects
       ---------------------------------------------------------------------
-      i_data_sb               => c_CHECKER_RAM_MUX_SQUID_OFFSET,
-
-      i_rd_ready        => ram_mux_squid_offset_rd_valid,
-      i_wr_ready        => ram_mux_squid_offset_rd_valid,
+      i_data_sb               => c_CHECKER_RAM1,
+      i_rd_ready              => ram1_rd_valid,
+      i_wr_ready              => ram1_rd_valid,
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      o_wr_data_valid   => i_mux_squid_offset_wr_en,
-      o_rd_data_valid   => i_mux_squid_offset_rd_en,
-      o_wr_rd_addr_vect => i_mux_squid_offset_wr_rd_addr,
-      o_wr_data_vect    => i_mux_squid_offset_wr_data,
-
+      o_wr_data_valid         => i_mux_squid_offset_wr_en,
+      o_rd_data_valid         => i_mux_squid_offset_rd_en,
+      o_wr_rd_addr_vect       => i_mux_squid_offset_wr_rd_addr,
+      o_wr_data_vect          => i_mux_squid_offset_wr_data,
       -- read value
-      i_rd_data_valid => o_mux_squid_offset_rd_valid,
-      i_rd_data_vect  => o_mux_squid_offset_rd_data,
-
+      i_rd_data_valid         => o_mux_squid_offset_rd_valid,
+      i_rd_data_vect          => o_mux_squid_offset_rd_data,
       ---------------------------------------------------------------------
       -- status
       ---------------------------------------------------------------------
-      o_wr_finish => ram_mux_squid_offset_wr_gen_finish,
-      o_rd_finish => ram_mux_squid_offset_rd_gen_finish,
-      o_error     => ram_mux_squid_offset
-      );
+      o_wr_finish             => ram1_wr_gen_finish,
+      o_rd_finish             => ram1_rd_gen_finish,
+      o_error                 => ram1_error
+    );
 
-  end generate gen_ram_mux_squid_offset;
-
+  end generate gen_ram1;
 
   ---------------------------------------------------------------------
-  -- Input: RAM Configuration (mux squid tf)
+  -- Input: RAM2 Configuration
   ---------------------------------------------------------------------
-  gen_ram_mux_squid_tf : if true generate
+  gen_ram2 : if true generate
 
   begin
 
     -- valid sequence generation
     ---------------------------------------------------------------------
     inst_pkg_valid_sequencer : pkg_valid_sequencer(
-      i_clk => i_clk,
-      i_en  => ram_mux_squid_tf_wr_start,
-
+      i_clk           => i_clk,
+      i_en            => ram2_wr_start,
       ---------------------------------------------------------------------
       -- input file
       ---------------------------------------------------------------------
-      i_filepath      => C_FILEPATH_RAM_MUX_SQUID_TF_IN,
+      i_filepath      => c_FILEPATH_RAM2_VALID_IN,
       i_csv_separator => c_CSV_SEPARATOR,
-
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      o_valid => ram_mux_squid_tf_rd_valid
-      );
+      o_valid         => ram2_rd_valid
+    );
 
     -- Data RAM generation
     ---------------------------------------------------------------------
     inst_pkg_memory_wr_tdpram_and_check : pkg_memory_wr_tdpram_and_check(
-      i_clk      => i_clk,
-      i_start_wr => ram_mux_squid_tf_wr_start,
-      i_start_rd => ram_mux_squid_tf_rd_start,
-
+      i_clk                   => i_clk,
+      i_start_wr              => ram2_wr_start,
+      i_start_rd              => ram2_rd_start,
       ---------------------------------------------------------------------
       -- input file
       ---------------------------------------------------------------------
-      i_filepath_wr   => C_FILEPATH_RAM_MUX_SQUID_TF_IN,
-      i_filepath_rd   => C_FILEPATH_RAM_MUX_SQUID_TF_IN,
-      i_csv_separator => c_CSV_SEPARATOR,
-
-      i_RD_NAME1 => "RAM_MUX_SQUID_TF",
-
+      i_filepath_wr           => c_FILEPATH_RAM2_IN,
+      i_filepath_rd           => c_FILEPATH_RAM2_IN,
+      i_csv_separator         => c_CSV_SEPARATOR,
+      i_RD_NAME1              => "ram_" & g_RAM2_NAME,
       --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
       --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
       --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
@@ -541,32 +513,28 @@ begin
       ---------------------------------------------------------------------
       -- Vunit Scoreboard objects
       ---------------------------------------------------------------------
-      i_data_sb               => C_CHECKER_RAM_MUX_SQUID_TF,
-
-      i_rd_ready        => ram_mux_squid_tf_rd_valid,
-      i_wr_ready        => ram_mux_squid_tf_rd_valid,
+      i_data_sb               => c_CHECKER_RAM2,
+      i_rd_ready              => ram2_rd_valid,
+      i_wr_ready              => ram2_rd_valid,
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      o_wr_data_valid   => i_mux_squid_tf_wr_en,
-      o_rd_data_valid   => i_mux_squid_tf_rd_en,
-      o_wr_rd_addr_vect => i_mux_squid_tf_wr_rd_addr,
-      o_wr_data_vect    => i_mux_squid_tf_wr_data,
-
+      o_wr_data_valid         => i_mux_squid_tf_wr_en,
+      o_rd_data_valid         => i_mux_squid_tf_rd_en,
+      o_wr_rd_addr_vect       => i_mux_squid_tf_wr_rd_addr,
+      o_wr_data_vect          => i_mux_squid_tf_wr_data,
       -- read value
-      i_rd_data_valid => o_mux_squid_tf_rd_valid,
-      i_rd_data_vect  => o_mux_squid_tf_rd_data,
-
+      i_rd_data_valid         => o_mux_squid_tf_rd_valid,
+      i_rd_data_vect          => o_mux_squid_tf_rd_data,
       ---------------------------------------------------------------------
       -- status
       ---------------------------------------------------------------------
-      o_wr_finish => ram_mux_squid_tf_wr_gen_finish,
-      o_rd_finish => ram_mux_squid_tf_rd_gen_finish,
-      o_error     => ram_mux_squid_tf_error
-      );
+      o_wr_finish             => ram2_wr_gen_finish,
+      o_rd_finish             => ram2_rd_gen_finish,
+      o_error                 => ram2_error
+    );
 
-  end generate gen_ram_mux_squid_tf;
-
+  end generate gen_ram2;
 
   ---------------------------------------------------------------------
   -- Input: data generation
@@ -581,27 +549,24 @@ begin
     -- valid sequence generation
     ---------------------------------------------------------------------
     inst_pkg_valid_sequencer : pkg_valid_sequencer(
-      i_clk => i_clk,
-      i_en  => data_start,
-
+      i_clk           => i_clk,
+      i_en            => data_start,
       ---------------------------------------------------------------------
       -- input file
       ---------------------------------------------------------------------
       i_filepath      => c_FILEPATH_DATA_VALID_IN,
       i_csv_separator => c_CSV_SEPARATOR,
-
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      o_valid => data_rd_valid
-      );
+      o_valid         => data_rd_valid
+    );
 
     -- data generation
     ---------------------------------------------------------------------
     inst_pkg_data_generator : pkg_data_generator_8(
-      i_clk   => i_clk,
-      i_start => data_start,
-
+      i_clk              => i_clk,
+      i_start            => data_start,
       ---------------------------------------------------------------------
       -- input file
       ---------------------------------------------------------------------
@@ -619,33 +584,31 @@ begin
       i_DATA5_COMMON_TYP => "UINT",
       i_DATA6_COMMON_TYP => "UINT",
       i_DATA7_COMMON_TYP => "UINT",
-      i_DATA8_COMMON_TYP => "UINT",
-
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      i_ready          => data_rd_valid,
-      o_data_valid     => data_valid,
-      o_data0_std_vect => pixel_sof_vect_tmp,     -- not connected
-      o_data1_std_vect => pixel_eof_vect_tmp,     -- not connected
-      o_data2_std_vect => i_pixel_id,     -- not connected
-      o_data3_std_vect => i_pixel_result,     -- not connected
-      o_data4_std_vect => frame_sof_vect_tmp,     -- not connected
-      o_data5_std_vect => frame_eof_vect_tmp,     -- not connected
-      o_data6_std_vect => i_frame_id,     -- not connected
-      o_data7_std_vect => i_mux_squid_feedback,     -- not connected
+      i_ready            => data_rd_valid,
+      o_data_valid       => data_valid,
+      o_data0_std_vect   => pixel_sof_vect_tmp, -- not connected
+      o_data1_std_vect   => pixel_eof_vect_tmp, -- not connected
+      o_data2_std_vect   => i_pixel_id, -- not connected
+      o_data3_std_vect   => i_pixel_result, -- not connected
+      o_data4_std_vect   => frame_sof_vect_tmp, -- not connected
+      o_data5_std_vect   => frame_eof_vect_tmp, -- not connected
+      o_data6_std_vect   => i_frame_id, -- not connected
+      o_data7_std_vect   => i_mux_squid_feedback, -- not connected
 
       ---------------------------------------------------------------------
       -- status
       ---------------------------------------------------------------------
-      o_finish => data_gen_finish
-      );
+      o_finish           => data_gen_finish
+    );
 
     i_pixel_valid <= data_valid;
-    i_pixel_sof <= pixel_sof_vect_tmp(0);
-    i_pixel_eof <= pixel_eof_vect_tmp(0);
-    i_frame_sof <= frame_sof_vect_tmp(0);
-    i_frame_eof <= frame_eof_vect_tmp(0);
+    i_pixel_sof   <= pixel_sof_vect_tmp(0);
+    i_pixel_eof   <= pixel_eof_vect_tmp(0);
+    i_frame_sof   <= frame_sof_vect_tmp(0);
+    i_frame_eof   <= frame_eof_vect_tmp(0);
 
     -- count input data
     ---------------------------------------------------------------------
@@ -657,83 +620,82 @@ begin
       -- output
       o_count      => data_count_in,
       o_overflow   => data_count_overflow_in
-      );
+    );
 
   end generate gen_data;
 
-
----------------------------------------------------------------------
--- DUT
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
+  -- DUT
+  ---------------------------------------------------------------------
   inst_mux_squid_top : entity fpasim.mux_squid_top
     generic map(
       -- pixel
-      g_PIXEL_ID_WIDTH              => g_PIXEL_ID_WIDTH,  -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
+      g_PIXEL_ID_WIDTH              => g_PIXEL_ID_WIDTH, -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
       -- frame
-      g_FRAME_ID_WIDTH              => g_FRAME_ID_WIDTH,  -- frame id bus width (expressed in bits). Possible values: [1; max integer value[
+      g_FRAME_ID_WIDTH              => g_FRAME_ID_WIDTH, -- frame id bus width (expressed in bits). Possible values: [1; max integer value[
       -- address
-      g_MUX_SQUID_TF_RAM_ADDR_WIDTH => g_MUX_SQUID_TF_RAM_ADDR_WIDTH,  -- address bus width (expressed in bits)
+      g_MUX_SQUID_TF_RAM_ADDR_WIDTH => g_MUX_SQUID_TF_RAM_ADDR_WIDTH, -- address bus width (expressed in bits)
       -- computation
-      g_PIXEL_RESULT_INPUT_WIDTH    => g_PIXEL_RESULT_INPUT_WIDTH,  -- pixel input result bus width (expressed in bits). Possible values: [1; max integer value[
-      g_PIXEL_RESULT_OUTPUT_WIDTH   => g_PIXEL_RESULT_OUTPUT_WIDTH  -- pixel output result bus width (expressed in bits). Possible values: [1; max integer value[
-      )
+      g_PIXEL_RESULT_INPUT_WIDTH    => g_PIXEL_RESULT_INPUT_WIDTH, -- pixel input result bus width (expressed in bits). Possible values: [1; max integer value[
+      g_PIXEL_RESULT_OUTPUT_WIDTH   => g_PIXEL_RESULT_OUTPUT_WIDTH -- pixel output result bus width (expressed in bits). Possible values: [1; max integer value[
+    )
     port map(
-      i_clk                         => i_clk,          -- clock signal
-      i_rst_status                  => i_rst_status,   -- reset error flag(s)
-      i_debug_pulse                 => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+      i_clk                         => i_clk, -- clock signal
+      i_rst_status                  => i_rst_status, -- reset error flag(s)
+      i_debug_pulse                 => i_debug_pulse, -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
       -- RAM: mux_squid_offset
       -- wr
-      i_mux_squid_offset_wr_en      => i_mux_squid_offset_wr_en,  -- write enable
-      i_mux_squid_offset_wr_rd_addr => i_mux_squid_offset_wr_rd_addr,  -- write address
-      i_mux_squid_offset_wr_data    => i_mux_squid_offset_wr_data,  -- write data
+      i_mux_squid_offset_wr_en      => i_mux_squid_offset_wr_en, -- write enable
+      i_mux_squid_offset_wr_rd_addr => i_mux_squid_offset_wr_rd_addr, -- write address
+      i_mux_squid_offset_wr_data    => i_mux_squid_offset_wr_data, -- write data
       -- rd
-      i_mux_squid_offset_rd_en      => i_mux_squid_offset_rd_en,  -- rd en
-      o_mux_squid_offset_rd_valid   => o_mux_squid_offset_rd_valid,  -- rd data valid
-      o_mux_squid_offset_rd_data    => o_mux_squid_offset_rd_data,  -- rd data
+      i_mux_squid_offset_rd_en      => i_mux_squid_offset_rd_en, -- rd en
+      o_mux_squid_offset_rd_valid   => o_mux_squid_offset_rd_valid, -- rd data valid
+      o_mux_squid_offset_rd_data    => o_mux_squid_offset_rd_data, -- rd data
       -- RAM: mux_squid_tf
       -- wr
-      i_mux_squid_tf_wr_en          => i_mux_squid_tf_wr_en,  -- write enable
-      i_mux_squid_tf_wr_rd_addr     => i_mux_squid_tf_wr_rd_addr,  -- write address
-      i_mux_squid_tf_wr_data        => i_mux_squid_tf_wr_data,   -- write data
+      i_mux_squid_tf_wr_en          => i_mux_squid_tf_wr_en, -- write enable
+      i_mux_squid_tf_wr_rd_addr     => i_mux_squid_tf_wr_rd_addr, -- write address
+      i_mux_squid_tf_wr_data        => i_mux_squid_tf_wr_data, -- write data
       --rd
-      i_mux_squid_tf_rd_en          => i_mux_squid_tf_rd_en,  -- rd enable
-      o_mux_squid_tf_rd_valid       => o_mux_squid_tf_rd_valid,  -- rd data valid
-      o_mux_squid_tf_rd_data        => o_mux_squid_tf_rd_data,   -- read data
+      i_mux_squid_tf_rd_en          => i_mux_squid_tf_rd_en, -- rd enable
+      o_mux_squid_tf_rd_valid       => o_mux_squid_tf_rd_valid, -- rd data valid
+      o_mux_squid_tf_rd_data        => o_mux_squid_tf_rd_data, -- read data
       ---------------------------------------------------------------------
       -- input1
       ---------------------------------------------------------------------
-      i_pixel_sof                   => i_pixel_sof,    -- first pixel sample
-      i_pixel_eof                   => i_pixel_eof,    -- last pixel sample
-      i_pixel_valid                 => i_pixel_valid,  -- valid pixel sample
-      i_pixel_id                    => i_pixel_id,     -- pixel id
-      i_pixel_result                => i_pixel_result,    -- pixel result value
-      i_frame_sof                   => i_frame_sof,    -- first frame sample
-      i_frame_eof                   => i_frame_eof,    -- last frame sample
-      i_frame_id                    => i_frame_id,     -- frame id
+      i_pixel_sof                   => i_pixel_sof, -- first pixel sample
+      i_pixel_eof                   => i_pixel_eof, -- last pixel sample
+      i_pixel_valid                 => i_pixel_valid, -- valid pixel sample
+      i_pixel_id                    => i_pixel_id, -- pixel id
+      i_pixel_result                => i_pixel_result, -- pixel result value
+      i_frame_sof                   => i_frame_sof, -- first frame sample
+      i_frame_eof                   => i_frame_eof, -- last frame sample
+      i_frame_id                    => i_frame_id, -- frame id
       ---------------------------------------------------------------------
       -- input2
       ---------------------------------------------------------------------
-      i_mux_squid_feedback          => i_mux_squid_feedback,  -- mux squid feedback value
+      i_mux_squid_feedback          => i_mux_squid_feedback, -- mux squid feedback value
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      o_pixel_sof               => o_pixel_sof,    -- first pixel sample
-      o_pixel_eof               => o_pixel_eof,    -- last pixel sample
-      o_pixel_valid             => o_pixel_valid,  -- valid pixel sample
-      o_pixel_id                => o_pixel_id,     --  pixel id
-      o_pixel_result            => o_pixel_result,      --  pixel result
-      o_frame_sof               => o_frame_sof,    -- first frame sample
-      o_frame_eof               => o_frame_eof,    -- last frame sample
-      o_frame_id                => o_frame_id,     --  frame id
+      o_pixel_sof                   => o_pixel_sof, -- first pixel sample
+      o_pixel_eof                   => o_pixel_eof, -- last pixel sample
+      o_pixel_valid                 => o_pixel_valid, -- valid pixel sample
+      o_pixel_id                    => o_pixel_id, --  pixel id
+      o_pixel_result                => o_pixel_result, --  pixel result
+      o_frame_sof                   => o_frame_sof, -- first frame sample
+      o_frame_eof                   => o_frame_eof, -- last frame sample
+      o_frame_id                    => o_frame_id, --  frame id
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------
-      o_errors                  => o_errors,       -- output errors
-      o_status                  => o_status        -- output status
-      );
+      o_errors                      => o_errors, -- output errors
+      o_status                      => o_status -- output status
+    );
 
   -- count output data
   ---------------------------------------------------------------------
@@ -745,13 +707,11 @@ begin
     -- output
     o_count      => data_count_out,
     o_overflow   => data_count_overflow_out
-    );
+  );
 
-
-
----------------------------------------------------------------------
--- log: data out
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
+  -- log: data out
+  ---------------------------------------------------------------------
   gen_log : if g_ENABLE_LOG = true generate
     signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
     signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
@@ -763,58 +723,55 @@ begin
     frame_sof_vect_tmp(0) <= o_frame_sof;
     frame_eof_vect_tmp(0) <= o_frame_eof;
 
-    gen_log_by_id: for i in 0 to g_NB_PIXEL_BY_FRAME - 1 generate
-      constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & c_VHDL_FILENAME_SUFFIX & "data_out" & to_string(i) & ".csv";
-      signal data_valid : std_logic;
+    gen_log_by_id : for i in 0 to g_NB_PIXEL_BY_FRAME - 1 generate
+      constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & "vhdl_data_out" & to_string(i) & ".csv";
+      signal data_valid            : std_logic;
     begin
-        data_valid <= o_pixel_valid when to_integer(unsigned(o_pixel_id)) = i else '0';
+      data_valid <= o_pixel_valid when to_integer(unsigned(o_pixel_id)) = i else '0';
 
-        inst_pkg_log_data_in_file : pkg_log_data_in_file_7(
-          i_clk   => i_clk,
-          i_start => data_start,
-          i_stop  => data_stop,
+      inst_pkg_log_data_in_file : pkg_log_data_in_file_7(
+        i_clk              => i_clk,
+        i_start            => data_start,
+        i_stop             => data_stop,
+        ---------------------------------------------------------------------
+        -- output file
+        ---------------------------------------------------------------------
+        i_filepath         => c_FILEPATH_DATA_OUT,
+        i_csv_separator    => c_CSV_SEPARATOR,
+        i_NAME0            => "pixel_sof",
+        i_NAME1            => "pixel_eof",
+        i_NAME2            => "pixel_id",
+        i_NAME3            => "pixel_result",
+        i_NAME4            => "frame_sof",
+        i_NAME5            => "frame_eof",
+        i_NAME6            => "frame_id",
+        --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
+        --  common typ = "INT" => the std_logic_vector value is converted into signed int representation
+        --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
+        --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
+        --  common typ = "STD_VEC" => the std_logic_vector value is not converted
+        i_DATA0_COMMON_TYP => "UINT",
+        i_DATA1_COMMON_TYP => "UINT",
+        i_DATA2_COMMON_TYP => "UINT",
+        i_DATA3_COMMON_TYP => "HEX",
+        i_DATA4_COMMON_TYP => "UINT",
+        i_DATA5_COMMON_TYP => "UINT",
+        i_DATA6_COMMON_TYP => "UINT",
+        ---------------------------------------------------------------------
+        -- signals to log
+        ---------------------------------------------------------------------
+        i_data_valid       => data_valid,
+        i_data0_std_vect   => pixel_sof_vect_tmp,
+        i_data1_std_vect   => pixel_eof_vect_tmp,
+        i_data2_std_vect   => o_pixel_id,
+        i_data3_std_vect   => o_pixel_result,
+        i_data4_std_vect   => frame_sof_vect_tmp,
+        i_data5_std_vect   => frame_eof_vect_tmp,
+        i_data6_std_vect   => o_frame_id
+      );
 
-          ---------------------------------------------------------------------
-          -- output file
-          ---------------------------------------------------------------------
-          i_filepath      => c_FILEPATH_DATA_OUT,
-          i_csv_separator => c_CSV_SEPARATOR,
-
-          i_NAME0            => "pixel_sof",
-          i_NAME1            => "pixel_eof",
-          i_NAME2            => "pixel_id",
-          i_NAME3            => "pixel_result",
-          i_NAME4            => "frame_sof",
-          i_NAME5            => "frame_eof",
-          i_NAME6            => "frame_id",
-          --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
-          --  common typ = "INT" => the std_logic_vector value is converted into signed int representation
-          --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
-          --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
-          --  common typ = "STD_VEC" => the std_logic_vector value is not converted
-          i_DATA0_COMMON_TYP => "UINT",
-          i_DATA1_COMMON_TYP => "UINT",
-          i_DATA2_COMMON_TYP => "UINT",
-          i_DATA3_COMMON_TYP => "UINT",
-          i_DATA4_COMMON_TYP => "UINT",
-          i_DATA5_COMMON_TYP => "UINT",
-          i_DATA6_COMMON_TYP => "UINT",
-          ---------------------------------------------------------------------
-          -- signals to log
-          ---------------------------------------------------------------------
-          i_data_valid       => data_valid,
-          i_data0_std_vect   => pixel_sof_vect_tmp,
-          i_data1_std_vect   => pixel_eof_vect_tmp,
-          i_data2_std_vect   => o_pixel_id,
-          i_data3_std_vect   => o_pixel_result,
-          i_data4_std_vect   => frame_sof_vect_tmp,
-          i_data5_std_vect   => frame_eof_vect_tmp,
-          i_data6_std_vect   => o_frame_id
-          );
-       
     end generate gen_log_by_id;
 
   end generate gen_log;
-
 
 end simulate;
