@@ -58,8 +58,8 @@ add wave -noupdate -group stat /tb_tes_top/data_count_overflow_out
 add wave -noupdate -group tes_signalling_pixel -group in /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_pixel/i_clk
 add wave -noupdate -group tes_signalling_pixel -group in /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_pixel/i_rst
 add wave -noupdate -group tes_signalling_pixel -group in /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_pixel/i_start
-add wave -noupdate -group tes_signalling_pixel -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_pixel/i_length
-add wave -noupdate -group tes_signalling_pixel -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_pixel/i_id_size
+add wave -noupdate -group tes_signalling_pixel -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_pixel/i_nb_samples_by_block
+add wave -noupdate -group tes_signalling_pixel -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_pixel/i_nb_block
 add wave -noupdate -group tes_signalling_pixel -group in /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_pixel/i_data_valid
 add wave -noupdate -group tes_signalling_pixel -expand -group step1 /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_pixel/sm_state_r1
 add wave -noupdate -group tes_signalling_pixel -expand -group step1 /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_pixel/data_valid_r1
@@ -75,8 +75,8 @@ add wave -noupdate -group tes_signalling_pixel -expand -group out /tb_tes_top/in
 add wave -noupdate -group tes_signalling_frame -expand -group in /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_frame/i_clk
 add wave -noupdate -group tes_signalling_frame -expand -group in /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_frame/i_rst
 add wave -noupdate -group tes_signalling_frame -expand -group in /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_frame/i_start
-add wave -noupdate -group tes_signalling_frame -expand -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_frame/i_length
-add wave -noupdate -group tes_signalling_frame -expand -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_frame/i_id_size
+add wave -noupdate -group tes_signalling_frame -expand -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_frame/i_nb_samples_by_block
+add wave -noupdate -group tes_signalling_frame -expand -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_frame/i_nb_block
 add wave -noupdate -group tes_signalling_frame -expand -group in /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_frame/i_data_valid
 add wave -noupdate -group tes_signalling_frame -group step1 /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_frame/sm_state_r1
 add wave -noupdate -group tes_signalling_frame -group step1 /tb_tes_top/inst_dut_tes_top/inst_tes_signalling/inst_tes_signalling_frame/data_valid_r1
@@ -93,7 +93,6 @@ add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsign
 add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_PIXEL_ID_WIDTH
 add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_PULSE_SHAPE_RAM_ADDR_WIDTH
 add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_PIXEL_RESULT_OUTPUT_WIDTH
-add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_FRAME_SIZE
 add wave -noupdate -expand -group tes_pulse_manager -group in /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/i_clk
 add wave -noupdate -expand -group tes_pulse_manager -group in /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/i_rst
 add wave -noupdate -expand -group tes_pulse_manager -group in /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/i_rst_status

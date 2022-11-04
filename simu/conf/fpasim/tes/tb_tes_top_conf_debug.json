@@ -20,8 +20,8 @@
                 "en":1,
                 "nb_sample_by_pixel":8,
                 "nb_pixel_by_frame":2,
-                "nb_frame_by_serie":2048,
-                "nb_serie":2
+                "nb_frame_by_pulse":2048,
+                "nb_pulse":2
             }
         ,
         "sequence":
@@ -105,8 +105,18 @@
             "time_shift":0
         }
     },
-    "ram_tes_shape":
+    "ram1":
     {
+        "generic":
+        {
+            "description_list":
+            [
+                ""
+            ],
+            "name":"tes_shape_pulse",
+            "check":0,
+            "verbosity":0
+        },
         "value":
         {
             "description_list":
@@ -131,8 +141,18 @@
             "time_shift":0
         }
     },
-    "ram_steady_state":
+    "ram2":
     {
+        "generic":
+        {
+            "description_list":
+            [
+                ""
+            ],
+            "name":"tes_steady_state",
+            "check":1,
+            "verbosity":1
+        },
         "value":
         {
             "description_list":
