@@ -304,12 +304,12 @@ begin
   ---------------------------------------------------------------------
   -- RAM: mux_squid_offset
   ---------------------------------------------------------------------
-  mux_squid_offset_ena   <= i_mux_squid_offset_wr_en;
+  mux_squid_offset_ena   <= i_mux_squid_offset_wr_en or i_mux_squid_offset_rd_en;
   mux_squid_offset_wea   <= i_mux_squid_offset_wr_en;
   mux_squid_offset_addra <= i_mux_squid_offset_wr_rd_addr;
   mux_squid_offset_dina  <= i_mux_squid_offset_wr_data;
 
-  mux_squid_offset_regcea <= i_mux_squid_offset_rd_en;
+  mux_squid_offset_regcea <= '1';
 
   inst_tdpram_mux_squid_offset : entity fpasim.tdpram
     generic map(
@@ -410,12 +410,12 @@ begin
   ---------------------------------------------------------------------
   -- RAM: mux_squid_tf
   ---------------------------------------------------------------------
-  mux_squid_tf_ena   <= i_mux_squid_tf_wr_en;
+  mux_squid_tf_ena   <= i_mux_squid_tf_wr_en or i_mux_squid_tf_rd_en;
   mux_squid_tf_wea   <= i_mux_squid_tf_wr_en;
   mux_squid_tf_addra <= i_mux_squid_tf_wr_rd_addr;
   mux_squid_tf_dina  <= i_mux_squid_tf_wr_data;
 
-  mux_squid_tf_regcea <= i_mux_squid_tf_rd_en;
+  mux_squid_tf_regcea <= '1';
 
   inst_tdpram_mux_squid_tf : entity fpasim.tdpram
     generic map(
