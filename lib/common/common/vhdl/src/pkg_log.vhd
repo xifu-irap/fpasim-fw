@@ -43,28 +43,25 @@ use csv_lib.pkg_csv_file.all;
 library common_lib;
 use common_lib.pkg_common.all;
 
-
 package pkg_log is
 
-
   ---------------------------------------------------------------------
--- This function allows to build column label of the *.csv file
----------------------------------------------------------------------
- --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
- --  common typ = "INT" => the std_logic_vector value is converted into signed int representation
- --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
- --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
- --  common typ = "STD_VEC" => the std_logic_vector value is not converted
-  function pkg_column_name(constant i_NAME  : in string; constant i_DATA_COMMON_TYP  : in string := "INT") return string;
-
+  -- This function allows to build column label of the *.csv file
+  ---------------------------------------------------------------------
+  --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
+  --  common typ = "INT" => the std_logic_vector value is converted into signed int representation
+  --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
+  --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
+  --  common typ = "STD_VEC" => the std_logic_vector value is not converted
+  function pkg_column_name(constant i_NAME : in string; constant i_DATA_COMMON_TYP : in string := "INT") return string;
 
   ---------------------------------------------------------------------
   -- pkg_log_data_in_file_1
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_1(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
@@ -77,22 +74,20 @@ package pkg_log is
     --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
     --  common typ = "STD_VEC" => the std_logic_vector value is not converted
     constant i_DATA0_COMMON_TYP : in string := "INT";
-
     ---------------------------------------------------------------------
     -- signal to log
     ---------------------------------------------------------------------
-    signal i_data_valid     : in std_logic;
-    signal i_data0_std_vect : in std_logic_vector
-    );
-
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector
+  );
 
   ---------------------------------------------------------------------
   -- pkg_log_data_in_file_2
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_2(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
@@ -106,22 +101,21 @@ package pkg_log is
     --  common typ = "STD_VEC" => the std_logic_vector value is not converted
     constant i_DATA0_COMMON_TYP : in string := "INT";
     constant i_DATA1_COMMON_TYP : in string := "INT";
-
     ---------------------------------------------------------------------
     -- signal to log
     ---------------------------------------------------------------------
-    signal i_data_valid     : in std_logic;
-    signal i_data0_std_vect : in std_logic_vector;
-    signal i_data1_std_vect : in std_logic_vector
-    );
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector
+  );
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_3
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_3(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
@@ -138,29 +132,27 @@ package pkg_log is
     constant i_DATA0_COMMON_TYP : in string := "INT";
     constant i_DATA1_COMMON_TYP : in string := "INT";
     constant i_DATA2_COMMON_TYP : in string := "INT";
-
     ---------------------------------------------------------------------
     -- signal to log
     ---------------------------------------------------------------------
-    signal i_data_valid     : in std_logic;
-    signal i_data0_std_vect : in std_logic_vector;
-    signal i_data1_std_vect : in std_logic_vector;
-    signal i_data2_std_vect : in std_logic_vector
-    );
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector
+  );
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_4
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_4(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -177,27 +169,25 @@ package pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector;
-    signal i_data3_std_vect     : in std_logic_vector
-    );
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector
+  );
 
-
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_5
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_5(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -216,27 +206,26 @@ package pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector;
-    signal i_data3_std_vect     : in std_logic_vector;
-    signal i_data4_std_vect     : in std_logic_vector
-    );
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector;
+    signal   i_data4_std_vect   : in std_logic_vector
+  );
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_6
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_6(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -257,28 +246,27 @@ package pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector;
-    signal i_data3_std_vect     : in std_logic_vector;
-    signal i_data4_std_vect     : in std_logic_vector;
-    signal i_data5_std_vect     : in std_logic_vector
-    );
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector;
+    signal   i_data4_std_vect   : in std_logic_vector;
+    signal   i_data5_std_vect   : in std_logic_vector
+  );
 
   ---------------------------------------------------------------------
   -- pkg_log_data_in_file_7
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_7(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -301,29 +289,28 @@ package pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector;
-    signal i_data3_std_vect     : in std_logic_vector;
-    signal i_data4_std_vect     : in std_logic_vector;
-    signal i_data5_std_vect     : in std_logic_vector;
-    signal i_data6_std_vect     : in std_logic_vector
-    );
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector;
+    signal   i_data4_std_vect   : in std_logic_vector;
+    signal   i_data5_std_vect   : in std_logic_vector;
+    signal   i_data6_std_vect   : in std_logic_vector
+  );
 
   ---------------------------------------------------------------------
   -- pkg_log_data_in_file_8
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_8(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -348,30 +335,29 @@ package pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector;
-    signal i_data3_std_vect     : in std_logic_vector;
-    signal i_data4_std_vect     : in std_logic_vector;
-    signal i_data5_std_vect     : in std_logic_vector;
-    signal i_data6_std_vect     : in std_logic_vector;
-    signal i_data7_std_vect     : in std_logic_vector
-    );
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector;
+    signal   i_data4_std_vect   : in std_logic_vector;
+    signal   i_data5_std_vect   : in std_logic_vector;
+    signal   i_data6_std_vect   : in std_logic_vector;
+    signal   i_data7_std_vect   : in std_logic_vector
+  );
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_10
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_10(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -400,32 +386,31 @@ package pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector;
-    signal i_data3_std_vect     : in std_logic_vector;
-    signal i_data4_std_vect     : in std_logic_vector;
-    signal i_data5_std_vect     : in std_logic_vector;
-    signal i_data6_std_vect     : in std_logic_vector;
-    signal i_data7_std_vect     : in std_logic_vector;
-    signal i_data8_std_vect     : in std_logic_vector;
-    signal i_data9_std_vect     : in std_logic_vector
-    );
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector;
+    signal   i_data4_std_vect   : in std_logic_vector;
+    signal   i_data5_std_vect   : in std_logic_vector;
+    signal   i_data6_std_vect   : in std_logic_vector;
+    signal   i_data7_std_vect   : in std_logic_vector;
+    signal   i_data8_std_vect   : in std_logic_vector;
+    signal   i_data9_std_vect   : in std_logic_vector
+  );
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_11
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_11(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk               : in std_logic;
+    signal   i_start             : in std_logic;
+    signal   i_stop              : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                   : in string;
+    i_csv_separator              : in character;
     constant i_NAME0             : in string;
     constant i_NAME1             : in string;
     constant i_NAME2             : in string;
@@ -456,35 +441,32 @@ package pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid          : in std_logic;
+    signal   i_data_valid        : in std_logic;
+    signal   i_data0_std_vect    : in std_logic_vector;
+    signal   i_data1_std_vect    : in std_logic_vector;
+    signal   i_data2_std_vect    : in std_logic_vector;
+    signal   i_data3_std_vect    : in std_logic_vector;
+    signal   i_data4_std_vect    : in std_logic_vector;
+    signal   i_data5_std_vect    : in std_logic_vector;
+    signal   i_data6_std_vect    : in std_logic_vector;
+    signal   i_data7_std_vect    : in std_logic_vector;
+    signal   i_data8_std_vect    : in std_logic_vector;
+    signal   i_data9_std_vect    : in std_logic_vector;
+    signal   i_data10_std_vect   : in std_logic_vector
+  );
 
-    signal i_data0_std_vect  : in std_logic_vector;
-    signal i_data1_std_vect  : in std_logic_vector;
-    signal i_data2_std_vect  : in std_logic_vector;
-    signal i_data3_std_vect  : in std_logic_vector;
-    signal i_data4_std_vect  : in std_logic_vector;
-    signal i_data5_std_vect  : in std_logic_vector;
-    signal i_data6_std_vect  : in std_logic_vector;
-    signal i_data7_std_vect  : in std_logic_vector;
-    signal i_data8_std_vect  : in std_logic_vector;
-    signal i_data9_std_vect  : in std_logic_vector;
-    signal i_data10_std_vect : in std_logic_vector
-    );
-
-
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_13
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_13(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk               : in std_logic;
+    signal   i_start             : in std_logic;
+    signal   i_stop              : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                   : in string;
+    i_csv_separator              : in character;
     constant i_NAME0             : in string;
     constant i_NAME1             : in string;
     constant i_NAME2             : in string;
@@ -519,57 +501,51 @@ package pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid          : in std_logic;
-    signal i_data0_std_vect      : in std_logic_vector;
-    signal i_data1_std_vect      : in std_logic_vector;
-    signal i_data2_std_vect      : in std_logic_vector;
-    signal i_data3_std_vect      : in std_logic_vector;
-    signal i_data4_std_vect      : in std_logic_vector;
-    signal i_data5_std_vect      : in std_logic_vector;
-    signal i_data6_std_vect      : in std_logic_vector;
-    signal i_data7_std_vect      : in std_logic_vector;
-    signal i_data8_std_vect      : in std_logic_vector;
-    signal i_data9_std_vect      : in std_logic_vector;
-    signal i_data10_std_vect     : in std_logic_vector;
-    signal i_data11_std_vect     : in std_logic_vector;
-    signal i_data12_std_vect     : in std_logic_vector
-    );
-
-
+    signal   i_data_valid        : in std_logic;
+    signal   i_data0_std_vect    : in std_logic_vector;
+    signal   i_data1_std_vect    : in std_logic_vector;
+    signal   i_data2_std_vect    : in std_logic_vector;
+    signal   i_data3_std_vect    : in std_logic_vector;
+    signal   i_data4_std_vect    : in std_logic_vector;
+    signal   i_data5_std_vect    : in std_logic_vector;
+    signal   i_data6_std_vect    : in std_logic_vector;
+    signal   i_data7_std_vect    : in std_logic_vector;
+    signal   i_data8_std_vect    : in std_logic_vector;
+    signal   i_data9_std_vect    : in std_logic_vector;
+    signal   i_data10_std_vect   : in std_logic_vector;
+    signal   i_data11_std_vect   : in std_logic_vector;
+    signal   i_data12_std_vect   : in std_logic_vector
+  );
 
 end package pkg_log;
 
 package body pkg_log is
 
-
----------------------------------------------------------------------
--- This function allows to build column label of the *.csv file
----------------------------------------------------------------------
- --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
- --  common typ = "INT" => the std_logic_vector value is converted into signed int representation
- --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
- --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
- --  common typ = "STD_VEC" => the std_logic_vector value is not converted
-  function pkg_column_name(constant i_NAME  : in string; constant i_DATA_COMMON_TYP  : in string := "INT") return string is
+  ---------------------------------------------------------------------
+  -- This function allows to build column label of the *.csv file
+  ---------------------------------------------------------------------
+  --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
+  --  common typ = "INT" => the std_logic_vector value is converted into signed int representation
+  --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
+  --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
+  --  common typ = "STD_VEC" => the std_logic_vector value is not converted
+  function pkg_column_name(constant i_NAME : in string; constant i_DATA_COMMON_TYP : in string := "INT") return string is
   begin
     return i_NAME & "_(" & i_DATA_COMMON_TYP & ")";
   end function;
-
-
 
   ---------------------------------------------------------------------
   -- pkg_log_data_in_file_1
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_1(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
     --  common typ = "INT" => the std_logic_vector value is converted into signed int representation
@@ -577,14 +553,12 @@ package body pkg_log is
     --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
     --  common typ = "STD_VEC" => the std_logic_vector value is not converted
     constant i_DATA0_COMMON_TYP : in string := "INT";
-
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid     : in std_logic;
-    signal i_data0_std_vect : in std_logic_vector
-
-    ) is
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector
+  ) is
     -- this function allows to write in *.csv file the testbench output signals:
     --   . the output value data_I
     --   . the output value data_Q
@@ -593,8 +567,8 @@ package body pkg_log is
 
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
-    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP); 
+    constant c_TEST      : boolean := true;
+    constant c_NAME0     : string  := pkg_column_name(i_NAME => i_NAME0, i_DATA_COMMON_TYP => i_DATA0_COMMON_TYP);
 
   begin
 
@@ -635,19 +609,18 @@ package body pkg_log is
 
           end if;
 
-          --if i_start = '1' then
-          v_fsm_state := E_RUN;
-          --else
-          -- file_close(fid);
-          --v_csv_file.dispose(void);
-          --v_fsm_state := E_END;
-          --end if;
+          if i_stop = '1' then
+            v_csv_file.dispose(void);
+            v_fsm_state := E_END;
+          else
+            v_fsm_state := E_RUN;
+          end if;
 
         when E_END =>
           -- c_TEST := false;
           v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -660,15 +633,14 @@ package body pkg_log is
   -- pkg_log_data_in_file_2
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_2(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
@@ -678,14 +650,13 @@ package body pkg_log is
     --  common typ = "STD_VEC" => the std_logic_vector value is not converted
     constant i_DATA0_COMMON_TYP : in string := "INT";
     constant i_DATA1_COMMON_TYP : in string := "INT";
-
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid     : in std_logic;
-    signal i_data0_std_vect : in std_logic_vector;
-    signal i_data1_std_vect : in std_logic_vector
-    ) is
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector
+  ) is
     -- this function allows to write in *.csv file the testbench output signals:
     --   . the output value data_I
     --   . the output value data_Q
@@ -694,9 +665,9 @@ package body pkg_log is
 
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
-    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
+    constant c_TEST      : boolean := true;
+    constant c_NAME0     : string  := pkg_column_name(i_NAME => i_NAME0, i_DATA_COMMON_TYP => i_DATA0_COMMON_TYP);
+    constant c_NAME1     : string  := pkg_column_name(i_NAME => i_NAME1, i_DATA_COMMON_TYP => i_DATA1_COMMON_TYP);
 
   begin
 
@@ -719,7 +690,7 @@ package body pkg_log is
             -- write the file header
             ---------------------------------------------------------------------
             -- build header
- 
+
             v_csv_file.write_string(value => c_NAME0, csv_separator => i_csv_separator);
             v_csv_file.write_string(value => c_NAME1, csv_separator => i_csv_separator, use_csv_separator => 0);
             v_csv_file.writeline(void);
@@ -740,19 +711,18 @@ package body pkg_log is
 
           end if;
 
-          --if i_start = '1' then
-          v_fsm_state := E_RUN;
-          --else
-          -- file_close(fid);
-          --v_csv_file.dispose(void);
-          --v_fsm_state := E_END;
-          --end if;
+          if i_stop = '1' then
+            v_csv_file.dispose(void);
+            v_fsm_state := E_END;
+          else
+            v_fsm_state := E_RUN;
+          end if;
 
         when E_END =>
           -- c_TEST := false;
           v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -761,20 +731,18 @@ package body pkg_log is
 
   end procedure pkg_log_data_in_file_2;
 
-
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_3
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_3(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -789,11 +757,11 @@ package body pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector
-    ) is
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector
+  ) is
     -- this function allows to write in *.csv file the testbench output signals:
     --   . the output value data_I
     --   . the output value data_Q
@@ -802,10 +770,10 @@ package body pkg_log is
 
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
-    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
+    constant c_TEST      : boolean := true;
+    constant c_NAME0     : string  := pkg_column_name(i_NAME => i_NAME0, i_DATA_COMMON_TYP => i_DATA0_COMMON_TYP);
+    constant c_NAME1     : string  := pkg_column_name(i_NAME => i_NAME1, i_DATA_COMMON_TYP => i_DATA1_COMMON_TYP);
+    constant c_NAME2     : string  := pkg_column_name(i_NAME => i_NAME2, i_DATA_COMMON_TYP => i_DATA2_COMMON_TYP);
 
   begin
 
@@ -848,19 +816,18 @@ package body pkg_log is
 
           end if;
 
-          --if i_start = '1' then
-          v_fsm_state := E_RUN;
-          --else
-          -- file_close(fid);
-          --v_csv_file.dispose(void);
-          --v_fsm_state := E_END;
-          --end if;
+          if i_stop = '1' then
+            v_csv_file.dispose(void);
+            v_fsm_state := E_END;
+          else
+            v_fsm_state := E_RUN;
+          end if;
 
         when E_END =>
           -- c_TEST := false;
           v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -869,19 +836,18 @@ package body pkg_log is
 
   end procedure pkg_log_data_in_file_3;
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_4
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_4(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -898,12 +864,12 @@ package body pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector;
-    signal i_data3_std_vect     : in std_logic_vector
-    ) is
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector
+  ) is
     -- this function allows to write in *.csv file the testbench output signals:
     --   . the output value data_I
     --   . the output value data_Q
@@ -912,12 +878,12 @@ package body pkg_log is
 
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
-    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
+    constant c_NAME0 : string := pkg_column_name(i_NAME => i_NAME0, i_DATA_COMMON_TYP => i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string := pkg_column_name(i_NAME => i_NAME1, i_DATA_COMMON_TYP => i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string := pkg_column_name(i_NAME => i_NAME2, i_DATA_COMMON_TYP => i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string := pkg_column_name(i_NAME => i_NAME3, i_DATA_COMMON_TYP => i_DATA3_COMMON_TYP);
 
   begin
 
@@ -962,19 +928,18 @@ package body pkg_log is
 
           end if;
 
-          --if i_start = '1' then
-          v_fsm_state := E_RUN;
-          --else
-          -- file_close(fid);
-          --v_csv_file.dispose(void);
-          --v_fsm_state := E_END;
-          --end if;
+          if i_stop = '1' then
+            v_csv_file.dispose(void);
+            v_fsm_state := E_END;
+          else
+            v_fsm_state := E_RUN;
+          end if;
 
         when E_END =>
           -- c_TEST := false;
           v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -983,19 +948,18 @@ package body pkg_log is
 
   end procedure pkg_log_data_in_file_4;
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_5
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_5(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -1014,29 +978,28 @@ package body pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector;
-    signal i_data3_std_vect     : in std_logic_vector;
-    signal i_data4_std_vect     : in std_logic_vector
-    ) is
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector;
+    signal   i_data4_std_vect   : in std_logic_vector
+  ) is
     -- this function allows to write in *.csv file the testbench output signals:
     --   . the output value data_I
     --   . the output value data_Q
     --   . the bit synchro value
     variable v_csv_file : t_csv_file_reader;
- 
 
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
-    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
+    constant c_NAME0 : string := pkg_column_name(i_NAME => i_NAME0, i_DATA_COMMON_TYP => i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string := pkg_column_name(i_NAME => i_NAME1, i_DATA_COMMON_TYP => i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string := pkg_column_name(i_NAME => i_NAME2, i_DATA_COMMON_TYP => i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string := pkg_column_name(i_NAME => i_NAME3, i_DATA_COMMON_TYP => i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string := pkg_column_name(i_NAME => i_NAME4, i_DATA_COMMON_TYP => i_DATA4_COMMON_TYP);
 
   begin
 
@@ -1083,19 +1046,18 @@ package body pkg_log is
 
           end if;
 
-          --if i_start = '1' then
-          v_fsm_state := E_RUN;
-          --else
-          -- file_close(fid);
-          --v_csv_file.dispose(void);
-          --v_fsm_state := E_END;
-          --end if;
+          if i_stop = '1' then
+            v_csv_file.dispose(void);
+            v_fsm_state := E_END;
+          else
+            v_fsm_state := E_RUN;
+          end if;
 
         when E_END =>
           -- c_TEST := false;
           v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -1104,19 +1066,18 @@ package body pkg_log is
 
   end procedure pkg_log_data_in_file_5;
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_6
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_6(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -1137,31 +1098,30 @@ package body pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector;
-    signal i_data3_std_vect     : in std_logic_vector;
-    signal i_data4_std_vect     : in std_logic_vector;
-    signal i_data5_std_vect     : in std_logic_vector
-    ) is
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector;
+    signal   i_data4_std_vect   : in std_logic_vector;
+    signal   i_data5_std_vect   : in std_logic_vector
+  ) is
     -- this function allows to write in *.csv file the testbench output signals:
     --   . the output value data_I
     --   . the output value data_Q
     --   . the bit synchro value
     variable v_csv_file : t_csv_file_reader;
- 
 
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
-    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
+    constant c_NAME0 : string := pkg_column_name(i_NAME => i_NAME0, i_DATA_COMMON_TYP => i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string := pkg_column_name(i_NAME => i_NAME1, i_DATA_COMMON_TYP => i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string := pkg_column_name(i_NAME => i_NAME2, i_DATA_COMMON_TYP => i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string := pkg_column_name(i_NAME => i_NAME3, i_DATA_COMMON_TYP => i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string := pkg_column_name(i_NAME => i_NAME4, i_DATA_COMMON_TYP => i_DATA4_COMMON_TYP);
+    constant c_NAME5 : string := pkg_column_name(i_NAME => i_NAME5, i_DATA_COMMON_TYP => i_DATA5_COMMON_TYP);
 
   begin
 
@@ -1210,19 +1170,18 @@ package body pkg_log is
 
           end if;
 
-          --if i_start = '1' then
-          v_fsm_state := E_RUN;
-          --else
-          -- file_close(fid);
-          --v_csv_file.dispose(void);
-          --v_fsm_state := E_END;
-          --end if;
+          if i_stop = '1' then
+            v_csv_file.dispose(void);
+            v_fsm_state := E_END;
+          else
+            v_fsm_state := E_RUN;
+          end if;
 
         when E_END =>
           -- c_TEST := false;
           v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -1231,19 +1190,18 @@ package body pkg_log is
 
   end procedure pkg_log_data_in_file_6;
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_7
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_7(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -1266,33 +1224,32 @@ package body pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector;
-    signal i_data3_std_vect     : in std_logic_vector;
-    signal i_data4_std_vect     : in std_logic_vector;
-    signal i_data5_std_vect     : in std_logic_vector;
-    signal i_data6_std_vect     : in std_logic_vector
-    ) is
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector;
+    signal   i_data4_std_vect   : in std_logic_vector;
+    signal   i_data5_std_vect   : in std_logic_vector;
+    signal   i_data6_std_vect   : in std_logic_vector
+  ) is
     -- this function allows to write in *.csv file the testbench output signals:
     --   . the output value data_I
     --   . the output value data_Q
     --   . the bit synchro value
     variable v_csv_file : t_csv_file_reader;
- 
 
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
-    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
-    constant c_NAME6 : string :=  pkg_column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
+    constant c_NAME0 : string := pkg_column_name(i_NAME => i_NAME0, i_DATA_COMMON_TYP => i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string := pkg_column_name(i_NAME => i_NAME1, i_DATA_COMMON_TYP => i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string := pkg_column_name(i_NAME => i_NAME2, i_DATA_COMMON_TYP => i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string := pkg_column_name(i_NAME => i_NAME3, i_DATA_COMMON_TYP => i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string := pkg_column_name(i_NAME => i_NAME4, i_DATA_COMMON_TYP => i_DATA4_COMMON_TYP);
+    constant c_NAME5 : string := pkg_column_name(i_NAME => i_NAME5, i_DATA_COMMON_TYP => i_DATA5_COMMON_TYP);
+    constant c_NAME6 : string := pkg_column_name(i_NAME => i_NAME6, i_DATA_COMMON_TYP => i_DATA6_COMMON_TYP);
 
   begin
 
@@ -1343,19 +1300,17 @@ package body pkg_log is
 
           end if;
 
-          --if i_start = '1' then
-          v_fsm_state := E_RUN;
-          --else
-          -- file_close(fid);
-          --v_csv_file.dispose(void);
-          --v_fsm_state := E_END;
-          --end if;
+          if i_stop = '1' then
+            v_csv_file.dispose(void);
+            v_fsm_state := E_END;
+          else
+            v_fsm_state := E_RUN;
+          end if;
 
         when E_END =>
-          -- c_TEST := false;
           v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -1364,19 +1319,18 @@ package body pkg_log is
 
   end procedure pkg_log_data_in_file_7;
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_8
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_8(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -1401,35 +1355,34 @@ package body pkg_log is
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid         : in std_logic;
-    signal i_data0_std_vect     : in std_logic_vector;
-    signal i_data1_std_vect     : in std_logic_vector;
-    signal i_data2_std_vect     : in std_logic_vector;
-    signal i_data3_std_vect     : in std_logic_vector;
-    signal i_data4_std_vect     : in std_logic_vector;
-    signal i_data5_std_vect     : in std_logic_vector;
-    signal i_data6_std_vect     : in std_logic_vector;
-    signal i_data7_std_vect     : in std_logic_vector
-    ) is
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector;
+    signal   i_data4_std_vect   : in std_logic_vector;
+    signal   i_data5_std_vect   : in std_logic_vector;
+    signal   i_data6_std_vect   : in std_logic_vector;
+    signal   i_data7_std_vect   : in std_logic_vector
+  ) is
     -- this function allows to write in *.csv file the testbench output signals:
     --   . the output value data_I
     --   . the output value data_Q
     --   . the bit synchro value
     variable v_csv_file : t_csv_file_reader;
 
-
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
-    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
-    constant c_NAME6 : string :=  pkg_column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
-    constant c_NAME7 : string :=  pkg_column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
+    constant c_NAME0 : string := pkg_column_name(i_NAME => i_NAME0, i_DATA_COMMON_TYP => i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string := pkg_column_name(i_NAME => i_NAME1, i_DATA_COMMON_TYP => i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string := pkg_column_name(i_NAME => i_NAME2, i_DATA_COMMON_TYP => i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string := pkg_column_name(i_NAME => i_NAME3, i_DATA_COMMON_TYP => i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string := pkg_column_name(i_NAME => i_NAME4, i_DATA_COMMON_TYP => i_DATA4_COMMON_TYP);
+    constant c_NAME5 : string := pkg_column_name(i_NAME => i_NAME5, i_DATA_COMMON_TYP => i_DATA5_COMMON_TYP);
+    constant c_NAME6 : string := pkg_column_name(i_NAME => i_NAME6, i_DATA_COMMON_TYP => i_DATA6_COMMON_TYP);
+    constant c_NAME7 : string := pkg_column_name(i_NAME => i_NAME7, i_DATA_COMMON_TYP => i_DATA7_COMMON_TYP);
 
   begin
 
@@ -1482,19 +1435,18 @@ package body pkg_log is
 
           end if;
 
-          --if i_start = '1' then
-          v_fsm_state := E_RUN;
-          --else
-          -- file_close(fid);
-          --v_csv_file.dispose(void);
-          --v_fsm_state := E_END;
-          --end if;
+          if i_stop = '1' then
+            v_csv_file.dispose(void);
+            v_fsm_state := E_END;
+          else
+            v_fsm_state := E_RUN;
+          end if;
 
         when E_END =>
           -- c_TEST := false;
           v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -1503,19 +1455,18 @@ package body pkg_log is
 
   end procedure pkg_log_data_in_file_8;
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_10
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_10(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk              : in std_logic;
+    signal   i_start            : in std_logic;
+    signal   i_stop             : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                  : in string;
+    i_csv_separator             : in character;
     constant i_NAME0            : in string;
     constant i_NAME1            : in string;
     constant i_NAME2            : in string;
@@ -1541,22 +1492,21 @@ package body pkg_log is
     constant i_DATA7_COMMON_TYP : in string := "INT";
     constant i_DATA8_COMMON_TYP : in string := "INT";
     constant i_DATA9_COMMON_TYP : in string := "INT";
-
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid     : in std_logic;
-    signal i_data0_std_vect : in std_logic_vector;
-    signal i_data1_std_vect : in std_logic_vector;
-    signal i_data2_std_vect : in std_logic_vector;
-    signal i_data3_std_vect : in std_logic_vector;
-    signal i_data4_std_vect : in std_logic_vector;
-    signal i_data5_std_vect : in std_logic_vector;
-    signal i_data6_std_vect : in std_logic_vector;
-    signal i_data7_std_vect : in std_logic_vector;
-    signal i_data8_std_vect : in std_logic_vector;
-    signal i_data9_std_vect : in std_logic_vector
-    ) is
+    signal   i_data_valid       : in std_logic;
+    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data1_std_vect   : in std_logic_vector;
+    signal   i_data2_std_vect   : in std_logic_vector;
+    signal   i_data3_std_vect   : in std_logic_vector;
+    signal   i_data4_std_vect   : in std_logic_vector;
+    signal   i_data5_std_vect   : in std_logic_vector;
+    signal   i_data6_std_vect   : in std_logic_vector;
+    signal   i_data7_std_vect   : in std_logic_vector;
+    signal   i_data8_std_vect   : in std_logic_vector;
+    signal   i_data9_std_vect   : in std_logic_vector
+  ) is
     -- this function allows to write in *.csv file the testbench output signals:
     --   . the output value data_I
     --   . the output value data_Q
@@ -1565,18 +1515,18 @@ package body pkg_log is
 
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
-    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
-    constant c_NAME6 : string :=  pkg_column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
-    constant c_NAME7 : string :=  pkg_column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
-    constant c_NAME8 : string :=  pkg_column_name(i_NAME=> i_NAME8, i_DATA_COMMON_TYP=> i_DATA8_COMMON_TYP);
-    constant c_NAME9 : string :=  pkg_column_name(i_NAME=> i_NAME9, i_DATA_COMMON_TYP=> i_DATA9_COMMON_TYP);
+    constant c_NAME0 : string := pkg_column_name(i_NAME => i_NAME0, i_DATA_COMMON_TYP => i_DATA0_COMMON_TYP);
+    constant c_NAME1 : string := pkg_column_name(i_NAME => i_NAME1, i_DATA_COMMON_TYP => i_DATA1_COMMON_TYP);
+    constant c_NAME2 : string := pkg_column_name(i_NAME => i_NAME2, i_DATA_COMMON_TYP => i_DATA2_COMMON_TYP);
+    constant c_NAME3 : string := pkg_column_name(i_NAME => i_NAME3, i_DATA_COMMON_TYP => i_DATA3_COMMON_TYP);
+    constant c_NAME4 : string := pkg_column_name(i_NAME => i_NAME4, i_DATA_COMMON_TYP => i_DATA4_COMMON_TYP);
+    constant c_NAME5 : string := pkg_column_name(i_NAME => i_NAME5, i_DATA_COMMON_TYP => i_DATA5_COMMON_TYP);
+    constant c_NAME6 : string := pkg_column_name(i_NAME => i_NAME6, i_DATA_COMMON_TYP => i_DATA6_COMMON_TYP);
+    constant c_NAME7 : string := pkg_column_name(i_NAME => i_NAME7, i_DATA_COMMON_TYP => i_DATA7_COMMON_TYP);
+    constant c_NAME8 : string := pkg_column_name(i_NAME => i_NAME8, i_DATA_COMMON_TYP => i_DATA8_COMMON_TYP);
+    constant c_NAME9 : string := pkg_column_name(i_NAME => i_NAME9, i_DATA_COMMON_TYP => i_DATA9_COMMON_TYP);
 
   begin
 
@@ -1619,7 +1569,6 @@ package body pkg_log is
         when E_RUN =>
           if i_data_valid = '1' then
 
-
             v_csv_file.write_std_vec_as_common_typ(value => i_data0_std_vect, csv_separator => i_csv_separator, common_typ => i_DATA0_COMMON_TYP);
             v_csv_file.write_std_vec_as_common_typ(value => i_data1_std_vect, csv_separator => i_csv_separator, common_typ => i_DATA1_COMMON_TYP);
             v_csv_file.write_std_vec_as_common_typ(value => i_data2_std_vect, csv_separator => i_csv_separator, common_typ => i_DATA2_COMMON_TYP);
@@ -1631,24 +1580,21 @@ package body pkg_log is
             v_csv_file.write_std_vec_as_common_typ(value => i_data8_std_vect, csv_separator => i_csv_separator, common_typ => i_DATA8_COMMON_TYP);
             v_csv_file.write_std_vec_as_common_typ(value => i_data9_std_vect, csv_separator => i_csv_separator, common_typ => i_DATA9_COMMON_TYP, use_csv_separator => 0);
 
-
             v_csv_file.writeline(void);
 
           end if;
 
-          --if i_start = '1' then
-          v_fsm_state := E_RUN;
-          --else
-          -- file_close(fid);
-          --v_csv_file.dispose(void);
-          --v_fsm_state := E_END;
-          --end if;
-
+          if i_stop = '1' then
+            v_csv_file.dispose(void);
+            v_fsm_state := E_END;
+          else
+            v_fsm_state := E_RUN;
+          end if;
         when E_END =>
           -- c_TEST := false;
           v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -1657,31 +1603,29 @@ package body pkg_log is
 
   end procedure pkg_log_data_in_file_10;
 
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_11
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_11(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk               : in std_logic;
+    signal   i_start             : in std_logic;
+    signal   i_stop              : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
-    constant i_NAME0  : in string;
-    constant i_NAME1  : in string;
-    constant i_NAME2  : in string;
-    constant i_NAME3  : in string;
-    constant i_NAME4  : in string;
-    constant i_NAME5  : in string;
-    constant i_NAME6  : in string;
-    constant i_NAME7  : in string;
-    constant i_NAME8  : in string;
-    constant i_NAME9  : in string;
-    constant i_NAME10 : in string;
-
+    i_filepath                   : in string;
+    i_csv_separator              : in character;
+    constant i_NAME0             : in string;
+    constant i_NAME1             : in string;
+    constant i_NAME2             : in string;
+    constant i_NAME3             : in string;
+    constant i_NAME4             : in string;
+    constant i_NAME5             : in string;
+    constant i_NAME6             : in string;
+    constant i_NAME7             : in string;
+    constant i_NAME8             : in string;
+    constant i_NAME9             : in string;
+    constant i_NAME10            : in string;
     --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
     --  common typ = "INT" => the std_logic_vector value is converted into signed int representation
     --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
@@ -1698,23 +1642,22 @@ package body pkg_log is
     constant i_DATA8_COMMON_TYP  : in string := "INT";
     constant i_DATA9_COMMON_TYP  : in string := "INT";
     constant i_DATA10_COMMON_TYP : in string := "INT";
-
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid : in std_logic;
-    signal i_data0_std_vect  : in std_logic_vector;
-    signal i_data1_std_vect  : in std_logic_vector;
-    signal i_data2_std_vect  : in std_logic_vector;
-    signal i_data3_std_vect  : in std_logic_vector;
-    signal i_data4_std_vect  : in std_logic_vector;
-    signal i_data5_std_vect  : in std_logic_vector;
-    signal i_data6_std_vect  : in std_logic_vector;
-    signal i_data7_std_vect  : in std_logic_vector;
-    signal i_data8_std_vect  : in std_logic_vector;
-    signal i_data9_std_vect  : in std_logic_vector;
-    signal i_data10_std_vect : in std_logic_vector
-    ) is
+    signal   i_data_valid        : in std_logic;
+    signal   i_data0_std_vect    : in std_logic_vector;
+    signal   i_data1_std_vect    : in std_logic_vector;
+    signal   i_data2_std_vect    : in std_logic_vector;
+    signal   i_data3_std_vect    : in std_logic_vector;
+    signal   i_data4_std_vect    : in std_logic_vector;
+    signal   i_data5_std_vect    : in std_logic_vector;
+    signal   i_data6_std_vect    : in std_logic_vector;
+    signal   i_data7_std_vect    : in std_logic_vector;
+    signal   i_data8_std_vect    : in std_logic_vector;
+    signal   i_data9_std_vect    : in std_logic_vector;
+    signal   i_data10_std_vect   : in std_logic_vector
+  ) is
     -- this function allows to write in *.csv file the testbench output signals:
     --   . the output value data_I
     --   . the output value data_Q
@@ -1723,19 +1666,19 @@ package body pkg_log is
 
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
-    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
-    constant c_NAME6 : string :=  pkg_column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
-    constant c_NAME7 : string :=  pkg_column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
-    constant c_NAME8 : string :=  pkg_column_name(i_NAME=> i_NAME8, i_DATA_COMMON_TYP=> i_DATA8_COMMON_TYP);
-    constant c_NAME9 : string :=  pkg_column_name(i_NAME=> i_NAME9, i_DATA_COMMON_TYP=> i_DATA9_COMMON_TYP);
-    constant c_NAME10 : string :=  pkg_column_name(i_NAME=> i_NAME10, i_DATA_COMMON_TYP=> i_DATA10_COMMON_TYP);
+    constant c_NAME0  : string := pkg_column_name(i_NAME => i_NAME0, i_DATA_COMMON_TYP => i_DATA0_COMMON_TYP);
+    constant c_NAME1  : string := pkg_column_name(i_NAME => i_NAME1, i_DATA_COMMON_TYP => i_DATA1_COMMON_TYP);
+    constant c_NAME2  : string := pkg_column_name(i_NAME => i_NAME2, i_DATA_COMMON_TYP => i_DATA2_COMMON_TYP);
+    constant c_NAME3  : string := pkg_column_name(i_NAME => i_NAME3, i_DATA_COMMON_TYP => i_DATA3_COMMON_TYP);
+    constant c_NAME4  : string := pkg_column_name(i_NAME => i_NAME4, i_DATA_COMMON_TYP => i_DATA4_COMMON_TYP);
+    constant c_NAME5  : string := pkg_column_name(i_NAME => i_NAME5, i_DATA_COMMON_TYP => i_DATA5_COMMON_TYP);
+    constant c_NAME6  : string := pkg_column_name(i_NAME => i_NAME6, i_DATA_COMMON_TYP => i_DATA6_COMMON_TYP);
+    constant c_NAME7  : string := pkg_column_name(i_NAME => i_NAME7, i_DATA_COMMON_TYP => i_DATA7_COMMON_TYP);
+    constant c_NAME8  : string := pkg_column_name(i_NAME => i_NAME8, i_DATA_COMMON_TYP => i_DATA8_COMMON_TYP);
+    constant c_NAME9  : string := pkg_column_name(i_NAME => i_NAME9, i_DATA_COMMON_TYP => i_DATA9_COMMON_TYP);
+    constant c_NAME10 : string := pkg_column_name(i_NAME => i_NAME10, i_DATA_COMMON_TYP => i_DATA10_COMMON_TYP);
 
   begin
 
@@ -1779,7 +1722,6 @@ package body pkg_log is
         when E_RUN =>
           if i_data_valid = '1' then
 
-
             v_csv_file.write_std_vec_as_common_typ(value => i_data0_std_vect, csv_separator => i_csv_separator, common_typ => i_DATA0_COMMON_TYP);
             v_csv_file.write_std_vec_as_common_typ(value => i_data1_std_vect, csv_separator => i_csv_separator, common_typ => i_DATA1_COMMON_TYP);
             v_csv_file.write_std_vec_as_common_typ(value => i_data2_std_vect, csv_separator => i_csv_separator, common_typ => i_DATA2_COMMON_TYP);
@@ -1795,19 +1737,18 @@ package body pkg_log is
 
           end if;
 
-          --if i_start = '1' then
-          v_fsm_state := E_RUN;
-          --else
-          -- file_close(fid);
-          --v_csv_file.dispose(void);
-          --v_fsm_state := E_END;
-          --end if;
+          if i_stop = '1' then
+            v_csv_file.dispose(void);
+            v_fsm_state := E_END;
+          else
+            v_fsm_state := E_RUN;
+          end if;
 
         when E_END =>
           -- c_TEST := false;
           v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -1816,20 +1757,18 @@ package body pkg_log is
 
   end procedure pkg_log_data_in_file_11;
 
-
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- pkg_log_data_in_file_13
   ---------------------------------------------------------------------
   procedure pkg_log_data_in_file_13(
-    signal i_clk   : in std_logic;
-    signal i_start : in std_logic;
-
+    signal   i_clk               : in std_logic;
+    signal   i_start             : in std_logic;
+    signal   i_stop              : in std_logic;
     ---------------------------------------------------------------------
     -- output file
     ---------------------------------------------------------------------
-    i_filepath      : in string;
-    i_csv_separator : in character;
-
+    i_filepath                   : in string;
+    i_csv_separator              : in character;
     constant i_NAME0             : in string;
     constant i_NAME1             : in string;
     constant i_NAME2             : in string;
@@ -1861,49 +1800,47 @@ package body pkg_log is
     constant i_DATA10_COMMON_TYP : in string := "INT";
     constant i_DATA11_COMMON_TYP : in string := "INT";
     constant i_DATA12_COMMON_TYP : in string := "INT";
-
     ---------------------------------------------------------------------
     -- signals to log
     ---------------------------------------------------------------------
-    signal i_data_valid      : in std_logic;
-    signal i_data0_std_vect  : in std_logic_vector;
-    signal i_data1_std_vect  : in std_logic_vector;
-    signal i_data2_std_vect  : in std_logic_vector;
-    signal i_data3_std_vect  : in std_logic_vector;
-    signal i_data4_std_vect  : in std_logic_vector;
-    signal i_data5_std_vect  : in std_logic_vector;
-    signal i_data6_std_vect  : in std_logic_vector;
-    signal i_data7_std_vect  : in std_logic_vector;
-    signal i_data8_std_vect  : in std_logic_vector;
-    signal i_data9_std_vect  : in std_logic_vector;
-    signal i_data10_std_vect : in std_logic_vector;
-    signal i_data11_std_vect : in std_logic_vector;
-    signal i_data12_std_vect : in std_logic_vector
-    ) is
+    signal   i_data_valid        : in std_logic;
+    signal   i_data0_std_vect    : in std_logic_vector;
+    signal   i_data1_std_vect    : in std_logic_vector;
+    signal   i_data2_std_vect    : in std_logic_vector;
+    signal   i_data3_std_vect    : in std_logic_vector;
+    signal   i_data4_std_vect    : in std_logic_vector;
+    signal   i_data5_std_vect    : in std_logic_vector;
+    signal   i_data6_std_vect    : in std_logic_vector;
+    signal   i_data7_std_vect    : in std_logic_vector;
+    signal   i_data8_std_vect    : in std_logic_vector;
+    signal   i_data9_std_vect    : in std_logic_vector;
+    signal   i_data10_std_vect   : in std_logic_vector;
+    signal   i_data11_std_vect   : in std_logic_vector;
+    signal   i_data12_std_vect   : in std_logic_vector
+  ) is
     -- this function allows to write in *.csv file the testbench output signals:
     --   . the output value data_I
     --   . the output value data_Q
     --   . the bit synchro value
     variable v_csv_file : t_csv_file_reader;
 
-
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
-    constant c_NAME0 : string :=  pkg_column_name(i_NAME=> i_NAME0, i_DATA_COMMON_TYP=> i_DATA0_COMMON_TYP);
-    constant c_NAME1 : string :=  pkg_column_name(i_NAME=> i_NAME1, i_DATA_COMMON_TYP=> i_DATA1_COMMON_TYP);
-    constant c_NAME2 : string :=  pkg_column_name(i_NAME=> i_NAME2, i_DATA_COMMON_TYP=> i_DATA2_COMMON_TYP);
-    constant c_NAME3 : string :=  pkg_column_name(i_NAME=> i_NAME3, i_DATA_COMMON_TYP=> i_DATA3_COMMON_TYP);
-    constant c_NAME4 : string :=  pkg_column_name(i_NAME=> i_NAME4, i_DATA_COMMON_TYP=> i_DATA4_COMMON_TYP);
-    constant c_NAME5 : string :=  pkg_column_name(i_NAME=> i_NAME5, i_DATA_COMMON_TYP=> i_DATA5_COMMON_TYP);
-    constant c_NAME6 : string :=  pkg_column_name(i_NAME=> i_NAME6, i_DATA_COMMON_TYP=> i_DATA6_COMMON_TYP);
-    constant c_NAME7 : string :=  pkg_column_name(i_NAME=> i_NAME7, i_DATA_COMMON_TYP=> i_DATA7_COMMON_TYP);
-    constant c_NAME8 : string :=  pkg_column_name(i_NAME=> i_NAME8, i_DATA_COMMON_TYP=> i_DATA8_COMMON_TYP);
-    constant c_NAME9 : string :=  pkg_column_name(i_NAME=> i_NAME9, i_DATA_COMMON_TYP=> i_DATA9_COMMON_TYP);
-    constant c_NAME10 : string :=  pkg_column_name(i_NAME=> i_NAME10, i_DATA_COMMON_TYP=> i_DATA10_COMMON_TYP);
-    constant c_NAME11 : string :=  pkg_column_name(i_NAME=> i_NAME11, i_DATA_COMMON_TYP=> i_DATA11_COMMON_TYP);
-    constant c_NAME12 : string :=  pkg_column_name(i_NAME=> i_NAME12, i_DATA_COMMON_TYP=> i_DATA12_COMMON_TYP);
+    constant c_NAME0  : string := pkg_column_name(i_NAME => i_NAME0, i_DATA_COMMON_TYP => i_DATA0_COMMON_TYP);
+    constant c_NAME1  : string := pkg_column_name(i_NAME => i_NAME1, i_DATA_COMMON_TYP => i_DATA1_COMMON_TYP);
+    constant c_NAME2  : string := pkg_column_name(i_NAME => i_NAME2, i_DATA_COMMON_TYP => i_DATA2_COMMON_TYP);
+    constant c_NAME3  : string := pkg_column_name(i_NAME => i_NAME3, i_DATA_COMMON_TYP => i_DATA3_COMMON_TYP);
+    constant c_NAME4  : string := pkg_column_name(i_NAME => i_NAME4, i_DATA_COMMON_TYP => i_DATA4_COMMON_TYP);
+    constant c_NAME5  : string := pkg_column_name(i_NAME => i_NAME5, i_DATA_COMMON_TYP => i_DATA5_COMMON_TYP);
+    constant c_NAME6  : string := pkg_column_name(i_NAME => i_NAME6, i_DATA_COMMON_TYP => i_DATA6_COMMON_TYP);
+    constant c_NAME7  : string := pkg_column_name(i_NAME => i_NAME7, i_DATA_COMMON_TYP => i_DATA7_COMMON_TYP);
+    constant c_NAME8  : string := pkg_column_name(i_NAME => i_NAME8, i_DATA_COMMON_TYP => i_DATA8_COMMON_TYP);
+    constant c_NAME9  : string := pkg_column_name(i_NAME => i_NAME9, i_DATA_COMMON_TYP => i_DATA9_COMMON_TYP);
+    constant c_NAME10 : string := pkg_column_name(i_NAME => i_NAME10, i_DATA_COMMON_TYP => i_DATA10_COMMON_TYP);
+    constant c_NAME11 : string := pkg_column_name(i_NAME => i_NAME11, i_DATA_COMMON_TYP => i_DATA11_COMMON_TYP);
+    constant c_NAME12 : string := pkg_column_name(i_NAME => i_NAME12, i_DATA_COMMON_TYP => i_DATA12_COMMON_TYP);
 
   begin
 
@@ -1940,7 +1877,6 @@ package body pkg_log is
             v_csv_file.write_string(value => c_NAME11, csv_separator => i_csv_separator);
             v_csv_file.write_string(value => c_NAME12, csv_separator => i_csv_separator, use_csv_separator => 0);
 
-
             v_csv_file.writeline(void);
             v_fsm_state := E_RUN;
           else
@@ -1949,7 +1885,6 @@ package body pkg_log is
 
         when E_RUN =>
           if i_data_valid = '1' then
-
 
             v_csv_file.write_std_vec_as_common_typ(value => i_data0_std_vect, csv_separator => i_csv_separator, common_typ => i_DATA0_COMMON_TYP);
             v_csv_file.write_std_vec_as_common_typ(value => i_data1_std_vect, csv_separator => i_csv_separator, common_typ => i_DATA1_COMMON_TYP);
@@ -1969,19 +1904,18 @@ package body pkg_log is
 
           end if;
 
-          --if i_start = '1' then
-          v_fsm_state := E_RUN;
-          --else
-          -- file_close(fid);
-          --v_csv_file.dispose(void);
-          --v_fsm_state := E_END;
-          --end if;
+          if i_stop = '1' then
+            v_csv_file.dispose(void);
+            v_fsm_state := E_END;
+          else
+            v_fsm_state := E_RUN;
+          end if;
 
         when E_END =>
           -- c_TEST := false;
           v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -1989,8 +1923,5 @@ package body pkg_log is
     end loop;
 
   end procedure pkg_log_data_in_file_13;
-
-
- 
 
 end package body pkg_log;
