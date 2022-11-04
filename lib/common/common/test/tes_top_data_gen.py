@@ -1,3 +1,38 @@
+# -*- coding: utf-8 -*-
+# -------------------------------------------------------------------------------------------------------------
+#                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
+# -------------------------------------------------------------------------------------------------------------
+#                              This file is part of the ATHENA X-IFU DRE Focal Plane Assembly simulator.
+#
+#                              fpasim-fw is free software: you can redistribute it and/or modify
+#                              it under the terms of the GNU General Public License as published by
+#                              the Free Software Foundation, either version 3 of the License, or
+#                              (at your option) any later version.
+#
+#                              This program is distributed in the hope that it will be useful,
+#                              but WITHOUT ANY WARRANTY; without even the implied warranty of
+#                              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#                              GNU General Public License for more details.
+#
+#                              You should have received a copy of the GNU General Public License
+#                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# -------------------------------------------------------------------------------------------------------------
+#    email                   kenji.delarosa@alten.com
+#    @file                   tes_top_data_gen.py
+# -------------------------------------------------------------------------------------------------------------
+#    Automatic Generation    No
+#    Code Rules Reference    N/A
+# -------------------------------------------------------------------------------------------------------------
+#    @details
+#    This python script defines the TesTopDataGen class.
+#    This class defines methods to generate data for the tes_top test bench
+#    
+#    Note:
+#       . This script is aware of the json configuration file
+#       . This script was tested with python 3.10
+# -------------------------------------------------------------------------------------------------------------
+
+# standard library
 
 from common import Display
 from common import ValidSequencer
@@ -6,137 +41,6 @@ import json
 import os
 import shutil
 
-
-class TesSignallingModel:
-    def __init__(self):
-        self.nb_sample_by_pixel = None
-        self.nb_frame_by_serie = None
-        self.nb_pixel_by_frame = None
-        self.nb_serie = None
-
-        self.pixel_sof_list = []
-        self.pixel_eof_list = []
-        self.pixel_id_list = []
-        self.frame_sof_list = []
-        self.frame_eof_list = []
-        self.frame_id_list = []
-
-    def set_conf(self,nb_sample_by_pixel_p,nb_pixel_by_frame_p,nb_frame_by_serie_p,nb_serie_p):
-        self.nb_sample_by_pixel = nb_sample_by_pixel_p
-        self.nb_frame_by_serie = nb_frame_by_serie_p
-        self.nb_pixel_by_frame = nb_pixel_by_frame_p
-        self.nb_serie = nb_serie_p
-        self._compute()
-
-    def _oversample(self,data_list_p,oversample_p):
-        res = []
-
-        for data in data_list_p:
-            for i in range(oversample_p):
-                res.append(data)
-        return res
-    def _compute_flags(self,data_list_p,length_p):
-
-        sof_list = []
-        eof_list = []
-        cnt = 1
-        for data in data_list_p:
-            if cnt == 1:
-                sof_list.append(1)
-            else:
-                sof_list.append(0)
-            if cnt == length_p:
-                eof_list.append(1)
-            else:
-                eof_list.append(0)
-            if cnt == length_p:
-                cnt = 1
-            else:
-                cnt = cnt + 1
-        return sof_list,eof_list
-    def _compute(self):
-        nb_sample_by_pixel = self.nb_sample_by_pixel
-        nb_pixel_by_frame   = self.nb_pixel_by_frame
-        nb_frame_by_serie  = self.nb_frame_by_serie
-        nb_serie           = self.nb_serie
-
-        nb_sample_by_frame = nb_pixel_by_frame * nb_sample_by_pixel
-
-        # compute id
-        pixel_id_list = list(range(0,nb_pixel_by_frame-1))
-        frame_id_list = list(range(0,nb_frame_by_serie-1))
-
-        # oversample
-        pixel_id_oversample_list = self._oversample(data_list_p=pixel_id_list,oversample_p=nb_sample_by_pixel)
-        frame_id_oversample_list = self._oversample(data_list_p=frame_id_list,oversample_p=nb_sample_by_frame)
-
-        # duplicate
-        pixel_id_oversample_list = pixel_id_oversample_list * nb_serie * nb_frame_by_serie
-        frame_id_oversample_list = frame_id_oversample_list * nb_serie
-        # compute flags
-        pixel_sof_list,pixel_eof_list = self._compute_flags(data_list_p=pixel_id_oversample_list,length_p=nb_sample_by_pixel)
-        frame_sof_list,frame_eof_list = self._compute_flags(data_list_p=frame_id_oversample_list,length_p=nb_sample_by_frame)
-
-        self.pixel_sof_list = pixel_sof_list
-        self.pixel_eof_list = pixel_eof_list
-        self.pixel_id_list = pixel_id_oversample_list
-
-        self.frame_sof_list = frame_sof_list
-        self.frame_eof_list = frame_eof_list
-        self.frame_id_list = frame_id_oversample_list
-
-
-
-    def save(self,filepath_p,csv_separator_p=';'):
-
-
-        pixel_sof_list = self.pixel_sof_list
-        pixel_eof_list = self.pixel_eof_list
-        pixel_id_list = self.pixel_id_list
-
-        frame_sof_list = self.frame_sof_list
-        frame_eof_list = self.frame_eof_list
-        frame_id_list = self.frame_id_list
-
-
-        filepath = filepath_p
-        csv_separator = csv_separator_p
-
-        fid = open(filepath,'w')
-        #############################################
-        # write header
-        #############################################
-        fid.write('pixel_sof_uint_t')
-        fid.write(csv_separator)
-        fid.write('pixel_eof_uint_t')
-        fid.write(csv_separator)
-        fid.write('pixel_id_uint_t')
-        fid.write(csv_separator)
-        fid.write('frame_sof_uint_t')
-        fid.write(csv_separator)
-        fid.write('frame_eof_uint_t')
-        fid.write(csv_separator)
-        fid.write('frame_id_uint_t')
-        fid.write('\n')
-        index_max = len(pixel_sof_list) - 1
-        #############################################
-        index = 0
-        for pixel_sof,pixel_eof,pixel_id,frame_sof,frame_eof,frame_id in zip(pixel_sof_list,pixel_eof_list,pixel_id_list,frame_sof_list,frame_eof_list,frame_id_list):
-            fid.write(str(pixel_sof))
-            fid.write(csv_separator)
-            fid.write(str(pixel_eof))
-            fid.write(csv_separator)
-            fid.write(str(pixel_id))
-            fid.write(csv_separator)
-            fid.write(str(frame_sof))
-            fid.write(csv_separator)
-            fid.write(str(frame_eof))
-            fid.write(csv_separator)
-            fid.write(str(frame_id))
-            if index != index_max:
-                fid.write('\n')
-            index = index + 1
-        fid.close()
 
 class TesTopDataGen:
 
@@ -198,11 +102,21 @@ class TesTopDataGen:
         json_data = self.json_data
 
         nb_pixel_by_frame = json_data['register']['value']['nb_pixel_by_frame']
-        nb_frame_by_serie = json_data['register']['value']['nb_frame_by_serie']
+        nb_frame_by_pulse = json_data['register']['value']['nb_frame_by_pulse']
+
+        ram1_check = json_data['ram1']['generic']['check']
+        ram1_verbosity = json_data['ram1']['generic']['verbosity']
+
+        ram2_check = json_data['ram2']['generic']['check']
+        ram2_verbosity = json_data['ram2']['generic']['verbosity']
 
         dic = {}
         dic['g_NB_PIXEL_BY_FRAME'] = int(nb_pixel_by_frame)
-        dic['g_NB_FRAME_BY_SERIE'] = int(nb_frame_by_serie)
+        dic['g_NB_FRAME_BY_PULSE'] = int(nb_frame_by_pulse)
+        dic['g_RAM1_CHECK'] = bool(ram1_check)
+        dic['g_RAM1_VERBOSITY'] = ram1_verbosity
+        dic['g_RAM2_CHECK'] = bool(ram2_check)
+        dic['g_RAM2_VERBOSITY'] = ram2_verbosity
         return dic
 
 
@@ -232,8 +146,8 @@ class TesTopDataGen:
         dic_sequence.append(json_data["register"]["sequence"])
         dic_sequence.append(json_data["cmd"]["sequence"])
         dic_sequence.append(json_data["data"]["sequence"])
-        dic_sequence.append(json_data["ram_tes_shape"]["sequence"])
-        dic_sequence.append(json_data["ram_steady_state"]["sequence"])
+        dic_sequence.append(json_data["ram1"]["sequence"])
+        dic_sequence.append(json_data["ram2"]["sequence"])
 
         for dic in dic_sequence:
             filename = dic["filename"]
@@ -270,8 +184,8 @@ class TesTopDataGen:
         en                 = json_data["register"]["value"]["en"]
         nb_sample_by_pixel = json_data["register"]["value"]["nb_sample_by_pixel"]
         nb_pixel_by_frame  = json_data["register"]["value"]["nb_pixel_by_frame"]
-        nb_frame_by_serie  = json_data["register"]["value"]["nb_frame_by_serie"]
-        nb_serie           = json_data["register"]["value"]["nb_serie"]
+        nb_frame_by_pulse  = json_data["register"]["value"]["nb_frame_by_pulse"]
+        nb_pulse           = json_data["register"]["value"]["nb_pulse"]
 
         pixel_length = nb_sample_by_pixel
         frame_length = nb_sample_by_pixel * nb_pixel_by_frame
@@ -306,7 +220,7 @@ class TesTopDataGen:
         ####################################################
         # process data
         ####################################################
-        nb_samples = frame_length * nb_frame_by_serie * nb_serie
+        nb_samples = frame_length * nb_frame_by_pulse * nb_pulse
         msg0 = 'TesTopDataGen._run: Generate data file'
 
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
@@ -371,8 +285,8 @@ class TesTopDataGen:
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
         dic_sequence = []
-        dic_sequence.append(json_data["ram_tes_shape"]["value"])
-        dic_sequence.append(json_data["ram_steady_state"]["value"])
+        dic_sequence.append(json_data["ram1"]["value"])
+        dic_sequence.append(json_data["ram2"]["value"])
 
         for dic in dic_sequence:
             input_filename = dic['input_filename']

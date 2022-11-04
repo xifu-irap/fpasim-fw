@@ -43,7 +43,9 @@ from common.display import Display
 #########################################
 from common.test.valid_sequencer import *
 from common.test.vunit_conf import VunitConf
+from common.test.tes_signalling_model import TesSignallingModel
 from common.test.tes_top_data_gen import TesTopDataGen
+from common.test.mux_squid_top_data_gen import MuxSquidTopDataGen
 
 
 
