@@ -1,4 +1,4 @@
-offset_addr_uint;data_uint
+offset_addr_uint15_t;data_uint16_t
 0;    0
 1;  513
 2; 1023
