@@ -25,19 +25,19 @@
 --!   @details                
 --
 -- This module generates flags to tags
---  . the first frame sample
---  . the last frame sample
---  The frame length is defined by the i_length input port
--- And for each frame, an frame id is incremented until the i_id_size - 1 value.
--- Then the frame id rolls back to 0
+--  . the first block sample
+--  . the last block sample
+--  The block size is defined by the i_nb_samples_by_block input port
+-- And for each output block, the block id is incremented from 0 to (i_nb_block - 1).
+-- Then the block id rolls back to 0
 
--- Example0: (length = 4, id_size = 3) with continuous i_data_valid signal
+-- Example0: (length = 4, i_nb_block = 3) with continuous i_data_valid signal
 -- data valid | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
 -- id         |            0  |          1    |      2        |   0           |
 -- sof        | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 |
 -- eof        | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 |
 --
--- Example1: (length = 4, id_size = 3)  with non-continuous i_data_valid signal
+-- Example1: (length = 4, i_nb_block = 3)  with non-continuous i_data_valid signal
 -- data valid | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 |
 -- id         |             0                 |          1                    |              2                |           0                   |
 -- sof        | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -53,32 +53,32 @@ library fpasim;
 
 entity tes_signalling_generator is
   generic(
-    g_LENGTH_WIDTH : positive := 16;    -- frame bus width (expressed in bits). Possible values: [1; integer max value[
-    g_ID_WIDTH     : positive := 11;    -- ID bus width (expressed in bits). . Possible values: [1; integer max value[
-    g_LATENCY_OUT  : natural  := 0      -- add output latency. Possible values: [0; integer max value[
+    g_BLOCK_LENGTH_WIDTH : positive := 16; -- block bus width (expressed in bits). Possible values: [1; integer max value[
+    g_ID_WIDTH           : positive := 11; -- ID bus width (expressed in bits). . Possible values: [1; integer max value[
+    g_LATENCY_OUT        : natural  := 0 -- add output latency. Possible values: [0; integer max value[
   );
   port(
-    i_clk        : in  std_logic;       -- clock signal
-    i_rst        : in  std_logic;       -- reset signal
+    i_clk                 : in  std_logic; -- clock signal
+    i_rst                 : in  std_logic; -- reset signal
     ---------------------------------------------------------------------
     -- Commands
     ---------------------------------------------------------------------
-    i_start      : in  std_logic;       -- start the generation (pulse)
-    i_length     : in  std_logic_vector(g_LENGTH_WIDTH - 1 downto 0); -- number of samples by frame
-    i_id_size    : in  std_logic_vector(g_ID_WIDTH - 1 downto 0); -- max id value
+    i_start               : in  std_logic; -- start the generation (pulse)
+    i_nb_samples_by_block : in  std_logic_vector(g_BLOCK_LENGTH_WIDTH - 1 downto 0); -- number of samples by block
+    i_nb_block            : in  std_logic_vector(g_ID_WIDTH - 1 downto 0); -- number of block to generate
 
     ---------------------------------------------------------------------
     -- Input data
     ---------------------------------------------------------------------
-    i_data_valid : in  std_logic;       -- input valid data
+    i_data_valid          : in  std_logic; -- input valid data
 
     ---------------------------------------------------------------------
     -- Output data
     ---------------------------------------------------------------------
-    o_sof        : out std_logic;       -- first frame sample
-    o_eof        : out std_logic;       -- last frame sample
-    o_id         : out std_logic_vector(g_ID_WIDTH - 1 downto 0); -- id value
-    o_data_valid : out std_logic        -- valid output frame sample
+    o_sof                 : out std_logic; -- first block sample
+    o_eof                 : out std_logic; -- last block sample
+    o_id                  : out std_logic_vector(g_ID_WIDTH - 1 downto 0); -- block id
+    o_data_valid          : out std_logic -- valid block sample
 
   );
 end entity tes_signalling_generator;
@@ -101,20 +101,20 @@ architecture RTL of tes_signalling_generator is
   signal eof_next : std_logic;
   signal eof_r1   : std_logic := '0';
 
-  signal cnt_frame_next : unsigned(i_length'range);
-  signal cnt_frame_r1   : unsigned(i_length'range) := (others => '0');
+  signal cnt_frame_next : unsigned(i_nb_samples_by_block'range);
+  signal cnt_frame_r1   : unsigned(i_nb_samples_by_block'range) := (others => '0');
 
-  signal cnt_frame_max_next : unsigned(i_length'range);
-  signal cnt_frame_max_r1   : unsigned(i_length'range) := (others => '0');
+  signal cnt_frame_max_next : unsigned(i_nb_samples_by_block'range);
+  signal cnt_frame_max_r1   : unsigned(i_nb_samples_by_block'range) := (others => '0');
 
-  signal cnt_id_next : unsigned(i_id_size'range);
-  signal cnt_id_r1   : unsigned(i_id_size'range) := (others => '0');
+  signal cnt_id_next : unsigned(i_nb_block'range);
+  signal cnt_id_r1   : unsigned(i_nb_block'range) := (others => '0');
 
   ---------------------------------------------------------------------
   -- step2
   ---------------------------------------------------------------------
   constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_id_size'length - 1;
+  constant c_IDX0_H : integer := c_IDX0_L + i_nb_block'length - 1;
 
   constant c_IDX1_L : integer := c_IDX0_H + 1;
   constant c_IDX1_H : integer := c_IDX1_L + 1 - 1;
@@ -128,14 +128,14 @@ architecture RTL of tes_signalling_generator is
   signal data_tmp0 : std_logic_vector(c_IDX3_H downto 0);
   signal data_tmp1 : std_logic_vector(c_IDX3_H downto 0);
 
-  signal data_valid1 : std_logic := '0';
-  signal sof1        : std_logic := '0';
-  signal eof1        : std_logic := '0';
-  signal id1         : std_logic_vector(i_id_size'range):= (others => '0');
+  signal data_valid1 : std_logic                          := '0';
+  signal sof1        : std_logic                          := '0';
+  signal eof1        : std_logic                          := '0';
+  signal id1         : std_logic_vector(i_nb_block'range) := (others => '0');
 
 begin
 
-  p_decode_state : process(i_start, cnt_frame_max_r1, cnt_frame_r1, cnt_id_r1, i_length, i_id_size, i_data_valid, sm_state_r1) is
+  p_decode_state : process(i_start, cnt_frame_max_r1, cnt_frame_r1, cnt_id_r1, i_nb_samples_by_block, i_nb_block, i_data_valid, sm_state_r1) is
   begin
     -- default value
 
@@ -163,21 +163,21 @@ begin
       when E_START =>
 
         if i_data_valid = '1' then
-          if cnt_id_r1 = unsigned(i_id_size) then
-            cnt_id_next <= to_unsigned(0, i_id_size'length);
+          if cnt_id_r1 = unsigned(i_nb_block) then
+            cnt_id_next <= to_unsigned(0, i_nb_block'length);
           else
             cnt_id_next <= cnt_id_r1 + 1;
           end if;
           data_valid_next <= i_data_valid;
 
           sof_next       <= '1';
-          cnt_frame_next <= to_unsigned(0, i_length'length);
+          cnt_frame_next <= to_unsigned(0, i_nb_samples_by_block'length);
           -- special case: frame of one sample
-          if unsigned(i_length) = to_unsigned(0, i_length'length) then
+          if unsigned(i_nb_samples_by_block) = to_unsigned(0, i_nb_samples_by_block'length) then
             eof_next      <= '1';
             sm_state_next <= E_START;
           else
-            cnt_frame_max_next <= unsigned(i_length) - 1; --susbract - 1 to anticipate
+            cnt_frame_max_next <= unsigned(i_nb_samples_by_block) - 1; --susbract - 1 to anticipate
             sm_state_next      <= E_RUN;
           end if;
         else

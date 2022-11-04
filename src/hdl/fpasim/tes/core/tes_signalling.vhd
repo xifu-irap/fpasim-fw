@@ -64,9 +64,9 @@ entity tes_signalling is
         ---------------------------------------------------------------------
         i_start        : in  std_logic; -- start the signalling generation
         i_pixel_length : in  std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0); -- number of samples by pixel
-        i_pixel_nb     : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);     -- number of pixel
+        i_pixel_nb     : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- number of pixel
         i_frame_length : in  std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0); -- number of samples by frame
-        i_frame_nb     : in std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0); -- number of frames by series
+        i_frame_nb     : in  std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0); -- number of frames by series
         ---------------------------------------------------------------------
         -- Input data
         ---------------------------------------------------------------------
@@ -88,15 +88,15 @@ end entity tes_signalling;
 
 architecture RTL of tes_signalling is
     -- frame
-    
-    constant c_NB_PIPES_OUT  : integer                            := pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY;
+
+    constant c_NB_PIPES_OUT : integer := pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY;
     ---------------------------------------------------------------------
     -- pixel signalling
     ---------------------------------------------------------------------
-    signal pixel_sof         : std_logic;
-    signal pixel_eof         : std_logic;
-    signal pixel_valid       : std_logic;
-    signal pixel_id          : std_logic_vector(o_pixel_id'range);
+    signal pixel_sof        : std_logic;
+    signal pixel_eof        : std_logic;
+    signal pixel_valid      : std_logic;
+    signal pixel_id         : std_logic_vector(o_pixel_id'range);
 
     ---------------------------------------------------------------------
     -- frame signalling
@@ -112,31 +112,31 @@ begin
     ---------------------------------------------------------------------
     inst_tes_signalling_pixel : entity fpasim.tes_signalling_generator
         generic map(
-            g_LENGTH_WIDTH => i_pixel_length'length,
-            g_ID_WIDTH     => i_pixel_nb'length,
+            g_BLOCK_LENGTH_WIDTH => i_pixel_length'length,
+            g_ID_WIDTH           => i_pixel_nb'length,
             -- number of the output registers
-            g_LATENCY_OUT  => c_NB_PIPES_OUT
+            g_LATENCY_OUT        => c_NB_PIPES_OUT
         )
         port map(
-            i_clk        => i_clk,
-            i_rst        => i_rst,
+            i_clk                 => i_clk,
+            i_rst                 => i_rst,
             ---------------------------------------------------------------------
             -- Commands
             ---------------------------------------------------------------------
-            i_start      => i_start,
-            i_length     => i_pixel_length,
-            i_id_size    => i_pixel_nb,
+            i_start               => i_start,
+            i_nb_samples_by_block => i_pixel_length,
+            i_nb_block            => i_pixel_nb,
             ---------------------------------------------------------------------
             -- Input data
             ---------------------------------------------------------------------
-            i_data_valid => i_data_valid,
+            i_data_valid          => i_data_valid,
             ---------------------------------------------------------------------
             -- Output data
             ---------------------------------------------------------------------
-            o_sof        => pixel_sof,
-            o_eof        => pixel_eof,
-            o_id         => pixel_id,
-            o_data_valid => pixel_valid
+            o_sof                 => pixel_sof,
+            o_eof                 => pixel_eof,
+            o_id                  => pixel_id,
+            o_data_valid          => pixel_valid
         );
 
     ---------------------------------------------------------------------
@@ -144,31 +144,31 @@ begin
     ---------------------------------------------------------------------
     inst_tes_signalling_frame : entity fpasim.tes_signalling_generator
         generic map(
-            g_LENGTH_WIDTH => i_frame_length'length,
-            g_ID_WIDTH     => i_frame_nb'length,
+            g_BLOCK_LENGTH_WIDTH => i_frame_length'length,
+            g_ID_WIDTH           => i_frame_nb'length,
             -- number of the output registers
-            g_LATENCY_OUT  => c_NB_PIPES_OUT
+            g_LATENCY_OUT        => c_NB_PIPES_OUT
         )
         port map(
-            i_clk        => i_clk,
-            i_rst        => i_rst,
+            i_clk                 => i_clk,
+            i_rst                 => i_rst,
             ---------------------------------------------------------------------
             -- Commands
             ---------------------------------------------------------------------
-            i_start      => i_start,
-            i_length     => i_frame_length,
-            i_id_size    => i_frame_nb,
+            i_start               => i_start,
+            i_nb_samples_by_block => i_frame_length,
+            i_nb_block            => i_frame_nb,
             ---------------------------------------------------------------------
             -- Input data
             ---------------------------------------------------------------------
-            i_data_valid => i_data_valid,
+            i_data_valid          => i_data_valid,
             ---------------------------------------------------------------------
             -- Output data
             ---------------------------------------------------------------------
-            o_sof        => frame_sof,
-            o_eof        => frame_eof,
-            o_id         => frame_id,
-            o_data_valid => open
+            o_sof                 => frame_sof,
+            o_eof                 => frame_eof,
+            o_id                  => frame_id,
+            o_data_valid          => open
         );
 
     ---------------------------------------------------------------------
