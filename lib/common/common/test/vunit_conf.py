@@ -32,6 +32,7 @@
 #       . This script is aware of the project tree structure
 #       . If a new path need to be added, update VunitConf._build_path method with the new path.
 #        Then, the user can create a new method by copying an existing method code in order to use the new added path
+#       . This script was tested with python 3.10
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
