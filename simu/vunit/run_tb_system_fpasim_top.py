@@ -229,7 +229,7 @@ if __name__ == '__main__':
     #####################################################
     # Set the simulation options
     #####################################################
-    VU.set_sim_option("modelsim.vsim_flags", ["-stats=-cmd,-time",'-c','-t','ps','-voptargs=+acc','-title',__file__.replace('\\','/')])
+    VU.set_sim_option("modelsim.vsim_flags", ["-stats=-cmd,-time",'-c','-t','ps','fpasim.glbl','-voptargs=+acc','-title',__file__.replace('\\','/')])
 
     ######################################################
     # get the list of conf_filepath (if any)
@@ -273,8 +273,7 @@ if __name__ == '__main__':
         tb.add_config(
                       name=test_name,
         
-                      # pre_config=obj.pre_config,
-                      pre_config=data_gen_obj.pre_config,
+                      # pre_config=data_gen_obj.pre_config,
                       generics = generic_dic
                         # {
                         # "g_TEST_NAME":name
