@@ -46,6 +46,7 @@ from common.test.vunit_conf import VunitConf
 from common.test.tes_signalling_model import TesSignallingModel
 from common.test.tes_top_data_gen import TesTopDataGen
 from common.test.mux_squid_top_data_gen import MuxSquidTopDataGen
+from common.test.amp_squid_top_data_gen import AmpSquidTopDataGen
 
 
 
