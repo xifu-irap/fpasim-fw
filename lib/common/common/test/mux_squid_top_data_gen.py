@@ -41,6 +41,7 @@ from pathlib import Path,PurePosixPath
 import json
 import os
 import shutil
+import random
 
 
 class MuxSquidTopDataGen:
