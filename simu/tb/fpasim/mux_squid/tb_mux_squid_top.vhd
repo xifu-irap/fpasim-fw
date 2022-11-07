@@ -405,7 +405,7 @@ begin
 
   begin
 
-    -- valid sequence
+    -- valid sequence generation
     ---------------------------------------------------------------------
     inst_pkg_valid_sequencer : pkg_valid_sequencer(
       i_clk           => i_clk,
@@ -589,14 +589,14 @@ begin
       ---------------------------------------------------------------------
       i_ready            => data_rd_valid,
       o_data_valid       => data_valid,
-      o_data0_std_vect   => pixel_sof_vect_tmp, -- not connected
-      o_data1_std_vect   => pixel_eof_vect_tmp, -- not connected
-      o_data2_std_vect   => i_pixel_id, -- not connected
-      o_data3_std_vect   => i_pixel_result, -- not connected
-      o_data4_std_vect   => frame_sof_vect_tmp, -- not connected
-      o_data5_std_vect   => frame_eof_vect_tmp, -- not connected
-      o_data6_std_vect   => i_frame_id, -- not connected
-      o_data7_std_vect   => i_mux_squid_feedback, -- not connected
+      o_data0_std_vect   => pixel_sof_vect_tmp, 
+      o_data1_std_vect   => pixel_eof_vect_tmp,
+      o_data2_std_vect   => i_pixel_id, 
+      o_data3_std_vect   => i_pixel_result,
+      o_data4_std_vect   => frame_sof_vect_tmp,
+      o_data5_std_vect   => frame_eof_vect_tmp,
+      o_data6_std_vect   => i_frame_id, 
+      o_data7_std_vect   => i_mux_squid_feedback,
 
       ---------------------------------------------------------------------
       -- status
@@ -671,7 +671,7 @@ begin
       i_pixel_eof                   => i_pixel_eof, -- last pixel sample
       i_pixel_valid                 => i_pixel_valid, -- valid pixel sample
       i_pixel_id                    => i_pixel_id, -- pixel id
-      i_pixel_result                => i_pixel_result, -- pixel result value
+      i_pixel_result                => i_pixel_result, -- pixel result 
       i_frame_sof                   => i_frame_sof, -- first frame sample
       i_frame_eof                   => i_frame_eof, -- last frame sample
       i_frame_id                    => i_frame_id, -- frame id
