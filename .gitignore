@@ -55,3 +55,6 @@
 external_libraries.json
 language_version.json
 library_mapping.json
+
+# untracked temporary Vunit test
+/simu/vunit/tmp_test
