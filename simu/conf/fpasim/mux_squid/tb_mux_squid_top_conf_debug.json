@@ -30,9 +30,9 @@
                 },
                 "pixel_result":
                 {   
-                    "mode":0,
-                    "min_value":1,
-                    "max_value":10
+                    "mode":1,
+                    "min_value":10,
+                    "max_value":20
                 }
             }
         ,
