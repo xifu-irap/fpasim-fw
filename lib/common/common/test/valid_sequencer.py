@@ -33,40 +33,41 @@
 #       . This script was tested with python 3.10
 # -------------------------------------------------------------------------------------------------------------
 
-
 # standard library
 import os
 
-
 class ValidSequencer:
     """
-
+    This class provides methods to generate an output csv file in order to
+    configure the VHDL pkg_valid_sequencer procedure (see pkg_sequence.vhd)
     """
-
     def __init__(self, name_p):
         """
-        init the class
+        This method initializes the class instance
+        :param name_p: (string) name of the valid sequence
         """
         self.name = name_p
-
+        # define the mode
         self.ctrl = None
-
+        # define the first (min_value, max_value)
         self.min_value1 = None
         self.max_value1 = None
-
+        # define the second (min_value, max_value)
         self.min_value2 = None
         self.max_value2 = None
-
+        # set the number of clock cycle before starting the generation
         self.time_shift = None
+        # set the level of verbosity
         self.verbosity = 0
 
     def set_verbosity(self, verbosity_p):
         """
-
-        :param verbosity_p:
-        :return:
+        Set the level of verbosity
+        :param verbosity_p: (integer >=0) level of verbosity
+        :return: None
         """
         self.verbosity = verbosity_p
+        return None
 
     def set_sequence(self, ctrl_p, min_value1_p, max_value1_p, min_value2_p, max_value2_p, time_shift_p=0):
         """
@@ -74,18 +75,18 @@ class ValidSequencer:
         :param ctrl_p: define the mode: Possibles values are:
             .0: continuous valid generation
                 . min_value1, max_value1, min_value2, max_value2 values are ignored
-            .1: random short pulse generation
-                . a positive pulse with a width of 1 clock cycle followed by
-                . a negative pulse with a random width between min_value2 and max_value2
-            .2. constant short pulse generation
+            .1. constant short pulse generation
                 . a positive pulse with a width of 1 clock cycle followed by
                 . a negative pulse with a constant width defined by the min_value2 value
-            .3. random pulse generation
-                . a positive pulse with a width defined by a random value between min_value1_v and max_value1_v followed by
-                . a negative pulse with a width defined by a random value between min_value2_v and max_value2_
-            .4. constant pulse generation
+            .2. constant pulse generation
                 . a positive pulse with a width defined by the min_value1_v value followed by
                 . a negative pulse with a width defined by the min_value2_v value
+            .3: random short pulse generation
+                . a positive pulse with a width of 1 clock cycle followed by
+                . a negative pulse with a random width between min_value2 and max_value2
+            .4. random pulse generation
+                . a positive pulse with a width defined by a random value between min_value1_v and max_value1_v followed by
+                . a negative pulse with a width defined by a random value between min_value2_v and max_value2_
             others values : continuous valid generation
         :param min_value1_p: define a min value for the positive pulse
         :param max_value1_p: define a max value for the positive pulse
@@ -107,8 +108,8 @@ class ValidSequencer:
 
     def save(self, filepath_p, csv_separator_p=';'):
         """
-        save the configuration in a *.csv file
-        :return:
+        This method save the parameters in an output csv file
+        :return: None
         """
         filepath = filepath_p
         ctrl = self.ctrl
@@ -124,7 +125,7 @@ class ValidSequencer:
 
         fid = open(filepath, 'w')
         ###########################################################
-        # write the header
+        # write the header (column names)
         ###########################################################
         fid.write('rd_ctrl')
         fid.write(csv_separator_p)
@@ -164,3 +165,5 @@ class ValidSequencer:
             print('*' * 20)
             print('Sequencer : ' + self.name)
             print('filepath = {0}'.format(filepath))
+
+        return None

@@ -55,18 +55,19 @@ package pkg_sequence is
 --       :param ctrl: define the mode: Possibles values are:
 --               .0: continuous valid generation
 --                   . min_value1, max_value1, min_value2, max_value2 values are ignored
---               .1: random short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a random width between min_value2 and max_value2
---               .2. constant short pulse generation
+--               .1. constant short pulse generation
 --                   . a positive pulse with a width of 1 clock cycle followed by
 --                   . a negative pulse with a constant width defined by the min_value2 value
---               .3. random pulse generation
---                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
---                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
---               .4. constant pulse generation
+--               .2. constant pulse generation
 --                   . a positive pulse with a width defined by the v_min_value1 value followed by
 --                   . a negative pulse with a width defined by the v_min_value2 value
+--               .3: random short pulse generation
+--                   . a positive pulse with a width of 1 clock cycle followed by
+--                   . a negative pulse with a random width between min_value2 and max_value2
+--               .4. random pulse generation
+--                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
+--                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
+--               others values : continuous valid generation
 --               others values : continuous valid generation
 --       :param min_value1: define a min value for the positive pulse
 --       :param max_value1: define a max value for the positive pulse
@@ -88,18 +89,18 @@ package pkg_sequence is
 --       :param ctrl: define the mode: Possibles values are:
 --               .0: continuous valid generation
 --                   . min_value1, max_value1, min_value2, max_value2 values are ignored
---               .1: random short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a random width between min_value2 and max_value2
---               .2. constant short pulse generation
+--               .1. constant short pulse generation
 --                   . a positive pulse with a width of 1 clock cycle followed by
 --                   . a negative pulse with a constant width defined by the min_value2 value
---               .3. random pulse generation
---                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
---                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
---               .4. constant pulse generation
+--               .2. constant pulse generation
 --                   . a positive pulse with a width defined by the v_min_value1 value followed by
 --                   . a negative pulse with a width defined by the v_min_value2 value
+--               .3: random short pulse generation
+--                   . a positive pulse with a width of 1 clock cycle followed by
+--                   . a negative pulse with a random width between min_value2 and max_value2
+--               .4. random pulse generation
+--                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
+--                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
 --               others values : continuous valid generation
 --       :param min_value1: define a min value for the positive pulse
 --       :param max_value1: define a max value for the positive pulse
@@ -132,18 +133,18 @@ package body pkg_sequence is
 --       :param ctrl: define the mode: Possibles values are:
 --               .0: continuous valid generation
 --                   . min_value1, max_value1, min_value2, max_value2 values are ignored
---               .1: random short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a random width between min_value2 and max_value2
---               .2. constant short pulse generation
+--               .1. constant short pulse generation
 --                   . a positive pulse with a width of 1 clock cycle followed by
 --                   . a negative pulse with a constant width defined by the min_value2 value
---               .3. random pulse generation
---                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
---                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
---               .4. constant pulse generation
+--               .2. constant pulse generation
 --                   . a positive pulse with a width defined by the v_min_value1 value followed by
 --                   . a negative pulse with a width defined by the v_min_value2 value
+--               .3: random short pulse generation
+--                   . a positive pulse with a width of 1 clock cycle followed by
+--                   . a negative pulse with a random width between min_value2 and max_value2
+--               .4. random pulse generation
+--                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
+--                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
 --               others values : continuous valid generation
 --       :param min_value1: define a min value for the positive pulse
 --       :param max_value1: define a max value for the positive pulse
@@ -229,14 +230,6 @@ package body pkg_sequence is
               v_valid := '1';
               v_fsm_state := E_RUN;
             when 1 =>
-              -- random short pulse : 
-              --   a positive pulse with a width of 1 clock cycle followed by
-              --   a negative pulse with a random width between the min_value2 value and the max_value2 value
-              v_valid     := '1';
-              v_cnt_tempo := 1;
-              v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
-              v_fsm_state     := E_TEMPO_NEG;
-            when 2 =>
               -- constant short pulse:
               --   a positive pulse with a width of 1 clock cycle followed by
               --   a negative pulse with a constant width defined by the min_value2 value
@@ -244,8 +237,24 @@ package body pkg_sequence is
               v_cnt_tempo := 1;
               v_tempo_neg := v_min_value2;
               v_fsm_state     := E_TEMPO_NEG;
-
+            when 2 =>
+              -- constant pulse
+              --  a positive pulse with a width defined by the v_min_value1 value followed by
+              --  a negative pulse with a width defined by the v_min_value2 value
+              v_valid     := '1';
+              v_tempo_pos := v_min_value1;
+              v_tempo_neg := v_min_value2;
+              v_fsm_state     := E_TEMPO_POS;
             when 3 =>
+              -- random short pulse : 
+              --   a positive pulse with a width of 1 clock cycle followed by
+              --   a negative pulse with a random width between the min_value2 value and the max_value2 value
+              v_valid     := '1';
+              v_cnt_tempo := 1;
+              v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
+              v_fsm_state     := E_TEMPO_NEG;
+
+            when 4 =>
               -- random pulse : random pulse 
               --   a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
               --   a negative pulse with a width defined by a random value between v_min_value2 and v_max_value2
@@ -254,14 +263,6 @@ package body pkg_sequence is
               v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
               v_fsm_state     := E_TEMPO_POS;
 
-            when 4 =>
-              -- constant pulse
-              --  a positive pulse with a width defined by the v_min_value1 value followed by
-              --  a negative pulse with a width defined by the v_min_value2 value
-              v_valid     := '1';
-              v_tempo_pos := v_min_value1;
-              v_tempo_neg := v_min_value2;
-              v_fsm_state     := E_TEMPO_POS;
 
             when others =>
               -- continuous valid
@@ -307,18 +308,18 @@ package body pkg_sequence is
 --       :param ctrl: define the mode: Possibles values are:
 --               .0: continuous valid generation
 --                   . min_value1, max_value1, min_value2, max_value2 values are ignored
---               .1: random short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a random width between min_value2 and max_value2
---               .2. constant short pulse generation
+--               .1. constant short pulse generation
 --                   . a positive pulse with a width of 1 clock cycle followed by
 --                   . a negative pulse with a constant width defined by the min_value2 value
---               .3. random pulse generation
---                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
---                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
---               .4. constant pulse  generation
+--               .2. constant pulse  generation
 --                   . a positive pulse with a width defined by the v_min_value1 value followed by
 --                   . a negative pulse with a width defined by the v_min_value2 value
+--               .3: random short pulse generation
+--                   . a positive pulse with a width of 1 clock cycle followed by
+--                   . a negative pulse with a random width between min_value2 and max_value2
+--               .4. random pulse generation
+--                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
+--                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
 --               others values : continuous valid generation
 --       :param min_value1: define a min value for the positive pulse
 --       :param max_value1: define a max value for the positive pulse
@@ -405,14 +406,6 @@ package body pkg_sequence is
               v_valid := '1';
               v_fsm_state := E_RUN;
             when 1 =>
-              -- random short pulse : 
-              --   a positive pulse with a width of 1 clock cycle followed by
-              --   a negative pulse with a random width between the min_value2 value and the max_value2 value
-              v_valid     := '1';
-              v_cnt_tempo := 0;
-              v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
-              v_fsm_state     := E_TEMPO_NEG;
-            when 2 =>
               -- constant short pulse:
               --   a positive pulse with a width of 1 clock cycle followed by
               --   a negative pulse with a constant width defined by the min_value2 value
@@ -420,8 +413,24 @@ package body pkg_sequence is
               v_cnt_tempo := 0;
               v_tempo_neg := v_min_value2;
               v_fsm_state     := E_TEMPO_NEG;
-
+            when 2 =>
+              -- constant pulse
+              --  a positive pulse with a width defined by the v_min_value1 value followed by
+              --  a negative pulse with a width defined by the v_min_value2 value
+              v_valid     := '1';
+              v_tempo_pos := v_min_value1;
+              v_tempo_neg := v_min_value2;
+              v_fsm_state     := E_TEMPO_POS;
             when 3 =>
+              -- random short pulse : 
+              --   a positive pulse with a width of 1 clock cycle followed by
+              --   a negative pulse with a random width between the min_value2 value and the max_value2 value
+              v_valid     := '1';
+              v_cnt_tempo := 0;
+              v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
+              v_fsm_state     := E_TEMPO_NEG;
+
+            when 4 =>
               -- random pulse : random pulse 
               --   a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
               --   a negative pulse with a width defined by a random value between v_min_value2 and v_max_value2
@@ -430,14 +439,6 @@ package body pkg_sequence is
               v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
               v_fsm_state     := E_TEMPO_POS;
 
-            when 4 =>
-              -- constant pulse
-              --  a positive pulse with a width defined by the v_min_value1 value followed by
-              --  a negative pulse with a width defined by the v_min_value2 value
-              v_valid     := '1';
-              v_tempo_pos := v_min_value1;
-              v_tempo_neg := v_min_value2;
-              v_fsm_state     := E_TEMPO_POS;
 
             when others =>
               -- continuous valid
