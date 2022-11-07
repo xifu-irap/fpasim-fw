@@ -264,12 +264,12 @@ begin
   ---------------------------------------------------------------------
   -- RAM: mux_squid_tf
   ---------------------------------------------------------------------
-  amp_squid_tf_ena   <= i_amp_squid_tf_wr_en;
+  amp_squid_tf_ena   <= i_amp_squid_tf_wr_en or i_amp_squid_tf_rd_en;
   amp_squid_tf_wea   <= i_amp_squid_tf_wr_en;
   amp_squid_tf_addra <= i_amp_squid_tf_wr_rd_addr;
   amp_squid_tf_dina  <= i_amp_squid_tf_wr_data;
 
-  amp_squid_tf_regcea <= i_amp_squid_tf_rd_en;
+  amp_squid_tf_regcea <= '1';
 
   inst_tdpram_amp_squid_tf : entity fpasim.tdpram
     generic map(
