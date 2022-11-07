@@ -59,6 +59,8 @@ entity tb_amp_squid_top is
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
+    g_NB_PIXEL_BY_FRAME          : positive := 1;
+    
     g_VUNIT_DEBUG                : boolean  := true;
     g_TEST_NAME                  : string   := "";
     g_ENABLE_CHECK               : boolean  := true;
@@ -66,7 +68,10 @@ entity tb_amp_squid_top is
     -- RAM1
     g_RAM1_NAME                  : string   := "amp_squid_tf";
     g_RAM1_CHECK                 : boolean  := true;
-    g_RAM1_VERBOSITY             : integer  := 0
+    g_RAM1_VERBOSITY             : integer  := 0;
+
+    -- FPAGAIN Register
+    g_FPAGAIN                    : integer := 0
     );
 end tb_amp_squid_top;
 
@@ -169,40 +174,24 @@ architecture simulate of tb_amp_squid_top is
   -- filepath definition
   ---------------------------------------------------------------------
   constant c_CSV_SEPARATOR             : character := ';';
-  constant c_PY_FILENAME_SUFFIX        : string    := "py_";
-  constant c_MATLAB_FILENAME_SUFFIX    : string    := "matlab_";
-  constant c_MATLAB_PY_FILENAME_SUFFIX : string    := "matlab_py_";
-  constant c_VHDL_FILENAME_SUFFIX      : string    := "vhdl_";
 
-
-  -- input register generation
-  constant c_FILENAME_REG_VALID_IN : string := c_PY_FILENAME_SUFFIX & "reg_valid_sequencer_in.csv";
-  constant c_FILEPATH_REG_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_REG_VALID_IN;
-
-  constant c_FILENAME_REG_IN : string := c_PY_FILENAME_SUFFIX & "reg_in.csv";
-  constant c_FILEPATH_REG_IN : string := c_INPUT_BASEPATH & c_FILENAME_REG_IN;
 
   -- input data generation
-  constant c_FILENAME_DATA_VALID_IN : string := c_PY_FILENAME_SUFFIX & "data_valid_sequencer_in.csv";
+  constant c_FILENAME_DATA_VALID_IN : string := "py_data_valid_sequencer_in.csv";
   constant c_FILEPATH_DATA_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_VALID_IN;
 
-  constant c_FILENAME_DATA_IN : string := c_PY_FILENAME_SUFFIX & "data_in.csv";
+  constant c_FILENAME_DATA_IN : string := "py_data_in.csv";
   constant c_FILEPATH_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_IN;
 
-
   -- input ram tes pulse shape
-  constant c_FILENAME_RAM1_VALID_IN : string := c_PY_FILENAME_SUFFIX & "ram_amp_squid_tf_valid_sequencer_in.csv";
+  constant c_FILENAME_RAM1_VALID_IN : string := "py_ram_amp_squid_tf_valid_sequencer_in.csv";
   constant c_FILEPATH_RAM1_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM1_VALID_IN;
 
-  constant c_FILENAME_RAM1_TF_IN : string := c_PY_FILENAME_SUFFIX & "ram_amp_squid_tf.csv";
-  constant c_FILEPATH_RAM1_TF_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM1_TF_IN;
+  constant c_FILENAME_RAM1_IN : string := "py_ram_amp_squid_tf.csv";
+  constant c_FILEPATH_RAM1_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM1_IN;
   -- output data log
-  constant c_FILENAME_DATA_OUT : string := c_VHDL_FILENAME_SUFFIX & "data_out.csv";
+  constant c_FILENAME_DATA_OUT : string := "vhdl_data_out.csv";
   --constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT;
-
-  --  -- check output data
-  --  constant c_FILENAME_DATA_OUT_REF : string := c_MATLAB_FILENAME_SUFFIX & "data_out_ref.csv";
-  --  constant c_FILEPATH_DATA_OUT_REF : string := c_INPUT_BASEPATH & c_FILENAME_DATA_OUT_REF;
 
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
@@ -253,7 +242,6 @@ begin
     if g_RAM1_VERBOSITY > 0 then
       show(get_logger("check:ram1"), display_handler, pass);
     end if;
-    show(get_logger("check"), display_handler, pass);
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     info("Test bench: Generic parameter values");
@@ -266,7 +254,7 @@ begin
     info("    g_AMP_SQUID_TF_RAM_ADDR_WIDTH = " & to_string(g_AMP_SQUID_TF_RAM_ADDR_WIDTH));
     info("    g_PIXEL_RESULT_INPUT_WIDTH = " & to_string(g_PIXEL_RESULT_INPUT_WIDTH));
     info("    g_PIXEL_RESULT_OUTPUT_WIDTH = " & to_string(g_PIXEL_RESULT_OUTPUT_WIDTH));
-    
+
     -- simulator paramters
     info("    g_VUNIT_DEBUG = " & to_string(g_VUNIT_DEBUG));
     info("    g_TEST_NAME = " & g_TEST_NAME);
@@ -276,10 +264,9 @@ begin
     info("    g_RAM1_NAME = " & g_RAM1_NAME);
     info("    g_RAM1_CHECK = " & to_string(g_RAM1_CHECK));
     info("    g_RAM1_VERBOSITY = " & to_string(g_RAM1_VERBOSITY));
+    info("    g_FPAGAIN = " & to_string(g_FPAGAIN));
 
     info("Test bench: input files");
-    info("    c_FILEPATH_REG_VALID_IN = " & c_FILEPATH_REG_VALID_IN);
-    info("    c_FILEPATH_REG_IN = " & c_FILEPATH_REG_IN);
     info("    c_FILEPATH_DATA_VALID_IN = " & c_FILEPATH_DATA_VALID_IN);
     info("    c_FILEPATH_DATA_IN = " & c_FILEPATH_DATA_IN);
     info("    c_FILEPATH_RAM1_VALID_IN = " & c_FILEPATH_RAM1_VALID_IN);
@@ -290,29 +277,23 @@ begin
     ---------------------------------------------------------------------
     -- reset
     ---------------------------------------------------------------------
+    i_fpasim_gain <= (others => '0');
     info("Enable the reset");
-    i_rst         <= '1';
     i_rst_status  <= '1';
     i_debug_pulse <= '0';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     info("Disable the reset");
-    i_rst         <= '0';
     i_rst_status  <= '0';
     i_debug_pulse <= '0';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
-    -- Register Configuration
+    -- Register configuration
     ---------------------------------------------------------------------
-    info("Start Register configuration");
-    reg_start <= '1';
+    info("Start Register configuration: FPAGAIN");
+    i_fpasim_gain <= std_logic_vector(to_unsigned(g_FPAGAIN,i_fpasim_gain'length));
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-    -- wait until all data from the input file are read
-    wait until rising_edge(i_clk) and reg_gen_finish = '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-    -- set timeout for the vunit.watchdog
-    --set_timeout(runner, 2 ms);
 
     ---------------------------------------------------------------------
     -- RAM1 Configuration
@@ -323,7 +304,7 @@ begin
     wait until rising_edge(i_clk) and ram1_wr_gen_finish = '1';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
-
+    
     ---------------------------------------------------------------------
     -- Data Generation
     ---------------------------------------------------------------------
@@ -386,68 +367,13 @@ begin
   --test_runner_watchdog(runner, 10 ms);
 
   ---------------------------------------------------------------------
-  -- Input: Register Configuration
-  ---------------------------------------------------------------------
-  gen_reg : if true generate
-    signal sig_vect : std_logic_vector(0 downto 0);
-
-  begin
-
-    -- valid sequence
-    ---------------------------------------------------------------------
-    inst_pkg_valid_sequencer : pkg_valid_sequencer(
-      i_clk           => i_clk,
-      i_en            => reg_start,
-      ---------------------------------------------------------------------
-      -- input file
-      ---------------------------------------------------------------------
-      i_filepath      => c_FILEPATH_REG_VALID_IN,
-      i_csv_separator => c_CSV_SEPARATOR,
-      ---------------------------------------------------------------------
-      -- command
-      ---------------------------------------------------------------------
-      o_valid         => reg_rd_valid
-    );
-
-    -- data generation
-    ---------------------------------------------------------------------
-    inst_pkg_data_generator : pkg_data_generator_1(
-      i_clk              => i_clk,
-      i_start            => reg_start,
-      ---------------------------------------------------------------------
-      -- input file
-      ---------------------------------------------------------------------
-      i_filepath         => c_FILEPATH_REG_IN,
-      i_csv_separator    => c_CSV_SEPARATOR,
-      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
-      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
-      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
-      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
-      i_DATA0_COMMON_TYP => "UINT",
-
-      ---------------------------------------------------------------------
-      -- command
-      ---------------------------------------------------------------------
-      i_ready            => reg_rd_valid,
-      o_data_valid       => reg_valid,  -- not connected
-      o_data0_std_vect => i_fpasim_gain
-
-      ---------------------------------------------------------------------
-      -- status
-      ---------------------------------------------------------------------
-      o_finish => reg_gen_finish
-      );
-
-  end generate gen_reg;
-
-  ---------------------------------------------------------------------
   -- Input: RAM1 Configuration
   ---------------------------------------------------------------------
   gen_ram1 : if true generate
 
   begin
 
-    -- valid sequence
+    -- valid sequence generation
     ---------------------------------------------------------------------
     inst_pkg_valid_sequencer : pkg_valid_sequencer(
       i_clk           => i_clk,
@@ -516,7 +442,10 @@ begin
   -- Input: data generation
   ---------------------------------------------------------------------
   gen_data : if true generate
-    signal vect_tmp : std_logic_vector(0 downto 0);
+    signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
+    signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
+    signal frame_sof_vect_tmp : std_logic_vector(0 downto 0);
+    signal frame_eof_vect_tmp : std_logic_vector(0 downto 0);
   begin
 
     -- valid sequence generation
@@ -537,7 +466,7 @@ begin
 
     -- data generation
     ---------------------------------------------------------------------
-    inst_pkg_data_generator : pkg_data_generator_1(
+    inst_pkg_data_generator : pkg_data_generator_8(
       i_clk              => i_clk,
       i_start            => data_start,
       ---------------------------------------------------------------------
@@ -550,12 +479,26 @@ begin
       --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
       --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
       i_DATA0_COMMON_TYP => "UINT",
+      i_DATA1_COMMON_TYP => "UINT",
+      i_DATA2_COMMON_TYP => "UINT",
+      i_DATA3_COMMON_TYP => "UINT",
+      i_DATA4_COMMON_TYP => "UINT",
+      i_DATA5_COMMON_TYP => "UINT",
+      i_DATA6_COMMON_TYP => "UINT",
+      i_DATA7_COMMON_TYP => "UINT",
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
       i_ready            => data_rd_valid,
       o_data_valid       => data_valid,
-      o_data0_std_vect   => vect_tmp,   -- not connected
+      o_data0_std_vect   => pixel_sof_vect_tmp, 
+      o_data1_std_vect   => pixel_eof_vect_tmp,
+      o_data2_std_vect   => i_pixel_id, 
+      o_data3_std_vect   => i_pixel_result,
+      o_data4_std_vect   => frame_sof_vect_tmp,
+      o_data5_std_vect   => frame_eof_vect_tmp,
+      o_data6_std_vect   => i_frame_id, 
+      o_data7_std_vect   => i_amp_squid_offset_correction,
 
       ---------------------------------------------------------------------
       -- status
@@ -563,7 +506,11 @@ begin
       o_finish           => data_gen_finish
     );
 
-    i_data_valid <= data_valid;
+    i_pixel_valid <= data_valid;
+    i_pixel_sof   <= pixel_sof_vect_tmp(0);
+    i_pixel_eof   <= pixel_eof_vect_tmp(0);
+    i_frame_sof   <= frame_sof_vect_tmp(0);
+    i_frame_eof   <= frame_eof_vect_tmp(0);
 
     -- count input data
     ---------------------------------------------------------------------
@@ -582,7 +529,7 @@ begin
   ---------------------------------------------------------------------
   -- DUT
   ---------------------------------------------------------------------
-  inst_amp_squid_top : entity fpasim.amp_squid_top
+  dut_amp_squid_top : entity fpasim.amp_squid_top
     generic map(
       -- pixel
       g_PIXEL_ID_WIDTH              => g_PIXEL_ID_WIDTH,  -- pixel id bus width (expressed in bits). Possible values [1; max integer value[
@@ -672,7 +619,7 @@ begin
     frame_eof_vect_tmp(0) <= o_frame_eof;
 
     gen_log_by_id : for i in 0 to g_NB_PIXEL_BY_FRAME - 1 generate
-      constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & c_VHDL_FILENAME_SUFFIX & "data_out" & to_string(i) & ".csv";
+      constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & "vhdl_data_out" & to_string(i) & ".csv";
       signal data_valid            : std_logic;
     begin
       data_valid <= o_pixel_valid when to_integer(unsigned(o_pixel_id)) = i else '0';
