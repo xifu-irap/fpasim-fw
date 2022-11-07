@@ -627,7 +627,7 @@ begin
   ---------------------------------------------------------------------
   -- DUT
   ---------------------------------------------------------------------
-  inst_mux_squid_top : entity fpasim.mux_squid_top
+  dut_mux_squid_top : entity fpasim.mux_squid_top
     generic map(
       -- pixel
       g_PIXEL_ID_WIDTH              => g_PIXEL_ID_WIDTH, -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
