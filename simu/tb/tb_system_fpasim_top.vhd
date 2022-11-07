@@ -42,7 +42,7 @@ use opal_kelly_lib.pkg_front_panel;
 library vunit_lib;
 context vunit_lib.vunit_context;
 
-entity tb_system_fpasim is
+entity tb_system_fpasim_top is
   generic(
   	runner_cfg : string := ""; -- don't touch
     input_basepath_g  : string := "C:/Project/fpasim-fw-hardware/Inputs/";
@@ -56,9 +56,9 @@ entity tb_system_fpasim is
     ENABLE_CHECK_g : boolean := true;
     ENABLE_LOG_g   : boolean := true
   	);
-end tb_system_fpasim;
+end tb_system_fpasim_top;
 
-architecture simulate of tb_system_fpasim is
+architecture simulate of tb_system_fpasim_top is
 
   ---------------------------------------------------------------------
   -- module input signals
@@ -349,7 +349,7 @@ begin
   i_adc_clk_p <= sys_clk;
   i_adc_clk_n <= not(sys_clk);
 
-  top_fpasim_system_INST : entity fpasim.top_fpasim_system
+  dut_top_fpasim_system : entity fpasim.top_fpasim_system
     port map(
       --  Opal Kelly inouts --
       okUH          => okUH,
