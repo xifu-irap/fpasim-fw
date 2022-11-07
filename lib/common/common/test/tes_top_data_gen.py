@@ -43,17 +43,39 @@ import shutil
 
 
 class TesTopDataGen:
+    """
+        This class defines methods to generate data for the VHDL tes_top testbench file.
+        Note:
+            Method name starting by '_' are local to the class (ex:def _toto(...)).
+            It should not be usually used by the user
+    """
 
     def __init__(self):
-            self.conf_filepath = None
-            self.display_obj = Display()
-            self.level = 0
-            self.verbosity = 0
-            self.filepath_list_mif = None
-            self.json_data = None
-            self.vunit_conf_obj = None
+        """
+        This method initializes the class instance
+        """
+        # path to the configuration file
+        self.conf_filepath = None
+        # display object
+        self.display_obj = Display()
+        # set indentation level (integer >=0)
+        self.level = 0
+        # set the level of verbosity
+        self.verbosity = 0
+        # path to the Xilinx mif files (for Xilinx RAM, ...)
+        self.filepath_list_mif = None
+        # JSON object as a dictionary
+        self.json_data = None
+        # instance of the VunitConf class
+        #  => use its method to retrieve filepath
+        self.vunit_conf_obj = None
 
     def set_conf_filepath(self,conf_filepath_p):
+        """
+        This method set the json configuration filepath and get its dictionary
+        :param conf_filepath_p: (string) configuration filepath
+        :return: None
+        """
 
         conf_filepath = conf_filepath_p
         display_obj = self.display_obj
@@ -78,12 +100,20 @@ class TesTopDataGen:
 
         # Closing file
         fid_in.close()
-
+        # save the json dictionary
         self.json_data = json_data
+        # save the configuration filepath
         self.conf_filepath = conf_filepath
+        return None
 
     def set_vunit_conf_obj(self,obj_p):
+        """
+        This method set the VunitConf instance
+        :param obj_p: (VunitConf instance) instance of the VunitConf class
+        :return: None
+        """
         self.vunit_conf_obj = obj_p
+        return None
 
     def set_indentation_level(self, level_p):
         """
@@ -94,11 +124,22 @@ class TesTopDataGen:
         self.level = level_p
         return None
 
-
     def set_verbosity(self, verbosity_p):
+        """
+        Set the level of verbosity
+        :param verbosity_p: (integer >=0) level of verbosity
+        :return: None
+        """
         self.verbosity = verbosity_p
+        return None
 
     def get_generic_dic(self):
+        """
+        Get the testbench vhdl generic parameters
+        Note: Vunit set the testbench vhdl generic parameters with a python
+        dictionary where key name are the VHDL generic parameter names
+        :return: (dictionary)
+        """
         json_data = self.json_data
 
         nb_pixel_by_frame = json_data['register']['value']['nb_pixel_by_frame']
@@ -121,7 +162,12 @@ class TesTopDataGen:
 
 
     def _run(self, tb_input_base_path_p, tb_output_base_path_p):
-
+        """
+        This method generates output files for the testbench
+        :param tb_input_base_path_p: (string) base path of the testbench VHDL input files
+        :param tb_output_base_path_p: (string) base path of the testbench VHDL output files
+        :return: None
+        """
         tb_input_base_path = tb_input_base_path_p
         tb_output_base_path = tb_output_base_path_p
         conf_filepath = self.conf_filepath
@@ -158,7 +204,6 @@ class TesTopDataGen:
             max_value1 = dic["max_value1"]
             min_value2 = dic["min_value2"]
             max_value2 = dic["max_value2"]
-            max_value2 = dic["max_value2"]
             time_shift = dic["time_shift"]
 
             seq = ValidSequencer(name_p = filename)
@@ -190,7 +235,7 @@ class TesTopDataGen:
         pixel_length = nb_sample_by_pixel
         frame_length = nb_sample_by_pixel * nb_pixel_by_frame
 
-        # count from 0 instead 1 => substract -1
+        # count from 0 instead of 1. So, we need to subtract -1 to the values
         pixel_length_tmp = pixel_length - 1
         nb_pixel_by_frame_tmp = nb_pixel_by_frame - 1
         frame_length_tmp = frame_length - 1
@@ -302,6 +347,9 @@ class TesTopDataGen:
             shutil.copyfile(input_filepath,output_filepath)
 
 
+        return None
+
+
     def _get_indentation_level(self, level_p):
         """
         This method select the indentation level to use.
@@ -338,7 +386,7 @@ class TesTopDataGen:
     def set_mif_files(self, filepath_list_p):
         """
         This method stores a list of *.mif files.
-        For Modelsim/Questa simulator, these *.mif files will be copied
+        For Modelsim/Questa simulator, these *.mif files must be copied
         into a specific directory in order to be "seen" by the simulator
         Note: 
            This method is used for Xilinx IP which uses RAM
@@ -387,6 +435,7 @@ class TesTopDataGen:
         2 actions are provided:
             . execute a python script with a predefined set of command line arguments
             . copy the "mif files" into the Vunit simulation director for the compatible Xilinx IP
+        Note: This method is the main entry point for the Vunit library
         :param output_path: (string) Vunit Output Simulation Path (auto-computed by Vunit)
         :return: boolean
         """
