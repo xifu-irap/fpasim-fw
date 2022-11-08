@@ -231,7 +231,7 @@ PACKAGE pkg_regdecode IS
     -- user-defined: error_sel
     ---------------------------------------------------------------------
     -- user-defined: error_sel (bit index high)
-    constant pkg_ERROR_SEL_IDX_H : integer := 3;
+    constant pkg_ERROR_SEL_IDX_H : integer := 2;
     -- user-defined: error_sel (bit index low)
     constant pkg_ERROR_SEL_IDX_L : integer := 0;
     -- auto-computed: error_sel width
