@@ -716,8 +716,7 @@ begin
       g_ADDR_WIDTH    => fifo_addr'length,
       g_DATA_WIDTH    => fifo_data'length,
       -- resynchronized errors bits
-      g_DEST_SYNC_FF  => 2,
-      g_SRC_INPUT_REG => 1
+      g_CDC_SYNC_STAGES => 2
     )
     port map(
       i_clk              => i_clk,
