@@ -298,11 +298,38 @@ begin
   p_select_error_status : process(i_out_clk) is
   begin
     if rising_edge(i_out_clk) then
+      case i_error_sel is
+          when "000" => 
+          errors_r1 <= errors_tmp1(0);
+          status_r1 <= status_tmp1(0);
+          when "001" => 
+          errors_r1 <= errors_tmp1(1);
+          status_r1 <= status_tmp1(1);
+          when "010" => 
+          errors_r1 <= errors_tmp1(2);
+          status_r1 <= status_tmp1(2);
+          when "011" => 
+          errors_r1 <= errors_tmp1(3);
+          status_r1 <= status_tmp1(3);
+          when "100" => 
+          errors_r1 <= errors_tmp1(4);
+          status_r1 <= status_tmp1(4);
+          when "101" => 
+          errors_r1 <= errors_tmp1(5);
+          status_r1 <= status_tmp1(5);
+          when "110" => 
+          errors_r1 <= errors_tmp1(6);
+          status_r1 <= status_tmp1(6);
+          when others => 
+            errors_r1 <= errors_tmp1(7);
+            status_r1 <= status_tmp1(7);
+      end case;
+
       for i in errors_tmp1'range loop
-        if i = to_integer(unsigned(i_error_sel)) then
-          errors_r1 <= errors_tmp1(i);
-          status_r1 <= status_tmp1(i);
-        end if;
+        --if i = to_integer(unsigned(i_error_sel)) then
+        --  errors_r1 <= errors_tmp1(i);
+        --  status_r1 <= status_tmp1(i);
+        --end if;
         -- generate one bit error by error word
         if unsigned(errors_tmp1(i)) /= to_unsigned(0, errors_tmp1(i)'length) then
           trig_errors_vec_r1(i) <= '1';
