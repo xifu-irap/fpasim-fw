@@ -765,7 +765,7 @@ if __name__ == '__main__':
     # save the individual test for further use (sequence building)
     solo_test_dic[test_name] = test_dic0
 
-    # 0: individual test
+    # 7: individual test
     ############################################################################
     # search run python script file
     tb_name = 'tb_system_fpasim_top'
