@@ -146,7 +146,7 @@ begin
   ----------------------------------------------------
   --    Opal Kelly Host
   ----------------------------------------------------
-  Opak_Kelly_Host : okHost
+  Opal_Kelly_Host : okHost
     port map(  -- @suppress "Port map uses default values. Missing optional actuals: dna, dna_valid"
       okUH  => okUH,
       okHU  => okHU,
