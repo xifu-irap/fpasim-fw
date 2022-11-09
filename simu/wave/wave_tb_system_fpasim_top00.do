@@ -102,18 +102,24 @@ add wave -noupdate -expand -group regdecode_top -group reg -group make_pulse /tb
 add wave -noupdate -expand -group regdecode_top -group reg -group make_pulse /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_reg_make_eof
 add wave -noupdate -expand -group regdecode_top -group reg -group make_pulse /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_reg_make_pulse_valid
 add wave -noupdate -expand -group regdecode_top -group reg -group make_pulse /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_reg_make_pulse
-add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_mux_squid_offset_ram_wr_en
-add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group wr -radix unsigned /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_mux_squid_offset_ram_wr_rd_addr
-add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_mux_squid_offset_ram_wr_data
-add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_mux_squid_offset_ram_rd_en
-add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_mux_squid_offset_ram_rd_valid
-add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_mux_squid_offset_ram_rd_data
+add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_pulse_shape_ram_wr_en
+add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -expand -group wr -radix unsigned /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_pulse_shape_ram_wr_rd_addr
+add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_pulse_shape_ram_wr_data
+add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_pulse_shape_ram_rd_en
+add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_tes_pulse_shape_ram_rd_valid
+add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_tes_pulse_shape_ram_rd_data
 add wave -noupdate -expand -group regdecode_top -group ram_tes_steady_state -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_std_state_ram_wr_en
 add wave -noupdate -expand -group regdecode_top -group ram_tes_steady_state -group wr -radix unsigned /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_std_state_ram_wr_rd_addr
 add wave -noupdate -expand -group regdecode_top -group ram_tes_steady_state -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_std_state_ram_wr_data
 add wave -noupdate -expand -group regdecode_top -group ram_tes_steady_state -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_std_state_ram_rd_en
 add wave -noupdate -expand -group regdecode_top -group ram_tes_steady_state -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_tes_std_state_ram_rd_valid
 add wave -noupdate -expand -group regdecode_top -group ram_tes_steady_state -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_tes_std_state_ram_rd_data
+add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_mux_squid_offset_ram_wr_en
+add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group wr -radix unsigned /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_mux_squid_offset_ram_wr_rd_addr
+add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_mux_squid_offset_ram_wr_data
+add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_mux_squid_offset_ram_rd_en
+add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_mux_squid_offset_ram_rd_valid
+add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_offset -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_mux_squid_offset_ram_rd_data
 add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_tf -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_mux_squid_tf_ram_wr_en
 add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_tf -group wr -radix unsigned /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_mux_squid_tf_ram_wr_rd_addr
 add wave -noupdate -expand -group regdecode_top -group ram_mux_squid_tf -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_mux_squid_tf_ram_wr_data
@@ -126,12 +132,6 @@ add wave -noupdate -expand -group regdecode_top -group ram_amp_squid_tf -group w
 add wave -noupdate -expand -group regdecode_top -group ram_amp_squid_tf -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_amp_squid_tf_ram_rd_en
 add wave -noupdate -expand -group regdecode_top -group ram_amp_squid_tf -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_amp_squid_tf_ram_rd_valid
 add wave -noupdate -expand -group regdecode_top -group ram_amp_squid_tf -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_amp_squid_tf_ram_rd_data
-add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_pulse_shape_ram_wr_en
-add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -group wr -radix unsigned /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_pulse_shape_ram_wr_rd_addr
-add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_pulse_shape_ram_wr_data
-add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/o_tes_pulse_shape_ram_rd_en
-add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_tes_pulse_shape_ram_rd_valid
-add wave -noupdate -expand -group regdecode_top -group ram_tes_pulse_shape -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/i_tes_pulse_shape_ram_rd_data
 add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group user /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/i_clk
 add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group user /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/i_out_clk
 add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group user /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/i_rst_status
@@ -146,17 +146,17 @@ add wave -noupdate -expand -group regdecode_ctrl_reg -group usb /tb_system_fpasi
 add wave -noupdate -expand -group regdecode_ctrl_reg -group usb /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/o_fifo_empty
 add wave -noupdate -expand -group regdecode_ctrl_reg -group usb /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/o_errors
 add wave -noupdate -expand -group regdecode_ctrl_reg -group usb /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/o_status
-add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group fifo0 -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/wr_rst_tmp0
-add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group fifo0 -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/wr_tmp0
-add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group fifo0 -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data_tmp0
-add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group fifo0 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/rd1
-add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group fifo0 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data_valid1
-add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group fifo0 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data1
-add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group fifo1 -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/wr_tmp2
-add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group fifo1 -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data_tmp2
-add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group fifo1 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/rd3
-add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group fifo1 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data_valid3
-add wave -noupdate -expand -group regdecode_ctrl_reg -expand -group fifo1 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data3
+add wave -noupdate -expand -group regdecode_ctrl_reg -group fifo0 -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/wr_rst_tmp0
+add wave -noupdate -expand -group regdecode_ctrl_reg -group fifo0 -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/wr_tmp0
+add wave -noupdate -expand -group regdecode_ctrl_reg -group fifo0 -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data_tmp0
+add wave -noupdate -expand -group regdecode_ctrl_reg -group fifo0 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/rd1
+add wave -noupdate -expand -group regdecode_ctrl_reg -group fifo0 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data_valid1
+add wave -noupdate -expand -group regdecode_ctrl_reg -group fifo0 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data1
+add wave -noupdate -expand -group regdecode_ctrl_reg -group fifo1 -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/wr_tmp2
+add wave -noupdate -expand -group regdecode_ctrl_reg -group fifo1 -expand -group wr /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data_tmp2
+add wave -noupdate -expand -group regdecode_ctrl_reg -group fifo1 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/rd3
+add wave -noupdate -expand -group regdecode_ctrl_reg -group fifo1 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data_valid3
+add wave -noupdate -expand -group regdecode_ctrl_reg -group fifo1 -expand -group rd /tb_system_fpasim_top/dut_top_fpasim_system/inst_top_fpasim/inst_regdecode_top/inst_regdecode_wire_wr_rd_ctrl_register/data3
 TreeUpdate [SetDefaultTree]
 WaveRestoreCursors {{Cursor 1} {491914 ps} 0}
 quietly wave cursor active 1
@@ -174,4 +174,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {466028 ps} {551934 ps}
+WaveRestoreZoom {39038081 ps} {39123987 ps}

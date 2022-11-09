@@ -209,6 +209,7 @@ architecture simulate of tb_system_fpasim_top is
                                                                           hi_datain => (others => '0')
                                                                           );
 
+shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
 
 begin
 
@@ -297,13 +298,14 @@ begin
     data_start <= '1';
     pkg_wait_nb_rising_edge_plus_margin(i_clk=> usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
-    info("Start: SetWireInValue");
-    SetWireInValue(ep=>x"00" ,val=>x"0000_0001" ,mask=> v_NO_MASK ,front_panel_conf=> v_front_panel_conf);
 
     ---------------------------------------------------------------------
     -- Set a WireIn
     ---------------------------------------------------------------------
+    info("Start: SetWireInValue");
+    SetWireInValue(ep=>x"00" ,val=>x"0000_0001" ,mask=> v_NO_MASK ,front_panel_conf=> v_front_panel_conf);
     info("End: SetWireInValue");
+
     info("Start: UpdateWireIns");
     UpdateWireIns(
                   --i_clk=>usb_clk,
@@ -345,18 +347,19 @@ begin
     info("End: UpdateWireOuts");
 
     info("Start: GetWireOutValue");
-    v_tmp32:= GetWireOutValue(
+    GetWireOutValue(
         ep  => x"20",
-        front_panel_conf => v_front_panel_conf);
+        front_panel_conf => v_front_panel_conf,
+        result=> v_tmp32);
     info("End: GetWireOutValue: " & to_string(v_tmp32) );
 
-    ---------------------------------------------------------------------
-    -- write pipe
-    ---------------------------------------------------------------------
-    v_front_panel_conf.pipeIn(0):= x"CA";
-    v_front_panel_conf.pipeIn(1):= x"DE";
-    v_front_panel_conf.pipeIn(2):= x"00";
-    v_front_panel_conf.pipeIn(3):= x"00";
+    -----------------------------------------------------------------------
+    ---- write pipe
+    -----------------------------------------------------------------------
+    v_front_panel_conf.set_pipeIn(index=> 0, value=> x"CA");
+    v_front_panel_conf.set_pipeIn(index=> 1, value=> x"DE");
+    v_front_panel_conf.set_pipeIn(index=> 2, value=> x"00");
+    v_front_panel_conf.set_pipeIn(index=> 3, value=> x"00");
     WriteToPipeIn(
         --i_clk => usb_clk,
         ep    => x"80",
