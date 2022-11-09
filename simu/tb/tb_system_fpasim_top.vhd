@@ -196,7 +196,16 @@ architecture simulate of tb_system_fpasim_top is
   --constant c_CHECKER_RAM2       : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME);
 
 
-  signal usb_if0 : opal_kelly_lib.pkg_front_panel.t_internal_if := opal_kelly_lib.pkg_front_panel.init_internal_if(0);
+  --signal usb_if0 : opal_kelly_lib.pkg_front_panel.t_internal_if := opal_kelly_lib.pkg_front_panel.init_internal_if(0);
+  signal usb_wr_if0 : opal_kelly_lib.pkg_front_panel.t_internal_wr_if := (
+                                                                          hi_drive=> '0',
+                                                                          hi_cmd => (others => '0'),
+                                                                          hi_dataout => (others => '0')
+                                                                          );
+
+  signal usb_rd_if0 : opal_kelly_lib.pkg_front_panel.t_internal_rd_if := (hi_busy=> '0',
+                                                                          hi_datain => (others => '0')
+                                                                          );
 
 
 begin
@@ -221,35 +230,14 @@ begin
   end process p_sys_clk;
 
 
+
   ---------------------------------------------------------------------
   -- master fsm
   ---------------------------------------------------------------------
   p_master_fsm : process is
-  variable v_NO_MASK : std_logic_vector(31 downto 0) := x"ffff_ffff";
-    constant BlockDelayStates1 : integer := 5;
-    constant ReadyCheckDelay1  : integer := 5;
-    constant PostReadyDelay1   : integer := 5;
-    constant pipeInSize1       : integer := 5;
-    constant pipeOutSize1      : integer := 5;
-    constant registerSetSize1  : integer := 5;
-
-    --variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf(
-    --  pipeIn(0 to pipeInSize1 - 1),
-    --  pipeOut(0 to pipeOutSize1 - 1),
-    --  WireIns(0 to 31),
-    --  WireOuts(0 to 31),
-    --  Triggered(0 to 31),
-    --  u32Address(0 to registerSetSize1 - 1),
-    --  u32Data(0 to registerSetSize1 - 1)) := opal_kelly_lib.pkg_front_panel.init_front_panel_conf(
-    --    BlockDelayStates => BlockDelayStates1,
-    --    ReadyCheckDelay  => ReadyCheckDelay1,
-    --    PostReadyDelay   => PostReadyDelay1,
-    --    pipeInSize       => pipeInSize1,
-    --    pipeOutSize      => pipeOutSize1,
-    --    registerSetSize  => registerSetSize1
-    --    );
-
+      variable v_NO_MASK : std_logic_vector(31 downto 0) := x"ffff_ffff";
       variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
+      variable v_tmp32 : std_logic_vector(31 downto 0);
 
   begin
     if runner_cfg'length > 0 then
@@ -289,7 +277,12 @@ begin
     -- reset
     ---------------------------------------------------------------------
     info("Reset the USB core");
-    opal_kelly_lib.pkg_front_panel.FrontPanelReset(i_clk => usb_clk, front_panel_conf => v_front_panel_conf, internal_if => usb_if0);
+    opal_kelly_lib.pkg_front_panel.FrontPanelReset(
+                                                   i_clk => usb_clk,
+                                                   front_panel_conf => v_front_panel_conf,
+                                                   internal_wr_if => usb_wr_if0,
+                                                   internal_rd_if => usb_rd_if0
+                                                   );
     info("end FrontPanelReset");
     pkg_wait_nb_rising_edge_plus_margin(i_clk=> usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     
@@ -304,38 +297,74 @@ begin
 
     info("Start: SetWireInValue");
     SetWireInValue(ep=>x"00" ,val=>x"0000_0001" ,mask=> v_NO_MASK ,front_panel_conf=> v_front_panel_conf);
+
+    ---------------------------------------------------------------------
+    -- Set a WireIn
+    ---------------------------------------------------------------------
     info("End: SetWireInValue");
-    UpdateWireIns(i_clk=>usb_clk,front_panel_conf=> v_front_panel_conf,internal_if=> usb_if0);
+    info("Start: UpdateWireIns");
+    UpdateWireIns(
+                  i_clk=>usb_clk,
+                  front_panel_conf=> v_front_panel_conf,
+                  internal_wr_if => usb_wr_if0,
+                  internal_rd_if => usb_rd_if0);
     info("End UpdateWireIns");
-    --ActivateTriggerIn(i_clk=> usb_clk, ep=> x"09",bit=>12,internal_if=> usb_if0 );
-    -- Reset LFSR
-    --SetWireInValue(x"00", x"0000_0001", NO_MASK);
-    --UpdateWireIns;
-    --SetWireInValue(x"00", x"0000_0000", NO_MASK);
-    --UpdateWireIns;
 
-    --for j in 0 to 2 loop
-    --  -- Select mode as LFSR to periodically read pseudo-random values
-    --  Check_LFSR(MODE_LFSR);
+    ---------------------------------------------------------------------
+    -- Set a Trigger
+    ---------------------------------------------------------------------
+    info("Start: ActivateTriggerIn");
+    ActivateTriggerIn(
+                      i_clk=> usb_clk,
+                      ep=> x"40",
+                      bit=>12,
+                      internal_wr_if => usb_wr_if0,
+                      internal_rd_if => usb_rd_if0
+                   );
+    info("End: ActivateTriggerIn");
 
-    --  -- Select mode as Counter
-    --  Check_LFSR(MODE_Counter);
-    --end loop;
 
-    ---- Read LFSR values in sequence using pipes
-    --Check_PipeOut(MODE_LFSR);
+    ---------------------------------------------------------------------
+    -- add tempo
+    ---------------------------------------------------------------------
+    pkg_wait_nb_rising_edge_plus_margin(i_clk=> usb_clk, i_nb_rising_edge => 16, i_margin => 12 ps);
 
-    ---- Read Counter values in sequence using pipes
-    --Check_PipeOut(MODE_COUNTER);
 
-    ---- Send piped values back to FPGA
-    --for i in 0 to pipeInSize - 1 loop
-    --  pipeIn(i) := pipeOut(i);
-    --end loop;
-    --WriteToPipeIn(x"80", pipeInSize);
+    ---------------------------------------------------------------------
+    -- Read WireOut
+    ---------------------------------------------------------------------
+    info("Start: UpdateWireOuts");
+    UpdateWireOuts(
+        i_clk            => usb_clk,
+        front_panel_conf => v_front_panel_conf,
+        internal_wr_if   => usb_wr_if0,
+        internal_rd_if   => usb_rd_if0
+        );
+    info("End: UpdateWireOuts");
 
-    ---- Send values to FPGA for storage and read them back
-    --Check_Registers;
+    info("Start: GetWireOutValue");
+    v_tmp32:= GetWireOutValue(
+        ep  => x"20",
+        front_panel_conf => v_front_panel_conf);
+    info("End: GetWireOutValue: " & to_string(v_tmp32) );
+
+    ---------------------------------------------------------------------
+    -- write pipe
+    ---------------------------------------------------------------------
+    v_front_panel_conf.pipeIn(0):= x"CA";
+    v_front_panel_conf.pipeIn(1):= x"DE";
+    v_front_panel_conf.pipeIn(2):= x"00";
+    v_front_panel_conf.pipeIn(3):= x"00";
+    WriteToPipeIn(
+        i_clk => usb_clk,
+        ep    => x"80",
+        length => 4,--write length expressed in bytes
+        front_panel_conf => v_front_panel_conf,
+        internal_wr_if   => usb_wr_if0,
+        internal_rd_if   => usb_rd_if0
+        );
+
+
 
     ---------------------------------------------------------------------
     -- End of simulation: wait few more clock cycles
@@ -384,13 +413,28 @@ begin
   --  okUHU       => okUHU,
   --  internal_if => usb_if0
   --  );
+  --okUH(0)          <= usb_clk;
+  --okUH(1)          <= usb_if0.hi_drive;
+  --okUH(4 downto 2) <= usb_if0.hi_cmd; 
+  --okUHU            <= usb_if0.hi_dataout when (usb_if0.hi_drive = '1') else (others => 'Z');
+  --usb_if0.hi_datain        <= okUHU;
+  --usb_if0.hi_busy          <= okHU(0); 
 
-okUH(0)          <= usb_clk;
-  okUH(1)          <= usb_if0.hi_drive;
-  okUH(4 downto 2) <= usb_if0.hi_cmd; 
-  usb_if0.hi_datain        <= okUHU;
-  usb_if0.hi_busy          <= okHU(0); 
-  okUHU            <= usb_if0.hi_dataout when (usb_if0.hi_drive = '1') else (others => 'Z');
+  opal_kelly_lib.pkg_front_panel.okHost_driver(
+    i_clk       => usb_clk,
+    okUH        => okUH,
+    okHU        => okHU,
+    okUHU       => okUHU,
+    internal_wr_if => usb_wr_if0,
+    internal_rd_if => usb_rd_if0
+    );
+
+  -- okUH(0)          <= usb_clk;
+  --okUH(1)          <= usb_wr_if0.hi_drive;
+  --okUH(4 downto 2) <= usb_wr_if0.hi_cmd; 
+  --okUHU            <= usb_wr_if0.hi_dataout when (usb_wr_if0.hi_drive = '1') else (others => 'Z');
+  --usb_rd_if0.hi_datain        <= okUHU;
+  --usb_rd_if0.hi_busy          <= okHU(0); 
 
 
   data_gen : process (sys_clk) is
