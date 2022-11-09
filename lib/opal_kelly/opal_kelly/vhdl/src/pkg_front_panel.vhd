@@ -114,21 +114,25 @@ package pkg_front_panel is
     type STD_ARRAY is array (integer range <>) of std_logic_vector(31 downto 0);
     type REGISTER_ARRAY is array (integer range <>) of std_logic_vector(31 downto 0);
 
-    type t_front_panel_conf is record
-        pipeIn           : PIPEIN_ARRAY(0 to pipeInSize - 1);
 
-        pipeOut          : PIPEOUT_ARRAY(0 to pipeOutSize - 1);
+    type t_front_panel_conf is protected
+        procedure set_WireIns(index: in integer; value: in std_logic_vector);
+        procedure set_WireOuts(index: in integer; value: in std_logic_vector);
+        procedure set_Triggered(index: in integer; value: in std_logic_vector);
+        procedure set_pipeIn(index: in integer; value: in std_logic_vector);
+        procedure set_pipeOut(index: in integer; value: in std_logic_vector);
+        procedure set_u32Data(index: in integer; value: in std_logic_vector);
+        impure function get_WireIns(index: in integer) return std_logic_vector;
+        impure function get_WireOuts(index: in integer) return std_logic_vector;
+        impure function get_Triggered(index: in integer) return std_logic_vector;
+        impure function get_pipeIn(index: in integer) return std_logic_vector;
+        impure function get_pipeOut(index: in integer) return std_logic_vector;
+        impure function get_u32Count return std_logic_vector;
+        impure function get_u32Address(index: in integer) return std_logic_vector;
+        impure function get_u32Data(index: in integer) return std_logic_vector;
 
-        WireIns          : STD_ARRAY(0 to 31);   -- 32x32 array storing WireIn values
-        WireOuts         : STD_ARRAY(0 to 31);   -- 32x32 array storing WireOut values 
-        Triggered        : STD_ARRAY(0 to 31);   -- 32x32 array storing IsTriggered values
+    end protected;
 
-        u32Address       : REGISTER_ARRAY(0 to registerSetSize - 1);
-        u32Data          : REGISTER_ARRAY(0 to registerSetSize - 1);
-        u32Count         : std_logic_vector(31 downto 0);
-        --ReadRegisterData : std_logic_vector(31 downto 0);
-
-    end record t_front_panel_conf;
 
 
     impure function init_internal_if(dummy : in integer) return t_internal_if;
@@ -190,19 +194,22 @@ package pkg_front_panel is
     -----------------------------------------------------------------------
     -- GetWireOutValue
     -----------------------------------------------------------------------
-    impure function GetWireOutValue(
+    procedure GetWireOutValue(
         ep               : std_logic_vector;
-        front_panel_conf : in t_front_panel_conf) return std_logic_vector;
+        variable front_panel_conf : inout t_front_panel_conf;
+        result: out std_logic_vector);
+
+
 
     -----------------------------------------------------------------------
     -- IsTriggered
     -----------------------------------------------------------------------
-    impure function IsTriggered(
+     procedure IsTriggered(
         ep               : std_logic_vector;
         mask             : std_logic_vector(31 downto 0);
-        front_panel_conf : t_front_panel_conf
-    ) return boolean;
-
+        variable front_panel_conf : inout t_front_panel_conf;
+        result : out boolean
+    );
     -----------------------------------------------------------------------
     -- UpdateWireIns
     -----------------------------------------------------------------------
@@ -351,6 +358,94 @@ end;
 
 package body pkg_front_panel is
 
+    type t_front_panel_conf is protected body
+        variable pipeIn           : PIPEIN_ARRAY(0 to pipeInSize - 1);
+
+        variable pipeOut          : PIPEOUT_ARRAY(0 to pipeOutSize - 1);
+
+        variable WireIns          : STD_ARRAY(0 to 31);   -- 32x32 array storing WireIn values
+        variable WireOuts         : STD_ARRAY(0 to 31);   -- 32x32 array storing WireOut values 
+        variable Triggered        : STD_ARRAY(0 to 31);   -- 32x32 array storing IsTriggered values
+
+        variable u32Address       : REGISTER_ARRAY(0 to registerSetSize - 1);
+        variable u32Data          : REGISTER_ARRAY(0 to registerSetSize - 1);
+        variable u32Count         : std_logic_vector(31 downto 0);
+        --ReadRegisterData : std_logic_vector(31 downto 0);
+
+        procedure set_WireIns(index: in integer; value: in std_logic_vector) is
+        begin
+            WireIns(index):= value;
+        end;
+
+        procedure set_WireOuts(index: in integer; value: in std_logic_vector) is
+        begin
+            WireOuts(index):= value;
+        end;
+
+        procedure set_Triggered(index: in integer; value: in std_logic_vector) is
+        begin
+            Triggered(index):= value;
+        end;
+
+        procedure set_pipeIn(index: in integer; value: in std_logic_vector) is
+        begin
+            pipeIn(index):= value;
+        end;
+
+        procedure set_pipeOut(index: in integer; value: in std_logic_vector) is
+        begin
+            pipeOut(index):= value;
+        end;
+
+        procedure set_u32Data(index: in integer; value: in std_logic_vector) is
+        begin
+            u32Data(index):= value;
+        end;
+
+
+
+        impure function get_WireIns(index: in integer) return std_logic_vector is
+        begin
+            return WireIns(index);
+        end;
+
+        impure function get_WireOuts(index: in integer) return std_logic_vector is
+        begin
+            return WireOuts(index);
+        end;
+
+        impure function get_Triggered(index: in integer) return std_logic_vector is
+        begin
+            return Triggered(index);
+        end;
+
+        impure function get_pipeIn(index: in integer) return std_logic_vector is
+        begin
+            return pipeIn(index);
+        end;
+
+         impure function get_pipeOut(index: in integer) return std_logic_vector is
+        begin
+            return pipeOut(index);
+        end;
+
+        impure function get_u32Count return std_logic_vector is
+        begin
+            return u32Count;
+        end;
+
+         impure function get_u32Address(index: in integer) return std_logic_vector is
+        begin
+            return u32Address(index);
+        end;
+        impure function get_u32Data(index: in integer) return std_logic_vector is
+        begin
+            return u32Data(index);
+        end;
+
+
+    end protected body;
+
 
     -----------------------------------------------------------------------
     -- init_internal_if
@@ -419,15 +514,13 @@ package body pkg_front_panel is
         alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy   : std_logic is internal_rd_if.hi_busy;
 
-        alias WireIns   : STD_ARRAY(front_panel_conf.WireIns'range) is front_panel_conf.WireIns;
-        alias WireOuts  : STD_ARRAY(front_panel_conf.WireOuts'range) is front_panel_conf.WireOuts;
-        alias Triggered : STD_ARRAY(front_panel_conf.Triggered'range) is front_panel_conf.Triggered;
+        constant c_ZEROS: std_logic_vector(31 downto 0):= (others => '0');
 
     begin
         for i in 31 downto 0 loop
-            WireIns(i)   := (others => '0');
-            WireOuts(i)  := (others => '0');
-            Triggered(i) := (others => '0');
+            front_panel_conf.set_WireIns(index=> i,value=> c_ZEROS);
+            front_panel_conf.set_WireOuts(index=> i,value=> c_ZEROS);
+            front_panel_conf.set_Triggered(index=> i,value=> c_ZEROS);
         end loop;
         wait until (rising_edge(i_clk));
         hi_cmd <= DReset;
@@ -449,13 +542,12 @@ package body pkg_front_panel is
         variable tmp_slv32 : std_logic_vector(31 downto 0);
         variable tmpI      : integer;
 
-        alias WireIns : STD_ARRAY(front_panel_conf.WireIns'range) is front_panel_conf.WireIns;
-
     begin
         tmpI          := to_integer(unsigned(ep));
-        tmp_slv32     := WireIns(tmpI) and (not mask);
-        WireIns(tmpI) := (tmp_slv32 or (val and mask));
+        tmp_slv32     := front_panel_conf.get_WireIns(tmpI) and (not mask);
+        front_panel_conf.set_WireIns(index=> tmpI, value=> (tmp_slv32 or (val and mask)));
     end procedure SetWireInValue;
+
 
     -----------------------------------------------------------------------
     -- UpdateWireIns
@@ -474,7 +566,6 @@ package body pkg_front_panel is
         alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
 
-        alias WireIns    : STD_ARRAY(front_panel_conf.WireIns'range) is front_panel_conf.WireIns;
 
     begin
         wait until (rising_edge(i_clk));
@@ -486,7 +577,7 @@ package body pkg_front_panel is
         wait until (rising_edge(i_clk));
             hi_cmd   <= DNOP;
         for i in 0 to 31 loop
-            hi_dataout <= WireIns(i);
+            hi_dataout <= front_panel_conf.get_WireIns(i);
             wait until (rising_edge(i_clk));
         end loop;
         wait on i_clk until (hi_busy = '0');
@@ -495,52 +586,52 @@ package body pkg_front_panel is
     -----------------------------------------------------------------------
     -- GetWireOutValue
     -----------------------------------------------------------------------
-    impure function GetWireOutValue(
+    procedure GetWireOutValue(
         ep               : std_logic_vector;
-        front_panel_conf : in t_front_panel_conf)
-    return std_logic_vector is
+        front_panel_conf : inout t_front_panel_conf;
+        result: out std_logic_vector
+        )
+         is
 
         variable tmp_slv32 : std_logic_vector(31 downto 0);
         variable tmpI      : integer;
 
-        alias WireOuts : STD_ARRAY(front_panel_conf.WireOuts'range) is front_panel_conf.WireOuts;
-
     begin
         tmpI      := to_integer(unsigned(ep));
-        tmp_slv32 := WireOuts(tmpI - 16#20#);
-        return (tmp_slv32);
+        tmp_slv32 := front_panel_conf.get_WireOuts(tmpI - 16#20#);
+        result    := tmp_slv32;
     end GetWireOutValue;
 
     -----------------------------------------------------------------------
     -- IsTriggered
-    -----------------------------------------------------------------------
-    impure function IsTriggered(
+    ---------------------------------------------------------------------
+    procedure IsTriggered(
         ep               : std_logic_vector;
         mask             : std_logic_vector(31 downto 0);
-        front_panel_conf : t_front_panel_conf
-    ) return boolean is
+        variable front_panel_conf : inout t_front_panel_conf;
+        result : out boolean
+    ) is
 
-        alias Triggered    : STD_ARRAY(front_panel_conf.Triggered'range) is front_panel_conf.Triggered;
-        variable tmp_slv32 : std_logic_vector(Triggered(0)'range);
+        variable tmp_slv32 : std_logic_vector(mask'range);
         variable tmpI      : integer;
         variable msg_line  : line;
 
     begin
         tmpI      := to_integer(unsigned(ep));
-        tmp_slv32 := (Triggered(tmpI - 16#60#) and mask);
+        tmp_slv32 := (front_panel_conf.get_Triggered(tmpI - 16#60#) and mask);
 
         if (tmp_slv32 >= std_logic_vector(to_unsigned(0, tmp_slv32'length))) then
             if (tmp_slv32 = std_logic_vector(to_unsigned(0, tmp_slv32'length))) then
-                return FALSE;
+                result:=  FALSE;
             else
-                return TRUE;
+                result:=  TRUE;
             end if;
         else
             write(msg_line, STRING'("***FRONTPANEL ERROR: IsTriggered mask 0x"));
             hwrite(msg_line, mask);
             write(msg_line, STRING'(" covers unused Triggers"));
             writeline(output, msg_line);
-            return FALSE;
+            result:=  FALSE;
         end if;
     end IsTriggered;
 
@@ -562,8 +653,6 @@ package body pkg_front_panel is
         alias hi_busy   : std_logic is internal_rd_if.hi_busy;
         alias hi_datain : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
 
-        alias WireOuts : STD_ARRAY(front_panel_conf.WireOuts'range) is front_panel_conf.WireOuts;
-
     begin
         wait until (rising_edge(i_clk));
         hi_cmd   <= DWires;
@@ -578,7 +667,7 @@ package body pkg_front_panel is
         wait until (rising_edge(i_clk));
         for i in 0 to 31 loop
             wait until (rising_edge(i_clk));
-            WireOuts(i) := hi_datain;
+            front_panel_conf.set_WireOuts(index=> i,value=> hi_datain);
         end loop;
         wait on i_clk until (hi_busy = '0');
     end procedure UpdateWireOuts;
@@ -636,7 +725,6 @@ package body pkg_front_panel is
         alias hi_busy   : std_logic is internal_rd_if.hi_busy;
         alias hi_datain : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
 
-        alias Triggered : STD_ARRAY(front_panel_conf.Triggered'range) is front_panel_conf.Triggered;
     begin
         wait until (rising_edge(i_clk));
             hi_cmd   <= DTriggers;
@@ -657,7 +745,7 @@ package body pkg_front_panel is
 
         for i in 0 to 31 loop
             wait until (rising_edge(i_clk));
-            Triggered(i) := hi_datain;
+            front_panel_conf.set_Triggered(index=> i,value=> hi_datain);
         end loop;
         wait on i_clk until (hi_busy = '0');
     end procedure UpdateTriggerOuts;
@@ -685,7 +773,7 @@ package body pkg_front_panel is
         alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
 
-        alias pipeIn           : PIPEIN_ARRAY(front_panel_conf.pipeIn'range) is front_panel_conf.pipeIn;
+        --alias pipeIn           : PIPEIN_ARRAY(front_panel_conf.pipeIn'range) is front_panel_conf.pipeIn;
 
     begin
         len       := (length / 4);
@@ -707,10 +795,10 @@ package body pkg_front_panel is
         hi_dataout <= tmp_slv32;
         for i in 0 to len - 1 loop
             wait until (rising_edge(i_clk));
-            hi_dataout(7 downto 0)   <= pipeIn(i * 4);
-            hi_dataout(15 downto 8)  <= pipeIn((i * 4) + 1);
-            hi_dataout(23 downto 16) <= pipeIn((i * 4) + 2);
-            hi_dataout(31 downto 24) <= pipeIn((i * 4) + 3);
+            hi_dataout(7 downto 0)   <= front_panel_conf.get_pipeIn(i * 4);
+            hi_dataout(15 downto 8)  <= front_panel_conf.get_pipeIn((i * 4) + 1);
+            hi_dataout(23 downto 16) <= front_panel_conf.get_pipeIn((i * 4) + 2);
+            hi_dataout(31 downto 24) <= front_panel_conf.get_pipeIn((i * 4) + 3);
             j                        := j + 4;
             if (j = blockSize) then
                 for k in 0 to BlockDelayStates - 1 loop
@@ -746,7 +834,6 @@ package body pkg_front_panel is
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
         alias hi_datain  : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
 
-        alias pipeOut          : PIPEOUT_ARRAY(front_panel_conf.pipeOut'range) is front_panel_conf.pipeOut;
 
     begin
         len       := (length / 4);
@@ -769,10 +856,10 @@ package body pkg_front_panel is
         hi_drive   <= '0';
         for i in 0 to len - 1 loop
             wait until (rising_edge(i_clk));
-            pipeOut(i * 4)       := hi_datain(7 downto 0);
-            pipeOut((i * 4) + 1) := hi_datain(15 downto 8);
-            pipeOut((i * 4) + 2) := hi_datain(23 downto 16);
-            pipeOut((i * 4) + 3) := hi_datain(31 downto 24);
+            front_panel_conf.set_pipeOut(index=> (i * 4)    , value=>  hi_datain(7 downto 0));
+            front_panel_conf.set_pipeOut(index=> (i * 4) + 1, value=>  hi_datain(15 downto 8));
+            front_panel_conf.set_pipeOut(index=> (i * 4) + 2, value=>  hi_datain(23 downto 16));
+            front_panel_conf.set_pipeOut(index=> (i * 4) + 3, value=>  hi_datain(31 downto 24));
             j                    := j + 4;
             if (j = blockSize) then
                 for k in 0 to BlockDelayStates - 1 loop
@@ -808,8 +895,6 @@ package body pkg_front_panel is
 
         alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
-
-        alias pipeIn           : PIPEIN_ARRAY(front_panel_conf.pipeIn'range) is front_panel_conf.pipeIn;
 
     begin
         len       := (length / 4);
@@ -847,10 +932,10 @@ package body pkg_front_panel is
             wait until (rising_edge(i_clk));
             wait until (rising_edge(i_clk));
             for j in 1 to blockSize loop
-                hi_dataout(7 downto 0)   <= pipeIn(k);
-                hi_dataout(15 downto 8)  <= pipeIn(k + 1);
-                hi_dataout(23 downto 16) <= pipeIn(k + 2);
-                hi_dataout(31 downto 24) <= pipeIn(k + 3);
+                hi_dataout(7 downto 0)   <= front_panel_conf.get_pipeIn(k);
+                hi_dataout(15 downto 8)  <= front_panel_conf.get_pipeIn(k + 1);
+                hi_dataout(23 downto 16) <= front_panel_conf.get_pipeIn(k + 2);
+                hi_dataout(31 downto 24) <= front_panel_conf.get_pipeIn(k + 3);
                 wait until (rising_edge(i_clk));
                 k                        := k + 4;
             end loop;
@@ -886,8 +971,6 @@ package body pkg_front_panel is
         alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
         alias hi_datain  : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
-
-        alias pipeOut          : PIPEOUT_ARRAY(front_panel_conf.pipeOut'range) is front_panel_conf.pipeOut;
 
     begin
         len       := (length / 4);
@@ -927,10 +1010,10 @@ package body pkg_front_panel is
             wait until (rising_edge(i_clk));
             wait until (rising_edge(i_clk));
             for j in 1 to blockSize loop
-                pipeOut(k)     := hi_datain(7 downto 0);
-                pipeOut(k + 1) := hi_datain(15 downto 8);
-                pipeOut(k + 2) := hi_datain(23 downto 16);
-                pipeOut(k + 3) := hi_datain(31 downto 24);
+                front_panel_conf.set_pipeOut(index=> k    ,value=> hi_datain(7 downto 0));
+                front_panel_conf.set_pipeOut(index=> k + 1,value=> hi_datain(15 downto 8));
+                front_panel_conf.set_pipeOut(index=> k + 2,value=> hi_datain(23 downto 16));
+                front_panel_conf.set_pipeOut(index=> k + 3,value=> hi_datain(31 downto 24));
                 wait until (rising_edge(i_clk));
                 k              := k + 4;
             end loop;
@@ -1032,11 +1115,8 @@ package body pkg_front_panel is
         alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
 
-        alias u32Count   : std_logic_vector(front_panel_conf.u32Count'range) is front_panel_conf.u32Count;
-        alias u32Data    : REGISTER_ARRAY(front_panel_conf.u32Data'range) is front_panel_conf.u32Data;
-        alias u32Address : REGISTER_ARRAY(front_panel_conf.u32Address'range) is front_panel_conf.u32Address;
     begin
-        u32Count_int := to_integer(unsigned(u32Count));
+        u32Count_int := to_integer(unsigned(front_panel_conf.get_u32Count));
         wait until (rising_edge(i_clk));
         hi_cmd       <= DRegisters;
         wait until (rising_edge(i_clk));
@@ -1045,12 +1125,12 @@ package body pkg_front_panel is
         hi_drive     <= '1';
         hi_cmd       <= DNOP;
         wait until (rising_edge(i_clk));
-        hi_dataout   <= u32Count;
+        hi_dataout   <= front_panel_conf.get_u32Count;
         for i in 1 to u32Count_int loop
             wait until (rising_edge(i_clk));
-            hi_dataout <= u32Address(i - 1);
+            hi_dataout <= front_panel_conf.get_u32Address(i - 1);
             wait until (rising_edge(i_clk));
-            hi_dataout <= u32Data(i - 1);
+            hi_dataout <= front_panel_conf.get_u32Data(i - 1);
             wait until (rising_edge(i_clk));
             wait until (rising_edge(i_clk));
         end loop;
@@ -1078,11 +1158,8 @@ package body pkg_front_panel is
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
         alias hi_datain  : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
 
-        alias u32Count   : std_logic_vector(front_panel_conf.u32Count'range) is front_panel_conf.u32Count;
-        alias u32Data    : REGISTER_ARRAY(front_panel_conf.u32Data'range) is front_panel_conf.u32Data;
-        alias u32Address : REGISTER_ARRAY(front_panel_conf.u32Address'range) is front_panel_conf.u32Address;
     begin
-        u32Count_int := to_integer(unsigned(u32Count));
+        u32Count_int := to_integer(unsigned(front_panel_conf.get_u32Count));
         wait until (rising_edge(i_clk));
         hi_cmd       <= DRegisters;
         wait until (rising_edge(i_clk));
@@ -1091,15 +1168,15 @@ package body pkg_front_panel is
         hi_drive     <= '1';
         hi_cmd       <= DNOP;
         wait until (rising_edge(i_clk));
-        hi_dataout   <= u32Count;
+        hi_dataout   <= front_panel_conf.get_u32Count;
         for i in 1 to u32Count_int loop
             wait until (rising_edge(i_clk));
-            hi_dataout     <= u32Address(i - 1);
+            hi_dataout     <= front_panel_conf.get_u32Address(i - 1);
             wait until (rising_edge(i_clk));
             hi_drive       <= '0';
             wait until (rising_edge(i_clk));
             wait until (rising_edge(i_clk));
-            u32Data(i - 1) := hi_datain;
+            front_panel_conf.set_u32Data(index=> i - 1, value=> hi_datain);
             hi_drive       <= '1';
         end loop;
         wait on i_clk until (hi_busy = '0');
