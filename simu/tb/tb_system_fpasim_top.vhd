@@ -203,7 +203,9 @@ architecture simulate of tb_system_fpasim_top is
                                                                           hi_dataout => (others => '0')
                                                                           );
 
-  signal usb_rd_if0 : opal_kelly_lib.pkg_front_panel.t_internal_rd_if := (hi_busy=> '0',
+  signal usb_rd_if0 : opal_kelly_lib.pkg_front_panel.t_internal_rd_if := (
+                                                                          i_clk => '0',
+                                                                          hi_busy=> '0',
                                                                           hi_datain => (others => '0')
                                                                           );
 
@@ -278,7 +280,7 @@ begin
     ---------------------------------------------------------------------
     info("Reset the USB core");
     opal_kelly_lib.pkg_front_panel.FrontPanelReset(
-                                                   i_clk => usb_clk,
+                                                   --i_clk => usb_clk,
                                                    front_panel_conf => v_front_panel_conf,
                                                    internal_wr_if => usb_wr_if0,
                                                    internal_rd_if => usb_rd_if0
@@ -304,7 +306,7 @@ begin
     info("End: SetWireInValue");
     info("Start: UpdateWireIns");
     UpdateWireIns(
-                  i_clk=>usb_clk,
+                  --i_clk=>usb_clk,
                   front_panel_conf=> v_front_panel_conf,
                   internal_wr_if => usb_wr_if0,
                   internal_rd_if => usb_rd_if0);
@@ -315,7 +317,7 @@ begin
     ---------------------------------------------------------------------
     info("Start: ActivateTriggerIn");
     ActivateTriggerIn(
-                      i_clk=> usb_clk,
+                      --i_clk=> usb_clk,
                       ep=> x"40",
                       bit=>12,
                       internal_wr_if => usb_wr_if0,
@@ -335,7 +337,7 @@ begin
     ---------------------------------------------------------------------
     info("Start: UpdateWireOuts");
     UpdateWireOuts(
-        i_clk            => usb_clk,
+        --i_clk            => usb_clk,
         front_panel_conf => v_front_panel_conf,
         internal_wr_if   => usb_wr_if0,
         internal_rd_if   => usb_rd_if0
@@ -356,7 +358,7 @@ begin
     v_front_panel_conf.pipeIn(2):= x"00";
     v_front_panel_conf.pipeIn(3):= x"00";
     WriteToPipeIn(
-        i_clk => usb_clk,
+        --i_clk => usb_clk,
         ep    => x"80",
         length => 4,--write length expressed in bytes
         front_panel_conf => v_front_panel_conf,
