@@ -73,6 +73,7 @@ package pkg_front_panel is
 
 
     type t_internal_rd_if is record
+        i_clk      : std_logic;
         hi_busy    : std_logic;
         hi_datain  : std_logic_vector(31 downto 0);
     end record;
@@ -125,7 +126,7 @@ package pkg_front_panel is
         u32Address       : REGISTER_ARRAY(0 to registerSetSize - 1);
         u32Data          : REGISTER_ARRAY(0 to registerSetSize - 1);
         u32Count         : std_logic_vector(31 downto 0);
-        ReadRegisterData : std_logic_vector(31 downto 0);
+        --ReadRegisterData : std_logic_vector(31 downto 0);
 
     end record t_front_panel_conf;
 
@@ -170,7 +171,7 @@ package pkg_front_panel is
     -- FrontPanelReset
     -----------------------------------------------------------------------
     procedure FrontPanelReset(
-        signal i_clk : in std_logic;
+        --signal i_clk : in std_logic;
         variable front_panel_conf : inout t_front_panel_conf;
         signal internal_wr_if : out t_internal_wr_if;
         signal internal_rd_if : in t_internal_rd_if
@@ -205,7 +206,8 @@ package pkg_front_panel is
     -----------------------------------------------------------------------
     -- UpdateWireIns
     -----------------------------------------------------------------------
-    procedure UpdateWireIns(signal   i_clk            : in std_logic;
+    procedure UpdateWireIns(
+                            --signal   i_clk            : in std_logic;
                             variable front_panel_conf : inout t_front_panel_conf;
                             signal internal_wr_if : out t_internal_wr_if;
                             signal internal_rd_if : in t_internal_rd_if
@@ -216,7 +218,7 @@ package pkg_front_panel is
     -- UpdateWireOuts
     -----------------------------------------------------------------------
     procedure UpdateWireOuts(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         variable front_panel_conf : inout t_front_panel_conf;
         signal internal_wr_if : out t_internal_wr_if;
         signal internal_rd_if : in t_internal_rd_if
@@ -226,7 +228,7 @@ package pkg_front_panel is
     -- ActivateTriggerIn
     -----------------------------------------------------------------------
     procedure ActivateTriggerIn(
-        signal i_clk       : in std_logic;
+        --signal i_clk       : in std_logic;
         ep                 : in std_logic_vector(7 downto 0);
         bit                : in integer;
         signal internal_wr_if : out t_internal_wr_if;
@@ -237,7 +239,7 @@ package pkg_front_panel is
     -- UpdateTriggerOuts
     -----------------------------------------------------------------------
     procedure UpdateTriggerOuts(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         variable front_panel_conf : inout t_front_panel_conf;
         signal internal_wr_if : out t_internal_wr_if;
         signal internal_rd_if : in t_internal_rd_if
@@ -247,7 +249,7 @@ package pkg_front_panel is
     -- WriteToPipeIn
     -----------------------------------------------------------------------
     procedure WriteToPipeIn(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         ep                        : in std_logic_vector(7 downto 0);
         length                    : in integer;
         variable front_panel_conf : inout t_front_panel_conf;
@@ -259,7 +261,7 @@ package pkg_front_panel is
     -- ReadFromPipeOut
     -----------------------------------------------------------------------
     procedure ReadFromPipeOut(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         ep                        : in std_logic_vector(7 downto 0);
         length                    : in integer;
         variable front_panel_conf : inout t_front_panel_conf;
@@ -271,7 +273,7 @@ package pkg_front_panel is
     -- WriteToBlockPipeIn
     -----------------------------------------------------------------------
     procedure WriteToBlockPipeIn(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         ep                        : in std_logic_vector(7 downto 0);
         blockLength               : in integer;
         length                    : in integer;
@@ -284,7 +286,7 @@ package pkg_front_panel is
     -- ReadFromBlockPipeOut
     -----------------------------------------------------------------------
     procedure ReadFromBlockPipeOut(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         ep                        : in std_logic_vector(7 downto 0);
         blockLength               : in integer;
         length                    : in integer;
@@ -297,7 +299,7 @@ package pkg_front_panel is
     -- WriteRegister
     -----------------------------------------------------------------------
     procedure WriteRegister(
-        signal i_clk       : in std_logic;
+        --signal i_clk       : in std_logic;
         address            : in std_logic_vector(31 downto 0);
         data               : in std_logic_vector(31 downto 0);
         signal internal_wr_if : out t_internal_wr_if;
@@ -308,7 +310,7 @@ package pkg_front_panel is
     -- ReadRegister
     -----------------------------------------------------------------------
     procedure ReadRegister(
-        signal i_clk       : in std_logic;
+        --signal i_clk       : in std_logic;
         address            : in std_logic_vector(31 downto 0);
         data               : out std_logic_vector(31 downto 0);
         signal internal_wr_if : out t_internal_wr_if;
@@ -319,7 +321,7 @@ package pkg_front_panel is
     -- WriteRegisterSet
     -----------------------------------------------------------------------
     procedure WriteRegisterSet(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         variable front_panel_conf : inout t_front_panel_conf;
         signal internal_wr_if : out t_internal_wr_if;
         signal internal_rd_if : in t_internal_rd_if
@@ -329,7 +331,7 @@ package pkg_front_panel is
     -- ReadRegisterSet
     -----------------------------------------------------------------------
     procedure ReadRegisterSet(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         variable front_panel_conf : inout t_front_panel_conf;
         signal internal_wr_if : out t_internal_wr_if;
         signal internal_rd_if : in t_internal_rd_if
@@ -388,7 +390,12 @@ package body pkg_front_panel is
         alias hi_datain  : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
 
     begin
+        -- get clocks for the procedure/function
+        internal_rd_if.i_clk <= i_clk;
         -- okHostCalls Simulation okHostCall<->okHost Mapping  --------------------------------------
+        ---------------------------------------------------------------------
+        -- drive usb ports
+        ---------------------------------------------------------------------
         okUH(0)          <= i_clk;
         okUH(1)          <= hi_drive;
         okUH(4 downto 2) <= hi_cmd;
@@ -400,15 +407,16 @@ package body pkg_front_panel is
     -----------------------------------------------------------------------
     -- FrontPanelReset
     -----------------------------------------------------------------------
-    procedure FrontPanelReset(signal i_clk : in std_logic; 
+    procedure FrontPanelReset(
+        --signal i_clk : in std_logic; 
         variable front_panel_conf : inout t_front_panel_conf;
         signal internal_wr_if : out t_internal_wr_if;
         signal internal_rd_if : in t_internal_rd_if
         ) is
         variable i        : integer := 0;
-
         alias hi_cmd    : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy   : std_logic is internal_rd_if.hi_busy;
 
         alias WireIns   : STD_ARRAY(front_panel_conf.WireIns'range) is front_panel_conf.WireIns;
@@ -452,17 +460,20 @@ package body pkg_front_panel is
     -----------------------------------------------------------------------
     -- UpdateWireIns
     -----------------------------------------------------------------------
-    procedure UpdateWireIns(signal   i_clk            : in std_logic;
+    procedure UpdateWireIns(
+                            --signal   i_clk            : in std_logic;
                             variable front_panel_conf : inout t_front_panel_conf;
                             signal internal_wr_if : out t_internal_wr_if;
                             signal internal_rd_if : in t_internal_rd_if
         ) is
         variable i : integer := 0;
-
         alias hi_drive   : std_logic is internal_wr_if.hi_drive;
         alias hi_cmd     : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
-        alias hi_busy    : std_logic is internal_rd_if.hi_busy;
         alias hi_dataout : std_logic_vector(internal_wr_if.hi_dataout'range) is internal_wr_if.hi_dataout;
+
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
+        alias hi_busy    : std_logic is internal_rd_if.hi_busy;
+
         alias WireIns    : STD_ARRAY(front_panel_conf.WireIns'range) is front_panel_conf.WireIns;
 
     begin
@@ -478,7 +489,7 @@ package body pkg_front_panel is
             hi_dataout <= WireIns(i);
             wait until (rising_edge(i_clk));
         end loop;
-        wait until (hi_busy = '0' and rising_edge(i_clk));
+        wait on i_clk until (hi_busy = '0');
     end procedure UpdateWireIns;
 
     -----------------------------------------------------------------------
@@ -537,7 +548,7 @@ package body pkg_front_panel is
     -- UpdateWireOuts
     -----------------------------------------------------------------------
     procedure UpdateWireOuts(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         variable front_panel_conf : inout t_front_panel_conf;
         signal internal_wr_if : out t_internal_wr_if;
         signal internal_rd_if : in t_internal_rd_if
@@ -547,6 +558,7 @@ package body pkg_front_panel is
         alias hi_drive  : std_logic is internal_wr_if.hi_drive;
         alias hi_cmd    : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy   : std_logic is internal_rd_if.hi_busy;
         alias hi_datain : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
 
@@ -575,7 +587,7 @@ package body pkg_front_panel is
     -- ActivateTriggerIn
     -----------------------------------------------------------------------
     procedure ActivateTriggerIn(
-        signal i_clk       : in std_logic;
+        --signal i_clk       : in std_logic;
         ep                 : in std_logic_vector(7 downto 0);
         bit                : in integer;
         signal internal_wr_if : out t_internal_wr_if;
@@ -588,6 +600,7 @@ package body pkg_front_panel is
         alias hi_cmd     : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
         alias hi_dataout : std_logic_vector(internal_wr_if.hi_dataout'range) is internal_wr_if.hi_dataout;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
 
     begin
@@ -610,7 +623,7 @@ package body pkg_front_panel is
     -- UpdateTriggerOuts
     -----------------------------------------------------------------------
     procedure UpdateTriggerOuts(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         variable front_panel_conf : inout t_front_panel_conf;
         signal internal_wr_if : out t_internal_wr_if;
         signal internal_rd_if : in t_internal_rd_if
@@ -619,6 +632,7 @@ package body pkg_front_panel is
         alias hi_drive  : std_logic is internal_wr_if.hi_drive;
         alias hi_cmd    : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy   : std_logic is internal_rd_if.hi_busy;
         alias hi_datain : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
 
@@ -652,7 +666,7 @@ package body pkg_front_panel is
     -- WriteToPipeIn
     -----------------------------------------------------------------------
     procedure WriteToPipeIn(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         ep                        : in std_logic_vector(7 downto 0);
         length                    : in integer;
         variable front_panel_conf : inout t_front_panel_conf;
@@ -668,6 +682,7 @@ package body pkg_front_panel is
         alias hi_cmd     : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
         alias hi_dataout : std_logic_vector(internal_wr_if.hi_dataout'range) is internal_wr_if.hi_dataout;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
 
         alias pipeIn           : PIPEIN_ARRAY(front_panel_conf.pipeIn'range) is front_panel_conf.pipeIn;
@@ -711,7 +726,7 @@ package body pkg_front_panel is
     -- ReadFromPipeOut
     -----------------------------------------------------------------------
     procedure ReadFromPipeOut(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         ep                        : in std_logic_vector(7 downto 0);
         length                    : in integer;
         variable front_panel_conf : inout t_front_panel_conf;
@@ -727,6 +742,7 @@ package body pkg_front_panel is
         alias hi_cmd     : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
         alias hi_dataout : std_logic_vector(internal_wr_if.hi_dataout'range) is internal_wr_if.hi_dataout;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
         alias hi_datain  : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
 
@@ -772,7 +788,7 @@ package body pkg_front_panel is
     -- WriteToBlockPipeIn
     -----------------------------------------------------------------------
     procedure WriteToBlockPipeIn(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         ep                        : in std_logic_vector(7 downto 0);
         blockLength               : in integer;
         length                    : in integer;
@@ -790,6 +806,7 @@ package body pkg_front_panel is
         alias hi_cmd     : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
         alias hi_dataout : std_logic_vector(internal_wr_if.hi_dataout'range) is internal_wr_if.hi_dataout;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
 
         alias pipeIn           : PIPEIN_ARRAY(front_panel_conf.pipeIn'range) is front_panel_conf.pipeIn;
@@ -848,7 +865,7 @@ package body pkg_front_panel is
     -- ReadFromBlockPipeOut
     -----------------------------------------------------------------------
     procedure ReadFromBlockPipeOut(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         ep                        : in std_logic_vector(7 downto 0);
         blockLength               : in integer;
         length                    : in integer;
@@ -866,6 +883,7 @@ package body pkg_front_panel is
         alias hi_cmd     : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
         alias hi_dataout : std_logic_vector(internal_wr_if.hi_dataout'range) is internal_wr_if.hi_dataout;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
         alias hi_datain  : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
 
@@ -927,7 +945,7 @@ package body pkg_front_panel is
     -- WriteRegister
     -----------------------------------------------------------------------
     procedure WriteRegister(
-        signal i_clk       : in std_logic;
+        --signal i_clk       : in std_logic;
         address            : in std_logic_vector(31 downto 0);
         data               : in std_logic_vector(31 downto 0);
         signal internal_wr_if : out t_internal_wr_if;
@@ -938,6 +956,7 @@ package body pkg_front_panel is
         alias hi_cmd     : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
         alias hi_dataout : std_logic_vector(internal_wr_if.hi_dataout'range) is internal_wr_if.hi_dataout;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
 
     begin
@@ -960,7 +979,7 @@ package body pkg_front_panel is
     -- ReadRegister
     -----------------------------------------------------------------------
     procedure ReadRegister(
-        signal i_clk       : in std_logic;
+        --signal i_clk       : in std_logic;
         address            : in std_logic_vector(31 downto 0);
         data               : out std_logic_vector(31 downto 0);
         signal internal_wr_if : out t_internal_wr_if;
@@ -971,6 +990,7 @@ package body pkg_front_panel is
         alias hi_cmd     : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
         alias hi_dataout : std_logic_vector(internal_wr_if.hi_dataout'range) is internal_wr_if.hi_dataout;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_datain  : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
 
@@ -996,7 +1016,7 @@ package body pkg_front_panel is
     -- WriteRegisterSet
     -----------------------------------------------------------------------
     procedure WriteRegisterSet(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         variable front_panel_conf : inout t_front_panel_conf;
         signal internal_wr_if : out t_internal_wr_if;
         signal internal_rd_if : in t_internal_rd_if
@@ -1009,6 +1029,7 @@ package body pkg_front_panel is
         alias hi_cmd     : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
         alias hi_dataout : std_logic_vector(internal_wr_if.hi_dataout'range) is internal_wr_if.hi_dataout;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
 
         alias u32Count   : std_logic_vector(front_panel_conf.u32Count'range) is front_panel_conf.u32Count;
@@ -1041,7 +1062,7 @@ package body pkg_front_panel is
     -- ReadRegisterSet
     -----------------------------------------------------------------------
     procedure ReadRegisterSet(
-        signal   i_clk            : in std_logic;
+        --signal   i_clk            : in std_logic;
         variable front_panel_conf : inout t_front_panel_conf;
         signal internal_wr_if : out t_internal_wr_if;
         signal internal_rd_if : in t_internal_rd_if
@@ -1053,6 +1074,7 @@ package body pkg_front_panel is
         alias hi_cmd     : std_logic_vector(internal_wr_if.hi_cmd'range) is internal_wr_if.hi_cmd;
         alias hi_dataout : std_logic_vector(internal_wr_if.hi_dataout'range) is internal_wr_if.hi_dataout;
 
+        alias i_clk    : std_logic is internal_rd_if.i_clk;
         alias hi_busy    : std_logic is internal_rd_if.hi_busy;
         alias hi_datain  : std_logic_vector(internal_rd_if.hi_datain'range) is internal_rd_if.hi_datain;
 
