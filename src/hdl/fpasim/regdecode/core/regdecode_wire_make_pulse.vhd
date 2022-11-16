@@ -66,6 +66,7 @@ entity regdecode_wire_make_pulse is
     -- data
     i_make_pulse_valid : in  std_logic; -- make pulse valid
     i_make_pulse       : in  std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0); -- make pulse value
+    o_wr_data_count    : out std_logic_vector(15 downto 0);
     ---------------------------------------------------------------------
     -- from/to the user:  @i_out_clk
     ---------------------------------------------------------------------
@@ -73,12 +74,14 @@ entity regdecode_wire_make_pulse is
     i_rst_status       : in  std_logic; -- reset error flag(s)
     i_debug_pulse      : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     -- extracted command
+    i_data_rd          : in std_logic;
     o_data_valid       : out std_logic;
     o_sof              : out std_logic;
     o_eof              : out std_logic;
     o_data             : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0);
+    o_empty            : out std_logic;
     ---------------------------------------------------------------------
-    -- to the regdecode: @i_clk
+    -- from/to the regdecode: @i_clk
     ---------------------------------------------------------------------
     i_fifo_rd          : in  std_logic; -- fifo read enable
     o_fifo_data_valid  : out std_logic; -- fifo data valid
@@ -147,14 +150,19 @@ architecture RTL of regdecode_wire_make_pulse is
 
   signal data_valid_tmp0 : std_logic;
   signal data_tmp0       : std_logic_vector(c_IDX2_H downto 0);
+  signal ready_tmp0      : std_logic;
+  signal wr_data_count_tmp0 : std_logic_vector(o_wr_data_count'range);
 
   signal rd_tmp1         : std_logic;
   signal data_valid_tmp1 : std_logic;
   signal data_tmp1       : std_logic_vector(c_IDX2_H downto 0);
   signal empty_tmp1      : std_logic;
 
+
+  signal rd_tmp2         : std_logic;
   signal data_valid_tmp2 : std_logic;
   signal data_tmp2       : std_logic_vector(c_IDX2_H downto 0);
+  signal empty_tmp2         : std_logic;
 
   signal errors : std_logic_vector(o_errors'range);
   signal status : std_logic_vector(o_status'range);
@@ -179,7 +187,7 @@ begin
   ---------------------------------------------------------------------
   -- fsm
   ---------------------------------------------------------------------
-  p_decode_state : process(i_make_pulse_valid, i_pixel_nb, pixel_all_tmp, pixel_id_tmp, pixel_id_max_r1, pixel_id_r1, sm_state_r1) is
+  p_decode_state : process(i_make_pulse_valid, i_pixel_nb, pixel_all_tmp, pixel_id_tmp, pixel_id_max_r1, pixel_id_r1, sm_state_r1, ready_tmp0) is
   begin
     sof_next          <= '0';
     eof_next          <= '0';
@@ -195,12 +203,12 @@ begin
       when E_WAIT =>
         if i_make_pulse_valid = '1' then
           data_valid_next   <= '1';
-          pixel_id_max_next <= unsigned(i_pixel_nb) - 1;
+          pixel_id_max_next <= unsigned(i_pixel_nb) - 1 - 1; -- 1 start @0 and -1 to anticipate
 
           if pixel_all_tmp = '1' then
             sof_next      <= '1';
             pixel_id_next <= (others => '0');
-            if unsigned(i_pixel_nb) = to_unsigned(0, i_pixel_nb'length) then
+            if unsigned(i_pixel_nb) = to_unsigned(1, i_pixel_nb'length) then
               -- special case: one pixel
               eof_next      <= '1';
               sm_state_next <= E_WAIT;
@@ -225,13 +233,17 @@ begin
         else
           error_next <= '0';
         end if;
-        pixel_id_next   <= pixel_id_r1 + 1;
-        data_valid_next <= '1';
-        if pixel_id_max_r1 = pixel_id_r1 then
-          eof_next      <= '1';
-          sm_state_next <= E_WAIT;
+        if ready_tmp0 = '1' then
+            data_valid_next <= '1';
+            pixel_id_next <= pixel_id_r1 + 1;
+            if pixel_id_max_r1 = pixel_id_r1 then
+              eof_next      <= '1';
+              sm_state_next <= E_WAIT;
+            else
+              sm_state_next <= E_GEN_PIXEL_ID;
+            end if;
         else
-          sm_state_next <= E_GEN_PIXEL_ID;
+             sm_state_next <= E_GEN_PIXEL_ID;
         end if;
       when others =>                    -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
         sm_state_next <= E_RST;
@@ -279,7 +291,7 @@ begin
   tmp(c_PIXEL_ID_IDX_L - 1 downto 0)            <= data_r1(c_PIXEL_ID_IDX_L - 1 downto 0);
 
   ---------------------------------------------------------------------
-  -- regdecode_wire_wr_rd
+  -- regdecode_wire_make_pulse_wr_rd
   ---------------------------------------------------------------------
 
   data_valid_tmp0                     <= data_valid_r1;
@@ -287,7 +299,7 @@ begin
   data_tmp0(c_IDX1_H)                 <= eof_r1;
   data_tmp0(c_IDX0_H downto c_IDX0_L) <= tmp;
 
-  inst_regdecode_wire_wr_rd : entity fpasim.regdecode_wire_wr_rd
+  inst_regdecode_wire_make_pulse_wr_rd : entity fpasim.regdecode_wire_make_pulse_wr_rd
     generic map(
       g_DATA_WIDTH_OUT => data_tmp0'length -- define the RAM address width
     )
@@ -300,6 +312,8 @@ begin
       -- data
       i_data_valid      => data_valid_tmp0, -- data valid
       i_data            => data_tmp0,   -- data value
+      o_ready           => ready_tmp0,
+      o_wr_data_count   => wr_data_count_tmp0,
       ---------------------------------------------------------------------
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
@@ -307,8 +321,10 @@ begin
       i_rst_status      => i_rst_status, -- reset error flag(s)
       i_debug_pulse     => i_debug_pulse, -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- ram: wr
+      i_data_rd         => rd_tmp2,
       o_data_valid      => data_valid_tmp2, -- data valid
       o_data            => data_tmp2,   -- data
+      o_empty           => empty_tmp2,
       ---------------------------------------------------------------------
       -- to the regdecode: @i_clk
       ---------------------------------------------------------------------
@@ -322,7 +338,9 @@ begin
       o_errors          => errors,      -- output errors
       o_status          => status       -- output status
     );
-  rd_tmp1           <= i_fifo_rd;
+
+  rd_tmp1  <= i_fifo_rd;
+  rd_tmp2  <= i_data_rd;
   -- output: to USB
   ---------------------------------------------------------------------
   o_fifo_data_valid <= data_valid_tmp1;
@@ -331,12 +349,15 @@ begin
   o_fifo_data       <= data_tmp1(c_IDX0_H downto c_IDX0_L);
   o_fifo_empty      <= empty_tmp1;
 
+  o_wr_data_count   <= wr_data_count_tmp0;
+
   -- output: to the user
   ---------------------------------------------------------------------
   o_data_valid <= data_valid_tmp2;
   o_sof        <= data_tmp2(c_IDX2_H);
   o_eof        <= data_tmp2(c_IDX1_H);
   o_data       <= data_tmp2(c_IDX0_H downto c_IDX0_L);
+  o_empty      <= empty_tmp2;
 
   ---------------------------------------------------------------------
   -- synchronize error : i_clk -> i_out_clk

@@ -221,11 +221,11 @@ entity regdecode_top is
     o_reg_debug_ctrl_valid            : out std_logic; -- register debug_ctrl valid
     o_reg_debug_ctrl                  : out std_logic_vector(31 downto 0); -- register debug_ctrl value
     -- make pulse register
+    i_reg_make_pulse_ready            : in std_logic;
     o_reg_make_sof                    : out std_logic; -- first sample
     o_reg_make_eof                    : out std_logic; -- last sample
     o_reg_make_pulse_valid            : out std_logic; -- register make_pulse valid
     o_reg_make_pulse                  : out std_logic_vector(31 downto 0); -- register make_pulse value
-
     -- to the usb 
     ---------------------------------------------------------------------
     -- errors
@@ -462,6 +462,7 @@ architecture RTL of regdecode_top is
   signal pixel_nb                   : std_logic_vector(c_TES_CONF_PIXEL_NB_WIDTH - 1 downto 0);
   signal make_pulse_data_valid_tmp0 : std_logic;
   signal make_pulse_data_tmp0       : std_logic_vector(i_usb_wirein_make_pulse'range);
+  signal make_pulse_wr_data_count_tmp0 : std_logic_vector(15 downto 0);
 
   signal make_pulse_rd_tmp1    : std_logic;
   --signal make_pulse_data_valid_tmp1  : std_logic;
@@ -470,10 +471,12 @@ architecture RTL of regdecode_top is
   signal make_pulse_data_tmp1  : std_logic_vector(i_usb_wirein_make_pulse'range);
   signal make_pulse_empty_tmp1 : std_logic;
 
+  signal make_pulse_rd_tmp2         : std_logic;
   signal make_pulse_sof_tmp2        : std_logic;
   signal make_pulse_eof_tmp2        : std_logic;
   signal make_pulse_data_valid_tmp2 : std_logic;
   signal make_pulse_data_tmp2       : std_logic_vector(i_usb_wirein_make_pulse'range);
+  signal make_pulse_empty_tmp2      : std_logic;
 
   signal make_pulse_errors : std_logic_vector(15 downto 0);
   signal make_pulse_status : std_logic_vector(7 downto 0);
@@ -615,7 +618,8 @@ begin
   o_usb_pipeout_fifo_data(31 downto 16) <= pipeout_addr;
   o_usb_pipeout_fifo_data(15 downto 0)  <= pipeout_data;
   -- resize 
-  o_usb_wireout_fifo_data_count         <= std_logic_vector(resize(unsigned(pipeout_data_count), o_usb_wireout_fifo_data_count'length));
+  o_usb_wireout_fifo_data_count(31 downto 16) <=  make_pulse_wr_data_count_tmp0;
+  o_usb_wireout_fifo_data_count(15 downto 0) <=  pipeout_data_count;
 
   ---------------------------------------------------------------------
   -- output: to the user
@@ -859,6 +863,7 @@ begin
   make_pulse_data_valid_tmp0 <= trig_make_pulse_valid;
   make_pulse_data_tmp0       <= i_usb_wirein_make_pulse;
   pixel_nb                   <= i_usb_wirein_tes_conf(c_TES_CONF_PIXEL_NB_IDX_H downto c_TES_CONF_PIXEL_NB_IDX_L);
+
   inst_regdecode_wire_make_pulse : entity fpasim.regdecode_wire_make_pulse
     generic map(
       g_DATA_WIDTH_OUT => make_pulse_data_tmp0'length, -- define the RAM address width
@@ -875,6 +880,7 @@ begin
       -- data
       i_make_pulse_valid => make_pulse_data_valid_tmp0,
       i_make_pulse       => make_pulse_data_tmp0,
+      o_wr_data_count    => make_pulse_wr_data_count_tmp0,
       ---------------------------------------------------------------------
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
@@ -882,10 +888,12 @@ begin
       i_rst_status       => i_rst_status,
       i_debug_pulse      => i_debug_pulse,
       -- ram: wr
+      i_data_rd          => make_pulse_rd_tmp2,
       o_sof              => make_pulse_sof_tmp2,
       o_eof              => make_pulse_eof_tmp2,
       o_data_valid       => make_pulse_data_valid_tmp2,
       o_data             => make_pulse_data_tmp2,
+      o_empty            => make_pulse_empty_tmp2,
       ---------------------------------------------------------------------
       -- to the regdecode: @i_clk
       ---------------------------------------------------------------------
@@ -903,6 +911,9 @@ begin
     );
   -- to the USB: auto-read the FIFO
   make_pulse_rd_tmp1 <= '1' when make_pulse_empty_tmp1 = '0' else '0';
+
+  -- to the user: auto read the fifo if the upstream fifo is empty and if the downstream fifo is ready
+  make_pulse_rd_tmp2 <= '1' when ((make_pulse_empty_tmp2 = '0') and (i_reg_make_pulse_ready = '1')) else '0';
 
   -- output: to USB
   ---------------------------------------------------------------------
