@@ -102,6 +102,7 @@ architecture simulate of tb_tes_top is
   signal i_cmd_pulse_height        : std_logic_vector(10 downto 0);
   signal i_cmd_pixel_id            : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);
   signal i_cmd_time_shift          : std_logic_vector(3 downto 0);
+  signal o_cmd_ready          : std_logic;
   -- RAM: pulse shape
   -- wr
   signal i_pulse_shape_wr_en       : std_logic;
@@ -519,7 +520,7 @@ begin
   -- Input: Command Configuration
   ---------------------------------------------------------------------
   gen_cmd : if true generate
-
+   signal cmd_ready : std_logic;
   begin
 
     --  valid sequence
@@ -537,7 +538,7 @@ begin
       ---------------------------------------------------------------------
       o_valid         => cmd_rd_valid
     );
-
+    cmd_ready <= '1' when cmd_rd_valid = '1' and o_cmd_ready = '1' else '0';
     --  data generation
     ---------------------------------------------------------------------
     inst_pkg_data_generator : pkg_data_generator_3(
@@ -558,7 +559,7 @@ begin
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      i_ready            => cmd_rd_valid,
+      i_ready            => cmd_ready,
       o_data_valid       => i_cmd_valid,
       o_data0_std_vect   => i_cmd_pulse_height,
       o_data1_std_vect   => i_cmd_pixel_id,
@@ -810,6 +811,7 @@ begin
       i_cmd_pulse_height        => i_cmd_pulse_height, -- pulse height command
       i_cmd_pixel_id            => i_cmd_pixel_id, -- pixel id command
       i_cmd_time_shift          => i_cmd_time_shift, -- time shift command
+      o_cmd_ready               => o_cmd_ready,
       -- RAM: pulse shape
       -- wr
       i_pulse_shape_wr_en       => i_pulse_shape_wr_en, -- write enable
