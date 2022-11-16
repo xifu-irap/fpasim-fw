@@ -131,7 +131,7 @@ architecture RTL of regdecode_pipe_rd_all is
   ---------------------------------------------------------------------
   type t_state is (E_RST, E_WAIT, E_RUN0, E_RUN1, E_RUN2, E_RUN3, E_RUN4);
   signal sm_state_next : t_state := E_RST;
-  signal sm_state_reg  : t_state := E_RST;
+  signal sm_state_r1  : t_state := E_RST;
 
   signal rd0_next : std_logic;
   -- signal rd0_r1   : std_logic;
@@ -216,7 +216,7 @@ architecture RTL of regdecode_pipe_rd_all is
 
 begin
 
-  p_decode_state : process(i_fifo_data_valid0, i_fifo_data_valid1, i_fifo_data_valid2, i_fifo_data_valid3, i_fifo_data_valid4, i_fifo_empty0, i_fifo_empty1, i_fifo_empty2, i_fifo_empty3, i_fifo_empty4, i_fifo_eof0, i_fifo_eof1, i_fifo_eof2, i_fifo_eof3, i_fifo_eof4, prog_full0, sel_r1, sm_state_reg) is
+  p_decode_state : process(i_fifo_data_valid0, i_fifo_data_valid1, i_fifo_data_valid2, i_fifo_data_valid3, i_fifo_data_valid4, i_fifo_empty0, i_fifo_empty1, i_fifo_empty2, i_fifo_empty3, i_fifo_empty4, i_fifo_eof0, i_fifo_eof1, i_fifo_eof2, i_fifo_eof3, i_fifo_eof4, prog_full0, sel_r1, sm_state_r1) is
   begin
     rd0_next <= '0';
     rd1_next <= '0';
@@ -224,7 +224,7 @@ begin
     rd3_next <= '0';
     rd4_next <= '0';
     sel_next <= sel_r1;
-    case sm_state_reg is
+    case sm_state_r1 is
       when E_RST =>
         sm_state_next <= E_WAIT;
 
@@ -316,9 +316,9 @@ begin
   begin
     if rising_edge(i_clk) then
       if i_rst = '1' then
-        sm_state_reg <= E_RST;
+        sm_state_r1 <= E_RST;
       else
-        sm_state_reg <= sm_state_next;
+        sm_state_r1 <= sm_state_next;
       end if;
       -- rd0_r1 <= rd0_next;
       -- rd1_r1 <= rd1_next;

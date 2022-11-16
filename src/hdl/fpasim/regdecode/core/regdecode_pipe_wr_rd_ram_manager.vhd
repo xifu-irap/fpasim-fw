@@ -107,6 +107,9 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
 
   constant c_RAM_ADDR_WIDTH : integer                                 := fpasim.pkg_utils.pkg_width_from_value(g_RAM_NB_WORDS);
   constant c_CNT_MAX        : unsigned(c_RAM_ADDR_WIDTH - 1 downto 0) := (others => '1');
+  constant c_DELAY_OUT      : integer := 1;
+  constant c_ADDR_DELAY_OUT : integer := c_DELAY_OUT + g_RAM_RD_LATENCY;
+
   ---------------------------------------------------------------------
   -- fsm
   ---------------------------------------------------------------------
@@ -120,8 +123,8 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   signal eof_next : std_logic;
   signal eof_r1   : std_logic := '0';
 
-  signal wr_next : std_logic;
-  signal wr_r1   : std_logic := '0';
+  signal sel_wr_next : std_logic;
+  signal sel_wr_r1   : std_logic := '0';
 
   signal data_valid_next : std_logic;
   signal data_valid_r1   : std_logic := '0';
@@ -177,7 +180,7 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
 
   signal sof1  : std_logic;
   signal eof1  : std_logic;
-  signal wr1   : std_logic;
+  signal sel_wr1   : std_logic;
   signal addr1 : std_logic_vector(i_addr'range);
   signal data1 : std_logic_vector(i_data'range);
 
@@ -244,9 +247,9 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   ---------------------------------------------------------------------
   -- cross clock domain: user to regdecode
   ---------------------------------------------------------------------
-  constant c_FIFO_DEPTH2     : integer := 32; --see IP
+  constant c_FIFO_DEPTH2     : integer := 16; --see IP
   constant c_FIFO_WIDTH2     : integer := c_FIFO_IDX4_H + 1; --see IP
-  constant c_FIFO_PROG_FULL2 : integer := c_FIFO_DEPTH2 - 20;
+  constant c_FIFO_PROG_FULL2 : integer := c_FIFO_DEPTH2 - 8;
 
   signal wr_tmp2    : std_logic;
   signal data_tmp2  : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
@@ -289,7 +292,7 @@ begin
   begin
     sof_next        <= '0';
     eof_next        <= '0';
-    wr_next         <= '0';
+    sel_wr_next         <= '0';
     data_valid_next <= '0';
     cnt_next        <= cnt_r1;
     addr_next       <= addr_r1;
@@ -303,7 +306,7 @@ begin
         if i_start_auto_rd = '1' then
           sof_next        <= '1';
           data_valid_next <= '1';
-          wr_next         <= '0';
+          sel_wr_next         <= '0';
           addr_next       <= unsigned(i_addr_range_min);
 
           if i_data_valid = '1' then
@@ -316,7 +319,7 @@ begin
           sof_next        <= '0';
           eof_next        <= '0';
           data_valid_next <= i_data_valid;
-          wr_next         <= '1';
+          sel_wr_next         <= '1';
           addr_next       <= unsigned(i_addr);
           sm_state_next   <= E_WAIT;
         end if;
@@ -332,13 +335,13 @@ begin
         if prog_full_fsm = '0' then
           -- auto generate address
           data_valid_next <= '1';
-          wr_next         <= '0';
+          sel_wr_next     <= '0';
           addr_next       <= addr_r1 + 1;
           if cnt_r1 = c_CNT_MAX then
             eof_next      <= '1';
             sm_state_next <= E_WAIT;
           else
-            cnt_next      <= cnt_r1 + 1;
+            cnt_next        <= cnt_r1 + 1;
             sm_state_next <= E_AUTO_RD;
           end if;
         else
@@ -362,7 +365,7 @@ begin
       end if;
       sof_r1        <= sof_next;
       eof_r1        <= eof_next;
-      wr_r1         <= wr_next;
+      sel_wr_r1     <= sel_wr_next;
       data_valid_r1 <= data_valid_next;
       cnt_r1        <= cnt_next;
       addr_r1       <= addr_next;
@@ -391,7 +394,7 @@ begin
   ---------------------------------------------------------------------
   wr_rst_tmp0                                   <= i_rst;
   wr_tmp0                                       <= data_valid_r1;
-  data_tmp0(c_FIFO_IDX4_H)                      <= wr_r1;
+  data_tmp0(c_FIFO_IDX4_H)                      <= sel_wr_r1;
   data_tmp0(c_FIFO_IDX3_H)                      <= sof_r1;
   data_tmp0(c_FIFO_IDX2_H)                      <= eof_r1;
   data_tmp0(c_FIFO_IDX1_H downto c_FIFO_IDX1_L) <= std_logic_vector(addr_r1);
@@ -440,11 +443,11 @@ begin
 
   rd1 <= '1' when empty1 = '0' else '0';
 
-  wr1   <= data_tmp1(c_FIFO_IDX4_H);
-  sof1  <= data_tmp1(c_FIFO_IDX3_H);
-  eof1  <= data_tmp1(c_FIFO_IDX2_H);
-  addr1 <= data_tmp1(c_FIFO_IDX1_H downto c_FIFO_IDX1_L);
-  data1 <= data_tmp1(c_FIFO_IDX0_H downto c_FIFO_IDX0_L);
+  sel_wr1 <= data_tmp1(c_FIFO_IDX4_H);
+  sof1    <= data_tmp1(c_FIFO_IDX3_H);
+  eof1    <= data_tmp1(c_FIFO_IDX2_H);
+  addr1   <= data_tmp1(c_FIFO_IDX1_H downto c_FIFO_IDX1_L);
+  data1   <= data_tmp1(c_FIFO_IDX0_H downto c_FIFO_IDX0_L);
 
   ---------------------------------------------------------------------
   -- generate output
@@ -456,7 +459,7 @@ begin
       eof_sync_r1  <= eof1;
       -- generate flag
       if data_valid1 = '1' then
-        if wr1 = '1' then
+        if sel_wr1 = '1' then
           wr_sync_r1 <= '1';
           rd_sync_r1 <= '0';
         else
@@ -482,7 +485,7 @@ begin
 
   inst_pipeliner_add_delay_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => 1,
+      g_NB_PIPES   => c_DELAY_OUT,
       g_DATA_WIDTH => data_pipe_tmp2'length
     )
     port map(
@@ -514,7 +517,7 @@ begin
 
   inst_pipeliner_sync_with_rd_ram_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => g_RAM_RD_LATENCY,
+      g_NB_PIPES   => c_ADDR_DELAY_OUT,
       g_DATA_WIDTH => data_pipe_tmp0'length
     )
     port map(
