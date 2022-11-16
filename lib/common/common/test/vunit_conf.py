@@ -529,7 +529,7 @@ class VunitConf:
                               library_name_p=library_name, level_p=level0)
         return None
 
-    def compile_opal_kelly_lib(self, name_p='lib_opal_kelly', library_name_p='opal_kelly_lib', version_p='2008', level_p=None):
+    def compile_opal_kelly_lib(self, name_p='opal_kelly_lib', library_name_p='opal_kelly_lib', version_p='2008', level_p=None):
         """
         This method compiles the user-defined files associated to the opal kelly IP
         :param name_p: (string) name to print in the console
