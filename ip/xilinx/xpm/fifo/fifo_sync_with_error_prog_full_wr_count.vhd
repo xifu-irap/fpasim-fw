@@ -518,13 +518,12 @@ architecture RTL of fifo_sync_with_error_prog_full_wr_count is
   constant c_DELAY_FLAG : integer := 1;
   constant c_DELAY_OUT  : integer := 0;
   ---------------------------------------------------------------------
-  -- output
+  -- fifo
   ---------------------------------------------------------------------
   -- fifo: write side
   signal wr_full        : std_logic;
+  signal wr_prog_full   : std_logic;
   signal wr_rst_busy    : std_logic;
-
-  signal wr_prog_full  : std_logic;
   signal wr_data_count : std_logic_vector(g_WR_DATA_COUNT_WIDTH - 1 downto 0);
 
   -- fifo: read side
