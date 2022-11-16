@@ -71,7 +71,7 @@ entity tes_pulse_shape_manager is
     i_cmd_pulse_height        : in  std_logic_vector(10 downto 0); -- pulse height command
     i_cmd_pixel_id            : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id command
     i_cmd_time_shift          : in  std_logic_vector(3 downto 0); -- time shift command
-
+    o_cmd_ready               : out std_logic;
     -- RAM: pulse shape
     -- wr
     i_pulse_shape_wr_en       : in  std_logic; -- write enable
@@ -157,12 +157,15 @@ architecture RTL of tes_pulse_shape_manager is
   constant c_CMD_IDX2_H : integer := c_CMD_IDX2_L + i_cmd_pulse_height'length - 1;
 
   -- find the power of 2 superior to the g_DELAY
+  --constant c_FIFO_DEPTH0 : integer := c_PIXEL_NB_MAX; 
   constant c_FIFO_DEPTH0 : integer := 16; --see IP
+  constant c_FIFO_PROG_FULL : integer := c_FIFO_DEPTH0 - 5; --see IP
   constant c_FIFO_WIDTH0 : integer := c_CMD_IDX2_H + 1; --see IP
 
   signal wr_tmp0   : std_logic;
   signal data_tmp0 : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
   -- signal full0        : std_logic;
+   signal prog_full0        : std_logic;
   -- signal wr_rst_busy0 : std_logic;
 
   signal rd1       : std_logic;
@@ -358,11 +361,12 @@ begin
   data_tmp0(c_CMD_IDX1_H downto c_CMD_IDX1_L) <= i_cmd_pixel_id;
   data_tmp0(c_CMD_IDX0_H downto c_CMD_IDX0_L) <= i_cmd_time_shift;
 
-  inst_fifo_sync_with_error_cmd : entity fpasim.fifo_sync_with_error
+  inst_fifo_sync_with_error_prog_full_cmd : entity fpasim.fifo_sync_with_error_prog_full
     generic map(
       g_FIFO_MEMORY_TYPE  => "distributed",
       g_FIFO_READ_LATENCY => 1,
       g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH0,
+      g_PROG_FULL_THRESH  => c_FIFO_PROG_FULL,
       g_READ_DATA_WIDTH   => data_tmp0'length,
       g_READ_MODE         => "fwft",
       g_WRITE_DATA_WIDTH  => data_tmp0'length
@@ -376,6 +380,7 @@ begin
       i_wr_en         => wr_tmp0,
       i_wr_din        => data_tmp0,
       o_wr_full       => open,
+      o_wr_prog_full  => prog_full0,
       o_wr_rst_busy   => open,
       ---------------------------------------------------------------------
       -- port B
@@ -391,8 +396,16 @@ begin
       o_errors_sync   => errors_sync,
       o_empty_sync    => empty_sync
     );
-
   rd1 <= cmd_rd_r1;
+
+  p_prog_full : process( i_clk)
+  begin
+    if rising_edge(i_clk) then
+      o_cmd_ready  <= not(prog_full0);
+    end if;
+  end process p_prog_full;
+
+
 
   cmd_pulse_height1 <= data_tmp1(c_CMD_IDX2_H downto c_CMD_IDX2_L);
   cmd_pixel_id1     <= data_tmp1(c_CMD_IDX1_H downto c_CMD_IDX1_L);

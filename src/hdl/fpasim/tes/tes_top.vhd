@@ -69,7 +69,7 @@ entity tes_top is
     i_cmd_pulse_height        : in  std_logic_vector(10 downto 0); -- pulse height command
     i_cmd_pixel_id            : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id command
     i_cmd_time_shift          : in  std_logic_vector(3 downto 0); -- time shift command
-
+    o_cmd_ready               : out std_logic;
     -- RAM: pulse shape
     -- wr
     i_pulse_shape_wr_en       : in  std_logic; -- write enable
@@ -135,6 +135,7 @@ architecture RTL of tes_top is
   ---------------------------------------------------------------------
   -- tes_pulse_shape_manager
   ---------------------------------------------------------------------
+  signal cmd_ready             : std_logic;
   signal pulse_shape_rd_valid1 : std_logic;
   signal pulse_shape_rd_data1  : std_logic_vector(o_pulse_shape_rd_data'range);
 
@@ -238,6 +239,7 @@ begin
       i_cmd_pulse_height        => i_cmd_pulse_height, -- pulse height value
       i_cmd_pixel_id            => i_cmd_pixel_id, -- pixel id
       i_cmd_time_shift          => i_cmd_time_shift, -- time shift value
+      o_cmd_ready               => cmd_ready,
       -- RAM: pulse shape
       -- wr
       i_pulse_shape_wr_en       => i_pulse_shape_wr_en, -- write enable
@@ -279,6 +281,7 @@ begin
       o_status                  => status1
     );
 
+  o_cmd_ready <= cmd_ready;
   ---------------------------------------------------------------------
   -- sync with the tes_pulse_shape_manager out
   ---------------------------------------------------------------------
