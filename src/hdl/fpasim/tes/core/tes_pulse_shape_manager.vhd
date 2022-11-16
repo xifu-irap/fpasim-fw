@@ -180,6 +180,8 @@ architecture RTL of tes_pulse_shape_manager is
   signal errors_sync : std_logic_vector(3 downto 0);
   signal empty_sync  : std_logic;
 
+  signal cmd_ready_r1 : std_logic:= '0';
+
   ---------------------------------------------------------------------
   -- State machine
   ---------------------------------------------------------------------
@@ -401,10 +403,10 @@ begin
   p_prog_full : process( i_clk)
   begin
     if rising_edge(i_clk) then
-      o_cmd_ready  <= not(prog_full0);
+      cmd_ready_r1  <= not(prog_full0);
     end if;
   end process p_prog_full;
-
+o_cmd_ready <= cmd_ready_r1;
 
 
   cmd_pulse_height1 <= data_tmp1(c_CMD_IDX2_H downto c_CMD_IDX2_L);
