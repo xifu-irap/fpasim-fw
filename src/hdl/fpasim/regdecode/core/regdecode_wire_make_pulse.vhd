@@ -203,12 +203,12 @@ begin
       when E_WAIT =>
         if i_make_pulse_valid = '1' then
           data_valid_next   <= '1';
-          pixel_id_max_next <= unsigned(i_pixel_nb) - 1 - 1; -- 1 start @0 and -1 to anticipate
+          pixel_id_max_next <= unsigned(i_pixel_nb) - 1; -- 1 start @0 
 
           if pixel_all_tmp = '1' then
             sof_next      <= '1';
             pixel_id_next <= (others => '0');
-            if unsigned(i_pixel_nb) = to_unsigned(1, i_pixel_nb'length) then
+            if unsigned(i_pixel_nb) = to_unsigned(0, i_pixel_nb'length) then
               -- special case: one pixel
               eof_next      <= '1';
               sm_state_next <= E_WAIT;
