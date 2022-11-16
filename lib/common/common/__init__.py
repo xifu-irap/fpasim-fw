@@ -47,6 +47,7 @@ from common.test.tes_signalling_model import TesSignallingModel
 from common.test.tes_top_data_gen import TesTopDataGen
 from common.test.mux_squid_top_data_gen import MuxSquidTopDataGen
 from common.test.amp_squid_top_data_gen import AmpSquidTopDataGen
+from common.test.system_fpasim_top_data_gen import SystemFpasimTopDataGen
 
 
 
