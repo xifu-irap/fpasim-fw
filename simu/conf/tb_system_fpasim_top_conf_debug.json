@@ -1,0 +1,290 @@
+{
+  "description_list": [
+    "This file was manually generated"
+  ],
+  "sequence": {
+    "description_list": [
+      ""
+    ],
+    "output_tb_filename": "py_usb_data.csv",
+    "cmd_list": [
+      "usb_ctrl;wr;rst=1",
+      "usb_trig;wr;ctrl=1",
+      "usb_ctrl;wr;rst=0",
+      "usb_trig;wr;ctrl=1",
+      "usb_fpgasim_gain;wr;gain=1",
+      "usb_mux_sq_fb_delay;wr;gain=2",
+      "usb_amp_sq_of_delay;wr;gain=3",
+      "usb_error_delay;wr;gain=4",
+      "usb_ra_delay;wr;gain=5",
+      "usb_tes_conf;wr",
+      "usb_trig;wr;reg_valid=1",
+      "nop;wr;delay=16",
+      "usb_fpgasim_gain;rd;gain=1",
+      "usb_mux_sq_fb_delay;rd;gain=2",
+      "usb_amp_sq_of_delay;rd;gain=3",
+      "usb_error_delay;rd;gain=4",
+      "usb_ra_delay;rd;gain=5",
+      "usb_ctrl;wr;en=1",
+      "usb_trig;wr;ctrl=1",
+      "usb_make_pulse;wr;pixel_all=1;pixel_id=4;time_shift=5;pulse_height=6",
+      "usb_trig;wr;make_pulse=1"
+   
+    ]
+  },
+  "def": {
+    "@nop":
+    {
+      "usb_type": "nop",
+      "field":
+      {
+        "delay":
+        {
+          "value":1
+        }
+      }
+    },
+    "@usb_ctrl": {
+      "usb_type": "wire",
+      "wr": {
+        "usb_addr": "0x00"
+      },
+      "rd": {
+        "usb_addr": "0x20"
+      },
+      "field": {
+        "en": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        },
+        "rst": {
+          "value": 0,
+          "bit_pos_min": 1,
+          "width": 1
+        }
+      }
+    },
+    "@usb_trig": {
+      "usb_type": "trig",
+      "wr": {
+        "usb_addr": "0x40"
+      },
+      "field": {
+        "reg_valid": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        },
+        "make_pulse": {
+          "value": 0,
+          "bit_pos_min": 4,
+          "width": 1
+        },
+        "rd_all": {
+          "value": 0,
+          "bit_pos_min": 8,
+          "width": 1
+        },
+        "ctrl": {
+          "value": 0,
+          "bit_pos_min": 12,
+          "width": 1
+        },
+        "debug": {
+          "value": 0,
+          "bit_pos_min": 16,
+          "width": 1
+        }
+      }
+    },
+    "@usb_make_pulse": {
+      "usb_type": "wire",
+      "wr": {
+        "usb_addr": "0x01"
+      },
+      "rd": {
+        "usb_addr": "0x21"
+      },
+      "field": {
+        "pixel_all": {
+          "value": 0,
+          "bit_pos_min": 31,
+          "width": 1
+        },
+        "pixel_id": {
+          "value": 0,
+          "bit_pos_min": 24,
+          "width": 6
+        },
+        "time_shift": {
+          "value": 0,
+          "bit_pos_min": 16,
+          "width": 4
+        },
+        "pulse_height": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
+    "@usb_fpgasim_gain": {
+      "usb_type": "wire",
+      "wr": {
+        "usb_addr": "0x02"
+      },
+      "rd": {
+        "usb_addr": "0x22"
+      },
+      "field": {
+        "gain": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 3
+        }
+      }
+    },
+    "@usb_mux_sq_fb_delay": {
+      "usb_type": "wire",
+      "wr": {
+        "usb_addr": "0x03"
+      },
+      "rd": {
+        "usb_addr": "0x23"
+      },
+      "field": {
+        "gain": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_amp_sq_of_delay": {
+      "usb_type": "wire",
+      "wr": {
+        "usb_addr": "0x04"
+      },
+      "rd": {
+        "usb_addr": "0x24"
+      },
+      "field": {
+        "gain": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_error_delay": {
+      "usb_type": "wire",
+      "wr": {
+        "usb_addr": "0x05"
+      },
+      "rd": {
+        "usb_addr": "0x25"
+      },
+      "field": {
+        "gain": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_ra_delay": {
+      "usb_type": "wire",
+      "wr": {
+        "usb_addr": "0x06"
+      },
+      "rd": {
+        "usb_addr": "0x26"
+      },
+      "field": {
+        "gain": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_tes_conf": {
+      "usb_type": "wire",
+      "wr": {
+        "usb_addr": "0x07"
+      },
+      "rd": {
+        "usb_addr": "0x27"
+      },
+      "field": {
+        "nb_pixels": {
+          "value": 34,
+          "bit_pos_min": 24,
+          "width": 6
+        },
+        "nb_samples_by_pixel": {
+          "value": 40,
+          "bit_pos_min": 16,
+          "width": 7
+        },
+        "frame_size": {
+          "value": 1360,
+          "bit_pos_min": 0,
+          "width": 13
+        }
+      }
+    },
+    "@usb_ram": {
+      "usb_type": "pipe",
+      "wr": {
+        "usb_addr": "0x80"
+      },
+      "rd": {
+        "usb_addr": "0xA0"
+      },
+      "field": {
+        "tes_shape_pulse": {
+          "description_list": [
+            ""
+          ],
+          "name": "tes_shape_pulse",
+          "offset_addr": "0x0000",
+          "input_filename": "tes_response.csv"
+        },
+        "amp_squid_tf": {
+          "description_list": [
+            ""
+          ],
+          "name": "amp_squid_tf",
+          "offset_addr": "0x8000",
+          "input_filename": "amp_squid_tf.csv"
+        },
+        "mux_squid_tf": {
+          "description_list": [
+            ""
+          ],
+          "name": "mux_squid_tf",
+          "offset_addr": "0xC000",
+          "input_filename": "mux_squid_tf.csv"
+        },
+        "tes_steady_state": {
+          "description_list": [
+            ""
+          ],
+          "name": "tes_steady_state",
+          "offset_addr": "0xE000",
+          "input_filename": "tes_steady_state.csv"
+        },
+        "mux_squid_offset": {
+          "description_list": [
+            ""
+          ],
+          "name": "mux_squid_offset",
+          "offset_addr": "0xE040",
+          "input_filename": "mux_squid_offset.csv"
+        }
+      }
+    }
+  }
+}

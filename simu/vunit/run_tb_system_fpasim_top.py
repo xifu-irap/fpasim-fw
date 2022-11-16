@@ -112,7 +112,7 @@ if path_list != None:
 #################################################################
 from vunit import VUnit, VUnitCLI
 from common import Display, VunitConf
-from common import MuxSquidTopDataGen
+from common import SystemFpasimTopDataGen
      
 
 if __name__ == '__main__':
@@ -261,7 +261,7 @@ if __name__ == '__main__':
         ####################################################################
         # generate the input command/data files and others actions before launching the simulator
         ####################################################################
-        data_gen_obj = MuxSquidTopDataGen()
+        data_gen_obj = SystemFpasimTopDataGen()
         data_gen_obj.set_indentation_level(level_p= level1)
         data_gen_obj.set_conf_filepath(conf_filepath_p= conf_filepath)
         data_gen_obj.set_vunit_conf_obj(obj_p= obj)
@@ -273,11 +273,8 @@ if __name__ == '__main__':
         tb.add_config(
                       name=test_name,
         
-                      # pre_config=data_gen_obj.pre_config,
+                      pre_config=data_gen_obj.pre_config,
                       generics = generic_dic
-                        # {
-                        # "g_TEST_NAME":name
-                        # }
                         )
 
 

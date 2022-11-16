@@ -33,7 +33,7 @@ use ieee.numeric_std.all;
 library fpasim;
 
 library opal_kelly_lib;
-use opal_kelly_lib.pkg_front_panel.all;
+context opal_kelly_lib.opal_kelly_context;
 
 use fpasim.pkg_fpasim.all;
 
@@ -54,6 +54,9 @@ entity tb_system_fpasim_top is
   	---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
+
+    g_OPAL_ADDR_PIPE_IN : integer := 0;
+    g_OPAL_ADDR_PIPE_OUT : integer := 0;
     
     g_VUNIT_DEBUG                 : boolean  := true;
     g_TEST_NAME                   : string   := "";
@@ -155,11 +158,18 @@ architecture simulate of tb_system_fpasim_top is
   ---------------------------------------------------------------------
   -- Clock definition
   ---------------------------------------------------------------------
-  constant c_CLK_PERIOD0 : time := 9.259 ns;
+  constant c_CLK_PERIOD0 : time := 9.99206 ns; -- @100.8MHz (usb3 opal kelly speed)
   constant c_CLK_PERIOD1    : time := 4 ns;
   ---------------------------------------------------------------------
   -- Generate reading sequence
   ---------------------------------------------------------------------
+  -- ram tes pulse shape
+  signal ram1_wr_start      : std_logic                    := '0';
+  signal ram1_rd_start      : std_logic                    := '0';
+  signal ram1_rd_valid      : std_logic                    := '0';
+  signal ram1_wr_gen_finish : std_logic                    := '0';
+  signal ram1_rd_gen_finish : std_logic                    := '0';
+  signal ram1_wr_error         : std_logic_vector(0 downto 0) := (others => '0');
 
   -- data
   signal data_start             : std_logic := '0';
@@ -171,18 +181,19 @@ architecture simulate of tb_system_fpasim_top is
 
   signal data_stop : std_logic := '0';
 
+  signal o_opal_kelly_type : integer:= 8;
+  signal o_opal_kelly_addr : std_logic_vector(7 downto 0):= (others => '0');
+  signal o_data : std_logic_vector(31 downto 0):= (others => '0');
+  signal o_data_valid : std_logic;
+
   ---------------------------------------------------------------------
   -- filepath definition
   ---------------------------------------------------------------------
   constant c_CSV_SEPARATOR             : character := ';';
 
   -- input data generation
-  constant c_FILENAME_DATA_VALID_IN : string := "py_data_valid_sequencer_in.csv";
-  constant c_FILEPATH_DATA_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_VALID_IN;
-
-  constant c_FILENAME_DATA_IN : string := "py_data_in.csv";
+  constant c_FILENAME_DATA_IN : string := "py_usb_data.csv";
   constant c_FILEPATH_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_IN;
-
 
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
@@ -192,8 +203,7 @@ architecture simulate of tb_system_fpasim_top is
   -- checkers
   constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors");
   constant c_CHECKER_DATA_COUNT : checker_t := new_checker("check:data_count");
-  --constant c_CHECKER_RAM1       : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME);
-  --constant c_CHECKER_RAM2       : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME);
+  constant c_CHECKER_DATA       : checker_t := new_checker("check:data");
 
 
   --signal usb_if0 : opal_kelly_lib.pkg_front_panel.t_internal_if := opal_kelly_lib.pkg_front_panel.init_internal_if(0);
@@ -210,6 +220,9 @@ architecture simulate of tb_system_fpasim_top is
                                                                           );
 
 shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
+
+
+
 
 begin
 
@@ -272,103 +285,20 @@ begin
     info("    g_ENABLE_LOG = " & to_string(g_ENABLE_LOG));
 
     info("Test bench: input files");
-    info("    c_FILEPATH_DATA_VALID_IN = " & c_FILEPATH_DATA_VALID_IN);
     info("    c_FILEPATH_DATA_IN = " & c_FILEPATH_DATA_IN);
 
-
-    ---------------------------------------------------------------------
-    -- reset
-    ---------------------------------------------------------------------
-    info("Reset the USB core");
-    opal_kelly_lib.pkg_front_panel.FrontPanelReset(
-                                                   --i_clk => usb_clk,
-                                                   front_panel_conf => v_front_panel_conf,
-                                                   internal_wr_if => usb_wr_if0,
-                                                   internal_rd_if => usb_rd_if0
-                                                   );
-    info("end FrontPanelReset");
-    pkg_wait_nb_rising_edge_plus_margin(i_clk=> usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-    
-
-
-    ---------------------------------------------------------------------
-    -- Data Generation
-    ---------------------------------------------------------------------
-    info("Start data Generation");
-    data_start <= '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk=> usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-
-
-    ---------------------------------------------------------------------
-    -- Set a WireIn
-    ---------------------------------------------------------------------
-    info("Start: SetWireInValue");
-    SetWireInValue(ep=>x"00" ,val=>x"0000_0001" ,mask=> v_NO_MASK ,front_panel_conf=> v_front_panel_conf);
-    info("End: SetWireInValue");
-
-    info("Start: UpdateWireIns");
-    UpdateWireIns(
-                  --i_clk=>usb_clk,
-                  front_panel_conf=> v_front_panel_conf,
-                  internal_wr_if => usb_wr_if0,
-                  internal_rd_if => usb_rd_if0);
-    info("End UpdateWireIns");
-
-    ---------------------------------------------------------------------
-    -- Set a Trigger
-    ---------------------------------------------------------------------
-    info("Start: ActivateTriggerIn");
-    ActivateTriggerIn(
-                      --i_clk=> usb_clk,
-                      ep=> x"40",
-                      bit=>12,
-                      internal_wr_if => usb_wr_if0,
-                      internal_rd_if => usb_rd_if0
-                   );
-    info("End: ActivateTriggerIn");
-
-
-    ---------------------------------------------------------------------
+   ---------------------------------------------------------------------
     -- add tempo
     ---------------------------------------------------------------------
     pkg_wait_nb_rising_edge_plus_margin(i_clk=> usb_clk, i_nb_rising_edge => 16, i_margin => 12 ps);
 
-
     ---------------------------------------------------------------------
-    -- Read WireOut
+    -- conf RAM
     ---------------------------------------------------------------------
-    info("Start: UpdateWireOuts");
-    UpdateWireOuts(
-        --i_clk            => usb_clk,
-        front_panel_conf => v_front_panel_conf,
-        internal_wr_if   => usb_wr_if0,
-        internal_rd_if   => usb_rd_if0
-        );
-    info("End: UpdateWireOuts");
-
-    info("Start: GetWireOutValue");
-    GetWireOutValue(
-        ep  => x"20",
-        front_panel_conf => v_front_panel_conf,
-        result=> v_tmp32);
-    info("End: GetWireOutValue: " & to_string(v_tmp32) );
-
-    -----------------------------------------------------------------------
-    ---- write pipe
-    -----------------------------------------------------------------------
-    v_front_panel_conf.set_pipeIn(index=> 0, value=> x"CA");
-    v_front_panel_conf.set_pipeIn(index=> 1, value=> x"DE");
-    v_front_panel_conf.set_pipeIn(index=> 2, value=> x"00");
-    v_front_panel_conf.set_pipeIn(index=> 3, value=> x"00");
-    WriteToPipeIn(
-        --i_clk => usb_clk,
-        ep    => x"80",
-        length => 4,--write length expressed in bytes
-        front_panel_conf => v_front_panel_conf,
-        internal_wr_if   => usb_wr_if0,
-        internal_rd_if   => usb_rd_if0
-        );
-
+    info("Start: USB configuration");
+    ram1_wr_start <= '1';
+    wait on usb_clk until ram1_wr_gen_finish = '1';
+    info("End: USB confiuration");
 
 
     ---------------------------------------------------------------------
@@ -387,15 +317,11 @@ begin
     --val_v := to_integer(unsigned(o_errors));
 
     --check_equal(c_CHECKER_ERRORS, 0, val_v, result("checker output errors"));
-    --check_equal(c_CHECKER_DATA_COUNT, data_count_in, data_count_out, result("checker input/output data count"));
 
-    ---- summary
-    --info(c_LOGGER_SUMMARY, "===Summary===" & LF &
-    -- "c_CHECKER_RAM1: " & to_string(get_checker_stat(c_CHECKER_RAM1)) & LF &
-    --  "c_CHECKER_RAM2: " & to_string(get_checker_stat(c_CHECKER_RAM2)) & LF &
-    --   "c_CHECKER_ERRORS: " & to_string(get_checker_stat(c_CHECKER_ERRORS)) & LF &
-    --    "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(c_CHECKER_DATA_COUNT))
-    --);
+    -- summary
+    info(c_LOGGER_SUMMARY, "===Summary===" & LF &
+       "c_CHECKER_DATA: " & to_string(get_checker_stat(c_CHECKER_DATA))
+    );
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk=> usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
@@ -411,36 +337,73 @@ begin
 ---------------------------------------------------------------------
 -- Input/Output: USB controller
 ---------------------------------------------------------------------
-  --opal_kelly_lib.pkg_front_panel.okHost_driver(
-  --  i_clk       => usb_clk,
-  --  okUH        => okUH,
-  --  okHU        => okHU,
-  --  okUHU       => okUHU,
-  --  internal_if => usb_if0
-  --  );
-  --okUH(0)          <= usb_clk;
-  --okUH(1)          <= usb_if0.hi_drive;
-  --okUH(4 downto 2) <= usb_if0.hi_cmd; 
-  --okUHU            <= usb_if0.hi_dataout when (usb_if0.hi_drive = '1') else (others => 'Z');
-  --usb_if0.hi_datain        <= okUHU;
-  --usb_if0.hi_busy          <= okHU(0); 
 
   opal_kelly_lib.pkg_front_panel.okHost_driver(
     i_clk       => usb_clk,
-    okUH        => okUH,
-    okHU        => okHU,
-    okUHU       => okUHU,
-    internal_wr_if => usb_wr_if0,
-    internal_rd_if => usb_rd_if0
+    o_okUH        => okUH,
+    i_okHU        => okHU,
+    b_okUHU       => okUHU,
+    i_internal_wr_if => usb_wr_if0,
+    o_internal_rd_if => usb_rd_if0
     );
 
-  -- okUH(0)          <= usb_clk;
-  --okUH(1)          <= usb_wr_if0.hi_drive;
-  --okUH(4 downto 2) <= usb_wr_if0.hi_cmd; 
-  --okUHU            <= usb_wr_if0.hi_dataout when (usb_wr_if0.hi_drive = '1') else (others => 'Z');
-  --usb_rd_if0.hi_datain        <= okUHU;
-  --usb_rd_if0.hi_busy          <= okHU(0); 
+---------------------------------------------------------------------
+-- wr conf
+---------------------------------------------------------------------
+ram1_rd_valid <= '1';
+gen_conf_RAM: if true generate
 
+begin
+ pkg_usb_wr(
+     i_clk      => usb_clk,
+     i_start_wr => ram1_wr_start,
+    ---------------------------------------------------------------------
+    -- input file
+    ---------------------------------------------------------------------
+    i_filepath_wr  => c_FILEPATH_DATA_IN,
+    i_csv_separator => c_CSV_SEPARATOR,
+
+    --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
+    --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
+    --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
+    --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
+     i_USB_WR_ADDR_COMMON_TYP => "HEX",
+     i_USB_WR_DATA_COMMON_TYP => "HEX",
+
+    
+    ---------------------------------------------------------------------
+    -- command
+    ---------------------------------------------------------------------
+     i_wr_ready       =>  ram1_rd_valid,
+
+    ---------------------------------------------------------------------
+    -- usb
+    ---------------------------------------------------------------------
+     b_front_panel_conf => v_front_panel_conf,
+     o_internal_wr_if => usb_wr_if0,
+     i_internal_rd_if => usb_rd_if0,
+
+    i_data0_sb => c_CHECKER_DATA,
+    ---------------------------------------------------------------------
+    -- data
+    ---------------------------------------------------------------------
+     o_opal_kelly_type=> o_opal_kelly_type,
+     o_opal_kelly_addr=> o_opal_kelly_addr,
+     o_data_valid => o_data_valid,
+     o_data=> o_data,
+
+    ---------------------------------------------------------------------
+    -- status
+    ---------------------------------------------------------------------
+     o_wr_finish => ram1_wr_gen_finish,
+     o_error     => ram1_wr_error
+    );
+end generate gen_conf_RAM;
+ 
+
+---------------------------------------------------------------------
+-- Data Generation
+---------------------------------------------------------------------
 
   data_gen : process (sys_clk) is
   begin
