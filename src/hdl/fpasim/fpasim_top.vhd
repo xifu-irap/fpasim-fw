@@ -216,7 +216,7 @@ architecture RTL of top_fpasim is
   signal cmd_pixel_id     : std_logic_vector(c_MAKE_PULSE_PIXEL_ID_WIDTH - 1 downto 0);
   signal cmd_time_shift   : std_logic_vector(c_MAKE_PULSE_TIME_SHIFT_WIDTH - 1 downto 0);
   signal cmd_pulse_height : std_logic_vector(c_MAKE_PULSE_PULSE_HEIGHT_WIDTH - 1 downto 0);
-
+  signal cmd_ready        : std_logic;
   signal fpasim_gain : std_logic_vector(c_FPASIM_GAIN_WIDTH - 1 downto 0);
 
   -- mux_sq_fb_delay register
@@ -316,9 +316,7 @@ architecture RTL of top_fpasim is
   signal reg_make_eof         : std_logic;  -- last sample
   signal reg_make_pulse_valid : std_logic;  -- register make_pulse valid
   signal reg_make_pulse       : std_logic_vector(31 downto 0);
-
-
-
+  signal reg_make_pulse_ready : std_logic;
 
   signal pipe_errors5 : std_logic_vector(15 downto 0);
   signal pipe_errors4 : std_logic_vector(15 downto 0);
@@ -588,7 +586,7 @@ begin
       o_reg_make_eof                    => reg_make_eof,  -- last sample
       o_reg_make_pulse_valid            => reg_make_pulse_valid,  -- register make_pulse valid
       o_reg_make_pulse                  => reg_make_pulse,  -- register make_pulse value
-
+      i_reg_make_pulse_ready            => reg_make_pulse_ready,
       -- to the usb 
       ---------------------------------------------------------------------
       -- errors
@@ -655,7 +653,8 @@ begin
   cmd_pixel_id     <= reg_make_pulse(c_MAKE_PULSE_PIXEL_ID_IDX_H downto c_MAKE_PULSE_PIXEL_ID_IDX_L);
   cmd_time_shift   <= reg_make_pulse(c_MAKE_PULSE_TIME_SHIFT_IDX_H downto c_MAKE_PULSE_TIME_SHIFT_IDX_L);
   cmd_pulse_height <= reg_make_pulse(c_MAKE_PULSE_PULSE_HEIGHT_IDX_H downto c_MAKE_PULSE_PULSE_HEIGHT_IDX_L);
-
+  reg_make_pulse_ready <= cmd_ready;
+  
 -- extract fields from the reg_fpasim_gain
   fpasim_gain <= reg_fpasim_gain(c_FPASIM_GAIN_IDX_H downto c_FPASIM_GAIN_IDX_L);
 
@@ -834,6 +833,7 @@ begin
       i_cmd_pulse_height        => cmd_pulse_height,
       i_cmd_pixel_id            => cmd_pixel_id,
       i_cmd_time_shift          => cmd_time_shift,
+      o_cmd_ready               => cmd_ready,
       -- RAM: pulse shape
       -- wr
       i_pulse_shape_wr_en       => tes_pulse_shape_ram_wr_en,
