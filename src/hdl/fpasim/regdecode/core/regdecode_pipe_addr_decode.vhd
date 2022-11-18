@@ -39,8 +39,8 @@ use fpasim.pkg_regdecode.all;
 
 entity regdecode_pipe_addr_decode is
   generic(
-    g_ADDR_WIDTH : integer := 16; -- address bus width
-    g_DATA_WIDTH : integer := 16 -- data bus width
+    g_ADDR_WIDTH : integer := 16;       -- address bus width
+    g_DATA_WIDTH : integer := 16        -- data bus width
   );
   port(
     i_clk                    : in  std_logic; -- clock

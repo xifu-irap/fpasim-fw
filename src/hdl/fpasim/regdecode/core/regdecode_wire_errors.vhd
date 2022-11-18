@@ -272,7 +272,7 @@ begin
         i_wr_rst        => '0',
         i_wr_en         => wr_en_flag(i),
         i_wr_din        => wr_din_flag(i),
-        o_wr_full       => open, 
+        o_wr_full       => open,
         o_wr_rst_busy   => wr_rst_busy_flag(i),
         ---------------------------------------------------------------------
         -- read side
@@ -299,30 +299,30 @@ begin
   begin
     if rising_edge(i_out_clk) then
       case i_error_sel is
-          when "000" => 
+        when "000" =>
           errors_r1 <= errors_tmp1(0);
           status_r1 <= status_tmp1(0);
-          when "001" => 
+        when "001" =>
           errors_r1 <= errors_tmp1(1);
           status_r1 <= status_tmp1(1);
-          when "010" => 
+        when "010" =>
           errors_r1 <= errors_tmp1(2);
           status_r1 <= status_tmp1(2);
-          when "011" => 
+        when "011" =>
           errors_r1 <= errors_tmp1(3);
           status_r1 <= status_tmp1(3);
-          when "100" => 
+        when "100" =>
           errors_r1 <= errors_tmp1(4);
           status_r1 <= status_tmp1(4);
-          when "101" => 
+        when "101" =>
           errors_r1 <= errors_tmp1(5);
           status_r1 <= status_tmp1(5);
-          when "110" => 
+        when "110" =>
           errors_r1 <= errors_tmp1(6);
           status_r1 <= status_tmp1(6);
-          when others => 
-            errors_r1 <= errors_tmp1(7);
-            status_r1 <= status_tmp1(7);
+        when others =>
+          errors_r1 <= errors_tmp1(7);
+          status_r1 <= status_tmp1(7);
       end case;
 
       for i in errors_tmp1'range loop

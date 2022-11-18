@@ -66,7 +66,7 @@ entity regdecode_wire_make_pulse_wr_rd is
     i_rst_status      : in  std_logic;  -- reset error flag(s)
     i_debug_pulse     : in  std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     -- ram: wr
-    i_data_rd         : in std_logic;
+    i_data_rd         : in  std_logic;
     o_data_valid      : out std_logic;  -- data valid
     o_data            : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0); -- data
     o_empty           : out std_logic;
@@ -94,17 +94,17 @@ architecture RTL of regdecode_wire_make_pulse_wr_rd is
   constant c_FIFO_IDX0_L : integer := 0;
   constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + i_data'length - 1;
 
-  constant c_FIFO_DEPTH0 : integer := 16; --see IP
-  constant c_FIFO_PROG_FULL0 : integer := c_FIFO_DEPTH0 - 4; --see IP
-  constant c_FIFO_WIDTH0:  integer := c_FIFO_IDX0_H + 1; --see IP
-  constant c_FIFO_WR_DATA_WIDTH0 : integer := integer(log2(real(c_FIFO_DEPTH0)))+1; --see IP
+  constant c_FIFO_DEPTH0         : integer := 16; --see IP
+  constant c_FIFO_PROG_FULL0     : integer := c_FIFO_DEPTH0 - 4; --see IP
+  constant c_FIFO_WIDTH0         : integer := c_FIFO_IDX0_H + 1; --see IP
+  constant c_FIFO_WR_DATA_WIDTH0 : integer := integer(log2(real(c_FIFO_DEPTH0))) + 1; --see IP
 
-  signal wr_rst_tmp0 : std_logic;
-  signal wr_tmp0     : std_logic;
-  signal data_tmp0   : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  signal wr_rst_tmp0    : std_logic;
+  signal wr_tmp0        : std_logic;
+  signal data_tmp0      : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
   -- signal full0        : std_logic;
-   signal prog_full0     : std_logic;
-   signal wr_data_count0 :  std_logic_vector(c_FIFO_WR_DATA_WIDTH0 - 1 downto 0);
+  signal prog_full0     : std_logic;
+  signal wr_data_count0 : std_logic_vector(c_FIFO_WR_DATA_WIDTH0 - 1 downto 0);
   -- signal wr_rst_busy0 : std_logic;
 
   signal rd1         : std_logic;
@@ -180,20 +180,20 @@ begin
 
   inst_fifo_async_with_error_prog_full_wr_count_regdecode_to_user : entity fpasim.fifo_async_with_error_prog_full_wr_count
     generic map(
-      g_CDC_SYNC_STAGES   => 2,
-      g_FIFO_MEMORY_TYPE  => "distributed",
-      g_FIFO_READ_LATENCY => 1,
-      g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH0,
-      g_PROG_FULL_THRESH  => c_FIFO_PROG_FULL0,
-      g_READ_DATA_WIDTH   => data_tmp0'length,
-      g_READ_MODE         => "std",
-      g_RELATED_CLOCKS    => 0,
-      g_WRITE_DATA_WIDTH  => data_tmp0'length,
+      g_CDC_SYNC_STAGES     => 2,
+      g_FIFO_MEMORY_TYPE    => "distributed",
+      g_FIFO_READ_LATENCY   => 1,
+      g_FIFO_WRITE_DEPTH    => c_FIFO_DEPTH0,
+      g_PROG_FULL_THRESH    => c_FIFO_PROG_FULL0,
+      g_READ_DATA_WIDTH     => data_tmp0'length,
+      g_READ_MODE           => "std",
+      g_RELATED_CLOCKS      => 0,
+      g_WRITE_DATA_WIDTH    => data_tmp0'length,
       g_WR_DATA_COUNT_WIDTH => c_FIFO_WR_DATA_WIDTH0,
       ---------------------------------------------------------------------
       -- resynchronization: fifo errors/empty flag
       ---------------------------------------------------------------------
-      g_SYNC_SIDE         => "rd"      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
+      g_SYNC_SIDE           => "rd"     -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
     )
     port map(
       ---------------------------------------------------------------------
@@ -230,24 +230,23 @@ begin
   ---------------------------------------------------------------------
   -- generate fifo ready signal (wr side)
   ---------------------------------------------------------------------
-  p_wr_ready: process (i_clk) is
+  p_wr_ready : process(i_clk) is
   begin
     if rising_edge(i_clk) then
-      ready_r1  <= not(prog_full0);     
+      ready_r1 <= not (prog_full0);
     end if;
   end process p_wr_ready;
   ---------------------------------------------------------------------
   -- to the usb: output
   ---------------------------------------------------------------------
-  o_wr_data_count <= std_logic_vector(resize(unsigned(wr_data_count0),o_wr_data_count'length));
+  o_wr_data_count <= std_logic_vector(resize(unsigned(wr_data_count0), o_wr_data_count'length));
   o_ready         <= ready_r1;
   ---------------------------------------------------------------------
   -- to the user: output
   ---------------------------------------------------------------------
-  o_data_valid <= data_valid1;
-  o_data       <= data1;
-  o_empty      <= empty1;
-  
+  o_data_valid    <= data_valid1;
+  o_data          <= data1;
+  o_empty         <= empty1;
 
   ---------------------------------------------------------------------
   -- optional: add latency before writing
@@ -287,7 +286,7 @@ begin
       ---------------------------------------------------------------------
       -- resynchronization: fifo errors/empty flag
       ---------------------------------------------------------------------
-      g_SYNC_SIDE         => "wr"      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
+      g_SYNC_SIDE         => "wr"       -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
 
     )
     port map(

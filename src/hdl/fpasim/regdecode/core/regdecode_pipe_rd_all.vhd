@@ -48,15 +48,15 @@ library fpasim;
 
 entity regdecode_pipe_rd_all is
   generic(
-    g_ADDR_WIDTH    : integer := 16;    -- define the address bus width
-    g_DATA_WIDTH    : integer := 16;    -- define the data bus width
-   -- +---------------------------------------------------------------------------------------------------------------------+
+    g_ADDR_WIDTH      : integer := 16;  -- define the address bus width
+    g_DATA_WIDTH      : integer := 16;  -- define the data bus width
+    -- +---------------------------------------------------------------------------------------------------------------------+
     -- | CDC_SYNC_STAGES      | Integer            | Range: 2 - 8. Default value = 2.                                        |
     -- |---------------------------------------------------------------------------------------------------------------------|
     -- | Specifies the number of synchronization stages on the CDC path                                                      |
     -- |                                                                                                                     |
     -- |   Must be < 5 if FIFO_WRITE_DEPTH = 16       
-    g_CDC_SYNC_STAGES : integer := 2  -- resynchronized errors bits
+    g_CDC_SYNC_STAGES : integer := 2    -- resynchronized errors bits
   );
   port(
     i_clk              : in  std_logic; -- clock
@@ -131,7 +131,7 @@ architecture RTL of regdecode_pipe_rd_all is
   ---------------------------------------------------------------------
   type t_state is (E_RST, E_WAIT, E_RUN0, E_RUN1, E_RUN2, E_RUN3, E_RUN4);
   signal sm_state_next : t_state := E_RST;
-  signal sm_state_r1  : t_state := E_RST;
+  signal sm_state_r1   : t_state := E_RST;
 
   signal rd0_next : std_logic;
   -- signal rd0_r1   : std_logic;
@@ -452,9 +452,8 @@ begin
   ---------------------------------------------------------------------
   gen_bit_synchronizer : for i in 4 downto 0 generate
     signal data_tmp      : std_logic_vector(4 downto 0);
-    signal wr_r         : std_logic;
-    signal data_r       : std_logic_vector(4 downto 0);
-    signal data_tmp_sync : std_logic_vector(4 downto 0);
+    signal wr_r          : std_logic;
+    signal data_r        : std_logic_vector(4 downto 0);
 
     signal wr_en_flag       : std_logic;
     signal wr_din_flag      : std_logic_vector(4 downto 0);
@@ -469,7 +468,7 @@ begin
     data_tmp(4)          <= empty_sync;
     data_tmp(3 downto 0) <= errors_sync;
 
-     p_detect_change : process(i_clk) is
+    p_detect_change : process(i_clk) is
     begin
       if rising_edge(i_clk) then
         data_r <= data_tmp;
@@ -486,7 +485,7 @@ begin
 
     inst_fifo_async_flag : entity fpasim.fifo_async
       generic map(
-        g_CDC_SYNC_STAGES   => 2,
+        g_CDC_SYNC_STAGES   => g_CDC_SYNC_STAGES,
         g_FIFO_MEMORY_TYPE  => "distributed",
         g_FIFO_READ_LATENCY => 1,
         g_FIFO_WRITE_DEPTH  => 16,
@@ -516,7 +515,7 @@ begin
         o_rd_rst_busy   => rd_rst_busy_flag
       );
 
-     rd_en_flag <= '1' when rd_empty_flag = '0' and rd_rst_busy_flag = '0' else '0';
+    rd_en_flag <= '1' when rd_empty_flag = '0' and rd_rst_busy_flag = '0' else '0';
 
     -- resync
     empty_resync  <= rd_dout_flag(4);

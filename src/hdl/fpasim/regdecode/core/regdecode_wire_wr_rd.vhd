@@ -180,7 +180,7 @@ begin
       ---------------------------------------------------------------------
       -- resynchronization: fifo errors/empty flag
       ---------------------------------------------------------------------
-      g_SYNC_SIDE         => "rd"      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
+      g_SYNC_SIDE         => "rd"       -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
     )
     port map(
       ---------------------------------------------------------------------
@@ -223,6 +223,7 @@ begin
   ---------------------------------------------------------------------
   data_pipe_tmp0(c_PIPE_IDX1_H)                      <= data_valid1;
   data_pipe_tmp0(c_PIPE_IDX0_H downto c_PIPE_IDX0_L) <= data1;
+
   inst_pipeliner_sync_with_rd_ram_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_WR_TO_RD_DELAY,
@@ -233,8 +234,9 @@ begin
       i_data => data_pipe_tmp0,
       o_data => data_pipe_tmp1
     );
-  data_valid_sync_rx                                 <= data_pipe_tmp1(c_PIPE_IDX1_H);
-  data_sync_rx                                       <= data_pipe_tmp1(c_PIPE_IDX0_H downto c_PIPE_IDX0_L);
+
+  data_valid_sync_rx <= data_pipe_tmp1(c_PIPE_IDX1_H);
+  data_sync_rx       <= data_pipe_tmp1(c_PIPE_IDX0_H downto c_PIPE_IDX0_L);
 
   ---------------------------------------------------------------------
   -- cross clock domain: 
@@ -256,7 +258,7 @@ begin
       ---------------------------------------------------------------------
       -- resynchronization: fifo errors/empty flag
       ---------------------------------------------------------------------
-      g_SYNC_SIDE         => "wr"      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
+      g_SYNC_SIDE         => "wr"       -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
 
     )
     port map(

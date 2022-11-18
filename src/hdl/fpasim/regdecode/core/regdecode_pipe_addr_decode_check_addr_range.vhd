@@ -65,13 +65,13 @@ architecture RTL of regdecode_pipe_addr_decode_check_addr_range is
   --  1. i_addr_range_min <= i_addr
   --  2. i_addr <= i_addr_range_max
   ---------------------------------------------------------------------
-  signal data_valid_low_r1  : std_logic:= '0';
-  signal data_valid_high_r1 : std_logic:= '0';
+  signal data_valid_low_r1  : std_logic := '0';
+  signal data_valid_high_r1 : std_logic := '0';
 
   ---------------------------------------------------------------------
   -- combine address => check if i_addr_min <= i_addr <= i_addr_range_max
   ---------------------------------------------------------------------
-  signal data_valid_r2 : std_logic:= '0';
+  signal data_valid_r2 : std_logic := '0';
 
 begin
 

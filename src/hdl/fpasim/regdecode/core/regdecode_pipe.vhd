@@ -393,7 +393,7 @@ begin
       i_rst             => i_rst,       -- reset
       -- command
       i_start_auto_rd   => i_start_auto_rd, -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_TES_PULSE_SHAPE_ADDR_RANGE_MIN, -- minimal address range
+      i_addr_range_min  => c_TES_PULSE_SHAPE_ADDR_RANGE_MIN, -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
       -- data
       i_data_valid      => tes_pulse_shape_wr_en0, -- input data valid
       i_addr            => addr0,       -- input address
@@ -460,7 +460,7 @@ begin
       i_rst             => i_rst,       -- reset
       -- command
       i_start_auto_rd   => i_start_auto_rd, -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_AMP_SQUID_TF_ADDR_RANGE_MIN, -- minimal address range
+      i_addr_range_min  => c_AMP_SQUID_TF_ADDR_RANGE_MIN, -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
       -- data
       i_data_valid      => amp_squid_tf_wr_en0, -- input data valid
       i_addr            => addr0,       -- input address
@@ -527,7 +527,7 @@ begin
       i_rst             => i_rst,       -- reset
       -- command
       i_start_auto_rd   => i_start_auto_rd, -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_MUX_SQUID_TF_ADDR_RANGE_MIN, -- minimal address range
+      i_addr_range_min  => c_MUX_SQUID_TF_ADDR_RANGE_MIN, -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
       -- data
       i_data_valid      => mux_squid_tf_wr_en0, -- input data valid
       i_addr            => addr0,       -- input address
@@ -594,7 +594,7 @@ begin
       i_rst             => i_rst,       -- reset
       -- command
       i_start_auto_rd   => i_start_auto_rd, -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_TES_STD_STATE_ADDR_RANGE_MIN, -- minimal address range
+      i_addr_range_min  => c_TES_STD_STATE_ADDR_RANGE_MIN, -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
       -- data
       i_data_valid      => tes_std_state_wr_en0, -- input data valid
       i_addr            => addr0,       -- input address
@@ -661,7 +661,7 @@ begin
       i_rst             => i_rst,       -- reset
       -- command
       i_start_auto_rd   => i_start_auto_rd, -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN, -- minimal address range
+      i_addr_range_min  => c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN, -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
       -- data
       i_data_valid      => mux_squid_offset_wr_en0, -- input data valid
       i_addr            => addr0,       -- input address
@@ -713,8 +713,8 @@ begin
   ---------------------------------------------------------------------
   inst_regdecode_pipe_rd_all : entity fpasim.regdecode_pipe_rd_all
     generic map(
-      g_ADDR_WIDTH    => fifo_addr'length,
-      g_DATA_WIDTH    => fifo_data'length,
+      g_ADDR_WIDTH      => fifo_addr'length,
+      g_DATA_WIDTH      => fifo_data'length,
       -- resynchronized errors bits
       g_CDC_SYNC_STAGES => 2
     )

@@ -74,7 +74,7 @@ entity regdecode_wire_make_pulse is
     i_rst_status       : in  std_logic; -- reset error flag(s)
     i_debug_pulse      : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     -- extracted command
-    i_data_rd          : in std_logic;
+    i_data_rd          : in  std_logic;
     o_data_valid       : out std_logic;
     o_sof              : out std_logic;
     o_eof              : out std_logic;
@@ -148,9 +148,9 @@ architecture RTL of regdecode_wire_make_pulse is
   constant c_IDX2_L : integer := c_IDX1_H + 1;
   constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
 
-  signal data_valid_tmp0 : std_logic;
-  signal data_tmp0       : std_logic_vector(c_IDX2_H downto 0);
-  signal ready_tmp0      : std_logic;
+  signal data_valid_tmp0    : std_logic;
+  signal data_tmp0          : std_logic_vector(c_IDX2_H downto 0);
+  signal ready_tmp0         : std_logic;
   signal wr_data_count_tmp0 : std_logic_vector(o_wr_data_count'range);
 
   signal rd_tmp1         : std_logic;
@@ -158,11 +158,10 @@ architecture RTL of regdecode_wire_make_pulse is
   signal data_tmp1       : std_logic_vector(c_IDX2_H downto 0);
   signal empty_tmp1      : std_logic;
 
-
   signal rd_tmp2         : std_logic;
   signal data_valid_tmp2 : std_logic;
   signal data_tmp2       : std_logic_vector(c_IDX2_H downto 0);
-  signal empty_tmp2         : std_logic;
+  signal empty_tmp2      : std_logic;
 
   signal errors : std_logic_vector(o_errors'range);
   signal status : std_logic_vector(o_status'range);
@@ -182,7 +181,7 @@ architecture RTL of regdecode_wire_make_pulse is
 begin
   -- extract fields 
   pixel_all_tmp <= i_make_pulse(c_PIXEL_ALL_IDX);
-  pixel_id_tmp  <= i_make_pulse(c_PIXEL_ID_IDX_H downto c_PIXEL_ID_IDX_L);
+  pixel_id_tmp  <= i_make_pulse(c_PIXEL_ID_IDX_H downto c_PIXEL_ID_IDX_L); -- @suppress "Incorrect array size in assignment: expected (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>) but was (<6>)"
 
   ---------------------------------------------------------------------
   -- fsm
@@ -203,7 +202,7 @@ begin
       when E_WAIT =>
         if i_make_pulse_valid = '1' then
           data_valid_next   <= '1';
-          pixel_id_max_next <= unsigned(i_pixel_nb) - 1; -- 1 start @0 
+          pixel_id_max_next <= unsigned(i_pixel_nb) - 1; -- 1 start @0  -- @suppress "Incorrect array size in assignment: expected (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>) but was (<g_PIXEL_NB_WIDTH>)"
 
           if pixel_all_tmp = '1' then
             sof_next      <= '1';
@@ -234,16 +233,16 @@ begin
           error_next <= '0';
         end if;
         if ready_tmp0 = '1' then
-            data_valid_next <= '1';
-            pixel_id_next <= pixel_id_r1 + 1;
-            if pixel_id_max_r1 = pixel_id_r1 then
-              eof_next      <= '1';
-              sm_state_next <= E_WAIT;
-            else
-              sm_state_next <= E_GEN_PIXEL_ID;
-            end if;
+          data_valid_next <= '1';
+          pixel_id_next   <= pixel_id_r1 + 1;
+          if pixel_id_max_r1 = pixel_id_r1 then
+            eof_next      <= '1';
+            sm_state_next <= E_WAIT;
+          else
+            sm_state_next <= E_GEN_PIXEL_ID;
+          end if;
         else
-             sm_state_next <= E_GEN_PIXEL_ID;
+          sm_state_next <= E_GEN_PIXEL_ID;
         end if;
       when others =>                    -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
         sm_state_next <= E_RST;
@@ -286,7 +285,7 @@ begin
   -- keep the input data fields (above the pixel id field)
   tmp(data_r1'high downto c_PIXEL_ID_IDX_H + 1) <= data_r1(data_r1'high downto c_PIXEL_ID_IDX_H + 1);
   -- replace the pixed id field
-  tmp(c_PIXEL_ID_IDX_H downto c_PIXEL_ID_IDX_L) <= std_logic_vector(pixel_id_r1);
+  tmp(c_PIXEL_ID_IDX_H downto c_PIXEL_ID_IDX_L) <= std_logic_vector(pixel_id_r1); -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>)"
   -- keep the input data field (below the pixel id field)
   tmp(c_PIXEL_ID_IDX_L - 1 downto 0)            <= data_r1(c_PIXEL_ID_IDX_L - 1 downto 0);
 
@@ -339,8 +338,8 @@ begin
       o_status          => status       -- output status
     );
 
-  rd_tmp1  <= i_fifo_rd;
-  rd_tmp2  <= i_data_rd;
+  rd_tmp1           <= i_fifo_rd;
+  rd_tmp2           <= i_data_rd;
   -- output: to USB
   ---------------------------------------------------------------------
   o_fifo_data_valid <= data_valid_tmp1;
@@ -349,7 +348,7 @@ begin
   o_fifo_data       <= data_tmp1(c_IDX0_H downto c_IDX0_L);
   o_fifo_empty      <= empty_tmp1;
 
-  o_wr_data_count   <= wr_data_count_tmp0;
+  o_wr_data_count <= wr_data_count_tmp0;
 
   -- output: to the user
   ---------------------------------------------------------------------

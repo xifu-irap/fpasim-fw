@@ -221,7 +221,7 @@ entity regdecode_top is
     o_reg_debug_ctrl_valid            : out std_logic; -- register debug_ctrl valid
     o_reg_debug_ctrl                  : out std_logic_vector(31 downto 0); -- register debug_ctrl value
     -- make pulse register
-    i_reg_make_pulse_ready            : in std_logic;
+    i_reg_make_pulse_ready            : in  std_logic;
     o_reg_make_sof                    : out std_logic; -- first sample
     o_reg_make_eof                    : out std_logic; -- last sample
     o_reg_make_pulse_valid            : out std_logic; -- register make_pulse valid
@@ -324,12 +324,13 @@ architecture RTL of regdecode_top is
   signal pipein_addr0  : std_logic_vector(15 downto 0);
   signal pipein_data0  : std_logic_vector(15 downto 0);
 
-  signal pipeout_sof        : std_logic;
-  signal pipeout_eof        : std_logic;
-  signal pipeout_valid      : std_logic;
+  signal pipeout_rd         : std_logic;
+  signal pipeout_sof        : std_logic; -- @suppress "signal pipeout_sof is never read"
+  signal pipeout_eof        : std_logic; -- @suppress "signal pipeout_eof is never read"
+  signal pipeout_valid      : std_logic; -- @suppress "signal pipeout_valid is never read"
   signal pipeout_addr       : std_logic_vector(15 downto 0);
   signal pipeout_data       : std_logic_vector(15 downto 0);
-  signal pipeout_empty      : std_logic;
+  signal pipeout_empty      : std_logic; -- @suppress "signal pipeout_empty is never read"
   signal pipeout_data_count : std_logic_vector(15 downto 0);
 
   -- tes_pulse_shape
@@ -459,9 +460,9 @@ architecture RTL of regdecode_top is
   ---------------------------------------------------------------------
   -- wire: make pulse register
   ---------------------------------------------------------------------
-  signal pixel_nb                   : std_logic_vector(c_TES_CONF_PIXEL_NB_WIDTH - 1 downto 0);
-  signal make_pulse_data_valid_tmp0 : std_logic;
-  signal make_pulse_data_tmp0       : std_logic_vector(i_usb_wirein_make_pulse'range);
+  signal pixel_nb                      : std_logic_vector(c_TES_CONF_PIXEL_NB_WIDTH - 1 downto 0);
+  signal make_pulse_data_valid_tmp0    : std_logic;
+  signal make_pulse_data_tmp0          : std_logic_vector(i_usb_wirein_make_pulse'range);
   signal make_pulse_wr_data_count_tmp0 : std_logic_vector(15 downto 0);
 
   signal make_pulse_rd_tmp1    : std_logic;
@@ -510,6 +511,7 @@ begin
   pipein_valid0 <= i_usb_pipein_fifo_valid;
   pipein_addr0  <= i_usb_pipein_fifo(31 downto 16);
   pipein_data0  <= i_usb_pipein_fifo(15 downto 0);
+  pipeout_rd    <= i_usb_pipeout_fifo_rd;
 
   inst_regdecode_pipe : entity fpasim.regdecode_pipe
     generic map(
@@ -534,7 +536,7 @@ begin
       -- to the pipe out: @i_clk
       ---------------------------------------------------------------------
 
-      i_fifo_rd                         => i_usb_pipeout_fifo_rd,
+      i_fifo_rd                         => pipeout_rd,
       o_fifo_sof                        => pipeout_sof,
       o_fifo_eof                        => pipeout_eof,
       o_fifo_data_valid                 => pipeout_valid,
@@ -615,11 +617,11 @@ begin
   -- output: to the usb
   ---------------------------------------------------------------------
   -- to the usb: pipeout
-  o_usb_pipeout_fifo_data(31 downto 16) <= pipeout_addr;
-  o_usb_pipeout_fifo_data(15 downto 0)  <= pipeout_data;
+  o_usb_pipeout_fifo_data(31 downto 16)       <= pipeout_addr;
+  o_usb_pipeout_fifo_data(15 downto 0)        <= pipeout_data;
   -- resize 
-  o_usb_wireout_fifo_data_count(31 downto 16) <=  make_pulse_wr_data_count_tmp0;
-  o_usb_wireout_fifo_data_count(15 downto 0) <=  pipeout_data_count;
+  o_usb_wireout_fifo_data_count(31 downto 16) <= make_pulse_wr_data_count_tmp0;
+  o_usb_wireout_fifo_data_count(15 downto 0)  <= pipeout_data_count;
 
   ---------------------------------------------------------------------
   -- output: to the user
@@ -862,7 +864,7 @@ begin
   ---------------------------------------------------------------------
   make_pulse_data_valid_tmp0 <= trig_make_pulse_valid;
   make_pulse_data_tmp0       <= i_usb_wirein_make_pulse;
-  pixel_nb                   <= i_usb_wirein_tes_conf(c_TES_CONF_PIXEL_NB_IDX_H downto c_TES_CONF_PIXEL_NB_IDX_L);
+  pixel_nb                   <= i_usb_wirein_tes_conf(c_TES_CONF_PIXEL_NB_IDX_H downto c_TES_CONF_PIXEL_NB_IDX_L); -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_PIXEL_NB_WIDTH>) but was (<6>)"
 
   inst_regdecode_wire_make_pulse : entity fpasim.regdecode_wire_make_pulse
     generic map(
@@ -932,7 +934,7 @@ begin
   ---------------------------------------------------------------------
   -- errors register
   ---------------------------------------------------------------------
-  error_sel <= i_usb_wirein_sel_errors(c_ERROR_SEL_IDX_H downto c_ERROR_SEL_IDX_L);
+  error_sel <= i_usb_wirein_sel_errors(c_ERROR_SEL_IDX_H downto c_ERROR_SEL_IDX_L); -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_SEL_WIDTH>) but was (<3>)"
   inst_regdecode_wire_errors : entity fpasim.regdecode_wire_errors
     generic map(
       g_ERROR_SEL_WIDTH => error_sel'length
@@ -980,29 +982,29 @@ begin
   -- debug
   ---------------------------------------------------------------------
   gen_debug_ila : if g_DEBUG = true generate -- @suppress "Redundant boolean equality check with true"
-    inst_fpasim_regdecode_top_ila_0 : entity fpasim.fpasim_regdecode_top_ila_0
-      port map(
-        clk                  => i_clk,
-        -- probe0
-        probe0(4)            => trig_debug_valid,
-        probe0(3)            => trig_ctrl_valid,
-        probe0(2)            => trig_rd_all_valid,
-        probe0(1)            => trig_make_pulse_valid,
-        probe0(0)            => trig_reg_valid,
-        -- probe1
-        probe1(5)            => i_usb_pipeout_fifo_rd,
-        probe1(4)            => pipeout_sof,
-        probe1(3)            => pipeout_eof,
-        probe1(2)            => pipeout_valid,
-        probe1(1)            => pipeout_empty,
-        probe1(0)            => pipein_valid0,
-        -- probe2
-        probe2(31 downto 16) => pipein_addr0,
-        probe2(15 downto 0)  => pipein_data0,
-        -- probe3
-        probe3(31 downto 16) => pipeout_addr,
-        probe3(15 downto 0)  => pipeout_data
-      );
+    -- inst_fpasim_regdecode_top_ila_0 : entity fpasim.fpasim_regdecode_top_ila_0
+    --   port map(
+    --     clk                  => i_clk,
+    --     -- probe0
+    --     probe0(4)            => trig_debug_valid,
+    --     probe0(3)            => trig_ctrl_valid,
+    --     probe0(2)            => trig_rd_all_valid,
+    --     probe0(1)            => trig_make_pulse_valid,
+    --     probe0(0)            => trig_reg_valid,
+    --     -- probe1
+    --     probe1(5)            => i_usb_pipeout_fifo_rd,
+    --     probe1(4)            => pipeout_sof,
+    --     probe1(3)            => pipeout_eof,
+    --     probe1(2)            => pipeout_valid,
+    --     probe1(1)            => pipeout_empty,
+    --     probe1(0)            => pipein_valid0,
+    --     -- probe2
+    --     probe2(31 downto 16) => pipein_addr0,
+    --     probe2(15 downto 0)  => pipein_data0,
+    --     -- probe3
+    --     probe3(31 downto 16) => pipeout_addr,
+    --     probe3(15 downto 0)  => pipeout_data
+    --   );
 
   end generate gen_debug_ila;
 
