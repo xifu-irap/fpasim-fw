@@ -40,6 +40,8 @@
 --!   Note: 
 --!     . During the reading, the FSM manages the fifo data flow. So, the data flow can automatically be paused.
 --!     . i_addr_range_min is used to manage address offset during the read address generation.
+--!   Limitation:
+--!     g_RAM_NB_WORDS >= 2.
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -105,8 +107,8 @@ end entity regdecode_pipe_wr_rd_ram_manager;
 
 architecture RTL of regdecode_pipe_wr_rd_ram_manager is
 
-  constant c_RAM_ADDR_WIDTH : integer                                 := fpasim.pkg_utils.pkg_width_from_value(g_RAM_NB_WORDS);
-  constant c_CNT_MAX        : unsigned(c_RAM_ADDR_WIDTH - 1 downto 0) := (others => '1');
+  constant c_RAM_ADDR_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_value(g_RAM_NB_WORDS);
+  constant c_CNT_MAX        : integer := 2 ** c_RAM_ADDR_WIDTH;
   constant c_DELAY_OUT      : integer := 1;
   constant c_ADDR_DELAY_OUT : integer := c_DELAY_OUT + g_RAM_RD_LATENCY;
 
@@ -114,8 +116,8 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   -- fsm
   ---------------------------------------------------------------------
   type t_state is (E_RST, E_WAIT, E_AUTO_RD);
-  signal sm_state_r1        : t_state;
-  signal sm_state_next      : t_state;
+  signal sm_state_next : t_state;
+  signal sm_state_r1   : t_state;
 
   signal sof_next : std_logic;
   signal sof_r1   : std_logic := '0';
@@ -178,11 +180,11 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   signal data_valid1 : std_logic;
   -- signal rd_rst_busy1 : std_logic;
 
-  signal sof1  : std_logic;
-  signal eof1  : std_logic;
-  signal sel_wr1   : std_logic;
-  signal addr1 : std_logic_vector(i_addr'range);
-  signal data1 : std_logic_vector(i_data'range);
+  signal sof1    : std_logic;
+  signal eof1    : std_logic;
+  signal sel_wr1 : std_logic;
+  signal addr1   : std_logic_vector(i_addr'range);
+  signal data1   : std_logic_vector(i_data'range);
 
   -- synchronized errors
   signal errors_sync1 : std_logic_vector(3 downto 0);
@@ -241,7 +243,7 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
 
   signal sof_sync_rx  : std_logic;
   signal eof_sync_rx  : std_logic;
-  signal rd_sync_rx   : std_logic;
+  signal rd_sync_rx   : std_logic;      -- @suppress "signal rd_sync_rx is never read"
   signal addr_sync_rx : std_logic_vector(o_fifo_addr'range);
 
   ---------------------------------------------------------------------
@@ -292,7 +294,7 @@ begin
   begin
     sof_next        <= '0';
     eof_next        <= '0';
-    sel_wr_next         <= '0';
+    sel_wr_next     <= '0';
     data_valid_next <= '0';
     cnt_next        <= cnt_r1;
     addr_next       <= addr_r1;
@@ -306,7 +308,7 @@ begin
         if i_start_auto_rd = '1' then
           sof_next        <= '1';
           data_valid_next <= '1';
-          sel_wr_next         <= '0';
+          sel_wr_next     <= '0';
           addr_next       <= unsigned(i_addr_range_min);
 
           if i_data_valid = '1' then
@@ -319,7 +321,7 @@ begin
           sof_next        <= '0';
           eof_next        <= '0';
           data_valid_next <= i_data_valid;
-          sel_wr_next         <= '1';
+          sel_wr_next     <= '1';
           addr_next       <= unsigned(i_addr);
           sm_state_next   <= E_WAIT;
         end if;
@@ -337,11 +339,11 @@ begin
           data_valid_next <= '1';
           sel_wr_next     <= '0';
           addr_next       <= addr_r1 + 1;
-          if cnt_r1 = c_CNT_MAX then
+          cnt_next        <= cnt_r1 + 1;
+          if cnt_r1 = to_unsigned(c_CNT_MAX - 1 - 1, cnt_r1'length) then -- -1 start from @0 and -1 to anticipate
             eof_next      <= '1';
             sm_state_next <= E_WAIT;
           else
-            cnt_next        <= cnt_r1 + 1;
             sm_state_next <= E_AUTO_RD;
           end if;
         else
