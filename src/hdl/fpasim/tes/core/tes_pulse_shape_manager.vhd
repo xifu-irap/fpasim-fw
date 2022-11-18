@@ -157,15 +157,15 @@ architecture RTL of tes_pulse_shape_manager is
   constant c_CMD_IDX2_H : integer := c_CMD_IDX2_L + i_cmd_pulse_height'length - 1;
 
   -- find the power of 2 superior to the g_DELAY
-  --constant c_FIFO_DEPTH0 : integer := c_PIXEL_NB_MAX; 
-  constant c_FIFO_DEPTH0 : integer := 16; --see IP
+  --constant c_FIFO_DEPTH0  : integer := c_PIXEL_NB_MAX; 
+  constant c_FIFO_DEPTH0    : integer := 16; --see IP
   constant c_FIFO_PROG_FULL : integer := c_FIFO_DEPTH0 - 5; --see IP
-  constant c_FIFO_WIDTH0 : integer := c_CMD_IDX2_H + 1; --see IP
+  constant c_FIFO_WIDTH0    : integer := c_CMD_IDX2_H + 1; --see IP
 
-  signal wr_tmp0   : std_logic;
-  signal data_tmp0 : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  signal wr_tmp0    : std_logic;
+  signal data_tmp0  : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
   -- signal full0        : std_logic;
-   signal prog_full0        : std_logic;
+  signal prog_full0 : std_logic;
   -- signal wr_rst_busy0 : std_logic;
 
   signal rd1       : std_logic;
@@ -180,7 +180,7 @@ architecture RTL of tes_pulse_shape_manager is
   signal errors_sync : std_logic_vector(3 downto 0);
   signal empty_sync  : std_logic;
 
-  signal cmd_ready_r1 : std_logic:= '0';
+  signal cmd_ready_r1 : std_logic := '0';
 
   ---------------------------------------------------------------------
   -- State machine
@@ -197,7 +197,7 @@ architecture RTL of tes_pulse_shape_manager is
   signal cmd_rd_r1   : std_logic := '0';
 
   signal cnt_sample_pulse_shape_next : unsigned(g_FRAME_WIDTH - 1 downto 0);
-  signal cnt_sample_pulse_shape_r1   : unsigned(g_FRAME_WIDTH - 1 downto 0):= (others => '0');
+  signal cnt_sample_pulse_shape_r1   : unsigned(g_FRAME_WIDTH - 1 downto 0) := (others => '0');
 
   signal cnt_sample_pulse_shape_table_next : t_addr_pulse_shape_array;
   signal cnt_sample_pulse_shape_table_r1   : t_addr_pulse_shape_array := (others => (others => '0'));
@@ -400,14 +400,13 @@ begin
     );
   rd1 <= cmd_rd_r1;
 
-  p_prog_full : process( i_clk)
+  p_prog_full : process(i_clk)
   begin
     if rising_edge(i_clk) then
-      cmd_ready_r1  <= not(prog_full0);
+      cmd_ready_r1 <= not (prog_full0);
     end if;
   end process p_prog_full;
-o_cmd_ready <= cmd_ready_r1;
-
+  o_cmd_ready <= cmd_ready_r1;
 
   cmd_pulse_height1 <= data_tmp1(c_CMD_IDX2_H downto c_CMD_IDX2_L);
   cmd_pixel_id1     <= data_tmp1(c_CMD_IDX1_H downto c_CMD_IDX1_L);
@@ -854,7 +853,7 @@ o_cmd_ready <= cmd_ready_r1;
       --------------------------------------------------------------
       -- output : S = C - A*B
       --------------------------------------------------------------
-      o_s   => result_ry
+      o_s   => result_ry -- @suppress "Incorrect array size in assignment: expected (<16>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
     );
 
   assert not (result_ry'length /= c_TES_MULT_SUB_Q_WIDTH_S) report "[tes_pulse_shape_manager]: result => output result width and sfixed package definition width doesn't match." severity error;
