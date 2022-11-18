@@ -25,13 +25,14 @@
 --    @details                
 --    This file defines a context.
 --    It's used to define a set of library and package use clauses into a single unit that can be reused
+--
+--    Note: the following package are compiled in the opal_kelly_lib library
+--
 -- -------------------------------------------------------------------------------------------------------------
-
 
 context opal_kelly_context is
   library opal_kelly_lib;
   use opal_kelly_lib.pkg_front_panel.all;
   use opal_kelly_lib.pkg_usb.all;
-
 
 end context;
