@@ -45,24 +45,20 @@ context common_lib.common_context;
 
 entity tb_system_fpasim_top is
   generic(
-    runner_cfg                    : string   := runner_cfg_default; -- vunit generic: don't touch
-    output_path                   : string   := "C:/Project/fpasim-fw-hardware/"; -- vunit generic: don't touch
+    runner_cfg           : string  := runner_cfg_default; -- vunit generic: don't touch
+    output_path          : string  := "C:/Project/fpasim-fw-hardware/"; -- vunit generic: don't touch
     ---------------------------------------------------------------------
     -- DUT generic
     ---------------------------------------------------------------------
 
-  	---------------------------------------------------------------------
+    ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
-
-    g_OPAL_ADDR_PIPE_IN : integer := 0;
-    g_OPAL_ADDR_PIPE_OUT : integer := 0;
-    
-    g_VUNIT_DEBUG                 : boolean  := true;
-    g_TEST_NAME                   : string   := "";
-    g_ENABLE_CHECK                : boolean  := true;
-    g_ENABLE_LOG                  : boolean  := true
-  	);
+    g_VUNIT_DEBUG        : boolean := true;
+    g_TEST_NAME          : string  := "";
+    g_ENABLE_CHECK       : boolean := true;
+    g_ENABLE_LOG         : boolean := true
+  );
 end tb_system_fpasim_top;
 
 architecture simulate of tb_system_fpasim_top is
@@ -73,70 +69,70 @@ architecture simulate of tb_system_fpasim_top is
   ---------------------------------------------------------------------
   -- module input signals
   ---------------------------------------------------------------------
-  
+
   -- FMC: from the adc
   ---------------------------------------------------------------------
-  signal i_adc_clk_p   : std_logic;     --  differential clock p @250MHz
-  signal i_adc_clk_n   : std_logic;     --  differential clock n @250MHZ
+  signal i_adc_clk_p : std_logic;       --  differential clock p @250MHz
+  signal i_adc_clk_n : std_logic;       --  differential clock n @250MHZ
   -- adc_a
   -- bit P/N: 0-1
-  signal i_da0_p       : std_logic;
-  signal i_da0_n       : std_logic;
-  signal i_da2_p       : std_logic;
-  signal i_da2_n       : std_logic;
-  signal i_da4_p       : std_logic;
-  signal i_da4_n       : std_logic;
-  signal i_da6_p       : std_logic;
-  signal i_da6_n       : std_logic;
-  signal i_da8_p       : std_logic;
-  signal i_da8_n       : std_logic;
-  signal i_da10_p      : std_logic;
-  signal i_da10_n      : std_logic;
-  signal i_da12_p      : std_logic;
-  signal i_da12_n      : std_logic;
+  signal i_da0_p     : std_logic;
+  signal i_da0_n     : std_logic;
+  signal i_da2_p     : std_logic;
+  signal i_da2_n     : std_logic;
+  signal i_da4_p     : std_logic;
+  signal i_da4_n     : std_logic;
+  signal i_da6_p     : std_logic;
+  signal i_da6_n     : std_logic;
+  signal i_da8_p     : std_logic;
+  signal i_da8_n     : std_logic;
+  signal i_da10_p    : std_logic;
+  signal i_da10_n    : std_logic;
+  signal i_da12_p    : std_logic;
+  signal i_da12_n    : std_logic;
   -- adc_b
-  signal i_db0_p       : std_logic;
-  signal i_db0_n       : std_logic;
-  signal i_db2_p       : std_logic;
-  signal i_db2_n       : std_logic;
-  signal i_db4_p       : std_logic;
-  signal i_db4_n       : std_logic;
-  signal i_db6_p       : std_logic;
-  signal i_db6_n       : std_logic;
-  signal i_db8_p       : std_logic;
-  signal i_db8_n       : std_logic;
-  signal i_db10_p      : std_logic;
-  signal i_db10_n      : std_logic;
-  signal i_db12_p      : std_logic;
-  signal i_db12_n      : std_logic;
+  signal i_db0_p     : std_logic;
+  signal i_db0_n     : std_logic;
+  signal i_db2_p     : std_logic;
+  signal i_db2_n     : std_logic;
+  signal i_db4_p     : std_logic;
+  signal i_db4_n     : std_logic;
+  signal i_db6_p     : std_logic;
+  signal i_db6_n     : std_logic;
+  signal i_db8_p     : std_logic;
+  signal i_db8_n     : std_logic;
+  signal i_db10_p    : std_logic;
+  signal i_db10_n    : std_logic;
+  signal i_db12_p    : std_logic;
+  signal i_db12_n    : std_logic;
 
   -- FMC: to sync
   ---------------------------------------------------------------------
-  signal o_ref_clk     : std_logic;
-  signal o_sync        : std_logic;
+  signal o_ref_clk : std_logic; -- @suppress "signal o_ref_clk is never read"
+  signal o_sync    : std_logic; -- @suppress "signal o_sync is never read"
 
   -- FMC: to dac
   ---------------------------------------------------------------------
-  signal o_dac_clk_p   : std_logic;
-  signal o_dac_clk_n   : std_logic;
-  signal o_dac_frame_p : std_logic;
-  signal o_dac_frame_n : std_logic;
-  signal o_dac0_p      : std_logic;
-  signal o_dac0_n      : std_logic;
-  signal o_dac1_p      : std_logic;
-  signal o_dac1_n      : std_logic;
-  signal o_dac2_p      : std_logic;
-  signal o_dac2_n      : std_logic;
-  signal o_dac3_p      : std_logic;
-  signal o_dac3_n      : std_logic;
-  signal o_dac4_p      : std_logic;
-  signal o_dac4_n      : std_logic;
-  signal o_dac5_p      : std_logic;
-  signal o_dac5_n      : std_logic;
-  signal o_dac6_p      : std_logic;
-  signal o_dac6_n      : std_logic;
-  signal o_dac7_p      : std_logic;
-  signal o_dac7_n      : std_logic;
+  signal o_dac_clk_p   : std_logic; -- @suppress "signal o_dac_clk_p is never read"
+  signal o_dac_clk_n   : std_logic; -- @suppress "signal o_dac_clk_n is never read"
+  signal o_dac_frame_p : std_logic; -- @suppress "signal o_dac_frame_p is never read"
+  signal o_dac_frame_n : std_logic; -- @suppress "signal o_dac_frame_n is never read"
+  signal o_dac0_p      : std_logic; -- @suppress "signal o_dac0_p is never read"
+  signal o_dac0_n      : std_logic; -- @suppress "signal o_dac0_n is never read"
+  signal o_dac1_p      : std_logic; -- @suppress "signal o_dac1_p is never read"
+  signal o_dac1_n      : std_logic; -- @suppress "signal o_dac1_n is never read"
+  signal o_dac2_p      : std_logic; -- @suppress "signal o_dac2_p is never read"
+  signal o_dac2_n      : std_logic; -- @suppress "signal o_dac2_n is never read"
+  signal o_dac3_p      : std_logic; -- @suppress "signal o_dac3_p is never read"
+  signal o_dac3_n      : std_logic; -- @suppress "signal o_dac3_n is never read"
+  signal o_dac4_p      : std_logic; -- @suppress "signal o_dac4_p is never read"
+  signal o_dac4_n      : std_logic; -- @suppress "signal o_dac4_n is never read"
+  signal o_dac5_p      : std_logic; -- @suppress "signal o_dac5_p is never read"
+  signal o_dac5_n      : std_logic; -- @suppress "signal o_dac5_n is never read"
+  signal o_dac6_p      : std_logic; -- @suppress "signal o_dac6_p is never read"
+  signal o_dac6_n      : std_logic; -- @suppress "signal o_dac6_n is never read"
+  signal o_dac7_p      : std_logic; -- @suppress "signal o_dac7_p is never read"
+  signal o_dac7_n      : std_logic; -- @suppress "signal o_dac7_n is never read"
 
   signal data0 : unsigned(13 downto 0) := (others => '0');
   signal data1 : unsigned(13 downto 0) := (others => '0');
@@ -149,80 +145,75 @@ architecture simulate of tb_system_fpasim_top is
   signal sys_clk : std_logic := '0';
 
   --  Opal Kelly inouts --
-  signal okUH          : std_logic_vector(4 downto 0):= (others => '0');
-  signal okHU          : std_logic_vector(2 downto 0):= (others => '0');
-  signal okUHU         : std_logic_vector(31 downto 0);
-  signal okAA          : std_logic:= '0';
-  
+  signal okUH  : std_logic_vector(4 downto 0) := (others => '0');
+  signal okHU  : std_logic_vector(2 downto 0) := (others => '0');
+  signal okUHU : std_logic_vector(31 downto 0);
+  signal okAA  : std_logic                    := '0';
 
   ---------------------------------------------------------------------
   -- Clock definition
   ---------------------------------------------------------------------
-  constant c_CLK_PERIOD0 : time := 9.99206 ns; -- @100.8MHz (usb3 opal kelly speed)
-  constant c_CLK_PERIOD1    : time := 4 ns;
+  constant c_CLK_PERIOD0    : time                         := 9.99206 ns; -- @100.8MHz (usb3 opal kelly speed)
+  constant c_CLK_PERIOD1    : time                         := 4 ns;
   ---------------------------------------------------------------------
   -- Generate reading sequence
   ---------------------------------------------------------------------
-  -- ram tes pulse shape
-  signal ram1_wr_start      : std_logic                    := '0';
-  signal ram1_rd_start      : std_logic                    := '0';
-  signal ram1_rd_valid      : std_logic                    := '0';
-  signal ram1_wr_gen_finish : std_logic                    := '0';
-  signal ram1_rd_gen_finish : std_logic                    := '0';
-  signal ram1_wr_error         : std_logic_vector(0 downto 0) := (others => '0');
-
   -- data
-  signal data_start             : std_logic := '0';
-  signal data_rd_valid          : std_logic := '0';
-  signal data_gen_finish        : std_logic := '0';
-  signal data_valid             : std_logic := '0';
-  signal data_count_in          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_in : std_logic;
+  signal data_start         : std_logic                    := '0';
+  signal data_rd_valid      : std_logic                    := '0';
+  signal data_wr_gen_finish : std_logic                    := '0';
+  signal data_wr_error      : std_logic_vector(0 downto 0) := (others => '0'); -- @suppress "signal data_wr_error is never read"
+  signal data_stop          : std_logic                    := '0';
 
-  signal data_stop : std_logic := '0';
-
-  signal o_opal_kelly_type : integer:= 8;
-  signal o_opal_kelly_addr : std_logic_vector(7 downto 0):= (others => '0');
-  signal o_data : std_logic_vector(31 downto 0):= (others => '0');
-  signal o_data_valid : std_logic;
+  signal o_reg_id     : integer                       := 0;
+  signal o_data       : std_logic_vector(31 downto 0) := (others => '0');
+  signal o_data_valid : std_logic                     := '0';
 
   ---------------------------------------------------------------------
   -- filepath definition
   ---------------------------------------------------------------------
-  constant c_CSV_SEPARATOR             : character := ';';
+  constant c_CSV_SEPARATOR : character := ';';
 
   -- input data generation
   constant c_FILENAME_DATA_IN : string := "py_usb_data.csv";
   constant c_FILEPATH_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_IN;
 
+  constant c_FILENAME_DATA_OUT0 : string := "vhdl_tes_pulse_shape_out.csv";
+  constant c_FILEPATH_DATA_OUT0 : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT0;
+
+  constant c_FILENAME_DATA_OUT1 : string := "vhdl_amp_squid_tf.csv";
+  constant c_FILEPATH_DATA_OUT1 : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT1;
+
+  constant c_FILENAME_DATA_OUT2 : string := "vhdl_mux_squid_tf.csv";
+  constant c_FILEPATH_DATA_OUT2 : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT2;
+
+  constant c_FILENAME_DATA_OUT3 : string := "vhdl_tes_steady_state.csv";
+  constant c_FILEPATH_DATA_OUT3 : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT3;
+
+  constant c_FILENAME_DATA_OUT4 : string := "vhdl_mux_squid_offset.csv";
+  constant c_FILEPATH_DATA_OUT4 : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT4;
+
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers 
-  constant c_LOGGER_SUMMARY     : logger_t  := get_logger("log:summary");
+  constant c_LOGGER_SUMMARY : logger_t  := get_logger("log:summary"); -- @suppress "Expression does not result in a constant"
   -- checkers
-  constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors");
-  constant c_CHECKER_DATA_COUNT : checker_t := new_checker("check:data_count");
-  constant c_CHECKER_DATA       : checker_t := new_checker("check:data");
+  constant c_CHECKER_DATA   : checker_t := new_checker("check:data"); -- @suppress "Expression does not result in a constant"
 
-
-  --signal usb_if0 : opal_kelly_lib.pkg_front_panel.t_internal_if := opal_kelly_lib.pkg_front_panel.init_internal_if(0);
   signal usb_wr_if0 : opal_kelly_lib.pkg_front_panel.t_internal_wr_if := (
-                                                                          hi_drive=> '0',
-                                                                          hi_cmd => (others => '0'),
-                                                                          hi_dataout => (others => '0')
-                                                                          );
+    hi_drive   => '0',
+    hi_cmd     => (others => '0'),
+    hi_dataout => (others => '0')
+  );
 
   signal usb_rd_if0 : opal_kelly_lib.pkg_front_panel.t_internal_rd_if := (
-                                                                          i_clk => '0',
-                                                                          hi_busy=> '0',
-                                                                          hi_datain => (others => '0')
-                                                                          );
+    i_clk     => '0',
+    hi_busy   => '0',
+    hi_datain => (others => '0')
+  );
 
-shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
-
-
-
+  shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
 
 begin
 
@@ -232,28 +223,23 @@ begin
   p_usb_clk_gen : process is
   begin
     usb_clk <= '0';
-    wait for c_CLK_PERIOD0/2;
+    wait for c_CLK_PERIOD0 / 2;
     usb_clk <= '1';
-    wait for c_CLK_PERIOD0/2;
+    wait for c_CLK_PERIOD0 / 2;
   end process p_usb_clk_gen;
 
   p_sys_clk : process is
   begin
     sys_clk <= '0';
-    wait for c_CLK_PERIOD1/2;
+    wait for c_CLK_PERIOD1 / 2;
     sys_clk <= '1';
-    wait for c_CLK_PERIOD1/2;
+    wait for c_CLK_PERIOD1 / 2;
   end process p_sys_clk;
-
-
 
   ---------------------------------------------------------------------
   -- master fsm
   ---------------------------------------------------------------------
   p_master_fsm : process is
-      variable v_NO_MASK : std_logic_vector(31 downto 0) := x"ffff_ffff";
-      variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
-      variable v_tmp32 : std_logic_vector(31 downto 0);
 
   begin
     if runner_cfg'length > 0 then
@@ -263,7 +249,7 @@ begin
     ---------------------------------------------------------------------
     -- VUNIT - Scoreboard object : Visibility definition
     ---------------------------------------------------------------------
-    if g_VUNIT_DEBUG = true then
+    if g_VUNIT_DEBUG = true then -- @suppress "Redundant boolean equality check with true"
       -- the simulator doesn't stop on errors => stop on failure
       set_stop_level(failure);
     end if;
@@ -272,8 +258,7 @@ begin
     show(get_logger("check:data_count"), display_handler, pass);
     show(get_logger("check:errors"), display_handler, pass);
 
-
-    pkg_wait_nb_rising_edge_plus_margin(i_clk=> usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     info("Test bench: Generic parameter values");
     info("    output_path = " & output_path);
@@ -286,20 +271,24 @@ begin
 
     info("Test bench: input files");
     info("    c_FILEPATH_DATA_IN = " & c_FILEPATH_DATA_IN);
+    info("    c_FILEPATH_DATA_OUT0 = " & c_FILEPATH_DATA_OUT0);
+    info("    c_FILEPATH_DATA_OUT1 = " & c_FILEPATH_DATA_OUT1);
+    info("    c_FILEPATH_DATA_OUT2 = " & c_FILEPATH_DATA_OUT2);
+    info("    c_FILEPATH_DATA_OUT3 = " & c_FILEPATH_DATA_OUT3);
+    info("    c_FILEPATH_DATA_OUT4 = " & c_FILEPATH_DATA_OUT4);
 
-   ---------------------------------------------------------------------
+    ---------------------------------------------------------------------
     -- add tempo
     ---------------------------------------------------------------------
-    pkg_wait_nb_rising_edge_plus_margin(i_clk=> usb_clk, i_nb_rising_edge => 16, i_margin => 12 ps);
+    pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 16, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- conf RAM
     ---------------------------------------------------------------------
     info("Start: USB configuration");
-    ram1_wr_start <= '1';
-    wait on usb_clk until ram1_wr_gen_finish = '1';
+    data_start <= '1';
+    wait on usb_clk until data_wr_gen_finish = '1';
     info("End: USB confiuration");
-
 
     ---------------------------------------------------------------------
     -- End of simulation: wait few more clock cycles
@@ -307,23 +296,16 @@ begin
     info("Wait end of simulation");
     wait for 4096 * c_CLK_PERIOD0;
     data_stop <= '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk=> usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- VUNIT - checking errors and summary
     ---------------------------------------------------------------------
-    -- errors checking
-    --info("Check results:");
-    --val_v := to_integer(unsigned(o_errors));
-
-    --check_equal(c_CHECKER_ERRORS, 0, val_v, result("checker output errors"));
-
     -- summary
-    info(c_LOGGER_SUMMARY, "===Summary===" & LF &
-       "c_CHECKER_DATA: " & to_string(get_checker_stat(c_CHECKER_DATA))
+    info(c_LOGGER_SUMMARY, "===Summary===" & LF & "c_CHECKER_DATA: " & to_string(get_checker_stat(c_CHECKER_DATA))
     );
 
-    pkg_wait_nb_rising_edge_plus_margin(i_clk=> usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     if runner_cfg'length > 0 then
       test_runner_cleanup(runner);      -- Simulation ends here
@@ -334,85 +316,77 @@ begin
 
   --test_runner_watchdog(runner, 10 ms);
 
----------------------------------------------------------------------
--- Input/Output: USB controller
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
+  -- Input/Output: USB controller
+  ---------------------------------------------------------------------
 
   opal_kelly_lib.pkg_front_panel.okHost_driver(
-    i_clk       => usb_clk,
-    o_okUH        => okUH,
-    i_okHU        => okHU,
-    b_okUHU       => okUHU,
+    i_clk            => usb_clk,
+    o_okUH           => okUH,
+    i_okHU           => okHU,
+    b_okUHU          => okUHU,
     i_internal_wr_if => usb_wr_if0,
     o_internal_rd_if => usb_rd_if0
+  );
+
+  ---------------------------------------------------------------------
+  -- wr conf
+  ---------------------------------------------------------------------
+  data_rd_valid <= '1';
+  gen_conf_RAM : if true generate
+
+  begin
+    pkg_usb_wr(
+      i_clk              => usb_clk,
+      i_start_wr         => data_start,
+      ---------------------------------------------------------------------
+      -- input file
+      ---------------------------------------------------------------------
+      i_filepath_wr      => c_FILEPATH_DATA_IN,
+      i_csv_separator    => c_CSV_SEPARATOR,
+      --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+      --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+      --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+      --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+      --  data type = "STD_VEC" => no data convertion before writing in the output file
+      i_USB_WR_ADDR_TYP  => "HEX",
+      i_USB_WR_DATA_TYP  => "HEX",
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      i_wr_ready         => data_rd_valid,
+      ---------------------------------------------------------------------
+      -- usb
+      ---------------------------------------------------------------------
+      b_front_panel_conf => v_front_panel_conf,
+      o_internal_wr_if   => usb_wr_if0,
+      i_internal_rd_if   => usb_rd_if0,
+      i_data0_sb         => c_CHECKER_DATA,
+      ---------------------------------------------------------------------
+      -- data
+      ---------------------------------------------------------------------
+      o_reg_id           => o_reg_id,
+      o_data_valid       => o_data_valid,
+      o_data             => o_data,
+      ---------------------------------------------------------------------
+      -- status
+      ---------------------------------------------------------------------
+      o_wr_finish        => data_wr_gen_finish,
+      o_error            => data_wr_error
     );
+  end generate gen_conf_RAM;
 
----------------------------------------------------------------------
--- wr conf
----------------------------------------------------------------------
-ram1_rd_valid <= '1';
-gen_conf_RAM: if true generate
+  ---------------------------------------------------------------------
+  -- Data Generation
+  ---------------------------------------------------------------------
 
-begin
- pkg_usb_wr(
-     i_clk      => usb_clk,
-     i_start_wr => ram1_wr_start,
-    ---------------------------------------------------------------------
-    -- input file
-    ---------------------------------------------------------------------
-    i_filepath_wr  => c_FILEPATH_DATA_IN,
-    i_csv_separator => c_CSV_SEPARATOR,
-
-    --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
-    --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
-    --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
-    --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
-     i_USB_WR_ADDR_COMMON_TYP => "HEX",
-     i_USB_WR_DATA_COMMON_TYP => "HEX",
-
-    
-    ---------------------------------------------------------------------
-    -- command
-    ---------------------------------------------------------------------
-     i_wr_ready       =>  ram1_rd_valid,
-
-    ---------------------------------------------------------------------
-    -- usb
-    ---------------------------------------------------------------------
-     b_front_panel_conf => v_front_panel_conf,
-     o_internal_wr_if => usb_wr_if0,
-     i_internal_rd_if => usb_rd_if0,
-
-    i_data0_sb => c_CHECKER_DATA,
-    ---------------------------------------------------------------------
-    -- data
-    ---------------------------------------------------------------------
-     o_opal_kelly_type=> o_opal_kelly_type,
-     o_opal_kelly_addr=> o_opal_kelly_addr,
-     o_data_valid => o_data_valid,
-     o_data=> o_data,
-
-    ---------------------------------------------------------------------
-    -- status
-    ---------------------------------------------------------------------
-     o_wr_finish => ram1_wr_gen_finish,
-     o_error     => ram1_wr_error
-    );
-end generate gen_conf_RAM;
- 
-
----------------------------------------------------------------------
--- Data Generation
----------------------------------------------------------------------
-
-  data_gen : process (sys_clk) is
+  data_gen : process(sys_clk) is
   begin
     if rising_edge(sys_clk) then
       data0 <= data0 + 1;
       data1 <= data1 + 2;
     end if;
   end process data_gen;
-
 
   i_da0_p  <= data0(0);
   i_da0_n  <= data0(1);
@@ -448,7 +422,7 @@ end generate gen_conf_RAM;
   -- DUT
   ---------------------------------------------------------------------
   i_adc_clk_p <= sys_clk;
-  i_adc_clk_n <= not(sys_clk);
+  i_adc_clk_n <= not (sys_clk);
 
   dut_top_fpasim_system : entity fpasim.top_fpasim_system
     port map(
@@ -521,72 +495,194 @@ end generate gen_conf_RAM;
       o_dac6_n      => o_dac6_n,
       o_dac7_p      => o_dac7_p,
       o_dac7_n      => o_dac7_n
-      );
-
+    );
 
   ---------------------------------------------------------------------
   -- log: data out
   ---------------------------------------------------------------------
-  gen_log : if g_ENABLE_LOG = true generate
-    signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
-    signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
-    signal frame_sof_vect_tmp : std_logic_vector(0 downto 0);
-    signal frame_eof_vect_tmp : std_logic_vector(0 downto 0);
+  gen_log_ram_pulse_shape : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+    signal addr       : std_logic_vector(15 downto 0);
+    signal data       : std_logic_vector(15 downto 0);
+    signal data_valid : std_logic;
   begin
-    --pixel_sof_vect_tmp(0) <= o_pixel_sof;
-    --pixel_eof_vect_tmp(0) <= o_pixel_eof;
-    --frame_sof_vect_tmp(0) <= o_frame_sof;
-    --frame_eof_vect_tmp(0) <= o_frame_eof;
+    addr       <= o_data(31 downto 16);
+    data       <= o_data(15 downto 0);
+    data_valid <= o_data_valid when o_reg_id = 32 else '0';
 
-    --gen_log_by_id : for i in 0 to g_NB_PIXEL_BY_FRAME - 1 generate
-    --  constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & "vhdl_data_out" & to_string(i) & ".csv";
-    --  signal data_valid            : std_logic;
-    --begin
-    --  data_valid <= o_pixel_valid when to_integer(unsigned(o_pixel_id)) = i else '0';
+    inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
+      i_clk            => usb_clk,
+      i_start          => data_start,
+      i_stop           => data_stop,
+      ---------------------------------------------------------------------
+      -- output file
+      ---------------------------------------------------------------------
+      i_filepath       => c_FILEPATH_DATA_OUT0,
+      i_csv_separator  => c_CSV_SEPARATOR,
+      i_NAME0          => "addr",
+      i_NAME1          => "data",
+      --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+      --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+      --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+      --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+      --  data type = "STD_VEC" => no data convertion before writing in the output file
+      i_DATA0_TYP      => "UINT",
+      i_DATA1_TYP      => "UINT",
+      ---------------------------------------------------------------------
+      -- signals to log
+      ---------------------------------------------------------------------
+      i_data_valid     => data_valid,
+      i_data0_std_vect => addr,
+      i_data1_std_vect => data
+    );
 
-    --  inst_pkg_log_data_in_file : pkg_log_data_in_file_7(
-    --    i_clk              => i_clk,
-    --    i_start            => data_start,
-    --    i_stop             => data_stop,
-    --    ---------------------------------------------------------------------
-    --    -- output file
-    --    ---------------------------------------------------------------------
-    --    i_filepath         => c_FILEPATH_DATA_OUT,
-    --    i_csv_separator    => c_CSV_SEPARATOR,
-    --    i_NAME0            => "pixel_sof",
-    --    i_NAME1            => "pixel_eof",
-    --    i_NAME2            => "pixel_id",
-    --    i_NAME3            => "pixel_result",
-    --    i_NAME4            => "frame_sof",
-    --    i_NAME5            => "frame_eof",
-    --    i_NAME6            => "frame_id",
-    --    --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
-    --    --  common typ = "INT" => the std_logic_vector value is converted into signed int representation
-    --    --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
-    --    --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
-    --    --  common typ = "STD_VEC" => the std_logic_vector value is not converted
-    --    i_DATA0_COMMON_TYP => "UINT",
-    --    i_DATA1_COMMON_TYP => "UINT",
-    --    i_DATA2_COMMON_TYP => "UINT",
-    --    i_DATA3_COMMON_TYP => "HEX",
-    --    i_DATA4_COMMON_TYP => "UINT",
-    --    i_DATA5_COMMON_TYP => "UINT",
-    --    i_DATA6_COMMON_TYP => "UINT",
-    --    ---------------------------------------------------------------------
-    --    -- signals to log
-    --    ---------------------------------------------------------------------
-    --    i_data_valid       => data_valid,
-    --    i_data0_std_vect   => pixel_sof_vect_tmp,
-    --    i_data1_std_vect   => pixel_eof_vect_tmp,
-    --    i_data2_std_vect   => o_pixel_id,
-    --    i_data3_std_vect   => o_pixel_result,
-    --    i_data4_std_vect   => frame_sof_vect_tmp,
-    --    i_data5_std_vect   => frame_eof_vect_tmp,
-    --    i_data6_std_vect   => o_frame_id
-    --  );
+  end generate gen_log_ram_pulse_shape;
 
-    --end generate gen_log_by_id;
+  gen_log_ram_amp_squid_tf : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+    signal addr       : std_logic_vector(15 downto 0);
+    signal data       : std_logic_vector(15 downto 0);
+    signal data_valid : std_logic;
+  begin
+    addr       <= o_data(31 downto 16);
+    data       <= o_data(15 downto 0);
+    data_valid <= o_data_valid when o_reg_id = 33 else '0';
 
-  end generate gen_log;
+    inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
+      i_clk            => usb_clk,
+      i_start          => data_start,
+      i_stop           => data_stop,
+      ---------------------------------------------------------------------
+      -- output file
+      ---------------------------------------------------------------------
+      i_filepath       => c_FILEPATH_DATA_OUT1,
+      i_csv_separator  => c_CSV_SEPARATOR,
+      i_NAME0          => "addr",
+      i_NAME1          => "data",
+      --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+      --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+      --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+      --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+      --  data type = "STD_VEC" => no data convertion before writing in the output file
+      i_DATA0_TYP      => "UINT",
+      i_DATA1_TYP      => "UINT",
+      ---------------------------------------------------------------------
+      -- signals to log
+      ---------------------------------------------------------------------
+      i_data_valid     => data_valid,
+      i_data0_std_vect => addr,
+      i_data1_std_vect => data
+    );
+
+  end generate gen_log_ram_amp_squid_tf;
+
+  gen_log_ram_mux_squid_tf : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+    signal addr       : std_logic_vector(15 downto 0);
+    signal data       : std_logic_vector(15 downto 0);
+    signal data_valid : std_logic;
+  begin
+    addr       <= o_data(31 downto 16);
+    data       <= o_data(15 downto 0);
+    data_valid <= o_data_valid when o_reg_id = 34 else '0';
+
+    inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
+      i_clk            => usb_clk,
+      i_start          => data_start,
+      i_stop           => data_stop,
+      ---------------------------------------------------------------------
+      -- output file
+      ---------------------------------------------------------------------
+      i_filepath       => c_FILEPATH_DATA_OUT2,
+      i_csv_separator  => c_CSV_SEPARATOR,
+      i_NAME0          => "addr",
+      i_NAME1          => "data",
+      --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+      --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+      --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+      --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+      --  data type = "STD_VEC" => no data convertion before writing in the output file
+      i_DATA0_TYP      => "UINT",
+      i_DATA1_TYP      => "UINT",
+      ---------------------------------------------------------------------
+      -- signals to log
+      ---------------------------------------------------------------------
+      i_data_valid     => data_valid,
+      i_data0_std_vect => addr,
+      i_data1_std_vect => data
+    );
+
+  end generate gen_log_ram_mux_squid_tf;
+
+  gen_log_ram_tes_steady_state : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+    signal addr       : std_logic_vector(15 downto 0);
+    signal data       : std_logic_vector(15 downto 0);
+    signal data_valid : std_logic;
+  begin
+    addr       <= o_data(31 downto 16);
+    data       <= o_data(15 downto 0);
+    data_valid <= o_data_valid when o_reg_id = 35 else '0';
+
+    inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
+      i_clk            => usb_clk,
+      i_start          => data_start,
+      i_stop           => data_stop,
+      ---------------------------------------------------------------------
+      -- output file
+      ---------------------------------------------------------------------
+      i_filepath       => c_FILEPATH_DATA_OUT3,
+      i_csv_separator  => c_CSV_SEPARATOR,
+      i_NAME0          => "addr",
+      i_NAME1          => "data",
+      --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+      --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+      --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+      --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+      --  data type = "STD_VEC" => no data convertion before writing in the output file
+      i_DATA0_TYP      => "UINT",
+      i_DATA1_TYP      => "UINT",
+      ---------------------------------------------------------------------
+      -- signals to log
+      ---------------------------------------------------------------------
+      i_data_valid     => data_valid,
+      i_data0_std_vect => addr,
+      i_data1_std_vect => data
+    );
+
+  end generate gen_log_ram_tes_steady_state;
+
+  gen_log_ram_mux_squid_offset : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+    signal addr       : std_logic_vector(15 downto 0);
+    signal data       : std_logic_vector(15 downto 0);
+    signal data_valid : std_logic;
+  begin
+    addr       <= o_data(31 downto 16);
+    data       <= o_data(15 downto 0);
+    data_valid <= o_data_valid when o_reg_id = 35 else '0';
+
+    inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
+      i_clk            => usb_clk,
+      i_start          => data_start,
+      i_stop           => data_stop,
+      ---------------------------------------------------------------------
+      -- output file
+      ---------------------------------------------------------------------
+      i_filepath       => c_FILEPATH_DATA_OUT4,
+      i_csv_separator  => c_CSV_SEPARATOR,
+      i_NAME0          => "addr",
+      i_NAME1          => "data",
+      --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+      --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+      --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+      --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+      --  data type = "STD_VEC" => no data convertion before writing in the output file
+      i_DATA0_TYP      => "UINT",
+      i_DATA1_TYP      => "UINT",
+      ---------------------------------------------------------------------
+      -- signals to log
+      ---------------------------------------------------------------------
+      i_data_valid     => data_valid,
+      i_data0_std_vect => addr,
+      i_data1_std_vect => data
+    );
+
+  end generate gen_log_ram_mux_squid_offset;
 
 end simulate;
