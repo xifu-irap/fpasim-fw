@@ -85,9 +85,9 @@ PACKAGE pkg_regdecode IS
     constant pkg_TES_STD_STATE_ADDR_RANGE_MAX : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"E03F";
 
     -- user-defined : minimal address value associated to the mux_squid_offset ram
-    constant pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"E000";
+    constant pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"E040";
     -- user-defined : maximal address value associated to the mux_squid_offset ram
-    constant pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MAX : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"E03F";
+    constant pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MAX : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"E07F";
 
     ---------------------------------------------------------------------
     -- register field definition
@@ -136,21 +136,21 @@ PACKAGE pkg_regdecode IS
     constant pkg_MAKE_PULSE_PIXEL_ID_IDX_L : integer := 24;
     -- auto-computed: pixel id width
     constant pkg_MAKE_PULSE_PIXEL_ID_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_MAKE_PULSE_PIXEL_ID_IDX_H, i_idx_low => pkg_MAKE_PULSE_PIXEL_ID_IDX_L);
-    
+
     -- user-defined: time shift (bit index high)
     constant pkg_MAKE_PULSE_TIME_SHIFT_IDX_H : integer := 19;
     -- user-defined: time shift (bit index low)
     constant pkg_MAKE_PULSE_TIME_SHIFT_IDX_L : integer := 16;
     -- auto-computed: time shift width
     constant pkg_MAKE_PULSE_TIME_SHIFT_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_MAKE_PULSE_TIME_SHIFT_IDX_H, i_idx_low => pkg_MAKE_PULSE_TIME_SHIFT_IDX_L);
-    
+
     -- user-defined: pulse height (bit index high)
     constant pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_H : integer := 10;
     -- user-defined: pulse height (bit index low)
     constant pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_L : integer := 0;
     -- auto-computed: pulse height width
     constant pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_H, i_idx_low => pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_L);
-    
+
     -- user-defined: fpasim_gain
     ---------------------------------------------------------------------
     -- user-defined: fpasim_gain (bit index high)
@@ -159,7 +159,7 @@ PACKAGE pkg_regdecode IS
     constant pkg_FPASIM_GAIN_IDX_L : integer := 0;
     -- auto-computed: fpasim_gain width
     constant pkg_FPASIM_GAIN_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_FPASIM_GAIN_IDX_H, i_idx_low => pkg_FPASIM_GAIN_IDX_L);
-    
+
     -- user-defined: mux_sq_fb_delay
     ---------------------------------------------------------------------
     -- user-defined: mux_sq_fb_delay (bit index high)
@@ -168,7 +168,7 @@ PACKAGE pkg_regdecode IS
     constant pkg_MUX_SQ_FB_DELAY_IDX_L : integer := 0;
     -- auto-computed: mux_sq_fb_delay width
     constant pkg_MUX_SQ_FB_DELAY_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_MUX_SQ_FB_DELAY_IDX_H, i_idx_low => pkg_MUX_SQ_FB_DELAY_IDX_L);
-    
+
     -- user-defined: amp_sq_of_delay
     ---------------------------------------------------------------------
     -- user-defined: amp_sq_of_delay (bit index high)
@@ -177,7 +177,7 @@ PACKAGE pkg_regdecode IS
     constant pkg_AMP_SQ_OF_DELAY_IDX_L : integer := 0;
     -- auto-computed: amp_sq_of_delay width
     constant pkg_AMP_SQ_OF_DELAY_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_AMP_SQ_OF_DELAY_IDX_H, i_idx_low => pkg_AMP_SQ_OF_DELAY_IDX_L);
-    
+
     ---------------------------------------------------------------------
     -- user-defined: error_delay
     ---------------------------------------------------------------------
@@ -187,7 +187,7 @@ PACKAGE pkg_regdecode IS
     constant pkg_ERROR_DELAY_IDX_L : integer := 0;
     -- auto-computed: error_delay width
     constant pkg_ERROR_DELAY_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_ERROR_DELAY_IDX_H, i_idx_low => pkg_ERROR_DELAY_IDX_L);
-    
+
     ---------------------------------------------------------------------
     -- user-defined: ra_delay
     ---------------------------------------------------------------------
@@ -197,7 +197,7 @@ PACKAGE pkg_regdecode IS
     constant pkg_RA_DELAY_IDX_L : integer := 0;
     -- auto-computed: ra_delay width
     constant pkg_RA_DELAY_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_RA_DELAY_IDX_H, i_idx_low => pkg_RA_DELAY_IDX_L);
-    
+
     -- user-defined: tes_conf 
     ---------------------------------------------------------------------
     -- user-defined: pixel_nb (bit index high)
@@ -206,28 +206,28 @@ PACKAGE pkg_regdecode IS
     constant pkg_TES_CONF_PIXEL_NB_IDX_L : integer := 24;
     -- auto-computed: pixel_nb width
     constant pkg_TES_CONF_PIXEL_NB_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_PIXEL_NB_IDX_H, i_idx_low => pkg_TES_CONF_PIXEL_NB_IDX_L);
-    
+
     -- user-defined: pixel_length (bit index high)
     constant pkg_TES_CONF_PIXEL_LENGTH_IDX_H : integer := 22;
     -- user-defined: pixel_length (bit index low)
     constant pkg_TES_CONF_PIXEL_LENGTH_IDX_L : integer := 16;
     -- auto-computed: pixel_length width
     constant pkg_TES_CONF_PIXEL_LENGTH_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_PIXEL_LENGTH_IDX_H, i_idx_low => pkg_TES_CONF_PIXEL_LENGTH_IDX_L);
-    
+
     -- user-defined: frame_length (bit index high)
     constant pkg_TES_CONF_FRAME_LENGTH_IDX_H : integer := 12;
     -- user-defined: frame_length (bit index low)
     constant pkg_TES_CONF_FRAME_LENGTH_IDX_L : integer := 0;
     -- auto-computed: frame_length width
     constant pkg_TES_CONF_FRAME_LENGTH_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_FRAME_LENGTH_IDX_H, i_idx_low => pkg_TES_CONF_FRAME_LENGTH_IDX_L);
-    
+
     -- user-defined: debug_ctrl 
     ---------------------------------------------------------------------
     -- user-defined: debug_pulse (bit index)
     constant pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H : integer := 0;
     -- user-defined: rst_status (bit index)
     constant pkg_DEBUG_CTRL_RST_STATUS_IDX_H  : integer := 1;
-    
+
     -- user-defined: error_sel
     ---------------------------------------------------------------------
     -- user-defined: error_sel (bit index high)
