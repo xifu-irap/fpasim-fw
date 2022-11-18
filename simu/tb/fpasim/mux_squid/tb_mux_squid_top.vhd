@@ -58,8 +58,7 @@ entity tb_mux_squid_top is
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
-    g_NB_PIXEL_BY_FRAME          : positive := 1;
-    
+    g_NB_PIXEL_BY_FRAME           : positive := 1;
     g_VUNIT_DEBUG                 : boolean  := true;
     g_TEST_NAME                   : string   := "";
     g_ENABLE_CHECK                : boolean  := true;
@@ -137,7 +136,7 @@ architecture simulate of tb_mux_squid_top is
   -- errors/status
   ---------------------------------------------------------------------
   signal o_errors : std_logic_vector(15 downto 0);
-  signal o_status : std_logic_vector(7 downto 0);
+  signal o_status : std_logic_vector(7 downto 0); -- @suppress "signal o_status is never read"
 
   ---------------------------------------------------------------------
   -- Clock definition
@@ -154,7 +153,7 @@ architecture simulate of tb_mux_squid_top is
   signal data_gen_finish        : std_logic := '0';
   signal data_valid             : std_logic := '0';
   signal data_count_in          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_in : std_logic;
+  signal data_count_overflow_in : std_logic; -- @suppress "signal data_count_overflow_in is never read"
 
   -- ram tes pulse shape
   signal ram1_wr_start      : std_logic                    := '0';
@@ -162,7 +161,7 @@ architecture simulate of tb_mux_squid_top is
   signal ram1_rd_valid      : std_logic                    := '0';
   signal ram1_wr_gen_finish : std_logic                    := '0';
   signal ram1_rd_gen_finish : std_logic                    := '0';
-  signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0');
+  signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0'); -- @suppress "signal ram1_error is never read"
 
   -- ram tes steady state
   signal ram2_wr_start      : std_logic                    := '0';
@@ -170,19 +169,18 @@ architecture simulate of tb_mux_squid_top is
   signal ram2_rd_valid      : std_logic                    := '0';
   signal ram2_wr_gen_finish : std_logic                    := '0';
   signal ram2_rd_gen_finish : std_logic                    := '0';
-  signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0');
+  signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0'); -- @suppress "signal ram2_error is never read"
 
   -- check
   signal data_count_out          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_out : std_logic;
-  signal data_error_out          : std_logic_vector(1 downto 0);
+  signal data_count_overflow_out : std_logic; -- @suppress "signal data_count_overflow_out is never read"
 
   signal data_stop : std_logic := '0';
 
   ---------------------------------------------------------------------
   -- filepath definition
   ---------------------------------------------------------------------
-  constant c_CSV_SEPARATOR             : character := ';';
+  constant c_CSV_SEPARATOR : character := ';';
 
   -- input data generation
   constant c_FILENAME_DATA_VALID_IN : string := "py_data_valid_sequencer_in.csv";
@@ -206,19 +204,19 @@ architecture simulate of tb_mux_squid_top is
   constant c_FILEPATH_RAM2_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM2_IN;
 
   -- output data log
-  constant c_FILENAME_DATA_OUT : string := "vhdl_data_out.csv";
+  --constant c_FILENAME_DATA_OUT : string := "vhdl_data_out.csv";
   --constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT;
 
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers 
-  constant c_LOGGER_SUMMARY     : logger_t  := get_logger("log:summary");
+  constant c_LOGGER_SUMMARY     : logger_t  := get_logger("log:summary"); -- @suppress "Expression does not result in a constant"
   -- checkers
-  constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors");
-  constant c_CHECKER_DATA_COUNT : checker_t := new_checker("check:data_count");
-  constant c_CHECKER_RAM1       : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME);
-  constant c_CHECKER_RAM2       : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME);
+  constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_DATA_COUNT : checker_t := new_checker("check:data_count"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM1       : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM2       : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME); -- @suppress "Expression does not result in a constant"
 
 begin
 
@@ -247,7 +245,7 @@ begin
     ---------------------------------------------------------------------
     -- VUNIT - Scoreboard object : Visibility definition
     ---------------------------------------------------------------------
-    if g_VUNIT_DEBUG = true then
+    if g_VUNIT_DEBUG = true then        -- @suppress "Redundant boolean equality check with true"
       -- the simulator doesn't stop on errors => stop on failure
       set_stop_level(failure);
     end if;
@@ -328,7 +326,6 @@ begin
     wait until rising_edge(i_clk) and ram2_wr_gen_finish = '1';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
-
     ---------------------------------------------------------------------
     -- Data Generation
     ---------------------------------------------------------------------
@@ -339,7 +336,7 @@ begin
     ---------------------------------------------------------------------
     -- RAM Check: RAM1
     ---------------------------------------------------------------------
-    if g_RAM1_CHECK = true then
+    if g_RAM1_CHECK = true then         -- @suppress "Redundant boolean equality check with true"
       info("Start RAM reading: " & g_RAM1_NAME);
       ram1_rd_start <= '1';
       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
@@ -350,7 +347,7 @@ begin
     ---------------------------------------------------------------------
     -- RAM Check: RAM2
     ---------------------------------------------------------------------
-    if g_RAM2_CHECK = true then
+    if g_RAM2_CHECK = true then         -- @suppress "Redundant boolean equality check with true"
       info("Start RAM reading: " & g_RAM2_NAME);
       ram2_rd_start <= '1';
       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
@@ -424,45 +421,46 @@ begin
     -- Data RAM Generation
     ---------------------------------------------------------------------
     inst_pkg_memory_wr_tdpram_and_check : pkg_memory_wr_tdpram_and_check(
-      i_clk                   => i_clk,
-      i_start_wr              => ram1_wr_start,
-      i_start_rd              => ram1_rd_start,
+      i_clk             => i_clk,
+      i_start_wr        => ram1_wr_start,
+      i_start_rd        => ram1_rd_start,
       ---------------------------------------------------------------------
       -- input file
       ---------------------------------------------------------------------
-      i_filepath_wr           => c_FILEPATH_RAM1_IN,
-      i_filepath_rd           => c_FILEPATH_RAM1_IN,
-      i_csv_separator         => c_CSV_SEPARATOR,
-      i_RD_NAME1              => "ram_" & g_RAM1_NAME,
-      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
-      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
-      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
-      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
-      i_WR_RD_ADDR_COMMON_TYP => "UINT",
-      i_WR_DATA_COMMON_TYP    => "UINT",
-      i_RD_DATA_COMMON_TYP    => "UINT",
+      i_filepath_wr     => c_FILEPATH_RAM1_IN,
+      i_filepath_rd     => c_FILEPATH_RAM1_IN,
+      i_csv_separator   => c_CSV_SEPARATOR,
+      i_RD_NAME1        => "ram_" & g_RAM1_NAME,
+      --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+      --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+      --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+      --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+      --  data type = "STD_VEC" => no data convertion before writing in the output file
+      i_WR_RD_ADDR_TYP  => "UINT",
+      i_WR_DATA_TYP     => "UINT",
+      i_RD_DATA_TYP     => "UINT",
       ---------------------------------------------------------------------
       -- Vunit Scoreboard objects
       ---------------------------------------------------------------------
-      i_data_sb               => c_CHECKER_RAM1,
-      i_rd_ready              => ram1_rd_valid,
-      i_wr_ready              => ram1_rd_valid,
+      i_data_sb         => c_CHECKER_RAM1,
+      i_rd_ready        => ram1_rd_valid,
+      i_wr_ready        => ram1_rd_valid,
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      o_wr_data_valid         => i_mux_squid_offset_wr_en,
-      o_rd_data_valid         => i_mux_squid_offset_rd_en,
-      o_wr_rd_addr_vect       => i_mux_squid_offset_wr_rd_addr,
-      o_wr_data_vect          => i_mux_squid_offset_wr_data,
+      o_wr_data_valid   => i_mux_squid_offset_wr_en,
+      o_rd_data_valid   => i_mux_squid_offset_rd_en,
+      o_wr_rd_addr_vect => i_mux_squid_offset_wr_rd_addr,
+      o_wr_data_vect    => i_mux_squid_offset_wr_data,
       -- read value
-      i_rd_data_valid         => o_mux_squid_offset_rd_valid,
-      i_rd_data_vect          => o_mux_squid_offset_rd_data,
+      i_rd_data_valid   => o_mux_squid_offset_rd_valid,
+      i_rd_data_vect    => o_mux_squid_offset_rd_data,
       ---------------------------------------------------------------------
       -- status
       ---------------------------------------------------------------------
-      o_wr_finish             => ram1_wr_gen_finish,
-      o_rd_finish             => ram1_rd_gen_finish,
-      o_error                 => ram1_error
+      o_wr_finish       => ram1_wr_gen_finish,
+      o_rd_finish       => ram1_rd_gen_finish,
+      o_error           => ram1_error
     );
 
   end generate gen_ram1;
@@ -493,45 +491,46 @@ begin
     -- Data RAM generation
     ---------------------------------------------------------------------
     inst_pkg_memory_wr_tdpram_and_check : pkg_memory_wr_tdpram_and_check(
-      i_clk                   => i_clk,
-      i_start_wr              => ram2_wr_start,
-      i_start_rd              => ram2_rd_start,
+      i_clk             => i_clk,
+      i_start_wr        => ram2_wr_start,
+      i_start_rd        => ram2_rd_start,
       ---------------------------------------------------------------------
       -- input file
       ---------------------------------------------------------------------
-      i_filepath_wr           => c_FILEPATH_RAM2_IN,
-      i_filepath_rd           => c_FILEPATH_RAM2_IN,
-      i_csv_separator         => c_CSV_SEPARATOR,
-      i_RD_NAME1              => "ram_" & g_RAM2_NAME,
-      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
-      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
-      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
-      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
-      i_WR_RD_ADDR_COMMON_TYP => "UINT",
-      i_WR_DATA_COMMON_TYP    => "UINT",
-      i_RD_DATA_COMMON_TYP    => "UINT",
+      i_filepath_wr     => c_FILEPATH_RAM2_IN,
+      i_filepath_rd     => c_FILEPATH_RAM2_IN,
+      i_csv_separator   => c_CSV_SEPARATOR,
+      i_RD_NAME1        => "ram_" & g_RAM2_NAME,
+      --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+      --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+      --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+      --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+      --  data type = "STD_VEC" => no data convertion before writing in the output file
+      i_WR_RD_ADDR_TYP  => "UINT",
+      i_WR_DATA_TYP     => "UINT",
+      i_RD_DATA_TYP     => "UINT",
       ---------------------------------------------------------------------
       -- Vunit Scoreboard objects
       ---------------------------------------------------------------------
-      i_data_sb               => c_CHECKER_RAM2,
-      i_rd_ready              => ram2_rd_valid,
-      i_wr_ready              => ram2_rd_valid,
+      i_data_sb         => c_CHECKER_RAM2,
+      i_rd_ready        => ram2_rd_valid,
+      i_wr_ready        => ram2_rd_valid,
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      o_wr_data_valid         => i_mux_squid_tf_wr_en,
-      o_rd_data_valid         => i_mux_squid_tf_rd_en,
-      o_wr_rd_addr_vect       => i_mux_squid_tf_wr_rd_addr,
-      o_wr_data_vect          => i_mux_squid_tf_wr_data,
+      o_wr_data_valid   => i_mux_squid_tf_wr_en,
+      o_rd_data_valid   => i_mux_squid_tf_rd_en,
+      o_wr_rd_addr_vect => i_mux_squid_tf_wr_rd_addr,
+      o_wr_data_vect    => i_mux_squid_tf_wr_data,
       -- read value
-      i_rd_data_valid         => o_mux_squid_tf_rd_valid,
-      i_rd_data_vect          => o_mux_squid_tf_rd_data,
+      i_rd_data_valid   => o_mux_squid_tf_rd_valid,
+      i_rd_data_vect    => o_mux_squid_tf_rd_data,
       ---------------------------------------------------------------------
       -- status
       ---------------------------------------------------------------------
-      o_wr_finish             => ram2_wr_gen_finish,
-      o_rd_finish             => ram2_rd_gen_finish,
-      o_error                 => ram2_error
+      o_wr_finish       => ram2_wr_gen_finish,
+      o_rd_finish       => ram2_rd_gen_finish,
+      o_error           => ram2_error
     );
 
   end generate gen_ram2;
@@ -565,43 +564,43 @@ begin
     -- data generation
     ---------------------------------------------------------------------
     inst_pkg_data_generator : pkg_data_generator_8(
-      i_clk              => i_clk,
-      i_start            => data_start,
+      i_clk            => i_clk,
+      i_start          => data_start,
       ---------------------------------------------------------------------
       -- input file
       ---------------------------------------------------------------------
-      i_filepath         => c_FILEPATH_DATA_IN,
-      i_csv_separator    => c_CSV_SEPARATOR,
-      --  common typ = "UINT" => the file integer value is converted into an unsigned vector -> std_logic_vector
-      --  common typ = "INT" => the file integer value  is converted into a signed vector -> std_logic_vector
-      --  common typ = "HEX" => the hexadecimal value is converted into a std_logic_vector
-      --  common typ = "STD_VEC" (binary value) => the std_logic_vector is not converted
-      i_DATA0_COMMON_TYP => "UINT",
-      i_DATA1_COMMON_TYP => "UINT",
-      i_DATA2_COMMON_TYP => "UINT",
-      i_DATA3_COMMON_TYP => "UINT",
-      i_DATA4_COMMON_TYP => "UINT",
-      i_DATA5_COMMON_TYP => "UINT",
-      i_DATA6_COMMON_TYP => "UINT",
-      i_DATA7_COMMON_TYP => "UINT",
+      i_filepath       => c_FILEPATH_DATA_IN,
+      i_csv_separator  => c_CSV_SEPARATOR,
+      --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+      --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+      --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+      --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+      --  data type = "STD_VEC" => no data convertion before writing in the output filed
+      i_DATA0_TYP      => "UINT",
+      i_DATA1_TYP      => "UINT",
+      i_DATA2_TYP      => "UINT",
+      i_DATA3_TYP      => "UINT",
+      i_DATA4_TYP      => "UINT",
+      i_DATA5_TYP      => "UINT",
+      i_DATA6_TYP      => "UINT",
+      i_DATA7_TYP      => "UINT",
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      i_ready            => data_rd_valid,
-      o_data_valid       => data_valid,
-      o_data0_std_vect   => pixel_sof_vect_tmp, 
-      o_data1_std_vect   => pixel_eof_vect_tmp,
-      o_data2_std_vect   => i_pixel_id, 
-      o_data3_std_vect   => i_pixel_result,
-      o_data4_std_vect   => frame_sof_vect_tmp,
-      o_data5_std_vect   => frame_eof_vect_tmp,
-      o_data6_std_vect   => i_frame_id, 
-      o_data7_std_vect   => i_mux_squid_feedback,
-
+      i_ready          => data_rd_valid,
+      o_data_valid     => data_valid,
+      o_data0_std_vect => pixel_sof_vect_tmp,
+      o_data1_std_vect => pixel_eof_vect_tmp,
+      o_data2_std_vect => i_pixel_id,
+      o_data3_std_vect => i_pixel_result,
+      o_data4_std_vect => frame_sof_vect_tmp,
+      o_data5_std_vect => frame_eof_vect_tmp,
+      o_data6_std_vect => i_frame_id,
+      o_data7_std_vect => i_mux_squid_feedback,
       ---------------------------------------------------------------------
       -- status
       ---------------------------------------------------------------------
-      o_finish           => data_gen_finish
+      o_finish         => data_gen_finish
     );
 
     i_pixel_valid <= data_valid;
@@ -712,7 +711,7 @@ begin
   ---------------------------------------------------------------------
   -- log: data out
   ---------------------------------------------------------------------
-  gen_log : if g_ENABLE_LOG = true generate
+  gen_log : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
     signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
     signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
     signal frame_sof_vect_tmp : std_logic_vector(0 downto 0);
@@ -730,44 +729,44 @@ begin
       data_valid <= o_pixel_valid when to_integer(unsigned(o_pixel_id)) = i else '0';
 
       inst_pkg_log_data_in_file : pkg_log_data_in_file_7(
-        i_clk              => i_clk,
-        i_start            => data_start,
-        i_stop             => data_stop,
+        i_clk            => i_clk,
+        i_start          => data_start,
+        i_stop           => data_stop,
         ---------------------------------------------------------------------
         -- output file
         ---------------------------------------------------------------------
-        i_filepath         => c_FILEPATH_DATA_OUT,
-        i_csv_separator    => c_CSV_SEPARATOR,
-        i_NAME0            => "pixel_sof",
-        i_NAME1            => "pixel_eof",
-        i_NAME2            => "pixel_id",
-        i_NAME3            => "pixel_result",
-        i_NAME4            => "frame_sof",
-        i_NAME5            => "frame_eof",
-        i_NAME6            => "frame_id",
-        --  common typ = "UINT" => the std_logic_vector value is converted into unsigned int representation
-        --  common typ = "INT" => the std_logic_vector value is converted into signed int representation
-        --  common typ = "HEX" => the std_logic_vector value is considered as a signed vector, then it's converted into hex representation
-        --  common typ = "UHEX" => the std_logic_vector value is considered as a unsigned vector, then it's converted into hex representation
-        --  common typ = "STD_VEC" => the std_logic_vector value is not converted
-        i_DATA0_COMMON_TYP => "UINT",
-        i_DATA1_COMMON_TYP => "UINT",
-        i_DATA2_COMMON_TYP => "UINT",
-        i_DATA3_COMMON_TYP => "HEX",
-        i_DATA4_COMMON_TYP => "UINT",
-        i_DATA5_COMMON_TYP => "UINT",
-        i_DATA6_COMMON_TYP => "UINT",
+        i_filepath       => c_FILEPATH_DATA_OUT,
+        i_csv_separator  => c_CSV_SEPARATOR,
+        i_NAME0          => "pixel_sof",
+        i_NAME1          => "pixel_eof",
+        i_NAME2          => "pixel_id",
+        i_NAME3          => "pixel_result",
+        i_NAME4          => "frame_sof",
+        i_NAME5          => "frame_eof",
+        i_NAME6          => "frame_id",
+        --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+        --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+        --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+        --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+        --  data type = "STD_VEC" => no data convertion before writing in the output file
+        i_DATA0_TYP      => "UINT",
+        i_DATA1_TYP      => "UINT",
+        i_DATA2_TYP      => "UINT",
+        i_DATA3_TYP      => "HEX",
+        i_DATA4_TYP      => "UINT",
+        i_DATA5_TYP      => "UINT",
+        i_DATA6_TYP      => "UINT",
         ---------------------------------------------------------------------
         -- signals to log
         ---------------------------------------------------------------------
-        i_data_valid       => data_valid,
-        i_data0_std_vect   => pixel_sof_vect_tmp,
-        i_data1_std_vect   => pixel_eof_vect_tmp,
-        i_data2_std_vect   => o_pixel_id,
-        i_data3_std_vect   => o_pixel_result,
-        i_data4_std_vect   => frame_sof_vect_tmp,
-        i_data5_std_vect   => frame_eof_vect_tmp,
-        i_data6_std_vect   => o_frame_id
+        i_data_valid     => data_valid,
+        i_data0_std_vect => pixel_sof_vect_tmp,
+        i_data1_std_vect => pixel_eof_vect_tmp,
+        i_data2_std_vect => o_pixel_id,
+        i_data3_std_vect => o_pixel_result,
+        i_data4_std_vect => frame_sof_vect_tmp,
+        i_data5_std_vect => frame_eof_vect_tmp,
+        i_data6_std_vect => o_frame_id
       );
 
     end generate gen_log_by_id;
