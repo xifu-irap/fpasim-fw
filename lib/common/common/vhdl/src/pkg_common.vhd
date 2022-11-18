@@ -25,7 +25,6 @@
 --    @details                
 --    This VHDL package defines commonly used simulaton VHDL functions/procedures.
 --    
---    Note: This package should be compiled into the common_lib.
 --    Dependencies:
 --      . csv_lib.pkg_csv_file
 --
@@ -39,28 +38,24 @@ use ieee.math_real.all;
 library csv_lib;
 use csv_lib.pkg_csv_file.all;
 
-
 package pkg_common is
-
 
   ------------------------------------------------------
   -- this procedure allows to wait a number of rising edge
   -- then a margin is applied, if any
   ------------------------------------------------------
-  procedure pkg_wait_nb_rising_edge_plus_margin (
-    signal i_clk               : in std_logic;
+  procedure pkg_wait_nb_rising_edge_plus_margin(
+    signal   i_clk            : in std_logic;
     constant i_nb_rising_edge : in natural;
-    constant i_margin          : in time
-    );
+    constant i_margin         : in time
+  );
 
-
-
----------------------------------------------------------------------
--- This function allows to convert a std_logic signal into an integer
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
+  -- This function allows to convert a std_logic signal into an integer
+  ---------------------------------------------------------------------
   function pkg_to_integer(s : std_logic) return integer;
 
-    ---------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- This function generates a integer random_by_range value
   --  between i_min_value and i_max_value
   ---------------------------------------------------------------------
@@ -80,89 +75,83 @@ package pkg_common is
     variable v_result    : inout integer
   );
 
-
----------------------------------------------------------------------
--- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
--- Note: 
---   . The last counter bit is used to detect an overflow.
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
+  -- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
+  -- Note: 
+  --   . The last counter bit is used to detect an overflow.
+  ---------------------------------------------------------------------
   procedure pkg_data_valid_counter(
-    signal i_clk        : in  std_logic;
+    signal i_clk        : in std_logic;
     -- input
-    signal i_start      : in  std_logic;
-    signal i_data_valid : in  std_logic;
+    signal i_start      : in std_logic;
+    signal i_data_valid : in std_logic;
     -- output
-    signal o_count     : out std_logic_vector;
-    signal o_overflow  : out std_logic
-    );
-
+    signal o_count      : out std_logic_vector;
+    signal o_overflow   : out std_logic
+  );
 
   ---------------------------------------------------------------------
--- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
--- if the i_load is set to '1', then i_load_data is load in the counter
--- Note: 
---   . The last counter bit is used to detect an overflow.
----------------------------------------------------------------------
+  -- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
+  -- if the i_load is set to '1', then i_load_data is load in the counter
+  -- Note: 
+  --   . The last counter bit is used to detect an overflow.
+  ---------------------------------------------------------------------
   procedure pkg_data_valid_counter_with_load(
-    signal i_clk        : in  std_logic;
+    signal i_clk        : in std_logic;
     -- input
-    signal i_start      : in  std_logic;
-    signal i_data_valid : in  std_logic;
+    signal i_start      : in std_logic;
+    signal i_data_valid : in std_logic;
     signal i_load       : in std_logic;
     signal i_load_data  : in std_logic_vector;
     -- output
-    signal o_count     : out std_logic_vector;
-    signal o_overflow  : out std_logic
-    );
-
+    signal o_count      : out std_logic_vector;
+    signal o_overflow   : out std_logic
+  );
 
   ---------------------------------------------------------------------
--- frame_flags_builder_file
--- This function allows allows to generate (sof, eof) flags
----------------------------------------------------------------------
-  procedure pkg_frame_flags_builder (
-    signal i_clk        : in  std_logic;
-    signal i_start      : in  std_logic;
-    signal i_data_valid : in  std_logic;
-    i_filepath          : in  string;
-    i_csv_separator     : in  character;
-    signal o_sof     : out std_logic;
-    signal o_eof     : out std_logic;
-    signal o_index   : out integer;
-    signal o_finish  : out std_logic
-    );
+  -- frame_flags_builder_file
+  -- This function allows allows to generate (sof, eof) flags
+  ---------------------------------------------------------------------
+  procedure pkg_frame_flags_builder(
+    signal i_clk        : in std_logic;
+    signal i_start      : in std_logic;
+    signal i_data_valid : in std_logic;
+    i_filepath          : in string;
+    i_csv_separator     : in character;
+    signal o_sof        : out std_logic;
+    signal o_eof        : out std_logic;
+    signal o_index      : out integer;
+    signal o_finish     : out std_logic
+  );
 
----------------------------------------------------------------------
--- frame_flags_builder_cst
--- This function allows allows to generate (sof, eof) flags
----------------------------------------------------------------------
-  procedure pkg_frame_flags_builder (
-    signal i_clk          : in  std_logic;
-    signal i_start        : in  std_logic;
-    signal i_data_valid   : in  std_logic;
-    constant i_frame_size : in  integer;
-    signal o_sof       : out std_logic;
-    signal o_eof       : out std_logic;
-    signal o_index     : out integer;
-    signal o_finish    : out std_logic
-
-    );
-
-
+  ---------------------------------------------------------------------
+  -- frame_flags_builder_cst
+  -- This function allows allows to generate (sof, eof) flags
+  ---------------------------------------------------------------------
+  procedure pkg_frame_flags_builder(
+    signal   i_clk        : in std_logic;
+    signal   i_start      : in std_logic;
+    signal   i_data_valid : in std_logic;
+    constant i_frame_size : in integer;
+    signal   o_sof        : out std_logic;
+    signal   o_eof        : out std_logic;
+    signal   o_index      : out integer;
+    signal   o_finish     : out std_logic
+  );
 
 end package pkg_common;
 
 package body pkg_common is
 
-------------------------------------------------------
+  ------------------------------------------------------
   -- this procedure allows to wait a number of rising edge
   -- then a margin is applied, if any
   ------------------------------------------------------
-procedure pkg_wait_nb_rising_edge_plus_margin (
-    signal i_clk               : in std_logic;
+  procedure pkg_wait_nb_rising_edge_plus_margin(
+    signal   i_clk            : in std_logic;
     constant i_nb_rising_edge : in natural;
-    constant i_margin          : in time
-    ) is
+    constant i_margin         : in time
+  ) is
   begin
     -- Wait for number of rising edges
     --   if the number of rising edges = 0 => only the margin is applied, if any
@@ -175,13 +164,9 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
     wait for i_margin;
   end procedure;
 
-
-
-
-
----------------------------------------------------------------------
--- This function allows to convert a std_logic signal into an integer
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
+  -- This function allows to convert a std_logic signal into an integer
+  ---------------------------------------------------------------------
   function pkg_to_integer(s : std_logic) return integer is
   begin
     if s = '1' then
@@ -191,14 +176,14 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
     end if;
   end function;
 
-   ---------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- This function generates an integer random value
   --  between i_min_value and i_max_value
   ---------------------------------------------------------------------
-  function pkg_random_by_range (
+  function pkg_random_by_range(
     constant i_min_value : in integer;
     constant i_max_value : in integer
-    ) return integer is
+  ) return integer is
     variable v_rand_result : integer;
     variable v_seed1       : positive := 10;
     variable v_seed2       : positive := 1000;
@@ -210,44 +195,43 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
   ---------------------------------------------------------------------
   -- this function generates an uniform random value between min_value and max_value
   ---------------------------------------------------------------------
-  procedure pkg_random_uniform_by_range (
+  procedure pkg_random_uniform_by_range(
     constant i_min_value : in integer;
     constant i_max_value : in integer;
-    variable v_seed1   : inout positive;
-    variable v_seed2   : inout positive;
-    variable v_result  : inout integer
-    ) is
+    variable v_seed1     : inout positive;
+    variable v_seed2     : inout positive;
+    variable v_result    : inout integer
+  ) is
     variable v_rand : real;
   begin
     -- generate a uniform real random_uniform_by_range value between [0;1.0]
     uniform(v_seed1, v_seed2, v_rand);
     -- Scale to a random_uniform_by_range integer between min_value and max_value
-    v_result := integer(real(i_min_value) + trunc(v_rand*(1.0+real(i_max_value)-real(i_min_value))));
+    v_result := integer(real(i_min_value) + trunc(v_rand * (1.0 + real(i_max_value) - real(i_min_value))));
   end;
 
- 
----------------------------------------------------------------------
--- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
--- Note: 
---   . The last counter bit is used to detect an overflow.
----------------------------------------------------------------------
-   procedure pkg_data_valid_counter(
-                signal i_clk        : in  std_logic;
-                   -- input
-                   signal i_start      : in  std_logic;
-                   signal i_data_valid : in std_logic;
-                   -- output
-                   signal o_count     : out std_logic_vector;
-                   signal o_overflow  : out std_logic
-                               ) is
+  ---------------------------------------------------------------------
+  -- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
+  -- Note: 
+  --   . The last counter bit is used to detect an overflow.
+  ---------------------------------------------------------------------
+  procedure pkg_data_valid_counter(
+    signal i_clk        : in std_logic;
+    -- input
+    signal i_start      : in std_logic;
+    signal i_data_valid : in std_logic;
+    -- output
+    signal o_count      : out std_logic_vector;
+    signal o_overflow   : out std_logic
+  ) is
     type t_state is (E_RST, E_WAIT, E_RUN);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
-    variable v_cnt          : unsigned(o_count'high + 1 downto 0) := (others => '0');  -- add 1 to detect an overflow
-    variable v_MSB_bit_last : std_logic                              := '0';
-    variable v_MSB_bit      : std_logic                              := '0';
-    variable v_overflow     : std_logic                              := '0';
+    variable v_cnt          : unsigned(o_count'high + 1 downto 0) := (others => '0'); -- add 1 to detect an overflow
+    variable v_MSB_bit_last : std_logic                           := '0';
+    variable v_MSB_bit      : std_logic                           := '0';
+    variable v_overflow     : std_logic                           := '0';
   begin
     while c_TEST loop
       case v_fsm_state is
@@ -257,7 +241,7 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
           v_overflow     := '0';
           v_MSB_bit      := '0';
           v_MSB_bit_last := '0';
-          v_fsm_state        := E_WAIT;
+          v_fsm_state    := E_WAIT;
 
         when E_WAIT =>
           ---------------------------------------------------------------------
@@ -275,7 +259,7 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
             v_cnt := v_cnt + 1;
           end if;
           -- 
-          v_MSB_bit := v_cnt(v_cnt'high);
+          v_MSB_bit      := v_cnt(v_cnt'high);
           if v_MSB_bit /= v_MSB_bit_last then
             v_overflow := '1';
           end if;
@@ -283,7 +267,7 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
 
           v_fsm_state := E_RUN;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
       o_overflow <= v_overflow;
@@ -293,32 +277,31 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
     end loop;
   end procedure pkg_data_valid_counter;
 
-
   ---------------------------------------------------------------------
--- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
--- if the i_load is set to '1', then i_load_data is load in the counter
--- Note: 
---   . The last counter bit is used to detect an overflow.
----------------------------------------------------------------------
+  -- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
+  -- if the i_load is set to '1', then i_load_data is load in the counter
+  -- Note: 
+  --   . The last counter bit is used to detect an overflow.
+  ---------------------------------------------------------------------
   procedure pkg_data_valid_counter_with_load(
-                               signal i_clk        : in  std_logic;
-                               -- input
-                               signal i_start      : in  std_logic;
-                               signal i_data_valid : in std_logic;
-                               signal i_load       : in std_logic;
-                               signal i_load_data  : in std_logic_vector;
-                               -- output
-                               signal o_count     : out std_logic_vector;
-                               signal o_overflow  : out std_logic
-                               ) is
+    signal i_clk        : in std_logic;
+    -- input
+    signal i_start      : in std_logic;
+    signal i_data_valid : in std_logic;
+    signal i_load       : in std_logic;
+    signal i_load_data  : in std_logic_vector;
+    -- output
+    signal o_count      : out std_logic_vector;
+    signal o_overflow   : out std_logic
+  ) is
     type t_state is (E_RST, E_WAIT, E_RUN);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
-    variable v_cnt          : unsigned(o_count'high + 1 downto 0) := (others => '0');  -- add 1 to detect an overflow
-    variable v_MSB_bit_last : std_logic                              := '0';
-    variable v_MSB_bit      : std_logic                              := '0';
-    variable v_overflow     : std_logic                              := '0';
+    variable v_cnt          : unsigned(o_count'high + 1 downto 0) := (others => '0'); -- add 1 to detect an overflow
+    variable v_MSB_bit_last : std_logic                           := '0';
+    variable v_MSB_bit      : std_logic                           := '0';
+    variable v_overflow     : std_logic                           := '0';
   begin
     while c_TEST loop
       case v_fsm_state is
@@ -328,7 +311,7 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
           v_overflow     := '0';
           v_MSB_bit      := '0';
           v_MSB_bit_last := '0';
-          v_fsm_state        := E_WAIT;
+          v_fsm_state    := E_WAIT;
 
         when E_WAIT =>
           ---------------------------------------------------------------------
@@ -350,7 +333,7 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
             end if;
           end if;
           -- 
-          v_MSB_bit := v_cnt(v_cnt'high);
+          v_MSB_bit      := v_cnt(v_cnt'high);
           if v_MSB_bit /= v_MSB_bit_last then
             v_overflow := '1';
           end if;
@@ -358,7 +341,7 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
 
           v_fsm_state := E_RUN;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
       o_overflow <= v_overflow;
@@ -368,28 +351,26 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
     end loop;
   end procedure pkg_data_valid_counter_with_load;
 
-  
-
----------------------------------------------------------------------
--- frame_flags_builder_file
--- This function allows allows to generate (sof, eof) flags
----------------------------------------------------------------------
-  procedure pkg_frame_flags_builder (
-    signal i_clk        : in  std_logic;
-    signal i_start      : in  std_logic;
-    signal i_data_valid : in  std_logic;
-    i_filepath          : in  string;
-    i_csv_separator     : in  character;
-    signal o_sof       : out std_logic;
-    signal o_eof       : out std_logic;
-    signal o_index     : out integer;
-    signal o_finish    : out std_logic
-    ) is
+  ---------------------------------------------------------------------
+  -- frame_flags_builder_file
+  -- This function allows allows to generate (sof, eof) flags
+  ---------------------------------------------------------------------
+  procedure pkg_frame_flags_builder(
+    signal i_clk        : in std_logic;
+    signal i_start      : in std_logic;
+    signal i_data_valid : in std_logic;
+    i_filepath          : in string;
+    i_csv_separator     : in character;
+    signal o_sof        : out std_logic;
+    signal o_eof        : out std_logic;
+    signal o_index      : out integer;
+    signal o_finish     : out std_logic
+  ) is
     variable v_csv_file : t_csv_file_reader;
 
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
     variable v_cnt     : integer   := 0;
     variable v_cnt_max : integer   := 0;
@@ -415,7 +396,7 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
           if i_start = '1' then
             v_cnt   := 0;
             v_index := 0;
-            v_csv_file.initialize(i_filepath, csv_separator => i_csv_separator);
+            v_csv_file.initialize(i_filepath, i_csv_separator => i_csv_separator);
             -- skip the header
             v_csv_file.readline(void);
 
@@ -476,20 +457,19 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
 
             v_fsm_state := E_RUN;
           else
-            v_sof   := '0';
-            v_eof   := '0';
+            v_sof       := '0';
+            v_eof       := '0';
             v_fsm_state := E_RUN;
           end if;
 
         when E_END =>
 
-          v_finish := '1';
-          v_fsm_state  := E_END;
+          v_finish    := '1';
+          v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
-
 
       o_sof    <= v_sof;
       o_eof    <= v_eof;
@@ -503,24 +483,22 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
 
   ---------------------------------------------------------------------
   -- frame_flags_builder_cst
--- This function allows allows to generate (sof, eof) flags
----------------------------------------------------------------------
-  procedure pkg_frame_flags_builder (
-    signal i_clk          : in std_logic;
-    signal i_start        : in std_logic;
-    signal i_data_valid   : in std_logic;
+  -- This function allows allows to generate (sof, eof) flags
+  ---------------------------------------------------------------------
+  procedure pkg_frame_flags_builder(
+    signal   i_clk        : in std_logic;
+    signal   i_start      : in std_logic;
+    signal   i_data_valid : in std_logic;
     constant i_frame_size : in integer;
-
-    signal o_sof    : out std_logic;
-    signal o_eof    : out std_logic;
-    signal o_index  : out integer;
-    signal o_finish : out std_logic
-    ) is
-
+    signal   o_sof        : out std_logic;
+    signal   o_eof        : out std_logic;
+    signal   o_index      : out integer;
+    signal   o_finish     : out std_logic
+  ) is
 
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
+    constant c_TEST      : boolean := true;
 
     variable v_cnt     : integer   := 0;
     variable v_cnt_max : integer   := 0;
@@ -543,11 +521,11 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
           -- wait to be sure: uvvm object are correctly initialized
           ---------------------------------------------------------------------
           if i_start = '1' then
-            v_cnt     := 0;
-            v_index   := 0;
-            v_cnt_max := i_frame_size;
-            v_finish  := '0';
-            v_fsm_state   := E_RUN;
+            v_cnt       := 0;
+            v_index     := 0;
+            v_cnt_max   := i_frame_size;
+            v_finish    := '0';
+            v_fsm_state := E_RUN;
           else
             v_fsm_state := E_WAIT;
           end if;
@@ -578,20 +556,19 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
             end if;
             v_fsm_state := E_RUN;
           else
-            v_sof   := '0';
-            v_eof   := '0';
+            v_sof       := '0';
+            v_eof       := '0';
             v_fsm_state := E_RUN;
           end if;
 
         when E_END =>
 
-          v_finish := '1';
-          v_fsm_state  := E_END;
+          v_finish    := '1';
+          v_fsm_state := E_END;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
-
 
       o_sof    <= v_sof;
       o_eof    <= v_eof;
@@ -602,6 +579,5 @@ procedure pkg_wait_nb_rising_edge_plus_margin (
     end loop;
 
   end procedure pkg_frame_flags_builder;
-
 
 end package body pkg_common;

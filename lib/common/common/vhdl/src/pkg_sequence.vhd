@@ -24,12 +24,11 @@
 -- -------------------------------------------------------------------------------------------------------------
 --    @details
 --    This simulation VHDL package defines VHDL functions/procedures in order to
---      . generate a sequence of pulse.
+--      . generate a sequence of pulse with a configurable duty cycle.
 --
 --    Note: This package should be compiled into the common_lib
 --    Dependencies: 
 --      . csv_lib.pkg_csv_file
---      . common_lib.pkg_common
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -40,128 +39,120 @@ use ieee.numeric_std.all;
 library csv_lib;
 use csv_lib.pkg_csv_file.all;
 
-library common_lib;
-use common_lib.pkg_common.all;
 
+use work.pkg_common.all;
 
 package pkg_sequence is
 
+  ---------------------------------------------------------------------
+  -- this function generates an output valid signal with a configurable duty cycle. 
+  --   .the behaviour is provived by the input csv file
+  --   .the file has the following parameters
+  --       :param ctrl: define the mode. Possibles values are:
+  --               .0: continuous valid generation
+  --                   . min_value1, max_value1, min_value2, max_value2 values are ignored
+  --               .1. constant short pulse generation
+  --                   . a positive pulse with a width of 1 clock cycle followed by
+  --                   . a negative pulse with a constant width defined by the min_value2 value
+  --               .2. constant pulse generation
+  --                   . a positive pulse with a width defined by the v_min_value1 value followed by
+  --                   . a negative pulse with a width defined by the v_min_value2 value
+  --               .3: random short pulse generation
+  --                   . a positive pulse with a width of 1 clock cycle followed by
+  --                   . a negative pulse with a random width between min_value2 and max_value2
+  --               .4. random pulse generation
+  --                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
+  --                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
+  --               others values : continuous valid generation
+  --               others values : continuous valid generation
+  --       :param min_value1: define a min value for the positive pulse
+  --       :param max_value1: define a max value for the positive pulse
+  --       :param min_value2: define a min value for the negative pulse
+  --       :param max_value2: define a min value for the negative pulse
+  --       :param num_rising_edge_before_pulse: define a starting offset before generating pulses
+  ---------------------------------------------------------------------
+  procedure pkg_valid_sequencer(signal i_clk   : in std_logic;
+                                signal i_en    : in std_logic;
+                                i_filepath      : in string;
+                                i_csv_separator : in character;
+                                signal o_valid : out std_logic
+                               );
 
----------------------------------------------------------------------
--- this function allows to generate a output valid signal from a *.csv configuration file. Several method are
--- implemented
---   .the behaviour is provived by the input file
---   .the file has the following parameters/value
---       :param ctrl: define the mode: Possibles values are:
---               .0: continuous valid generation
---                   . min_value1, max_value1, min_value2, max_value2 values are ignored
---               .1. constant short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a constant width defined by the min_value2 value
---               .2. constant pulse generation
---                   . a positive pulse with a width defined by the v_min_value1 value followed by
---                   . a negative pulse with a width defined by the v_min_value2 value
---               .3: random short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a random width between min_value2 and max_value2
---               .4. random pulse generation
---                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
---                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
---               others values : continuous valid generation
---               others values : continuous valid generation
---       :param min_value1: define a min value for the positive pulse
---       :param max_value1: define a max value for the positive pulse
---       :param min_value2: define a min value for the negative pulse
---       :param max_value2: define a min value for the negative pulse
---       :param num_rising_edge_before_pulse_gen: define a starting offset before generating pulses
----------------------------------------------------------------------
-  procedure pkg_valid_sequencer(signal i_clk    : in  std_logic;
-                            signal i_en     : in  std_logic;
-                            i_filepath      : in  string;
-                            i_csv_separator : in  character;
-                            signal o_valid : out std_logic
-                            );
-
----------------------------------------------------------------------
--- this function allows to generate a output valid signal from input parameters. Several method are
--- implemented
---   .the parameters/values are:
---       :param ctrl: define the mode: Possibles values are:
---               .0: continuous valid generation
---                   . min_value1, max_value1, min_value2, max_value2 values are ignored
---               .1. constant short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a constant width defined by the min_value2 value
---               .2. constant pulse generation
---                   . a positive pulse with a width defined by the v_min_value1 value followed by
---                   . a negative pulse with a width defined by the v_min_value2 value
---               .3: random short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a random width between min_value2 and max_value2
---               .4. random pulse generation
---                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
---                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
---               others values : continuous valid generation
---       :param min_value1: define a min value for the positive pulse
---       :param max_value1: define a max value for the positive pulse
---       :param min_value2: define a min value for the negative pulse
---       :param max_value2: define a min value for the negative pulse
---       :param num_rising_edge_before_pulse_gen: define a starting offset before generating pulses
-  procedure pkg_valid_sequencer(signal i_clk : in std_logic;
-                            signal i_en  : in std_logic;
-
-                            constant i_ctrl                             : in integer := 0;
-                            constant i_min_value1                       : in integer := 0;
-                            constant i_max_value1                       : in integer := 0;
-                            constant i_min_value2                       : in integer := 0;
-                            constant i_max_value2                       : in integer := 0;
-                            constant i_num_rising_edge_before_pulse_gen : in integer := 0;
-
-                            signal o_valid : out std_logic
-                            );
-
+  ---------------------------------------------------------------------
+  -- this function generates an output valid signal with a configurable duty cycle. 
+  --   .the parameters are:
+  --       :param ctrl: define the mode: Possibles values are:
+  --               .0: continuous valid generation
+  --                   . min_value1, max_value1, min_value2, max_value2 values are ignored
+  --               .1. constant short pulse generation
+  --                   . a positive pulse with a width of 1 clock cycle followed by
+  --                   . a negative pulse with a constant width defined by the min_value2 value
+  --               .2. constant pulse generation
+  --                   . a positive pulse with a width defined by the v_min_value1 value followed by
+  --                   . a negative pulse with a width defined by the v_min_value2 value
+  --               .3: random short pulse generation
+  --                   . a positive pulse with a width of 1 clock cycle followed by
+  --                   . a negative pulse with a random width between min_value2 and max_value2
+  --               .4. random pulse generation
+  --                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
+  --                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
+  --               others values : continuous valid generation
+  --       :param min_value1: define a min value for the positive pulse
+  --       :param max_value1: define a max value for the positive pulse
+  --       :param min_value2: define a min value for the negative pulse
+  --       :param max_value2: define a min value for the negative pulse
+  --       :param num_rising_edge_before_pulse: define a starting offset before generating pulses
+  procedure pkg_valid_sequencer(signal   i_clk                              : in std_logic;
+                                signal   i_en                               : in std_logic;
+                                constant i_ctrl                             : in integer := 0;
+                                constant i_min_value1                       : in integer := 0;
+                                constant i_max_value1                       : in integer := 0;
+                                constant i_min_value2                       : in integer := 0;
+                                constant i_max_value2                       : in integer := 0;
+                                constant i_num_rising_edge_before_pulse     : in integer := 0;
+                                signal   o_valid                            : out std_logic
+                               );
 
 end package pkg_sequence;
 
 package body pkg_sequence is
 
----------------------------------------------------------------------
--- this function allows to generate a output valid signal from a *.csv configuration file. Several method are
--- implemented
---   .the behaviour is provived by the input file
---   .the file has the following parameters/value
---       :param ctrl: define the mode: Possibles values are:
---               .0: continuous valid generation
---                   . min_value1, max_value1, min_value2, max_value2 values are ignored
---               .1. constant short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a constant width defined by the min_value2 value
---               .2. constant pulse generation
---                   . a positive pulse with a width defined by the v_min_value1 value followed by
---                   . a negative pulse with a width defined by the v_min_value2 value
---               .3: random short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a random width between min_value2 and max_value2
---               .4. random pulse generation
---                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
---                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
---               others values : continuous valid generation
---       :param min_value1: define a min value for the positive pulse
---       :param max_value1: define a max value for the positive pulse
---       :param min_value2: define a min value for the negative pulse
---       :param max_value2: define a min value for the negative pulse
---       :param num_rising_edge_before_pulse_gen: define a starting offset before generating pulses
----------------------------------------------------------------------
-  procedure pkg_valid_sequencer(signal i_clk    : in  std_logic;
-                            signal i_en     : in  std_logic;
-                            i_filepath      : in  string;
-                            i_csv_separator : in  character;
-                            signal o_valid : out std_logic
-                            ) is
+  ---------------------------------------------------------------------
+  -- this function generates an output valid signal with a configurable duty cycle. 
+  --   .the behaviour is provived by the input csv file
+  --   .the file has the following parameters
+  --       :param ctrl: define the mode: Possibles values are:
+  --               .0: continuous valid generation
+  --                   . min_value1, max_value1, min_value2, max_value2 values are ignored
+  --               .1. constant short pulse generation
+  --                   . a positive pulse with a width of 1 clock cycle followed by
+  --                   . a negative pulse with a constant width defined by the min_value2 value
+  --               .2. constant pulse generation
+  --                   . a positive pulse with a width defined by the v_min_value1 value followed by
+  --                   . a negative pulse with a width defined by the v_min_value2 value
+  --               .3: random short pulse generation
+  --                   . a positive pulse with a width of 1 clock cycle followed by
+  --                   . a negative pulse with a random width between min_value2 and max_value2
+  --               .4. random pulse generation
+  --                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
+  --                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
+  --               others values : continuous valid generation
+  --       :param min_value1: define a min value for the positive pulse
+  --       :param max_value1: define a max value for the positive pulse
+  --       :param min_value2: define a min value for the negative pulse
+  --       :param max_value2: define a min value for the negative pulse
+  --       :param num_rising_edge_before_pulse_gen: define a starting offset before generating pulses
+  ---------------------------------------------------------------------
+  procedure pkg_valid_sequencer(signal i_clk   : in std_logic;
+                                signal i_en    : in std_logic;
+                                i_filepath      : in string;
+                                i_csv_separator : in character;
+                                signal o_valid : out std_logic
+                               ) is
     type t_state is (E_RST, E_WAIT, E_RUN, E_TEMPO_NEG, E_TEMPO_POS);
-    variable v_fsm_state    : t_state := E_RST;
-    constant c_TEST     : boolean   := true;
-    variable v_csv_file : t_csv_file_reader;
+    variable v_fsm_state : t_state := E_RST;
+    constant c_TEST      : boolean := true;
+    variable v_csv_file  : t_csv_file_reader;
 
     variable v_ctrl : integer := 0;
 
@@ -171,7 +162,7 @@ package body pkg_sequence is
     variable v_min_value2 : integer := 0;
     variable v_max_value2 : integer := 0;
 
-    variable v_num_rising_edge_before_pulse_gen : integer := 0;
+    variable v_num_rising_edge_before_pulse : integer := 0;
 
     variable v_tempo_pos : integer   := 0;
     variable v_tempo_neg : integer   := 0;
@@ -184,7 +175,7 @@ package body pkg_sequence is
       case v_fsm_state is
         when E_RST =>
 
-          v_valid := '0';
+          v_valid     := '0';
           v_fsm_state := E_WAIT;
 
         when E_WAIT =>
@@ -192,7 +183,7 @@ package body pkg_sequence is
           -- wait to be sure: uvvm object are correctly initialized
           ---------------------------------------------------------------------
           if i_en = '1' then
-            v_csv_file.initialize(i_filepath, csv_separator => i_csv_separator);
+            v_csv_file.initialize(i_filepath, i_csv_separator => i_csv_separator);
             -- skip the header
             v_csv_file.readline;
 
@@ -209,13 +200,13 @@ package body pkg_sequence is
             -- get the max value2
             v_max_value2                       := v_csv_file.read_integer;
             -- get the v_num_rising_edge_before_pulse_gen
-            v_num_rising_edge_before_pulse_gen := v_csv_file.read_integer;
+            v_num_rising_edge_before_pulse := v_csv_file.read_integer;
 
-            if v_num_rising_edge_before_pulse_gen < 0 then
+            if v_num_rising_edge_before_pulse < 0 then
               v_fsm_state := E_RUN;
             else
-              v_tempo_neg := v_num_rising_edge_before_pulse_gen;
-              v_fsm_state     := E_TEMPO_NEG;
+              v_tempo_neg := v_num_rising_edge_before_pulse;
+              v_fsm_state := E_TEMPO_NEG;
             end if;
 
           else
@@ -227,7 +218,7 @@ package body pkg_sequence is
           case v_ctrl is
             when 0 =>
               -- continuous pulse signal (infinite width)
-              v_valid := '1';
+              v_valid     := '1';
               v_fsm_state := E_RUN;
             when 1 =>
               -- constant short pulse:
@@ -236,7 +227,7 @@ package body pkg_sequence is
               v_valid     := '1';
               v_cnt_tempo := 1;
               v_tempo_neg := v_min_value2;
-              v_fsm_state     := E_TEMPO_NEG;
+              v_fsm_state := E_TEMPO_NEG;
             when 2 =>
               -- constant pulse
               --  a positive pulse with a width defined by the v_min_value1 value followed by
@@ -244,7 +235,7 @@ package body pkg_sequence is
               v_valid     := '1';
               v_tempo_pos := v_min_value1;
               v_tempo_neg := v_min_value2;
-              v_fsm_state     := E_TEMPO_POS;
+              v_fsm_state := E_TEMPO_POS;
             when 3 =>
               -- random short pulse : 
               --   a positive pulse with a width of 1 clock cycle followed by
@@ -252,7 +243,7 @@ package body pkg_sequence is
               v_valid     := '1';
               v_cnt_tempo := 1;
               v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
-              v_fsm_state     := E_TEMPO_NEG;
+              v_fsm_state := E_TEMPO_NEG;
 
             when 4 =>
               -- random pulse : random pulse 
@@ -261,37 +252,35 @@ package body pkg_sequence is
               v_valid     := '1';
               v_tempo_pos := pkg_random_by_range(v_min_value1, v_max_value1);
               v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
-              v_fsm_state     := E_TEMPO_POS;
-
+              v_fsm_state := E_TEMPO_POS;
 
             when others =>
               -- continuous valid
-              v_valid := '1';
+              v_valid     := '1';
               v_fsm_state := E_RUN;
           end case;
-
 
         when E_TEMPO_NEG =>
           v_valid := '0';
           if v_cnt_tempo = v_tempo_neg then
             v_cnt_tempo := 1;
-            v_fsm_state     := E_RUN;
+            v_fsm_state := E_RUN;
           else
             v_cnt_tempo := v_cnt_tempo + 1;
-            v_fsm_state     := E_TEMPO_NEG;
+            v_fsm_state := E_TEMPO_NEG;
           end if;
 
         when E_TEMPO_POS =>
           v_valid := '1';
           if v_cnt_tempo = v_tempo_pos then
             v_cnt_tempo := 1;
-            v_fsm_state     := E_TEMPO_NEG;
+            v_fsm_state := E_TEMPO_NEG;
           else
             v_cnt_tempo := v_cnt_tempo + 1;
-            v_fsm_state     := E_TEMPO_POS;
+            v_fsm_state := E_TEMPO_POS;
           end if;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -301,48 +290,44 @@ package body pkg_sequence is
     end loop;
   end procedure pkg_valid_sequencer;
 
----------------------------------------------------------------------
--- this function allows to generate a output valid signal from input parameters. Several method are
--- implemented
---   .the parameters/values are:
---       :param ctrl: define the mode: Possibles values are:
---               .0: continuous valid generation
---                   . min_value1, max_value1, min_value2, max_value2 values are ignored
---               .1. constant short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a constant width defined by the min_value2 value
---               .2. constant pulse  generation
---                   . a positive pulse with a width defined by the v_min_value1 value followed by
---                   . a negative pulse with a width defined by the v_min_value2 value
---               .3: random short pulse generation
---                   . a positive pulse with a width of 1 clock cycle followed by
---                   . a negative pulse with a random width between min_value2 and max_value2
---               .4. random pulse generation
---                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
---                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
---               others values : continuous valid generation
---       :param min_value1: define a min value for the positive pulse
---       :param max_value1: define a max value for the positive pulse
---       :param min_value2: define a min value for the negative pulse
---       :param max_value2: define a min value for the negative pulse
---       :param num_rising_edge_before_pulse_gen: define a starting offset before generating pulses
----------------------------------------------------------------------
-  procedure pkg_valid_sequencer(signal i_clk : in std_logic;
-                            signal i_en  : in std_logic;
-
-                            constant i_ctrl                             : in integer := 0;
-                            constant i_min_value1                       : in integer := 0;
-                            constant i_max_value1                       : in integer := 0;
-                            constant i_min_value2                       : in integer := 0;
-                            constant i_max_value2                       : in integer := 0;
-                            constant i_num_rising_edge_before_pulse_gen : in integer := 0;
-
-                            signal o_valid : out std_logic
-                            ) is
+  ---------------------------------------------------------------------
+  -- this function generates an output valid signal with a configurable duty cycle. 
+  --   .the parameters are:
+  --       :param ctrl: define the mode: Possibles values are:
+  --               .0: continuous valid generation
+  --                   . min_value1, max_value1, min_value2, max_value2 values are ignored
+  --               .1. constant short pulse generation
+  --                   . a positive pulse with a width of 1 clock cycle followed by
+  --                   . a negative pulse with a constant width defined by the min_value2 value
+  --               .2. constant pulse  generation
+  --                   . a positive pulse with a width defined by the v_min_value1 value followed by
+  --                   . a negative pulse with a width defined by the v_min_value2 value
+  --               .3: random short pulse generation
+  --                   . a positive pulse with a width of 1 clock cycle followed by
+  --                   . a negative pulse with a random width between min_value2 and max_value2
+  --               .4. random pulse generation
+  --                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
+  --                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_
+  --               others values : continuous valid generation
+  --       :param min_value1: define a min value for the positive pulse
+  --       :param max_value1: define a max value for the positive pulse
+  --       :param min_value2: define a min value for the negative pulse
+  --       :param max_value2: define a min value for the negative pulse
+  --       :param num_rising_edge_before_pulse: define a starting offset before generating pulses
+  ---------------------------------------------------------------------
+  procedure pkg_valid_sequencer(signal   i_clk                              : in std_logic;
+                                signal   i_en                               : in std_logic;
+                                constant i_ctrl                             : in integer := 0;
+                                constant i_min_value1                       : in integer := 0;
+                                constant i_max_value1                       : in integer := 0;
+                                constant i_min_value2                       : in integer := 0;
+                                constant i_max_value2                       : in integer := 0;
+                                constant i_num_rising_edge_before_pulse     : in integer := 0;
+                                signal   o_valid                            : out std_logic
+                               ) is
     type t_state is (E_RST, E_WAIT, E_RUN, E_TEMPO_NEG, E_TEMPO_POS);
     variable v_fsm_state : t_state := E_RST;
-    constant c_TEST  : boolean   := true;
-
+    constant c_TEST      : boolean := true;
 
     variable v_ctrl : integer := 0;
 
@@ -352,7 +337,7 @@ package body pkg_sequence is
     variable v_min_value2 : integer := 0;
     variable v_max_value2 : integer := 0;
 
-    variable v_num_rising_edge_before_pulse_gen : integer := 0;
+    variable v_num_rising_edge_before_pulse : integer := 0;
 
     variable v_tempo_pos : integer   := 0;
     variable v_tempo_neg : integer   := 0;
@@ -365,7 +350,7 @@ package body pkg_sequence is
       case v_fsm_state is
         when E_RST =>
 
-          v_valid := '0';
+          v_valid     := '0';
           v_fsm_state := E_WAIT;
 
         when E_WAIT =>
@@ -385,13 +370,13 @@ package body pkg_sequence is
             -- get the max value2
             v_max_value2                       := i_max_value2;
             -- get the v_num_rising_edge_before_pulse_gen
-            v_num_rising_edge_before_pulse_gen := i_num_rising_edge_before_pulse_gen;
+            v_num_rising_edge_before_pulse := i_num_rising_edge_before_pulse;
 
-            if v_num_rising_edge_before_pulse_gen < 0 then
+            if v_num_rising_edge_before_pulse < 0 then
               v_fsm_state := E_RUN;
             else
-              v_tempo_neg := v_num_rising_edge_before_pulse_gen;
-              v_fsm_state     := E_TEMPO_NEG;
+              v_tempo_neg := v_num_rising_edge_before_pulse;
+              v_fsm_state := E_TEMPO_NEG;
             end if;
 
           else
@@ -403,7 +388,7 @@ package body pkg_sequence is
           case v_ctrl is
             when 0 =>
               -- continuous pulse signal (infinite width)
-              v_valid := '1';
+              v_valid     := '1';
               v_fsm_state := E_RUN;
             when 1 =>
               -- constant short pulse:
@@ -412,7 +397,7 @@ package body pkg_sequence is
               v_valid     := '1';
               v_cnt_tempo := 0;
               v_tempo_neg := v_min_value2;
-              v_fsm_state     := E_TEMPO_NEG;
+              v_fsm_state := E_TEMPO_NEG;
             when 2 =>
               -- constant pulse
               --  a positive pulse with a width defined by the v_min_value1 value followed by
@@ -420,7 +405,7 @@ package body pkg_sequence is
               v_valid     := '1';
               v_tempo_pos := v_min_value1;
               v_tempo_neg := v_min_value2;
-              v_fsm_state     := E_TEMPO_POS;
+              v_fsm_state := E_TEMPO_POS;
             when 3 =>
               -- random short pulse : 
               --   a positive pulse with a width of 1 clock cycle followed by
@@ -428,7 +413,7 @@ package body pkg_sequence is
               v_valid     := '1';
               v_cnt_tempo := 0;
               v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
-              v_fsm_state     := E_TEMPO_NEG;
+              v_fsm_state := E_TEMPO_NEG;
 
             when 4 =>
               -- random pulse : random pulse 
@@ -437,37 +422,35 @@ package body pkg_sequence is
               v_valid     := '1';
               v_tempo_pos := pkg_random_by_range(v_min_value1, v_max_value1);
               v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
-              v_fsm_state     := E_TEMPO_POS;
-
+              v_fsm_state := E_TEMPO_POS;
 
             when others =>
               -- continuous valid
-              v_valid := '1';
+              v_valid     := '1';
               v_fsm_state := E_RUN;
           end case;
-
 
         when E_TEMPO_NEG =>
           v_valid := '0';
           if v_cnt_tempo = v_tempo_neg then
             v_cnt_tempo := 0;
-            v_fsm_state     := E_RUN;
+            v_fsm_state := E_RUN;
           else
             v_cnt_tempo := v_cnt_tempo + 1;
-            v_fsm_state     := E_TEMPO_NEG;
+            v_fsm_state := E_TEMPO_NEG;
           end if;
 
         when E_TEMPO_POS =>
           v_valid := '1';
           if v_cnt_tempo = v_tempo_pos then
             v_cnt_tempo := 0;
-            v_fsm_state     := E_TEMPO_NEG;
+            v_fsm_state := E_TEMPO_NEG;
           else
             v_cnt_tempo := v_cnt_tempo + 1;
-            v_fsm_state     := E_TEMPO_POS;
+            v_fsm_state := E_TEMPO_POS;
           end if;
 
-        when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
       end case;
 
@@ -476,9 +459,5 @@ package body pkg_sequence is
       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 0 ps);
     end loop;
   end procedure pkg_valid_sequencer;
-
-
-
-
 
 end package body pkg_sequence;

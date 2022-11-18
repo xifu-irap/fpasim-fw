@@ -25,8 +25,10 @@
 --    @details                
 --    This file defines a context.
 --    It's used to define a set of library and package use clauses into a single unit that can be reused
+--
+-- Note: the following package are compiled in the common_lib library
+--
 -- -------------------------------------------------------------------------------------------------------------
-
 
 context common_context is
   library common_lib;
