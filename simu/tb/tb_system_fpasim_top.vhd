@@ -199,7 +199,19 @@ architecture simulate of tb_system_fpasim_top is
   -- loggers 
   constant c_LOGGER_SUMMARY : logger_t  := get_logger("log:summary"); -- @suppress "Expression does not result in a constant"
   -- checkers
-  constant c_CHECKER_DATA   : checker_t := new_checker("check:data"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG   : checker_t := new_checker("check:reg:data"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM_TES_PULSE_SHAPE   : checker_t := new_checker("check:ram:tes_pulse_shape"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM_AMP_SQUID_TF   : checker_t := new_checker("check:ram:amp_squid_tf"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM_MUX_SQUID_TF   : checker_t := new_checker("check:ram:mux_squid_tf"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM_TES_STEADY_STATE   : checker_t := new_checker("check:ram:tes_steady_state"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM_MUX_SQUID_OFFSET   : checker_t := new_checker("check:ram:mux_squid_offset"); -- @suppress "Expression does not result in a constant"
+
+  constant c_CHECKER_REG_CTRL   : checker_t := new_checker("check:reg:ctrl"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG_FPASIM_GAIN   : checker_t := new_checker("check:reg:fpasim_gain"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG_MUX_SQ_FB_DELAY   : checker_t := new_checker("check:reg:mux_sq_fb_delay"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG_AMP_SQ_OF_DELAY   : checker_t := new_checker("check:reg:amp_sq_of_delay"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG_ERROR_DELAY   : checker_t := new_checker("check:reg:error_delay"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG_RA_DELAY   : checker_t := new_checker("check:reg:ra_delay"); -- @suppress "Expression does not result in a constant"
 
   signal usb_wr_if0 : opal_kelly_lib.pkg_front_panel.t_internal_wr_if := (
     hi_drive   => '0',
@@ -302,7 +314,14 @@ begin
     -- VUNIT - checking errors and summary
     ---------------------------------------------------------------------
     -- summary
-    info(c_LOGGER_SUMMARY, "===Summary===" & LF & "c_CHECKER_DATA: " & to_string(get_checker_stat(c_CHECKER_DATA))
+    info(c_LOGGER_SUMMARY,
+     "===Summary===" & LF &
+     "c_CHECKER_REG: " & to_string(get_checker_stat(c_CHECKER_REG)) & LF &
+     "c_CHECKER_RAM_TES_PULSE_SHAPE: " & to_string(get_checker_stat(c_CHECKER_RAM_TES_PULSE_SHAPE)) & LF &
+     "c_CHECKER_RAM_AMP_SQUID_TF: " & to_string(get_checker_stat(c_CHECKER_RAM_AMP_SQUID_TF)) & LF &
+     "c_CHECKER_RAM_MUX_SQUID_TF: " & to_string(get_checker_stat(c_CHECKER_RAM_MUX_SQUID_TF)) & LF &
+     "c_CHECKER_RAM_TES_STEADY_STATE: " & to_string(get_checker_stat(c_CHECKER_RAM_TES_STEADY_STATE)) & LF &
+     "c_CHECKER_RAM_MUX_SQUID_OFFSET: " & to_string(get_checker_stat(c_CHECKER_RAM_MUX_SQUID_OFFSET)) & LF
     );
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
@@ -361,7 +380,15 @@ begin
       b_front_panel_conf => v_front_panel_conf,
       o_internal_wr_if   => usb_wr_if0,
       i_internal_rd_if   => usb_rd_if0,
-      i_data0_sb         => c_CHECKER_DATA,
+      ---------------------------------------------------------------------
+      -- Vunit Scoreboard objects
+      ---------------------------------------------------------------------
+      i_sb_reg_data         => c_CHECKER_REG,
+      i_sb_ram_tes_pulse_shape => c_CHECKER_RAM_TES_PULSE_SHAPE,
+     i_sb_ram_amp_squid_tf => c_CHECKER_RAM_AMP_SQUID_TF,
+     i_sb_ram_mux_squid_tf => c_CHECKER_RAM_MUX_SQUID_TF,
+     i_sb_ram_tes_steady_state => c_CHECKER_RAM_TES_STEADY_STATE,
+     i_sb_ram_mux_offset => c_CHECKER_RAM_MUX_SQUID_OFFSET,
       ---------------------------------------------------------------------
       -- data
       ---------------------------------------------------------------------
