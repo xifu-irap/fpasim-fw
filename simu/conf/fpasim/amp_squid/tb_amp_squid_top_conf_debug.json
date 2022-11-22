@@ -105,5 +105,12 @@
             "max_value2":2,
             "time_shift":0
         }
+    },
+    "model":
+    {
+        "value":
+        {
+            "output_filename":"py_check_data_out.csv"
+        }
     }
 }
