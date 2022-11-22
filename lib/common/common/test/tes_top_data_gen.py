@@ -37,6 +37,8 @@
 from common import Display
 from common import ValidSequencer
 from pathlib import Path,PurePosixPath
+from common import TesSignallingModel
+from common import TesModel
 import json
 import os
 import shutil
@@ -236,9 +238,9 @@ class TesTopDataGen:
         frame_length = nb_sample_by_pixel * nb_pixel_by_frame
 
         # count from 0 instead of 1. So, we need to subtract -1 to the values
-        pixel_length_tmp = pixel_length - 1
+        pixel_length_tmp      = pixel_length - 1
         nb_pixel_by_frame_tmp = nb_pixel_by_frame - 1
-        frame_length_tmp = frame_length - 1
+        frame_length_tmp      = frame_length - 1
 
         filepath     = str(Path(tb_input_base_path,filename))
         fid = open(filepath,'w')
@@ -293,9 +295,9 @@ class TesTopDataGen:
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
         filename           = json_data["cmd"]["value"]["filename"]
-        pulse_height_list  = json_data["cmd"]["value"]["pulse_height_list"]
-        pixel_id_list      = json_data["cmd"]["value"]["pixel_id_list"]
-        time_shift_list    = json_data["cmd"]["value"]["time_shift_list"]
+        cmd_pulse_height_list  = json_data["cmd"]["value"]["pulse_height_list"]
+        cmd_pixel_id_list      = json_data["cmd"]["value"]["pixel_id_list"]
+        cmd_time_shift_list    = json_data["cmd"]["value"]["time_shift_list"]
 
         filepath     = str(Path(tb_input_base_path,filename))
         fid = open(filepath,'w')
@@ -306,9 +308,9 @@ class TesTopDataGen:
         fid.write(csv_separator)
         fid.write('time_shift')
         fid.write('\n')
-        index_max = len(pulse_height_list) - 1
+        index_max = len(cmd_pulse_height_list) - 1
         index = 0
-        for pulse_height, pixel_id, time_shift in zip(pulse_height_list,pixel_id_list,time_shift_list):
+        for pulse_height, pixel_id, time_shift in zip(cmd_pulse_height_list,cmd_pixel_id_list,cmd_time_shift_list):
             fid.write(str(pulse_height))
             fid.write(csv_separator)
             fid.write(str(pixel_id))
@@ -330,12 +332,15 @@ class TesTopDataGen:
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
         dic_sequence = []
-        dic_sequence.append(json_data["ram1"]["value"])
-        dic_sequence.append(json_data["ram2"]["value"])
+        dic_sequence.append(json_data["ram1"])
+        dic_sequence.append(json_data["ram2"])
+
+        dic_ram_content_tmp = {}
 
         for dic in dic_sequence:
-            input_filename = dic['input_filename']
-            output_filename = dic['output_filename']
+            input_filename = dic["value"]['input_filename']
+            output_filename = dic["value"]['output_filename']
+            name            = dic["generic"]['name']
             output_filepath = str(Path(tb_input_base_path,output_filename)) 
             input_filepath = vunit_conf_obj.get_data_filepath(filename_p=input_filename,level_p=level1)
 
@@ -345,6 +350,69 @@ class TesTopDataGen:
             display_obj.display(msg_p=msg0,level_p=level2)
 
             shutil.copyfile(input_filepath,output_filepath)
+
+            #####################################################
+            # extract the ram contents in order to compute the expected value 
+            # we assume the data are string representation of integer value
+            #####################################################
+            data_list = []
+            fid_tmp = open(input_filepath,'r')
+            lines = fid_tmp.readlines()
+            fid_tmp.close()
+
+            L = len(lines)
+
+            for i in range(L):
+                line = lines[i]
+                str_addr,str_data = line.split(csv_separator)
+                # skip the header
+                if i != 0:
+                    data_list.append(int(str_data)) 
+
+            # save the ram content
+            dic_ram_content_tmp[name] = data_list
+
+
+        #########################################################
+        # compute the expected output
+        #########################################################
+        obj = TesSignallingModel()
+        obj.set_conf(nb_sample_by_pixel_p=nb_sample_by_pixel, nb_pixel_by_frame_p=nb_pixel_by_frame, nb_frame_by_pulse_p=nb_frame_by_pulse, nb_pulse_p=nb_pulse)
+        pixel_sof_list,pixel_eof_list,pixel_id_list,frame_sof_list,frame_eof_list,frame_id_list = obj.get_data()
+
+        tes_pulse_shape_name = json_data["ram1"]["generic"]["name"]
+        tes_steady_state_name = json_data["ram2"]["generic"]["name"]
+        obj = TesModel()
+        obj.set_ram_tes_pulse_shape(data_list_p=dic_ram_content_tmp[tes_pulse_shape_name])
+        obj.set_ram_tes_steady_state(data_list_p=dic_ram_content_tmp[tes_steady_state_name])
+        obj.set_conf(nb_sample_by_pixel_p=nb_sample_by_pixel)
+        obj.set_pixel_id(data_list_p=pixel_id_list)
+        for pixel_id,time_shift,pulse_height in zip(cmd_pixel_id_list,cmd_time_shift_list,cmd_pulse_height_list):
+            obj.add_command(pixel_id_p=pixel_id,time_shift_p=time_shift,pulse_heigth_p=pulse_height)
+        obj.run()
+
+        result_list = obj.get_result()
+
+        output_filename = json_data["model"]["value"]["output_filename"]
+        output_filepath = str(Path(tb_input_base_path_p,output_filename))
+        fid = open(output_filepath,'w')
+        # write header
+        fid.write("expected_output_int")
+        fid.write(csv_separator)
+        fid.write('pixel_id_uint')
+        fid.write('\n')
+        L = len(result_list)
+        index_max = L - 1
+        for index in range(L):
+            result = result_list[index]
+            pixel_id = pixel_id_list[index]
+            fid.write(str(result))
+            fid.write(csv_separator)
+            fid.write(str(pixel_id))
+            if index != index_max:
+                fid.write('\n')
+
+        fid.close()
 
 
         return None
