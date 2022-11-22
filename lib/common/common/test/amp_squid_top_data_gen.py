@@ -37,6 +37,7 @@
 from common import Display
 from common import ValidSequencer
 from common import TesSignallingModel
+from common import AmpSquidModel
 from pathlib import Path,PurePosixPath
 import json
 import os
@@ -282,16 +283,16 @@ class AmpSquidTopDataGen:
                     res.append(data)
             return res
         # create a sequence of pixel
-        mux_squid_seq_list    = gen_seq(mode_p=amp_squid_offset_correction_mode,min_value_p=amp_squid_offset_correction_min_val,max_value_p=amp_squid_offset_correction_max_val)
+        amp_squid_offset_correction_seq_list    = gen_seq(mode_p=amp_squid_offset_correction_mode,min_value_p=amp_squid_offset_correction_min_val,max_value_p=amp_squid_offset_correction_max_val)
         pixel_result_seq_list = gen_seq(mode_p=pixel_result_mode,min_value_p=pixel_result_min_val,max_value_p=pixel_result_max_val)
 
         # duplicate the seq_list until the number of element is equal to nb_pixel
         nb_pixel = nb_pixel_by_frame * nb_frame_by_pulse * nb_pulse
-        mux_squid_list = gen_pixel(data_list_p=mux_squid_seq_list,nb_pixel_p=nb_pixel)
+        amp_squid_offset_correction_list = gen_pixel(data_list_p=amp_squid_offset_correction_seq_list,nb_pixel_p=nb_pixel)
         pixel_result_list = gen_pixel(data_list_p=pixel_result_seq_list,nb_pixel_p=nb_pixel)
 
         # oversample each sample
-        mux_squid_oversample_list    = oversample(data_list_p=mux_squid_list,oversample_p=nb_sample_by_pixel)
+        amp_squid_offset_correction_oversample_list    = oversample(data_list_p=amp_squid_offset_correction_list,oversample_p=nb_sample_by_pixel)
         pixel_result_oversample_list = oversample(data_list_p=pixel_result_list,oversample_p=nb_sample_by_pixel)
 
         fid = open(filepath,'w')
@@ -323,7 +324,7 @@ class AmpSquidTopDataGen:
             frame_sof = frame_sof_list[i]
             frame_eof = frame_eof_list[i]
             frame_id = frame_id_list[i]
-            amp_squid_offset_correction = mux_squid_oversample_list[i]
+            amp_squid_offset_correction = amp_squid_offset_correction_oversample_list[i]
             # header
             fid.write(str(pixel_sof))
             fid.write(csv_separator)
@@ -352,11 +353,15 @@ class AmpSquidTopDataGen:
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
         dic_sequence = []
-        dic_sequence.append(json_data["ram1"]["value"])
+        dic_sequence.append(json_data["ram1"])
+
+        dic_ram_content_tmp = {}
+
 
         for dic in dic_sequence:
-            input_filename = dic['input_filename']
-            output_filename = dic['output_filename']
+            input_filename = dic["value"]['input_filename']
+            output_filename = dic["value"]['output_filename']
+            name            = dic["generic"]['name']
             output_filepath = str(Path(tb_input_base_path,output_filename)) 
             input_filepath = vunit_conf_obj.get_data_filepath(filename_p=input_filename,level_p=level1)
 
@@ -366,6 +371,59 @@ class AmpSquidTopDataGen:
             display_obj.display(msg_p=msg0,level_p=level2)
 
             shutil.copyfile(input_filepath,output_filepath)
+
+            #####################################################
+            # extract the ram contents in order to compute the expected value 
+            # we assume the data are string representation of integer value
+            #####################################################
+            data_list = []
+            fid_tmp = open(input_filepath,'r')
+            lines = fid_tmp.readlines()
+            fid_tmp.close()
+
+            L = len(lines)
+
+            for i in range(L):
+                line = lines[i]
+                str_addr,str_data = line.split(csv_separator)
+                # skip the header
+                if i != 0:
+                    data_list.append(int(str_data)) 
+
+            # save the ram content
+            dic_ram_content_tmp[name] = data_list
+
+
+        #########################################################
+        # compute the expected output
+        #########################################################
+        fpasim_gain = json_data["register"]["value"]["fpagain"]
+        amp_squid_tf_name = json_data["ram1"]["generic"]["name"]
+        obj = AmpSquidModel()
+        obj.set_ram_amp_squid_tf(data_list_p=dic_ram_content_tmp[amp_squid_tf_name])
+        obj.set_data(data_list_p=pixel_result_oversample_list)
+        obj.set_amp_offset_correction(data_list_p=amp_squid_offset_correction_oversample_list)
+        obj.set_fpasim_gain(data_p=fpasim_gain)
+        obj.run()
+
+        result_list = obj.get_result()
+
+        output_filename = json_data["model"]["value"]["output_filename"]
+        output_filepath = str(Path(tb_input_base_path_p,output_filename))
+        fid = open(output_filepath,'w')
+        # write header
+        fid.write("expected_output_int")
+        fid.write('\n')
+        L = len(result_list)
+        index_max = L - 1
+        for index in range(L):
+            result = result_list[index]
+            fid.write(str(result))
+            if index != index_max:
+                fid.write('\n')
+
+        fid.close()
+
 
 
         return None
