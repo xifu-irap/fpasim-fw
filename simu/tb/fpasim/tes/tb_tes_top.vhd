@@ -188,6 +188,7 @@ architecture simulate of tb_tes_top is
   signal data_count_overflow_out : std_logic; -- @suppress "signal data_count_overflow_out is never read"
 
   signal data_stop : std_logic := '0';
+  signal data_out_error : std_logic_vector(0 downto 0); -- @suppress "signal data_out_error is never read"
 
   ---------------------------------------------------------------------
   -- filepath definition
@@ -229,10 +230,9 @@ architecture simulate of tb_tes_top is
   constant c_FILENAME_RAM2_IN : string := "py_ram_tes_steady_state.csv";
   constant c_FILEPATH_RAM2_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM2_IN;
 
-  -- output data log
-  --constant c_FILENAME_DATA_OUT : string := "vhd_data_out.csv";
-  --constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT;
-
+  -- output check data
+  constant c_FILENAME_CHECK_DATA_OUT : string := "py_check_data_out.csv";
+  constant c_FILEPATH_CHECK_DATA_OUT : string := c_INPUT_BASEPATH & c_FILENAME_CHECK_DATA_OUT;
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
@@ -243,6 +243,7 @@ architecture simulate of tb_tes_top is
   constant c_CHECKER_DATA_COUNT : checker_t := new_checker("check:data_count"); -- @suppress "Expression does not result in a constant"
   constant c_CHECKER_RAM1       : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME); -- @suppress "Expression does not result in a constant"
   constant c_CHECKER_RAM2       : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_DATA       : checker_t := new_checker("check:out:data_out"); -- @suppress "Expression does not result in a constant"
 
 begin
 
@@ -436,8 +437,14 @@ begin
     check_equal(c_CHECKER_DATA_COUNT, data_count_in, data_count_out, result("checker input/output data count"));
 
     -- summary
-    info(c_LOGGER_SUMMARY, "===Summary===" & LF & "c_CHECKER_ERRORS: " & to_string(get_checker_stat(c_CHECKER_ERRORS)) & LF & "c_CHECKER_DATA_COUNT: " & to_string(get_checker_stat(c_CHECKER_DATA_COUNT)) & LF & "c_CHECKER_RAM1: " & to_string(get_checker_stat(c_CHECKER_RAM1)) & LF & "c_CHECKER_RAM2: " & to_string(get_checker_stat(c_CHECKER_RAM2))
+    info(c_LOGGER_SUMMARY, "===Summary===" & LF &
+         "c_CHECKER_DATA: " & to_string(get_checker_stat(c_CHECKER_DATA)) & LF &
+        "c_CHECKER_RAM1: " & to_string(get_checker_stat(c_CHECKER_RAM1)) & LF & 
+        "c_CHECKER_RAM2: " & to_string(get_checker_stat(c_CHECKER_RAM2)) & LF &
+        "c_CHECKER_ERRORS: " & to_string(get_checker_stat(c_CHECKER_ERRORS)) & LF &
+        "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(c_CHECKER_DATA_COUNT))
     );
+
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
@@ -926,5 +933,43 @@ begin
     end generate gen_log_by_id;
 
   end generate gen_log;
+
+   ---------------------------------------------------------------------
+ -- check data
+ ---------------------------------------------------------------------
+  gen_check_data : if g_ENABLE_CHECK = true generate -- @suppress "Redundant boolean equality check with true"
+  begin
+
+    inst_pkg_vunit_data_checker : pkg_vunit_data_checker_1(
+      i_clk            => i_clk,
+      i_start          => data_start,
+      ---------------------------------------------------------------------
+      -- reference file
+      ---------------------------------------------------------------------
+      i_filepath       => c_FILEPATH_CHECK_DATA_OUT,
+      i_csv_separator  => c_CSV_SEPARATOR,
+      i_NAME0          => "mux_squid_out",
+      --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+      --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+      --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+      --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+      --  data type = "STD_VEC" => no data convertion before writing in the output file
+      i_DATA0_TYP      => "UINT",
+      ---------------------------------------------------------------------
+      -- Vunit Scoreboard objects
+      ---------------------------------------------------------------------
+      i_sb_data0       => c_CHECKER_DATA,
+      ---------------------------------------------------------------------
+      -- experimental signals
+      ---------------------------------------------------------------------
+      i_data_valid     => o_pixel_valid,
+      i_data0_std_vect => o_pixel_result,
+      ---------------------------------------------------------------------
+      -- status
+      ---------------------------------------------------------------------
+      o_error_std_vect => data_out_error
+    );
+
+  end generate gen_check_data;
 
 end simulate;
