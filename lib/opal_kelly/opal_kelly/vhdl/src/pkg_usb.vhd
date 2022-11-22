@@ -117,7 +117,12 @@ package pkg_usb is
     ---------------------------------------------------------------------
     -- Vunit Scoreboard objects
     ---------------------------------------------------------------------
-    constant i_data0_sb         : in checker_t;
+    constant i_sb_reg_data         : in checker_t;
+    constant i_sb_ram_tes_pulse_shape         : in checker_t;
+    constant i_sb_ram_amp_squid_tf         : in checker_t;
+    constant i_sb_ram_mux_squid_tf         : in checker_t;
+    constant i_sb_ram_tes_steady_state         : in checker_t;
+    constant i_sb_ram_mux_offset         : in checker_t;
     ---------------------------------------------------------------------
     -- data
     ---------------------------------------------------------------------
@@ -166,7 +171,12 @@ package body pkg_usb is
     ---------------------------------------------------------------------
     -- Vunit Scoreboard objects
     ---------------------------------------------------------------------
-    constant i_data0_sb         : in checker_t;
+    constant i_sb_reg_data         : in checker_t;
+    constant i_sb_ram_tes_pulse_shape         : in checker_t;
+    constant i_sb_ram_amp_squid_tf         : in checker_t;
+    constant i_sb_ram_mux_squid_tf         : in checker_t;
+    constant i_sb_ram_tes_steady_state         : in checker_t;
+    constant i_sb_ram_mux_offset         : in checker_t;
     ---------------------------------------------------------------------
     -- data
     ---------------------------------------------------------------------
@@ -550,49 +560,49 @@ package body pkg_usb is
                 v_wire_data2 := to_integer(unsigned(v_wire_data_out));
 
                 if v_file_reg_id = 37 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get CTRL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get CTRL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 38 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get MAKE_PULSE Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get MAKE_PULSE Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 39 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FPASIM_GAIN Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FPASIM_GAIN Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 40 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get MUX_SQ_FB_DELAY Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get MUX_SQ_FB_DELAY Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 41 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get AMP_SQ_OF_DELAY Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get AMP_SQ_OF_DELAY Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 42 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get ERROR_DELAY Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get ERROR_DELAY Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 43 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get RA_DELAY Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get RA_DELAY Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 44 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get TES_CONF Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get TES_CONF Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 45 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get DATA_COUNT Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get DATA_COUNT Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 46 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get DEBUG_CTRL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get DEBUG_CTRL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 47 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get ERROR_SEL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get ERROR_SEL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 48 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get ERRORS Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get ERRORS Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 49 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get STATUS Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get STATUS Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 50 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FPGA_ID Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FPGA_ID Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 51 then
-                  check_equal(i_data0_sb, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FPGA_VERSION Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FPGA_VERSION Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 v_wire_cnt := v_wire_cnt + 1;
 
@@ -604,7 +614,7 @@ package body pkg_usb is
 
               when 52 =>
                 ---------------------------------------------------------------------
-                -- wire out: TODO if necessary
+                -- trig out: TODO if necessary
                 ---------------------------------------------------------------------
                 v_error(0) := '1';
               when others =>
@@ -648,19 +658,19 @@ package body pkg_usb is
           v_data_out  := v_pipe_rd_data(v_pipe_rd_cnt_word);
 
           if v_file_reg_id = 32 then
-            check_equal(i_data0_sb, v_pipe_rd_data_file(v_pipe_rd_cnt_word), v_pipe_rd_data(v_pipe_rd_cnt_word), result("[pkg_usb_wr] : Get tes_pulse_shape , index: " & to_string(v_pipe_rd_cnt_index) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_pipe_rd_data_file(v_pipe_rd_cnt_word)) & ", (VHDL) : " & to_string(v_pipe_rd_data(v_pipe_rd_cnt_word))));
+            check_equal(i_sb_ram_tes_pulse_shape, v_pipe_rd_data_file(v_pipe_rd_cnt_word), v_pipe_rd_data(v_pipe_rd_cnt_word), result("[pkg_usb_wr] : Get tes_pulse_shape , index: " & to_string(v_pipe_rd_cnt_index) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_pipe_rd_data_file(v_pipe_rd_cnt_word)) & ", (VHDL) : " & to_string(v_pipe_rd_data(v_pipe_rd_cnt_word))));
           end if;
           if v_file_reg_id = 33 then
-            check_equal(i_data0_sb, v_pipe_rd_data_file(v_pipe_rd_cnt_word), v_pipe_rd_data(v_pipe_rd_cnt_word), result("[pkg_usb_wr] : Get amp_squid_tf , index: " & to_string(v_pipe_rd_cnt_index) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_pipe_rd_data_file(v_pipe_rd_cnt_word)) & ", (VHDL) : " & to_string(v_pipe_rd_data(v_pipe_rd_cnt_word))));
+            check_equal(i_sb_ram_amp_squid_tf, v_pipe_rd_data_file(v_pipe_rd_cnt_word), v_pipe_rd_data(v_pipe_rd_cnt_word), result("[pkg_usb_wr] : Get amp_squid_tf , index: " & to_string(v_pipe_rd_cnt_index) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_pipe_rd_data_file(v_pipe_rd_cnt_word)) & ", (VHDL) : " & to_string(v_pipe_rd_data(v_pipe_rd_cnt_word))));
           end if;
           if v_file_reg_id = 34 then
-            check_equal(i_data0_sb, v_pipe_rd_data_file(v_pipe_rd_cnt_word), v_pipe_rd_data(v_pipe_rd_cnt_word), result("[pkg_usb_wr] : Get mux_squid_tf , index: " & to_string(v_pipe_rd_cnt_index) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_pipe_rd_data_file(v_pipe_rd_cnt_word)) & ", (VHDL) : " & to_string(v_pipe_rd_data(v_pipe_rd_cnt_word))));
+            check_equal(i_sb_ram_mux_squid_tf, v_pipe_rd_data_file(v_pipe_rd_cnt_word), v_pipe_rd_data(v_pipe_rd_cnt_word), result("[pkg_usb_wr] : Get mux_squid_tf , index: " & to_string(v_pipe_rd_cnt_index) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_pipe_rd_data_file(v_pipe_rd_cnt_word)) & ", (VHDL) : " & to_string(v_pipe_rd_data(v_pipe_rd_cnt_word))));
           end if;
           if v_file_reg_id = 35 then
-            check_equal(i_data0_sb, v_pipe_rd_data_file(v_pipe_rd_cnt_word), v_pipe_rd_data(v_pipe_rd_cnt_word), result("[pkg_usb_wr] : Get tes_steady_state , index: " & to_string(v_pipe_rd_cnt_index) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_pipe_rd_data_file(v_pipe_rd_cnt_word)) & ", (VHDL) : " & to_string(v_pipe_rd_data(v_pipe_rd_cnt_word))));
+            check_equal(i_sb_ram_tes_steady_state, v_pipe_rd_data_file(v_pipe_rd_cnt_word), v_pipe_rd_data(v_pipe_rd_cnt_word), result("[pkg_usb_wr] : Get tes_steady_state , index: " & to_string(v_pipe_rd_cnt_index) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_pipe_rd_data_file(v_pipe_rd_cnt_word)) & ", (VHDL) : " & to_string(v_pipe_rd_data(v_pipe_rd_cnt_word))));
           end if;
           if v_file_reg_id = 36 then
-            check_equal(i_data0_sb, v_pipe_rd_data_file(v_pipe_rd_cnt_word), v_pipe_rd_data(v_pipe_rd_cnt_word), result("[pkg_usb_wr] : Get mux_squid_offset , index: " & to_string(v_pipe_rd_cnt_index) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_pipe_rd_data_file(v_pipe_rd_cnt_word)) & ", (VHDL) : " & to_string(v_pipe_rd_data(v_pipe_rd_cnt_word))));
+            check_equal(i_sb_ram_mux_offset, v_pipe_rd_data_file(v_pipe_rd_cnt_word), v_pipe_rd_data(v_pipe_rd_cnt_word), result("[pkg_usb_wr] : Get mux_squid_offset , index: " & to_string(v_pipe_rd_cnt_index) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_pipe_rd_data_file(v_pipe_rd_cnt_word)) & ", (VHDL) : " & to_string(v_pipe_rd_data(v_pipe_rd_cnt_word))));
           end if;
           v_pipe_rd_cnt_index := v_pipe_rd_cnt_index + 1;
 
