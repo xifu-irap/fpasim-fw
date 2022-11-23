@@ -161,7 +161,7 @@
     ],
       "wr": {
         "usb_addr": "0x40",
-        "reg_id": 5
+        "reg_id": 100
       },
       "field": {
         "reg_valid": {
@@ -208,11 +208,11 @@
     ],
       "wr": {
         "usb_addr": "0x00",
-        "reg_id": 6
+        "reg_id": 200
       },
       "rd": {
         "usb_addr": "0x20",
-        "reg_id": 37
+        "reg_id": 500
       },
       "field": {
         "en": {
@@ -252,11 +252,11 @@
     ],
       "wr": {
         "usb_addr": "0x01",
-        "reg_id": 7
+        "reg_id": 201
       },
       "rd": {
         "usb_addr": "0x21",
-        "reg_id": 38
+        "reg_id": 501
       },
       "field": {
         "pixel_all": {
@@ -294,11 +294,11 @@
     ],
       "wr": {
         "usb_addr": "0x02",
-        "reg_id": 8
+        "reg_id": 202
       },
       "rd": {
         "usb_addr": "0x22",
-        "reg_id": 39
+        "reg_id": 502
       },
       "field": {
         "gain": {
@@ -321,11 +321,11 @@
     ],
       "wr": {
         "usb_addr": "0x03",
-        "reg_id": 9
+        "reg_id": 203
       },
       "rd": {
         "usb_addr": "0x23",
-        "reg_id": 40
+        "reg_id": 503
       },
       "field": {
         "delay": {
@@ -348,11 +348,11 @@
     ],
       "wr": {
         "usb_addr": "0x04",
-        "reg_id": 10
+        "reg_id": 204
       },
       "rd": {
         "usb_addr": "0x24",
-        "reg_id": 41
+        "reg_id": 504
       },
       "field": {
         "gain": {
@@ -375,11 +375,11 @@
     ],
       "wr": {
         "usb_addr": "0x05",
-        "reg_id": 11
+        "reg_id": 205
       },
       "rd": {
         "usb_addr": "0x25",
-        "reg_id": 42
+        "reg_id": 505
       },
       "field": {
         "gain": {
@@ -402,11 +402,11 @@
     ],
       "wr": {
         "usb_addr": "0x06",
-        "reg_id": 12
+        "reg_id": 206
       },
       "rd": {
         "usb_addr": "0x26",
-        "reg_id": 43
+        "reg_id": 506
       },
       "field": {
         "gain": {
@@ -437,11 +437,11 @@
     ],
       "wr": {
         "usb_addr": "0x07",
-        "reg_id": 13
+        "reg_id": 207
       },
       "rd": {
         "usb_addr": "0x27",
-        "reg_id": 44
+        "reg_id": 507
       },
       "field": {
         "nb_pixels": {
@@ -478,11 +478,11 @@
     ],
       "wr": {
         "usb_addr": "0x08",
-        "reg_id": 14
+        "reg_id": 208
       },
       "rd": {
         "usb_addr": "0x29",
-        "reg_id": 46
+        "reg_id": 509
       },
       "field": {
         "debug_pulse": {
@@ -514,7 +514,7 @@
     ],
       "rd": {
         "usb_addr": "0x28",
-        "reg_id": 45
+        "reg_id": 508
       },
       "field": {
         "pipe_out_data_count": {
@@ -543,11 +543,11 @@
     ],
       "wr": {
         "usb_addr": "0x09",
-        "reg_id": 15
+        "reg_id": 209
       },
       "rd": {
         "usb_addr": "0x30",
-        "reg_id": 47
+        "reg_id": 510
       },
       "field": {
         "sel": {
@@ -570,7 +570,7 @@
     ],
       "rd": {
         "usb_addr": "0x31",
-        "reg_id": 48
+        "reg_id": 511
       },
       "field": {
         "error": {
@@ -594,7 +594,7 @@
     ],
       "rd": {
         "usb_addr": "0x32",
-        "reg_id": 49
+        "reg_id": 512
       },
       "field": {
         "status": {
@@ -605,10 +605,33 @@
       }
     },
 
+    "@usb_board_id": {
+      "description_list": [
+      "This command is used to access to the BOARD_ID register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_fpga_id/field/board_id' : board_id value",
+      "     'value' (integer) board_id value",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_fpga_id/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_fpga_id/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "rd": {
+        "usb_addr": "0x3D",
+        "reg_id": 529
+      },
+      "field": {
+        "baord_id": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
     
     "@usb_fpga_id": {
       "description_list": [
-      "This command is used to access to the DATA_COUNT register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "This command is used to access to the FPGA_ID register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
       "The 'def/@usb_fpga_id/field/fpga_id' : fpga_id value",
       "     'value' (integer) fpga_id value (hexadecimal ASCII VALUE)",
       "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
@@ -619,7 +642,7 @@
     ],
       "rd": {
         "usb_addr": "0x3E",
-        "reg_id": 50
+        "reg_id": 530
       },
       "field": {
         "fpga_id": {
@@ -643,7 +666,7 @@
     ],
       "rd": {
         "usb_addr": "0x3F",
-        "reg_id": 51
+        "reg_id": 531
       },
       "field": {
         "fpga_version": {
@@ -667,7 +690,7 @@
           },
           "rd": {
             "usb_addr": "0xA0",
-            "reg_id": 32
+            "reg_id": 300
           },
           "name": "tes_shape_pulse",
           "offset_addr": "0x0000",
@@ -684,7 +707,7 @@
           },
           "rd": {
             "usb_addr": "0xA0",
-            "reg_id": 33
+            "reg_id": 301
           },
           "name": "amp_squid_tf",
           "offset_addr": "0x8000",
@@ -701,7 +724,7 @@
           },
           "rd": {
             "usb_addr": "0xA0",
-            "reg_id": 34
+            "reg_id": 302
           },
           "name": "mux_squid_tf",
           "offset_addr": "0xC000",
@@ -718,7 +741,7 @@
           },
           "rd": {
             "usb_addr": "0xA0",
-            "reg_id": 35
+            "reg_id": 303
           },
           "name": "tes_steady_state",
           "offset_addr": "0xE000",
@@ -735,7 +758,7 @@
           },
           "rd": {
             "usb_addr": "0xA0",
-            "reg_id": 36
+            "reg_id": 304
           },
           "name": "mux_squid_offset",
           "offset_addr": "0xE040",
