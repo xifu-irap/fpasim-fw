@@ -229,37 +229,40 @@ class TesTopDataGen:
 
         filename           = json_data["register"]["value"]["filename"]
         en                 = json_data["register"]["value"]["en"]
-        nb_sample_by_pixel = json_data["register"]["value"]["nb_sample_by_pixel"]
-        nb_pixel_by_frame  = json_data["register"]["value"]["nb_pixel_by_frame"]
-        nb_frame_by_pulse  = json_data["register"]["value"]["nb_frame_by_pulse"]
-        nb_pulse           = json_data["register"]["value"]["nb_pulse"]
+        nb_sample_by_pixel_tmp = json_data["register"]["value"]["nb_sample_by_pixel"]
+        nb_pixel_by_frame_tmp  = json_data["register"]["value"]["nb_pixel_by_frame"]
+        nb_frame_by_pulse_tmp  = json_data["register"]["value"]["nb_frame_by_pulse"]
+        nb_pulse_tmp           = json_data["register"]["value"]["nb_pulse"]
 
-        pixel_length = nb_sample_by_pixel
-        frame_length = nb_sample_by_pixel * nb_pixel_by_frame
+        # compute values start from 1 (instead of 0)
+        nb_sample_by_pixel = nb_sample_by_pixel_tmp + 1
+        nb_pixel_by_frame  = nb_pixel_by_frame_tmp + 1
+        nb_frame_by_pulse  = nb_frame_by_pulse_tmp + 1
+        nb_pulse           = nb_pulse_tmp + 1
 
-        # count from 0 instead of 1. So, we need to subtract -1 to the values
-        pixel_length_tmp      = pixel_length - 1
-        nb_pixel_by_frame_tmp = nb_pixel_by_frame - 1
-        frame_length_tmp      = frame_length - 1
+        # auto-compute the VDHL expected nb_samples_by_frame value (start from 0)
+        nb_samples_by_frame_tmp = nb_sample_by_pixel * nb_pixel_by_frame - 1
+        # compute the number total of data to generate
+        nb_total_samples = nb_sample_by_pixel * nb_pixel_by_frame * nb_frame_by_pulse * nb_pulse
 
         filepath     = str(Path(tb_input_base_path,filename))
         fid = open(filepath,'w')
         # header
         fid.write('en_uint1_t')
         fid.write(csv_separator)
-        fid.write('pixel_length_uint')
+        fid.write('nb_samples_by_pixel_uint')
         fid.write(csv_separator)
-        fid.write('pixel_nb_uint')
+        fid.write('nb_pixel_by_frame_uint')
         fid.write(csv_separator)
-        fid.write('frame_length_uint')
+        fid.write('nb_samples_by_frame_uint')
         fid.write('\n')
         fid.write(str(en))
         fid.write(csv_separator)
-        fid.write(str(pixel_length_tmp))
+        fid.write(str(nb_sample_by_pixel_tmp))
         fid.write(csv_separator)
         fid.write(str(nb_pixel_by_frame_tmp))
         fid.write(csv_separator)
-        fid.write(str(frame_length_tmp))
+        fid.write(str(nb_samples_by_frame_tmp))
 
         msg0 = 'filepath='+filepath
         display_obj.display(msg_p=msg0,level_p=level1)
@@ -267,7 +270,6 @@ class TesTopDataGen:
         ####################################################
         # process data
         ####################################################
-        nb_samples = frame_length * nb_frame_by_pulse * nb_pulse
         msg0 = 'TesTopDataGen._run: Generate data file'
 
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
@@ -278,8 +280,8 @@ class TesTopDataGen:
         # header
         fid.write('data')
         fid.write('\n')
-        index_max = nb_samples - 1
-        for i in range(nb_samples):
+        index_max = nb_total_samples - 1
+        for i in range(nb_total_samples):
             fid.write(str(1))
             if i != index_max:
                 fid.write('\n')
