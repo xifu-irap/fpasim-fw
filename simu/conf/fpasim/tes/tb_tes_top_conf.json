@@ -90,7 +90,7 @@
         "description_list":
             [
       "The 'pulse_height': percentage applied on the pulse_shape values (multiplicator factor)",
-      "     'value' [0,65535]: 0 : 0% of pulse shape, 65535: 100% pulse shape",
+      "     'value' [0,65535]: 0 : 0% of pulse shape, 65535: 100% pulse shape (formula: percentage = pulse_height/65535)",
       "The 'pixel_id': value of the pixel id",
       "     'value' (integer: [0, nb_pixels - 1] (see TES_CONF_ register)): pixel_id value",
       "The 'time_shift': time_shift value (address offset on the pulse_shape RAM).",
@@ -129,7 +129,6 @@
             "check":1,
             "verbosity":0
         },
-
         "value":
         {
             "description_list":
@@ -188,6 +187,13 @@
             "min_value2":1,
             "max_value2":2,
             "time_shift":0
+        }
+    },
+    "model":
+    {
+        "value":
+        {
+            "output_filename":"py_check_data_out.csv"
         }
     }
 }
