@@ -36,6 +36,7 @@
 import os
 from pathlib import Path,PurePosixPath 
 import argparse
+import math
 
 def create_directory( path_p):
         """
@@ -113,10 +114,13 @@ class TesModel:
 
     def add_command(self, pixel_id_p, time_shift_p, pulse_heigth_p):
 
+        # 0 = 0%, 65535 = 100%
+        pulse_heigth_percentage = pulse_heigth_p /65535
+
         dic = {}
-        dic['pixel_id'] = pixel_id_p
-        dic['time_shift'] = time_shift_p
-        dic['pulse_heigth'] = pulse_heigth_p
+        dic['pixel_id']     = pixel_id_p
+        dic['time_shift']   = time_shift_p
+        dic['pulse_heigth_percentage'] = pulse_heigth_percentage
 
         self.cmd_dic_list.append(dic)
 
@@ -149,7 +153,7 @@ class TesModel:
         for cmd_dic in cmd_dic_list:
             cmd_pixel_id = cmd_dic['pixel_id']
             cmd_time_shift = cmd_dic['time_shift']
-            cmd_pulse_heigth = cmd_dic['pulse_heigth']
+            cmd_pulse_heigth_percentage = cmd_dic['pulse_heigth_percentage']
             cnt = 0
             cnt_sample = 1
             for i in range(L):
@@ -159,9 +163,9 @@ class TesModel:
                 if cmd_pixel_id == pixel_id:
                     if cnt <= (pulse_shape_nb_samples_by_frame - 1):
                         index = cnt*pulse_shape_oversampling_factor  + cmd_time_shift
-                        pulse_shape = tes_pulse_shape_list[index]
+                        pulse_shape = tes_pulse_shape_list[index] * cmd_pulse_heigth_percentage
                         res = i0 - pulse_shape
-                        data_list[i] = res  
+                        data_list[i] = math.floor(res)  
 
                         # add pulse shape
                     if cnt_sample == nb_sample_by_pixel:
