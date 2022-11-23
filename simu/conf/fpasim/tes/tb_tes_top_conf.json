@@ -14,14 +14,21 @@
             {
                 "description_list":
                 [
-                    ""
+                    "The 'nb_pixel_by_frame' : define the current number of pixels in a column (minus 1)",
+                    "     'value' (integer: [0, 63])): 0: 1 pixel, 1: 2 pixels and so on",
+                    "The 'nb_sample_by_pixel' : define the number of samples by pixels (minus 1)",
+                    "     'value' (integer: [0, 63])): 0: 1 sample duration, 1: 2 samples duration and so on",
+                    "The 'nb_frame_by_pulse' : define the number of frame to generate a pulse_shape",
+                    "     'value' (integer: [0, 2047])): 0: 1 frame, 1: 2 frame and so on",
+                    "The 'nb_pulse' : define the number of frame to generate a pulse_shape",
+                    "     'value' (integer: [0, integer max])): 0: 1 pulse shape, 1: 2 pulse shape and so on"
                 ],
                 "filename":"py_reg_in.csv",
                 "en":1,
-                "nb_sample_by_pixel":40,
-                "nb_pixel_by_frame":34,
-                "nb_frame_by_pulse":2048,
-                "nb_pulse":1
+                "nb_sample_by_pixel":39,
+                "nb_pixel_by_frame":33,
+                "nb_frame_by_pulse":2047,
+                "nb_pulse":0
             }
         ,
         "sequence":
@@ -82,12 +89,17 @@
         {
         "description_list":
             [
-                ""
+      "The 'pulse_height': percentage applied on the pulse_shape values (multiplicator factor)",
+      "     'value' [0,65535]: 0 : 0% of pulse shape, 65535: 100% pulse shape",
+      "The 'pixel_id': value of the pixel id",
+      "     'value' (integer: [0, nb_pixels - 1] (see TES_CONF_ register)): pixel_id value",
+      "The 'time_shift': time_shift value (address offset on the pulse_shape RAM).",
+      "     'value' (integer: [0, 15] ): time_shift value"
             ],
         "filename":"py_cmd_in.csv",
-        "pulse_height_list":[2],
+        "pulse_height_list":[1],
         "pixel_id_list":    [0],
-        "time_shift_list":  [0]
+        "time_shift_list":  [2]
         }
     ,
     "sequence":

@@ -28,7 +28,7 @@
                 "nb_sample_by_pixel":7,
                 "nb_pixel_by_frame":1,
                 "nb_frame_by_pulse":2047,
-                "nb_pulse":1
+                "nb_pulse":0
             }
         ,
         "sequence":
@@ -89,17 +89,15 @@
         {
         "description_list":
             [
+      "The 'pulse_height': percentage applied on the pulse_shape values (multiplicator factor)",
+      "     'value' [0,65535]: 0 : 0% of pulse shape, 65535: 100% pulse shape (formula: percentage = pulse_height/65535)",
       "The 'pixel_id': value of the pixel id",
       "     'value' (integer: [0, nb_pixels - 1] (see TES_CONF_ register)): pixel_id value",
       "The 'time_shift': time_shift value (address offset on the pulse_shape RAM).",
-      "     'value' (integer: [0, 15] ): time_shift value",
-      "The 'pulse_height': percentage applied on the pulse_shape values (multiplicator factor)",
-      "     'value' (Q1,15: [-1, 0.99999] ): pulse_height value (percentage)",
-      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
-      "     'width' (integer >=1): define the field width (expressed in bit)"
+      "     'value' (integer: [0, 15] ): time_shift value"
             ],
         "filename":"py_cmd_in.csv",
-        "pulse_height_list":[1],
+        "pulse_height_list":[65535],
         "pixel_id_list":    [0],
         "time_shift_list":  [2]
         }
