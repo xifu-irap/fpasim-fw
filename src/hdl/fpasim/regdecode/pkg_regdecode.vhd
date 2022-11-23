@@ -33,6 +33,7 @@ use ieee.numeric_std.all;
 
 library fpasim;
 use fpasim.pkg_utils;
+use fpasim.pkg_fpasim.all;
 
 PACKAGE pkg_regdecode IS
 
@@ -40,10 +41,7 @@ PACKAGE pkg_regdecode IS
     -- 
     ---------------------------------------------------------------------
     -- user-defined: FPGA version
-    constant pkg_MAJOR_VERSION_DIGIT0 : integer := 0; -- major version. Possible values [0,255]
-    constant pkg_MINOR_VERSION_DIGIT1 : integer := 0; -- minor version (2nd digit) . Possible values [0,255]
-    constant pkg_MINOR_VERSION_DIGIT0 : integer := 1; -- minor version (1st digit) . Possible values [0,255]
-    constant pkg_VERSION_DEBUG_DIGIT0 : integer := 0; -- debug version. Possible values [0,255]
+    constant pkg_FPGA_VERSION_VALUE : integer := 0;
 
     -- user-defined: FPGA ID (name)
     constant pkg_FPGA_ID_CHAR3 : character := 'f'; -- ascii character
@@ -54,7 +52,7 @@ PACKAGE pkg_regdecode IS
     -- auto-computed: fpga id
     constant pkg_FPGA_ID      : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR3), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR2), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR1), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR0), 8));
     -- auto-computed: fpga version
-    constant pkg_FPGA_VERSION : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(pkg_MAJOR_VERSION_DIGIT0, 8)) & std_logic_vector(to_unsigned(pkg_MINOR_VERSION_DIGIT1, 8)) & std_logic_vector(to_unsigned(pkg_MINOR_VERSION_DIGIT0, 8)) & std_logic_vector(to_unsigned(pkg_VERSION_DEBUG_DIGIT0, 8));
+    constant pkg_FPGA_VERSION : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(pkg_FPGA_VERSION_VALUE, 32));
 
     -------------------------------------------------------------------
     -- pipe
