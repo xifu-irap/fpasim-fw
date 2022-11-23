@@ -34,12 +34,16 @@ use ieee.numeric_std.all;
 
 library fpasim;
 use fpasim.pkg_fpasim.all;
+use fpasim.pkg_regdecode.all;
 
 entity tes_top is
   generic(
+    -- command
+    g_CMD_PULSE_HEIGHT_WIDTH     : positive := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH; -- pulse_heigth bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_TIME_SHIFT_WIDTH       : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH; -- time_shift bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_PIXEL_ID_WIDTH         : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
     -- pixel
     g_PIXEL_LENGTH_WIDTH         : positive := 6; -- bus width in order to define the number of samples by pixel
-    g_PIXEL_ID_WIDTH             : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
     -- frame
     g_FRAME_LENGTH_WIDTH         : positive := 11; -- bus width in order to define the number of samples by frame
     g_FRAME_ID_WIDTH             : positive := pkg_FRAME_ID_WIDTH; -- frame id bus width (expressed in bits). Possible values [1;max integer value[
@@ -62,13 +66,13 @@ entity tes_top is
     ---------------------------------------------------------------------
     i_en                      : in  std_logic; -- enable
     i_pixel_length            : in  std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);
-    i_pixel_nb                : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- number of pixel
+    i_pixel_nb                : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- number of pixel
     i_frame_length            : in  std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0);
     -- command
     i_cmd_valid               : in  std_logic; -- valid command
-    i_cmd_pulse_height        : in  std_logic_vector(10 downto 0); -- pulse height command
-    i_cmd_pixel_id            : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id command
-    i_cmd_time_shift          : in  std_logic_vector(3 downto 0); -- time shift command
+    i_cmd_pulse_height        : in  std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0); -- pulse height command
+    i_cmd_pixel_id            : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id command
+    i_cmd_time_shift          : in  std_logic_vector(g_CMD_TIME_SHIFT_WIDTH - 1 downto 0); -- time shift command
     o_cmd_ready               : out std_logic;
     -- RAM: pulse shape
     -- wr
@@ -83,7 +87,7 @@ entity tes_top is
     -- RAM:
     -- wr
     i_steady_state_wr_en      : in  std_logic; -- write enable
-    i_steady_state_wr_rd_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- write address
+    i_steady_state_wr_rd_addr : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- write address
     i_steady_state_wr_data    : in  std_logic_vector(15 downto 0); -- write data
     -- rd
     i_steady_state_rd_en      : in  std_logic; -- rd enable
@@ -101,7 +105,7 @@ entity tes_top is
     o_pixel_sof               : out std_logic; -- first pixel sample
     o_pixel_eof               : out std_logic; -- last pixel sample
     o_pixel_valid             : out std_logic; -- valid pixel sample
-    o_pixel_id                : out std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- output pixel id
+    o_pixel_id                : out std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- output pixel id
     o_pixel_result            : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0); -- output pixel result
     o_frame_sof               : out std_logic; -- first frame sample
     o_frame_eof               : out std_logic; -- last frame sample
@@ -216,12 +220,15 @@ begin
   -----------------------------------------------------------------
   inst_tes_pulse_shape_manager : entity fpasim.tes_pulse_shape_manager
     generic map(
+      -- command
+    g_CMD_PULSE_HEIGHT_WIDTH  => i_cmd_pulse_height'length,
+    g_CMD_TIME_SHIFT_WIDTH    => i_cmd_time_shift'length,
+    g_CMD_PIXEL_ID_WIDTH      => pixel_id0'length,
       -- frame
       g_FRAME_NB_BY_PULSE          => c_FRAME_NB_BY_PULSE,
       g_FRAME_WIDTH                => c_FRAME_WIDTH,
       -- pixel
       g_PIXEL_NB_MAX               => c_PIXEL_NB_MAX,
-      g_PIXEL_ID_WIDTH             => pixel_id0'length,
       -- addr
       g_PULSE_SHAPE_RAM_ADDR_WIDTH => i_pulse_shape_wr_rd_addr'length,
       -- output
@@ -237,8 +244,8 @@ begin
       ---------------------------------------------------------------------
       i_cmd_valid               => i_cmd_valid, -- '1': command is valid, '0': otherwise
       i_cmd_pulse_height        => i_cmd_pulse_height, -- pulse height value
-      i_cmd_pixel_id            => i_cmd_pixel_id, -- pixel id
-      i_cmd_time_shift          => i_cmd_time_shift, -- time shift value
+      i_cmd_pixel_id            => i_cmd_pixel_id,     -- pixel id
+      i_cmd_time_shift          => i_cmd_time_shift,   -- time shift value
       o_cmd_ready               => cmd_ready,
       -- RAM: pulse shape
       -- wr
