@@ -41,7 +41,7 @@ PACKAGE pkg_regdecode IS
     -- 
     ---------------------------------------------------------------------
     -- user-defined: FPGA version
-    constant pkg_FPGA_VERSION_VALUE : integer := 0;
+    constant pkg_FPGA_VERSION_VALUE : integer := 1;
 
     -- user-defined: FPGA ID (name)
     constant pkg_FPGA_ID_CHAR3 : character := 'f'; -- ascii character
@@ -128,26 +128,28 @@ PACKAGE pkg_regdecode IS
     -- user-defined: pixel all (bit index)
     constant pkg_MAKE_PULSE_PIXEL_ALL_IDX_H : integer := 31;
 
-    -- user-defined: pixel id (bit index high)
-    constant pkg_MAKE_PULSE_PIXEL_ID_IDX_H : integer := 29;
     -- user-defined: pixel id (bit index low)
     constant pkg_MAKE_PULSE_PIXEL_ID_IDX_L : integer := 24;
     -- auto-computed: pixel id width
-    constant pkg_MAKE_PULSE_PIXEL_ID_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_MAKE_PULSE_PIXEL_ID_IDX_H, i_idx_low => pkg_MAKE_PULSE_PIXEL_ID_IDX_L);
+    constant pkg_MAKE_PULSE_PIXEL_ID_WIDTH : integer := pkg_PIXEL_WIDTH_MAX;
+    -- auto-computed : pixel id (bit index high)
+    constant pkg_MAKE_PULSE_PIXEL_ID_IDX_H : integer := pkg_MAKE_PULSE_PIXEL_ID_IDX_L + pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1;
 
-    -- user-defined: time shift (bit index high)
-    constant pkg_MAKE_PULSE_TIME_SHIFT_IDX_H : integer := 19;
+
     -- user-defined: time shift (bit index low)
     constant pkg_MAKE_PULSE_TIME_SHIFT_IDX_L : integer := 16;
     -- auto-computed: time shift width
-    constant pkg_MAKE_PULSE_TIME_SHIFT_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_MAKE_PULSE_TIME_SHIFT_IDX_H, i_idx_low => pkg_MAKE_PULSE_TIME_SHIFT_IDX_L);
+    constant pkg_MAKE_PULSE_TIME_SHIFT_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_value(pkg_PULSE_SHAPE_OVERSAMPLE);
+    -- auto-computed : time shift (bit index high)
+    constant pkg_MAKE_PULSE_TIME_SHIFT_IDX_H : integer := pkg_MAKE_PULSE_TIME_SHIFT_IDX_L + pkg_MAKE_PULSE_TIME_SHIFT_WIDTH - 1;
 
-    -- user-defined: pulse height (bit index high)
-    constant pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_H : integer := 10;
+
     -- user-defined: pulse height (bit index low)
     constant pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_L : integer := 0;
     -- auto-computed: pulse height width
-    constant pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_H, i_idx_low => pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_L);
+    constant pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH : integer := pkg_TES_MULT_SUB_Q_WIDTH_B - 1;-- we substract 1 because one bit was added to pass from unsigned -> signed value
+    -- auto-computed: pulse height (bit index high)
+    constant pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_H : integer := pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_L + pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH - 1;
 
     -- user-defined: fpasim_gain
     ---------------------------------------------------------------------
@@ -157,6 +159,7 @@ PACKAGE pkg_regdecode IS
     constant pkg_FPASIM_GAIN_IDX_L : integer := 0;
     -- auto-computed: fpasim_gain width
     constant pkg_FPASIM_GAIN_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_FPASIM_GAIN_IDX_H, i_idx_low => pkg_FPASIM_GAIN_IDX_L);
+
 
     -- user-defined: mux_sq_fb_delay
     ---------------------------------------------------------------------
