@@ -32,6 +32,7 @@ use ieee.numeric_std.all;
 
 library fpasim;
 use fpasim.pkg_fpasim.all;
+use fpasim.pkg_regdecode.all;
 
 library vunit_lib;
 context vunit_lib.vunit_context;
@@ -46,9 +47,13 @@ entity tb_tes_top is
     ---------------------------------------------------------------------
     -- DUT generic
     ---------------------------------------------------------------------
+    -- command 
+    g_CMD_PULSE_HEIGHT_WIDTH     : positive := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH; -- pulse_heigth bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_TIME_SHIFT_WIDTH       : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH; --time_shift bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_PIXEL_ID_WIDTH         : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+    -- pixel
     -- pixel
     g_PIXEL_LENGTH_WIDTH         : positive := 6; -- bus width in order to define the number of samples by pixel
-    g_PIXEL_ID_WIDTH             : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
     -- frame
     g_FRAME_LENGTH_WIDTH         : positive := 11; -- bus width in order to define the number of samples by frame
     g_FRAME_ID_WIDTH             : positive := pkg_FRAME_ID_WIDTH; -- frame id bus width (expressed in bits). Possible values [1;max integer value[
@@ -93,13 +98,13 @@ architecture simulate of tb_tes_top is
   ---------------------------------------------------------------------
   signal i_en                      : std_logic;
   signal i_pixel_length            : std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);
-  signal i_pixel_nb                : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);
+  signal i_pixel_nb                : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
   signal i_frame_length            : std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0);
   -- command
   signal i_cmd_valid               : std_logic;
-  signal i_cmd_pulse_height        : std_logic_vector(10 downto 0);
-  signal i_cmd_pixel_id            : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);
-  signal i_cmd_time_shift          : std_logic_vector(3 downto 0);
+  signal i_cmd_pulse_height        : std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0);
+  signal i_cmd_pixel_id            : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
+  signal i_cmd_time_shift          : std_logic_vector(g_CMD_TIME_SHIFT_WIDTH - 1 downto 0);
   signal o_cmd_ready               : std_logic;
   -- RAM: pulse shape
   -- wr
@@ -113,7 +118,7 @@ architecture simulate of tb_tes_top is
   -- RAM:
   -- wr
   signal i_steady_state_wr_en      : std_logic;
-  signal i_steady_state_wr_rd_addr : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);
+  signal i_steady_state_wr_rd_addr : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
   signal i_steady_state_wr_data    : std_logic_vector(15 downto 0);
   -- rd
   signal i_steady_state_rd_en      : std_logic;
@@ -129,7 +134,7 @@ architecture simulate of tb_tes_top is
   signal o_pixel_sof    : std_logic;
   signal o_pixel_eof    : std_logic;
   signal o_pixel_valid  : std_logic;
-  signal o_pixel_id     : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);
+  signal o_pixel_id     : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
   signal o_pixel_result : std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0);
   signal o_frame_sof    : std_logic;
   signal o_frame_eof    : std_logic;
@@ -294,8 +299,10 @@ begin
     ---------------------------------------------------------------------
     -- DUT GENERIC
     ---------------------------------------------------------------------
+    info("    g_CMD_PULSE_HEIGHT_WIDTH = " & to_string(g_CMD_PULSE_HEIGHT_WIDTH));
+    info("    g_CMD_TIME_SHIFT_WIDTH = " & to_string(g_CMD_TIME_SHIFT_WIDTH));
+    info("    g_CMD_PIXEL_ID_WIDTH = " & to_string(g_CMD_PIXEL_ID_WIDTH));
     info("    g_PIXEL_LENGTH_WIDTH = " & to_string(g_PIXEL_LENGTH_WIDTH));
-    info("    g_PIXEL_ID_WIDTH = " & to_string(g_PIXEL_ID_WIDTH));
     info("    g_FRAME_LENGTH_WIDTH = " & to_string(g_FRAME_LENGTH_WIDTH));
     info("    g_FRAME_ID_WIDTH = " & to_string(g_FRAME_ID_WIDTH));
     info("    g_PULSE_SHAPE_RAM_ADDR_WIDTH = " & to_string(g_PULSE_SHAPE_RAM_ADDR_WIDTH));
@@ -787,9 +794,11 @@ begin
   ---------------------------------------------------------------------
   inst_dut_tes_top : entity fpasim.tes_top
     generic map(
+      g_CMD_PULSE_HEIGHT_WIDTH     => i_cmd_pulse_height'length, -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+      g_CMD_TIME_SHIFT_WIDTH       => i_cmd_time_shift'length, -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+      g_CMD_PIXEL_ID_WIDTH         => i_cmd_pixel_id'length, -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
       -- pixel
       g_PIXEL_LENGTH_WIDTH         => g_PIXEL_LENGTH_WIDTH, -- bus width in order to define the number of samples by pixel
-      g_PIXEL_ID_WIDTH             => o_pixel_id'length, -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
       -- frame
       g_FRAME_LENGTH_WIDTH         => g_FRAME_LENGTH_WIDTH, -- bus width in order to define the number of samples by frame
       g_FRAME_ID_WIDTH             => o_frame_id'length, -- frame id bus width (expressed in bits). Possible values [1;max integer value[
