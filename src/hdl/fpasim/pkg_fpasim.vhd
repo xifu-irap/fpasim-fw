@@ -199,9 +199,9 @@ PACKAGE pkg_fpasim IS
 
   -- pulse heigth
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_TES_MULT_SUB_Q_M_B     : positive := 12;
+  constant pkg_TES_MULT_SUB_Q_M_B     : positive := 1;
   -- user-defined: number of fraction bits
-  constant pkg_TES_MULT_SUB_Q_N_B     : natural  := 0;
+  constant pkg_TES_MULT_SUB_Q_N_B     : natural  := 16;
   -- auto-computed: bus width of the TES_Q_B
   constant pkg_TES_MULT_SUB_Q_WIDTH_B : positive := pkg_TES_MULT_SUB_Q_M_B + pkg_TES_MULT_SUB_Q_N_B;
 
