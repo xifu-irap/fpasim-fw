@@ -450,7 +450,7 @@ begin
   ---------------------------------------------------------------------
   -- Error latching
   ---------------------------------------------------------------------
-  gen_bit_synchronizer : for i in 4 downto 0 generate
+  gen_bit_synchronizer : if True generate
     signal data_tmp      : std_logic_vector(4 downto 0);
     signal wr_r          : std_logic;
     signal data_r        : std_logic_vector(4 downto 0);
