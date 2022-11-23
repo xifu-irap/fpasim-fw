@@ -800,9 +800,12 @@ begin
 
   inst_tes_top : entity fpasim.tes_top
     generic map(
+      -- command
+      g_CMD_PULSE_HEIGHT_WIDTH => cmd_pulse_height'length,
+      g_CMD_TIME_SHIFT_WIDTH => cmd_time_shift'length,
+      g_CMD_PIXEL_ID_WIDTH     => cmd_pixel_id'length,
       -- pixel
       g_PIXEL_LENGTH_WIDTH => pixel_length'length,
-      g_PIXEL_ID_WIDTH     => pixel_id1'length,
 
       -- frame
       g_FRAME_LENGTH_WIDTH => frame_length'length,

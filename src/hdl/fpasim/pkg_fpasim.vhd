@@ -25,6 +25,9 @@
 --!   @details                
 -- This package defines all constant used by the fpasim function. 
 -- These constants configure the bus width of the differents functions.
+--
+-- Note: Frame and column are interchangeable
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -52,7 +55,7 @@ PACKAGE pkg_fpasim IS
   constant pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY : natural := 1;
 
   -- pixel
-  -- user-defined: maximal number of pixels authorized by the design
+  -- user-defined: maximal number of pixels by column authorized by the design (must be a power of 2)
   constant pkg_MUX_FACT_MAX           : positive := 64;
   -- parameter renaming
   constant pkg_PIXEL_NB_MAX           : positive := pkg_MUX_FACT_MAX;
