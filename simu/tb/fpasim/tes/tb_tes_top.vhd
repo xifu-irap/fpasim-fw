@@ -957,7 +957,7 @@ begin
       ---------------------------------------------------------------------
       i_filepath       => c_FILEPATH_CHECK_DATA_OUT,
       i_csv_separator  => c_CSV_SEPARATOR,
-      i_NAME0          => "mux_squid_out",
+      i_NAME0          => "tes_out",
       --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
       --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
       --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
