@@ -42,9 +42,9 @@
     "output_tb_filename": "py_usb_data.csv",
     "cmd_list": [
       "usb_ctrl;wr;rst=1",
-      "usb_trig;wr;ctrl=1",
+      "usb_trig;wr;ctrl_valid=1",
       "usb_ctrl;wr;rst=0",
-      "usb_trig;wr;ctrl=1",
+      "usb_trig;wr;ctrl_valid=1",
       "usb_fpgasim_gain;wr;gain=1",
       "usb_mux_sq_fb_delay;wr;delay=2",
       "usb_amp_sq_of_delay;wr;delay=3",
@@ -65,7 +65,7 @@
       "usb_ram;rd;tes_shape_pulse;amp_squid_tf;mux_squid_tf;tes_steady_state;mux_squid_offset",
  
       "usb_ctrl;wr;en=1",
-      "usb_trig;wr;ctrl=1",
+      "usb_trig;wr;ctrl_valid=1",
 
       "usb_error_sel;wr;sel=0",
       "nop;wr;delay=16",
@@ -179,12 +179,12 @@
           "bit_pos_min": 8,
           "width": 1
         },
-        "ctrl": {
+        "ctrl_valid": {
           "value": 0,
           "bit_pos_min": 12,
           "width": 1
         },
-        "debug": {
+        "debug_valid": {
           "value": 0,
           "bit_pos_min": 16,
           "width": 1
@@ -355,7 +355,7 @@
         "reg_id": 504
       },
       "field": {
-        "gain": {
+        "delay": {
           "value": 0,
           "bit_pos_min": 0,
           "width": 6
@@ -382,7 +382,7 @@
         "reg_id": 505
       },
       "field": {
-        "gain": {
+        "delay": {
           "value": 0,
           "bit_pos_min": 0,
           "width": 6
@@ -409,7 +409,7 @@
         "reg_id": 506
       },
       "field": {
-        "gain": {
+        "delay": {
           "value": 0,
           "bit_pos_min": 0,
           "width": 6
