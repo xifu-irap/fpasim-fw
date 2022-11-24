@@ -26,6 +26,7 @@
 -- This module is the fpga top level
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library fpasim;
 
@@ -36,6 +37,11 @@ entity top_fpasim_system is
     okHU          : out   std_logic_vector(2 downto 0);
     okUHU         : inout std_logic_vector(31 downto 0);
     okAA          : inout std_logic;
+    ---------------------------------------------------------------------
+    -- FMC: from the card
+    ---------------------------------------------------------------------
+    -- TODO
+    i_board_id     : in std_logic_vector(7 downto 0); -- card board id 
     ---------------------------------------------------------------------
     -- FMC: from the adc
     ---------------------------------------------------------------------
@@ -138,6 +144,7 @@ architecture RTL of top_fpasim_system is
   signal usb_wireout_debug_ctrl      : std_logic_vector(31 downto 0);
   signal usb_wireout_fpga_id         : std_logic_vector(31 downto 0);
   signal usb_wireout_fpga_version    : std_logic_vector(31 downto 0);
+  signal usb_wireout_board_id        : std_logic_vector(31 downto 0);
   -- errors/status
   signal usb_wireout_errors          : std_logic_vector(31 downto 0);
   signal usb_wireout_sel_errors      : std_logic_vector(31 downto 0);
@@ -209,6 +216,7 @@ begin
   -----------------------------------------------------------------
   -- usb
   -----------------------------------------------------------------
+  usb_wireout_board_id <= std_logic_vector(resize(unsigned(i_board_id),usb_wireout_board_id'length) );
   inst_usb_opal_kelly : entity fpasim.usb_opal_kelly
     port map(
       --  Opal Kelly inouts --
@@ -237,6 +245,7 @@ begin
       i_usb_wireout_debug_ctrl      => usb_wireout_debug_ctrl,
       i_usb_wireout_fpga_id         => usb_wireout_fpga_id,
       i_usb_wireout_fpga_version    => usb_wireout_fpga_version,
+      i_usb_wireout_board_id        => usb_wireout_board_id,
       -- errors/status
       i_usb_wireout_sel_errors      => usb_wireout_sel_errors,
       i_usb_wireout_errors          => usb_wireout_errors,
