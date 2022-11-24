@@ -35,7 +35,7 @@ library fpasim;
 use fpasim.pkg_fpasim.all;
 use fpasim.pkg_regdecode.all;
 
-entity top_fpasim is
+entity fpasim_top is
   generic(
     g_DEBUG : boolean := true
     );
@@ -108,9 +108,9 @@ entity top_fpasim is
     o_dac_frame                       : out std_logic;  -- dac frame
     o_dac                             : out std_logic_vector(15 downto 0)  -- dac data
     );
-end entity top_fpasim;
+end entity fpasim_top;
 
-architecture RTL of top_fpasim is
+architecture RTL of fpasim_top is
   constant c_PIXEL_ID_WIDTH : integer := pkg_PIXEL_ID_WIDTH_MAX;
   constant c_FRAME_ID_WIDTH : integer := pkg_FRAME_ID_WIDTH;
   constant c_FRAME_NB_BY_PULSE : integer := pkg_FRAME_NB_BY_PULSE;
