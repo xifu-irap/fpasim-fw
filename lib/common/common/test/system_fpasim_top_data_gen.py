@@ -411,10 +411,10 @@ class SystemFpasimTopDataGen:
                 data_list.append(str_result)
 
                         
-        print('len(reg_id_list)',len(reg_id_list))
-        print('len(addr_list)',len(addr_list))
-        print('len(data_list)',len(data_list))
-        print('len(cmt_list)',len(cmt_list))
+        # print('len(reg_id_list)',len(reg_id_list))
+        # print('len(addr_list)',len(addr_list))
+        # print('len(data_list)',len(data_list))
+        # print('len(cmt_list)',len(cmt_list))
                 
         L = len(data_list)
         index_max = L - 1
