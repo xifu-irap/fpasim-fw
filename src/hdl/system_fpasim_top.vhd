@@ -17,7 +17,7 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   top_fpasim_system.vhd 
+--!   @file                   system_fpasim_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
@@ -30,7 +30,7 @@ use ieee.numeric_std.all;
 
 library fpasim;
 
-entity top_fpasim_system is
+entity system_fpasim_top is
   port(
     --  Opal Kelly inouts --
     okUH          : in    std_logic_vector(4 downto 0);
@@ -107,9 +107,9 @@ entity top_fpasim_system is
     o_dac7_p      : out   std_logic;
     o_dac7_n      : out   std_logic
   );
-end entity top_fpasim_system;
+end entity system_fpasim_top;
 
-architecture RTL of top_fpasim_system is
+architecture RTL of system_fpasim_top is
 
   ---------------------------------------------------------------------
   -- clock generation
@@ -275,7 +275,7 @@ begin
   ---------------------------------------------------------------------
   -- top_fpasim
   ---------------------------------------------------------------------
-  inst_top_fpasim : entity fpasim.top_fpasim
+  inst_fpasim_top : entity fpasim.fpasim_top
     generic map(
       g_DEBUG => false
     )
