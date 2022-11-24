@@ -208,7 +208,7 @@ if __name__ == '__main__':
     #####################################################
     # add source files
     #####################################################
-    obj.compile_src(filename_p='top_fpasim_system.vhd',level_p=level1)
+    obj.compile_src(filename_p='system_fpasim_top.vhd',level_p=level1)
     obj.compile_src_directory(directory_name_p='utils',level_p=level1)
     obj.compile_src_directory(directory_name_p='clocking',level_p=level1)
     obj.compile_src_directory(directory_name_p='fpasim',level_p=level1)

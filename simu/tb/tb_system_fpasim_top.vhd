@@ -453,7 +453,7 @@ begin
   i_adc_clk_p <= sys_clk;
   i_adc_clk_n <= not (sys_clk);
 
-  dut_top_fpasim_system : entity fpasim.top_fpasim_system
+  dut_system_fpasim_top : entity fpasim.system_fpasim_top
     port map(
       --  Opal Kelly inouts --
       okUH          => okUH,
