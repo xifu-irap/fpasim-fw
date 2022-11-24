@@ -159,35 +159,49 @@ if __name__ == '__main__':
         obj_display.display_subtitle(msg_p=msg0, level_p=level1, color_p='yellow')
         # search in test_list a name with test_name value
         for dic in test_list:
-            vunit_file_path = str(Path(dic['vunit']['run_filepath']))
+
+            # extract parameter values from the json
+            name = dic['name']
+            run_file_path = str(Path(dic['vunit']['run_filepath']))
             output_path = str(Path(dic['vunit']['vunit_outpath']))
-            report_path = str(Path(output_path, 'report.xml'))
             tb_filename = str(Path(dic['vunit']['tb_filename']))
             wave_filename = str(Path(dic['vunit']['wave_filename']))
             conf_filename_list = dic['conf']['filename_list']
-            name = dic['name']
 
+            # build a key to uniquely identify a test
+            #   True if an individual test is listed only one time in the test_list
             json_key_path = test_name + '/' + name
 
+            # build a unique test_report name
+            #   True if an individual test is listed only one time in the test_list
+            test_key = test_name + "__" + name
+            report_filename = 'report__'+test_key+'.xml'
+            report_path = str(Path(output_path, report_filename))
+
+            # build a message
             msg_list = []
-            msg_list.append('vunit_file_path: ' + vunit_file_path)
-            msg_list.append('output_path    : ' + output_path)
-            msg_list.append('report_path    : ' + report_path)
+            msg_list.append('run_file_path           : ' + run_file_path)
+            msg_list.append('output_path             : ' + output_path)
+            msg_list.append('report_path             : ' + report_path)
+            msg_list.append('test_list name          : ' + test_name)
+            msg_list.append('individual test name    : ' + name)
 
             for msg in msg_list:
                 obj_display.display(msg_p=msg, level_p=level2, color_p='green')
 
             ############################################################################
-            # Call the python script
+            # Call the simulation python script
             #  => Generate the list of argument
             ############################################################################
             cmd = []
             # call python
             cmd.append('python')
 
-            # specify the run file to launch
-            cmd.append(vunit_file_path)
+            # specify the simulation python script file to run
+            cmd.append(run_file_path)
 
+            # user arguments
+            ############################################################################
             # specify the vhdl simulator to use
             cmd.append('--simulator')
             cmd.append(simulator)
@@ -197,15 +211,30 @@ if __name__ == '__main__':
             # specify if the display mode of the simulator is activated
             cmd.append('--display')
             cmd.append(display)
-
+            # identify the test to run
             cmd.append('--json_key_path')
             cmd.append(json_key_path)
 
+            # Vunit library arguments
+            ############################################################################
+            # define the Output path for compilation and simulation artifacts
             cmd.append('-o')
             cmd.append(output_path)
 
+            # define the Xunit test report .xml file
             cmd.append('-x')
             cmd.append(report_path)
+
+            # Only valid with –xunit-xml argument. 
+            # Defines where in the XML file the simulator output is stored on a failure.
+            # “jenkins” = Output stored in <system-out>, “bamboo” = Output stored in <failure>.
+            cmd.append('--xunit-xml-format')
+            cmd.append("jenkins")
+
+            # Print test output immediately and not only when failure
+            # Default: False
+            cmd.append("-v")
+
 
             if verbosity == 2:
                 msg = 'generated command: ' + ' '.join(cmd)
