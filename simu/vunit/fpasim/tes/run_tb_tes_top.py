@@ -113,6 +113,9 @@ if path_list != None:
 from vunit import VUnit, VUnitCLI
 from common import Display, VunitConf
 from common import TesTopDataGen
+
+# from vunit.about import version
+from vunit import about
      
 
 if __name__ == '__main__':
@@ -175,7 +178,23 @@ if __name__ == '__main__':
     obj = VunitConf( json_filepath_p =json_filepath,script_name_p = script_name, json_key_path_p = json_key_path)
     obj.set_vunit_simulator(name_p = simulator,level_p=level1)
     obj.set_verbosity(verbosity_p = verbosity)
-    VU = VUnit.from_args(args=args)
+
+    # get the library Vunit version
+    vunit_version = about.VERSION
+    # print('Vunit version ',vunit_version)
+    # see: https://github.com/VUnit/vunit/issues/777
+    if vunit_version >= '5.0.0':
+        VU = VUnit.from_args(args=args)  # Do not use compile_builtins.
+        VU.add_vhdl_builtins()  #
+        VU.add_verilog_builtins()
+    elif vunit_version > '4.6.0':
+        VU = VUnit.from_args(args=args,compile_builtins=False)  # Stop using the builtins ahead of time.
+        VU.add_vhdl_builtins()  # Add the VHDL builtins explicitly!
+        VU.add_verilog_builtins()
+    else:
+        # vunit version <= 4.6.0
+        VU = VUnit.from_args(args=args)
+
     obj.set_vunit(vunit_object_p = VU)
     #####################################################
     # add compiled xilinx library
@@ -271,15 +290,11 @@ if __name__ == '__main__':
         #####################################################
         # Mandatory: The simulator modelsim/Questa wants generics filepaths in the Linux format
         #####################################################
+        tb.set_attribute(".requirement-117", None)
         tb.add_config(
                       name=test_name,
-        
-                      # pre_config=obj.pre_config,
                       pre_config=data_gen_obj.pre_config,
                       generics = generic_dic
-                        # {
-                        # "g_TEST_NAME":name
-                        # }
                         )
 
 
