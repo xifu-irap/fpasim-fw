@@ -59,6 +59,7 @@ entity usb_opal_kelly is
     i_usb_wireout_debug_ctrl      : in    std_logic_vector(31 downto 0);  -- debug_ctrl register (reading)
     i_usb_wireout_fpga_id         : in    std_logic_vector(31 downto 0);  -- fpga id register (reading)
     i_usb_wireout_fpga_version    : in    std_logic_vector(31 downto 0);  -- fpga version register (reading)
+    i_usb_wireout_board_id        : in    std_logic_vector(31 downto 0);  -- board id register (reading)
     -- errors/status
     i_usb_wireout_sel_errors      : in    std_logic_vector(31 downto 0);  -- sel_errors register (reading)
     i_usb_wireout_errors          : in    std_logic_vector(31 downto 0);  -- errors register (reading)
@@ -89,7 +90,7 @@ end entity usb_opal_kelly;
 architecture RTL of usb_opal_kelly is
 
   -- total number of wire out, pipe out, pipe in and trigger out
-  constant c_WIRE_PIPE_TRIG_NUMBER_OUT : integer := 18;
+  constant c_WIRE_PIPE_TRIG_NUMBER_OUT : integer := 19;
 
   ---- Opal Kelly signals ----
   signal okClk : std_logic;             -- Opal Kelly Clock
@@ -130,6 +131,7 @@ architecture RTL of usb_opal_kelly is
   signal ep31_wire : std_logic_vector(31 downto 0);
   signal ep32_wire : std_logic_vector(31 downto 0);
 
+  signal ep3D_wire : std_logic_vector(31 downto 0);
   signal ep3E_wire : std_logic_vector(31 downto 0);
   signal ep3F_wire : std_logic_vector(31 downto 0);
 
@@ -186,6 +188,7 @@ begin
   ep31_wire <= i_usb_wireout_errors;
   ep32_wire <= i_usb_wireout_status;
 
+  ep3D_wire             <= i_usb_wireout_board_id;
   ep3E_wire             <= i_usb_wireout_fpga_id;
   ep3F_wire             <= i_usb_wireout_fpga_version;
   -- from/to pipe out
@@ -422,10 +425,18 @@ begin
   ---------------------------------------------------------------------
   -- 
   ---------------------------------------------------------------------
-  inst_okwireout_ep3E : okWireOut
+  inst_okwireout_ep3D : okWireOut
     port map(
       okHE      => okHE,
       okEH      => okEHx(17 * 65 - 1 downto 16 * 65),
+      ep_addr   => x"3D",               -- Endpoint adress
+      ep_datain => ep3D_wire            -- Endpoint data out 32 bits
+      );
+
+  inst_okwireout_ep3E : okWireOut
+    port map(
+      okHE      => okHE,
+      okEH      => okEHx(18 * 65 - 1 downto 17 * 65),
       ep_addr   => x"3E",               -- Endpoint adress
       ep_datain => ep3E_wire            -- Endpoint data out 32 bits
       );
@@ -433,7 +444,7 @@ begin
   inst_okwireout_ep3F : okWireOut
     port map(
       okHE      => okHE,
-      okEH      => okEHx(18 * 65 - 1 downto 17 * 65),
+      okEH      => okEHx(19 * 65 - 1 downto 18 * 65),
       ep_addr   => x"3F",               -- Endpoint adress
       ep_datain => ep3F_wire            -- Endpoint data out 32 bits
       );
