@@ -39,19 +39,19 @@ use fpasim.pkg_regdecode.all;
 entity tes_top is
   generic(
     -- command
-    g_CMD_PULSE_HEIGHT_WIDTH     : positive := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH; -- pulse_heigth bus width (expressed in bits). Possible values [1;max integer value[
-    g_CMD_TIME_SHIFT_WIDTH       : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH; -- time_shift bus width (expressed in bits). Possible values [1;max integer value[
-    g_CMD_PIXEL_ID_WIDTH         : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_PULSE_HEIGHT_WIDTH        : positive := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH; -- pulse_heigth bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_TIME_SHIFT_WIDTH          : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH; -- time_shift bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_PIXEL_ID_WIDTH            : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
     -- pixel
-    g_PIXEL_LENGTH_WIDTH         : positive := 6; -- bus width in order to define the number of samples by pixel
+    g_NB_SAMPLE_BY_PIXEL_WIDTH      : positive := 6; -- bus width in order to define the number of samples by pixel
     -- frame
-    g_FRAME_LENGTH_WIDTH         : positive := 11; -- bus width in order to define the number of samples by frame
-    g_FRAME_ID_WIDTH             : positive := pkg_FRAME_ID_WIDTH; -- frame id bus width (expressed in bits). Possible values [1;max integer value[
-    g_FRAME_NB_BY_PULSE          : positive := pkg_FRAME_NB_BY_PULSE;
+    g_NB_SAMPLE_BY_FRAME_WIDTH      : positive := 11; -- bus width in order to define the number of samples by frame
+    g_NB_FRAME_BY_PULSE_SHAPE_WIDTH : positive := pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH; -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+    g_NB_FRAME_BY_PULSE_SHAPE       : positive := pkg_NB_FRAME_BY_PULSE_SHAPE; -- number of frame
     -- addr
-    g_PULSE_SHAPE_RAM_ADDR_WIDTH : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
+    g_PULSE_SHAPE_RAM_ADDR_WIDTH    : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
     -- output
-    g_PIXEL_RESULT_OUTPUT_WIDTH  : positive := pkg_TES_MULT_SUB_Q_WIDTH_S -- pixel output result bus width (expressed in bit). Possible values [1;max integer value[
+    g_PIXEL_RESULT_OUTPUT_WIDTH     : positive := pkg_TES_MULT_SUB_Q_WIDTH_S -- pixel output result bus width (expressed in bit). Possible values [1;max integer value[
   );
 
   port(
@@ -65,9 +65,9 @@ entity tes_top is
     -- input command: from the regdecode
     ---------------------------------------------------------------------
     i_en                      : in  std_logic; -- enable
-    i_pixel_length            : in  std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);
-    i_pixel_nb                : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- number of pixel
-    i_frame_length            : in  std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0);
+    i_nb_sample_by_pixel      : in  std_logic_vector(g_NB_SAMPLE_BY_PIXEL_WIDTH - 1 downto 0);
+    i_nb_pixel_by_frame       : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- number of pixel
+    i_nb_sample_by_frame      : in  std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
     -- command
     i_cmd_valid               : in  std_logic; -- valid command
     i_cmd_pulse_height        : in  std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0); -- pulse height command
@@ -109,7 +109,7 @@ entity tes_top is
     o_pixel_result            : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0); -- output pixel result
     o_frame_sof               : out std_logic; -- first frame sample
     o_frame_eof               : out std_logic; -- last frame sample
-    o_frame_id                : out std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0); -- output frame id
+    o_frame_id                : out std_logic_vector(g_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0); -- output frame id
     ---------------------------------------------------------------------
     -- errors/status
     ---------------------------------------------------------------------
@@ -120,17 +120,17 @@ end entity tes_top;
 
 architecture RTL of tes_top is
 
-  constant c_FRAME_WIDTH       : positive                           := pkg_FRAME_WIDTH;
-  constant c_PIXEL_NB_MAX      : positive                           := pkg_PIXEL_NB_MAX;
-  constant c_FRAME_NB_BY_PULSE : positive                           := g_FRAME_NB_BY_PULSE;
-  constant c_FRAME_ID_SIZE     : std_logic_vector(o_frame_id'range) := std_logic_vector(to_unsigned(g_FRAME_NB_BY_PULSE - 1, o_frame_id'length));
+  constant c_NB_SAMPLE_BY_FRAME_WIDTH : positive                           := pkg_NB_SAMPLE_BY_FRAME_WIDTH;
+  constant c_NB_PIXEL_BY_FRAME_MAX    : positive                           := pkg_NB_PIXEL_BY_FRAME_MAX;
+  constant c_NB_FRAME_BY_PULSE_SHAPE  : positive                           := g_NB_FRAME_BY_PULSE_SHAPE;
+  constant c_FRAME_ID_SIZE            : std_logic_vector(o_frame_id'range) := std_logic_vector(to_unsigned(g_NB_FRAME_BY_PULSE_SHAPE - 1, o_frame_id'length));
   ---------------------------------------------------------------------
   -- tes_signalling
   ---------------------------------------------------------------------
-  signal pixel_sof0            : std_logic;
-  signal pixel_eof0            : std_logic;
-  signal pixel_id0             : std_logic_vector(o_pixel_id'range);
-  signal pixel_valid0          : std_logic;
+  signal pixel_sof0                   : std_logic;
+  signal pixel_eof0                   : std_logic;
+  signal pixel_id0                    : std_logic_vector(o_pixel_id'range);
+  signal pixel_valid0                 : std_logic;
 
   signal frame_sof0 : std_logic;
   signal frame_eof0 : std_logic;
@@ -182,37 +182,37 @@ begin
   inst_tes_signalling : entity fpasim.tes_signalling
     generic map(
       -- pixel
-      g_PIXEL_LENGTH_WIDTH => i_pixel_length'length,
-      g_PIXEL_ID_WIDTH     => pixel_id0'length,
+      g_NB_SAMPLE_BY_PIXEL_WIDTH      => i_nb_sample_by_pixel'length,
+      g_NB_PIXEL_BY_FRAME_WIDTH                => pixel_id0'length,
       -- frame
-      g_FRAME_LENGTH_WIDTH => i_frame_length'length,
-      g_FRAME_ID_WIDTH     => frame_id0'length
+      g_NB_SAMPLE_BY_FRAME_WIDTH      => i_nb_sample_by_frame'length,
+      g_NB_FRAME_BY_PULSE_SHAPE_WIDTH => frame_id0'length
     )
     port map(
-      i_clk          => i_clk,
-      i_rst          => i_rst,
+      i_clk                => i_clk,
+      i_rst                => i_rst,
       ---------------------------------------------------------------------
       -- Commands
       ---------------------------------------------------------------------
-      i_start        => i_en,
-      i_pixel_length => i_pixel_length,
-      i_pixel_nb     => i_pixel_nb,
-      i_frame_length => i_frame_length,
-      i_frame_nb     => c_FRAME_ID_SIZE,
+      i_start              => i_en,
+      i_nb_sample_by_pixel => i_nb_sample_by_pixel,
+      i_nb_pixel_by_frame  => i_nb_pixel_by_frame,
+      i_nb_sample_by_frame => i_nb_sample_by_frame,
+      i_nb_frame           => c_FRAME_ID_SIZE,
       ---------------------------------------------------------------------
       -- Input data
       ---------------------------------------------------------------------
-      i_data_valid   => i_data_valid,
+      i_data_valid         => i_data_valid,
       ---------------------------------------------------------------------
       -- Output data
       ---------------------------------------------------------------------
-      o_pixel_sof    => pixel_sof0,
-      o_pixel_eof    => pixel_eof0,
-      o_pixel_id     => pixel_id0,
-      o_pixel_valid  => pixel_valid0,
-      o_frame_sof    => frame_sof0,
-      o_frame_eof    => frame_eof0,
-      o_frame_id     => frame_id0
+      o_pixel_sof          => pixel_sof0,
+      o_pixel_eof          => pixel_eof0,
+      o_pixel_id           => pixel_id0,
+      o_pixel_valid        => pixel_valid0,
+      o_frame_sof          => frame_sof0,
+      o_frame_eof          => frame_eof0,
+      o_frame_id           => frame_id0
     );
 
   -----------------------------------------------------------------
@@ -221,14 +221,14 @@ begin
   inst_tes_pulse_shape_manager : entity fpasim.tes_pulse_shape_manager
     generic map(
       -- command
-    g_CMD_PULSE_HEIGHT_WIDTH  => i_cmd_pulse_height'length,
-    g_CMD_TIME_SHIFT_WIDTH    => i_cmd_time_shift'length,
-    g_CMD_PIXEL_ID_WIDTH      => pixel_id0'length,
+      g_CMD_PULSE_HEIGHT_WIDTH     => i_cmd_pulse_height'length,
+      g_CMD_TIME_SHIFT_WIDTH       => i_cmd_time_shift'length,
+      g_CMD_PIXEL_ID_WIDTH         => pixel_id0'length,
       -- frame
-      g_FRAME_NB_BY_PULSE          => c_FRAME_NB_BY_PULSE,
-      g_FRAME_WIDTH                => c_FRAME_WIDTH,
+      g_NB_FRAME_BY_PULSE_SHAPE    => c_NB_FRAME_BY_PULSE_SHAPE,
+      g_NB_SAMPLE_BY_FRAME_WIDTH   => c_NB_SAMPLE_BY_FRAME_WIDTH,
       -- pixel
-      g_PIXEL_NB_MAX               => c_PIXEL_NB_MAX,
+      g_NB_PIXEL_BY_FRAME_MAX      => c_NB_PIXEL_BY_FRAME_MAX,
       -- addr
       g_PULSE_SHAPE_RAM_ADDR_WIDTH => i_pulse_shape_wr_rd_addr'length,
       -- output
@@ -244,8 +244,8 @@ begin
       ---------------------------------------------------------------------
       i_cmd_valid               => i_cmd_valid, -- '1': command is valid, '0': otherwise
       i_cmd_pulse_height        => i_cmd_pulse_height, -- pulse height value
-      i_cmd_pixel_id            => i_cmd_pixel_id,     -- pixel id
-      i_cmd_time_shift          => i_cmd_time_shift,   -- time shift value
+      i_cmd_pixel_id            => i_cmd_pixel_id, -- pixel id
+      i_cmd_time_shift          => i_cmd_time_shift, -- time shift value
       o_cmd_ready               => cmd_ready,
       -- RAM: pulse shape
       -- wr
@@ -288,7 +288,7 @@ begin
       o_status                  => status1
     );
 
-  o_cmd_ready <= cmd_ready;
+  o_cmd_ready                              <= cmd_ready;
   ---------------------------------------------------------------------
   -- sync with the tes_pulse_shape_manager out
   ---------------------------------------------------------------------
