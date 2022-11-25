@@ -131,7 +131,7 @@ PACKAGE pkg_regdecode IS
     -- user-defined: pixel id (bit index low)
     constant pkg_MAKE_PULSE_PIXEL_ID_IDX_L : integer := 24;
     -- auto-computed: pixel id width
-    constant pkg_MAKE_PULSE_PIXEL_ID_WIDTH : integer := pkg_PIXEL_WIDTH_MAX;
+    constant pkg_MAKE_PULSE_PIXEL_ID_WIDTH : integer := pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH;
     -- auto-computed : pixel id (bit index high)
     constant pkg_MAKE_PULSE_PIXEL_ID_IDX_H : integer := pkg_MAKE_PULSE_PIXEL_ID_IDX_L + pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1;
 
@@ -202,25 +202,25 @@ PACKAGE pkg_regdecode IS
     -- user-defined: tes_conf 
     ---------------------------------------------------------------------
     -- user-defined: pixel_nb (bit index high)
-    constant pkg_TES_CONF_PIXEL_NB_IDX_H : integer := 29;
+    constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H : integer := 29;
     -- user-defined: pixel_nb (bit index low)
-    constant pkg_TES_CONF_PIXEL_NB_IDX_L : integer := 24;
+    constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L : integer := 24;
     -- auto-computed: pixel_nb width
-    constant pkg_TES_CONF_PIXEL_NB_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_PIXEL_NB_IDX_H, i_idx_low => pkg_TES_CONF_PIXEL_NB_IDX_L);
+    constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);
 
     -- user-defined: pixel_length (bit index high)
-    constant pkg_TES_CONF_PIXEL_LENGTH_IDX_H : integer := 22;
+    constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H : integer := 22;
     -- user-defined: pixel_length (bit index low)
-    constant pkg_TES_CONF_PIXEL_LENGTH_IDX_L : integer := 16;
+    constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L : integer := 16;
     -- auto-computed: pixel_length width
-    constant pkg_TES_CONF_PIXEL_LENGTH_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_PIXEL_LENGTH_IDX_H, i_idx_low => pkg_TES_CONF_PIXEL_LENGTH_IDX_L);
+    constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H, i_idx_low => pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L);
 
     -- user-defined: frame_length (bit index high)
-    constant pkg_TES_CONF_FRAME_LENGTH_IDX_H : integer := 12;
+    constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H : integer := 12;
     -- user-defined: frame_length (bit index low)
-    constant pkg_TES_CONF_FRAME_LENGTH_IDX_L : integer := 0;
+    constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L : integer := 0;
     -- auto-computed: frame_length width
-    constant pkg_TES_CONF_FRAME_LENGTH_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_FRAME_LENGTH_IDX_H, i_idx_low => pkg_TES_CONF_FRAME_LENGTH_IDX_L);
+    constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);
 
     -- user-defined: debug_ctrl 
     ---------------------------------------------------------------------

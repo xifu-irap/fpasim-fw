@@ -303,9 +303,9 @@ architecture RTL of regdecode_top is
   -- fpga version
   constant c_FPGA_VERSION : std_logic_vector(31 downto 0) := pkg_FPGA_VERSION;
 
-  constant c_TES_CONF_PIXEL_NB_IDX_H : integer := pkg_TES_CONF_PIXEL_NB_IDX_H;
-  constant c_TES_CONF_PIXEL_NB_IDX_L : integer := pkg_TES_CONF_PIXEL_NB_IDX_L;
-  constant c_TES_CONF_PIXEL_NB_WIDTH : integer := pkg_TES_CONF_PIXEL_NB_WIDTH;
+  constant c_TES_CONF_PIXEL_NB_IDX_H : integer := pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H;
+  constant c_TES_CONF_PIXEL_NB_IDX_L : integer := pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L;
+  constant c_TES_CONF_PIXEL_NB_WIDTH : integer := pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH;
 
   constant c_ERROR_SEL_IDX_H : integer := pkg_ERROR_SEL_IDX_H;
   constant c_ERROR_SEL_IDX_L : integer := pkg_ERROR_SEL_IDX_L;
