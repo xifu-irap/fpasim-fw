@@ -43,7 +43,7 @@ use fpasim.pkg_fpasim.all;
 entity mux_squid is
   generic(
     -- pixel
-    g_PIXEL_ID_WIDTH              : positive := pkg_PIXEL_ID_WIDTH_MAX; -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
+    g_PIXEL_ID_WIDTH              : positive := pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH; -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
     -- address
     g_MUX_SQUID_TF_RAM_ADDR_WIDTH : positive := pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
     -- computation
