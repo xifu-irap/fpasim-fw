@@ -1,0 +1,33 @@
+;******************************************************************
+;** ADS62P49 Initialization                                      **
+;******************************************************************
+;
+; This .COE file specifies initialization values for a block
+; memory of depth=32, and width=16.
+; Values are specified in hexadecimal format:
+; 8 MSB = address, 8 LSB = data.
+;
+; Loading from ROM stops when address 0x76 has been processed.
+; therefore this register must be the last entry in this file.
+;2040, LOW speed mode , 2000 high speed mode gain a 6 db 55C0 A 68C0 B ,  gain a zero db 5500, A 6800, B
+memory_initialization_radix=16;
+memory_initialization_vector=
+0080,
+2000,
+3F20,
+4008,
+4180,
+4400,
+5044,
+5100,
+5200,
+5340,
+5500,
+5700,
+6203,
+6300,
+6640,
+6800,
+6A00,
+7503,
+7600;

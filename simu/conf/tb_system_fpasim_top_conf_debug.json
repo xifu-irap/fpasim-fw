@@ -1,0 +1,771 @@
+{
+  "description_list": [
+    "This file was manually generated",
+    "This file is constitued by 2 parts",
+    "The first part defines the list of commands (see the sequence key).",
+    "    It can be edited by the user",
+    "The second part defines the authorized register/commands (see the 'def/@command_name'",
+    "    To edit, only if the vhdl code is changed on registers (add,modify,delete)",
+    "Note: the second part is built from the 0136-FPAsim-D_commands_dictionnary.xlsx (api register document)",
+    "Note: the INTERRUPT register is not easily manageable in simulation. So, it's not defined here."
+  ],
+  "sequence": {
+    "description_list": [
+      "This dictionary defines 2 keys. Each key has different purpose.",
+      "   .The sequence/cmd_list key defines a list of command in order to configure the FPGA RAM(s) or register(s).",
+      "      . The command is divided in 3 parts:",
+      "         . Part1: The command_name (without @). The possible command_name are defined in def section (ex: 'def/@command_name').",
+      "                . The command_name are existing register name when possible. But few more commands are added for the simulation needs (ex: nop)",
+      "         . Part2: The mode. The mode has 2 possibles values: wr and/or rd.",
+      "                . To know the available mode for a command, see the corresponding command at the json path 'def/@command_name'",
+      "         . Part3: a list of string such as bit_field_name0=value0[;bit_field_name1=value1]",
+      "                . for a given command/register name, if a bit field is not overwritten by the command then the bit_field value is the one defined in the 'def/@command_name'",
+      "         . ex0: 'usb_ctrl;wr;rst=1'",
+      "         . ex1: 'usb_ctrl;wr;rst=1;en=1'",
+      "         Remark:",
+      "           . If a bit_field_name is not overwritten by a command the corresponding bit_field value by default is the one defined in 'def/@command/field/field_name/value'",
+      "             ex0: 'usb_ctrl;wr;rst=1;en=1' -> output: rst=1,en=1",
+      "             ex0: 'usb_ctrl;wr;rst=1'      -> output: rst=1,en=0. Indeed, the value of the en is 0 in 'def/usb_ctrl/field/en/value'",
+      "       Special case: command associated to the RAM configuration(s) is processed slightly differently",
+      "                 .In this case, the part3 of the command is slightly different since the list of string specify only a list of bit_field_name.",
+      "                     .ex0; 'usb_ram;wr;tes_pulse_shape",
+      "                     .ex1; 'usb_ram;wr;tes_pulse_shape;mux_squid_tf",
+      "                 Remark: by vhdl design",
+      "                      . in writting, the user can configure the rams as he wants (no order restriction)",
+      "                          ex: '@usb_ram;wr;tes_pulse_shape;amp_squid_tf' <-> '@usb_ram;wr;amp_squid_tf;tes_pulse_shape'",
+      "                      . in reading, the user must respect the following order",
+      "                           ex: 'usb_ram;rd;tes_shape_pulse;amp_squid_tf;mux_squid_tf;tes_steady_state;mux_squid_offset'",
+      "       Remark: ",
+      "           . The user mustn't finish the command by ';' because it's not managed by the python script",
+      "   .The sequence/output_tb_filename key defines the filename where to store the command sequence. The filename must match with the one defined in the VHDL testbench"
+    ],
+    "output_tb_filename": "py_usb_data.csv",
+    "cmd_list": [
+      "usb_ctrl;wr;rst=1",
+      "usb_trig;wr;ctrl_valid=1",
+      "usb_ctrl;wr;rst=0",
+      "usb_trig;wr;ctrl_valid=1",
+      "usb_fpgasim_gain;wr;gain=1",
+      "usb_mux_sq_fb_delay;wr;delay=2",
+      "usb_amp_sq_of_delay;wr;delay=3",
+      "usb_error_delay;wr;delay=4",
+      "usb_ra_delay;wr;delay=5",
+      "usb_tes_conf;wr",
+      "usb_trig;wr;reg_valid=1",
+      "nop;wr;delay=16",
+      "usb_fpgasim_gain;rd;gain=1",
+      "usb_mux_sq_fb_delay;rd;delay=2",
+      "usb_amp_sq_of_delay;rd;delay=3",
+      "usb_error_delay;rd;delay=4",
+      "usb_ra_delay;rd;delay=5",
+
+      "usb_ram;wr;tes_shape_pulse;amp_squid_tf;mux_squid_tf;tes_steady_state;mux_squid_offset",
+      "usb_trig;wr;rd_all=1",
+      "nop;wr;delay=16",
+      "usb_ram;rd;tes_shape_pulse;amp_squid_tf;mux_squid_tf;tes_steady_state;mux_squid_offset",
+ 
+      "usb_ctrl;wr;en=1",
+      "usb_trig;wr;ctrl_valid=1",
+
+      "usb_error_sel;wr;sel=0",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=0",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=1",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=1",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=2",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=2",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=3",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=3",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=4",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=4",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=5",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=5",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=6",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=6",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=7",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=7",
+      "usb_errors;rd;error=0"
+
+    ]
+  },
+  "def": {
+    "@nop": {
+      "description_list": [
+      "This command is a command created specifically for the simulation.",
+      "It adds delays between 2 consecutives commands (expressed in clock cycles)",
+      "The '@nop/wr/reg_id' and '@nop/rd/reg_id' value match the one defined in the vhdl procedure.",
+      "The '@nop/field/delay/value' (integer > 0) defines the number of clock cycle between 2 commands to add",
+      "Note: the parameter values are the default one."
+    ],
+      "wr":
+      {
+        "reg_id":-1
+      },
+      "rd":
+      {
+        "reg_id":-1
+      },
+      "field": {
+        "delay": {
+          "value": 1
+        }
+      }
+    },
+    "@usb_trig": {
+      "description_list": [
+      "This command is used to access to the trig register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_trig/field/reg_valid' write the associated registers in the cross clock domain FIFO",
+      "     'value' (integer: 0 or 1): 0: do nothing, 1: the FPASIM_GAIN, MUX_SQ_FB_DELAY, AMP_SQ_OF_DELAY, ERROR_DELAY, RA_DELAY and TES_CONF registers are written in the FIFO",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_trig/field/make_pulse' write the associated register in the cross clock domain FIFO",
+      "     'value' (integer: 0 or 1): 0: do nothing, 1: the MAKE_PULSE register is written in the FIFO",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_trig/field/rd_all' enable the auto-read of all design RAMs",
+      "     'value' (integer: 0 or 1): 0: do nothing, 1: enable the auto-read of all design RAMs. By design, the order is: tes_shape_pulse;amp_squid_tf;mux_squid_tf;tes_steady_state;mux_squid_offset ",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_trig/field/ctrl' write the associated register in the cross clock domain FIFO",
+      "     'value' (integer: 0 or 1): 0: do nothing, 1: the CTRL register is written in the FIFO",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_trig/field/debug' write the associated register in the cross clock domain FIFO",
+      "     'value' (integer: 0 or 1): 0: do nothing, 1: the DEBUG_CTRL register is written in the FIFO",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_trig/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_trig/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x40",
+        "reg_id": 100
+      },
+      "field": {
+        "reg_valid": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        },
+        "make_pulse": {
+          "value": 0,
+          "bit_pos_min": 4,
+          "width": 1
+        },
+        "rd_all": {
+          "value": 0,
+          "bit_pos_min": 8,
+          "width": 1
+        },
+        "ctrl_valid": {
+          "value": 0,
+          "bit_pos_min": 12,
+          "width": 1
+        },
+        "debug_valid": {
+          "value": 0,
+          "bit_pos_min": 16,
+          "width": 1
+        }
+      }
+    },
+    "@usb_ctrl": {
+      "description_list": [
+      "This command is used to access to the Ctrl register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_ctrl/field/en' : enable the vhdl functionalities",
+      "     'value' (integer: 0 or 1): 0: do nothing, 1: enable the vhdl functionalities",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_ctrl/field/rst' reset the vhld functionalities",
+      "     'value' (integer: 0 or 1): 0: do nothing, 1: reset the vhdl functionalities",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_ctrl/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_ctrl/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x00",
+        "reg_id": 200
+      },
+      "rd": {
+        "usb_addr": "0x20",
+        "reg_id": 500
+      },
+      "field": {
+        "en": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        },
+        "rst": {
+          "value": 0,
+          "bit_pos_min": 1,
+          "width": 1
+        }
+      }
+    },
+    "@usb_make_pulse": {
+      "description_list": [
+      "This command is used to access to the MAKE_PULSE register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_make_pulse/field/pixel_all' : auto-generate a sequence of pixel id with the same value of time_shift and pulse_height",
+      "     'value' (integer: 0 or 1): 0: no sequence auto-generation , 1: auto-generate a sequence a pixels id from 0 to nb_pixels - 1 (defined in the TES_CONF register) by overwritting the current pixel_id",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_make_pulse/field/pixel_id': value of the pixel id",
+      "     'value' (integer: [0, nb_pixels - 1] (see TES_CONF_ register)): pixel_id value",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_make_pulse/field/time_shift': time_shift value (address offset on the pulse_shape RAM).",
+      "     'value' (integer: [0, 15] ): time_shift value",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_make_pulse/field/pulse_height': percentage applied on the pulse_shape values (multiplicator factor)",
+      "     'value' (Q1,15: [-1, 0.99999] ): pulse_height value (percentage)",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_make_pulse/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_make_pulse/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x01",
+        "reg_id": 201
+      },
+      "rd": {
+        "usb_addr": "0x21",
+        "reg_id": 501
+      },
+      "field": {
+        "pixel_all": {
+          "value": 0,
+          "bit_pos_min": 31,
+          "width": 1
+        },
+        "pixel_id": {
+          "value": 0,
+          "bit_pos_min": 24,
+          "width": 6
+        },
+        "time_shift": {
+          "value": 0,
+          "bit_pos_min": 16,
+          "width": 4
+        },
+        "pulse_height": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
+    "@usb_fpgasim_gain": {
+      "description_list": [
+      "This command is used to access to the FPASIM_GAIN register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_fpgasim_gain/field/gain' : index table of fpasim gain value (multiplicatif factor)",
+      "     'value' (integer: [0,7]): 0: 0.25, 1:0.5, 2:0.75, 3:1, 4:1.5, 5:2, 6:3, 7:4",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_fpgasim_gain/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_fpgasim_gain/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x02",
+        "reg_id": 202
+      },
+      "rd": {
+        "usb_addr": "0x22",
+        "reg_id": 502
+      },
+      "field": {
+        "gain": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 3
+        }
+      }
+    },
+    "@usb_mux_sq_fb_delay": {
+      "description_list": [
+      "This command is used to access to the MUX_SQ_FB_DELAY register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_fpgasim_gain/field/delay' : delay to applied on the data path",
+      "     'value' (integer: [0, 2**6-1)): 0: no delay, 1: one clock cycle delay and so on",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_mux_sq_fb_delay/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_mux_sq_fb_delay/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x03",
+        "reg_id": 203
+      },
+      "rd": {
+        "usb_addr": "0x23",
+        "reg_id": 503
+      },
+      "field": {
+        "delay": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_amp_sq_of_delay": {
+      "description_list": [
+      "This command is used to access to the AMP_SQ_OF_DELAY register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_amp_sq_of_delay/field/delay' : delay to applied on the data path",
+      "     'value' (integer: [0, 2**6-1)): 0: no delay, 1: one clock cycle delay and so on",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_amp_sq_of_delay/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_amp_sq_of_delay/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x04",
+        "reg_id": 204
+      },
+      "rd": {
+        "usb_addr": "0x24",
+        "reg_id": 504
+      },
+      "field": {
+        "delay": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_error_delay": {
+      "description_list": [
+      "This command is used to access to the ERROR_DELAY register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_error_delay/field/delay' : delay to applied on the data path",
+      "     'value' (integer: [0, 2**6-1)): 0: no delay, 1: one clock cycle delay and so on",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_error_delay/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_error_delay/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x05",
+        "reg_id": 205
+      },
+      "rd": {
+        "usb_addr": "0x25",
+        "reg_id": 505
+      },
+      "field": {
+        "delay": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_ra_delay": {
+      "description_list": [
+      "This command is used to access to the RA_DELAY register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_ra_delay/field/delay' : delay to applied on the data path",
+      "     'value' (integer: [0, 2**6-1)): 0: no delay, 1: one clock cycle delay and so on",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_ra_delay/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_ra_delay/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x06",
+        "reg_id": 206
+      },
+      "rd": {
+        "usb_addr": "0x26",
+        "reg_id": 506
+      },
+      "field": {
+        "delay": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_tes_conf": {
+      "description_list": [
+      "This command is used to access to the TES_CONF register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_tes_conf/field/nb_pixels' : define the current number of pixels in a column (minus 1)",
+      "     'value' (integer: [0, 63])): 0: 1 pixel, 1: 2 pixels and so on",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_tes_conf/field/nb_samples_by_pixel' : define the number of samples by pixels (minus 1)",
+      "     'value' (integer: [0, 63])): 0: 1 sample duration, 1: 2 samples duration and so on",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_tes_conf/field/frame_size' : define the number of samples by frame. The value should be equal to nb_pixels*nb_samples_by_pixel - 1",
+      "     'value' (integer: [0, 63])): 0: 1 sample duration, 1: 2 samples duration and so on",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_tes_conf/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_tes_conf/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x07",
+        "reg_id": 207
+      },
+      "rd": {
+        "usb_addr": "0x27",
+        "reg_id": 507
+      },
+      "field": {
+        "nb_pixels": {
+          "value": 33,
+          "bit_pos_min": 24,
+          "width": 6
+        },
+        "nb_samples_by_pixel": {
+          "value": 39,
+          "bit_pos_min": 16,
+          "width": 7
+        },
+        "frame_size": {
+          "value": 1359,
+          "bit_pos_min": 0,
+          "width": 13
+        }
+      }
+    },
+    "@usb_debug_ctrl": {
+      "description_list": [
+      "This command is used to access to the DEBUG_CTRL register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_debug_ctrl/field/debug_pulse' : define if the errors are latched",
+      "     'value' (integer: 0 or 1): 0: do nothing, 1: errors are latched",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_debug_ctrl/field/rst_status': define if an errors is resetted",
+      "     'value' (integer: 0 or 1): 0: do nothing, 1: reset the errors",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_debug_ctrl/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_debug_ctrl/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x08",
+        "reg_id": 208
+      },
+      "rd": {
+        "usb_addr": "0x29",
+        "reg_id": 509
+      },
+      "field": {
+        "debug_pulse": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        },
+        "rst_status": {
+          "value": 0,
+          "bit_pos_min": 1,
+          "width": 1
+        }
+      }
+    },
+    "@usb_data_count": {
+      "description_list": [
+      "This command is used to access to the DATA_COUNT register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_data_count/field/make_pulse_data_count' : number of words currently in the make_pulse FIFO",
+      "     'value' (integer >=0): number of words in the make_pulse FIFO",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_data_count/field/pipe_out_data_count' : number of words currently in the pipe_out FIFO",
+      "     'value' (integer >=0): number of words in the pipe_out FIFO",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_data_count/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_data_count/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "rd": {
+        "usb_addr": "0x28",
+        "reg_id": 508
+      },
+      "field": {
+        "pipe_out_data_count": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        },
+        "make_pulse_data_count": {
+          "value": 0,
+          "bit_pos_min": 16,
+          "width": 16
+        }
+      }
+    },
+    
+    "@usb_error_sel": {
+      "description_list": [
+      "This command is used to access to the ERROR_SEL register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_error_sel/field/sel' : select one of the error/status registers",
+      "     'value' (integer: [0,7]): 0: select the first error and status register, 1: select the second error and status register and so on",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_error_sel/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_error_sel/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x09",
+        "reg_id": 209
+      },
+      "rd": {
+        "usb_addr": "0x30",
+        "reg_id": 510
+      },
+      "field": {
+        "sel": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 3
+        }
+      }
+    },
+    "@usb_errors": {
+      "description_list": [
+      "This command is used to access to the ERRORS register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_errors/field/error' : get the selected error register value",
+      "     'value' (integer >=0): selected error register value",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_errors/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_errors/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "rd": {
+        "usb_addr": "0x31",
+        "reg_id": 511
+      },
+      "field": {
+        "error": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 32
+        }
+      }
+    },
+
+    "@usb_status": {
+      "description_list": [
+      "This command is used to access to the STATUS register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_status/field/status' : get the selected status value",
+      "     'value' (integer >=0):  selected status register value",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_status/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_status/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "rd": {
+        "usb_addr": "0x32",
+        "reg_id": 512
+      },
+      "field": {
+        "status": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 32
+        }
+      }
+    },
+
+    "@usb_board_id": {
+      "description_list": [
+      "This command is used to access to the BOARD_ID register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_fpga_id/field/board_id' : board_id value",
+      "     'value' (integer) board_id value",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_fpga_id/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_fpga_id/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "rd": {
+        "usb_addr": "0x3D",
+        "reg_id": 529
+      },
+      "field": {
+        "baord_id": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
+    
+    "@usb_fpga_id": {
+      "description_list": [
+      "This command is used to access to the FPGA_ID register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_fpga_id/field/fpga_id' : fpga_id value",
+      "     'value' (integer) fpga_id value (hexadecimal ASCII VALUE)",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_fpga_id/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_fpga_id/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "rd": {
+        "usb_addr": "0x3E",
+        "reg_id": 530
+      },
+      "field": {
+        "fpga_id": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
+
+    "@usb_fpga_version": {
+      "description_list": [
+      "This command is used to access to the FPGA_VERSION register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_fpga_version/field/fpga_version' : fpga_version value",
+      "     'value' (integer): fpga_version value",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_fpga_version/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_fpga_version/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "rd": {
+        "usb_addr": "0x3F",
+        "reg_id": 531
+      },
+      "field": {
+        "fpga_version": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
+
+
+    "@usb_ram": {
+      "field": {
+        "tes_shape_pulse": {
+          "description_list": [
+            ""
+          ],
+          "wr": {
+            "usb_addr": "0x80",
+            "reg_id": 0
+          },
+          "rd": {
+            "usb_addr": "0xA0",
+            "reg_id": 300
+          },
+          "name": "tes_shape_pulse",
+          "offset_addr": "0x0000",
+          "input_filename": "tes_response.csv",
+          "output_tb_filename": "py_tes_pulse_shape_ref.csv"
+        },
+        "amp_squid_tf": {
+          "description_list": [
+            ""
+          ],
+          "wr": {
+            "usb_addr": "0x80",
+            "reg_id": 1
+          },
+          "rd": {
+            "usb_addr": "0xA0",
+            "reg_id": 301
+          },
+          "name": "amp_squid_tf",
+          "offset_addr": "0x8000",
+          "input_filename": "amp_squid_tf.csv",
+          "output_tb_filename": "py_amp_squid_tf_ref.csv"
+        },
+        "mux_squid_tf": {
+          "description_list": [
+            ""
+          ],
+          "wr": {
+            "usb_addr": "0x80",
+            "reg_id": 2
+          },
+          "rd": {
+            "usb_addr": "0xA0",
+            "reg_id": 302
+          },
+          "name": "mux_squid_tf",
+          "offset_addr": "0xC000",
+          "input_filename": "mux_squid_tf.csv",
+          "output_tb_filename": "py_mux_squid_tf_ref.csv"
+        },
+        "tes_steady_state": {
+          "description_list": [
+            ""
+          ],
+          "wr": {
+            "usb_addr": "0x80",
+            "reg_id": 3
+          },
+          "rd": {
+            "usb_addr": "0xA0",
+            "reg_id": 303
+          },
+          "name": "tes_steady_state",
+          "offset_addr": "0xE000",
+          "input_filename": "tes_steady_state.csv",
+          "output_tb_filename": "py_tes_steady_state_ref.csv"
+        },
+        "mux_squid_offset": {
+          "description_list": [
+            ""
+          ],
+          "wr": {
+            "usb_addr": "0x80",
+            "reg_id": 4
+          },
+          "rd": {
+            "usb_addr": "0xA0",
+            "reg_id": 304
+          },
+          "name": "mux_squid_offset",
+          "offset_addr": "0xE040",
+          "input_filename": "mux_squid_offset.csv",
+          "output_tb_filename": "py_mux_squid_offset_ref.csv"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,199 @@
+{
+    "description_list": 
+    [
+        "This file was manually generated"
+    ],
+    "register": 
+    {
+        "description_list":
+         [
+            "On the VHDL simulation computer, the user must set a system environment variable called VUNIT_PATH"
+        ],
+        "value":
+        
+            {
+                "description_list":
+                [
+                    "The 'nb_pixel_by_frame' : define the current number of pixels in a column (minus 1)",
+                    "     'value' (integer: [0, 63])): 0: 1 pixel, 1: 2 pixels and so on",
+                    "The 'nb_sample_by_pixel' : define the number of samples by pixels (minus 1)",
+                    "     'value' (integer: [0, 63])): 0: 1 sample duration, 1: 2 samples duration and so on",
+                    "The 'nb_frame_by_pulse' : define the number of frame to generate a pulse_shape",
+                    "     'value' (integer: [0, 2047])): 0: 1 frame, 1: 2 frame and so on",
+                    "The 'nb_pulse' : define the number of frame to generate a pulse_shape",
+                    "     'value' (integer: [0, integer max])): 0: 1 pulse shape, 1: 2 pulse shape and so on"
+                ],
+                "filename":"py_reg_in.csv",
+                "en":1,
+                "nb_sample_by_pixel":7,
+                "nb_pixel_by_frame":1,
+                "nb_frame_by_pulse":2047,
+                "nb_pulse":0
+            }
+        ,
+        "sequence":
+        {
+            "description_list":
+            [
+                ""
+            ],
+            "filename":"py_reg_valid_sequencer_in.csv",
+            "ctrl":0,
+            "min_value1":0,
+            "max_value1":1,
+            "min_value2":1,
+            "max_value2":2,
+            "time_shift":0
+        }
+    },
+    "data": 
+    {
+        "description_list":
+         [
+            "On the VHDL simulation computer, the user must set a system environment variable called VUNIT_PATH"
+        ],
+        "value":
+        
+            {
+                "description_list":
+                [
+                    ""
+                ],
+                "filename":"py_data_in.csv"
+            }
+        ,
+        "sequence":
+        {
+            "description_list":
+            [
+                ""
+            ],
+            "filename":"py_data_valid_sequencer_in.csv",
+            "ctrl":0,
+            "min_value1":0,
+            "max_value1":1,
+            "min_value2":1,
+            "max_value2":2,
+            "time_shift":0
+        }
+    },
+    "cmd":
+    {
+
+        "description":
+        [
+            ""
+        ],
+    "value":
+    
+        {
+        "description_list":
+            [
+      "The 'pulse_height': percentage applied on the pulse_shape values (multiplicator factor)",
+      "     'value' [0,65535]: 0 : 0% of pulse shape, 65535: 100% pulse shape (formula: percentage = pulse_height/65535)",
+      "The 'pixel_id': value of the pixel id",
+      "     'value' (integer: [0, nb_pixels - 1] (see TES_CONF_ register)): pixel_id value",
+      "The 'time_shift': time_shift value (address offset on the pulse_shape RAM).",
+      "     'value' (integer: [0, 15] ): time_shift value"
+            ],
+        "filename":"py_cmd_in.csv",
+        "pulse_height_list":[65535],
+        "pixel_id_list":    [0],
+        "time_shift_list":  [2]
+        }
+    ,
+    "sequence":
+        {
+            "description_list":
+            [
+                ""
+            ],
+            "filename":"py_cmd_valid_sequencer_in.csv",
+            "ctrl":"0",
+            "min_value1":0,
+            "max_value1":1,
+            "min_value2":1,
+            "max_value2":2,
+            "time_shift":0
+        }
+    },
+    "ram1":
+    {
+        "generic":
+        {
+            "description_list":
+            [
+                ""
+            ],
+            "name":"tes_shape_pulse",
+            "check":0,
+            "verbosity":0
+        },
+        "value":
+        {
+            "description_list":
+            [
+                ""
+            ],
+            "input_filename":"tes_response.csv",
+            "output_filename":"py_ram_tes_shape.csv"
+        },
+        "sequence":
+        {
+            "description_list":
+            [
+                ""
+            ],
+            "filename":"py_ram_tes_shape_valid_sequencer_in.csv",
+            "ctrl":"0",
+            "min_value1":0,
+            "max_value1":1,
+            "min_value2":1,
+            "max_value2":2,
+            "time_shift":0
+        }
+    },
+    "ram2":
+    {
+        "generic":
+        {
+            "description_list":
+            [
+                ""
+            ],
+            "name":"tes_steady_state",
+            "check":1,
+            "verbosity":1
+        },
+        "value":
+        {
+            "description_list":
+            [
+                ""
+            ],
+            "input_filename":"tes_steady_state.csv",
+            "output_filename":"py_ram_tes_steady_state.csv"
+        },
+        "sequence":
+        {
+            "description_list":
+            [
+                ""
+            ],
+            "filename":"py_ram_tes_steady_state_valid_sequencer_in.csv",
+            "ctrl":"0",
+            "min_value1":0,
+            "max_value1":1,
+            "min_value2":1,
+            "max_value2":2,
+            "time_shift":0
+        }
+    },
+    "model":
+    {
+        "value":
+        {
+            "output_filename":"py_check_data_out.csv"
+        }
+    }
+}

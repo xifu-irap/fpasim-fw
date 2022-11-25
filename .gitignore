@@ -1,1 +1,60 @@
-*.pdf
+#########################################################
+# untracked temporary directories/files
+#########################################################
+# Untracked no necessary project files
+/project/vivado00/fpasim.runs/.jobs/**/*
+/project/vivado00/fpasim.runs/synth_1/**/*
+/project/vivado00/fpasim.ip_user_files/**/*
+/project/vivado00/fpasim.hw/**/*
+/project/vivado00/fpasim.cache/*
+/project/vivado00/fpasim.sim/*
+/project/vivado00/fpasim.srcs/*
+/project/vivado00/fpasim.runs/**/*.pb
+/project/vivado00/fpasim.runs/**/*.txt
+/project/vivado00/fpasim.runs/**/*.js
+/project/vivado00/fpasim.runs/**/*.sh
+/project/vivado00/fpasim.runs/**/*.wdf
+/project/vivado00/fpasim.runs/**/*.bat
+/project/vivado00/fpasim.runs/**/*.log
+/project/vivado00/fpasim.runs/**/*.jou
+/project/vivado00/fpasim.runs/**/*.dcp
+/project/vivado00/fpasim.runs/**/*.rpt
+/project/vivado00/fpasim.runs/**/*.rpw
+/project/vivado00/fpasim.runs/**/*.xml
+/project/vivado00/fpasim.runs/**/*.rst
+/project/vivado00/fpasim.runs/**/*.tcl
+/project/vivado00/fpasim.runs/**/*.vdi
+/project/vivado00/fpasim.runs/**/*.rpx
+/project/vivado00/fpasim.runs/**/*.dmp
+/project/vivado00/fpasim.runs/**/*.xdc
+/project/vivado00/fpasim.runs/**/*.vds
+/project/vivado00/fpasim.runs/**/__synthesis_is_complete__
+# Untracked no necessary Xilinx IP Files
+/ip/xilinx/coregen/*/*.*
+/ip/xilinx/coregen/*/**/*.*
+
+# Track essential Xilinx IP files
+!/ip/xilinx/coregen/*/*.xdc
+!/ip/xilinx/coregen/*/*.xci
+!/ip/xilinx/coregen/*/*.mif
+
+# Untracked python compiled files
+/lib/common/**/__pycache__
+# Untracked python unitary tes output files
+/lib/common/**/__output__
+# Untracked output simulation directory
+/vunit_out
+# Untracked vendor Opal Kelly Source file directory
+/ip/opal_kelly
+# Untracked temporary vhdl source files
+/src/hdl/fmc
+# Untracked documentation
+/doc/**/*
+# Untracked vscode editor files
+/.vscode/*
+external_libraries.json
+language_version.json
+library_mapping.json
+
+# untracked temporary Vunit test
+/simu/vunit/tmp_test
