@@ -17,8 +17,9 @@ add wave -noupdate -group tes_top -group in /tb_tes_top/inst_dut_tes_top/i_rst
 add wave -noupdate -group tes_top -group in /tb_tes_top/inst_dut_tes_top/i_rst_status
 add wave -noupdate -group tes_top -group in /tb_tes_top/inst_dut_tes_top/i_debug_pulse
 add wave -noupdate -group tes_top -group in /tb_tes_top/inst_dut_tes_top/i_en
-add wave -noupdate -group tes_top -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/i_pixel_length
-add wave -noupdate -group tes_top -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/i_frame_length
+add wave -noupdate -group tes_top -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/i_nb_sample_by_pixel
+add wave -noupdate -group tes_top -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/i_nb_pixel_by_frame
+add wave -noupdate -group tes_top -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/i_nb_sample_by_frame
 add wave -noupdate -group tes_top -group in -group cmd /tb_tes_top/inst_dut_tes_top/i_cmd_valid
 add wave -noupdate -group tes_top -group in -group cmd -radix unsigned /tb_tes_top/inst_dut_tes_top/i_cmd_pulse_height
 add wave -noupdate -group tes_top -group in -group cmd -radix unsigned /tb_tes_top/inst_dut_tes_top/i_cmd_pixel_id
@@ -94,7 +95,9 @@ add wave -noupdate -group tes_signalling_frame -expand -group out /tb_tes_top/in
 add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_CMD_PULSE_HEIGHT_WIDTH
 add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_CMD_TIME_SHIFT_WIDTH
 add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_CMD_PIXEL_ID_WIDTH
-add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_FRAME_WIDTH
+add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_NB_FRAME_BY_PULSE_SHAPE
+add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_NB_SAMPLE_BY_FRAME_WIDTH
+add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_NB_PIXEL_BY_FRAME_MAX
 add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_PULSE_SHAPE_RAM_ADDR_WIDTH
 add wave -noupdate -expand -group tes_pulse_manager -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/g_PIXEL_RESULT_OUTPUT_WIDTH
 add wave -noupdate -expand -group tes_pulse_manager -group in /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/i_clk

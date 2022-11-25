@@ -56,7 +56,7 @@ entity tb_tes_top is
     g_PIXEL_LENGTH_WIDTH         : positive := 6; -- bus width in order to define the number of samples by pixel
     -- frame
     g_FRAME_LENGTH_WIDTH         : positive := 11; -- bus width in order to define the number of samples by frame
-    g_FRAME_ID_WIDTH             : positive := pkg_FRAME_ID_WIDTH; -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+    g_FRAME_ID_WIDTH             : positive := pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH; -- frame id bus width (expressed in bits). Possible values [1;max integer value[
     -- addr
     g_PULSE_SHAPE_RAM_ADDR_WIDTH : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
     -- output
@@ -65,7 +65,7 @@ entity tb_tes_top is
     -- simulation parameters
     ---------------------------------------------------------------------
     g_NB_PIXEL_BY_FRAME          : positive := 1;
-    g_NB_FRAME_BY_PULSE          : positive := pkg_FRAME_NB_BY_PULSE;
+    g_NB_FRAME_BY_PULSE          : positive := pkg_NB_FRAME_BY_PULSE_SHAPE;
     g_VUNIT_DEBUG                : boolean  := true;
     g_TEST_NAME                  : string   := "";
     g_ENABLE_CHECK               : boolean  := true;
@@ -97,9 +97,9 @@ architecture simulate of tb_tes_top is
   -- input command: from the regdecode
   ---------------------------------------------------------------------
   signal i_en                      : std_logic;
-  signal i_pixel_length            : std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);
-  signal i_pixel_nb                : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
-  signal i_frame_length            : std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0);
+  signal i_nb_sample_by_pixel      : std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);
+  signal i_nb_pixel_by_frame       : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
+  signal i_nb_sample_by_frame      : std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0);
   -- command
   signal i_cmd_valid               : std_logic;
   signal i_cmd_pulse_height        : std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0);
@@ -513,9 +513,9 @@ begin
       i_ready          => reg_rd_valid,
       o_data_valid     => reg_valid,    -- not connected
       o_data0_std_vect => sig_vect,
-      o_data1_std_vect => i_pixel_length,
-      o_data2_std_vect => i_pixel_nb,
-      o_data3_std_vect => i_frame_length,
+      o_data1_std_vect => i_nb_sample_by_pixel,
+      o_data2_std_vect => i_nb_pixel_by_frame,
+      o_data3_std_vect => i_nb_sample_by_frame,
       ---------------------------------------------------------------------
       -- status
       ---------------------------------------------------------------------
@@ -798,11 +798,11 @@ begin
       g_CMD_TIME_SHIFT_WIDTH       => i_cmd_time_shift'length, -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
       g_CMD_PIXEL_ID_WIDTH         => i_cmd_pixel_id'length, -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
       -- pixel
-      g_PIXEL_LENGTH_WIDTH         => g_PIXEL_LENGTH_WIDTH, -- bus width in order to define the number of samples by pixel
+      g_NB_SAMPLE_BY_PIXEL_WIDTH         => g_PIXEL_LENGTH_WIDTH, -- bus width in order to define the number of samples by pixel
       -- frame
-      g_FRAME_LENGTH_WIDTH         => g_FRAME_LENGTH_WIDTH, -- bus width in order to define the number of samples by frame
-      g_FRAME_ID_WIDTH             => o_frame_id'length, -- frame id bus width (expressed in bits). Possible values [1;max integer value[
-      g_FRAME_NB_BY_PULSE          => g_NB_FRAME_BY_PULSE, -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+      g_NB_SAMPLE_BY_FRAME_WIDTH         => g_FRAME_LENGTH_WIDTH, -- bus width in order to define the number of samples by frame
+      g_NB_FRAME_BY_PULSE_SHAPE_WIDTH    => o_frame_id'length, -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+      g_NB_FRAME_BY_PULSE_SHAPE          => g_NB_FRAME_BY_PULSE, -- frame id bus width (expressed in bits). Possible values [1;max integer value[
       -- addr
       g_PULSE_SHAPE_RAM_ADDR_WIDTH => g_PULSE_SHAPE_RAM_ADDR_WIDTH, -- address bus width (expressed in bits)
       -- output
@@ -817,9 +817,9 @@ begin
       -- input command: from the regdecode
       ---------------------------------------------------------------------
       i_en                      => i_en, -- enable
-      i_pixel_length            => i_pixel_length,
-      i_pixel_nb                => i_pixel_nb,
-      i_frame_length            => i_frame_length,
+      i_nb_sample_by_pixel      => i_nb_sample_by_pixel,
+      i_nb_pixel_by_frame       => i_nb_pixel_by_frame,
+      i_nb_sample_by_frame      => i_nb_sample_by_frame,
       -- command
       i_cmd_valid               => i_cmd_valid, -- valid command
       i_cmd_pulse_height        => i_cmd_pulse_height, -- pulse height command
