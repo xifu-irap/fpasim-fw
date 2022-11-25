@@ -58,17 +58,28 @@ PACKAGE pkg_fpasim IS
   -- user-defined: maximal number of pixels by column authorized by the design (must be a power of 2)
   constant pkg_MUX_FACT_MAX           : positive := 64;
   -- parameter renaming
-  constant pkg_PIXEL_NB_MAX           : positive := pkg_MUX_FACT_MAX;
-  -- user-defined: maximum number of samples by pixel authorized by the design
-  --   IMPORTANT: this value depends on the adc sampling frequency. Here, ADC sampling frequency is @250 MHz
-  constant pkg_PIXEL_SIZE_MAX         : positive := 64;
+  constant pkg_NB_PIXEL_BY_FRAME_MAX           : positive := pkg_MUX_FACT_MAX;
+  -- user-defined: maximum number of samples by pixel authorized by the design (must be a power of 2)
+  --   IMPORTANT: the corresponding time depends on the data sampling frequency and the expected pixel frequency.
+  constant pkg_NB_SAMPLE_BY_PIXEL_MAX         : positive := 64;
   -- auto-computed:  minimal bus width (expressed in bits) to represent the pkg_PIXEL_SIZE value
-  constant pkg_PIXEL_WIDTH_MAX        : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_PIXEL_SIZE_MAX);
-  -- user-defined: number of frames by pulse
-  --   Note: This value is equal to the number of samples of a pulse shape
-  constant pkg_FRAME_NB_BY_PULSE               : positive := 2048;
+  constant pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH        : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_NB_SAMPLE_BY_PIXEL_MAX);
+  -- user-defined: number of frames by pulse_shape
+  --   Note: This value is equal to the number of value of a pulse shape
+  constant pkg_NB_FRAME_BY_PULSE_SHAPE               : positive := 2048;
   -- user-defined: define the oversample factor of each word of the pulse shape memory
   constant pkg_PULSE_SHAPE_OVERSAMPLE : natural  := 16;
+
+    -- auto-computed:  minimal bus width (expressed in bits) to represent the c_MUX_FACT value
+    constant pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH : natural := fpasim.pkg_utils.pkg_width_from_value(pkg_NB_PIXEL_BY_FRAME_MAX);
+
+    -- frame
+    -- auto-computed:  minimal bus width (expressed in bits) to represent the pkg_FRAME_NB value
+    constant pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_NB_FRAME_BY_PULSE_SHAPE);
+    -- auto-computed : number of samples by frame
+    constant pkg_NB_SAMPLE_BY_FRAME     : positive := pkg_NB_PIXEL_BY_FRAME_MAX * pkg_NB_SAMPLE_BY_PIXEL_MAX;
+    -- auto-computed: minimal bus width (expressed in bits) to represent the pkg_FRAME_SIZE value
+    constant pkg_NB_SAMPLE_BY_FRAME_WIDTH    : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_NB_SAMPLE_BY_FRAME);
 
   ---------------------------------------------------------------------
   -- RAM
@@ -79,7 +90,7 @@ PACKAGE pkg_fpasim IS
   -- user-defined: read latency of the RAM (port B). Possible values: [2; max integer value[
   constant pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY : natural  := 2;
   -- auto-computed: number of words
-  constant pkg_TES_PULSE_SHAPE_RAM_NB_WORDS     : positive := pkg_PULSE_SHAPE_OVERSAMPLE * pkg_FRAME_NB_BY_PULSE;
+  constant pkg_TES_PULSE_SHAPE_RAM_NB_WORDS     : positive := pkg_PULSE_SHAPE_OVERSAMPLE * pkg_NB_FRAME_BY_PULSE_SHAPE;
   -- auto-computed: ram address bus width
   constant pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH   : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_TES_PULSE_SHAPE_RAM_NB_WORDS);
   -- user-defined: ram data bus width
@@ -91,7 +102,7 @@ PACKAGE pkg_fpasim IS
   -- auto-computed: read latency of the RAM (port B). Possible values: [2; max integer value[. Indeed, by design, memory are in parallel. So, we fixe the same latency
   constant pkg_TES_STD_STATE_RAM_B_RD_LATENCY : natural  := pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY;
   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
-  constant pkg_TES_STD_STATE_RAM_NB_WORDS     : positive := pkg_PIXEL_NB_MAX;
+  constant pkg_TES_STD_STATE_RAM_NB_WORDS     : positive := pkg_NB_PIXEL_BY_FRAME_MAX;
   -- auto-computed: ram address bus width
   constant pkg_TES_STD_STATE_RAM_ADDR_WIDTH   : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_TES_STD_STATE_RAM_NB_WORDS);
   -- user-defined: ram data bus width
@@ -103,9 +114,9 @@ PACKAGE pkg_fpasim IS
   -- user-defined: read latency of the RAM (port B). Possible values: [2; max integer value[
   constant pkg_MUX_SQUID_OFFSET_RAM_B_RD_LATENCY : natural  := 2;
   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
-  constant pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS     : positive := pkg_PIXEL_NB_MAX;
+  constant pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS     : positive := pkg_NB_PIXEL_BY_FRAME_MAX;
   -- auto-computed: ram address bus width
-  constant pkg_MUX_SQUID_OFFSET_RAM_ADDR_WIDTH   : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_PIXEL_NB_MAX);
+  constant pkg_MUX_SQUID_OFFSET_RAM_ADDR_WIDTH   : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_NB_PIXEL_BY_FRAME_MAX);
   -- user-defined: data bus width
   constant pkg_MUX_SQUID_OFFSET_RAM_DATA_WIDTH   : positive := 16;
 
@@ -158,16 +169,7 @@ PACKAGE pkg_fpasim IS
   -- tes_signalling_generator parameters
   ----------------------------------------------------------------------
 
-  -- auto-computed:  minimal bus width (expressed in bits) to represent the c_MUX_FACT value
-  constant pkg_PIXEL_ID_WIDTH_MAX : natural := fpasim.pkg_utils.pkg_width_from_value(pkg_PIXEL_NB_MAX);
 
-  -- frame
-  -- auto-computed:  minimal bus width (expressed in bits) to represent the pkg_FRAME_NB value
-  constant pkg_FRAME_ID_WIDTH : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_FRAME_NB_BY_PULSE);
-  -- auto-computed : number of samples by frame
-  constant pkg_FRAME_SIZE     : positive := pkg_PIXEL_NB_MAX * pkg_PIXEL_SIZE_MAX;
-  -- auto-computed: minimal bus width (expressed in bits) to represent the pkg_FRAME_SIZE value
-  constant pkg_FRAME_WIDTH    : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_FRAME_SIZE);
 
   -- hardcoded: latency of the fsm of the "tes_signalling_generator" module
   constant pkg_TES_SIGNALLING_GENERATOR_FSM_LATENCY : natural := 1;
