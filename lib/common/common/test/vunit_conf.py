@@ -907,7 +907,7 @@ class VunitConf:
 
         return filepath
 
-    def create_directory(self, path_p, level_p=None):
+    def _create_directory(self, path_p, level_p=None):
         """
         This function create the directory tree defined by the "path" argument (if not exist)
         :param path_p: (string) -> path to the directory to create
@@ -939,7 +939,7 @@ class VunitConf:
         into a specific directory in order to be "seen" by the simulator
         Note: 
            This method is used for Xilinx IP which uses RAM
-           This method should be called before the VunitConf.pre_config method (if necessary)
+           This method should be called before the pre_config method (if necessary)
         :param filepath_list_p: (list of strings) -> list of filepaths
         :return: None
         """
@@ -1013,6 +1013,7 @@ class VunitConf:
         2 actions are provided:
             . execute a python script with a predefined set of command line arguments
             . copy the "mif files" into the Vunit simulation director for the compatible Xilinx IP
+        Note: This method is the main entry point for the Vunit library
         :param output_path: (string) Vunit Output Simulation Path (auto-computed by Vunit)
         :return: boolean
         """
@@ -1035,8 +1036,8 @@ class VunitConf:
         # .output directory for the output data files
         tb_input_base_path = str(Path(output_path,'inputs').resolve())
         tb_output_base_path = str(Path(output_path,'outputs').resolve())
-        self.create_directory(path_p=tb_input_base_path,level_p = level1)
-        self.create_directory(path_p=tb_output_base_path,level_p =level1)
+        self._create_directory(path_p=tb_input_base_path,level_p = level1)
+        self._create_directory(path_p=tb_output_base_path,level_p =level1)
 
         # launch a python script to generate data and commands
         if script_filepath is not None:
