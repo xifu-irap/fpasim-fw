@@ -34,10 +34,10 @@ use fpasim.FRONTPANEL.all;
 entity usb_opal_kelly is
   port(
     --  Opal Kelly inouts --
-    okUH                          : in    std_logic_vector(4 downto 0);
-    okHU                          : out   std_logic_vector(2 downto 0);
-    okUHU                         : inout std_logic_vector(31 downto 0);
-    okAA                          : inout std_logic;
+    i_okUH                          : in    std_logic_vector(4 downto 0);
+    o_okHU                          : out   std_logic_vector(2 downto 0);
+    b_okUHU                         : inout std_logic_vector(31 downto 0);
+    b_okAA                          : inout std_logic;
     ---------------------------------------------------------------------
     -- from the user @o_usb_clk
     ---------------------------------------------------------------------
@@ -150,10 +150,10 @@ begin
   ----------------------------------------------------
   Opal_Kelly_Host : okHost
     port map(  -- @suppress "Port map uses default values. Missing optional actuals: dna, dna_valid"
-      okUH  => okUH,
-      okHU  => okHU,
-      okUHU => okUHU,
-      okAA  => okAA,
+      okUH  => i_okUH,
+      okHU  => o_okHU,
+      okUHU => b_okUHU,
+      okAA  => b_okAA,
       okClk => okClk,  -- Clock Opal Kelly generated in the okLibrary
       okHE  => okHE,
       okEH  => okEH
