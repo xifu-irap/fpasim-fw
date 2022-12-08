@@ -33,10 +33,10 @@ library fpasim;
 entity system_fpasim_top is
   port(
     --  Opal Kelly inouts --
-    okUH          : in    std_logic_vector(4 downto 0);
-    okHU          : out   std_logic_vector(2 downto 0);
-    okUHU         : inout std_logic_vector(31 downto 0);
-    okAA          : inout std_logic;
+    i_okUH          : in    std_logic_vector(4 downto 0);
+    o_okHU          : out   std_logic_vector(2 downto 0);
+    b_okUHU         : inout std_logic_vector(31 downto 0);
+    b_okAA          : inout std_logic;
     ---------------------------------------------------------------------
     -- FMC: from the card
     ---------------------------------------------------------------------
@@ -121,56 +121,6 @@ architecture RTL of system_fpasim_top is
   signal locked  : std_logic;
 
   ---------------------------------------------------------------------
-  -- usb 
-  ---------------------------------------------------------------------
-
-  -- from the user @o_usb_clk
-  ---------------------------------------------------------------------
-  -- pipe
-  signal usb_pipeout_fifo_rd         : std_logic;
-  signal usb_pipeout_fifo_data       : std_logic_vector(31 downto 0);
-  -- trig
-  signal usb_trigout_data            : std_logic_vector(31 downto 0);
-  -- wire
-  signal usb_wireout_fifo_data_count : std_logic_vector(31 downto 0);
-  signal usb_wireout_ctrl            : std_logic_vector(31 downto 0);
-  signal usb_wireout_make_pulse      : std_logic_vector(31 downto 0);
-  signal usb_wireout_fpasim_gain     : std_logic_vector(31 downto 0);
-  signal usb_wireout_mux_sq_fb_delay : std_logic_vector(31 downto 0);
-  signal usb_wireout_amp_sq_of_delay : std_logic_vector(31 downto 0);
-  signal usb_wireout_error_delay     : std_logic_vector(31 downto 0);
-  signal usb_wireout_ra_delay        : std_logic_vector(31 downto 0);
-  signal usb_wireout_tes_conf        : std_logic_vector(31 downto 0);
-  signal usb_wireout_debug_ctrl      : std_logic_vector(31 downto 0);
-  signal usb_wireout_fpga_id         : std_logic_vector(31 downto 0);
-  signal usb_wireout_fpga_version    : std_logic_vector(31 downto 0);
-  signal usb_wireout_board_id        : std_logic_vector(31 downto 0);
-  -- errors/status
-  signal usb_wireout_errors          : std_logic_vector(31 downto 0);
-  signal usb_wireout_sel_errors      : std_logic_vector(31 downto 0);
-  signal usb_wireout_status          : std_logic_vector(31 downto 0);
-
-  -- to the user @o_usb_clk
-  ---------------------------------------------------------------------
-  signal usb_clk                    : std_logic;
-  -- pipe
-  signal usb_pipein_fifo_valid      : std_logic;
-  signal usb_pipein_fifo            : std_logic_vector(31 downto 0);
-  -- trig
-  signal usb_trigin_data            : std_logic_vector(31 downto 0);
-  -- wire
-  signal usb_wirein_ctrl            : std_logic_vector(31 downto 0);
-  signal usb_wirein_make_pulse      : std_logic_vector(31 downto 0);
-  signal usb_wirein_fpasim_gain     : std_logic_vector(31 downto 0);
-  signal usb_wirein_mux_sq_fb_delay : std_logic_vector(31 downto 0);
-  signal usb_wirein_amp_sq_of_delay : std_logic_vector(31 downto 0);
-  signal usb_wirein_error_delay     : std_logic_vector(31 downto 0);
-  signal usb_wirein_ra_delay        : std_logic_vector(31 downto 0);
-  signal usb_wirein_tes_conf        : std_logic_vector(31 downto 0);
-  signal usb_wirein_debug_ctrl      : std_logic_vector(31 downto 0);
-  signal usb_wirein_sel_errors      : std_logic_vector(31 downto 0);
-
-  ---------------------------------------------------------------------
   -- fpasim
   ---------------------------------------------------------------------
   -- adc
@@ -213,65 +163,6 @@ begin
       o_locked  => locked               -- not connected
     );
 
-  -----------------------------------------------------------------
-  -- usb
-  -----------------------------------------------------------------
-  usb_wireout_board_id <= std_logic_vector(resize(unsigned(i_board_id),usb_wireout_board_id'length) );
-  inst_usb_opal_kelly : entity fpasim.usb_opal_kelly
-    port map(
-      --  Opal Kelly inouts --
-      okUH                          => okUH,
-      okHU                          => okHU,
-      okUHU                         => okUHU,
-      okAA                          => okAA,
-      ---------------------------------------------------------------------
-      -- from the user @o_usb_clk
-      ---------------------------------------------------------------------
-      -- pipe
-      o_usb_pipeout_fifo_rd         => usb_pipeout_fifo_rd,
-      i_usb_pipeout_fifo_data       => usb_pipeout_fifo_data,
-      i_usb_wireout_fifo_data_count => usb_wireout_fifo_data_count,
-      -- trig
-      i_usb_trigout_data            => usb_trigout_data,
-      -- wire
-      i_usb_wireout_ctrl            => usb_wireout_ctrl,
-      i_usb_wireout_make_pulse      => usb_wireout_make_pulse,
-      i_usb_wireout_fpasim_gain     => usb_wireout_fpasim_gain,
-      i_usb_wireout_mux_sq_fb_delay => usb_wireout_mux_sq_fb_delay,
-      i_usb_wireout_amp_sq_of_delay => usb_wireout_amp_sq_of_delay,
-      i_usb_wireout_error_delay     => usb_wireout_error_delay,
-      i_usb_wireout_ra_delay        => usb_wireout_ra_delay,
-      i_usb_wireout_tes_conf        => usb_wireout_tes_conf,
-      i_usb_wireout_debug_ctrl      => usb_wireout_debug_ctrl,
-      i_usb_wireout_fpga_id         => usb_wireout_fpga_id,
-      i_usb_wireout_fpga_version    => usb_wireout_fpga_version,
-      i_usb_wireout_board_id        => usb_wireout_board_id,
-      -- errors/status
-      i_usb_wireout_sel_errors      => usb_wireout_sel_errors,
-      i_usb_wireout_errors          => usb_wireout_errors,
-      i_usb_wireout_status          => usb_wireout_status,
-      ---------------------------------------------------------------------
-      -- to the user @o_usb_clk
-      ---------------------------------------------------------------------
-      o_usb_clk                     => usb_clk,
-      -- pipe
-      o_usb_pipein_fifo_valid       => usb_pipein_fifo_valid,
-      o_usb_pipein_fifo             => usb_pipein_fifo,
-      -- trig
-      o_usb_trigin_data             => usb_trigin_data,
-      -- wire
-      o_usb_wirein_ctrl             => usb_wirein_ctrl,
-      o_usb_wirein_make_pulse       => usb_wirein_make_pulse,
-      o_usb_wirein_fpasim_gain      => usb_wirein_fpasim_gain,
-      o_usb_wirein_mux_sq_fb_delay  => usb_wirein_mux_sq_fb_delay,
-      o_usb_wirein_amp_sq_of_delay  => usb_wirein_amp_sq_of_delay,
-      o_usb_wirein_error_delay      => usb_wirein_error_delay,
-      o_usb_wirein_ra_delay         => usb_wirein_ra_delay,
-      o_usb_wirein_tes_conf         => usb_wirein_tes_conf,
-      o_usb_wirein_debug_ctrl       => usb_wirein_debug_ctrl,
-      o_usb_wirein_sel_errors       => usb_wirein_sel_errors -- wirein select errors/status
-    );
-
   ---------------------------------------------------------------------
   -- top_fpasim
   ---------------------------------------------------------------------
@@ -284,50 +175,17 @@ begin
       i_adc_clk                         => adc_clk, -- adc clock
       i_ref_clk                         => ref_clk, -- reference clock
       i_dac_clk                         => dac_clk, -- dac clock
-      i_usb_clk                         => usb_clk, -- usb clock
       ---------------------------------------------------------------------
-      -- from the usb @i_usb_clk
+      -- from the usb @i_usb_clk (clock included)
       ---------------------------------------------------------------------
-      -- trig
-      i_usb_pipein_fifo_valid           => usb_pipein_fifo_valid,
-      i_usb_pipein_fifo                 => usb_pipein_fifo,
-      -- trig
-      i_usb_trigin_data                 => usb_trigin_data,
-      -- wire
-      i_usb_wirein_ctrl                 => usb_wirein_ctrl,
-      i_usb_wirein_make_pulse           => usb_wirein_make_pulse,
-      i_usb_wirein_fpasim_gain          => usb_wirein_fpasim_gain,
-      i_usb_wirein_mux_sq_fb_delay      => usb_wirein_mux_sq_fb_delay,
-      i_usb_wirein_amp_sq_of_delay      => usb_wirein_amp_sq_of_delay,
-      i_usb_wirein_error_delay          => usb_wirein_error_delay,
-      i_usb_wirein_ra_delay             => usb_wirein_ra_delay,
-      i_usb_wirein_tes_conf             => usb_wirein_tes_conf,
-      i_usb_wirein_debug_ctrl           => usb_wirein_debug_ctrl,
-      i_usb_wirein_sel_errors           => usb_wirein_sel_errors,
+      i_okUH                            => i_okUH,
+      o_okHU                            => o_okHU,
+      b_okUHU                           => b_okUHU,
+      b_okAA                            => b_okAA,
       ---------------------------------------------------------------------
-      -- to the usb @o_usb_clk
+      -- from the board
       ---------------------------------------------------------------------
-      -- pipe
-      i_usb_pipeout_fifo_rd             => usb_pipeout_fifo_rd,
-      o_usb_pipeout_fifo_data           => usb_pipeout_fifo_data,
-      o_usb_wireout_fifo_data_count     => usb_wireout_fifo_data_count,
-      -- trig
-      o_usb_trigout_data                => usb_trigout_data,
-      -- wire
-      o_usb_wireout_ctrl                => usb_wireout_ctrl,
-      o_usb_wireout_make_pulse          => usb_wireout_make_pulse,
-      o_usb_wireout_fpasim_gain         => usb_wireout_fpasim_gain,
-      o_usb_wireout_mux_sq_fb_delay     => usb_wireout_mux_sq_fb_delay,
-      o_usb_wireout_amp_sq_of_delay     => usb_wireout_amp_sq_of_delay,
-      o_usb_wireout_error_delay         => usb_wireout_error_delay,
-      o_usb_wireout_ra_delay            => usb_wireout_ra_delay,
-      o_usb_wireout_tes_conf            => usb_wireout_tes_conf,
-      o_usb_wireout_debug_ctrl          => usb_wireout_debug_ctrl,
-      o_usb_wireout_fpga_id             => usb_wireout_fpga_id,
-      o_usb_wireout_fpga_version        => usb_wireout_fpga_version,
-      o_usb_wireout_sel_errors          => usb_wireout_sel_errors,
-      o_usb_wireout_errors              => usb_wireout_errors,
-      o_usb_wireout_status              => usb_wireout_status,
+      i_board_id                        => i_board_id,
       ---------------------------------------------------------------------
       -- from adc
       ---------------------------------------------------------------------
