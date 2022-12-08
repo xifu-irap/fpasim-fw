@@ -38,22 +38,22 @@
 ###############################################################################################################
 # usb
 ###############################################################################################################
-create_clock -period 9.920 -name okUH0 [get_ports {okUH[0]}]
+create_clock -period 9.920 -name okUH0 [get_ports {i_okUH[0]}]
 # create_clock -period 9.920 -name virt_okUH0
 
 # set_clock_groups -name async-mmcm-user-virt -asynchronous -group mmcm0_clk0 -group virt_okUH0
 
-set_input_delay -clock [get_clocks mmcm0_clk0] -max -add_delay 8.000 [get_ports {okUH[*]}]
-set_input_delay -clock [get_clocks mmcm0_clk0] -min -add_delay 0.000 [get_ports {okUH[*]}]
+set_input_delay -clock [get_clocks mmcm0_clk0] -max -add_delay 8.000 [get_ports {i_okUH[*]}]
+set_input_delay -clock [get_clocks mmcm0_clk0] -min -add_delay 0.000 [get_ports {i_okUH[*]}]
 
-set_input_delay -clock [get_clocks mmcm0_clk0] -max -add_delay 8.000 [get_ports {okUHU[*]}]
-set_input_delay -clock [get_clocks mmcm0_clk0] -min -add_delay 2.000 [get_ports {okUHU[*]}]
+set_input_delay -clock [get_clocks mmcm0_clk0] -max -add_delay 8.000 [get_ports {b_okUHU[*]}]
+set_input_delay -clock [get_clocks mmcm0_clk0] -min -add_delay 2.000 [get_ports {b_okUHU[*]}]
 
-set_output_delay -clock [get_clocks mmcm0_clk0] -max -add_delay 2.000 [get_ports {okHU[*]}]
-set_output_delay -clock [get_clocks mmcm0_clk0] -min -add_delay -0.500 [get_ports {okHU[*]}]
+set_output_delay -clock [get_clocks mmcm0_clk0] -max -add_delay 2.000 [get_ports {o_okHU[*]}]
+set_output_delay -clock [get_clocks mmcm0_clk0] -min -add_delay -0.500 [get_ports {o_okHU[*]}]
 
-set_output_delay -clock [get_clocks mmcm0_clk0] -max -add_delay 2.000 [get_ports {okUHU[*]}]
-set_output_delay -clock [get_clocks mmcm0_clk0] -min -add_delay -0.500 [get_ports {okUHU[*]}]
+set_output_delay -clock [get_clocks mmcm0_clk0] -max -add_delay 2.000 [get_ports {b_okUHU[*]}]
+set_output_delay -clock [get_clocks mmcm0_clk0] -min -add_delay -0.500 [get_ports {b_okUHU[*]}]
 
 
 ###############################################################################################################

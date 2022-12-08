@@ -36,22 +36,22 @@
 ###############################################################################################################
 # usb
 ###############################################################################################################
-create_clock -name okUH0 -period 9.920 [get_ports {okUH[0]}]
+create_clock -name okUH0 -period 9.920 [get_ports {i_okUH[0]}]
 create_clock -name virt_okUH0 -period 9.920
 
 set_clock_groups -name async-mmcm-user-virt -asynchronous -group {mmcm0_clk0} -group {virt_okUH0}
 
-set_input_delay -add_delay -max -clock [get_clocks {virt_okUH0}]  8.000 [get_ports {okUH[*]}]
-set_input_delay -add_delay -min -clock [get_clocks {virt_okUH0}]  0.000 [get_ports {okUH[*]}]
+set_input_delay -add_delay -max -clock [get_clocks {virt_okUH0}]  8.000 [get_ports {i_okUH[*]}]
+set_input_delay -add_delay -min -clock [get_clocks {virt_okUH0}]  0.000 [get_ports {i_okUH[*]}]
 
-set_input_delay -add_delay -max -clock [get_clocks {virt_okUH0}]  8.000 [get_ports {okUHU[*]}]
-set_input_delay -add_delay -min -clock [get_clocks {virt_okUH0}]  2.000 [get_ports {okUHU[*]}]
+set_input_delay -add_delay -max -clock [get_clocks {virt_okUH0}]  8.000 [get_ports {b_okUHU[*]}]
+set_input_delay -add_delay -min -clock [get_clocks {virt_okUH0}]  2.000 [get_ports {b_okUHU[*]}]
 
-set_output_delay -add_delay -max -clock [get_clocks {okUH0}]  2.000 [get_ports {okHU[*]}]
-set_output_delay -add_delay -min -clock [get_clocks {okUH0}]  -0.500 [get_ports {okHU[*]}]
+set_output_delay -add_delay -max -clock [get_clocks {okUH0}]  2.000 [get_ports {o_okHU[*]}]
+set_output_delay -add_delay -min -clock [get_clocks {okUH0}]  -0.500 [get_ports {o_okHU[*]}]
 
-set_output_delay -add_delay -max -clock [get_clocks {okUH0}]  2.000 [get_ports {okUHU[*]}]
-set_output_delay -add_delay -min -clock [get_clocks {okUH0}]  -0.500 [get_ports {okUHU[*]}]
+set_output_delay -add_delay -max -clock [get_clocks {okUH0}]  2.000 [get_ports {b_okUHU[*]}]
+set_output_delay -add_delay -min -clock [get_clocks {okUH0}]  -0.500 [get_ports {b_okUHU[*]}]
 
 ###############################################################################################################
 # rename auto-derived clock
