@@ -44,52 +44,20 @@ entity fpasim_top is
     i_adc_clk                         : in  std_logic; -- adc clock
     i_ref_clk                         : in  std_logic; -- reference clock
     i_dac_clk                         : in  std_logic; -- dac clock
-    i_usb_clk                         : in  std_logic; -- usb clock
+    --i_usb_clk                         : in  std_logic; -- usb clock
     ---------------------------------------------------------------------
-    -- from the usb @i_usb_clk
+    -- from the usb @i_usb_clk (clock included)
     ---------------------------------------------------------------------
-    -- trig
-    i_usb_pipein_fifo_valid           : in  std_logic; -- pipe in data valid
-    i_usb_pipein_fifo                 : in  std_logic_vector(31 downto 0); -- pipe in data
-    -- trig
-    i_usb_trigin_data                 : in  std_logic_vector(31 downto 0); -- trigin value
-    -- wire
-    i_usb_wirein_ctrl                 : in  std_logic_vector(31 downto 0); -- wirein ctrl value
-    i_usb_wirein_make_pulse           : in  std_logic_vector(31 downto 0); -- wirein make_pulse value
-    i_usb_wirein_fpasim_gain          : in  std_logic_vector(31 downto 0); -- wirein fpasim_gain value
-    i_usb_wirein_mux_sq_fb_delay      : in  std_logic_vector(31 downto 0); -- wirein mux_sq_fb_delay value
-    i_usb_wirein_amp_sq_of_delay      : in  std_logic_vector(31 downto 0); -- wirein amp_sq_of_delay value
-    i_usb_wirein_error_delay          : in  std_logic_vector(31 downto 0); -- wirein error_delay value
-    i_usb_wirein_ra_delay             : in  std_logic_vector(31 downto 0); -- wirein ra_delay value
-    i_usb_wirein_tes_conf             : in  std_logic_vector(31 downto 0); -- wirein tes_conf value
-    i_usb_wirein_debug_ctrl           : in  std_logic_vector(31 downto 0); -- wirein debug_ctrl value
-    i_usb_wirein_sel_errors           : in  std_logic_vector(31 downto 0); -- wirein select errors/status
+    --  Opal Kelly inouts --
+    i_okUH                          : in    std_logic_vector(4 downto 0);
+    o_okHU                          : out   std_logic_vector(2 downto 0);
+    b_okUHU                         : inout std_logic_vector(31 downto 0);
+    b_okAA                          : inout std_logic;
 
     ---------------------------------------------------------------------
-    -- to the usb @o_usb_clk
+    -- from the board
     ---------------------------------------------------------------------
-    -- pipe
-    i_usb_pipeout_fifo_rd             : in  std_logic; -- pipe out fifo rd
-    o_usb_pipeout_fifo_data           : out std_logic_vector(31 downto 0); -- pipe out data
-    o_usb_wireout_fifo_data_count     : out std_logic_vector(31 downto 0); -- wire out fifo data count (necessary for the pipe out)
-    -- trig
-    o_usb_trigout_data                : out std_logic_vector(31 downto 0); -- trig out value
-
-    -- wire
-    o_usb_wireout_ctrl                : out std_logic_vector(31 downto 0); -- wire out ctrl value
-    o_usb_wireout_make_pulse          : out std_logic_vector(31 downto 0); -- wire out make_pulse value
-    o_usb_wireout_fpasim_gain         : out std_logic_vector(31 downto 0); -- wire out fpasim_gain value
-    o_usb_wireout_mux_sq_fb_delay     : out std_logic_vector(31 downto 0); -- wire out mux_sq_fb_delay value
-    o_usb_wireout_amp_sq_of_delay     : out std_logic_vector(31 downto 0); -- wire out amp_sq_of_delay value
-    o_usb_wireout_error_delay         : out std_logic_vector(31 downto 0); -- wire out error_delay value
-    o_usb_wireout_ra_delay            : out std_logic_vector(31 downto 0); -- wire out ra_delay value
-    o_usb_wireout_tes_conf            : out std_logic_vector(31 downto 0); -- wire out tes_conf value
-    o_usb_wireout_debug_ctrl          : out std_logic_vector(31 downto 0); -- wire out debug_ctrl value
-    o_usb_wireout_fpga_id             : out std_logic_vector(31 downto 0); -- wire out fpga id
-    o_usb_wireout_fpga_version        : out std_logic_vector(31 downto 0); -- wire out fpga version
-    o_usb_wireout_sel_errors          : out std_logic_vector(31 downto 0); -- wire out select errors/status
-    o_usb_wireout_errors              : out std_logic_vector(31 downto 0); -- wire out errors
-    o_usb_wireout_status              : out std_logic_vector(31 downto 0); -- wire out status
+    i_board_id : in std_logic_vector(7 downto 0);
 
     ---------------------------------------------------------------------
     -- from adc
@@ -454,51 +422,14 @@ begin
     )
     port map( -- @suppress "The order of the associations is different from the declaration order"
       ---------------------------------------------------------------------
-      -- from the usb @i_clk
+      -- from the usb @i_clk (clock included)
       ---------------------------------------------------------------------
-      i_clk                             => i_usb_clk,
       i_rst                             => '0',
-      -- trig
-      i_usb_pipein_fifo_valid           => i_usb_pipein_fifo_valid, -- pipe in data valid
-      i_usb_pipein_fifo                 => i_usb_pipein_fifo, -- pipe in data
-      -- trig
-      i_usb_trigin_data                 => i_usb_trigin_data, -- trigin value
-      -- wire
-      i_usb_wirein_ctrl                 => i_usb_wirein_ctrl, -- wirein ctrl value
-      i_usb_wirein_make_pulse           => i_usb_wirein_make_pulse, -- wirein make_pulse value
-      i_usb_wirein_fpasim_gain          => i_usb_wirein_fpasim_gain, -- wirein fpasim_gain value
-      i_usb_wirein_mux_sq_fb_delay      => i_usb_wirein_mux_sq_fb_delay, -- wirein mux_sq_fb_delay value
-      i_usb_wirein_amp_sq_of_delay      => i_usb_wirein_amp_sq_of_delay, -- wirein amp_sq_of_delay value
-      i_usb_wirein_error_delay          => i_usb_wirein_error_delay, -- wirein error_delay value
-      i_usb_wirein_ra_delay             => i_usb_wirein_ra_delay, -- wirein ra_delay value
-      i_usb_wirein_tes_conf             => i_usb_wirein_tes_conf, -- wirein tes_conf value
-      i_usb_wirein_debug_ctrl           => i_usb_wirein_debug_ctrl, -- wirein debug_ctrl value
-      i_usb_wirein_sel_errors           => i_usb_wirein_sel_errors, -- wirein select errors/status
-      ---------------------------------------------------------------------
-      -- to the usb @o_usb_clk
-      ---------------------------------------------------------------------
-      -- pipe
-      i_usb_pipeout_fifo_rd             => i_usb_pipeout_fifo_rd, -- rd pipe out 
-      o_usb_pipeout_fifo_data           => o_usb_pipeout_fifo_data, -- pipe out data
-      -- trig
-      o_usb_trigout_data                => o_usb_trigout_data, -- trig out value
-      -- wire
-      o_usb_wireout_fifo_data_count     => o_usb_wireout_fifo_data_count, -- wire out fifo data count (necessary for the pipe out)
-      o_usb_wireout_ctrl                => o_usb_wireout_ctrl, -- wire out ctrl value
-      o_usb_wireout_make_pulse          => o_usb_wireout_make_pulse, -- wire out make_pulse value
-      o_usb_wireout_fpasim_gain         => o_usb_wireout_fpasim_gain, -- wire out fpasim_gain value
-      o_usb_wireout_mux_sq_fb_delay     => o_usb_wireout_mux_sq_fb_delay, -- wire out mux_sq_fb_delay value
-      o_usb_wireout_amp_sq_of_delay     => o_usb_wireout_amp_sq_of_delay, -- wire out amp_sq_of_delay value
-      o_usb_wireout_error_delay         => o_usb_wireout_error_delay, -- wire out error_delay value
-      o_usb_wireout_ra_delay            => o_usb_wireout_ra_delay, -- wire out ra_delay value
-      o_usb_wireout_tes_conf            => o_usb_wireout_tes_conf, -- wire out tes_conf value
-      o_usb_wireout_debug_ctrl          => o_usb_wireout_debug_ctrl, -- wire out debug_ctrl value
-      o_usb_wireout_fpga_id             => o_usb_wireout_fpga_id, -- wire out fpga id
-      o_usb_wireout_fpga_version        => o_usb_wireout_fpga_version, -- wire out fpga version
-      o_usb_wireout_sel_errors          => o_usb_wireout_sel_errors, -- wire out selected errors
-      o_usb_wireout_errors              => o_usb_wireout_errors, -- wire out selected errors
-      o_usb_wireout_status              => o_usb_wireout_status, -- wire out selected status
-
+      --  Opal Kelly inouts --
+      i_okUH                            => i_okUH,
+      o_okHU                            => o_okHU,
+      b_okUHU                           => b_okUHU,
+      b_okAA                            => b_okAA,
       ---------------------------------------------------------------------
       -- from/to the user: @i_out_clk
       ---------------------------------------------------------------------
