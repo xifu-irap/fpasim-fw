@@ -45,8 +45,8 @@ context common_lib.common_context;
 
 entity tb_system_fpasim_top is
   generic(
-    runner_cfg           : string  := runner_cfg_default; -- vunit generic: don't touch
-    output_path          : string  := "C:/Project/fpasim-fw-hardware/"; -- vunit generic: don't touch
+    runner_cfg  : string := runner_cfg_default;  -- vunit generic: don't touch
+    output_path : string := "C:/Project/fpasim-fw-hardware/";  -- vunit generic: don't touch
     ---------------------------------------------------------------------
     -- DUT generic
     ---------------------------------------------------------------------
@@ -54,11 +54,11 @@ entity tb_system_fpasim_top is
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
-    g_VUNIT_DEBUG        : boolean := true;
-    g_TEST_NAME          : string  := "";
-    g_ENABLE_CHECK       : boolean := true;
-    g_ENABLE_LOG         : boolean := true
-  );
+    g_VUNIT_DEBUG  : boolean := true;
+    g_TEST_NAME    : string  := "";
+    g_ENABLE_CHECK : boolean := true;
+    g_ENABLE_LOG   : boolean := true
+    );
 end tb_system_fpasim_top;
 
 architecture simulate of tb_system_fpasim_top is
@@ -70,7 +70,7 @@ architecture simulate of tb_system_fpasim_top is
   -- module input signals
   ---------------------------------------------------------------------
   -- FMC: from the card
-  signal i_board_id : std_logic_vector(7 downto 0):= (others => '0');
+  signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');
   ---------------------------------------------------------------------
   -- FMC: from the adc
   ---------------------------------------------------------------------
@@ -110,31 +110,31 @@ architecture simulate of tb_system_fpasim_top is
 
   -- FMC: to sync
   ---------------------------------------------------------------------
-  signal o_ref_clk : std_logic; -- @suppress "signal o_ref_clk is never read"
-  signal o_sync    : std_logic; -- @suppress "signal o_sync is never read"
+  signal o_ref_clk : std_logic;  -- @suppress "signal o_ref_clk is never read"
+  signal o_sync    : std_logic;  -- @suppress "signal o_sync is never read"
 
   -- FMC: to dac
   ---------------------------------------------------------------------
-  signal o_dac_clk_p   : std_logic; -- @suppress "signal o_dac_clk_p is never read"
-  signal o_dac_clk_n   : std_logic; -- @suppress "signal o_dac_clk_n is never read"
-  signal o_dac_frame_p : std_logic; -- @suppress "signal o_dac_frame_p is never read"
-  signal o_dac_frame_n : std_logic; -- @suppress "signal o_dac_frame_n is never read"
-  signal o_dac0_p      : std_logic; -- @suppress "signal o_dac0_p is never read"
-  signal o_dac0_n      : std_logic; -- @suppress "signal o_dac0_n is never read"
-  signal o_dac1_p      : std_logic; -- @suppress "signal o_dac1_p is never read"
-  signal o_dac1_n      : std_logic; -- @suppress "signal o_dac1_n is never read"
-  signal o_dac2_p      : std_logic; -- @suppress "signal o_dac2_p is never read"
-  signal o_dac2_n      : std_logic; -- @suppress "signal o_dac2_n is never read"
-  signal o_dac3_p      : std_logic; -- @suppress "signal o_dac3_p is never read"
-  signal o_dac3_n      : std_logic; -- @suppress "signal o_dac3_n is never read"
-  signal o_dac4_p      : std_logic; -- @suppress "signal o_dac4_p is never read"
-  signal o_dac4_n      : std_logic; -- @suppress "signal o_dac4_n is never read"
-  signal o_dac5_p      : std_logic; -- @suppress "signal o_dac5_p is never read"
-  signal o_dac5_n      : std_logic; -- @suppress "signal o_dac5_n is never read"
-  signal o_dac6_p      : std_logic; -- @suppress "signal o_dac6_p is never read"
-  signal o_dac6_n      : std_logic; -- @suppress "signal o_dac6_n is never read"
-  signal o_dac7_p      : std_logic; -- @suppress "signal o_dac7_p is never read"
-  signal o_dac7_n      : std_logic; -- @suppress "signal o_dac7_n is never read"
+  signal o_dac_clk_p   : std_logic;  -- @suppress "signal o_dac_clk_p is never read"
+  signal o_dac_clk_n   : std_logic;  -- @suppress "signal o_dac_clk_n is never read"
+  signal o_dac_frame_p : std_logic;  -- @suppress "signal o_dac_frame_p is never read"
+  signal o_dac_frame_n : std_logic;  -- @suppress "signal o_dac_frame_n is never read"
+  signal o_dac0_p      : std_logic;  -- @suppress "signal o_dac0_p is never read"
+  signal o_dac0_n      : std_logic;  -- @suppress "signal o_dac0_n is never read"
+  signal o_dac1_p      : std_logic;  -- @suppress "signal o_dac1_p is never read"
+  signal o_dac1_n      : std_logic;  -- @suppress "signal o_dac1_n is never read"
+  signal o_dac2_p      : std_logic;  -- @suppress "signal o_dac2_p is never read"
+  signal o_dac2_n      : std_logic;  -- @suppress "signal o_dac2_n is never read"
+  signal o_dac3_p      : std_logic;  -- @suppress "signal o_dac3_p is never read"
+  signal o_dac3_n      : std_logic;  -- @suppress "signal o_dac3_n is never read"
+  signal o_dac4_p      : std_logic;  -- @suppress "signal o_dac4_p is never read"
+  signal o_dac4_n      : std_logic;  -- @suppress "signal o_dac4_n is never read"
+  signal o_dac5_p      : std_logic;  -- @suppress "signal o_dac5_p is never read"
+  signal o_dac5_n      : std_logic;  -- @suppress "signal o_dac5_n is never read"
+  signal o_dac6_p      : std_logic;  -- @suppress "signal o_dac6_p is never read"
+  signal o_dac6_n      : std_logic;  -- @suppress "signal o_dac6_n is never read"
+  signal o_dac7_p      : std_logic;  -- @suppress "signal o_dac7_p is never read"
+  signal o_dac7_n      : std_logic;  -- @suppress "signal o_dac7_n is never read"
 
   signal data0 : unsigned(13 downto 0) := (others => '0');
   signal data1 : unsigned(13 downto 0) := (others => '0');
@@ -147,15 +147,15 @@ architecture simulate of tb_system_fpasim_top is
   signal sys_clk : std_logic := '0';
 
   --  Opal Kelly inouts --
-  signal okUH  : std_logic_vector(4 downto 0) := (others => '0');
-  signal okHU  : std_logic_vector(2 downto 0) := (others => '0');
-  signal okUHU : std_logic_vector(31 downto 0);
-  signal okAA  : std_logic                    := '0';
+  signal i_okUH  : std_logic_vector(4 downto 0) := (others => '0');
+  signal o_okHU  : std_logic_vector(2 downto 0) := (others => '0');
+  signal b_okUHU : std_logic_vector(31 downto 0);
+  signal b_okAA  : std_logic                    := '0';
 
   ---------------------------------------------------------------------
   -- Clock definition
   ---------------------------------------------------------------------
-  constant c_CLK_PERIOD0    : time                         := 9.99206 ns; -- @100.8MHz (usb3 opal kelly speed)
+  constant c_CLK_PERIOD0    : time                         := 9.99206 ns;  -- @100.8MHz (usb3 opal kelly speed)
   constant c_CLK_PERIOD1    : time                         := 4 ns;
   ---------------------------------------------------------------------
   -- Generate reading sequence
@@ -164,7 +164,7 @@ architecture simulate of tb_system_fpasim_top is
   signal data_start         : std_logic                    := '0';
   signal data_rd_valid      : std_logic                    := '0';
   signal data_wr_gen_finish : std_logic                    := '0';
-  signal data_wr_error      : std_logic_vector(0 downto 0) := (others => '0'); -- @suppress "signal data_wr_error is never read"
+  signal data_wr_error      : std_logic_vector(0 downto 0) := (others => '0');  -- @suppress "signal data_wr_error is never read"
   signal data_stop          : std_logic                    := '0';
 
   signal o_reg_id     : integer                       := 0;
@@ -199,33 +199,33 @@ architecture simulate of tb_system_fpasim_top is
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers 
-  constant c_LOGGER_SUMMARY : logger_t  := get_logger("log:summary"); -- @suppress "Expression does not result in a constant"
+  constant c_LOGGER_SUMMARY               : logger_t  := get_logger("log:summary");  -- @suppress "Expression does not result in a constant"
   -- checkers
-  constant c_CHECKER_REG   : checker_t := new_checker("check:reg:data"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM_TES_PULSE_SHAPE   : checker_t := new_checker("check:ram:tes_pulse_shape"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM_AMP_SQUID_TF   : checker_t := new_checker("check:ram:amp_squid_tf"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM_MUX_SQUID_TF   : checker_t := new_checker("check:ram:mux_squid_tf"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM_TES_STEADY_STATE   : checker_t := new_checker("check:ram:tes_steady_state"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM_MUX_SQUID_OFFSET   : checker_t := new_checker("check:ram:mux_squid_offset"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG                  : checker_t := new_checker("check:reg:data");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM_TES_PULSE_SHAPE  : checker_t := new_checker("check:ram:tes_pulse_shape");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM_AMP_SQUID_TF     : checker_t := new_checker("check:ram:amp_squid_tf");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM_MUX_SQUID_TF     : checker_t := new_checker("check:ram:mux_squid_tf");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM_TES_STEADY_STATE : checker_t := new_checker("check:ram:tes_steady_state");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM_MUX_SQUID_OFFSET : checker_t := new_checker("check:ram:mux_squid_offset");  -- @suppress "Expression does not result in a constant"
 
-  constant c_CHECKER_REG_CTRL   : checker_t := new_checker("check:reg:ctrl"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_REG_FPASIM_GAIN   : checker_t := new_checker("check:reg:fpasim_gain"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_REG_MUX_SQ_FB_DELAY   : checker_t := new_checker("check:reg:mux_sq_fb_delay"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_REG_AMP_SQ_OF_DELAY   : checker_t := new_checker("check:reg:amp_sq_of_delay"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_REG_ERROR_DELAY   : checker_t := new_checker("check:reg:error_delay"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_REG_RA_DELAY   : checker_t := new_checker("check:reg:ra_delay"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG_CTRL            : checker_t := new_checker("check:reg:ctrl");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG_FPASIM_GAIN     : checker_t := new_checker("check:reg:fpasim_gain");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG_MUX_SQ_FB_DELAY : checker_t := new_checker("check:reg:mux_sq_fb_delay");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG_AMP_SQ_OF_DELAY : checker_t := new_checker("check:reg:amp_sq_of_delay");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG_ERROR_DELAY     : checker_t := new_checker("check:reg:error_delay");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG_RA_DELAY        : checker_t := new_checker("check:reg:ra_delay");  -- @suppress "Expression does not result in a constant"
 
   signal usb_wr_if0 : opal_kelly_lib.pkg_front_panel.t_internal_wr_if := (
     hi_drive   => '0',
     hi_cmd     => (others => '0'),
     hi_dataout => (others => '0')
-  );
+    );
 
   signal usb_rd_if0 : opal_kelly_lib.pkg_front_panel.t_internal_rd_if := (
     i_clk     => '0',
     hi_busy   => '0',
     hi_datain => (others => '0')
-  );
+    );
 
   shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
 
@@ -263,7 +263,7 @@ begin
     ---------------------------------------------------------------------
     -- VUNIT - Scoreboard object : Visibility definition
     ---------------------------------------------------------------------
-    if g_VUNIT_DEBUG = true then -- @suppress "Redundant boolean equality check with true"
+    if g_VUNIT_DEBUG = true then  -- @suppress "Redundant boolean equality check with true"
       -- the simulator doesn't stop on errors => stop on failure
       set_stop_level(failure);
     end if;
@@ -317,14 +317,14 @@ begin
     ---------------------------------------------------------------------
     -- summary
     info(c_LOGGER_SUMMARY,
-     "===Summary===" & LF &
-     "c_CHECKER_REG: " & to_string(get_checker_stat(c_CHECKER_REG)) & LF &
-     "c_CHECKER_RAM_TES_PULSE_SHAPE: " & to_string(get_checker_stat(c_CHECKER_RAM_TES_PULSE_SHAPE)) & LF &
-     "c_CHECKER_RAM_AMP_SQUID_TF: " & to_string(get_checker_stat(c_CHECKER_RAM_AMP_SQUID_TF)) & LF &
-     "c_CHECKER_RAM_MUX_SQUID_TF: " & to_string(get_checker_stat(c_CHECKER_RAM_MUX_SQUID_TF)) & LF &
-     "c_CHECKER_RAM_TES_STEADY_STATE: " & to_string(get_checker_stat(c_CHECKER_RAM_TES_STEADY_STATE)) & LF &
-     "c_CHECKER_RAM_MUX_SQUID_OFFSET: " & to_string(get_checker_stat(c_CHECKER_RAM_MUX_SQUID_OFFSET)) & LF
-    );
+         "===Summary===" & LF &
+         "c_CHECKER_REG: " & to_string(get_checker_stat(c_CHECKER_REG)) & LF &
+         "c_CHECKER_RAM_TES_PULSE_SHAPE: " & to_string(get_checker_stat(c_CHECKER_RAM_TES_PULSE_SHAPE)) & LF &
+         "c_CHECKER_RAM_AMP_SQUID_TF: " & to_string(get_checker_stat(c_CHECKER_RAM_AMP_SQUID_TF)) & LF &
+         "c_CHECKER_RAM_MUX_SQUID_TF: " & to_string(get_checker_stat(c_CHECKER_RAM_MUX_SQUID_TF)) & LF &
+         "c_CHECKER_RAM_TES_STEADY_STATE: " & to_string(get_checker_stat(c_CHECKER_RAM_TES_STEADY_STATE)) & LF &
+         "c_CHECKER_RAM_MUX_SQUID_OFFSET: " & to_string(get_checker_stat(c_CHECKER_RAM_MUX_SQUID_OFFSET)) & LF
+         );
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
@@ -343,12 +343,12 @@ begin
 
   opal_kelly_lib.pkg_front_panel.okHost_driver(
     i_clk            => usb_clk,
-    o_okUH           => okUH,
-    i_okHU           => okHU,
-    b_okUHU          => okUHU,
+    o_okUH           => i_okUH,
+    i_okHU           => o_okHU,
+    b_okUHU          => b_okUHU,
     i_internal_wr_if => usb_wr_if0,
     o_internal_rd_if => usb_rd_if0
-  );
+    );
 
   ---------------------------------------------------------------------
   -- wr conf
@@ -358,51 +358,51 @@ begin
 
   begin
     pkg_usb_wr(
-      i_clk              => usb_clk,
-      i_start_wr         => data_start,
+      i_clk                     => usb_clk,
+      i_start_wr                => data_start,
       ---------------------------------------------------------------------
       -- input file
       ---------------------------------------------------------------------
-      i_filepath_wr      => c_FILEPATH_DATA_IN,
-      i_csv_separator    => c_CSV_SEPARATOR,
+      i_filepath_wr             => c_FILEPATH_DATA_IN,
+      i_csv_separator           => c_CSV_SEPARATOR,
       --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
       --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
       --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
       --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
       --  data type = "STD_VEC" => no data convertion before writing in the output file
-      i_USB_WR_ADDR_TYP  => "HEX",
-      i_USB_WR_DATA_TYP  => "HEX",
+      i_USB_WR_ADDR_TYP         => "HEX",
+      i_USB_WR_DATA_TYP         => "HEX",
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      i_wr_ready         => data_rd_valid,
+      i_wr_ready                => data_rd_valid,
       ---------------------------------------------------------------------
       -- usb
       ---------------------------------------------------------------------
-      b_front_panel_conf => v_front_panel_conf,
-      o_internal_wr_if   => usb_wr_if0,
-      i_internal_rd_if   => usb_rd_if0,
+      b_front_panel_conf        => v_front_panel_conf,
+      o_internal_wr_if          => usb_wr_if0,
+      i_internal_rd_if          => usb_rd_if0,
       ---------------------------------------------------------------------
       -- Vunit Scoreboard objects
       ---------------------------------------------------------------------
-      i_sb_reg_data         => c_CHECKER_REG,
-      i_sb_ram_tes_pulse_shape => c_CHECKER_RAM_TES_PULSE_SHAPE,
-     i_sb_ram_amp_squid_tf => c_CHECKER_RAM_AMP_SQUID_TF,
-     i_sb_ram_mux_squid_tf => c_CHECKER_RAM_MUX_SQUID_TF,
-     i_sb_ram_tes_steady_state => c_CHECKER_RAM_TES_STEADY_STATE,
-     i_sb_ram_mux_offset => c_CHECKER_RAM_MUX_SQUID_OFFSET,
+      i_sb_reg_data             => c_CHECKER_REG,
+      i_sb_ram_tes_pulse_shape  => c_CHECKER_RAM_TES_PULSE_SHAPE,
+      i_sb_ram_amp_squid_tf     => c_CHECKER_RAM_AMP_SQUID_TF,
+      i_sb_ram_mux_squid_tf     => c_CHECKER_RAM_MUX_SQUID_TF,
+      i_sb_ram_tes_steady_state => c_CHECKER_RAM_TES_STEADY_STATE,
+      i_sb_ram_mux_offset       => c_CHECKER_RAM_MUX_SQUID_OFFSET,
       ---------------------------------------------------------------------
       -- data
       ---------------------------------------------------------------------
-      o_reg_id           => o_reg_id,
-      o_data_valid       => o_data_valid,
-      o_data             => o_data,
+      o_reg_id                  => o_reg_id,
+      o_data_valid              => o_data_valid,
+      o_data                    => o_data,
       ---------------------------------------------------------------------
       -- status
       ---------------------------------------------------------------------
-      o_wr_finish        => data_wr_gen_finish,
-      o_error            => data_wr_error
-    );
+      o_wr_finish               => data_wr_gen_finish,
+      o_error                   => data_wr_error
+      );
   end generate gen_conf_RAM;
 
   ---------------------------------------------------------------------
@@ -456,10 +456,10 @@ begin
   dut_system_fpasim_top : entity fpasim.system_fpasim_top
     port map(
       --  Opal Kelly inouts --
-      okUH          => okUH,
-      okHU          => okHU,
-      okUHU         => okUHU,
-      okAA          => okAA,
+      i_okUH        => i_okUH,
+      o_okHU        => o_okHU,
+      b_okUHU       => b_okUHU,
+      b_okAA        => b_okAA,
       ---------------------------------------------------------------------
       -- FMC: from the card
       ---------------------------------------------------------------------
@@ -528,12 +528,12 @@ begin
       o_dac6_n      => o_dac6_n,
       o_dac7_p      => o_dac7_p,
       o_dac7_n      => o_dac7_n
-    );
+      );
 
   ---------------------------------------------------------------------
   -- log: data out
   ---------------------------------------------------------------------
-  gen_log_ram_pulse_shape : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_log_ram_pulse_shape : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
     signal addr       : std_logic_vector(15 downto 0);
     signal data       : std_logic_vector(15 downto 0);
     signal data_valid : std_logic;
@@ -566,11 +566,11 @@ begin
       i_data_valid     => data_valid,
       i_data0_std_vect => addr,
       i_data1_std_vect => data
-    );
+      );
 
   end generate gen_log_ram_pulse_shape;
 
-  gen_log_ram_amp_squid_tf : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_log_ram_amp_squid_tf : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
     signal addr       : std_logic_vector(15 downto 0);
     signal data       : std_logic_vector(15 downto 0);
     signal data_valid : std_logic;
@@ -603,11 +603,11 @@ begin
       i_data_valid     => data_valid,
       i_data0_std_vect => addr,
       i_data1_std_vect => data
-    );
+      );
 
   end generate gen_log_ram_amp_squid_tf;
 
-  gen_log_ram_mux_squid_tf : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_log_ram_mux_squid_tf : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
     signal addr       : std_logic_vector(15 downto 0);
     signal data       : std_logic_vector(15 downto 0);
     signal data_valid : std_logic;
@@ -640,11 +640,11 @@ begin
       i_data_valid     => data_valid,
       i_data0_std_vect => addr,
       i_data1_std_vect => data
-    );
+      );
 
   end generate gen_log_ram_mux_squid_tf;
 
-  gen_log_ram_tes_steady_state : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_log_ram_tes_steady_state : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
     signal addr       : std_logic_vector(15 downto 0);
     signal data       : std_logic_vector(15 downto 0);
     signal data_valid : std_logic;
@@ -677,11 +677,11 @@ begin
       i_data_valid     => data_valid,
       i_data0_std_vect => addr,
       i_data1_std_vect => data
-    );
+      );
 
   end generate gen_log_ram_tes_steady_state;
 
-  gen_log_ram_mux_squid_offset : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_log_ram_mux_squid_offset : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
     signal addr       : std_logic_vector(15 downto 0);
     signal data       : std_logic_vector(15 downto 0);
     signal data_valid : std_logic;
@@ -714,7 +714,7 @@ begin
       i_data_valid     => data_valid,
       i_data0_std_vect => addr,
       i_data1_std_vect => data
-    );
+      );
 
   end generate gen_log_ram_mux_squid_offset;
 
