@@ -113,6 +113,11 @@ entity regdecode_top is
     b_okAA  : inout std_logic;
 
     ---------------------------------------------------------------------
+    -- from the board
+    ---------------------------------------------------------------------
+    i_board_id : in std_logic_vector(7 downto 0);
+
+    ---------------------------------------------------------------------
     -- from/to the user: @i_out_clk
     ---------------------------------------------------------------------
     i_out_clk     : in std_logic;       -- clock (user side)
@@ -567,6 +572,7 @@ begin
   ---------------------------------------------------------------------
   usb_wireout_fpga_id      <= c_FPGA_ID;
   usb_wireout_fpga_version <= c_FPGA_VERSION;
+  usb_wireout_board_id     <= std_logic_vector(resize(unsigned(i_board_id),usb_wireout_board_id'length));
 
   -- from trigin: extract bits signal
   trig_debug_valid      <= usb_trigin_data(c_TRIGIN_DEBUG_VALID_IDX_H);
