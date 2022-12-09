@@ -56,12 +56,12 @@ entity recording_top is
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
-    i_adc_rd         : in  std_logic;   -- read fifo
-    o_adc_data_valid : out std_logic;   -- output data valid
-    o_adc_sof        : out std_logic;   -- first word of a block
-    o_adc_eof        : out std_logic;   -- last word of a block
-    o_adc_data       : out std_logic_vector(31 downto 0);  -- output data value
-    o_adc_empty      : out std_logic;   -- fifo empty flag
+    i_fifo_adc_rd         : in  std_logic;   -- read fifo
+    o_fifo_adc_data_valid : out std_logic;   -- output data valid
+    o_fifo_adc_sof        : out std_logic;   -- first word of a block
+    o_fifo_adc_eof        : out std_logic;   -- last word of a block
+    o_fifo_adc_data       : out std_logic_vector(31 downto 0);  -- output data value
+    o_fifo_adc_empty      : out std_logic;   -- fifo empty flag
 
     -----------------------------------------------------------------
     -- errors/status
@@ -80,13 +80,13 @@ architecture RTL of recording_top is
   signal adc_data0 : std_logic_vector(15 downto 0);
   signal adc_data1 : std_logic_vector(15 downto 0);
 
-  signal adc_data_valid : std_logic;
-  signal adc_sof        : std_logic;
-  signal adc_eof        : std_logic;
-  signal adc_data       : std_logic_vector(o_adc_data'range);
-  signal adc_empty      : std_logic;
-  signal adc_errors     : std_logic_vector(o_adc_errors'range);
-  signal adc_status     : std_logic_vector(o_adc_status'range);
+  signal fifo_adc_data_valid : std_logic;
+  signal fifo_adc_sof        : std_logic;
+  signal fifo_adc_eof        : std_logic;
+  signal fifo_adc_data       : std_logic_vector(o_fifo_adc_data'range);
+  signal fifo_adc_empty      : std_logic;
+  signal adc_errors          : std_logic_vector(o_adc_errors'range);
+  signal adc_status          : std_logic_vector(o_adc_status'range);
 
 begin
 
@@ -120,12 +120,12 @@ begin
       ---------------------------------------------------------------------
       -- output @out_clk
       ---------------------------------------------------------------------
-      i_adc_rd                    => i_adc_rd,      -- read fifo
-      o_adc_sof                   => adc_sof,       -- first word of a block
-      o_adc_eof                   => adc_eof,       -- last word of a block
-      o_adc_data_valid            => adc_data_valid,   -- output data valid
-      o_adc_data                  => adc_data,      -- output data value
-      o_adc_empty                 => adc_empty,     -- fifo empty flag
+      i_fifo_adc_rd                    => i_fifo_adc_rd,      -- read fifo
+      o_fifo_adc_sof                   => fifo_adc_sof,       -- first word of a block
+      o_fifo_adc_eof                   => fifo_adc_eof,       -- last word of a block
+      o_fifo_adc_data_valid            => fifo_adc_data_valid,   -- output data valid
+      o_fifo_adc_data                  => fifo_adc_data,      -- output data value
+      o_fifo_adc_empty                 => fifo_adc_empty,     -- fifo empty flag
       -----------------------------------------------------------------
       -- errors/status
       -----------------------------------------------------------------
@@ -136,13 +136,16 @@ begin
 ---------------------------------------------------------------------
 -- output
 ---------------------------------------------------------------------
-  o_adc_sof        <= adc_sof;
-  o_adc_eof        <= adc_eof;
-  o_adc_data_valid <= adc_data_valid;
-  o_adc_data       <= adc_data;
-  o_adc_empty      <= adc_empty;
-  o_adc_errors     <= adc_errors;
-  o_adc_errors     <= adc_errors;
-  o_adc_status     <= adc_status;
+  o_fifo_adc_sof        <= fifo_adc_sof;
+  o_fifo_adc_eof        <= fifo_adc_eof;
+  o_fifo_adc_data_valid <= fifo_adc_data_valid;
+  o_fifo_adc_data       <= fifo_adc_data;
+  o_fifo_adc_empty      <= fifo_adc_empty;
+
+---------------------------------------------------------------------
+-- errors/status
+---------------------------------------------------------------------
+  o_adc_errors          <= adc_errors;
+  o_adc_status          <= adc_status;
 
 end architecture RTL;

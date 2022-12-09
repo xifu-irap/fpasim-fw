@@ -42,7 +42,7 @@
 -- Note: The State Machine of this module doesn't manage the data flow. So, the user must provide enough space in the output FIFO (by reading it)
 --       before sending a command to store a new data block. Otherwise, an error will be fired.
 -- Remark: 
---   . The output fifo is configured as standard (1 clock cycle delay between the i_adc_rd and the o_adc_data_valid). The user
+--   . The output fifo is configured as standard (1 clock cycle delay between the i_fifo_adc_rd and the o_fifo_adc_data_valid). The user
 --   needs to be careful in the management.
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -75,12 +75,12 @@ entity recording_adc is
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
-    i_adc_rd         : in  std_logic;   -- read fifo
-    o_adc_sof        : out std_logic;   -- first word of a block
-    o_adc_eof        : out std_logic;   -- last word of a block
-    o_adc_data_valid : out std_logic;   -- output data valid
-    o_adc_data       : out std_logic_vector(31 downto 0);  -- output data value
-    o_adc_empty      : out std_logic;   -- fifo empty flag
+    i_fifo_adc_rd         : in  std_logic;   -- read fifo
+    o_fifo_adc_sof        : out std_logic;   -- first word of a block
+    o_fifo_adc_eof        : out std_logic;   -- last word of a block
+    o_fifo_adc_data_valid : out std_logic;   -- output data valid
+    o_fifo_adc_data       : out std_logic_vector(31 downto 0);  -- output data value
+    o_fifo_adc_empty      : out std_logic;   -- fifo empty flag
 
     -----------------------------------------------------------------
     -- errors/status
@@ -97,7 +97,7 @@ architecture RTL of recording_adc is
   -- FIFO
   ---------------------------------------------------------------------
   constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + o_adc_data'length - 1;
+  constant c_IDX0_H : integer := c_IDX0_L + o_fifo_adc_data'length - 1;
 
   constant c_IDX1_L : integer := c_IDX0_H + 1;
   constant c_IDX1_H : integer := c_IDX1_L + 1 - 1;
@@ -134,7 +134,7 @@ architecture RTL of recording_adc is
   signal data1_r1 : std_logic_vector(i_adc_data1'range);
   signal data0_r1 : std_logic_vector(i_adc_data0'range);
 
-  signal data_tmp2    : std_logic_vector(o_adc_data'range);
+  signal data_tmp2    : std_logic_vector(o_fifo_adc_data'range);
   ---------------------------------------------------------------------
   -- step2
   ---------------------------------------------------------------------
@@ -152,7 +152,7 @@ architecture RTL of recording_adc is
   signal sof_tmp1        : std_logic;
   signal eof_tmp1        : std_logic;
   signal data_valid_tmp1 : std_logic;
-  signal data1           : std_logic_vector(o_adc_data'range);
+  signal data1           : std_logic_vector(o_fifo_adc_data'range);
 
   signal errors_sync1 : std_logic_vector(3 downto 0);
   signal empty_sync1  : std_logic;
@@ -307,7 +307,7 @@ begin
       o_empty_sync    => empty_sync1
       );
 
-  rd1 <= '1' when i_adc_rd = '1' and rd_rst_busy1 = '0' else '0';
+  rd1 <= '1' when i_fifo_adc_rd = '1' and rd_rst_busy1 = '0' else '0';
 
   sof_tmp1         <= data_tmp1(c_IDX2_H);
   eof_tmp1         <= data_tmp1(c_IDX1_H);
@@ -315,11 +315,11 @@ begin
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
-  o_adc_data_valid <= data_valid_tmp1;
-  o_adc_sof        <= sof_tmp1;
-  o_adc_eof        <= eof_tmp1;
-  o_adc_data       <= data1;
-  o_adc_empty      <= empty1;
+  o_fifo_adc_data_valid <= data_valid_tmp1;
+  o_fifo_adc_sof        <= sof_tmp1;
+  o_fifo_adc_eof        <= eof_tmp1;
+  o_fifo_adc_data       <= data1;
+  o_fifo_adc_empty      <= empty1;
 
 
   ---------------------------------------------------------------------
