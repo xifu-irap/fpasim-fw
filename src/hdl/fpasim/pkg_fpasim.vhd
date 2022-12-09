@@ -416,5 +416,11 @@ PACKAGE pkg_fpasim IS
   -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
   constant pkg_IO_SYNC_LATENCY : natural := 1;
 
+  ---------------------------------------------------------------------
+  -- Recording
+  ---------------------------------------------------------------------
+  -- user-defined: number of 32 bit-words in the output FIFO (must be a multiple of the usb3 minimum packet size)
+  constant pkg_REC_ADC_FIFO_OUT_DEPTH : integer := 16384;
+
 END pkg_fpasim;
 
