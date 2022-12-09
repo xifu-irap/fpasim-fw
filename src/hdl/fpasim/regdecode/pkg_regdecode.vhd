@@ -40,19 +40,19 @@ PACKAGE pkg_regdecode IS
     ---------------------------------------------------------------------
     -- 
     ---------------------------------------------------------------------
-    -- user-defined: FPGA version
-    constant pkg_FPGA_VERSION_VALUE : integer := 1;
+    -- user-defined: Firmware version
+    constant pkg_FIRMWARE_VERSION_VALUE : integer := 2;
 
-    -- user-defined: FPGA ID (name)
-    constant pkg_FPGA_ID_CHAR3 : character := 'f'; -- ascii character
-    constant pkg_FPGA_ID_CHAR2 : character := 'p'; -- ascii character
-    constant pkg_FPGA_ID_CHAR1 : character := 'a'; -- ascii character
-    constant pkg_FPGA_ID_CHAR0 : character := ' '; -- ascii character
+    -- user-defined: FIRMWARE ID (name)
+    constant pkg_FIRMWARE_ID_CHAR3 : character := 'f'; -- ascii character
+    constant pkg_FIRMWARE_ID_CHAR2 : character := 'p'; -- ascii character
+    constant pkg_FIRMWARE_ID_CHAR1 : character := 'a'; -- ascii character
+    constant pkg_FIRMWARE_ID_CHAR0 : character := ' '; -- ascii character
 
     -- auto-computed: fpga id
-    constant pkg_FPGA_ID      : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR3), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR2), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR1), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR0), 8));
+    constant pkg_FIRMWARE_ID      : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR3), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR2), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR1), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR0), 8));
     -- auto-computed: fpga version
-    constant pkg_FPGA_VERSION : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(pkg_FPGA_VERSION_VALUE, 32));
+    constant pkg_FIRMWARE_VERSION : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(pkg_FIRMWARE_VERSION_VALUE, 32));
 
     -------------------------------------------------------------------
     -- pipe
@@ -100,6 +100,8 @@ PACKAGE pkg_regdecode IS
 
     -- trig in
     ---------------------------------------------------------------------
+    -- user-defined: rec valid (bit index)
+    constant c_TRIGIN_REC_VALID_IDX_H : integer := 20;
     -- user-defined: debug valid (bit index)
     constant pkg_TRIGIN_DEBUG_VALID_IDX_H : integer := 16;
 
