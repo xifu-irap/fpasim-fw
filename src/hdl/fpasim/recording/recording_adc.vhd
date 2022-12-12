@@ -222,7 +222,7 @@ begin
           cnt_sample_next <= cnt_frame_r1 + 1;
           if cnt_frame_r1 = cnt_frame_max_r1 then
             eof_next      <= '1';
-            sm_state_next <= E_START;
+            sm_state_next <= E_WAIT;
           else
             sm_state_next <= E_RUN;
           end if;
