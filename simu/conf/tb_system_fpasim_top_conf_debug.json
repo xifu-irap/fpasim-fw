@@ -461,6 +461,115 @@
         }
       }
     },
+    "@usb_data_count": {
+      "description_list": [
+      "This command is used to access to the DATA_COUNT register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_data_count/field/pipe_out_data_count' : number of 32 bit-words currently in the pipe_out FIFO",
+      "     'value' (integer >=0): number of 32 bit-words in the pipe_out FIFO",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_data_count/field/make_pulse_data_count' : number of 32 bit-words currently in the make_pulse FIFO",
+      "     'value' (integer >=0): number of 32 bit-words in the make_pulse FIFO",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_data_count/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_data_count/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "rd": {
+        "usb_addr": "0x2B",
+        "reg_id": 511
+      },
+      "field": {
+        "pipe_out_data_count": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        },
+        "make_pulse_data_count": {
+          "value": 0,
+          "bit_pos_min": 16,
+          "width": 16
+        }
+      }
+    },
+    "@usb_rec_ctrl": {
+      "description_list": [
+      "This command is used to access to the REC_CTRL register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_rec_ctrl/field/rec_adc_en': ",
+      "     'value' (integer: 0 or 1): 0: do nothing, 1: enable the adc recording",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_rec_ctrl/wr(or rd)/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_rec_ctrl/wr(or rd)/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x0C",
+        "reg_id": 212
+      },
+      "rd": {
+        "usb_addr": "0x2C",
+        "reg_id": 512
+      },
+      "field": {
+        "rec_adc_en": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        }
+      }
+    },
+    "@usb_rec_conf0": {
+      "description_list": [
+      "This command is used to access to the REC_CONF0 register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_rec_ctrl/field/rec_adc_nb_word_32': Define the number of 32bit-word to record ",
+      "     'value' (integer >=0 ): Define the number of 32 bit-words to record on the ADC path",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_rec_ctrl/wr(or rd)/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_rec_ctrl/wr(or rd)/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "wr": {
+        "usb_addr": "0x0D",
+        "reg_id": 213
+      },
+      "rd": {
+        "usb_addr": "0x2D",
+        "reg_id": 513
+      },
+      "field": {
+        "rec_adc_nb_word_32": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        }
+      }
+    },
+    "@usb_rec_data_count": {
+      "description_list": [
+      "This command is used to access to the REC_DATA_COUNT register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_data_count/field/rec_adc_data_count' : number of 32 bit-words currently in the rec_pipe_out FIFO",
+      "     'value' (integer >=0): number of words in the rec_pipe_out FIFO",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+      "The 'def/@usb_data_count/rd/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_data_count/rd/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "rd": {
+        "usb_addr": "0x31",
+        "reg_id": 517
+      },
+      "field": {
+        "rec_adc_data_count": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
     "@usb_debug_ctrl": {
       "description_list": [
       "This command is used to access to the DEBUG_CTRL register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
@@ -477,12 +586,12 @@
       "Note: the parameter values are the default one."
     ],
       "wr": {
-        "usb_addr": "0x08",
-        "reg_id": 208
+        "usb_addr": "0x18",
+        "reg_id": 224
       },
       "rd": {
-        "usb_addr": "0x29",
-        "reg_id": 509
+        "usb_addr": "0x38",
+        "reg_id": 524
       },
       "field": {
         "debug_pulse": {
@@ -497,39 +606,7 @@
         }
       }
     },
-    "@usb_data_count": {
-      "description_list": [
-      "This command is used to access to the DATA_COUNT register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
-      "The 'def/@usb_data_count/field/make_pulse_data_count' : number of words currently in the make_pulse FIFO",
-      "     'value' (integer >=0): number of words in the make_pulse FIFO",
-      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
-      "     'width' (integer >=1): define the field width (expressed in bit)",
-      "The 'def/@usb_data_count/field/pipe_out_data_count' : number of words currently in the pipe_out FIFO",
-      "     'value' (integer >=0): number of words in the pipe_out FIFO",
-      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
-      "     'width' (integer >=1): define the field width (expressed in bit)",
-      "The 'def/@usb_data_count/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
-      "The 'def/@usb_data_count/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
-      "Note: the parameter values are the default one."
-    ],
-      "rd": {
-        "usb_addr": "0x28",
-        "reg_id": 508
-      },
-      "field": {
-        "pipe_out_data_count": {
-          "value": 0,
-          "bit_pos_min": 0,
-          "width": 16
-        },
-        "make_pulse_data_count": {
-          "value": 0,
-          "bit_pos_min": 16,
-          "width": 16
-        }
-      }
-    },
-    
+      
     "@usb_error_sel": {
       "description_list": [
       "This command is used to access to the ERROR_SEL register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
@@ -542,12 +619,12 @@
       "Note: the parameter values are the default one."
     ],
       "wr": {
-        "usb_addr": "0x09",
-        "reg_id": 209
+        "usb_addr": "0x19",
+        "reg_id": 225
       },
       "rd": {
-        "usb_addr": "0x30",
-        "reg_id": 510
+        "usb_addr": "0x39",
+        "reg_id": 525
       },
       "field": {
         "sel": {
@@ -569,8 +646,8 @@
       "Note: the parameter values are the default one."
     ],
       "rd": {
-        "usb_addr": "0x31",
-        "reg_id": 511
+        "usb_addr": "0x3A",
+        "reg_id": 526
       },
       "field": {
         "error": {
@@ -593,8 +670,8 @@
       "Note: the parameter values are the default one."
     ],
       "rd": {
-        "usb_addr": "0x32",
-        "reg_id": 512
+        "usb_addr": "0x3B",
+        "reg_id": 527
       },
       "field": {
         "status": {
@@ -608,12 +685,12 @@
     "@usb_board_id": {
       "description_list": [
       "This command is used to access to the BOARD_ID register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
-      "The 'def/@usb_fpga_id/field/board_id' : board_id value",
+      "The 'def/@usb_board_id/field/board_id' : board_id value",
       "     'value' (integer) board_id value",
       "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
       "     'width' (integer >=1): define the field width (expressed in bit)",
-      "The 'def/@usb_fpga_id/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
-      "The 'def/@usb_fpga_id/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_board_id/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_board_id/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
       "Note: the parameter values are the default one."
     ],
       "rd": {
@@ -629,15 +706,15 @@
       }
     },
     
-    "@usb_fpga_id": {
+    "@usb_firmware_id": {
       "description_list": [
       "This command is used to access to the FPGA_ID register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
-      "The 'def/@usb_fpga_id/field/fpga_id' : fpga_id value",
+      "The 'def/@usb_firmware_id/field/fpga_id' : fpga_id value",
       "     'value' (integer) fpga_id value (hexadecimal ASCII VALUE)",
       "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
       "     'width' (integer >=1): define the field width (expressed in bit)",
-      "The 'def/@usb_fpga_id/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
-      "The 'def/@usb_fpga_id/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_firmware_id/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_firmware_id/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
       "Note: the parameter values are the default one."
     ],
       "rd": {
@@ -645,7 +722,7 @@
         "reg_id": 530
       },
       "field": {
-        "fpga_id": {
+        "firmware_id": {
           "value": 0,
           "bit_pos_min": 0,
           "width": 16
@@ -653,15 +730,15 @@
       }
     },
 
-    "@usb_fpga_version": {
+    "@usb_firware_version": {
       "description_list": [
       "This command is used to access to the FPGA_VERSION register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
-      "The 'def/@usb_fpga_version/field/fpga_version' : fpga_version value",
+      "The 'def/@usb_firware_version/field/fpga_version' : fpga_version value",
       "     'value' (integer): fpga_version value",
       "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
       "     'width' (integer >=1): define the field width (expressed in bit)",
-      "The 'def/@usb_fpga_version/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
-      "The 'def/@usb_fpga_version/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "The 'def/@usb_firware_version/wr/usb_addr' (hexadecimal string) defines the Opal kelly address value",
+      "The 'def/@usb_firware_version/wr/reg_id' (integer) unique value associated to this register (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
       "Note: the parameter values are the default one."
     ],
       "rd": {
@@ -669,7 +746,7 @@
         "reg_id": 531
       },
       "field": {
-        "fpga_version": {
+        "firware_version": {
           "value": 0,
           "bit_pos_min": 0,
           "width": 16
@@ -677,7 +754,16 @@
       }
     },
 
-
+    "@usb_rec_adc": {
+      "description_list": [
+      "This command is used to access to the pipeout REC_ADC (see 0136-FPAsim-D_commands_dictionnary.xlsx)",
+      "Note: the parameter values are the default one."
+    ],
+      "rd": {
+        "usb_addr": "0xA1",
+        "reg_id": 305
+      }
+    },
     "@usb_ram": {
       "field": {
         "tes_shape_pulse": {
