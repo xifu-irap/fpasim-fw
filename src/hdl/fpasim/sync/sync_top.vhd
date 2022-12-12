@@ -38,8 +38,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library fpasim;
-use fpasim.pkg_fpasim.all;
+use work.pkg_fpasim.all;
 
 entity sync_top is
   generic(
@@ -146,7 +145,7 @@ begin
   ---------------------------------------------------------------------
   -- apply a delay on the input data
   ---------------------------------------------------------------------
-  inst_dynamic_shift_register_dac : entity fpasim.dynamic_shift_register
+  inst_dynamic_shift_register_dac : entity work.dynamic_shift_register
     generic map(
       g_ADDR_WIDTH => i_sync_delay'length, -- width of the address. Possibles values: [2, integer max value[ 
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -159,7 +158,7 @@ begin
       o_data(0)    => sync_rx           -- output data with/without delay
     );
 
-  inst_pipeliner_sync_with_dynamic_shift_register_when_delay_eq_0 : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_dynamic_shift_register_when_delay_eq_0 : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_DELAY_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -173,7 +172,7 @@ begin
   -----------------------------------------------------------------
   -- build pulse
   -----------------------------------------------------------------
-  inst_sync_pulse_generator : entity fpasim.sync_pulse_generator
+  inst_sync_pulse_generator : entity work.sync_pulse_generator
     generic map(
       g_PULSE_DURATION => g_PULSE_DURATION -- duration of the pulse. Possible values [1;integer max value[
     )
@@ -204,7 +203,7 @@ begin
   wr_tmp0             <= sync_valid_r2;
   data_tmp0(c_IDX0_H) <= sync_ry;
   wr_rst_tmp0         <= i_rst;
-  inst_fifo_async_with_error : entity fpasim.fifo_async_with_error
+  inst_fifo_async_with_error : entity work.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
       g_FIFO_MEMORY_TYPE  => "auto",
@@ -255,7 +254,7 @@ begin
   ---------------------------------------------------------------------
   data_pipe_tmp1(c_PIPE_IDX1_H) <= sync_valid1;
   data_pipe_tmp1(c_PIPE_IDX0_H) <= sync1;
-  inst_pipeliner : entity fpasim.pipeliner
+  inst_pipeliner : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_LATENCY_OUT,
       g_DATA_WIDTH => data_pipe_tmp1'length
@@ -281,7 +280,7 @@ begin
   error_tmp(1) <= errors_sync0(1);      -- fifo rd empty error
   error_tmp(0) <= errors_sync0(0);      -- fifo wr full error
   gen_errors_latch : for i in error_tmp'range generate
-    inst_one_error_latch : entity fpasim.one_error_latch
+    inst_one_error_latch : entity work.one_error_latch
       port map(
         i_clk         => i_clk,
         i_rst         => i_rst_status,

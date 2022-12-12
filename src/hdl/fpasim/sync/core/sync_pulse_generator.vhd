@@ -39,8 +39,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_utils;
+use work.pkg_utils;
 
 entity sync_pulse_generator is
   generic(
@@ -70,7 +69,7 @@ end entity sync_pulse_generator;
 
 architecture RTL of sync_pulse_generator is
 
-  constant c_CNT_WIDTH : integer                            := fpasim.pkg_utils.pkg_width_from_value(g_PULSE_DURATION);
+  constant c_CNT_WIDTH : integer                            := work.pkg_utils.pkg_width_from_value(g_PULSE_DURATION);
   constant c_CNT_MAX   : unsigned(c_CNT_WIDTH - 1 downto 0) := to_unsigned(g_PULSE_DURATION - 1, c_CNT_WIDTH);
 
   signal trig_tmp : std_logic;
@@ -182,7 +181,7 @@ begin
   ---------------------------------------------------------------------
   error_tmp(0) <= error_r1;
   gen_errors_latch : for i in error_tmp'range generate
-    inst_one_error_latch : entity fpasim.one_error_latch
+    inst_one_error_latch : entity work.one_error_latch
       port map(
         i_clk         => i_clk,
         i_rst         => i_rst_status,
