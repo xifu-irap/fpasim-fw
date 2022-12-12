@@ -42,8 +42,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_fpasim.all;
+use work.pkg_fpasim.all;
 
 entity tes_signalling is
     generic(
@@ -110,7 +109,7 @@ begin
     ---------------------------------------------------------------------
     -- pixel: flags generation
     ---------------------------------------------------------------------
-    inst_tes_signalling_pixel : entity fpasim.tes_signalling_generator
+    inst_tes_signalling_pixel : entity work.tes_signalling_generator
         generic map(
             g_BLOCK_LENGTH_WIDTH => i_nb_sample_by_pixel'length,
             g_ID_WIDTH           => i_nb_pixel_by_frame'length,
@@ -142,7 +141,7 @@ begin
     ---------------------------------------------------------------------
     -- frame: flags generation
     ---------------------------------------------------------------------
-    inst_tes_signalling_frame : entity fpasim.tes_signalling_generator
+    inst_tes_signalling_frame : entity work.tes_signalling_generator
         generic map(
             g_BLOCK_LENGTH_WIDTH => i_nb_sample_by_frame'length,
             g_ID_WIDTH           => i_nb_frame'length,

@@ -32,9 +32,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_fpasim.all;
-use fpasim.pkg_regdecode.all;
+use work.pkg_fpasim.all;
+use work.pkg_regdecode.all;
 
 entity tes_top is
   generic(
@@ -179,7 +178,7 @@ begin
   -------------------------------------------------------------------
   -- Generate pixel and frame flags
   -------------------------------------------------------------------
-  inst_tes_signalling : entity fpasim.tes_signalling
+  inst_tes_signalling : entity work.tes_signalling
     generic map(
       -- pixel
       g_NB_SAMPLE_BY_PIXEL_WIDTH      => i_nb_sample_by_pixel'length,
@@ -218,7 +217,7 @@ begin
   -----------------------------------------------------------------
   -- tes computation
   -----------------------------------------------------------------
-  inst_tes_pulse_shape_manager : entity fpasim.tes_pulse_shape_manager
+  inst_tes_pulse_shape_manager : entity work.tes_pulse_shape_manager
     generic map(
       -- command
       g_CMD_PULSE_HEIGHT_WIDTH     => i_cmd_pulse_height'length,
@@ -295,7 +294,7 @@ begin
   data_pipe_tmp0(c_IDX2_H)                 <= frame_sof0;
   data_pipe_tmp0(c_IDX1_H)                 <= frame_eof0;
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= frame_id0;
-  inst_pipeliner_sync_with_tes_pulse_manager_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_tes_pulse_manager_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => pkg_TES_PULSE_MANAGER_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[

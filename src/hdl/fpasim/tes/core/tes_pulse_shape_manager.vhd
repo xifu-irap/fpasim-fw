@@ -41,9 +41,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_fpasim.all;
-use fpasim.pkg_regdecode.all;
+
+use work.pkg_fpasim.all;
+use work.pkg_regdecode.all;
 
 entity tes_pulse_shape_manager is
   generic(
@@ -366,7 +366,7 @@ begin
   data_tmp0(c_CMD_IDX1_H downto c_CMD_IDX1_L) <= i_cmd_pixel_id;
   data_tmp0(c_CMD_IDX0_H downto c_CMD_IDX0_L) <= i_cmd_time_shift;
 
-  inst_fifo_sync_with_error_prog_full_cmd : entity fpasim.fifo_sync_with_error_prog_full
+  inst_fifo_sync_with_error_prog_full_cmd : entity work.fifo_sync_with_error_prog_full
     generic map(
       g_FIFO_MEMORY_TYPE  => "distributed",
       g_FIFO_READ_LATENCY => 1,
@@ -438,7 +438,7 @@ begin
         cnt_sample_pulse_shape_table_next <= (others => (others => '0'));
         pulse_heigth_table_next           <= (others => (others => '0'));
         time_shift_table_next             <= (others => (others => '0'));
-        sm_state_next                     <= E_WAIT;
+        sm_state_next <= E_WAIT;
 
       when E_WAIT =>
         pixel_valid_next <= i_pixel_valid;
@@ -521,7 +521,7 @@ begin
 
   data_pipe_mult_tmp0(c_MULT_IDX1_H)                      <= pixel_valid_r1;
   data_pipe_mult_tmp0(c_MULT_IDX0_H downto c_MULT_IDX0_L) <= std_logic_vector(pulse_heigth_r1);
-  inst_pipeliner_sync_with_mult_add_ufixed_out0 : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_mult_add_ufixed_out0 : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_MULT_ADD_UFIXED_LATENCY,
       g_DATA_WIDTH => data_pipe_mult_tmp0'length
@@ -535,7 +535,7 @@ begin
   pixel_valid_rc  <= data_pipe_mult_tmp1(c_MULT_IDX1_H);
   pulse_heigth_rc <= data_pipe_mult_tmp1(c_MULT_IDX0_H downto c_MULT_IDX0_L);
 
-  inst_mult_add_ufixed : entity fpasim.mult_add_ufixed
+  inst_mult_add_ufixed : entity work.mult_add_ufixed
     generic map(
       -- port A: AMD Q notation (fixed point)
       g_UQ_M_A => cnt_sample_pulse_shape_r1'length,
@@ -567,7 +567,7 @@ begin
   data_pipe_tmp0(c_IDX2_H)                 <= i_pixel_sof;
   data_pipe_tmp0(c_IDX1_H)                 <= i_pixel_eof;
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
-  inst_pipeliner_sync_with_mult_add_ufixed_out1 : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_mult_add_ufixed_out1 : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_MULT_ADD_UFIXED_LATENCY + 1,
       g_DATA_WIDTH => data_pipe_tmp0'length
@@ -592,7 +592,7 @@ begin
   pulse_shape_dina   <= i_pulse_shape_wr_data;
   pulse_shape_regcea <= '1';
 
-  inst_tdpram_tes_pulse_shape : entity fpasim.tdpram
+  inst_tdpram_tes_pulse_shape : entity work.tdpram
     generic map(
       -- port A
       g_ADDR_WIDTH_A       => pulse_shape_addra'length,
@@ -648,7 +648,7 @@ begin
   -------------------------------------------------------------------
   -- sync with rd ram out
   -------------------------------------------------------------------
-  inst_pipeliner_sync_with_tdpram_tes_pulse_shape_outa : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_tdpram_tes_pulse_shape_outa : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_TES_PULSE_SHAPE_RAM_A_RD_LATENCY,
       g_DATA_WIDTH => 1
@@ -667,7 +667,7 @@ begin
   ---------------------------------------------------------------------
   -- RAM check
   ---------------------------------------------------------------------
-  inst_ram_check_sdpram_tes_pulse_shape : entity fpasim.ram_check
+  inst_ram_check_sdpram_tes_pulse_shape : entity work.ram_check
     generic map(
       g_WR_ADDR_WIDTH => pulse_shape_addra'length,
       g_RD_ADDR_WIDTH => pulse_shape_addrb'length
@@ -696,7 +696,7 @@ begin
   steady_state_dina   <= i_steady_state_wr_data;
   steady_state_regcea <= '1';
 
-  inst_tdpram_tes_steady_state : entity fpasim.tdpram
+  inst_tdpram_tes_steady_state : entity work.tdpram
     generic map(
       -- port A
       g_ADDR_WIDTH_A       => steady_state_addra'length,
@@ -752,7 +752,7 @@ begin
   -------------------------------------------------------------------
   -- sync with rd RAM output
   -------------------------------------------------------------------
-  inst_pipeliner_sync_with_tdpram_tes_steady_state_outa : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_tdpram_tes_steady_state_outa : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_TES_STD_STATE_RAM_A_RD_LATENCY,
       g_DATA_WIDTH => 1
@@ -771,7 +771,7 @@ begin
   ---------------------------------------------------------------------
   -- RAM check
   ---------------------------------------------------------------------
-  inst_ram_check_sdpram_tes_steady_state : entity fpasim.ram_check
+  inst_ram_check_sdpram_tes_steady_state : entity work.ram_check
     generic map(
       g_WR_ADDR_WIDTH => steady_state_addra'length,
       g_RD_ADDR_WIDTH => steady_state_addrb'length
@@ -801,7 +801,7 @@ begin
   data_pipe_tmp2(c_IDX2_H)                 <= pixel_sof_rc;
   data_pipe_tmp2(c_IDX1_H)                 <= pixel_eof_rc;
   data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_rc;
-  inst_pipeliner_sync_with_rams_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_rams_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_TES_PULSE_SHAPE_RAM_B_RD_LATENCY,
       g_DATA_WIDTH => data_pipe_tmp2'length
@@ -829,7 +829,7 @@ begin
   pulse_heigth_tmp <= std_logic_vector(resize(unsigned(pulse_heigth_rx), pulse_heigth_tmp'length));
   steady_state_tmp <= std_logic_vector(resize(unsigned(steady_state_doutb), steady_state_tmp'length));
 
-  inst_mult_sub_sfixed : entity fpasim.mult_sub_sfixed
+  inst_mult_sub_sfixed : entity work.mult_sub_sfixed
     generic map(
       -- port A: AMD Q notation (fixed point)
       g_Q_M_A  => pkg_TES_MULT_SUB_Q_M_A,
@@ -868,7 +868,7 @@ begin
   data_pipe_tmp4(c_IDX2_H)                 <= pixel_sof_rx;
   data_pipe_tmp4(c_IDX1_H)                 <= pixel_eof_rx;
   data_pipe_tmp4(c_IDX0_H downto c_IDX0_L) <= pixel_id_rx;
-  inst_pipeliner_sync_with_mult_sub_sfixed_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_mult_sub_sfixed_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_COMPUTATION_LATENCY,
       g_DATA_WIDTH => data_pipe_tmp4'length
@@ -902,7 +902,7 @@ begin
   error_tmp(1) <= errors_sync(1);       -- fifo rd empty error
   error_tmp(0) <= errors_sync(0);       -- fifo wr full error
   gen_errors_latch : for i in error_tmp'range generate
-    inst_one_error_latch : entity fpasim.one_error_latch
+    inst_one_error_latch : entity work.one_error_latch
       port map(
         i_clk         => i_clk,
         i_rst         => i_rst_status,
