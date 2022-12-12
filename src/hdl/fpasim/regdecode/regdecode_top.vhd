@@ -217,56 +217,16 @@ entity regdecode_top is
     -- to the usb 
     ---------------------------------------------------------------------
     -- errors
-    i_reg_wire_errors7 : in  std_logic_vector(31 downto 0);  -- errors7 register
-    i_reg_wire_errors6 : in  std_logic_vector(31 downto 0);  -- errors6 register
-    i_reg_wire_errors5 : in  std_logic_vector(31 downto 0);  -- errors5 register
-    i_reg_wire_errors4 : in  std_logic_vector(31 downto 0);  -- errors4 register
-    i_reg_wire_errors3 : in  std_logic_vector(31 downto 0);  -- errors3 register
-    i_reg_wire_errors2 : in  std_logic_vector(31 downto 0);  -- errors2 register
-    i_reg_wire_errors1 : in  std_logic_vector(31 downto 0);  -- errors1 register
-    i_reg_wire_errors0 : in  std_logic_vector(31 downto 0);  -- errors0 register
+    i_reg_wire_errors3 : in std_logic_vector(31 downto 0);  -- errors3 register
+    i_reg_wire_errors2 : in std_logic_vector(31 downto 0);  -- errors2 register
+    i_reg_wire_errors1 : in std_logic_vector(31 downto 0);  -- errors1 register
+    i_reg_wire_errors0 : in std_logic_vector(31 downto 0);  -- errors0 register
     -- status
-    i_reg_wire_status7 : in  std_logic_vector(31 downto 0);  -- status7 register
-    i_reg_wire_status6 : in  std_logic_vector(31 downto 0);  -- status6 register
-    i_reg_wire_status5 : in  std_logic_vector(31 downto 0);  -- status5 register
-    i_reg_wire_status4 : in  std_logic_vector(31 downto 0);  -- status4 register
-    i_reg_wire_status3 : in  std_logic_vector(31 downto 0);  -- status3 register
-    i_reg_wire_status2 : in  std_logic_vector(31 downto 0);  -- status2 register
-    i_reg_wire_status1 : in  std_logic_vector(31 downto 0);  -- status1 register
-    i_reg_wire_status0 : in  std_logic_vector(31 downto 0);  -- status0 register
-    -- to the user: errors/status
-    ---------------------------------------------------------------------
-    -- pipe errors
-    o_pipe_errors5     : out std_logic_vector(15 downto 0);  -- rd all: output errors
-    o_pipe_errors4     : out std_logic_vector(15 downto 0);  -- mux squid offset: output errors
-    o_pipe_errors3     : out std_logic_vector(15 downto 0);  -- tes std state: output errors
-    o_pipe_errors2     : out std_logic_vector(15 downto 0);  -- mux squid tf: output errors
-    o_pipe_errors1     : out std_logic_vector(15 downto 0);  -- amp squid tf: output errors
-    o_pipe_errors0     : out std_logic_vector(15 downto 0);  -- tes pulse shape: output errors
+    i_reg_wire_status3 : in std_logic_vector(31 downto 0);  -- status3 register
+    i_reg_wire_status2 : in std_logic_vector(31 downto 0);  -- status2 register
+    i_reg_wire_status1 : in std_logic_vector(31 downto 0);  -- status1 register
+    i_reg_wire_status0 : in std_logic_vector(31 downto 0)   -- status0 register
 
-    -- pipe status
-    o_pipe_status5 : out std_logic_vector(7 downto 0);  -- rd all: output status
-    o_pipe_status4 : out std_logic_vector(7 downto 0);  -- mux squid offset: output status
-    o_pipe_status3 : out std_logic_vector(7 downto 0);  -- tes std state: output status
-    o_pipe_status2 : out std_logic_vector(7 downto 0);  -- mux squid tf: output status
-    o_pipe_status1 : out std_logic_vector(7 downto 0);  -- amp squid tf: output status
-    o_pipe_status0 : out std_logic_vector(7 downto 0);  -- tes pulse shape: output status
-
-    -- reg errors/status
-    o_reg_errors0 : out std_logic_vector(15 downto 0);  -- common register errors
-    o_reg_status0 : out std_logic_vector(7 downto 0);  -- common register status
-
-    -- ctrl errors/status
-    o_ctrl_errors0 : out std_logic_vector(15 downto 0);  -- register ctrl errors
-    o_ctrl_status0 : out std_logic_vector(7 downto 0);  -- register ctrl status
-
-    -- debug_ctrl errors/status
-    o_debug_ctrl_errors0 : out std_logic_vector(15 downto 0);  -- register debug_ctrl errors
-    o_debug_ctrl_status0 : out std_logic_vector(7 downto 0);  -- register debug_ctrl status
-
-    -- make_pulse errors/status
-    o_make_pulse_errors0 : out std_logic_vector(15 downto 0);  -- register make_pulse errors
-    o_make_pulse_status0 : out std_logic_vector(7 downto 0)  -- register make_pulse status
     );
 end entity regdecode_top;
 
@@ -550,17 +510,17 @@ architecture RTL of regdecode_top is
   signal reg_fifo_rec_adc_rd : std_logic;
 
   -- to usb: register
-  signal usb_rec_valid           : std_logic;
-  signal usb_rec_ctrl            : std_logic_vector(usb_wireout_rec_ctrl'range);
-  signal usb_rec_conf0           : std_logic_vector(usb_wireout_rec_conf0'range);
+  signal usb_rec_valid              : std_logic;
+  signal usb_rec_ctrl               : std_logic_vector(usb_wireout_rec_ctrl'range);
+  signal usb_rec_conf0              : std_logic_vector(usb_wireout_rec_conf0'range);
   -- to usb: fifo
-  signal usb_fifo_adc_rd         : std_logic;  -- fifo read enable
-  signal usb_fifo_adc_sof        : std_logic;  -- fifo first sample
-  signal usb_fifo_adc_eof        : std_logic;  -- fifo last sample
-  signal usb_fifo_adc_data_valid : std_logic;  -- fifo data valid
-  signal usb_fifo_adc_data       : std_logic_vector(usb_pipeout_rec_fifo_adc_data'range);  -- fifo data
-  signal usb_fifo_adc_empty      : std_logic;  -- fifo empty flag
-  signal usb_fifo_adc_wr_data_count   : std_logic_vector(15 downto 0);
+  signal usb_fifo_adc_rd            : std_logic;  -- fifo read enable
+  signal usb_fifo_adc_sof           : std_logic;  -- fifo first sample
+  signal usb_fifo_adc_eof           : std_logic;  -- fifo last sample
+  signal usb_fifo_adc_data_valid    : std_logic;  -- fifo data valid
+  signal usb_fifo_adc_data          : std_logic_vector(usb_pipeout_rec_fifo_adc_data'range);  -- fifo data
+  signal usb_fifo_adc_empty         : std_logic;  -- fifo empty flag
+  signal usb_fifo_adc_wr_data_count : std_logic_vector(15 downto 0);
 
   signal rec_errors1 : std_logic_vector(15 downto 0);
   signal rec_errors0 : std_logic_vector(15 downto 0);
@@ -575,6 +535,20 @@ architecture RTL of regdecode_top is
   signal wire_errors_valid : std_logic;
   signal wire_errors       : std_logic_vector(i_reg_wire_errors0'range);
   signal wire_status       : std_logic_vector(i_reg_wire_status0'range);
+
+  signal regdecode_errors5 : std_logic_vector(i_reg_wire_errors0'range);
+  signal regdecode_errors4 : std_logic_vector(i_reg_wire_errors0'range);
+  signal regdecode_errors3 : std_logic_vector(i_reg_wire_errors0'range);
+  signal regdecode_errors2 : std_logic_vector(i_reg_wire_errors0'range);
+  signal regdecode_errors1 : std_logic_vector(i_reg_wire_errors0'range);
+  signal regdecode_errors0 : std_logic_vector(i_reg_wire_errors0'range);
+
+  signal regdecode_status5 : std_logic_vector(i_reg_wire_status0'range);
+  signal regdecode_status4 : std_logic_vector(i_reg_wire_status0'range);
+  signal regdecode_status3 : std_logic_vector(i_reg_wire_status0'range);
+  signal regdecode_status2 : std_logic_vector(i_reg_wire_status0'range);
+  signal regdecode_status1 : std_logic_vector(i_reg_wire_status0'range);
+  signal regdecode_status0 : std_logic_vector(i_reg_wire_status0'range);
 
 begin
 
@@ -608,8 +582,8 @@ begin
       i_usb_wireout_firmware_version    => usb_wireout_firmware_version,
       i_usb_wireout_board_id            => usb_wireout_board_id,
       -- recording: register 
-      i_usb_wireout_rec_ctrl            => usb_wireout_rec_ctrl,  
-      i_usb_wireout_rec_conf0           => usb_wireout_rec_conf0, 
+      i_usb_wireout_rec_ctrl            => usb_wireout_rec_ctrl,
+      i_usb_wireout_rec_conf0           => usb_wireout_rec_conf0,
       -- recording: pipe 
       o_usb_pipeout_rec_fifo_adc_rd     => usb_pipeout_rec_fifo_adc_rd,
       i_usb_pipeout_rec_fifo_adc_data   => usb_pipeout_rec_fifo_adc_data,
@@ -681,6 +655,8 @@ begin
       ---------------------------------------------------------------------
       i_clk           => usb_clk,       -- clock
       i_rst           => i_rst,         -- reset
+      i_rst_status    => usb_rst_status,
+      i_debug_pulse   => usb_debug_pulse,
       -- from the trig in
       i_start_auto_rd => trig_rd_all_valid,  -- enable the auto generation of memory reading address
       -- from the pipe in
@@ -704,8 +680,6 @@ begin
       -- to the user: @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk                         => i_out_clk,
-      i_rst_status                      => i_rst_status,
-      i_debug_pulse                     => i_debug_pulse,
       -- tes_pulse_shape
       -- ram: wr
       o_tes_pulse_shape_ram_wr_en       => tes_pulse_shape_ram_wr_en,
@@ -752,7 +726,7 @@ begin
       i_mux_squid_offset_ram_rd_valid   => i_mux_squid_offset_ram_rd_valid,
       i_mux_squid_offset_ram_rd_data    => i_mux_squid_offset_ram_rd_data,
       ---------------------------------------------------------------------
-      -- errors/status @i_out_clk
+      -- errors/status @i_clk
       ---------------------------------------------------------------------
       -- errors
       o_errors5                         => regdecode_pipe_errors5,  -- rd all: output errors
@@ -769,6 +743,7 @@ begin
       o_status1                         => regdecode_pipe_status1,  -- amp squid tf: output status
       o_status0                         => regdecode_pipe_status0  -- tes pulse shape: output status
       );
+
   ---------------------------------------------------------------------
   -- output: to the usb
   ---------------------------------------------------------------------
@@ -822,19 +797,6 @@ begin
   -- ram: rd
   o_mux_squid_offset_ram_rd_en      <= mux_squid_offset_ram_rd_en;
 
-  o_pipe_errors5 <= regdecode_pipe_errors5;
-  o_pipe_errors4 <= regdecode_pipe_errors4;
-  o_pipe_errors3 <= regdecode_pipe_errors3;
-  o_pipe_errors2 <= regdecode_pipe_errors2;
-  o_pipe_errors1 <= regdecode_pipe_errors1;
-  o_pipe_errors0 <= regdecode_pipe_errors0;
-
-  o_pipe_status5                                  <= regdecode_pipe_status5;
-  o_pipe_status4                                  <= regdecode_pipe_status4;
-  o_pipe_status3                                  <= regdecode_pipe_status3;
-  o_pipe_status2                                  <= regdecode_pipe_status2;
-  o_pipe_status1                                  <= regdecode_pipe_status1;
-  o_pipe_status0                                  <= regdecode_pipe_status0;
   ---------------------------------------------------------------------
   -- common register
   ---------------------------------------------------------------------
@@ -855,6 +817,8 @@ begin
       ---------------------------------------------------------------------
       i_clk             => usb_clk,
       i_rst             => i_rst,
+      i_rst_status      => usb_rst_status,
+      i_debug_pulse     => usb_debug_pulse,
       -- data
       i_data_valid      => reg_data_valid_tmp0,
       i_data            => reg_data_tmp0,
@@ -862,8 +826,6 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,
-      i_rst_status      => i_rst_status,
-      i_debug_pulse     => i_debug_pulse,
       -- ram: wr
       o_data_valid      => reg_data_valid_tmp2,
       o_data            => reg_data_tmp2,
@@ -875,7 +837,7 @@ begin
       o_fifo_data       => reg_data_tmp1,
       o_fifo_empty      => reg_empty_tmp1,
       ---------------------------------------------------------------------
-      -- errors/status @ i_out_clk
+      -- errors/status @ i_clk
       ---------------------------------------------------------------------
       o_errors          => reg_errors,
       o_status          => reg_status
@@ -902,9 +864,6 @@ begin
   o_reg_mux_sq_fb_delay <= reg_data_tmp2(c_REG_IDX1_H downto c_REG_IDX1_L);
   o_reg_fpasim_gain     <= reg_data_tmp2(c_REG_IDX0_H downto c_REG_IDX0_L);
 
-  o_reg_errors0 <= reg_errors;
-  o_reg_status0 <= reg_status;
-
   ---------------------------------------------------------------------
   -- control register
   ---------------------------------------------------------------------
@@ -920,6 +879,8 @@ begin
       ---------------------------------------------------------------------
       i_clk             => usb_clk,
       i_rst             => i_rst,
+      i_rst_status      => usb_rst_status,
+      i_debug_pulse     => usb_debug_pulse,
       -- data
       i_data_valid      => ctrl_data_valid_tmp0,
       i_data            => ctrl_data_tmp0,
@@ -927,8 +888,6 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,
-      i_rst_status      => i_rst_status,
-      i_debug_pulse     => i_debug_pulse,
       -- ram: wr
       o_data_valid      => ctrl_data_valid_tmp2,
       o_data            => ctrl_data_tmp2,
@@ -940,7 +899,7 @@ begin
       o_fifo_data       => ctrl_data_tmp1,
       o_fifo_empty      => ctrl_empty_tmp1,
       ---------------------------------------------------------------------
-      -- errors/status @ i_out_clk
+      -- errors/status @ i_clk
       ---------------------------------------------------------------------
       o_errors          => ctrl_errors,
       o_status          => ctrl_status
@@ -957,15 +916,12 @@ begin
   o_reg_ctrl_valid <= ctrl_data_valid_tmp2;
   o_reg_ctrl       <= ctrl_data_tmp2;
 
-  o_ctrl_errors0 <= ctrl_errors;
-  o_ctrl_status0 <= ctrl_status;
-
   ---------------------------------------------------------------------
   -- debug control register
   ---------------------------------------------------------------------
   -- extract bits
-  usb_rst_status             <= usb_wirein_debug_ctrl(pkg_DEBUG_CTRL_RST_STATUS_IDX_H);
-  usb_debug_pulse            <= usb_wirein_debug_ctrl(pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H);
+  usb_rst_status  <= usb_wirein_debug_ctrl(pkg_DEBUG_CTRL_RST_STATUS_IDX_H);
+  usb_debug_pulse <= usb_wirein_debug_ctrl(pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H);
 
   debug_ctrl_data_valid_tmp0 <= trig_debug_valid;
   debug_ctrl_data_tmp0       <= usb_wirein_debug_ctrl;
@@ -979,6 +935,8 @@ begin
       ---------------------------------------------------------------------
       i_clk             => usb_clk,
       i_rst             => i_rst,
+      i_rst_status      => usb_rst_status,
+      i_debug_pulse     => usb_debug_pulse,
       -- data
       i_data_valid      => debug_ctrl_data_valid_tmp0,
       i_data            => debug_ctrl_data_tmp0,
@@ -986,8 +944,6 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,
-      i_rst_status      => i_rst_status,
-      i_debug_pulse     => i_debug_pulse,
       -- ram: wr
       o_data_valid      => debug_ctrl_data_valid_tmp2,
       o_data            => debug_ctrl_data_tmp2,
@@ -999,7 +955,7 @@ begin
       o_fifo_data       => debug_ctrl_data_tmp1,
       o_fifo_empty      => debug_ctrl_empty_tmp1,
       ---------------------------------------------------------------------
-      -- errors/status @ i_out_clk
+      -- errors/status @ i_clk
       ---------------------------------------------------------------------
       o_errors          => debug_ctrl_errors,
       o_status          => debug_ctrl_status
@@ -1015,9 +971,6 @@ begin
   ---------------------------------------------------------------------
   o_reg_debug_ctrl_valid <= debug_ctrl_data_valid_tmp2;
   o_reg_debug_ctrl       <= debug_ctrl_data_tmp2;
-
-  o_debug_ctrl_errors0 <= debug_ctrl_errors;
-  o_debug_ctrl_status0 <= debug_ctrl_status;
 
   ---------------------------------------------------------------------
   -- make pulse register
@@ -1037,6 +990,8 @@ begin
       ---------------------------------------------------------------------
       i_clk              => usb_clk,
       i_rst              => i_rst,
+      i_rst_status       => usb_rst_status,
+      i_debug_pulse      => usb_debug_pulse,
       -- conf
       i_pixel_nb         => pixel_nb,
       -- data
@@ -1047,8 +1002,6 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk          => i_out_clk,
-      i_rst_status       => i_rst_status,
-      i_debug_pulse      => i_debug_pulse,
       -- ram: wr
       i_data_rd          => make_pulse_rd_tmp2,
       o_sof              => make_pulse_sof_tmp2,
@@ -1066,7 +1019,7 @@ begin
       o_fifo_data        => make_pulse_data_tmp1,
       o_fifo_empty       => make_pulse_empty_tmp1,
       ---------------------------------------------------------------------
-      -- errors/status @ i_out_clk
+      -- errors/status @ i_clk
       ---------------------------------------------------------------------
       o_errors           => make_pulse_errors,
       o_status           => make_pulse_status
@@ -1088,9 +1041,6 @@ begin
   o_reg_make_pulse_valid <= make_pulse_data_valid_tmp2;
   o_reg_make_pulse       <= make_pulse_data_tmp2;
 
-  o_make_pulse_errors0 <= make_pulse_errors;
-  o_make_pulse_status0 <= make_pulse_status;
-
   ---------------------------------------------------------------------
   -- recording register
   ---------------------------------------------------------------------
@@ -1106,63 +1056,63 @@ begin
       ---------------------------------------------------------------------
       -- from the regdecode/usb: input @i_clk
       ---------------------------------------------------------------------
-      i_clk                     => usb_clk,         -- clock
-      i_rst                     => i_rst,           -- reset
+      i_clk                        => usb_clk,         -- clock
+      i_rst                        => i_rst,           -- reset
+      i_rst_status                 => usb_rst_status,  -- not connected  
+      i_debug_pulse                => usb_debug_pulse,     -- not connected  
       -- data
-      i_rec_valid               => rec_valid_tmp0,  -- register data valid
-      i_rec_ctrl                => rec_ctrl_tmp0,   -- register ctrl value
-      i_rec_conf0               => rec_conf0_tmp0,  -- register conf0 value
+      i_rec_valid                  => rec_valid_tmp0,  -- register data valid
+      i_rec_ctrl                   => rec_ctrl_tmp0,   -- register ctrl value
+      i_rec_conf0                  => rec_conf0_tmp0,  -- register conf0 value
       ---------------------------------------------------------------------
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
-      i_out_rst                 => i_out_rst,
-      i_out_clk                 => i_out_clk,
+      i_out_rst                    => i_out_rst,
+      i_out_clk                    => i_out_clk,
       -- register
-      o_rec_valid               => rec_valid_tmp2,
-      o_rec_ctrl                => rec_ctrl_tmp2,
-      o_rec_conf0               => rec_conf0_tmp2,
+      o_rec_valid                  => rec_valid_tmp2,
+      o_rec_ctrl                   => rec_ctrl_tmp2,
+      o_rec_conf0                  => rec_conf0_tmp2,
       -- data
-      o_fifo_adc_rd             => reg_fifo_rec_adc_rd,
-      i_fifo_adc_sof            => i_reg_fifo_rec_adc_sof,
-      i_fifo_adc_eof            => i_reg_fifo_rec_adc_eof,
-      i_fifo_adc_data_valid     => i_reg_fifo_rec_adc_data_valid,
-      i_fifo_adc_data           => i_reg_fifo_rec_adc_data,
-      i_fifo_adc_empty          => i_reg_fifo_rec_adc_empty,
+      o_fifo_adc_rd                => reg_fifo_rec_adc_rd,
+      i_fifo_adc_sof               => i_reg_fifo_rec_adc_sof,
+      i_fifo_adc_eof               => i_reg_fifo_rec_adc_eof,
+      i_fifo_adc_data_valid        => i_reg_fifo_rec_adc_data_valid,
+      i_fifo_adc_data              => i_reg_fifo_rec_adc_data,
+      i_fifo_adc_empty             => i_reg_fifo_rec_adc_empty,
       ---------------------------------------------------------------------
       -- to the regdecode/usb: @i_clk
       ---------------------------------------------------------------------
-      i_usb_rst_status          => usb_rst_status,  -- not connected  
-      i_usb_debug_pulse         => usb_debug_pulse, -- not connected  
       -- register
-      o_usb_rec_valid           => usb_rec_valid,   -- not connected  
-      o_usb_rec_ctrl            => usb_rec_ctrl,
-      o_usb_rec_conf0           => usb_rec_conf0,
+      o_usb_rec_valid              => usb_rec_valid,   -- not connected  
+      o_usb_rec_ctrl               => usb_rec_ctrl,
+      o_usb_rec_conf0              => usb_rec_conf0,
       -- data
-      i_usb_fifo_adc_rd         => usb_fifo_adc_rd,        -- not connected  
-      o_usb_fifo_adc_sof        => usb_fifo_adc_sof,       -- not connected  
-      o_usb_fifo_adc_eof        => usb_fifo_adc_eof,       -- not connected  
-      o_usb_fifo_adc_data_valid => usb_fifo_adc_data_valid,-- not connected  
-      o_usb_fifo_adc_data       => usb_fifo_adc_data,      
-      o_usb_fifo_adc_empty      => usb_fifo_adc_empty,     -- not connected  
-      o_usb_fifo_adc_wr_data_count   => usb_fifo_adc_wr_data_count, 
+      i_usb_fifo_adc_rd            => usb_fifo_adc_rd,     -- not connected  
+      o_usb_fifo_adc_sof           => usb_fifo_adc_sof,    -- not connected  
+      o_usb_fifo_adc_eof           => usb_fifo_adc_eof,    -- not connected  
+      o_usb_fifo_adc_data_valid    => usb_fifo_adc_data_valid,  -- not connected  
+      o_usb_fifo_adc_data          => usb_fifo_adc_data,
+      o_usb_fifo_adc_empty         => usb_fifo_adc_empty,  -- not connected  
+      o_usb_fifo_adc_wr_data_count => usb_fifo_adc_wr_data_count,
       ---------------------------------------------------------------------
       -- usb_errors/usb_status @ i_out_clk
       ---------------------------------------------------------------------
-      o_errors1                 => rec_errors1,     -- not connected
-      o_errors0                 => rec_errors0,     -- not connected
-      o_status1                 => rec_status1,     -- not connected
-      o_status0                 => rec_status0      -- not connected
+      o_errors1                    => rec_errors1,
+      o_errors0                    => rec_errors0,
+      o_status1                    => rec_status1,
+      o_status0                    => rec_status0
       );
 -- output: to USB
   ---------------------------------------------------------------------
   -- register
-  usb_wireout_rec_ctrl  <= usb_rec_ctrl;
-  usb_wireout_rec_conf0 <= usb_rec_conf0;
+  usb_wireout_rec_ctrl                          <= usb_rec_ctrl;
+  usb_wireout_rec_conf0                         <= usb_rec_conf0;
   usb_wireout_rec_fifo_data_count(31 downto 16) <= (others => '0');
-  usb_wireout_rec_fifo_data_count(15 downto 0) <= usb_fifo_adc_wr_data_count;
+  usb_wireout_rec_fifo_data_count(15 downto 0)  <= usb_fifo_adc_wr_data_count;
   -- fifo data
-  usb_fifo_adc_rd <= usb_pipeout_rec_fifo_adc_rd;
-  usb_pipeout_rec_fifo_adc_data <= usb_fifo_adc_data;
+  usb_fifo_adc_rd                               <= usb_pipeout_rec_fifo_adc_rd;
+  usb_pipeout_rec_fifo_adc_data                 <= usb_fifo_adc_data;
 
 
 -- output: to the user
@@ -1176,6 +1126,58 @@ begin
 
 
   ---------------------------------------------------------------------
+  -- regdecode errors/status
+  ---------------------------------------------------------------------
+  regdecode_errors5(31 downto 16) <= rec_errors1;  -- rec_conf0 register: output errors
+  regdecode_errors5(15 downto 0)  <= rec_errors0;  -- rec_ctrl/rec_conf0 register: output errors
+
+  regdecode_errors4(31 downto 16) <= make_pulse_errors;  -- make_pulse register: output errors
+  regdecode_errors4(15 downto 0)  <= debug_ctrl_errors;  -- debug_ctrl register: output errors
+
+  regdecode_errors3(31 downto 16) <= ctrl_errors;  -- ctrl register: output errors
+  regdecode_errors3(15 downto 0)  <= reg_errors;  -- common register: output errors
+
+  regdecode_errors2(31 downto 16) <= regdecode_pipe_errors5;  -- rd all: output errors
+  regdecode_errors2(15 downto 0)  <= regdecode_pipe_errors4;  -- mux squid offset: output errors
+
+  regdecode_errors1(31 downto 16) <= regdecode_pipe_errors3;  -- tes std state: output errors
+  regdecode_errors1(15 downto 0)  <= regdecode_pipe_errors2;  -- mux squid tf: output errors
+
+  regdecode_errors0(31 downto 16) <= regdecode_pipe_errors1;  -- amp squid tf: output errors
+  regdecode_errors0(15 downto 0)  <= regdecode_pipe_errors0;  -- tes pulse shape: output errors
+
+  regdecode_status5(31 downto 24) <= (others => '0');
+  regdecode_status5(23 downto 16) <= rec_status1;  -- rec_ctrl register: output status
+  regdecode_status5(15 downto 8)  <= (others => '0');
+  regdecode_status5(7 downto 0)   <= rec_status0;  -- rec_ctrl/rec_conf0 register: output status
+
+  regdecode_status4(31 downto 24) <= (others => '0');
+  regdecode_status4(23 downto 16) <= make_pulse_status;  -- make_pulse register: output status
+  regdecode_status4(15 downto 8)  <= (others => '0');
+  regdecode_status4(7 downto 0)   <= debug_ctrl_status;  -- debug_ctrl register: output status
+
+  regdecode_status3(31 downto 24) <= (others => '0');
+  regdecode_status3(23 downto 16) <= ctrl_status;  -- ctrl register: output status
+  regdecode_status3(15 downto 8)  <= (others => '0');
+  regdecode_status3(7 downto 0)   <= reg_status;  -- common register: output status
+
+
+  regdecode_status2(31 downto 24) <= (others => '0');
+  regdecode_status2(23 downto 16) <= regdecode_pipe_status5;  -- rd all: output status
+  regdecode_status2(15 downto 8)  <= (others => '0');
+  regdecode_status2(7 downto 0)   <= regdecode_pipe_status4;  -- mux squid offset: output status
+
+  regdecode_status1(31 downto 24) <= (others => '0');
+  regdecode_status1(23 downto 16) <= regdecode_pipe_status3;  -- tes std state: output status
+  regdecode_status1(15 downto 8)  <= (others => '0');
+  regdecode_status1(7 downto 0)   <= regdecode_pipe_status2;  -- mux squid tf: output status
+
+  regdecode_status0(31 downto 24) <= (others => '0');
+  regdecode_status0(23 downto 16) <= regdecode_pipe_status1;  -- amp squid tf: output status
+  regdecode_status0(15 downto 8)  <= (others => '0');
+  regdecode_status0(7 downto 0)   <= regdecode_pipe_status0;  -- tes pulse shape: output status
+
+  ---------------------------------------------------------------------
   -- errors register
   ---------------------------------------------------------------------
   error_sel <= usb_wirein_sel_errors(c_ERROR_SEL_IDX_H downto c_ERROR_SEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_SEL_WIDTH>) but was (<3>)"
@@ -1184,30 +1186,46 @@ begin
       g_ERROR_SEL_WIDTH => error_sel'length
       )
     port map(
-      i_clk               => i_out_clk,
+      ---------------------------------------------------------------------
+      -- input @i_out_clk
+      ---------------------------------------------------------------------
+      i_out_clk          => i_out_clk,
       -- errors
-      i_reg_wire_errors7  => i_reg_wire_errors7,
-      i_reg_wire_errors6  => i_reg_wire_errors6,
-      i_reg_wire_errors5  => i_reg_wire_errors5,
-      i_reg_wire_errors4  => i_reg_wire_errors4,
-      i_reg_wire_errors3  => i_reg_wire_errors3,
-      i_reg_wire_errors2  => i_reg_wire_errors2,
-      i_reg_wire_errors1  => i_reg_wire_errors1,
-      i_reg_wire_errors0  => i_reg_wire_errors0,
+      i_reg_wire_errors3 => i_reg_wire_errors3,
+      i_reg_wire_errors2 => i_reg_wire_errors2,
+      i_reg_wire_errors1 => i_reg_wire_errors1,
+      i_reg_wire_errors0 => i_reg_wire_errors0,
       -- status
-      i_reg_wire_status7  => i_reg_wire_status7,
-      i_reg_wire_status6  => i_reg_wire_status6,
-      i_reg_wire_status5  => i_reg_wire_status5,
-      i_reg_wire_status4  => i_reg_wire_status4,
-      i_reg_wire_status3  => i_reg_wire_status3,
-      i_reg_wire_status2  => i_reg_wire_status2,
-      i_reg_wire_status1  => i_reg_wire_status1,
-      i_reg_wire_status0  => i_reg_wire_status0,
+      i_reg_wire_status3 => i_reg_wire_status3,
+      i_reg_wire_status2 => i_reg_wire_status2,
+      i_reg_wire_status1 => i_reg_wire_status1,
+      i_reg_wire_status0 => i_reg_wire_status0,
+
       ---------------------------------------------------------------------
-      -- output
+      -- input @i_clk
       ---------------------------------------------------------------------
-      i_out_clk           => usb_clk,
-      i_error_sel         => error_sel,
+      i_clk       => usb_clk,
+      i_error_sel => error_sel,
+
+      -- errors
+      i_usb_reg_errors5 => regdecode_errors5,
+      i_usb_reg_errors4 => regdecode_errors4,
+      i_usb_reg_errors3 => regdecode_errors3,
+      i_usb_reg_errors2 => regdecode_errors2,
+      i_usb_reg_errors1 => regdecode_errors1,
+      i_usb_reg_errors0 => regdecode_errors0,
+
+      -- status
+      i_usb_reg_status5 => regdecode_status5,
+      i_usb_reg_status4 => regdecode_status4,
+      i_usb_reg_status3 => regdecode_status3,
+      i_usb_reg_status2 => regdecode_status2,
+      i_usb_reg_status1 => regdecode_status1,
+      i_usb_reg_status0 => regdecode_status0,
+
+      ---------------------------------------------------------------------
+      -- output @i_clk
+      ---------------------------------------------------------------------
       o_wire_errors_valid => wire_errors_valid,
       o_wire_errors       => wire_errors,
       o_wire_status       => wire_status
@@ -1221,6 +1239,8 @@ begin
 
   usb_trigout_data(31 downto 1) <= (others => '0');
   usb_trigout_data(0)           <= wire_errors_valid;
+
+
 
   ---------------------------------------------------------------------
   -- debug

@@ -24,18 +24,20 @@
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
 --! 
---!   This module synchronizes the input errors/status from the i_clk source clock domain to the i_out_clk destination clock domain.
+--!   This module synchronizes the input errors/status from the i_out_clk source clock domain to the i_clk destination clock domain.
 --!   Then, it generates a common error pulse signal on the first error detection.
 --!   
 --!   The architecture principle is as follows:
---!       @i_out_clk source clock domain                                         |                                  @ i_clk destination clock domain
---!                                                   |<-------------  single_bit_array_synchronizer <------------- i_errors7/i_status7
---!                                                   |<-------------  single_bit_array_synchronizer <-------------         .
---!        o_errors/o_status <--------- select output |<-------------  single_bit_array_synchronizer <-------------         .
---!                                                   |<-------------  single_bit_array_synchronizer <-------------         .
---!                                                   |<-------------  single_bit_array_synchronizer <------------- i_errors0/i_status0
---!
---!                                                                        |<-------------  /=0 ?    <------------- errors7 synchronized
+--!       @i_clk source clock domain                                         |                                 
+--!                                                   |<-------------  fifo_async <------------- i_reg_wire_errors0 (@i_out_clk)
+--!                                                   |<-------------  fifo_async <-------------         .
+--!        o_errors/o_status <--------- select output |<-------------  fifo_async <------------- i_reg_wire_errors3 (@i_out_clk)
+--!                                                   |<-------------  pass       <------------- i_usb_reg_errors0 (@i_clk)
+--!                                                   |<-------------  pass       <-------------          .  
+--!                                                   |<-------------  pass       <------------- i_usb_reg_errors5 (@i_clk)
+--!                                                   |-------------------------------------------------------------------->
+--!                                                                                                                         |
+--!                                                                        |<-------------  /=0 ?    <------------- errors8 synchronized
 --!                                                                        |<-------------  /=0 ?    <-------------         .
 --!        errors_valid <-- rising_edge detection <-- /= last value? ------|<-------------  /=0 ?    <-------------         .
 --!                                                                        |<-------------  /=0 ?    <-------------         .
@@ -49,46 +51,58 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
 
 entity regdecode_wire_errors is
   generic(
-    g_ERROR_SEL_WIDTH : integer := 8
-  );
+    g_ERROR_SEL_WIDTH : integer := 4
+    );
   port(
-    i_clk               : in  std_logic;
+    ---------------------------------------------------------------------
+    -- input @i_out_clk
+    ---------------------------------------------------------------------
+    i_out_clk          : in std_logic;
     -- errors
-    i_reg_wire_errors7  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors6  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors5  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors4  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors3  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors2  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors1  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_errors0  : in  std_logic_vector(31 downto 0);
+    i_reg_wire_errors3 : in std_logic_vector(31 downto 0);
+    i_reg_wire_errors2 : in std_logic_vector(31 downto 0);
+    i_reg_wire_errors1 : in std_logic_vector(31 downto 0);
+    i_reg_wire_errors0 : in std_logic_vector(31 downto 0);
     -- status
-    i_reg_wire_status7  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status6  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status5  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status4  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status3  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status2  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status1  : in  std_logic_vector(31 downto 0);
-    i_reg_wire_status0  : in  std_logic_vector(31 downto 0);
+    i_reg_wire_status3 : in std_logic_vector(31 downto 0);
+    i_reg_wire_status2 : in std_logic_vector(31 downto 0);
+    i_reg_wire_status1 : in std_logic_vector(31 downto 0);
+    i_reg_wire_status0 : in std_logic_vector(31 downto 0);
+
     ---------------------------------------------------------------------
-    -- output
+    -- input @i_clk
     ---------------------------------------------------------------------
-    i_out_clk           : in  std_logic;
+    i_clk               : in  std_logic;
     i_error_sel         : in  std_logic_vector(g_ERROR_SEL_WIDTH - 1 downto 0);
+    -- errors
+    i_usb_reg_errors5   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_errors4   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_errors3   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_errors2   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_errors1   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_errors0   : in  std_logic_vector(31 downto 0);
+    -- status
+    i_usb_reg_status5   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_status4   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_status3   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_status2   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_status1   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_status0   : in  std_logic_vector(31 downto 0);
+    ---------------------------------------------------------------------
+    -- output @ i_clk
+    ---------------------------------------------------------------------
     o_wire_errors_valid : out std_logic;
     o_wire_errors       : out std_logic_vector(31 downto 0);
     o_wire_status       : out std_logic_vector(31 downto 0)
-  );
+    );
 end entity regdecode_wire_errors;
 
 architecture RTL of regdecode_wire_errors is
 
-  constant c_NB_ERRORS : integer := 8;
+  constant c_NB_ERRORS : integer := 4;
   type t_errors is array (integer range <>) of std_logic_vector(i_reg_wire_errors0'range);
   signal errors_tmp0   : t_errors(0 to c_NB_ERRORS - 1);
   signal errors_tmp1   : t_errors(0 to c_NB_ERRORS - 1);
@@ -101,14 +115,18 @@ architecture RTL of regdecode_wire_errors is
   -- select output error and 
   -- for each error word, generate an associated trig bit if the error value is different of 0
   ---------------------------------------------------------------------
-  signal trig_errors_vec_r1 : std_logic_vector(c_NB_ERRORS - 1 downto 0);
+  constant c_NB_ERRORS_ALL : integer := 10;
+  signal errors_tmp        : t_errors(0 to c_NB_ERRORS_ALL - 1);
+  signal status_tmp        : t_status(0 to c_NB_ERRORS_ALL - 1);
+
+  signal trig_errors_vec_r1 : std_logic_vector(c_NB_ERRORS_ALL - 1 downto 0);
   signal errors_r1          : std_logic_vector(i_reg_wire_errors0'range);
   signal status_r1          : std_logic_vector(i_reg_wire_status0'range);
 
   ---------------------------------------------------------------------
   -- generate a common error bit for each change of trig_errors_vec
   ---------------------------------------------------------------------
-  signal trig_errors_vec_r2   : std_logic_vector(c_NB_ERRORS - 1 downto 0);
+  signal trig_errors_vec_r2   : std_logic_vector(c_NB_ERRORS_ALL - 1 downto 0);
   signal trig_common_error_r3 : std_logic;
 
   ---------------------------------------------------------------------
@@ -134,10 +152,9 @@ architecture RTL of regdecode_wire_errors is
 
 begin
 
-  errors_tmp0(7) <= i_reg_wire_errors7;
-  errors_tmp0(6) <= i_reg_wire_errors6;
-  errors_tmp0(5) <= i_reg_wire_errors5;
-  errors_tmp0(4) <= i_reg_wire_errors4;
+---------------------------------------------------------------------
+-- cross clock domain: i_out_clk -> i_clk
+---------------------------------------------------------------------
   errors_tmp0(3) <= i_reg_wire_errors3;
   errors_tmp0(2) <= i_reg_wire_errors2;
   errors_tmp0(1) <= i_reg_wire_errors1;
@@ -158,9 +175,9 @@ begin
 
   begin
 
-    p_detect_change : process(i_clk) is
+    p_detect_change : process(i_out_clk) is
     begin
-      if rising_edge(i_clk) then
+      if rising_edge(i_out_clk) then
         data_r(i) <= errors_tmp0(i);
         if data_r(i) /= errors_tmp0(i) then
           wr_r(i) <= '1';
@@ -173,7 +190,7 @@ begin
     wr_en_flag(i)  <= '1' when wr_r(i) = '1' and wr_rst_busy_flag(i) = '0' else '0';
     wr_din_flag(i) <= data_r(i);
 
-    inst_fifo_async_flag : entity fpasim.fifo_async
+    inst_fifo_async_flag : entity work.fifo_async
       generic map(
         g_CDC_SYNC_STAGES   => 2,
         g_FIFO_MEMORY_TYPE  => "distributed",
@@ -183,12 +200,12 @@ begin
         g_READ_MODE         => "std",
         g_RELATED_CLOCKS    => 0,
         g_WRITE_DATA_WIDTH  => wr_din_flag(i)'length
-      )
+        )
       port map(
         ---------------------------------------------------------------------
         -- write side
         ---------------------------------------------------------------------
-        i_wr_clk        => i_clk,
+        i_wr_clk        => i_out_clk,
         i_wr_rst        => '0',
         i_wr_en         => wr_en_flag(i),
         i_wr_din        => wr_din_flag(i),
@@ -197,13 +214,13 @@ begin
         ---------------------------------------------------------------------
         -- read side
         ---------------------------------------------------------------------
-        i_rd_clk        => i_out_clk,
+        i_rd_clk        => i_clk,
         i_rd_en         => rd_en_flag(i),
         o_rd_dout_valid => open,
         o_rd_dout       => rd_dout_flag(i),
         o_rd_empty      => rd_empty_flag(i),
         o_rd_rst_busy   => rd_rst_busy_flag(i)
-      );
+        );
 
     rd_en_flag(i) <= '1' when rd_empty_flag(i) = '0' and rd_rst_busy_flag(i) = '0' else '0';
 
@@ -213,10 +230,6 @@ begin
 
   -- status register
   ---------------------------------------------------------------------
-  status_tmp0(7) <= i_reg_wire_status7;
-  status_tmp0(6) <= i_reg_wire_status6;
-  status_tmp0(5) <= i_reg_wire_status5;
-  status_tmp0(4) <= i_reg_wire_status4;
   status_tmp0(3) <= i_reg_wire_status3;
   status_tmp0(2) <= i_reg_wire_status2;
   status_tmp0(1) <= i_reg_wire_status1;
@@ -238,9 +251,9 @@ begin
 
   begin
 
-    p_detect_change : process(i_clk) is
+    p_detect_change : process(i_out_clk) is
     begin
-      if rising_edge(i_clk) then
+      if rising_edge(i_out_clk) then
         data_r(i) <= status_tmp0(i);
         if data_r(i) /= status_tmp0(i) then
           wr_r(i) <= '1';
@@ -253,7 +266,7 @@ begin
     wr_en_flag(i)  <= '1' when wr_r(i) = '1' and wr_rst_busy_flag(i) = '0' else '0';
     wr_din_flag(i) <= data_r(i);
 
-    inst_fifo_async_flag : entity fpasim.fifo_async
+    inst_fifo_async_flag : entity work.fifo_async
       generic map(
         g_CDC_SYNC_STAGES   => 2,
         g_FIFO_MEMORY_TYPE  => "distributed",
@@ -263,12 +276,12 @@ begin
         g_READ_MODE         => "std",
         g_RELATED_CLOCKS    => 0,
         g_WRITE_DATA_WIDTH  => wr_din_flag(i)'length
-      )
+        )
       port map(
         ---------------------------------------------------------------------
         -- write side
         ---------------------------------------------------------------------
-        i_wr_clk        => i_clk,
+        i_wr_clk        => i_out_clk,
         i_wr_rst        => '0',
         i_wr_en         => wr_en_flag(i),
         i_wr_din        => wr_din_flag(i),
@@ -277,13 +290,13 @@ begin
         ---------------------------------------------------------------------
         -- read side
         ---------------------------------------------------------------------
-        i_rd_clk        => i_out_clk,
+        i_rd_clk        => i_clk,
         i_rd_en         => rd_en_flag(i),
         o_rd_dout_valid => open,
         o_rd_dout       => rd_dout_flag(i),
         o_rd_empty      => rd_empty_flag(i),
         o_rd_rst_busy   => rd_rst_busy_flag(i)
-      );
+        );
 
     rd_en_flag(i) <= '1' when rd_empty_flag(i) = '0' and rd_rst_busy_flag(i) = '0' else '0';
 
@@ -295,34 +308,62 @@ begin
   -- select output errors and 
   -- for each error word, generate an associated trig bit if the error value is different of 0
   -----------------------------------------------------------------
-  p_select_error_status : process(i_out_clk) is
+  errors_tmp(9) <= errors_tmp1(3);
+  errors_tmp(8) <= errors_tmp1(2);
+  errors_tmp(7) <= errors_tmp1(1);
+  errors_tmp(6) <= errors_tmp1(0);
+  errors_tmp(5) <= i_usb_reg_errors5;
+  errors_tmp(4) <= i_usb_reg_errors4;
+  errors_tmp(3) <= i_usb_reg_errors3;
+  errors_tmp(2) <= i_usb_reg_errors2;
+  errors_tmp(1) <= i_usb_reg_errors1;
+  errors_tmp(0) <= i_usb_reg_errors0;
+
+  status_tmp(9) <= errors_tmp1(3);
+  status_tmp(8) <= errors_tmp1(2);
+  status_tmp(7) <= errors_tmp1(1);
+  status_tmp(6) <= errors_tmp1(0);
+  status_tmp(5) <= i_usb_reg_errors5;
+  status_tmp(4) <= i_usb_reg_errors4;
+  status_tmp(3) <= i_usb_reg_errors3;
+  status_tmp(2) <= i_usb_reg_errors2;
+  status_tmp(1) <= i_usb_reg_errors1;
+  status_tmp(0) <= i_usb_reg_errors0;
+
+  p_select_error_status : process(i_clk) is
   begin
-    if rising_edge(i_out_clk) then
+    if rising_edge(i_clk) then
       case i_error_sel is
-        when "000" =>
-          errors_r1 <= errors_tmp1(0);
-          status_r1 <= status_tmp1(0);
-        when "001" =>
-          errors_r1 <= errors_tmp1(1);
-          status_r1 <= status_tmp1(1);
-        when "010" =>
-          errors_r1 <= errors_tmp1(2);
-          status_r1 <= status_tmp1(2);
-        when "011" =>
-          errors_r1 <= errors_tmp1(3);
-          status_r1 <= status_tmp1(3);
-        when "100" =>
-          errors_r1 <= errors_tmp1(4);
-          status_r1 <= status_tmp1(4);
-        when "101" =>
-          errors_r1 <= errors_tmp1(5);
-          status_r1 <= status_tmp1(5);
-        when "110" =>
-          errors_r1 <= errors_tmp1(6);
-          status_r1 <= status_tmp1(6);
+        when "0000" =>
+          errors_r1 <= errors_tmp(0);
+          status_r1 <= status_tmp(0);
+        when "0001" =>
+          errors_r1 <= errors_tmp(1);
+          status_r1 <= status_tmp(1);
+        when "0010" =>
+          errors_r1 <= errors_tmp(2);
+          status_r1 <= status_tmp(2);
+        when "0011" =>
+          errors_r1 <= errors_tmp(3);
+          status_r1 <= status_tmp(3);
+        when "0100" =>
+          errors_r1 <= errors_tmp(4);
+          status_r1 <= status_tmp(4);
+        when "0101" =>
+          errors_r1 <= errors_tmp(5);
+          status_r1 <= status_tmp(5);
+        when "0110" =>
+          errors_r1 <= errors_tmp(6);
+          status_r1 <= status_tmp(6);
+        when "0111" =>
+          errors_r1 <= errors_tmp(7);
+          status_r1 <= status_tmp(7);
+        when "1000" =>
+          errors_r1 <= errors_tmp(8);
+          status_r1 <= status_tmp(8);
         when others =>
-          errors_r1 <= errors_tmp1(7);
-          status_r1 <= status_tmp1(7);
+          errors_r1 <= errors_tmp(9);
+          status_r1 <= status_tmp(9);
       end case;
 
       for i in errors_tmp1'range loop
@@ -331,7 +372,7 @@ begin
         --  status_r1 <= status_tmp1(i);
         --end if;
         -- generate one bit error by error word
-        if unsigned(errors_tmp1(i)) /= to_unsigned(0, errors_tmp1(i)'length) then
+        if unsigned(errors_tmp(i)) /= to_unsigned(0, errors_tmp(i)'length) then
           trig_errors_vec_r1(i) <= '1';
         else
           trig_errors_vec_r1(i) <= '0';
@@ -343,9 +384,9 @@ begin
   ---------------------------------------------------------------------
   -- generate a common error bit for each change of trig_errors_vec
   ---------------------------------------------------------------------
-  p_generate_common_error : process(i_out_clk) is
+  p_generate_common_error : process(i_clk) is
   begin
-    if rising_edge(i_out_clk) then
+    if rising_edge(i_clk) then
       trig_errors_vec_r2 <= trig_errors_vec_r1;
       if trig_errors_vec_r2 /= trig_errors_vec_r1 then
         trig_common_error_r3 <= '1';
@@ -358,9 +399,9 @@ begin
   ---------------------------------------------------------------------
   -- detect the rising edge of the common error
   ---------------------------------------------------------------------
-  p_detect_rising_edge_of_common_error : process(i_out_clk) is
+  p_detect_rising_edge_of_common_error : process(i_clk) is
   begin
-    if rising_edge(i_out_clk) then
+    if rising_edge(i_clk) then
       trig_error_r4 <= trig_common_error_r3;
       if trig_common_error_r3 = '1' and trig_error_r4 = '0' then
         trig_common_error_re_r5 <= '1';
@@ -376,16 +417,16 @@ begin
   data_pipe_tmp0(c_IDX1_H downto c_IDX1_L) <= status_r1;
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= errors_r1;
 
-  inst_pipeliner_sync_with_the_detect_rising_edge_of_common_error_process : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_the_detect_rising_edge_of_common_error_process : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => 4,                -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => data_pipe_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
-    )
+      g_NB_PIPES   => 4,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => data_pipe_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
     port map(
-      i_clk  => i_out_clk,              -- clock signal
+      i_clk  => i_clk,                  -- clock signal
       i_data => data_pipe_tmp0,         -- input data
       o_data => data_pipe_tmp1          -- output data with/without delay
-    );
+      );
 
   status_r5 <= data_pipe_tmp1(c_IDX1_H downto c_IDX1_L);
   errors_r5 <= data_pipe_tmp1(c_IDX0_H downto c_IDX0_L);

@@ -27,14 +27,13 @@
 --
 --   The architecture is as follows:
 --   
---   i_fifo_data -> async_fifo (small) -> fifo_sync(max usb packet size) -> usb 
+--   i_fifo_data -> async_fifo (small) -> fifo_sync(max usb packet size) -> o_usb_fifo_data 
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
 use work.pkg_regdecode.all;
 use work.pkg_utils.all;
 
@@ -289,7 +288,7 @@ begin
   gen_errors_latch : for i in error_tmp'range generate
     inst_one_error_latch : entity work.one_error_latch
       port map(
-        i_clk         => i_out_clk,
+        i_clk         => i_clk,
         i_rst         => i_rst_status,
         i_debug_pulse => i_debug_pulse,
         i_error       => error_tmp(i),

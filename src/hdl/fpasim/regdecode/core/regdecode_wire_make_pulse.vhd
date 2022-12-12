@@ -35,9 +35,9 @@
 --! 
 --!   The architecture principle is as follows:
 --!        @i_clk source clock domain              |                   @ i_out_clk destination clock domain
---!        i_make_pulse_valid-------FSM -----> async_fifo -----------> o_data
---!                                                                      |
---!        o_fifo_data <----------------------  async_fifo <------------- 
+--!        i_make_pulse_valid-------FSM -----> async_fifo -----------> o_data 
+--!                                                                |
+--!        o_fifo_data <----------------------  async_fifo <-------
 --!   Note: 
 --!     . The read back of the synchronized data bus allows to check the clock domain crossing integrity.
 --!     . The number of written data is equal to the number of data to read.
@@ -47,32 +47,31 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_regdecode.all;
+use work.pkg_regdecode.all;
 
 entity regdecode_wire_make_pulse is
   generic(
     g_DATA_WIDTH_OUT : positive := 15;  -- define the RAM address width
     g_PIXEL_NB_WIDTH : integer  := pkg_MAKE_PULSE_PIXEL_ID_WIDTH
-  );
+    );
   port(
     ---------------------------------------------------------------------
     -- from the regdecode: input @i_clk
     ---------------------------------------------------------------------
-    i_clk              : in  std_logic; -- clock
-    i_rst              : in  std_logic; -- reset
+    i_clk              : in  std_logic;  -- clock
+    i_rst              : in  std_logic;  -- reset
+    i_rst_status       : in  std_logic;  -- reset error flag(s)
+    i_debug_pulse      : in  std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     -- conf
-    i_pixel_nb         : in  std_logic_vector(g_PIXEL_NB_WIDTH - 1 downto 0); -- number of pixels. Possibles values: [0,63]
+    i_pixel_nb         : in  std_logic_vector(g_PIXEL_NB_WIDTH - 1 downto 0);  -- number of pixels. Possibles values: [0,63]
     -- data
-    i_make_pulse_valid : in  std_logic; -- make pulse valid
-    i_make_pulse       : in  std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0); -- make pulse value
+    i_make_pulse_valid : in  std_logic;  -- make pulse valid
+    i_make_pulse       : in  std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0);  -- make pulse value
     o_wr_data_count    : out std_logic_vector(15 downto 0);
     ---------------------------------------------------------------------
     -- from/to the user:  @i_out_clk
     ---------------------------------------------------------------------
-    i_out_clk          : in  std_logic; -- output clock
-    i_rst_status       : in  std_logic; -- reset error flag(s)
-    i_debug_pulse      : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    i_out_clk          : in  std_logic;  -- output clock
     -- extracted command
     i_data_rd          : in  std_logic;
     o_data_valid       : out std_logic;
@@ -83,18 +82,18 @@ entity regdecode_wire_make_pulse is
     ---------------------------------------------------------------------
     -- from/to the regdecode: @i_clk
     ---------------------------------------------------------------------
-    i_fifo_rd          : in  std_logic; -- fifo read enable
-    o_fifo_data_valid  : out std_logic; -- fifo data valid
-    o_fifo_sof         : out std_logic; -- fifo first sample
-    o_fifo_eof         : out std_logic; -- fifo last sample
-    o_fifo_data        : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0); -- fifo data
-    o_fifo_empty       : out std_logic; -- fifo empty flag
+    i_fifo_rd          : in  std_logic;  -- fifo read enable
+    o_fifo_data_valid  : out std_logic;  -- fifo data valid
+    o_fifo_sof         : out std_logic;  -- fifo first sample
+    o_fifo_eof         : out std_logic;  -- fifo last sample
+    o_fifo_data        : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0);  -- fifo data
+    o_fifo_empty       : out std_logic;  -- fifo empty flag
     ---------------------------------------------------------------------
-    -- errors/status @ i_out_clk
+    -- errors/status @ i_clk
     ---------------------------------------------------------------------
-    o_errors           : out std_logic_vector(15 downto 0); -- output errors
-    o_status           : out std_logic_vector(7 downto 0) -- output status
-  );
+    o_errors           : out std_logic_vector(15 downto 0);  -- output errors
+    o_status           : out std_logic_vector(7 downto 0)    -- output status
+    );
 end entity regdecode_wire_make_pulse;
 
 architecture RTL of regdecode_wire_make_pulse is
@@ -166,11 +165,6 @@ architecture RTL of regdecode_wire_make_pulse is
   signal errors : std_logic_vector(o_errors'range);
   signal status : std_logic_vector(o_status'range);
 
-  -------------------------------------------------------------------
-  -- synchronize error: @i_clk -> i_out_clk
-  -------------------------------------------------------------------
-  signal error_sync : std_logic;
-
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
@@ -181,7 +175,7 @@ architecture RTL of regdecode_wire_make_pulse is
 begin
   -- extract fields 
   pixel_all_tmp <= i_make_pulse(c_PIXEL_ALL_IDX);
-  pixel_id_tmp  <= i_make_pulse(c_PIXEL_ID_IDX_H downto c_PIXEL_ID_IDX_L); -- @suppress "Incorrect array size in assignment: expected (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>) but was (<6>)"
+  pixel_id_tmp  <= i_make_pulse(c_PIXEL_ID_IDX_H downto c_PIXEL_ID_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>) but was (<6>)"
 
   ---------------------------------------------------------------------
   -- fsm
@@ -202,7 +196,7 @@ begin
       when E_WAIT =>
         if i_make_pulse_valid = '1' then
           data_valid_next   <= '1';
-          pixel_id_max_next <= unsigned(i_pixel_nb) - 1; -- 1 start @0  -- @suppress "Incorrect array size in assignment: expected (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>) but was (<g_PIXEL_NB_WIDTH>)"
+          pixel_id_max_next <= unsigned(i_pixel_nb) - 1;  -- 1 start @0  -- @suppress "Incorrect array size in assignment: expected (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>) but was (<g_PIXEL_NB_WIDTH>)"
 
           if pixel_all_tmp = '1' then
             sof_next      <= '1';
@@ -244,7 +238,7 @@ begin
         else
           sm_state_next <= E_GEN_PIXEL_ID;
         end if;
-      when others =>                    -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -285,7 +279,7 @@ begin
   -- keep the input data fields (above the pixel id field)
   tmp(data_r1'high downto c_PIXEL_ID_IDX_H + 1) <= data_r1(data_r1'high downto c_PIXEL_ID_IDX_H + 1);
   -- replace the pixed id field
-  tmp(c_PIXEL_ID_IDX_H downto c_PIXEL_ID_IDX_L) <= std_logic_vector(pixel_id_r1); -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>)"
+  tmp(c_PIXEL_ID_IDX_H downto c_PIXEL_ID_IDX_L) <= std_logic_vector(pixel_id_r1);  -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>)"
   -- keep the input data field (below the pixel id field)
   tmp(c_PIXEL_ID_IDX_L - 1 downto 0)            <= data_r1(c_PIXEL_ID_IDX_L - 1 downto 0);
 
@@ -298,18 +292,20 @@ begin
   data_tmp0(c_IDX1_H)                 <= eof_r1;
   data_tmp0(c_IDX0_H downto c_IDX0_L) <= tmp;
 
-  inst_regdecode_wire_make_pulse_wr_rd : entity fpasim.regdecode_wire_make_pulse_wr_rd
+  inst_regdecode_wire_make_pulse_wr_rd : entity work.regdecode_wire_make_pulse_wr_rd
     generic map(
-      g_DATA_WIDTH_OUT => data_tmp0'length -- define the RAM address width
-    )
+      g_DATA_WIDTH_OUT => data_tmp0'length   -- define the RAM address width
+      )
     port map(
       ---------------------------------------------------------------------
       -- from the regdecode: input @i_clk
       ---------------------------------------------------------------------
       i_clk             => i_clk,       -- clock
       i_rst             => i_rst,       -- rst
+      i_rst_status      => i_rst_status,   -- reset error flag(s)
+      i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- data
-      i_data_valid      => data_valid_tmp0, -- data valid
+      i_data_valid      => data_valid_tmp0,  -- data valid
       i_data            => data_tmp0,   -- data value
       o_ready           => ready_tmp0,
       o_wr_data_count   => wr_data_count_tmp0,
@@ -317,26 +313,24 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
-      i_rst_status      => i_rst_status, -- reset error flag(s)
-      i_debug_pulse     => i_debug_pulse, -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- ram: wr
       i_data_rd         => rd_tmp2,
-      o_data_valid      => data_valid_tmp2, -- data valid
+      o_data_valid      => data_valid_tmp2,  -- data valid
       o_data            => data_tmp2,   -- data
       o_empty           => empty_tmp2,
       ---------------------------------------------------------------------
       -- to the regdecode: @i_clk
       ---------------------------------------------------------------------
       i_fifo_rd         => rd_tmp1,     -- fifo read enable
-      o_fifo_data_valid => data_valid_tmp1, -- fifo data valid
+      o_fifo_data_valid => data_valid_tmp1,  -- fifo data valid
       o_fifo_data       => data_tmp1,   -- fifo data
       o_fifo_empty      => empty_tmp1,  -- fifo empty flag
       ---------------------------------------------------------------------
-      -- errors/status @ i_out_clk
+      -- errors/status @ i_clk
       ---------------------------------------------------------------------
       o_errors          => errors,      -- output errors
       o_status          => status       -- output status
-    );
+      );
 
   rd_tmp1           <= i_fifo_rd;
   rd_tmp2           <= i_data_rd;
@@ -359,42 +353,21 @@ begin
   o_empty      <= empty_tmp2;
 
   ---------------------------------------------------------------------
-  -- synchronize error : i_clk -> i_out_clk
-  ---------------------------------------------------------------------
-  inst_single_bit_synchronizer_error : entity fpasim.single_bit_synchronizer
-    generic map(
-      g_DEST_SYNC_FF  => 2,
-      g_SRC_INPUT_REG => 1
-    )
-    port map(
-      ---------------------------------------------------------------------
-      -- source
-      ---------------------------------------------------------------------
-      i_src_clk  => i_clk,              -- source clock
-      i_src      => error_r1,           -- input signal to be synchronized to dest_clk domain
-      ---------------------------------------------------------------------
-      -- destination
-      ---------------------------------------------------------------------
-      i_dest_clk => i_out_clk,          -- destination clock domain
-      o_dest     => error_sync          -- src_in synchronized to the destination clock domain. This output is registered.   
-    );
-
-  ---------------------------------------------------------------------
   -- Error latching
   ---------------------------------------------------------------------
-  error_tmp(0) <= error_sync;           -- fsm error: receive a wr command during the read address generation.
+  error_tmp(0) <= error_r1;  -- fsm error: receive a wr command during the read address generation.
   gen_errors_latch : for i in error_tmp'range generate
-    inst_one_error_latch : entity fpasim.one_error_latch
+    inst_one_error_latch : entity work.one_error_latch
       port map(
-        i_clk         => i_out_clk,
+        i_clk         => i_clk,
         i_rst         => i_rst_status,
         i_debug_pulse => i_debug_pulse,
         i_error       => error_tmp(i),
         o_error       => error_tmp_bis(i)
-      );
+        );
   end generate gen_errors_latch;
 
-  o_errors(15)          <= error_tmp_bis(0); -- fsm error: receive a wr command during the read address generation.
+  o_errors(15)          <= error_tmp_bis(0);  -- fsm error: receive a wr command during the read address generation.
   o_errors(14 downto 0) <= errors(14 downto 0);
   o_status              <= status;
   ---------------------------------------------------------------------
