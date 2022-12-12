@@ -31,9 +31,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_fpasim.all;
-use fpasim.pkg_regdecode.all;
+use work.pkg_fpasim.all;
+use work.pkg_regdecode.all;
 
 entity fpasim_top is
   generic(
@@ -173,8 +172,8 @@ architecture RTL of fpasim_top is
   -- clock
   signal usb_clk : std_logic;
   -- ctrl register
-  signal rst : std_logic;
-  signal en  : std_logic;
+  signal rst     : std_logic;
+  signal en      : std_logic;
 
   -- make_pulse register
   signal cmd_valid        : std_logic;
@@ -262,22 +261,22 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- common register
   signal reg_valid            : std_logic;  -- register valid -- @suppress "signal reg_valid is never read"
-  signal reg_fpasim_gain      : std_logic_vector(31 downto 0); 
-  signal reg_mux_sq_fb_delay  : std_logic_vector(31 downto 0);  
-  signal reg_amp_sq_of_delay  : std_logic_vector(31 downto 0); 
-  signal reg_error_delay      : std_logic_vector(31 downto 0); 
+  signal reg_fpasim_gain      : std_logic_vector(31 downto 0);
+  signal reg_mux_sq_fb_delay  : std_logic_vector(31 downto 0);
+  signal reg_amp_sq_of_delay  : std_logic_vector(31 downto 0);
+  signal reg_error_delay      : std_logic_vector(31 downto 0);
   signal reg_ra_delay         : std_logic_vector(31 downto 0);
-  signal reg_tes_conf         : std_logic_vector(31 downto 0); 
+  signal reg_tes_conf         : std_logic_vector(31 downto 0);
   -- ctrl register
   signal reg_ctrl_valid       : std_logic;  -- register ctrl valid -- @suppress "signal reg_ctrl_valid is never read"
-  signal reg_ctrl             : std_logic_vector(31 downto 0); 
+  signal reg_ctrl             : std_logic_vector(31 downto 0);
   -- debug ctrl register
   signal reg_debug_ctrl_valid : std_logic;  -- register debug_ctrl valid -- @suppress "signal reg_debug_ctrl_valid is never read"
-  signal reg_debug_ctrl       : std_logic_vector(31 downto 0); 
+  signal reg_debug_ctrl       : std_logic_vector(31 downto 0);
   -- make pulse register
   signal reg_make_sof         : std_logic;  -- first sample -- @suppress "signal reg_make_sof is never read"
   signal reg_make_eof         : std_logic;  -- last sample -- @suppress "signal reg_make_eof is never read"
-  signal reg_make_pulse_valid : std_logic;  
+  signal reg_make_pulse_valid : std_logic;
   signal reg_make_pulse       : std_logic_vector(31 downto 0);
   signal reg_make_pulse_ready : std_logic;
 
@@ -286,47 +285,11 @@ architecture RTL of fpasim_top is
   signal reg_rec_ctrl  : std_logic_vector(31 downto 0);
   signal reg_rec_conf0 : std_logic_vector(31 downto 0);
 
-  signal pipe_errors5 : std_logic_vector(15 downto 0);
-  signal pipe_errors4 : std_logic_vector(15 downto 0);
-  signal pipe_errors3 : std_logic_vector(15 downto 0);
-  signal pipe_errors2 : std_logic_vector(15 downto 0);
-  signal pipe_errors1 : std_logic_vector(15 downto 0);
-  signal pipe_errors0 : std_logic_vector(15 downto 0);
-
-  signal pipe_status5 : std_logic_vector(7 downto 0);
-  signal pipe_status4 : std_logic_vector(7 downto 0);
-  signal pipe_status3 : std_logic_vector(7 downto 0);
-  signal pipe_status2 : std_logic_vector(7 downto 0);
-  signal pipe_status1 : std_logic_vector(7 downto 0);
-  signal pipe_status0 : std_logic_vector(7 downto 0);
-
-  signal reg_errors0 : std_logic_vector(15 downto 0);
-  signal reg_status0 : std_logic_vector(7 downto 0);
-
-  signal ctrl_errors0 : std_logic_vector(15 downto 0);
-  signal ctrl_status0 : std_logic_vector(7 downto 0);
-
-  signal debug_ctrl_errors0 : std_logic_vector(15 downto 0);
-  signal debug_ctrl_status0 : std_logic_vector(7 downto 0);
-
-  signal make_pulse_errors0 : std_logic_vector(15 downto 0);
-  signal make_pulse_status0 : std_logic_vector(7 downto 0);
-
-  signal reg_wire_errors8 : std_logic_vector(31 downto 0);
-  signal reg_wire_errors7 : std_logic_vector(31 downto 0);
-  signal reg_wire_errors6 : std_logic_vector(31 downto 0);
-  signal reg_wire_errors5 : std_logic_vector(31 downto 0);
-  signal reg_wire_errors4 : std_logic_vector(31 downto 0);
   signal reg_wire_errors3 : std_logic_vector(31 downto 0);
   signal reg_wire_errors2 : std_logic_vector(31 downto 0);
   signal reg_wire_errors1 : std_logic_vector(31 downto 0);
   signal reg_wire_errors0 : std_logic_vector(31 downto 0);
 
-  signal reg_wire_status8 : std_logic_vector(31 downto 0);
-  signal reg_wire_status7 : std_logic_vector(31 downto 0);
-  signal reg_wire_status6 : std_logic_vector(31 downto 0);
-  signal reg_wire_status5 : std_logic_vector(31 downto 0);
-  signal reg_wire_status4 : std_logic_vector(31 downto 0);
   signal reg_wire_status3 : std_logic_vector(31 downto 0);
   signal reg_wire_status2 : std_logic_vector(31 downto 0);
   signal reg_wire_status1 : std_logic_vector(31 downto 0);
@@ -440,7 +403,7 @@ begin
   ---------------------------------------------------------------------
   -- RegDecode
   ---------------------------------------------------------------------
-  inst_regdecode_top : entity fpasim.regdecode_top
+  inst_regdecode_top : entity work.regdecode_top
     generic map(
       g_DEBUG => false
       )
@@ -448,15 +411,15 @@ begin
       ---------------------------------------------------------------------
       -- from the usb @i_clk (clock included)
       ---------------------------------------------------------------------
-      i_rst                             => '0',
+      i_rst   => '0',
       --  Opal Kelly inouts --
-      i_okUH                            => i_okUH,
-      o_okHU                            => o_okHU,
-      b_okUHU                           => b_okUHU,
-      b_okAA                            => b_okAA,
+      i_okUH  => i_okUH,
+      o_okHU  => o_okHU,
+      b_okUHU => b_okUHU,
+      b_okAA  => b_okAA,
 
       -- clock
-      o_usb_clk                         => usb_clk, -- not connected
+      o_usb_clk                         => usb_clk,      -- not connected
       ---------------------------------------------------------------------
       -- from the board
       ---------------------------------------------------------------------
@@ -464,7 +427,7 @@ begin
       ---------------------------------------------------------------------
       -- from/to the user: @i_out_clk
       ---------------------------------------------------------------------
-      i_out_rst                         => '0', -- TODO
+      i_out_rst                         => '0',          -- TODO
       i_out_clk                         => i_clk,        -- clock (user side)
       i_rst_status                      => rst_status,   -- reset error flag(s)
       i_debug_pulse                     => debug_pulse,  -- error mode (transparent vs capture). Possib
@@ -555,56 +518,15 @@ begin
       -- to the usb 
       ---------------------------------------------------------------------
       -- errors
-      i_reg_wire_errors7 => reg_wire_errors7,
-      i_reg_wire_errors6 => reg_wire_errors6,
-      i_reg_wire_errors5 => reg_wire_errors5,
-      i_reg_wire_errors4 => reg_wire_errors4,
       i_reg_wire_errors3 => reg_wire_errors3,
       i_reg_wire_errors2 => reg_wire_errors2,
       i_reg_wire_errors1 => reg_wire_errors1,
       i_reg_wire_errors0 => reg_wire_errors0,
       -- status
-      i_reg_wire_status7 => reg_wire_status7,
-      i_reg_wire_status6 => reg_wire_status6,
-      i_reg_wire_status5 => reg_wire_status5,
-      i_reg_wire_status4 => reg_wire_status4,
       i_reg_wire_status3 => reg_wire_status3,
       i_reg_wire_status2 => reg_wire_status2,
       i_reg_wire_status1 => reg_wire_status1,
-      i_reg_wire_status0 => reg_wire_status0,
-      -- to the user: errors/status
-      ---------------------------------------------------------------------
-      -- pipe errors
-      o_pipe_errors5     => pipe_errors5,  -- rd all: output errors
-      o_pipe_errors4     => pipe_errors4,  -- mux squid offset: output errors
-      o_pipe_errors3     => pipe_errors3,  -- tes std state: output errors
-      o_pipe_errors2     => pipe_errors2,  -- mux squid tf: output errors
-      o_pipe_errors1     => pipe_errors1,  -- amp squid tf: output errors
-      o_pipe_errors0     => pipe_errors0,  -- tes pulse shape: output errors
-
-      -- pipe status
-      o_pipe_status5 => pipe_status5,   -- rd all: output status
-      o_pipe_status4 => pipe_status4,   -- mux squid offset: output status
-      o_pipe_status3 => pipe_status3,   -- tes std state: output status
-      o_pipe_status2 => pipe_status2,   -- mux squid tf: output status
-      o_pipe_status1 => pipe_status1,   -- amp squid tf: output status
-      o_pipe_status0 => pipe_status0,   -- tes pulse shape: output status
-
-      -- reg errors/status
-      o_reg_errors0 => reg_errors0,     -- common register errors
-      o_reg_status0 => reg_status0,     -- common register status
-
-      -- ctrl errors/status
-      o_ctrl_errors0 => ctrl_errors0,   -- register ctrl errors
-      o_ctrl_status0 => ctrl_status0,   -- register ctrl status
-
-      -- debug_ctrl errors/status
-      o_debug_ctrl_errors0 => debug_ctrl_errors0,  -- register debug_ctrl errors
-      o_debug_ctrl_status0 => debug_ctrl_status0,  -- register debug_ctrl status
-
-      -- make_pulse errors/status
-      o_make_pulse_errors0 => make_pulse_errors0,  -- register make_pulse errors
-      o_make_pulse_status0 => make_pulse_status0  -- register make_pulse status
+      i_reg_wire_status0 => reg_wire_status0
       );
 
   -- extract fields from the ctrl register
@@ -646,23 +568,8 @@ begin
   rec_adc_cmd_nb_words_by_block <= reg_rec_conf0(15 downto 0);
 
   -- errors
-  reg_wire_errors8(31 downto 16) <= (others => '0');  -- TODO:
-  reg_wire_errors8(15 downto 0)  <= rec_adc_errors0;  -- TODO: recording adc errors
-
-  reg_wire_errors7(31 downto 16) <= pipe_errors5;  -- rd all: output errors
-  reg_wire_errors7(15 downto 0)  <= pipe_errors4;  -- mux squid offset: output errors
-
-  reg_wire_errors6(31 downto 16) <= pipe_errors3;  -- tes std state: output errors
-  reg_wire_errors6(15 downto 0)  <= pipe_errors2;  -- mux squid tf: output errors
-
-  reg_wire_errors5(31 downto 16) <= pipe_errors1;  -- amp squid tf: output errors
-  reg_wire_errors5(15 downto 0)  <= pipe_errors0;  -- tes pulse shape: output errors
-
-  reg_wire_errors4(31 downto 16) <= debug_ctrl_errors0;  -- debug ctrl register
-  reg_wire_errors4(15 downto 0)  <= reg_errors0;         -- reg register
-
-  reg_wire_errors3(31 downto 16) <= make_pulse_errors0;  -- make pulse register
-  reg_wire_errors3(15 downto 0)  <= ctrl_errors0;        -- ctrl register
+  reg_wire_errors3(31 downto 16) <= (others => '0');
+  reg_wire_errors3(15 downto 0)  <= rec_adc_errors0;  -- recording
 
   reg_wire_errors2(31 downto 16) <= sync_errors0;  -- sync top
   reg_wire_errors2(15 downto 0)  <= dac_errors0;   -- dac
@@ -674,35 +581,10 @@ begin
   reg_wire_errors0(15 downto 0)  <= adc_errors0;  -- adc
 
   -- status
-  reg_wire_status8(31 downto 24) <= (others => '0');
-  reg_wire_status8(23 downto 16) <= (others => '0');  -- TODO
-  reg_wire_status8(15 downto 8)  <= (others => '0');
-  reg_wire_status8(7 downto 0)   <= rec_adc_status0;  -- TODO: record adc: output status
-
-  reg_wire_status7(31 downto 24) <= (others => '0');
-  reg_wire_status7(23 downto 16) <= pipe_status5;  -- rd all: output status
-  reg_wire_status7(15 downto 8)  <= (others => '0');
-  reg_wire_status7(7 downto 0)   <= pipe_status4;  -- mux squid offset: output status
-
-  reg_wire_status6(31 downto 24) <= (others => '0');
-  reg_wire_status6(23 downto 16) <= pipe_status3;  -- tes std state: output status
-  reg_wire_status6(15 downto 8)  <= (others => '0');
-  reg_wire_status6(7 downto 0)   <= pipe_status2;  -- mux squid tf: output status
-
-  reg_wire_status5(31 downto 24) <= (others => '0');
-  reg_wire_status5(23 downto 16) <= pipe_status1;  -- amp squid tf: output status
-  reg_wire_status5(15 downto 8)  <= (others => '0');
-  reg_wire_status5(7 downto 0)   <= pipe_status0;  -- tes pulse shape: output status
-
-  reg_wire_status4(31 downto 24) <= (others => '0');
-  reg_wire_status4(23 downto 16) <= debug_ctrl_status0;  -- debug ctrl register
-  reg_wire_status4(15 downto 8)  <= (others => '0');
-  reg_wire_status4(7 downto 0)   <= reg_status0;         -- reg register
-
   reg_wire_status3(31 downto 24) <= (others => '0');
-  reg_wire_status3(23 downto 16) <= make_pulse_status0;  -- make pulse
+  reg_wire_status3(23 downto 16) <= (others => '0');
   reg_wire_status3(15 downto 8)  <= (others => '0');
-  reg_wire_status3(7 downto 0)   <= ctrl_status0;        -- ctrl register
+  reg_wire_status3(7 downto 0)   <= rec_adc_status0;  -- recording
 
   reg_wire_status2(31 downto 24) <= (others => '0');
   reg_wire_status2(23 downto 16) <= sync_status0;  -- sync top
@@ -722,7 +604,7 @@ begin
   ---------------------------------------------------------------------
   -- adc
   ---------------------------------------------------------------------
-  inst_adc_top : entity fpasim.adc_top
+  inst_adc_top : entity work.adc_top
     generic map(
       g_ADC1_WIDTH       => i_adc_mux_squid_feedback'length,
       g_ADC0_WIDTH       => i_adc_amp_squid_offset_correction'length,
@@ -767,7 +649,7 @@ begin
   tes_pulse_shape_ram_wr_rd_addr_tmp <= tes_pulse_shape_ram_wr_rd_addr(tes_pulse_shape_ram_wr_rd_addr_tmp'range);
   tes_std_state_ram_wr_rd_addr_tmp   <= tes_std_state_ram_wr_rd_addr(tes_std_state_ram_wr_rd_addr_tmp'range);
 
-  inst_tes_top : entity fpasim.tes_top
+  inst_tes_top : entity work.tes_top
     generic map(
       -- command
       g_CMD_PULSE_HEIGHT_WIDTH        => cmd_pulse_height'length,
@@ -846,7 +728,7 @@ begin
   -----------------------------------------------------------------
   data_pipe_tmp0(c_IDX1_H downto c_IDX1_L) <= adc_mux_squid_feedback0;
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= adc_amp_squid_offset_correction0;
-  inst_pipeliner_sync_with_tes_top_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_tes_top_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_TES_TOP_LATENCY,
       g_DATA_WIDTH => data_pipe_tmp0'length
@@ -867,7 +749,7 @@ begin
   mux_squid_tf_ram_wr_rd_addr_tmp     <= mux_squid_tf_ram_wr_rd_addr(mux_squid_tf_ram_wr_rd_addr_tmp'range);
   mux_squid_offset_ram_wr_rd_addr_tmp <= mux_squid_offset_ram_wr_rd_addr(mux_squid_offset_ram_wr_rd_addr_tmp'range);
 
-  inst_mux_squid_top : entity fpasim.mux_squid_top
+  inst_mux_squid_top : entity work.mux_squid_top
     generic map(
       -- pixel
       g_PIXEL_ID_WIDTH              => pixel_id1'length,
@@ -939,7 +821,7 @@ begin
 
   -- sync with inst_mux_squid_top out
   -----------------------------------------------------------------
-  inst_pipeliner_sync_with_mux_squid_top_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_mux_squid_top_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_MUX_SQUID_TOP_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => amp_squid_offset_correction1'length  -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -956,7 +838,7 @@ begin
   -- extract LSB address bits
   amp_squid_tf_ram_wr_rd_addr_tmp <= amp_squid_tf_ram_wr_rd_addr(amp_squid_tf_ram_wr_rd_addr_tmp'range);
 
-  inst_amp_squid_top : entity fpasim.amp_squid_top
+  inst_amp_squid_top : entity work.amp_squid_top
     generic map(
       -- pixel
       g_PIXEL_ID_WIDTH              => pixel_id1'length,
@@ -1024,7 +906,7 @@ begin
   ---------------------------------------------------------------------
   -- dac_top
   ---------------------------------------------------------------------
-  inst_dac_top : entity fpasim.dac_top
+  inst_dac_top : entity work.dac_top
     generic map(
       g_DAC_DELAY_WIDTH => dac_delay'length
       )
@@ -1061,7 +943,7 @@ begin
   ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
-  inst_sync_top : entity fpasim.sync_top
+  inst_sync_top : entity work.sync_top
     generic map(
       g_PULSE_DURATION   => c_SYNC_PULSE_DURATION,  -- duration of the output pulse. Possible values [1;integer max value[
       g_SYNC_DELAY_WIDTH => sync_delay'length
@@ -1107,7 +989,7 @@ begin
   ---------------------------------------------------------------------
   -- Recording
   ---------------------------------------------------------------------
-  inst_recording_top : entity fpasim.recording_top
+  inst_recording_top : entity work.recording_top
     generic map(
       g_ADC_FIFO_OUT_DEPTH => pkg_REC_ADC_FIFO_OUT_DEPTH  -- depth of the FIFO (number of words). Must be a power of 2
       )
@@ -1129,17 +1011,17 @@ begin
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      i_fifo_adc_rd                    => fifo_rec_adc_rd,
-      o_fifo_adc_data_valid            => fifo_rec_adc_data_valid,
-      o_fifo_adc_sof                   => fifo_rec_adc_sof,      
-      o_fifo_adc_eof                   => fifo_rec_adc_eof,       
-      o_fifo_adc_data                  => fifo_rec_adc_data,
-      o_fifo_adc_empty                 => fifo_rec_adc_empty,
+      i_fifo_adc_rd               => fifo_rec_adc_rd,
+      o_fifo_adc_data_valid       => fifo_rec_adc_data_valid,
+      o_fifo_adc_sof              => fifo_rec_adc_sof,
+      o_fifo_adc_eof              => fifo_rec_adc_eof,
+      o_fifo_adc_data             => fifo_rec_adc_data,
+      o_fifo_adc_empty            => fifo_rec_adc_empty,
       -----------------------------------------------------------------
       -- errors/status
       -----------------------------------------------------------------
-      o_adc_errors                => rec_adc_errors0,     -- to connect
-      o_adc_status                => rec_adc_status0      -- to connect
+      o_adc_errors                => rec_adc_errors0,
+      o_adc_status                => rec_adc_status0
       );
 
 
@@ -1149,7 +1031,7 @@ begin
   -- debug
   ---------------------------------------------------------------------
   gen_debug : if g_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
-  -- inst_fpasim_top_ila_0 : entity fpasim.fpasim_top_ila_0
+  -- inst_fpasim_top_ila_0 : entity work.fpasim_top_ila_0
   --   port map(
   --     clk                 => i_clk,
   --     probe0              => pixel_result3,
