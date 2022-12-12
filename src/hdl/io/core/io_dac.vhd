@@ -36,8 +36,6 @@ use ieee.std_logic_1164.all;
 Library UNISIM;
 use UNISIM.vcomponents.all;
 
-library fpasim;
-
 entity io_dac is
    generic(
       g_OUTPUT_LATENCY : natural := 0   -- add latency before the output IO. Possible values: [0; max integer value[
@@ -115,7 +113,7 @@ begin
    ---------------------------------------------------------------------
    data_pipe_tmp0(c_IDX1_H)                 <= i_dac_frame;
    data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_dac;
-   inst_pipeliner_add_output_latency : entity fpasim.pipeliner
+   inst_pipeliner_add_output_latency : entity work.pipeliner
       generic map(
          g_NB_PIPES   => g_OUTPUT_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
          g_DATA_WIDTH => data_pipe_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -147,7 +145,7 @@ begin
       dac_tmp0(16 downto 9) <= dac1(15 downto 8);
       dac_tmp0(8)           <= dac_frame1;
       dac_tmp0(7 downto 0)  <= dac1(7 downto 0);
-      inst_selectio_wiz_dac : entity fpasim.selectio_wiz_dac
+      inst_selectio_wiz_dac : entity work.selectio_wiz_dac
          port map(
             data_out_from_device => dac_tmp0,
             data_out_to_pins_p   => dac_p_tmp1,

@@ -37,7 +37,6 @@ use ieee.std_logic_1164.all;
 Library UNISIM;
 use UNISIM.vcomponents.all;
 
-library fpasim;
 
 entity io_adc is
    generic(
@@ -71,7 +70,7 @@ architecture RTL of io_adc is
 
 begin
 
-   inst_selectio_wiz_adc : entity fpasim.selectio_wiz_adc
+   inst_selectio_wiz_adc : entity work.selectio_wiz_adc
       port map(
          data_in_from_pins_p => i_adc_p,
          data_in_from_pins_n => i_adc_n,
@@ -97,7 +96,7 @@ begin
    ---------------------------------------------------------------------
    -- optionnally add latency after input IO
    ---------------------------------------------------------------------
-   inst_pipeliner_add_input_latency : entity fpasim.pipeliner
+   inst_pipeliner_add_input_latency : entity work.pipeliner
       generic map(
          g_NB_PIPES   => g_INPUT_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
          g_DATA_WIDTH => adc_tmp1'length -- width of the input/output data.  Possibles values: [1, integer max value[

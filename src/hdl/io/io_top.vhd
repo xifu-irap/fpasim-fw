@@ -33,8 +33,7 @@ use ieee.std_logic_1164.all;
 library UNISIM;
 use UNISIM.vcomponents.all;
 
-library fpasim;
-use fpasim.pkg_fpasim.all;
+use work.pkg_fpasim.all;
 
 entity io_top is
   port(
@@ -162,7 +161,7 @@ begin
   adc_a_tmp0_p(0) <= i_da0_p;
   adc_a_tmp0_n(0) <= i_da0_n;
 
-  inst_io_adc_a : entity fpasim.io_adc
+  inst_io_adc_a : entity work.io_adc
     generic map(
       g_ADC_WIDTH     => adc_a_tmp0_p'length,
       g_INPUT_LATENCY => c_ADC_INPUT_LATENCY
@@ -205,7 +204,7 @@ begin
   adc_b_tmp0_p(0) <= i_db0_p;
   adc_b_tmp0_n(0) <= i_db0_n;
 
-  inst_io_adc_b : entity fpasim.io_adc
+  inst_io_adc_b : entity work.io_adc
     generic map(
       g_ADC_WIDTH     => adc_b_tmp0_p'length,
       g_INPUT_LATENCY => c_ADC_INPUT_LATENCY
@@ -229,7 +228,7 @@ begin
   ---------------------------------------------------------------------
   -- sync
   ---------------------------------------------------------------------
-  inst_io_sync : entity fpasim.io_sync
+  inst_io_sync : entity work.io_sync
     generic map(
       g_OUTPUT_LATENCY => c_SYNC_OUTPUT_LATENCY
     )
@@ -249,7 +248,7 @@ begin
   ---------------------------------------------------------------------
   -- dac
   ---------------------------------------------------------------------
-  inst_io_dac : entity fpasim.io_dac
+  inst_io_dac : entity work.io_dac
     generic map(
       g_OUTPUT_LATENCY => c_DAC_OUTPUT_LATENCY
     )

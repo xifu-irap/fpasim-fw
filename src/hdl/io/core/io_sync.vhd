@@ -33,7 +33,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library fpasim;
 
 Library UNISIM;
 use UNISIM.vcomponents.all;
@@ -74,7 +73,7 @@ begin
    ---------------------------------------------------------------------
    -- output: optionnally add latency before output IOs
    ---------------------------------------------------------------------
-   inst_pipeliner_add_output_latency : entity fpasim.pipeliner
+   inst_pipeliner_add_output_latency : entity work.pipeliner
       generic map(
          g_NB_PIPES   => g_OUTPUT_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
          g_DATA_WIDTH => 1              -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -93,7 +92,7 @@ begin
       signal data_tmp1 : std_logic_vector(0 downto 0);
    begin
       data_tmp0(0) <= sync_rx;
-      inst_selectio_wiz_sync : entity fpasim.selectio_wiz_sync
+      inst_selectio_wiz_sync : entity work.selectio_wiz_sync
          port map(
             data_out_from_device => data_tmp0,
             data_out_to_pins     => data_tmp1,
