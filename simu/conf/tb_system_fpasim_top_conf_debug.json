@@ -59,6 +59,14 @@
       "usb_error_delay;rd;delay=4",
       "usb_ra_delay;rd;delay=5",
 
+
+      "usb_rec_conf0;wr;rec_adc_nb_word_32=4",
+      "usb_rec_ctrl;wr;rec_adc_en=1",
+      "usb_trig;wr;rec_valid=1",
+      "nop;wr;delay=16",
+      "usb_rec_conf0;rd;rec_adc_nb_word_32=4",
+      "usb_rec_ctrl;rd;rec_adc_en=1",
+
       "usb_ram;wr;tes_shape_pulse;amp_squid_tf;mux_squid_tf;tes_steady_state;mux_squid_offset",
       "usb_trig;wr;rd_all=1",
       "nop;wr;delay=16",
@@ -187,6 +195,11 @@
         "debug_valid": {
           "value": 0,
           "bit_pos_min": 16,
+          "width": 1
+        },
+        "rec_valid": {
+          "value": 0,
+          "bit_pos_min": 20,
           "width": 1
         }
       }
@@ -543,7 +556,7 @@
         "rec_adc_nb_word_32": {
           "value": 0,
           "bit_pos_min": 0,
-          "width": 1
+          "width": 16
         }
       }
     },
