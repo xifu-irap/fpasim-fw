@@ -105,9 +105,9 @@ architecture RTL of recording_adc is
   constant c_IDX2_L : integer := c_IDX1_H + 1;
   constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
 
-  constant c_FIFO_DEPTH        : integer := g_ADC_FIFO_OUT_DEPTH;  --see IP
-  constant c_FIFO_WIDTH        : integer := c_IDX2_H + 1;          --see IP
-  constant c_FIFO_READ_LATENCY : integer := 1;                     --see IP
+  constant c_FIFO_DEPTH        : integer := g_ADC_FIFO_OUT_DEPTH; 
+  constant c_FIFO_WIDTH        : integer := c_IDX2_H + 1;         
+  constant c_FIFO_READ_LATENCY : integer := 2;                    
 
   ---------------------------------------------------------------------
   -- state machine

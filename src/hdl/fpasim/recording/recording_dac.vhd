@@ -106,7 +106,7 @@ architecture RTL of recording_dac is
 
   constant c_FIFO_DEPTH        : integer := g_FIFO_DEPTH;  --see IP
   constant c_FIFO_WIDTH        : integer := c_IDX2_H + 1;  --see IP
-  constant c_FIFO_READ_LATENCY : integer := 1;             --see IP
+  constant c_FIFO_READ_LATENCY : integer := 2;             --see IP
 
   ---------------------------------------------------------------------
   -- build ouput word
@@ -248,7 +248,7 @@ begin
           cnt_sample_next <= cnt_frame_r1 + 1;
           if cnt_frame_r1 = cnt_frame_max_r1 then
             eof_next      <= '1';
-            sm_state_next <= E_START;
+            sm_state_next <= E_WAIT;
           else
             sm_state_next <= E_RUN;
           end if;
