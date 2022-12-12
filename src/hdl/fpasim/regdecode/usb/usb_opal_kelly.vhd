@@ -28,8 +28,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library fpasim;
-use fpasim.FRONTPANEL.all;
+
+use work.FRONTPANEL.all;
 
 entity usb_opal_kelly is
   port(
