@@ -40,7 +40,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library fpasim;
 
 entity dac_data_insert is
   generic(
@@ -143,7 +142,7 @@ begin
   data_tmp0(c_IDX1_H)                 <= i_dac_frame;
   data_tmp0(c_IDX0_H downto c_IDX0_L) <= i_dac;
   wr_rst_tmp0                         <= i_rst;
-  inst_fifo_async_with_error : entity fpasim.fifo_async_with_error
+  inst_fifo_async_with_error : entity work.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
       g_FIFO_MEMORY_TYPE  => "distributed",
@@ -254,7 +253,7 @@ begin
   error_tmp(1) <= errors_sync0(1);      -- fifo rd empty error
   error_tmp(0) <= errors_sync0(0);      -- fifo wr full error
   error_flag_mng : for i in error_tmp'range generate
-    inst_one_error_latch : entity fpasim.one_error_latch
+    inst_one_error_latch : entity work.one_error_latch
       port map(
         i_clk         => i_clk,
         i_rst         => i_rst_status,

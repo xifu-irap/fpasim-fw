@@ -40,7 +40,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library fpasim;
 
 entity dac_top is
   generic(
@@ -78,7 +77,7 @@ entity dac_top is
 end entity dac_top;
 
 architecture RTL of dac_top is
-  constant c_DAC_FRAME_SIZE : positive := fpasim.pkg_fpasim.pkg_DAC_FRAME_SIZE;
+  constant c_DAC_FRAME_SIZE : positive := work.pkg_fpasim.pkg_DAC_FRAME_SIZE;
 
   -------------------------------------------------------------------
   -- cross clock domain
@@ -110,7 +109,7 @@ begin
   -------------------------------------------------------------------
   -- cross clock domain
   -------------------------------------------------------------------
-  inst_synchronous_reset_synchronizer_rst_dac : entity fpasim.synchronous_reset_synchronizer
+  inst_synchronous_reset_synchronizer_rst_dac : entity work.synchronous_reset_synchronizer
     generic map(
       g_DEST_SYNC_FF => 2,
       g_INIT         => 1
@@ -132,7 +131,7 @@ begin
   -- apply a dynamic delay on the data path
   --   . the latency is 1 clock cycle when i_dac_delay = 0
   ---------------------------------------------------------------------
-  inst_dynamic_shift_register_dac : entity fpasim.dynamic_shift_register
+  inst_dynamic_shift_register_dac : entity work.dynamic_shift_register
     generic map(
       g_ADDR_WIDTH => i_dac_delay'length, -- width of the address. Possibles values: [2, integer max value[ 
       g_DATA_WIDTH => i_dac'length    -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -150,7 +149,7 @@ begin
   --   . 1 clock latency
   --   . the dac_valid_r1 is synchronized with dac_rx when i_dac_delay = 0
   ---------------------------------------------------------------------
-  dac_frame_generator_INST : entity fpasim.dac_frame_generator
+  dac_frame_generator_INST : entity work.dac_frame_generator
     generic map(
       g_FRAME_SIZE => c_DAC_FRAME_SIZE  -- frame size. Possible values: [2;integer max value[
     )
@@ -169,7 +168,7 @@ begin
       o_data_valid => dac_valid_r1      -- output valid sample
     );
 
-  inst_dac_data_insert : entity fpasim.dac_data_insert
+  inst_dac_data_insert : entity work.dac_data_insert
     generic map(
       g_DAC_WIDTH => dac_rx'length
     )
@@ -202,7 +201,7 @@ begin
 ---------------------------------------------------------------------
 -- check if no hole in the output data flow
 ---------------------------------------------------------------------
-  inst_dac_check_dataflow : entity fpasim.dac_check_dataflow
+  inst_dac_check_dataflow : entity work.dac_check_dataflow
     port map(
       ---------------------------------------------------------------------
       -- input @i_dac_clk

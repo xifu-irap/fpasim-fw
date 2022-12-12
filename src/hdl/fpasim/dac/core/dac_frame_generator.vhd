@@ -49,8 +49,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_utils;
+use work.pkg_utils;
 
 entity dac_frame_generator is
   generic(
@@ -74,7 +73,7 @@ entity dac_frame_generator is
 end entity dac_frame_generator;
 
 architecture RTL of dac_frame_generator is
-  constant c_CNT_WIDTH : integer                            := fpasim.pkg_utils.pkg_width_from_value(g_FRAME_SIZE);
+  constant c_CNT_WIDTH : integer                            := work.pkg_utils.pkg_width_from_value(g_FRAME_SIZE);
   constant c_CNT_MAX   : unsigned(c_CNT_WIDTH - 1 downto 0) := to_unsigned(g_FRAME_SIZE - 1, c_CNT_WIDTH);
 
   type t_state is (E_RST, E_WAIT, E_RUN);
