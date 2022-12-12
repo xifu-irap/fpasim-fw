@@ -206,12 +206,7 @@ class SystemFpasimTopDataGen:
         fid = open(output_tb_filepath,'w')
 
         description_list = []
-        description_list.append("pipe_in: opal_kelly_type=0")
-        description_list.append("wire_in: opal_kelly_type=1")
-        description_list.append("trig_in: opal_kelly_type=2")
-        description_list.append("pipe_out: opal_kelly_type=10")
-        description_list.append("wire_out: opal_kelly_type=11")
-        description_list.append("trig_out: opal_kelly_type=12")
+        description_list.append("the reg_id is used to select the wire_in or the wire_out .....")
         description = ', '.join(description_list)
 
         fid.write("reg_id")
