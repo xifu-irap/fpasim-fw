@@ -48,7 +48,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library fpasim;
 
 entity adc_top is
   generic(
@@ -91,7 +90,7 @@ end entity adc_top;
 
 architecture RTL of adc_top is
 
-  constant c_FIFO_READ_LATENCY : natural := fpasim.pkg_fpasim.pkg_ADC_FIFO_READ_LATENCY;
+  constant c_FIFO_READ_LATENCY : natural := work.pkg_fpasim.pkg_ADC_FIFO_READ_LATENCY;
 
   ---------------------------------------------------------------------
   -- FIFO
@@ -146,7 +145,7 @@ begin
   data_tmp0(c_IDX1_H downto c_IDX1_L) <= i_adc1;
   data_tmp0(c_IDX0_H downto c_IDX0_L) <= i_adc0;
   wr_rst_tmp0                         <= '0';
-  inst_fifo_async_with_error : entity fpasim.fifo_async_with_error
+  inst_fifo_async_with_error : entity work.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
       g_FIFO_MEMORY_TYPE  => "distributed",
@@ -195,7 +194,7 @@ begin
   ---------------------------------------------------------------------
   -- apply a different delay on each adc data
   ---------------------------------------------------------------------
-  inst_dynamic_shift_register_adc0 : entity fpasim.dynamic_shift_register
+  inst_dynamic_shift_register_adc0 : entity work.dynamic_shift_register
     generic map(
       g_ADDR_WIDTH => i_adc0_delay'length,
       g_DATA_WIDTH => adc0_tmp1'length
@@ -209,7 +208,7 @@ begin
     );
 
 
-  inst_dynamic_shift_register_adc1 : entity fpasim.dynamic_shift_register
+  inst_dynamic_shift_register_adc1 : entity work.dynamic_shift_register
     generic map(
       g_ADDR_WIDTH => i_adc1_delay'length, -- width of the address. Possibles values: [2, integer max value[ 
       g_DATA_WIDTH => adc1_tmp1'length  -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -225,7 +224,7 @@ begin
 -- synchronize with the dynamic_shift_register output when i_adc0/1_delay = 0
 ---------------------------------------------------------------------
 data_valid1 <= data_valid_tmp1 and i_en;
-  inst_pipeliner_sync_with_dynamic_shift_register_when_delay_eq_0 : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_dynamic_shift_register_when_delay_eq_0 : entity work.pipeliner
     generic map(
       g_NB_PIPES   => 1,                -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -250,7 +249,7 @@ data_valid1 <= data_valid_tmp1 and i_en;
   error_tmp(1) <= errors_sync1(1);      -- fifo rd empty error
   error_tmp(0) <= errors_sync1(0);      -- fifo wr full error
   gen_errors_latch : for i in error_tmp'range generate
-    inst_one_error_latch : entity fpasim.one_error_latch
+    inst_one_error_latch : entity work.one_error_latch
       port map(
         i_clk         => i_clk,
         i_rst         => i_rst_status,
