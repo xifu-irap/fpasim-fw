@@ -36,8 +36,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_fpasim.all;
+use work.pkg_fpasim.all;
 
 entity amp_squid is
   generic(
@@ -213,7 +212,7 @@ begin
   pixel_result_tmp                <= i_pixel_result;
   amp_squid_offset_correction_tmp <= i_amp_squid_offset_correction;
 
-  inst_sub_sfixed_amp_squid : entity fpasim.sub_sfixed
+  inst_sub_sfixed_amp_squid : entity work.sub_sfixed
     generic map(
       -- port A: AMD Q notation (fixed point)
       g_Q_M_A => pkg_AMP_SQUID_SUB_Q_M_A,
@@ -245,7 +244,7 @@ begin
   data_pipe_tmp0(c_IDX2_H)                 <= i_pixel_sof;
   data_pipe_tmp0(c_IDX1_H)                 <= i_pixel_eof;
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
-  inst_pipeliner_sync_with_sub_sfixed_amp_squid_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_sub_sfixed_amp_squid_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => pkg_AMP_SQUID_SUB_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -271,7 +270,7 @@ begin
 
   amp_squid_tf_regcea <= '1';
 
-  inst_tdpram_amp_squid_tf : entity fpasim.tdpram
+  inst_tdpram_amp_squid_tf : entity work.tdpram
     generic map(
       -- port A
       g_ADDR_WIDTH_A       => amp_squid_tf_addra'length,
@@ -327,7 +326,7 @@ begin
   -------------------------------------------------------------------
   -- sync with rd RAM output
   -------------------------------------------------------------------
-  inst_pipeliner_sync_with_tdpram_amp_squid_tf_outa : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_tdpram_amp_squid_tf_outa : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_AMP_SQUID_TF_RAM_A_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -346,7 +345,7 @@ begin
   ---------------------------------------------------------------------
   -- ram check
   ---------------------------------------------------------------------
-  inst_ram_check_sdpram_amp_squid_tf : entity fpasim.ram_check
+  inst_ram_check_sdpram_amp_squid_tf : entity work.ram_check
     generic map(
       g_WR_ADDR_WIDTH => amp_squid_tf_addra'length,
       g_RD_ADDR_WIDTH => amp_squid_tf_addrb'length
@@ -373,7 +372,7 @@ begin
   data_pipe_tmp2(c_IDX2_H)                 <= pixel_sof_rx;
   data_pipe_tmp2(c_IDX1_H)                 <= pixel_eof_rx;
   data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_rx;
-  inst_pipeliner_sync_with_sdpram_amp_squid_tf_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_sdpram_amp_squid_tf_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_AMP_SQUID_TF_RAM_B_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp2'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -392,7 +391,7 @@ begin
   ---------------------------------------------------------------------
   -- get fpagain from a table
   ---------------------------------------------------------------------
-  inst_amp_squid_fpagain_table : entity fpasim.amp_squid_fpagain_table
+  inst_amp_squid_fpagain_table : entity work.amp_squid_fpagain_table
     generic map(
       -- port S: AMD Q notation (fixed point)
       g_Q_M_S       => pkg_AMP_SQUID_MULT_Q_M_B, -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
@@ -425,7 +424,7 @@ begin
   -- no change: already sfixed
   fpasim_gain_tmp  <= fpasim_gain;
 
-  inst_mult_sfixed_amp_squid_correction_and_tf : entity fpasim.mult_sfixed
+  inst_mult_sfixed_amp_squid_correction_and_tf : entity work.mult_sfixed
     generic map(
       -- port A: AMD Q notation (fixed point)
       g_Q_M_A => pkg_AMP_SQUID_MULT_Q_M_A,
@@ -457,9 +456,9 @@ begin
   data_pipe_tmp4(c_IDX2_H)                 <= pixel_sof_ry;
   data_pipe_tmp4(c_IDX1_H)                 <= pixel_eof_ry;
   data_pipe_tmp4(c_IDX0_H downto c_IDX0_L) <= pixel_id_ry;
-  inst_pipeliner_sync_with_mult_sfixed_amp_squid_correction_and_tf_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_mult_sfixed_amp_squid_correction_and_tf_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => fpasim.pkg_fpasim.pkg_AMP_SQUID_MULT_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => work.pkg_fpasim.pkg_AMP_SQUID_MULT_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp4'length -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -487,7 +486,7 @@ begin
   ---------------------------------------------------------------------
   error_tmp(0) <= amp_squid_tf_error;
   gen_errors_latch : for i in error_tmp'range generate
-    inst_one_error_latch : entity fpasim.one_error_latch
+    inst_one_error_latch : entity work.one_error_latch
       port map(
         i_clk         => i_clk,
         i_rst         => i_rst_status,

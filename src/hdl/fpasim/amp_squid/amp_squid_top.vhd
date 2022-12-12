@@ -30,8 +30,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library fpasim;
-use fpasim.pkg_fpasim.all;
+use work.pkg_fpasim.all;
 
 entity amp_squid_top is
   generic(
@@ -139,7 +138,7 @@ architecture RTL of amp_squid_top is
 
 begin
 
-  inst_amp_squid : entity fpasim.amp_squid
+  inst_amp_squid : entity work.amp_squid
     generic map(
       -- pixel
       g_PIXEL_ID_WIDTH              => i_pixel_id'length,
@@ -199,7 +198,7 @@ begin
   data_pipe_tmp0(c_IDX2_H)                 <= i_frame_sof;
   data_pipe_tmp0(c_IDX1_H)                 <= i_frame_eof;
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_frame_id;
-  inst_pipeliner_sync_with_amp_squid_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_amp_squid_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => pkg_AMP_SQUID_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
