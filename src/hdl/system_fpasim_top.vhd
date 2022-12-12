@@ -28,7 +28,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
 
 entity system_fpasim_top is
   port(
@@ -121,7 +120,7 @@ architecture RTL of system_fpasim_top is
   signal locked  : std_logic;
 
   ---------------------------------------------------------------------
-  -- fpasim
+  -- fpasim_top
   ---------------------------------------------------------------------
   -- adc
   signal adc_valid                       : std_logic;
@@ -146,7 +145,7 @@ begin
   ---------------------------------------------------------------------
   -- clock generation
   ---------------------------------------------------------------------
-  inst_clocking_top : entity fpasim.clocking_top
+  inst_clocking_top : entity work.clocking_top
     port map(
       ---------------------------------------------------------------------
       -- input
@@ -166,7 +165,7 @@ begin
   ---------------------------------------------------------------------
   -- top_fpasim
   ---------------------------------------------------------------------
-  inst_fpasim_top : entity fpasim.fpasim_top
+  inst_fpasim_top : entity work.fpasim_top
     generic map(
       g_DEBUG => false
     )
@@ -211,7 +210,7 @@ begin
   -- Xilinx IOs
   ---------------------------------------------------------------------
 
-  inst_io_top : entity fpasim.io_top
+  inst_io_top : entity work.io_top
     port map(
       ---------------------------------------------------------------------
       -- adc
