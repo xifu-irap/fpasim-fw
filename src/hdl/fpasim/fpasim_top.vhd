@@ -177,8 +177,9 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- regdecode
   ---------------------------------------------------------------------
-  -- clock
+  -- usb clock
   signal usb_clk : std_logic;
+
   -- ctrl register
   signal rst     : std_logic;
   signal en      : std_logic;
@@ -292,6 +293,16 @@ architecture RTL of fpasim_top is
   signal reg_rec_valid : std_logic;
   signal reg_rec_ctrl  : std_logic_vector(31 downto 0);
   signal reg_rec_conf0 : std_logic_vector(31 downto 0);
+
+  -- to the user @usb_clk
+  signal reg_usb_spi_valid : std_logic;
+  signal reg_usb_spi_ctrl : std_logic_vector(31 downto 0);
+  signal reg_usb_spi_conf : std_logic_vector(31 downto 0);
+  signal reg_usb_spi_wr_data : std_logic_vector(31 downto 0);
+  -- from the user @usb_clk
+  signal reg_usb_spi_rd_data_valid : std_logic;
+  signal reg_usb_spi_rd_data : std_logic_vector(31 downto 0);
+  signal reg_usb_spi_status : std_logic_vector(31 downto 0);
 
   signal reg_wire_errors3 : std_logic_vector(31 downto 0);
   signal reg_wire_errors2 : std_logic_vector(31 downto 0);
@@ -426,8 +437,17 @@ begin
       b_okUHU => b_okUHU,
       b_okAA  => b_okAA,
 
-      -- clock
-      o_usb_clk                         => usb_clk,      -- not connected
+      ---------------------------------------------------------------------
+      -- from/to the user @usb_clk
+      ---------------------------------------------------------------------
+      o_usb_clk                             => usb_clk,      -- not connected
+      o_reg_usb_spi_valid                   => reg_usb_spi_valid,
+      o_reg_usb_spi_ctrl                    => reg_usb_spi_ctrl,
+      o_reg_usb_spi_conf                    => reg_usb_spi_conf,
+      o_reg_usb_spi_wr_data                 => reg_usb_spi_wr_data,
+      i_reg_usb_spi_rd_data_valid           => reg_usb_spi_rd_data_valid,
+      i_reg_usb_spi_rd_data                 => reg_usb_spi_rd_data,
+      i_reg_usb_spi_status                  => reg_usb_spi_status,
       ---------------------------------------------------------------------
       -- from the board
       ---------------------------------------------------------------------
@@ -443,70 +463,70 @@ begin
       ---------------------------------------------------------------------
       -- tes_pulse_shape
       -- ram: wr
-      o_tes_pulse_shape_ram_wr_en       => tes_pulse_shape_ram_wr_en,  -- output write enable
-      o_tes_pulse_shape_ram_wr_rd_addr  => tes_pulse_shape_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
-      o_tes_pulse_shape_ram_wr_data     => tes_pulse_shape_ram_wr_data,  -- output data
+      o_tes_pulse_shape_ram_wr_en       => tes_pulse_shape_ram_wr_en,  
+      o_tes_pulse_shape_ram_wr_rd_addr  => tes_pulse_shape_ram_wr_rd_addr, 
+      o_tes_pulse_shape_ram_wr_data     => tes_pulse_shape_ram_wr_data, 
       -- ram: rd
-      o_tes_pulse_shape_ram_rd_en       => tes_pulse_shape_ram_rd_en,  -- output read enable
-      i_tes_pulse_shape_ram_rd_valid    => tes_pulse_shape_ram_rd_valid,  -- input read valid
-      i_tes_pulse_shape_ram_rd_data     => tes_pulse_shape_ram_rd_data,  -- input data
+      o_tes_pulse_shape_ram_rd_en       => tes_pulse_shape_ram_rd_en, 
+      i_tes_pulse_shape_ram_rd_valid    => tes_pulse_shape_ram_rd_valid, 
+      i_tes_pulse_shape_ram_rd_data     => tes_pulse_shape_ram_rd_data, 
       -- amp_squid_tf
       -- ram: wr
-      o_amp_squid_tf_ram_wr_en          => amp_squid_tf_ram_wr_en,  -- output write enable
-      o_amp_squid_tf_ram_wr_rd_addr     => amp_squid_tf_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
-      o_amp_squid_tf_ram_wr_data        => amp_squid_tf_ram_wr_data,  -- output data
+      o_amp_squid_tf_ram_wr_en          => amp_squid_tf_ram_wr_en, 
+      o_amp_squid_tf_ram_wr_rd_addr     => amp_squid_tf_ram_wr_rd_addr,  
+      o_amp_squid_tf_ram_wr_data        => amp_squid_tf_ram_wr_data, 
       -- ram: rd
-      o_amp_squid_tf_ram_rd_en          => amp_squid_tf_ram_rd_en,  -- output read enable
-      i_amp_squid_tf_ram_rd_valid       => amp_squid_tf_ram_rd_valid,  -- input read valid
-      i_amp_squid_tf_ram_rd_data        => amp_squid_tf_ram_rd_data,  -- input read data
+      o_amp_squid_tf_ram_rd_en          => amp_squid_tf_ram_rd_en, 
+      i_amp_squid_tf_ram_rd_valid       => amp_squid_tf_ram_rd_valid, 
+      i_amp_squid_tf_ram_rd_data        => amp_squid_tf_ram_rd_data, 
       -- mux_squid_tf
       -- ram: wr
-      o_mux_squid_tf_ram_wr_en          => mux_squid_tf_ram_wr_en,  -- output write enable
-      o_mux_squid_tf_ram_wr_rd_addr     => mux_squid_tf_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
-      o_mux_squid_tf_ram_wr_data        => mux_squid_tf_ram_wr_data,  -- output data
+      o_mux_squid_tf_ram_wr_en          => mux_squid_tf_ram_wr_en,  
+      o_mux_squid_tf_ram_wr_rd_addr     => mux_squid_tf_ram_wr_rd_addr, 
+      o_mux_squid_tf_ram_wr_data        => mux_squid_tf_ram_wr_data,  
       -- ram: rd
-      o_mux_squid_tf_ram_rd_en          => mux_squid_tf_ram_rd_en,  -- output read enable
-      i_mux_squid_tf_ram_rd_valid       => mux_squid_tf_ram_rd_valid,  -- input read valid
-      i_mux_squid_tf_ram_rd_data        => mux_squid_tf_ram_rd_data,  -- input read data
+      o_mux_squid_tf_ram_rd_en          => mux_squid_tf_ram_rd_en, 
+      i_mux_squid_tf_ram_rd_valid       => mux_squid_tf_ram_rd_valid, 
+      i_mux_squid_tf_ram_rd_data        => mux_squid_tf_ram_rd_data, 
       -- tes_std_state
       -- ram: wr
-      o_tes_std_state_ram_wr_en         => tes_std_state_ram_wr_en,  -- output write enable
-      o_tes_std_state_ram_wr_rd_addr    => tes_std_state_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
-      o_tes_std_state_ram_wr_data       => tes_std_state_ram_wr_data,  -- output data
+      o_tes_std_state_ram_wr_en         => tes_std_state_ram_wr_en, 
+      o_tes_std_state_ram_wr_rd_addr    => tes_std_state_ram_wr_rd_addr, 
+      o_tes_std_state_ram_wr_data       => tes_std_state_ram_wr_data, 
       -- ram: rd
-      o_tes_std_state_ram_rd_en         => tes_std_state_ram_rd_en,  -- output read enable
-      i_tes_std_state_ram_rd_valid      => tes_std_state_ram_rd_valid,  -- input read valid
-      i_tes_std_state_ram_rd_data       => tes_std_state_ram_rd_data,  -- input read data
+      o_tes_std_state_ram_rd_en         => tes_std_state_ram_rd_en, 
+      i_tes_std_state_ram_rd_valid      => tes_std_state_ram_rd_valid, 
+      i_tes_std_state_ram_rd_data       => tes_std_state_ram_rd_data, 
       -- mux_squid_offset
       -- ram: wr
-      o_mux_squid_offset_ram_wr_en      => mux_squid_offset_ram_wr_en,  -- output write enable
-      o_mux_squid_offset_ram_wr_rd_addr => mux_squid_offset_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
-      o_mux_squid_offset_ram_wr_data    => mux_squid_offset_ram_wr_data,  -- output data
+      o_mux_squid_offset_ram_wr_en      => mux_squid_offset_ram_wr_en, 
+      o_mux_squid_offset_ram_wr_rd_addr => mux_squid_offset_ram_wr_rd_addr, 
+      o_mux_squid_offset_ram_wr_data    => mux_squid_offset_ram_wr_data, 
       -- ram: rd
-      o_mux_squid_offset_ram_rd_en      => mux_squid_offset_ram_rd_en,  -- output read enable
-      i_mux_squid_offset_ram_rd_valid   => mux_squid_offset_ram_rd_valid,  -- input read valid
-      i_mux_squid_offset_ram_rd_data    => mux_squid_offset_ram_rd_data,  -- input read data
+      o_mux_squid_offset_ram_rd_en      => mux_squid_offset_ram_rd_en, 
+      i_mux_squid_offset_ram_rd_valid   => mux_squid_offset_ram_rd_valid, 
+      i_mux_squid_offset_ram_rd_data    => mux_squid_offset_ram_rd_data, 
       -- Register configuration
       ---------------------------------------------------------------------
       -- common register
-      o_reg_valid                       => reg_valid,    -- register valid
-      o_reg_fpasim_gain                 => reg_fpasim_gain,  -- register fpasim_gain value
-      o_reg_mux_sq_fb_delay             => reg_mux_sq_fb_delay,  -- register mux_sq_fb_delay value
-      o_reg_amp_sq_of_delay             => reg_amp_sq_of_delay,  -- register amp_sq_of_delay value
-      o_reg_error_delay                 => reg_error_delay,  -- register error_delay value
-      o_reg_ra_delay                    => reg_ra_delay,  -- register ra_delay value
-      o_reg_tes_conf                    => reg_tes_conf,  -- register tes_conf value
+      o_reg_valid                       => reg_valid,    
+      o_reg_fpasim_gain                 => reg_fpasim_gain, 
+      o_reg_mux_sq_fb_delay             => reg_mux_sq_fb_delay, 
+      o_reg_amp_sq_of_delay             => reg_amp_sq_of_delay, 
+      o_reg_error_delay                 => reg_error_delay,  
+      o_reg_ra_delay                    => reg_ra_delay, 
+      o_reg_tes_conf                    => reg_tes_conf, 
       -- ctrl register
-      o_reg_ctrl_valid                  => reg_ctrl_valid,  -- register ctrl valid
-      o_reg_ctrl                        => reg_ctrl,     -- register ctrl value
+      o_reg_ctrl_valid                  => reg_ctrl_valid,
+      o_reg_ctrl                        => reg_ctrl,  
       -- debug ctrl register
-      o_reg_debug_ctrl_valid            => reg_debug_ctrl_valid,  -- register debug_ctrl valid
-      o_reg_debug_ctrl                  => reg_debug_ctrl,  -- register debug_ctrl value
+      o_reg_debug_ctrl_valid            => reg_debug_ctrl_valid, 
+      o_reg_debug_ctrl                  => reg_debug_ctrl, 
       -- make pulse register
-      o_reg_make_sof                    => reg_make_sof,  -- first sample
-      o_reg_make_eof                    => reg_make_eof,  -- last sample
-      o_reg_make_pulse_valid            => reg_make_pulse_valid,  -- register make_pulse valid
-      o_reg_make_pulse                  => reg_make_pulse,  -- register make_pulse value
+      o_reg_make_sof                    => reg_make_sof, 
+      o_reg_make_eof                    => reg_make_eof,
+      o_reg_make_pulse_valid            => reg_make_pulse_valid, 
+      o_reg_make_pulse                  => reg_make_pulse,
       i_reg_make_pulse_ready            => reg_make_pulse_ready,
 
       -- recording: register
