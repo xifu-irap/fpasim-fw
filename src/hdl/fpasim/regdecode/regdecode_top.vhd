@@ -113,13 +113,23 @@ entity regdecode_top is
     b_okUHU : inout std_logic_vector(31 downto 0);
     b_okAA  : inout std_logic;
 
-    -- clock
-    o_usb_clk : out std_logic;
+    ---------------------------------------------------------------------
+    -- from/to the user @usb_clk
+    ---------------------------------------------------------------------
+    o_usb_clk             : out std_logic;  -- clock @usb_clk
+    o_reg_usb_spi_valid   : out std_logic;  -- valid spi_wr_data and spi_ctrl register
+    o_reg_usb_spi_ctrl    : out std_logic_vector(31 downto 0);  -- spi_ctrl register value
+    o_reg_usb_spi_conf    : out std_logic_vector(31 downto 0);  -- spi_ctrl register value
+    o_reg_usb_spi_wr_data : out std_logic_vector(31 downto 0);  -- spi_wr_data register value
+
+    i_reg_usb_spi_rd_data_valid : in std_logic;  -- to connect
+    i_reg_usb_spi_rd_data       : in std_logic_vector(31 downto 0);  -- spi_rd_data register value
+    i_reg_usb_spi_status        : in std_logic_vector(31 downto 0);  -- spi_status register value
 
     ---------------------------------------------------------------------
     -- from the board
     ---------------------------------------------------------------------
-    i_board_id : in std_logic_vector(7 downto 0);
+    i_board_id : in std_logic_vector(7 downto 0);  -- board id
 
     ---------------------------------------------------------------------
     -- from/to the user: @i_out_clk
@@ -203,16 +213,16 @@ entity regdecode_top is
     -- recording
     ---------------------------------------------------------------------
     -- register
-    o_reg_rec_valid               : out std_logic;
-    o_reg_rec_ctrl                : out std_logic_vector(31 downto 0);
-    o_reg_rec_conf0               : out std_logic_vector(31 downto 0);
+    o_reg_rec_valid               : out std_logic;  -- register rec_ctrl/rec_conf0 valid
+    o_reg_rec_ctrl                : out std_logic_vector(31 downto 0);  -- register rec_ctrl value
+    o_reg_rec_conf0               : out std_logic_vector(31 downto 0);  -- register rec_conf0 value
     -- data
-    o_reg_fifo_rec_adc_rd         : out std_logic;
-    i_reg_fifo_rec_adc_sof        : in  std_logic;
-    i_reg_fifo_rec_adc_eof        : in  std_logic;
-    i_reg_fifo_rec_adc_data_valid : in  std_logic;
-    i_reg_fifo_rec_adc_data       : in  std_logic_vector(31 downto 0);
-    i_reg_fifo_rec_adc_empty      : in  std_logic;
+    o_reg_fifo_rec_adc_rd         : out std_logic;  -- fifo read signal
+    i_reg_fifo_rec_adc_sof        : in  std_logic;  -- first sample
+    i_reg_fifo_rec_adc_eof        : in  std_logic;  -- last sample
+    i_reg_fifo_rec_adc_data_valid : in  std_logic;  -- data valid
+    i_reg_fifo_rec_adc_data       : in  std_logic_vector(31 downto 0);  -- data value
+    i_reg_fifo_rec_adc_empty      : in  std_logic;  -- fifo empty flag
 
     -- to the usb 
     ---------------------------------------------------------------------
@@ -231,17 +241,19 @@ entity regdecode_top is
 end entity regdecode_top;
 
 architecture RTL of regdecode_top is
-  -- rec valid
+  -- spi_valid
+  constant c_TRIGIN_SPI_VALID_IDX_H        : integer := pkg_TRIGIN_SPI_VALID_IDX_H;
+  -- rec_valid
   constant c_TRIGIN_REC_VALID_IDX_H        : integer := pkg_TRIGIN_REC_VALID_IDX_H;
-  -- debug valid
+  -- debug_valid
   constant c_TRIGIN_DEBUG_VALID_IDX_H      : integer := pkg_TRIGIN_DEBUG_VALID_IDX_H;
-  -- ctrl valid
+  -- ctrl_valid
   constant c_TRIGIN_CTRL_VALID_IDX_H       : integer := pkg_TRIGIN_CTRL_VALID_IDX_H;
-  -- read all
+  -- read_all
   constant c_TRIGIN_READ_ALL_VALID_IDX_H   : integer := pkg_TRIGIN_READ_ALL_VALID_IDX_H;
-  -- make pulse valid
+  -- make_pulse valid
   constant c_TRIGIN_MAKE_PULSE_VALID_IDX_H : integer := pkg_TRIGIN_MAKE_PULSE_VALID_IDX_H;
-  -- reg valid
+  -- reg_valid
   constant c_TRIGIN_REG_VALID_IDX_H        : integer := pkg_TRIGIN_REG_VALID_IDX_H;
 
   -- firwmare id
@@ -269,9 +281,11 @@ architecture RTL of regdecode_top is
   signal usb_wireout_fifo_data_count     : std_logic_vector(31 downto 0);
   -- trig
   signal usb_trigout_data                : std_logic_vector(31 downto 0);
-  -- wire
+  -- ctrl: register
   signal usb_wireout_ctrl                : std_logic_vector(31 downto 0);
+  -- make_pulse: register
   signal usb_wireout_make_pulse          : std_logic_vector(31 downto 0);
+  -- common: register
   signal usb_wireout_fpasim_gain         : std_logic_vector(31 downto 0);
   signal usb_wireout_mux_sq_fb_delay     : std_logic_vector(31 downto 0);
   signal usb_wireout_amp_sq_of_delay     : std_logic_vector(31 downto 0);
@@ -289,6 +303,12 @@ architecture RTL of regdecode_top is
   signal usb_pipeout_rec_fifo_adc_rd     : std_logic;  --  read fifo
   signal usb_pipeout_rec_fifo_adc_data   : std_logic_vector(31 downto 0);
   signal usb_wireout_rec_fifo_data_count : std_logic_vector(31 downto 0);
+  -- spi: register
+  signal usb_wireout_spi_ctrl            : std_logic_vector(31 downto 0);
+  signal usb_wireout_spi_conf            : std_logic_vector(31 downto 0);
+  signal usb_wireout_spi_wr_data         : std_logic_vector(31 downto 0);
+  signal usb_wireout_spi_rd_data         : std_logic_vector(31 downto 0);
+  signal usb_wireout_spi_status          : std_logic_vector(31 downto 0);
   -- errors/status
   signal usb_wireout_sel_errors          : std_logic_vector(31 downto 0);
   signal usb_wireout_errors              : std_logic_vector(31 downto 0);
@@ -302,20 +322,27 @@ architecture RTL of regdecode_top is
   signal usb_pipein_fifo            : std_logic_vector(31 downto 0);
   -- trig
   signal usb_trigin_data            : std_logic_vector(31 downto 0);
-  -- wire
+  -- ctrl: register
   signal usb_wirein_ctrl            : std_logic_vector(31 downto 0);
+  -- make_pulse: register
   signal usb_wirein_make_pulse      : std_logic_vector(31 downto 0);
+  -- common: register
   signal usb_wirein_fpasim_gain     : std_logic_vector(31 downto 0);
   signal usb_wirein_mux_sq_fb_delay : std_logic_vector(31 downto 0);
   signal usb_wirein_amp_sq_of_delay : std_logic_vector(31 downto 0);
   signal usb_wirein_error_delay     : std_logic_vector(31 downto 0);
   signal usb_wirein_ra_delay        : std_logic_vector(31 downto 0);
   signal usb_wirein_tes_conf        : std_logic_vector(31 downto 0);
-  -- recording
+  -- recording: register
   signal usb_wirein_rec_ctrl        : std_logic_vector(31 downto 0);
   signal usb_wirein_rec_conf0       : std_logic_vector(31 downto 0);
 
-  -- debug
+  -- spi:register
+  signal usb_wirein_spi_ctrl    : std_logic_vector(31 downto 0);
+  signal usb_wirein_spi_conf    : std_logic_vector(31 downto 0);
+  signal usb_wirein_spi_wr_data : std_logic_vector(31 downto 0);
+
+  -- debug: register
   signal usb_wirein_debug_ctrl : std_logic_vector(31 downto 0);
   signal usb_wirein_sel_errors : std_logic_vector(31 downto 0);
 
@@ -328,6 +355,7 @@ architecture RTL of regdecode_top is
   signal trig_ctrl_valid       : std_logic;
   signal trig_debug_valid      : std_logic;
   signal trig_rec_valid        : std_logic;
+  signal trig_spi_valid        : std_logic;
 
   signal pipein_valid0 : std_logic;
   signal pipein_addr0  : std_logic_vector(15 downto 0);
@@ -588,37 +616,61 @@ begin
       o_usb_pipeout_rec_fifo_adc_rd     => usb_pipeout_rec_fifo_adc_rd,
       i_usb_pipeout_rec_fifo_adc_data   => usb_pipeout_rec_fifo_adc_data,
       i_usb_wireout_rec_fifo_data_count => usb_wireout_rec_fifo_data_count,  -- to connect
+      -- spi: register
+      i_usb_wireout_spi_ctrl            => usb_wireout_spi_ctrl,
+      i_usb_wireout_spi_conf            => usb_wireout_spi_conf,
+      i_usb_wireout_spi_wr_data         => usb_wireout_spi_wr_data,
+      i_usb_wireout_spi_rd_data         => i_reg_usb_spi_rd_data,
+      i_usb_wireout_spi_status          => i_reg_usb_spi_status,
+
       -- errors/status
-      i_usb_wireout_sel_errors          => usb_wireout_sel_errors,
-      i_usb_wireout_errors              => usb_wireout_errors,
-      i_usb_wireout_status              => usb_wireout_status,
+      i_usb_wireout_sel_errors     => usb_wireout_sel_errors,
+      i_usb_wireout_errors         => usb_wireout_errors,
+      i_usb_wireout_status         => usb_wireout_status,
       ---------------------------------------------------------------------
       -- to the user @o_usb_clk
       ---------------------------------------------------------------------
-      o_usb_clk                         => usb_clk,               -- usb clock
+      o_usb_clk                    => usb_clk,  -- usb clock
       -- pipe
-      o_usb_pipein_fifo_valid           => usb_pipein_fifo_valid,
-      o_usb_pipein_fifo                 => usb_pipein_fifo,
+      o_usb_pipein_fifo_valid      => usb_pipein_fifo_valid,
+      o_usb_pipein_fifo            => usb_pipein_fifo,
       -- trig
-      o_usb_trigin_data                 => usb_trigin_data,
+      o_usb_trigin_data            => usb_trigin_data,
       -- wire
-      o_usb_wirein_ctrl                 => usb_wirein_ctrl,
-      o_usb_wirein_make_pulse           => usb_wirein_make_pulse,
-      o_usb_wirein_fpasim_gain          => usb_wirein_fpasim_gain,
-      o_usb_wirein_mux_sq_fb_delay      => usb_wirein_mux_sq_fb_delay,
-      o_usb_wirein_amp_sq_of_delay      => usb_wirein_amp_sq_of_delay,
-      o_usb_wirein_error_delay          => usb_wirein_error_delay,
-      o_usb_wirein_ra_delay             => usb_wirein_ra_delay,
-      o_usb_wirein_tes_conf             => usb_wirein_tes_conf,
+      o_usb_wirein_ctrl            => usb_wirein_ctrl,
+      o_usb_wirein_make_pulse      => usb_wirein_make_pulse,
+      o_usb_wirein_fpasim_gain     => usb_wirein_fpasim_gain,
+      o_usb_wirein_mux_sq_fb_delay => usb_wirein_mux_sq_fb_delay,
+      o_usb_wirein_amp_sq_of_delay => usb_wirein_amp_sq_of_delay,
+      o_usb_wirein_error_delay     => usb_wirein_error_delay,
+      o_usb_wirein_ra_delay        => usb_wirein_ra_delay,
+      o_usb_wirein_tes_conf        => usb_wirein_tes_conf,
       -- recording
-      o_usb_wirein_rec_ctrl             => usb_wirein_rec_ctrl,   -- to connect
-      o_usb_wirein_rec_conf0            => usb_wirein_rec_conf0,  -- to connect
+      o_usb_wirein_rec_ctrl        => usb_wirein_rec_ctrl,
+      o_usb_wirein_rec_conf0       => usb_wirein_rec_conf0,
+      -- spi: register
+      o_usb_wirein_spi_ctrl        => usb_wirein_spi_ctrl,
+      o_usb_wirein_spi_conf        => usb_wirein_spi_conf,
+      o_usb_wirein_spi_wr_data     => usb_wirein_spi_wr_data,
+
       -- debug
-      o_usb_wirein_debug_ctrl           => usb_wirein_debug_ctrl,
-      o_usb_wirein_sel_errors           => usb_wirein_sel_errors
+      o_usb_wirein_debug_ctrl => usb_wirein_debug_ctrl,
+      o_usb_wirein_sel_errors => usb_wirein_sel_errors
       );
 
-  o_usb_clk <= usb_clk;
+  ---------------------------------------------------------------------
+  -- output @usb_clk
+  ---------------------------------------------------------------------
+  o_usb_clk             <= usb_clk;
+  o_reg_usb_spi_valid   <= trig_spi_valid;
+  o_reg_usb_spi_ctrl    <= usb_wirein_spi_ctrl;
+  o_reg_usb_spi_conf    <= usb_wirein_spi_conf;
+  o_reg_usb_spi_wr_data <= usb_wirein_spi_wr_data;
+
+  -- loop back register value
+  usb_wireout_spi_ctrl    <= usb_wirein_spi_ctrl;
+  usb_wireout_spi_conf    <= usb_wirein_spi_conf;
+  usb_wireout_spi_wr_data <= usb_wirein_spi_wr_data;
 
   ---------------------------------------------------------------------
   -- get the firmware id
@@ -628,6 +680,7 @@ begin
   usb_wireout_board_id         <= std_logic_vector(resize(unsigned(i_board_id), usb_wireout_board_id'length));
 
   -- from trigin: extract bits signal
+  trig_spi_valid        <= usb_trigin_data(c_TRIGIN_SPI_VALID_IDX_H);
   trig_rec_valid        <= usb_trigin_data(c_TRIGIN_REC_VALID_IDX_H);
   trig_debug_valid      <= usb_trigin_data(c_TRIGIN_DEBUG_VALID_IDX_H);
   trig_ctrl_valid       <= usb_trigin_data(c_TRIGIN_CTRL_VALID_IDX_H);

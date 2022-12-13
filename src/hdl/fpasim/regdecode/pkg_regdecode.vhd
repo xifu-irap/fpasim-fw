@@ -100,18 +100,19 @@ PACKAGE pkg_regdecode IS
 
     -- trig in
     ---------------------------------------------------------------------
-    
-    -- user-defined: rec valid (bit index)
+    -- user-defined: spi_valid (bit index)
+    constant pkg_TRIGIN_SPI_VALID_IDX_H : integer := 24;
+    -- user-defined: rec_valid (bit index)
     constant pkg_TRIGIN_REC_VALID_IDX_H : integer := 20;
-    -- user-defined: debug valid (bit index)
+    -- user-defined: debug_valid (bit index)
     constant pkg_TRIGIN_DEBUG_VALID_IDX_H : integer := 16;
-    -- user-defined: ctrl valid (bit index)
+    -- user-defined: ctrl_valid (bit index)
     constant pkg_TRIGIN_CTRL_VALID_IDX_H : integer := 12;
-    -- user-defined: read all (bit index)
+    -- user-defined: read_all (bit index)
     constant pkg_TRIGIN_READ_ALL_VALID_IDX_H : integer := 8;
-    -- user-defined: make pulse valid (bit index)
+    -- user-defined: make_pulse valid (bit index)
     constant pkg_TRIGIN_MAKE_PULSE_VALID_IDX_H : integer := 4;
-    -- user-defined: reg valid (bit index)
+    -- user-defined: reg_valid (bit index)
     constant pkg_TRIGIN_REG_VALID_IDX_H : integer := 0;
 
     -- wire in/wire out
@@ -235,6 +236,19 @@ PACKAGE pkg_regdecode IS
     -- auto-computed: rec_adc_nb_word32b width
     constant pkg_REC_CONF0_ADC_NB_WORD32b_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_REC_CONF0_ADC_NB_WORD32b_IDX_H, i_idx_low => pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L);
 
+    -- user-defined: spi_ctrl
+    ---------------------------------------------------------------------
+    -- user-defined: spi_mode (bit index high)
+    constant pkg_SPI_CTRL_MODE_IDX_H : integer := 0;
+
+    -- user-defined: spi_id (bit index high)
+    constant pkg_SPI_CTRL_ID_IDX_H : integer := 6;
+    -- user-defined: spi_id (bit index low)
+    constant pkg_SPI_CTRL_ID_IDX_L : integer := 4;
+    -- auto-computed: spi_id width
+    constant pkg_SPI_CTRL_ID_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_SPI_CTRL_ID_IDX_H, i_idx_low => pkg_SPI_CTRL_ID_IDX_L);
+
+    
 
     -- user-defined: debug_ctrl 
     ---------------------------------------------------------------------
