@@ -161,6 +161,14 @@ architecture RTL of fpasim_top is
   constant c_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L : integer := pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L;
   constant c_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH : integer := pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH;
 
+  -- rec_ctrl
+  ---------------------------------------------------------------------
+  constant c_REC_CTRL_ADC_EN_IDX_H : integer := pkg_REC_CTRL_ADC_EN_IDX_H;
+
+  -- rec_conf0
+  ---------------------------------------------------------------------
+  constant c_REC_CONF0_ADC_NB_WORD32b_IDX_H : integer := pkg_REC_CONF0_ADC_NB_WORD32b_IDX_H;
+  constant c_REC_CONF0_ADC_NB_WORD32b_IDX_L : integer := pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L;
   -- debug_ctrl
   ---------------------------------------------------------------------
   constant c_DEBUG_CTRL_DEBUG_PULSE_IDX_H : integer := pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H;
@@ -564,8 +572,8 @@ begin
   rst_status  <= reg_debug_ctrl(c_DEBUG_CTRL_RST_STATUS_IDX_H);
 
   -- extract fields from the reg_rec_ctrl register
-  rec_adc_cmd_valid             <= reg_rec_valid and reg_rec_ctrl(0);
-  rec_adc_cmd_nb_words_by_block <= reg_rec_conf0(15 downto 0);
+  rec_adc_cmd_valid             <= reg_rec_valid and reg_rec_ctrl(c_REC_CTRL_ADC_EN_IDX_H);
+  rec_adc_cmd_nb_words_by_block <= reg_rec_conf0(c_REC_CONF0_ADC_NB_WORD32b_IDX_H downto c_REC_CONF0_ADC_NB_WORD32b_IDX_L);
 
   -- errors
   reg_wire_errors3(31 downto 16) <= (others => '0');
