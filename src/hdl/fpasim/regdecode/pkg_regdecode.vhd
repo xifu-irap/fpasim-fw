@@ -100,20 +100,17 @@ PACKAGE pkg_regdecode IS
 
     -- trig in
     ---------------------------------------------------------------------
+    
     -- user-defined: rec valid (bit index)
-    constant c_TRIGIN_REC_VALID_IDX_H : integer := 20;
+    constant pkg_TRIGIN_REC_VALID_IDX_H : integer := 20;
     -- user-defined: debug valid (bit index)
     constant pkg_TRIGIN_DEBUG_VALID_IDX_H : integer := 16;
-
     -- user-defined: ctrl valid (bit index)
     constant pkg_TRIGIN_CTRL_VALID_IDX_H : integer := 12;
-
     -- user-defined: read all (bit index)
     constant pkg_TRIGIN_READ_ALL_VALID_IDX_H : integer := 8;
-
     -- user-defined: make pulse valid (bit index)
     constant pkg_TRIGIN_MAKE_PULSE_VALID_IDX_H : integer := 4;
-
     -- user-defined: reg valid (bit index)
     constant pkg_TRIGIN_REG_VALID_IDX_H : integer := 0;
 

@@ -232,7 +232,7 @@ end entity regdecode_top;
 
 architecture RTL of regdecode_top is
   -- rec valid
-  constant c_TRIGIN_REC_VALID_IDX_H        : integer := c_TRIGIN_REC_VALID_IDX_H;
+  constant c_TRIGIN_REC_VALID_IDX_H        : integer := pkg_TRIGIN_REC_VALID_IDX_H;
   -- debug valid
   constant c_TRIGIN_DEBUG_VALID_IDX_H      : integer := pkg_TRIGIN_DEBUG_VALID_IDX_H;
   -- ctrl valid
