@@ -223,16 +223,16 @@ PACKAGE pkg_regdecode IS
 
     -- user-defined: rec_ctrl
     ---------------------------------------------------------------------
-    -- user-defined: fpasim_gain (bit index high)
+    -- user-defined: rec_adc_en (bit index high)
     constant pkg_REC_CTRL_ADC_EN_IDX_H : integer := 0;
 
     -- user-defined: rec_conf0
     ---------------------------------------------------------------------
-    -- user-defined: rec_conf0 (bit index high)
+    -- user-defined: rec_adc_nb_word32b (bit index high)
     constant pkg_REC_CONF0_ADC_NB_WORD32b_IDX_H : integer := 15;
-    -- user-defined: rec_conf0 (bit index low)
+    -- user-defined: rec_adc_nb_word32b (bit index low)
     constant pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L : integer := 0;
-    -- auto-computed: rec_conf0 width
+    -- auto-computed: rec_adc_nb_word32b width
     constant pkg_REC_CONF0_ADC_NB_WORD32b_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_REC_CONF0_ADC_NB_WORD32b_IDX_H, i_idx_low => pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L);
 
 
