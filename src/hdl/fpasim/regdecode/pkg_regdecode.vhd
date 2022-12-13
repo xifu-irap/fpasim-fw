@@ -221,6 +221,21 @@ PACKAGE pkg_regdecode IS
     -- auto-computed: frame_length width
     constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);
 
+    -- user-defined: rec_ctrl
+    ---------------------------------------------------------------------
+    -- user-defined: fpasim_gain (bit index high)
+    constant pkg_REC_CTRL_ADC_EN_IDX_H : integer := 0;
+
+    -- user-defined: rec_conf0
+    ---------------------------------------------------------------------
+    -- user-defined: rec_conf0 (bit index high)
+    constant pkg_REC_CONF0_ADC_NB_WORD32b_IDX_H : integer := 15;
+    -- user-defined: rec_conf0 (bit index low)
+    constant pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L : integer := 0;
+    -- auto-computed: rec_conf0 width
+    constant pkg_REC_CONF0_ADC_NB_WORD32b_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_REC_CONF0_ADC_NB_WORD32b_IDX_H, i_idx_low => pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L);
+
+
     -- user-defined: debug_ctrl 
     ---------------------------------------------------------------------
     -- user-defined: debug_pulse (bit index)
@@ -237,5 +252,6 @@ PACKAGE pkg_regdecode IS
     -- auto-computed: error_sel width
     constant pkg_ERROR_SEL_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_ERROR_SEL_IDX_H, i_idx_low => pkg_ERROR_SEL_IDX_L);
 
+    
 END pkg_regdecode;
 
