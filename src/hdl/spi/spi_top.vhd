@@ -38,9 +38,9 @@ use ieee.numeric_std.all;
 
 entity spi_top is
   port (
-    i_clk         : in std_logic;       -- clock
-    i_rst         : in std_logic;       -- reset
-    i_rst_status  : in std_logic;       -- reset error flag(s)
+    i_clk         : in std_logic;  -- clock
+    i_rst         : in std_logic;  -- reset
+    i_rst_status  : in std_logic;  -- reset error flag(s)
     i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     ---------------------------------------------------------------------
@@ -422,12 +422,14 @@ begin
   o_spi_ready <= ready_r1;
 
   -- to the regdecode
+  o_spi_rd_data_valid           <= rd_data_valid_r1;
+  o_spi_rd_data                 <= rd_data_r1;
   o_reg_spi_status(31 downto 9) <= (others => '0');
-  o_reg_spi_status(8)          <= cdce_status(0);
-  o_reg_spi_status(7 downto 5) <= (others => '0');
-  o_reg_spi_status(4)          <= amc_status(0);
-  o_reg_spi_status(3 downto 1) <= (others => '0');
-  o_reg_spi_status(0)          <= ready_r1;
+  o_reg_spi_status(8)           <= amc_status(0);
+  o_reg_spi_status(7 downto 5)  <= (others => '0');
+  o_reg_spi_status(4)           <= cdce_status(0);
+  o_reg_spi_status(3 downto 1)  <= (others => '0');
+  o_reg_spi_status(0)           <= ready_r1;
 
   ---------------------------------------------------------------------
   -- tx pipeline
