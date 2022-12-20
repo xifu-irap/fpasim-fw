@@ -34,10 +34,10 @@
 --!        o_errors/o_status <--------- select output |<-------------  fifo_async <------------- i_reg_wire_errors3 (@i_out_clk)
 --!                                                   |<-------------  pass       <------------- i_usb_reg_errors0 (@i_clk)
 --!                                                   |<-------------  pass       <-------------          .  
---!                                                   |<-------------  pass       <------------- i_usb_reg_errors5 (@i_clk)
+--!                                                   |<-------------  pass       <------------- i_usb_reg_errorsx (@i_clk)
 --!                                                   |-------------------------------------------------------------------->
 --!                                                                                                                         |
---!                                                                        |<-------------  /=0 ?    <------------- errors8 synchronized
+--!                                                                        |<-------------  /=0 ?    <------------- errorsx synchronized
 --!                                                                        |<-------------  /=0 ?    <-------------         .
 --!        errors_valid <-- rising_edge detection <-- /= last value? ------|<-------------  /=0 ?    <-------------         .
 --!                                                                        |<-------------  /=0 ?    <-------------         .
@@ -78,6 +78,7 @@ entity regdecode_wire_errors is
     i_clk               : in  std_logic;
     i_error_sel         : in  std_logic_vector(g_ERROR_SEL_WIDTH - 1 downto 0);
     -- errors
+    i_usb_reg_errors6   : in  std_logic_vector(31 downto 0);
     i_usb_reg_errors5   : in  std_logic_vector(31 downto 0);
     i_usb_reg_errors4   : in  std_logic_vector(31 downto 0);
     i_usb_reg_errors3   : in  std_logic_vector(31 downto 0);
@@ -85,6 +86,7 @@ entity regdecode_wire_errors is
     i_usb_reg_errors1   : in  std_logic_vector(31 downto 0);
     i_usb_reg_errors0   : in  std_logic_vector(31 downto 0);
     -- status
+    i_usb_reg_status6   : in  std_logic_vector(31 downto 0);
     i_usb_reg_status5   : in  std_logic_vector(31 downto 0);
     i_usb_reg_status4   : in  std_logic_vector(31 downto 0);
     i_usb_reg_status3   : in  std_logic_vector(31 downto 0);
@@ -115,7 +117,7 @@ architecture RTL of regdecode_wire_errors is
   -- select output error and 
   -- for each error word, generate an associated trig bit if the error value is different of 0
   ---------------------------------------------------------------------
-  constant c_NB_ERRORS_ALL : integer := 10;
+  constant c_NB_ERRORS_ALL : integer := 11;
   signal errors_tmp        : t_errors(0 to c_NB_ERRORS_ALL - 1);
   signal status_tmp        : t_status(0 to c_NB_ERRORS_ALL - 1);
 
@@ -308,10 +310,11 @@ begin
   -- select output errors and 
   -- for each error word, generate an associated trig bit if the error value is different of 0
   -----------------------------------------------------------------
-  errors_tmp(9) <= errors_tmp1(3);
-  errors_tmp(8) <= errors_tmp1(2);
-  errors_tmp(7) <= errors_tmp1(1);
-  errors_tmp(6) <= errors_tmp1(0);
+  errors_tmp(10) <= errors_tmp1(3);
+  errors_tmp(9) <= errors_tmp1(2);
+  errors_tmp(8) <= errors_tmp1(1);
+  errors_tmp(7) <= errors_tmp1(0);
+  errors_tmp(6) <= i_usb_reg_errors6;
   errors_tmp(5) <= i_usb_reg_errors5;
   errors_tmp(4) <= i_usb_reg_errors4;
   errors_tmp(3) <= i_usb_reg_errors3;
@@ -319,16 +322,17 @@ begin
   errors_tmp(1) <= i_usb_reg_errors1;
   errors_tmp(0) <= i_usb_reg_errors0;
 
-  status_tmp(9) <= errors_tmp1(3);
-  status_tmp(8) <= errors_tmp1(2);
-  status_tmp(7) <= errors_tmp1(1);
-  status_tmp(6) <= errors_tmp1(0);
-  status_tmp(5) <= i_usb_reg_errors5;
-  status_tmp(4) <= i_usb_reg_errors4;
-  status_tmp(3) <= i_usb_reg_errors3;
-  status_tmp(2) <= i_usb_reg_errors2;
-  status_tmp(1) <= i_usb_reg_errors1;
-  status_tmp(0) <= i_usb_reg_errors0;
+  status_tmp(10) <= status_tmp1(3);
+  status_tmp(9) <= status_tmp1(2);
+  status_tmp(8) <= status_tmp1(1);
+  status_tmp(7) <= status_tmp1(0);
+  status_tmp(6) <= i_usb_reg_status6;
+  status_tmp(5) <= i_usb_reg_status5;
+  status_tmp(4) <= i_usb_reg_status4;
+  status_tmp(3) <= i_usb_reg_status3;
+  status_tmp(2) <= i_usb_reg_status2;
+  status_tmp(1) <= i_usb_reg_status1;
+  status_tmp(0) <= i_usb_reg_status0;
 
   p_select_error_status : process(i_clk) is
   begin
@@ -361,9 +365,12 @@ begin
         when "1000" =>
           errors_r1 <= errors_tmp(8);
           status_r1 <= status_tmp(8);
-        when others =>
+        when "1001" =>
           errors_r1 <= errors_tmp(9);
           status_r1 <= status_tmp(9);
+        when others =>
+          errors_r1 <= errors_tmp(10);
+          status_r1 <= status_tmp(10);
       end case;
 
       for i in errors_tmp1'range loop

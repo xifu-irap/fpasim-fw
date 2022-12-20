@@ -117,15 +117,23 @@ entity regdecode_top is
     -- from/to the user @usb_clk
     ---------------------------------------------------------------------
     o_usb_clk             : out std_logic;  -- clock @usb_clk
-    o_reg_usb_spi_valid   : out std_logic;  -- valid spi_wr_data and spi_ctrl register
-    o_reg_usb_spi_ctrl    : out std_logic_vector(31 downto 0);  -- spi_ctrl register value
-    o_reg_usb_spi_conf    : out std_logic_vector(31 downto 0);  -- spi_ctrl register value
-    o_reg_usb_spi_wr_data : out std_logic_vector(31 downto 0);  -- spi_wr_data register value
+    o_usb_rst_status        : out std_logic; -- reset error flag(s)
+    o_usb_debug_pulse       : out std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
-    i_reg_usb_spi_rd_data_valid : in std_logic;  -- to connect
-    i_reg_usb_spi_rd_data       : in std_logic_vector(31 downto 0);  -- spi_rd_data register value
-    i_reg_usb_spi_status        : in std_logic_vector(31 downto 0);  -- spi_status register value
+    -- spi: tx
+    o_reg_spi_valid   : out std_logic;  -- valid spi_wr_data and spi_ctrl register
+    o_reg_spi_ctrl    : out std_logic_vector(31 downto 0);  -- spi_ctrl register value
+    o_reg_spi_conf    : out std_logic_vector(31 downto 0);  -- spi_ctrl register value
+    o_reg_spi_wr_data : out std_logic_vector(31 downto 0);  -- spi_wr_data register value
 
+    -- spi: rx
+    i_reg_spi_rd_data_valid : in std_logic;  -- to connect
+    i_reg_spi_rd_data       : in std_logic_vector(31 downto 0);  -- spi_rd_data register value
+    -- spi: status
+    i_reg_spi_status        : in std_logic_vector(31 downto 0);  -- spi_status register value
+
+    i_spi_errors: in std_logic_vector(15 downto 0);
+    i_spi_status: in std_logic_vector(7 downto 0);
     ---------------------------------------------------------------------
     -- from the board
     ---------------------------------------------------------------------
@@ -564,6 +572,7 @@ architecture RTL of regdecode_top is
   signal wire_errors       : std_logic_vector(i_reg_wire_errors0'range);
   signal wire_status       : std_logic_vector(i_reg_wire_status0'range);
 
+  signal regdecode_errors6 : std_logic_vector(i_reg_wire_errors0'range);
   signal regdecode_errors5 : std_logic_vector(i_reg_wire_errors0'range);
   signal regdecode_errors4 : std_logic_vector(i_reg_wire_errors0'range);
   signal regdecode_errors3 : std_logic_vector(i_reg_wire_errors0'range);
@@ -571,6 +580,7 @@ architecture RTL of regdecode_top is
   signal regdecode_errors1 : std_logic_vector(i_reg_wire_errors0'range);
   signal regdecode_errors0 : std_logic_vector(i_reg_wire_errors0'range);
 
+  signal regdecode_status6 : std_logic_vector(i_reg_wire_status0'range);
   signal regdecode_status5 : std_logic_vector(i_reg_wire_status0'range);
   signal regdecode_status4 : std_logic_vector(i_reg_wire_status0'range);
   signal regdecode_status3 : std_logic_vector(i_reg_wire_status0'range);
@@ -620,8 +630,8 @@ begin
       i_usb_wireout_spi_ctrl            => usb_wireout_spi_ctrl,
       i_usb_wireout_spi_conf            => usb_wireout_spi_conf,
       i_usb_wireout_spi_wr_data         => usb_wireout_spi_wr_data,
-      i_usb_wireout_spi_rd_data         => i_reg_usb_spi_rd_data,
-      i_usb_wireout_spi_status          => i_reg_usb_spi_status,
+      i_usb_wireout_spi_rd_data         => i_reg_spi_rd_data,
+      i_usb_wireout_spi_status          => i_reg_spi_status,
 
       -- errors/status
       i_usb_wireout_sel_errors     => usb_wireout_sel_errors,
@@ -662,10 +672,13 @@ begin
   -- output @usb_clk
   ---------------------------------------------------------------------
   o_usb_clk             <= usb_clk;
-  o_reg_usb_spi_valid   <= trig_spi_valid;
-  o_reg_usb_spi_ctrl    <= usb_wirein_spi_ctrl;
-  o_reg_usb_spi_conf    <= usb_wirein_spi_conf;
-  o_reg_usb_spi_wr_data <= usb_wirein_spi_wr_data;
+  o_reg_spi_valid   <= trig_spi_valid;
+  o_reg_spi_ctrl    <= usb_wirein_spi_ctrl;
+  o_reg_spi_conf    <= usb_wirein_spi_conf;
+  o_reg_spi_wr_data <= usb_wirein_spi_wr_data;
+
+  o_usb_rst_status  <= usb_rst_status;
+  o_usb_debug_pulse  <= usb_debug_pulse;
 
   -- loop back register value
   usb_wireout_spi_ctrl    <= usb_wirein_spi_ctrl;
@@ -1181,6 +1194,10 @@ begin
   ---------------------------------------------------------------------
   -- regdecode errors/status
   ---------------------------------------------------------------------
+  -- errors
+  regdecode_errors6(31 downto 16) <= (others => '0');  
+  regdecode_errors6(15 downto 0)  <= i_spi_errors;  -- spi register: output errors
+  
   regdecode_errors5(31 downto 16) <= rec_errors1;  -- rec_conf0 register: output errors
   regdecode_errors5(15 downto 0)  <= rec_errors0;  -- rec_ctrl/rec_conf0 register: output errors
 
@@ -1198,6 +1215,12 @@ begin
 
   regdecode_errors0(31 downto 16) <= regdecode_pipe_errors1;  -- amp squid tf: output errors
   regdecode_errors0(15 downto 0)  <= regdecode_pipe_errors0;  -- tes pulse shape: output errors
+
+  -- status
+  regdecode_status6(31 downto 24) <= (others => '0');
+  regdecode_status6(23 downto 16) <= (others => '0');  
+  regdecode_status6(15 downto 8)  <= (others => '0');
+  regdecode_status6(7 downto 0)   <= i_spi_status;  -- spi register: output status
 
   regdecode_status5(31 downto 24) <= (others => '0');
   regdecode_status5(23 downto 16) <= rec_status1;  -- rec_ctrl register: output status
@@ -1261,6 +1284,7 @@ begin
       i_error_sel => error_sel,
 
       -- errors
+      i_usb_reg_errors6 => regdecode_errors6,
       i_usb_reg_errors5 => regdecode_errors5,
       i_usb_reg_errors4 => regdecode_errors4,
       i_usb_reg_errors3 => regdecode_errors3,
@@ -1269,6 +1293,7 @@ begin
       i_usb_reg_errors0 => regdecode_errors0,
 
       -- status
+      i_usb_reg_status6 => regdecode_status6,
       i_usb_reg_status5 => regdecode_status5,
       i_usb_reg_status4 => regdecode_status4,
       i_usb_reg_status3 => regdecode_status3,
@@ -1290,8 +1315,10 @@ begin
   usb_wireout_errors     <= wire_errors;
   usb_wireout_status     <= wire_status;
 
-  usb_trigout_data(31 downto 1) <= (others => '0');
-  usb_trigout_data(0)           <= wire_errors_valid;
+  usb_trigout_data(31 downto 29) <= (others => '0');
+  usb_trigout_data(28)           <= wire_errors_valid;
+  usb_trigout_data(27 downto 1) <= (others => '0');
+  usb_trigout_data(0)           <= i_reg_spi_rd_data_valid;
 
 
 

@@ -236,18 +236,24 @@ PACKAGE pkg_regdecode IS
     -- auto-computed: rec_adc_nb_word32b width
     constant pkg_REC_CONF0_ADC_NB_WORD32b_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_REC_CONF0_ADC_NB_WORD32b_IDX_H, i_idx_low => pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L);
 
-    -- user-defined: spi_ctrl
+    -- user-defined: spi_conf
     ---------------------------------------------------------------------
     -- user-defined: spi_mode (bit index high)
-    constant pkg_SPI_CTRL_MODE_IDX_H : integer := 0;
+    constant pkg_SPI_CTRL_EN_IDX_H : integer := 0;
+    constant pkg_SPI_CTRL_RST_IDX_H : integer := 1;
+
+    -- user-defined: spi_mode (bit index high)
+    constant pkg_SPI_CONF_MODE_IDX_H : integer := 0;
 
     -- user-defined: spi_id (bit index high)
-    constant pkg_SPI_CTRL_ID_IDX_H : integer := 6;
+    constant pkg_SPI_CONF_ID_IDX_H : integer := 5;
     -- user-defined: spi_id (bit index low)
-    constant pkg_SPI_CTRL_ID_IDX_L : integer := 4;
+    constant pkg_SPI_CONF_ID_IDX_L : integer := 4;
     -- auto-computed: spi_id width
-    constant pkg_SPI_CTRL_ID_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_SPI_CTRL_ID_IDX_H, i_idx_low => pkg_SPI_CTRL_ID_IDX_L);
+    constant pkg_SPI_CONF_ID_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_SPI_CONF_ID_IDX_H, i_idx_low => pkg_SPI_CONF_ID_IDX_L);
 
+    -- user-defined: dac_tx_enable (bit index high)
+    constant pkg_SPI_CONF_DAC_TX_ENABLE_IDX_H : integer := 8;
     
 
     -- user-defined: debug_ctrl 
