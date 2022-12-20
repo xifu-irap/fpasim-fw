@@ -44,7 +44,7 @@ entity fpasim_top is
     i_ref_clk : in    std_logic;        -- reference clock
     i_dac_clk : in    std_logic;        -- dac clock
     ---------------------------------------------------------------------
-    -- from the usb @i_usb_clk (clock included)
+    -- from the usb @sb_clk (clock included)
     ---------------------------------------------------------------------
     --  Opal Kelly inouts --
     i_okUH    : in    std_logic_vector(4 downto 0);
@@ -53,9 +53,31 @@ entity fpasim_top is
     b_okAA    : inout std_logic;
 
     ---------------------------------------------------------------------
+    -- from/to the spi: @usb_clk
+    ---------------------------------------------------------------------
+    o_usb_clk            : out std_logic;
+    -- tx
+    o_spi_rst            : out std_logic;
+    o_spi_en             : out std_logic;
+    o_spi_dac_tx_present : out std_logic;
+    o_spi_mode           : out std_logic;
+    o_spi_id             : out std_logic_vector(1 downto 0);
+    o_spi_cmd_valid      : out std_logic;
+    o_spi_cmd_wr_data    : out std_logic_vector(31 downto 0);
+    -- rx
+    i_spi_rd_data_valid  : in  std_logic;
+    i_spi_rd_data        : in  std_logic_vector(31 downto 0);
+    i_reg_spi_status     : in  std_logic_vector(31 downto 0);
+    -- others
+    o_usb_rst_status     : out std_logic;
+    o_usb_debug_pulse    : out std_logic;
+    -- errors/status
+    i_spi_errors         : in  std_logic_vector(15 downto 0);
+    i_spi_status         : in  std_logic_vector(7 downto 0);
+    ---------------------------------------------------------------------
     -- from the board
     ---------------------------------------------------------------------
-    i_board_id : in std_logic_vector(7 downto 0);
+    i_board_id           : in  std_logic_vector(7 downto 0);
 
     ---------------------------------------------------------------------
     -- from adc
@@ -171,18 +193,20 @@ architecture RTL of fpasim_top is
   constant c_REC_CONF0_ADC_NB_WORD32b_IDX_L : integer := pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L;
   -- debug_ctrl
   ---------------------------------------------------------------------
-  constant c_DEBUG_CTRL_DEBUG_PULSE_IDX_H : integer := pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H;
-  constant c_DEBUG_CTRL_RST_STATUS_IDX_H  : integer := pkg_DEBUG_CTRL_RST_STATUS_IDX_H;
+  constant c_DEBUG_CTRL_DEBUG_PULSE_IDX_H   : integer := pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H;
+  constant c_DEBUG_CTRL_RST_STATUS_IDX_H    : integer := pkg_DEBUG_CTRL_RST_STATUS_IDX_H;
 
   ---------------------------------------------------------------------
   -- regdecode
   ---------------------------------------------------------------------
   -- usb clock
-  signal usb_clk : std_logic;
+  signal usb_clk         : std_logic;
+  signal usb_rst_status  : std_logic;
+  signal usb_debug_pulse : std_logic;
 
   -- ctrl register
-  signal rst     : std_logic;
-  signal en      : std_logic;
+  signal rst : std_logic;
+  signal en  : std_logic;
 
   -- make_pulse register
   signal cmd_valid        : std_logic;
@@ -295,14 +319,12 @@ architecture RTL of fpasim_top is
   signal reg_rec_conf0 : std_logic_vector(31 downto 0);
 
   -- to the user @usb_clk
-  signal reg_usb_spi_valid : std_logic;
-  signal reg_usb_spi_ctrl : std_logic_vector(31 downto 0);
-  signal reg_usb_spi_conf : std_logic_vector(31 downto 0);
-  signal reg_usb_spi_wr_data : std_logic_vector(31 downto 0);
+  signal reg_spi_valid   : std_logic;
+  signal reg_spi_ctrl    : std_logic_vector(31 downto 0);
+  signal reg_spi_conf    : std_logic_vector(31 downto 0);
+  signal reg_spi_wr_data : std_logic_vector(31 downto 0);
   -- from the user @usb_clk
-  signal reg_usb_spi_rd_data_valid : std_logic;
-  signal reg_usb_spi_rd_data : std_logic_vector(31 downto 0);
-  signal reg_usb_spi_status : std_logic_vector(31 downto 0);
+  signal reg_spi_status  : std_logic_vector(31 downto 0);
 
   signal reg_wire_errors3 : std_logic_vector(31 downto 0);
   signal reg_wire_errors2 : std_logic_vector(31 downto 0);
@@ -317,7 +339,6 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- adc_top
   ---------------------------------------------------------------------
-
   signal adc_valid0                       : std_logic;
   signal adc_mux_squid_feedback0          : std_logic_vector(i_adc_mux_squid_feedback'range);
   signal adc_amp_squid_offset_correction0 : std_logic_vector(i_adc_amp_squid_offset_correction'range);
@@ -440,14 +461,23 @@ begin
       ---------------------------------------------------------------------
       -- from/to the user @usb_clk
       ---------------------------------------------------------------------
-      o_usb_clk                             => usb_clk,      -- not connected
-      o_reg_usb_spi_valid                   => reg_usb_spi_valid,
-      o_reg_usb_spi_ctrl                    => reg_usb_spi_ctrl,
-      o_reg_usb_spi_conf                    => reg_usb_spi_conf,
-      o_reg_usb_spi_wr_data                 => reg_usb_spi_wr_data,
-      i_reg_usb_spi_rd_data_valid           => reg_usb_spi_rd_data_valid,
-      i_reg_usb_spi_rd_data                 => reg_usb_spi_rd_data,
-      i_reg_usb_spi_status                  => reg_usb_spi_status,
+      o_usb_clk               => usb_clk,
+      o_usb_rst_status        => usb_rst_status,
+      o_usb_debug_pulse       => usb_debug_pulse,
+      -- tx
+      o_reg_spi_valid         => reg_spi_valid,
+      o_reg_spi_ctrl          => reg_spi_ctrl,
+      o_reg_spi_conf          => reg_spi_conf,
+      o_reg_spi_wr_data       => reg_spi_wr_data,
+      -- rx
+      i_reg_spi_rd_data_valid => i_spi_rd_data_valid,
+      i_reg_spi_rd_data       => i_spi_rd_data,
+      i_reg_spi_status        => i_reg_spi_status,
+
+      -- errors/status
+      i_spi_errors => i_spi_errors,
+      i_spi_status => i_spi_status,
+
       ---------------------------------------------------------------------
       -- from the board
       ---------------------------------------------------------------------
@@ -463,69 +493,69 @@ begin
       ---------------------------------------------------------------------
       -- tes_pulse_shape
       -- ram: wr
-      o_tes_pulse_shape_ram_wr_en       => tes_pulse_shape_ram_wr_en,  
-      o_tes_pulse_shape_ram_wr_rd_addr  => tes_pulse_shape_ram_wr_rd_addr, 
-      o_tes_pulse_shape_ram_wr_data     => tes_pulse_shape_ram_wr_data, 
+      o_tes_pulse_shape_ram_wr_en       => tes_pulse_shape_ram_wr_en,
+      o_tes_pulse_shape_ram_wr_rd_addr  => tes_pulse_shape_ram_wr_rd_addr,
+      o_tes_pulse_shape_ram_wr_data     => tes_pulse_shape_ram_wr_data,
       -- ram: rd
-      o_tes_pulse_shape_ram_rd_en       => tes_pulse_shape_ram_rd_en, 
-      i_tes_pulse_shape_ram_rd_valid    => tes_pulse_shape_ram_rd_valid, 
-      i_tes_pulse_shape_ram_rd_data     => tes_pulse_shape_ram_rd_data, 
+      o_tes_pulse_shape_ram_rd_en       => tes_pulse_shape_ram_rd_en,
+      i_tes_pulse_shape_ram_rd_valid    => tes_pulse_shape_ram_rd_valid,
+      i_tes_pulse_shape_ram_rd_data     => tes_pulse_shape_ram_rd_data,
       -- amp_squid_tf
       -- ram: wr
-      o_amp_squid_tf_ram_wr_en          => amp_squid_tf_ram_wr_en, 
-      o_amp_squid_tf_ram_wr_rd_addr     => amp_squid_tf_ram_wr_rd_addr,  
-      o_amp_squid_tf_ram_wr_data        => amp_squid_tf_ram_wr_data, 
+      o_amp_squid_tf_ram_wr_en          => amp_squid_tf_ram_wr_en,
+      o_amp_squid_tf_ram_wr_rd_addr     => amp_squid_tf_ram_wr_rd_addr,
+      o_amp_squid_tf_ram_wr_data        => amp_squid_tf_ram_wr_data,
       -- ram: rd
-      o_amp_squid_tf_ram_rd_en          => amp_squid_tf_ram_rd_en, 
-      i_amp_squid_tf_ram_rd_valid       => amp_squid_tf_ram_rd_valid, 
-      i_amp_squid_tf_ram_rd_data        => amp_squid_tf_ram_rd_data, 
+      o_amp_squid_tf_ram_rd_en          => amp_squid_tf_ram_rd_en,
+      i_amp_squid_tf_ram_rd_valid       => amp_squid_tf_ram_rd_valid,
+      i_amp_squid_tf_ram_rd_data        => amp_squid_tf_ram_rd_data,
       -- mux_squid_tf
       -- ram: wr
-      o_mux_squid_tf_ram_wr_en          => mux_squid_tf_ram_wr_en,  
-      o_mux_squid_tf_ram_wr_rd_addr     => mux_squid_tf_ram_wr_rd_addr, 
-      o_mux_squid_tf_ram_wr_data        => mux_squid_tf_ram_wr_data,  
+      o_mux_squid_tf_ram_wr_en          => mux_squid_tf_ram_wr_en,
+      o_mux_squid_tf_ram_wr_rd_addr     => mux_squid_tf_ram_wr_rd_addr,
+      o_mux_squid_tf_ram_wr_data        => mux_squid_tf_ram_wr_data,
       -- ram: rd
-      o_mux_squid_tf_ram_rd_en          => mux_squid_tf_ram_rd_en, 
-      i_mux_squid_tf_ram_rd_valid       => mux_squid_tf_ram_rd_valid, 
-      i_mux_squid_tf_ram_rd_data        => mux_squid_tf_ram_rd_data, 
+      o_mux_squid_tf_ram_rd_en          => mux_squid_tf_ram_rd_en,
+      i_mux_squid_tf_ram_rd_valid       => mux_squid_tf_ram_rd_valid,
+      i_mux_squid_tf_ram_rd_data        => mux_squid_tf_ram_rd_data,
       -- tes_std_state
       -- ram: wr
-      o_tes_std_state_ram_wr_en         => tes_std_state_ram_wr_en, 
-      o_tes_std_state_ram_wr_rd_addr    => tes_std_state_ram_wr_rd_addr, 
-      o_tes_std_state_ram_wr_data       => tes_std_state_ram_wr_data, 
+      o_tes_std_state_ram_wr_en         => tes_std_state_ram_wr_en,
+      o_tes_std_state_ram_wr_rd_addr    => tes_std_state_ram_wr_rd_addr,
+      o_tes_std_state_ram_wr_data       => tes_std_state_ram_wr_data,
       -- ram: rd
-      o_tes_std_state_ram_rd_en         => tes_std_state_ram_rd_en, 
-      i_tes_std_state_ram_rd_valid      => tes_std_state_ram_rd_valid, 
-      i_tes_std_state_ram_rd_data       => tes_std_state_ram_rd_data, 
+      o_tes_std_state_ram_rd_en         => tes_std_state_ram_rd_en,
+      i_tes_std_state_ram_rd_valid      => tes_std_state_ram_rd_valid,
+      i_tes_std_state_ram_rd_data       => tes_std_state_ram_rd_data,
       -- mux_squid_offset
       -- ram: wr
-      o_mux_squid_offset_ram_wr_en      => mux_squid_offset_ram_wr_en, 
-      o_mux_squid_offset_ram_wr_rd_addr => mux_squid_offset_ram_wr_rd_addr, 
-      o_mux_squid_offset_ram_wr_data    => mux_squid_offset_ram_wr_data, 
+      o_mux_squid_offset_ram_wr_en      => mux_squid_offset_ram_wr_en,
+      o_mux_squid_offset_ram_wr_rd_addr => mux_squid_offset_ram_wr_rd_addr,
+      o_mux_squid_offset_ram_wr_data    => mux_squid_offset_ram_wr_data,
       -- ram: rd
-      o_mux_squid_offset_ram_rd_en      => mux_squid_offset_ram_rd_en, 
-      i_mux_squid_offset_ram_rd_valid   => mux_squid_offset_ram_rd_valid, 
-      i_mux_squid_offset_ram_rd_data    => mux_squid_offset_ram_rd_data, 
+      o_mux_squid_offset_ram_rd_en      => mux_squid_offset_ram_rd_en,
+      i_mux_squid_offset_ram_rd_valid   => mux_squid_offset_ram_rd_valid,
+      i_mux_squid_offset_ram_rd_data    => mux_squid_offset_ram_rd_data,
       -- Register configuration
       ---------------------------------------------------------------------
       -- common register
-      o_reg_valid                       => reg_valid,    
-      o_reg_fpasim_gain                 => reg_fpasim_gain, 
-      o_reg_mux_sq_fb_delay             => reg_mux_sq_fb_delay, 
-      o_reg_amp_sq_of_delay             => reg_amp_sq_of_delay, 
-      o_reg_error_delay                 => reg_error_delay,  
-      o_reg_ra_delay                    => reg_ra_delay, 
-      o_reg_tes_conf                    => reg_tes_conf, 
+      o_reg_valid                       => reg_valid,
+      o_reg_fpasim_gain                 => reg_fpasim_gain,
+      o_reg_mux_sq_fb_delay             => reg_mux_sq_fb_delay,
+      o_reg_amp_sq_of_delay             => reg_amp_sq_of_delay,
+      o_reg_error_delay                 => reg_error_delay,
+      o_reg_ra_delay                    => reg_ra_delay,
+      o_reg_tes_conf                    => reg_tes_conf,
       -- ctrl register
       o_reg_ctrl_valid                  => reg_ctrl_valid,
-      o_reg_ctrl                        => reg_ctrl,  
+      o_reg_ctrl                        => reg_ctrl,
       -- debug ctrl register
-      o_reg_debug_ctrl_valid            => reg_debug_ctrl_valid, 
-      o_reg_debug_ctrl                  => reg_debug_ctrl, 
+      o_reg_debug_ctrl_valid            => reg_debug_ctrl_valid,
+      o_reg_debug_ctrl                  => reg_debug_ctrl,
       -- make pulse register
-      o_reg_make_sof                    => reg_make_sof, 
+      o_reg_make_sof                    => reg_make_sof,
       o_reg_make_eof                    => reg_make_eof,
-      o_reg_make_pulse_valid            => reg_make_pulse_valid, 
+      o_reg_make_pulse_valid            => reg_make_pulse_valid,
       o_reg_make_pulse                  => reg_make_pulse,
       i_reg_make_pulse_ready            => reg_make_pulse_ready,
 
@@ -557,43 +587,56 @@ begin
       i_reg_wire_status0 => reg_wire_status0
       );
 
-  -- extract fields from the ctrl register
+  -- ctrl register: extract fields
   rst <= reg_ctrl(c_CTRL_RST_IDX_H);
   en  <= reg_ctrl(c_CTRL_EN_IDX_H);
 
-  -- extract fields from the make_pulse register
+  -- make_pulse register: extract fields
   cmd_valid            <= reg_make_pulse_valid;
   cmd_pixel_id         <= reg_make_pulse(c_MAKE_PULSE_PIXEL_ID_IDX_H downto c_MAKE_PULSE_PIXEL_ID_IDX_L);
   cmd_time_shift       <= reg_make_pulse(c_MAKE_PULSE_TIME_SHIFT_IDX_H downto c_MAKE_PULSE_TIME_SHIFT_IDX_L);
   cmd_pulse_height     <= reg_make_pulse(c_MAKE_PULSE_PULSE_HEIGHT_IDX_H downto c_MAKE_PULSE_PULSE_HEIGHT_IDX_L);
   reg_make_pulse_ready <= cmd_ready;
 
-  -- extract fields from the reg_fpasim_gain
+  -- reg_fpasim_gain register: extract fields
   fpasim_gain <= reg_fpasim_gain(c_FPASIM_GAIN_IDX_H downto c_FPASIM_GAIN_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_FPASIM_GAIN_WIDTH>) but was (<3>)"
 
-  -- extract fields from the reg_mux_sq_fb_delay
+  -- reg_mux_sq_fb_delay register: extract fields
   adc0_delay <= reg_mux_sq_fb_delay(c_MUX_SQ_FB_DELAY_IDX_H downto c_MUX_SQ_FB_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_AMP_SQ_OF_DELAY_WIDTH>) but was (<6>)"
-  -- extract fields from the reg_amp_sq_of_delay
+  -- reg_amp_sq_of_delay register: extract fields
   adc1_delay <= reg_amp_sq_of_delay(c_AMP_SQ_OF_DELAY_IDX_H downto c_AMP_SQ_OF_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_MUX_SQ_FB_DELAY_WIDTH>) but was (<6>)"
 
-  -- extract fields from the error_delay
+  -- error_delay register: extract fields
   dac_delay <= reg_error_delay(c_ERROR_DELAY_IDX_H downto c_ERROR_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_DELAY_WIDTH>) but was (<6>)"
 
-  -- extract fields from the ra_delay
+  -- ra_delay register: extract fields
   sync_delay <= reg_ra_delay(c_RA_DELAY_IDX_H downto c_RA_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_RA_DELAY_WIDTH>) but was (<6>)"
 
-  -- extract fields from the tes_conf
+  -- tes_conf register: extract fields
   nb_pixel_by_frame  <= reg_tes_conf(c_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H downto c_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>) but was (<6>)"
   nb_sample_by_pixel <= reg_tes_conf(c_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H downto c_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH>) but was (<7>)"
   nb_sample_by_frame <= reg_tes_conf(c_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H downto c_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH>) but was (<13>)"
 
-  -- extract fields from the debug_ctrl register
+  -- debug_ctrl register
   debug_pulse <= reg_debug_ctrl(c_DEBUG_CTRL_DEBUG_PULSE_IDX_H);
   rst_status  <= reg_debug_ctrl(c_DEBUG_CTRL_RST_STATUS_IDX_H);
 
-  -- extract fields from the reg_rec_ctrl register
+  -- recording:
   rec_adc_cmd_valid             <= reg_rec_valid and reg_rec_ctrl(c_REC_CTRL_ADC_EN_IDX_H);
   rec_adc_cmd_nb_words_by_block <= reg_rec_conf0(c_REC_CONF0_ADC_NB_WORD32b_IDX_H downto c_REC_CONF0_ADC_NB_WORD32b_IDX_L);
+
+  -- spi:
+  o_usb_clk            <= usb_clk;
+  o_spi_rst            <= reg_spi_ctrl(pkg_SPI_CTRL_RST_IDX_H);
+  o_spi_en             <= reg_spi_ctrl(pkg_SPI_CTRL_EN_IDX_H);
+  o_spi_cmd_valid      <= reg_spi_valid;
+  o_spi_dac_tx_present <= reg_spi_conf(pkg_SPI_CONF_DAC_TX_ENABLE_IDX_H);
+  o_spi_mode           <= reg_spi_conf(pkg_SPI_CONF_MODE_IDX_H);
+  o_spi_id             <= reg_spi_conf(pkg_SPI_CONF_ID_IDX_H downto pkg_SPI_CONF_ID_IDX_L);
+  o_spi_cmd_wr_data    <= reg_spi_wr_data;
+
+  o_usb_rst_status  <= usb_rst_status;
+  o_usb_debug_pulse <= usb_debug_pulse;
 
   -- errors
   reg_wire_errors3(31 downto 16) <= (others => '0');
