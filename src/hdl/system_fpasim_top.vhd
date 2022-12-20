@@ -32,15 +32,15 @@ use ieee.numeric_std.all;
 entity system_fpasim_top is
   port(
     --  Opal Kelly inouts --
-    i_okUH          : in    std_logic_vector(4 downto 0);
-    o_okHU          : out   std_logic_vector(2 downto 0);
-    b_okUHU         : inout std_logic_vector(31 downto 0);
-    b_okAA          : inout std_logic;
+    i_okUH        : in    std_logic_vector(4 downto 0);
+    o_okHU        : out   std_logic_vector(2 downto 0);
+    b_okUHU       : inout std_logic_vector(31 downto 0);
+    b_okAA        : inout std_logic;
     ---------------------------------------------------------------------
     -- FMC: from the card
     ---------------------------------------------------------------------
     -- TODO
-    i_board_id     : in std_logic_vector(7 downto 0); -- card board id 
+    i_board_id    : in    std_logic_vector(7 downto 0);  -- card board id 
     ---------------------------------------------------------------------
     -- FMC: from the adc
     ---------------------------------------------------------------------
@@ -104,8 +104,44 @@ entity system_fpasim_top is
     o_dac6_p      : out   std_logic;
     o_dac6_n      : out   std_logic;
     o_dac7_p      : out   std_logic;
-    o_dac7_n      : out   std_logic
-  );
+    o_dac7_n      : out   std_logic;
+
+    ---------------------------------------------------------------------
+    -- devices: spi links + specific signals
+    ---------------------------------------------------------------------
+    -- common: shared link between the spi
+    o_spi_sclk  : out std_logic;        -- Shared SPI clock line
+    o_spi_sdata : out std_logic;        -- Shared SPI MOSI
+
+    -- CDCE: SPI
+    i_cdce_sdo  : in  std_logic;        -- SPI MISO
+    o_cdce_n_en : out std_logic;        -- SPI chip select
+
+    -- CDCE: specific signals
+    i_cdce_pll_status : in  std_logic;  -- pll_status : This pin is set high if the PLL is in lock.
+    o_cdce_n_reset    : out std_logic;  -- reset_n or hold_n
+    o_cdce_n_pd       : out std_logic;  -- power_down_n
+    o_ref_en          : out std_logic;  -- enable the primary reference clock
+
+    -- ADC: SPI
+    i_adc_sdo   : in  std_logic;        -- SPI MISO
+    o_adc_n_en  : out std_logic;        -- SPI chip select
+    -- ADC: specific signals
+    o_adc_reset : out std_logic;        -- adc hardware reset
+
+    -- DAC: SPI
+    i_dac_sdo        : in  std_logic;   -- SPI MISO
+    o_dac_n_en       : out std_logic;   -- SPI chip select
+    -- DAC: specific signal
+    o_dac_tx_present : out std_logic;   -- enable tx acquisition
+
+    -- AMC: SPI (monitoring)
+    i_mon_sdo     : in  std_logic;      -- SPI data out
+    o_mon_n_en    : out std_logic;      -- SPI chip select
+    -- AMC : specific signals
+    i_mon_n_int   : in  std_logic;  -- galr_n: Global analog input out-of-range alarm.
+    o_mon_n_reset : out std_logic       -- reset_n: hardware reset
+    );
 end entity system_fpasim_top;
 
 architecture RTL of system_fpasim_top is
@@ -122,6 +158,27 @@ architecture RTL of system_fpasim_top is
   ---------------------------------------------------------------------
   -- fpasim_top
   ---------------------------------------------------------------------
+  -- spi
+  signal usb_clk                         : std_logic;
+  signal usb_rst_status                  : std_logic;
+  signal usb_debug_pulse                 : std_logic;
+  -- tx
+  signal spi_rst                         : std_logic;
+  signal spi_en                          : std_logic;
+  signal spi_cmd_valid                   : std_logic;
+  signal spi_dac_tx_present              : std_logic;
+  signal spi_mode                        : std_logic;
+  signal spi_id                          : std_logic_vector(1 downto 0);
+  signal spi_cmd_wr_data                 : std_logic_vector(31 downto 0);
+  -- rx
+  signal spi_rd_data_valid               : std_logic;
+  signal spi_rd_data                     : std_logic_vector(31 downto 0);
+  --signal spi_ready                       : std_logic;
+  -- status: register
+  signal reg_spi_status                  : std_logic_vector(31 downto 0);
+  -- errors/status
+  signal spi_errors                      : std_logic_vector(15 downto 0);
+  signal spi_status                      : std_logic_vector(7 downto 0);
   -- adc
   signal adc_valid                       : std_logic;
   signal adc_amp_squid_offset_correction : std_logic_vector(13 downto 0);
@@ -139,6 +196,36 @@ architecture RTL of system_fpasim_top is
   ---------------------------------------------------------------------
   signal adc_a : std_logic_vector(13 downto 0);
   signal adc_b : std_logic_vector(13 downto 0);
+
+  ---------------------------------------------------------------------
+  -- spi
+  ---------------------------------------------------------------------
+  -- common: shared link between the spi
+  signal spi_sclk  : std_logic;         -- Shared SPI clock line
+  signal spi_sdata : std_logic;         -- Shared SPI MOSI
+
+  -- CDCE: SPI
+  signal cdce_n_en : std_logic;         -- SPI chip select
+
+  -- CDCE: specific signals
+  signal cdce_n_reset : std_logic;      -- reset_n or hold_n
+  signal cdce_n_pd    : std_logic;      -- power_down_n
+  signal ref_en       : std_logic;      -- enable the primary reference clock
+
+  -- ADC: SPI
+  signal adc_n_en  : std_logic;         -- SPI chip select
+  -- ADC: specific signals
+  signal adc_reset : std_logic;         -- adc hardware reset
+
+  -- DAC: SPI
+  signal dac_n_en       : std_logic;    -- SPI chip select
+  -- DAC: specific signal
+  signal dac_tx_present : std_logic;    -- enable tx acquisition
+
+  -- AMC: SPI (monitoring)
+  signal mon_n_en    : std_logic;       -- SPI chip select
+  -- AMC : specific signals
+  signal mon_n_reset : std_logic;       -- reset_n: hardware reset
 
 begin
 
@@ -160,7 +247,7 @@ begin
       o_dac_clk => dac_clk,             -- dac output clock @500 MHz
       o_clk     => clk,                 -- sys output clock @333.33333 MHz
       o_locked  => locked               -- not connected
-    );
+      );
 
   ---------------------------------------------------------------------
   -- top_fpasim
@@ -168,12 +255,12 @@ begin
   inst_fpasim_top : entity work.fpasim_top
     generic map(
       g_DEBUG => false
-    )
+      )
     port map(
-      i_clk                             => clk, -- system clock
-      i_adc_clk                         => adc_clk, -- adc clock
-      i_ref_clk                         => ref_clk, -- reference clock
-      i_dac_clk                         => dac_clk, -- dac clock
+      i_clk                             => clk,        -- system clock
+      i_adc_clk                         => adc_clk,    -- adc clock
+      i_ref_clk                         => ref_clk,    -- reference clock
+      i_dac_clk                         => dac_clk,    -- dac clock
       ---------------------------------------------------------------------
       -- from the usb @i_usb_clk (clock included)
       ---------------------------------------------------------------------
@@ -185,6 +272,29 @@ begin
       -- from the board
       ---------------------------------------------------------------------
       i_board_id                        => i_board_id,
+      ---------------------------------------------------------------------
+      -- from/to the spi: @usb_clk
+      ---------------------------------------------------------------------
+      o_usb_clk                         => usb_clk,
+      o_usb_rst_status                  => usb_rst_status,
+      o_usb_debug_pulse                 => usb_debug_pulse,
+      --tx
+      o_spi_rst                         => spi_rst,
+      o_spi_en                          => spi_en,
+      o_spi_dac_tx_present              => spi_dac_tx_present,
+      o_spi_id                          => spi_id,
+      o_spi_mode                        => spi_mode,
+      -- command
+      o_spi_cmd_valid                   => spi_cmd_valid,
+      o_spi_cmd_wr_data                 => spi_cmd_wr_data,
+      -- rx
+      i_spi_rd_data_valid               => spi_rd_data_valid,
+      i_spi_rd_data                     => spi_rd_data,
+      i_reg_spi_status                  => reg_spi_status,
+      --i_spi_ready                       => spi_ready,
+      -- errors/status
+      i_spi_errors                      => spi_errors,
+      i_spi_status                      => spi_status,
       ---------------------------------------------------------------------
       -- from adc
       ---------------------------------------------------------------------
@@ -198,10 +308,10 @@ begin
       ---------------------------------------------------------------------
       -- output dac @i_clk_dac
       ---------------------------------------------------------------------
-      o_dac_valid                       => dac_valid, -- not connected
+      o_dac_valid                       => dac_valid,  -- not connected
       o_dac_frame                       => dac_frame,
       o_dac                             => dac
-    );
+      );
 
   adc_amp_squid_offset_correction <= adc_a;
   adc_mux_squid_feedback          <= adc_b;
@@ -209,44 +319,43 @@ begin
   ---------------------------------------------------------------------
   -- Xilinx IOs
   ---------------------------------------------------------------------
-
   inst_io_top : entity work.io_top
     port map(
       ---------------------------------------------------------------------
       -- adc
       ---------------------------------------------------------------------
       -- from MMCM 
-      i_adc_clk     => adc_clk,
+      i_adc_clk => adc_clk,
       -- from fpga pads: adc_a 
-      i_da0_p       => i_da0_p,
-      i_da0_n       => i_da0_n,
-      i_da2_p       => i_da2_p,
-      i_da2_n       => i_da2_n,
-      i_da4_p       => i_da4_p,
-      i_da4_n       => i_da4_n,
-      i_da6_p       => i_da6_p,
-      i_da6_n       => i_da6_n,
-      i_da8_p       => i_da8_p,
-      i_da8_n       => i_da8_n,
-      i_da10_p      => i_da10_p,
-      i_da10_n      => i_da10_n,
-      i_da12_p      => i_da12_p,
-      i_da12_n      => i_da12_n,
+      i_da0_p   => i_da0_p,
+      i_da0_n   => i_da0_n,
+      i_da2_p   => i_da2_p,
+      i_da2_n   => i_da2_n,
+      i_da4_p   => i_da4_p,
+      i_da4_n   => i_da4_n,
+      i_da6_p   => i_da6_p,
+      i_da6_n   => i_da6_n,
+      i_da8_p   => i_da8_p,
+      i_da8_n   => i_da8_n,
+      i_da10_p  => i_da10_p,
+      i_da10_n  => i_da10_n,
+      i_da12_p  => i_da12_p,
+      i_da12_n  => i_da12_n,
       -- from fpga pads: adc_b
-      i_db0_p       => i_db0_p,
-      i_db0_n       => i_db0_n,
-      i_db2_p       => i_db2_p,
-      i_db2_n       => i_db2_n,
-      i_db4_p       => i_db4_p,
-      i_db4_n       => i_db4_n,
-      i_db6_p       => i_db6_p,
-      i_db6_n       => i_db6_n,
-      i_db8_p       => i_db8_p,
-      i_db8_n       => i_db8_n,
-      i_db10_p      => i_db10_p,
-      i_db10_n      => i_db10_n,
-      i_db12_p      => i_db12_p,
-      i_db12_n      => i_db12_n,
+      i_db0_p   => i_db0_p,
+      i_db0_n   => i_db0_n,
+      i_db2_p   => i_db2_p,
+      i_db2_n   => i_db2_n,
+      i_db4_p   => i_db4_p,
+      i_db4_n   => i_db4_n,
+      i_db6_p   => i_db6_p,
+      i_db6_n   => i_db6_n,
+      i_db8_p   => i_db8_p,
+      i_db8_n   => i_db8_n,
+      i_db10_p  => i_db10_p,
+      i_db10_n  => i_db10_n,
+      i_db12_p  => i_db12_p,
+      i_db12_n  => i_db12_n,
 
 
       -- to user :
@@ -290,6 +399,93 @@ begin
       o_dac6_n      => o_dac6_n,
       o_dac7_p      => o_dac7_p,
       o_dac7_n      => o_dac7_n
-    );
+      );
+
+  ---------------------------------------------------------------------
+  -- spi interface
+  ---------------------------------------------------------------------
+  inst_spi_top : entity work.spi_top
+    port map(
+      i_clk                => usb_clk,  -- clock
+      i_rst                => spi_rst,  -- reset
+      i_rst_status         => usb_rst_status,  -- reset error flag(s)
+      i_debug_pulse        => usb_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      -- input
+      i_spi_en             => spi_en,
+      i_spi_dac_tx_present => spi_dac_tx_present,  -- 1:enable data tx, 0: otherwise
+      i_spi_mode           => spi_mode,     -- 1:wr, 0:rd
+      i_spi_id             => spi_id,  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
+      i_spi_cmd_valid      => spi_cmd_valid,   -- command valid
+      i_spi_cmd_wr_data    => spi_cmd_wr_data,  -- data to write
+      -- output
+      o_spi_rd_data_valid  => spi_rd_data_valid,  -- read data valid
+      o_spi_rd_data        => spi_rd_data,  -- read data
+      o_spi_ready          => open,  -- 1: all spi links are ready,0: one of the spi link is busy
+      o_reg_spi_status     => reg_spi_status,  -- 1: all spi links are ready,0: one of the spi link is busy
+      ---------------------------------------------------------------------
+      -- errors/status
+      ---------------------------------------------------------------------
+      o_errors             => spi_errors,
+      o_status             => spi_status,
+      ---------------------------------------------------------------------
+      -- from/to the IOs
+      ---------------------------------------------------------------------
+      -- common: shared link between the spi
+      o_spi_sclk           => spi_sclk,     -- Shared SPI clock line
+      o_spi_sdata          => spi_sdata,    -- Shared SPI MOSI
+      -- CDCE: SPI
+      i_cdce_sdo           => i_cdce_sdo,   -- SPI MISO
+      o_cdce_n_en          => cdce_n_en,    -- SPI chip select
+      -- CDCE: specific signals
+      i_cdce_pll_status    => i_cdce_pll_status,  -- pll_status : This pin is set high if the PLL is in lock.
+      o_cdce_n_reset       => cdce_n_reset,    -- reset_n or hold_n
+      o_cdce_n_pd          => cdce_n_pd,    -- power_down_n
+      o_ref_en             => ref_en,   -- enable the primary reference clock
+      -- ADC: SPI
+      i_adc_sdo            => i_adc_sdo,    -- SPI MISO
+      o_adc_n_en           => adc_n_en,     -- SPI chip select
+      -- ADC: specific signals
+      o_adc_reset          => adc_reset,    -- adc hardware reset
+      -- DAC: SPI
+      i_dac_sdo            => i_dac_sdo,    -- SPI MISO
+      o_dac_n_en           => dac_n_en,     -- SPI chip select
+      -- DAC: specific signal
+      o_dac_tx_present     => dac_tx_present,  -- enable tx acquisition
+      -- AMC: SPI (monitoring)
+      i_mon_sdo            => i_mon_sdo,    -- SPI data out
+      o_mon_n_en           => mon_n_en,     -- SPI chip select
+      -- AMC : specific signals
+      i_mon_n_int          => i_mon_n_int,  -- galr_n: Global analog input out-of-range alarm.
+      o_mon_n_reset        => mon_n_reset   -- reset_n: hardware reset
+      );
+
+---------------------------------------------------------------------
+-- output
+---------------------------------------------------------------------
+-- common: shared link between the spi
+  o_spi_sclk     <= spi_sclk;           -- Shared SPI clock line
+  o_spi_sdata    <= spi_sdata;          -- Shared SPI MOSI
+--cdce
+  o_cdce_n_en    <= cdce_n_en;          -- SPI chip select
+  o_cdce_n_reset <= cdce_n_reset;       -- reset_n or hold_n
+  o_cdce_n_pd    <= cdce_n_pd;          -- power_down_n
+  o_ref_en       <= ref_en;             -- enable the primary reference clock
+
+--adc
+  o_adc_n_en  <= adc_n_en;              -- SPI chip select
+  o_adc_reset <= adc_reset;             -- adc hardware reset
+
+--dac
+  o_dac_n_en       <= dac_n_en;         -- SPI chip select
+  o_dac_tx_present <= dac_tx_present;   -- enable tx acquisition
+
+--amc
+  o_mon_n_en    <= mon_n_en;            -- SPI chip select
+  o_mon_n_reset <= mon_n_reset;         -- reset_n: hardware reset
+
+
 
 end architecture RTL;
