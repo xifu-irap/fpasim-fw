@@ -354,11 +354,11 @@ set_property IOSTANDARD LVDS_25 [get_ports {o_dac6_n}];# DAC_D6_N
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-C26 
-# set_property PACKAGE_PIN D9 [get_ports {}];# MON_N_EN
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# MON_N_EN
+set_property PACKAGE_PIN D9 [get_ports {o_mon_n_en}];# MON_N_EN
+set_property IOSTANDARD LVCMOS25 [get_ports {o_mon_n_en}];# MON_N_EN
 # FMC-C27 
-# set_property PACKAGE_PIN D8 [get_ports {}];# MON_N_RESET
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# MON_N_RESET
+set_property PACKAGE_PIN D8 [get_ports {o_mon_n_reset}];# MON_N_RESET
+set_property IOSTANDARD LVCMOS25 [get_ports {o_mon_n_reset}];# MON_N_RESET
 # FMC-C28 
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
@@ -807,11 +807,11 @@ set_property IOSTANDARD LVDS_25 [get_ports {i_db8_n}];# CHB_08_N
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-G18
-# set_property PACKAGE_PIN A9 [get_ports {}];# ADC_N_EN
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# ADC_N_EN
+set_property PACKAGE_PIN A9 [get_ports {o_adc_n_en}];# ADC_N_EN
+set_property IOSTANDARD LVCMOS25 [get_ports {o_adc_n_en}];# ADC_N_EN
 # FMC-G19
-# set_property PACKAGE_PIN A8 [get_ports {}];# TXENABLE
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# TXENABLE
+set_property PACKAGE_PIN A8 [get_ports {o_dac_tx_present}];# TXENABLE
+set_property IOSTANDARD LVCMOS25 [get_ports {o_dac_tx_present}];# TXENABLE
 # FMC-G2
 # set_property PACKAGE_PIN E11 [get_ports {}];# EXT_TRIGGER_P
 # set_property IOSTANDARD LVDS_25 [get_ports {}];# EXT_TRIGGER_P
@@ -849,29 +849,29 @@ set_property IOSTANDARD LVDS_25 [get_ports {o_dac1_n}];# DAC_D1_N
 # set_property PACKAGE_PIN D11 [get_ports {}];# EXT_TRIGGER_N
 # set_property IOSTANDARD LVDS_25 [get_ports {}];# EXT_TRIGGER_N
 # FMC-G30
-# set_property PACKAGE_PIN J13 [get_ports {}];# SPI_SCLK
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# SPI_SCLK
+set_property PACKAGE_PIN J13 [get_ports {o_spi_sclk}];# SPI_SCLK
+set_property IOSTANDARD LVCMOS25 [get_ports {o_spi_sclk}];# SPI_SCLK
 # FMC-G31
-# set_property PACKAGE_PIN H13 [get_ports {}];# SPI_DATA
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# SPI_DATA
+set_property PACKAGE_PIN H13 [get_ports {o_spi_sdata}];# SPI_DATA
+set_property IOSTANDARD LVCMOS25 [get_ports {o_spi_sdata}];# SPI_DATA
 # FMC-G32
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-G33
-# set_property PACKAGE_PIN J11 [get_ports {}];# CDCE_N_RESET
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# CDCE_N_RESET
+set_property PACKAGE_PIN J11 [get_ports {o_cdce_n_reset}];# CDCE_N_RESET
+set_property IOSTANDARD LVCMOS25 [get_ports {o_cdce_n_reset}];# CDCE_N_RESET
 # FMC-G34
-# set_property PACKAGE_PIN J10 [get_ports {}];# CDCE_N_PD
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# CDCE_N_PD
+set_property PACKAGE_PIN J10 [get_ports {o_cdce_n_pd}];# CDCE_N_PD
+set_property IOSTANDARD LVCMOS25 [get_ports {o_cdce_n_pd}];# CDCE_N_PD
 # FMC-G35
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-G36
-# set_property PACKAGE_PIN F9 [get_ports {}];# REF_EN
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# REF_EN
+set_property PACKAGE_PIN F9 [get_ports {o_ref_en}];# REF_EN
+set_property IOSTANDARD LVCMOS25 [get_ports {o_ref_en}];# REF_EN
 # FMC-G37
-# set_property PACKAGE_PIN F8 [get_ports {}];# PLL_STATUS
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# PLL_STATUS
+set_property PACKAGE_PIN F8 [get_ports {i_cdce_pll_status}];# PLL_STATUS
+set_property IOSTANDARD LVCMOS25 [get_ports {i_cdce_pll_status}];# PLL_STATUS
 # FMC-G38
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
@@ -930,14 +930,14 @@ set_property IOSTANDARD LVDS_25 [get_ports {i_db6_n}];# CHB_06_N
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-H19
-# set_property PACKAGE_PIN K16 [get_ports {}];# ADC_SDO
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# ADC_SDO
+set_property PACKAGE_PIN K16 [get_ports {i_adc_sdo}];# ADC_SDO
+set_property IOSTANDARD LVCMOS25 [get_ports {i_adc_sdo}];# ADC_SDO
 # FMC-H2
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-H20
-# set_property PACKAGE_PIN K17 [get_ports {}];# ADC_RESET
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# ADC_RESET
+set_property PACKAGE_PIN K17 [get_ports {o_adc_reset}];# ADC_RESET
+set_property IOSTANDARD LVCMOS25 [get_ports {o_adc_reset}];# ADC_RESET
 # FMC-H21
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
@@ -972,29 +972,29 @@ set_property IOSTANDARD LVDS_25 [get_ports {o_dac2_n}];# DAC_D2_N
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-H31
-# set_property PACKAGE_PIN G12 [get_ports {}];# DAC_N_EN
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# DAC_N_EN
+set_property PACKAGE_PIN G12 [get_ports {o_dac_n_en}];# DAC_N_EN
+set_property IOSTANDARD LVCMOS25 [get_ports {o_dac_n_en}];# DAC_N_EN
 # FMC-H32
-# set_property PACKAGE_PIN F12 [get_ports {}];# DAC_SDO
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# DAC_SDO
+set_property PACKAGE_PIN F12 [get_ports {i_dac_sdo}];# DAC_SDO
+set_property IOSTANDARD LVCMOS25 [get_ports {i_dac_sdo}];# DAC_SDO
 # FMC-H33
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-H34
-# set_property PACKAGE_PIN G10 [get_ports {}];# CDCE_N_EN
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# CDCE_N_EN
+set_property PACKAGE_PIN G10 [get_ports {o_cdce_n_en}];# CDCE_N_EN
+set_property IOSTANDARD LVCMOS25 [get_ports {o_cdce_n_en}];# CDCE_N_EN
 # FMC-H35
-# set_property PACKAGE_PIN G9 [get_ports {}];# CDCE_SDO
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# CDCE_SDO
+set_property PACKAGE_PIN G9 [get_ports {i_cdce_sdo}];# CDCE_SDO
+set_property IOSTANDARD LVCMOS25 [get_ports {i_cdce_sdo}];# CDCE_SDO
 # FMC-H36
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-H37
-# set_property PACKAGE_PIN H9 [get_ports {}];# MON_SDO
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# MON_SDO
+set_property PACKAGE_PIN H9 [get_ports {i_mon_sdo}];# MON_SDO
+set_property IOSTANDARD LVCMOS25 [get_ports {i_mon_sdo}];# MON_SDO
 # FMC-H38
-# set_property PACKAGE_PIN H8 [get_ports {}];# MON_N_INIT
-# set_property IOSTANDARD LVCMOS25 [get_ports {}];# MON_N_INIT
+set_property PACKAGE_PIN H8 [get_ports {i_mon_n_int}];# MON_N_INIT
+set_property IOSTANDARD LVCMOS25 [get_ports {i_mon_n_int}];# MON_N_INIT
 # FMC-H39
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
