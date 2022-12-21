@@ -31,12 +31,12 @@
 --
 --   g_SYNC_STAGES     - Integer value for number of synchronizing registers, must be 2 or higher
 --   g_PIPELINE_STAGES - Integer value for number of registers on the output of the
---                     synchronizer for the purpose of improveing performance.
+--                     synchronizer for the purpose of improving performance. Possible values: [1; integer max value [
 --                     Particularly useful for high-fanout nets.
 --   g_INIT            - Initial value of synchronizer registers upon startup, 1'b0 or 1'b1.
 --
 --  Note: 
---    . This code is based on the example of the Xilinx language template
+--    . This code is based on the code example of the Xilinx language template
 --
 --  IMPORTANT: At the output, when the input data is a bus, the bus bits may not keep synchronization between each other
 -- -------------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ entity synchronizer is
   generic(
     g_INIT            : std_logic := '0';  -- Initial value of synchronizer registers upon startup, 1'b0 or 1'b1.
     g_SYNC_STAGES     : natural   := 3;  -- Integer value for number of synchronizing registers, must be 2 or higher
-    g_PIPELINE_STAGES : natural   := 1;  -- Integer value for number of registers on the output of the synchronizer for the purpose of improveing performance.
+    g_PIPELINE_STAGES : natural   := 1;  -- Integer value for number of registers on the output of the synchronizer for the purpose of improving performance. Possible values: [1; integer max value [
     g_DATA_WIDTH      : integer   := 1  -- data width expressed in bits
     );
   port(
@@ -76,13 +76,13 @@ begin
   process(i_clk)
   begin
     if rising_edge(i_clk) then
-      s_r1 <= s_r1(g_SYNC_STAGES-2 downto 0) & i_async_data;  -- Async Input <async_in>
+      s_r1 <= s_r1(s_r1'high - 1 downto 0) & i_async_data;  -- Async Input <async_in>
     end if;
   end process;
 
   no_pipeline : if g_PIPELINE_STAGES = 0 generate
   begin
-    data_tmp <= s_r1(g_SYNC_STAGES-1);
+    data_tmp <= s_r1(s_r1'high);
   end generate;
 
   one_pipeline : if g_PIPELINE_STAGES = 1 generate
@@ -90,7 +90,7 @@ begin
     process(i_clk)
     begin
       if rising_edge(i_clk) then
-        data_tmp <= s_r1(g_SYNC_STAGES-1);
+        data_tmp <= s_r1(s_r1'high);
       end if;
     end process;
   end generate;
@@ -100,10 +100,10 @@ begin
     process(i_clk)
     begin
       if rising_edge(i_clk) then
-        sreg_pipe_r1 <= sreg_pipe_r1(g_PIPELINE_STAGES-2 downto 0) & s_r1(g_SYNC_STAGES-1);
+        sreg_pipe_r1 <= sreg_pipe_r1(sreg_pipe_r1'high - 1 downto 0) & s_r1(s_r1'high);
       end if;
     end process;
-    data_tmp <= sreg_pipe_r1(g_PIPELINE_STAGES-1);
+    data_tmp <= sreg_pipe_r1(sreg_pipe_r1'high);
   end generate;
 
 ---------------------------------------------------------------------
