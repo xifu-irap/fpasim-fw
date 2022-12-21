@@ -131,19 +131,17 @@ begin
    -- I/O interface:
    -- bit remapping : see the selectio_wiz_dac_sim_netlist.vhdl from Xilinx ip compilation.
    -- data_out_to_pins_p(0) <= data_out_from_device(0); -- pos edge
-   -- data_out_to_pins_n(0) <= data_out_from_device(9); -- neg edge
+   -- data_out_to_pins_n(0) <= data_out_from_device(8); -- neg edge
    -- data_out_to_pins_p(1) <= data_out_from_device(1); -- pos edge
-   -- data_out_to_pins_n(1) <= data_out_from_device(10); -- neg edge
+   -- data_out_to_pins_n(1) <= data_out_from_device(9); -- neg edge
    -- and so on
    ---------------------------------------------------------------------
    gen_io_dac : if true generate
-      signal dac_tmp0   : std_logic_vector(17 downto 0);
-      signal dac_p_tmp1 : std_logic_vector(8 downto 0);
-      signal dac_n_tmp1 : std_logic_vector(8 downto 0);
+      signal dac_tmp0   : std_logic_vector(15 downto 0);
+      signal dac_p_tmp1 : std_logic_vector(7 downto 0);
+      signal dac_n_tmp1 : std_logic_vector(7 downto 0);
    begin
-      dac_tmp0(17)          <= dac_frame1;
-      dac_tmp0(16 downto 9) <= dac1(15 downto 8);
-      dac_tmp0(8)           <= dac_frame1;
+      dac_tmp0(15 downto 8) <= dac1(15 downto 8);
       dac_tmp0(7 downto 0)  <= dac1(7 downto 0);
       inst_selectio_wiz_dac : entity work.selectio_wiz_dac
          port map(
@@ -156,12 +154,29 @@ begin
             clk_reset            => '0',
             io_reset             => '0'
          );
-      dac_frame_p_tmp3      <= dac_p_tmp1(8);
-      dac_p_tmp3            <= dac_p_tmp1(7 downto 0);
+      
+      dac_p_tmp3  <= dac_p_tmp1(7 downto 0);
+      dac_n_tmp3  <= dac_n_tmp1(7 downto 0);
 
-      dac_frame_n_tmp3 <= dac_n_tmp1(8);
-      dac_n_tmp3       <= dac_n_tmp1(7 downto 0);
    end generate gen_io_dac;
+
+   gen_io_dac_frame: if true generate
+      signal dac_tmp0   : std_logic_vector(0 downto 0);
+      signal dac_p_tmp1 : std_logic_vector(0 downto 0);
+      signal dac_n_tmp1 : std_logic_vector(0 downto 0);
+   begin
+   dac_tmp0(0) <= dac_frame1;
+   inst_selectio_wiz_dac_frame : entity work.selectio_wiz_dac_frame
+         port map(
+            data_out_from_device => dac_tmp0,
+            data_out_to_pins_p   => dac_p_tmp1,
+            data_out_to_pins_n   => dac_n_tmp1,
+            clk_in               => i_clk,
+            io_reset             => '0'
+         );
+     dac_frame_p_tmp3  <= dac_p_tmp1(0);
+     dac_frame_n_tmp3   <= dac_n_tmp1(0);
+   end generate gen_io_dac_frame;
 
    ---------------------------------------------------------------------
    -- output
