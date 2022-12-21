@@ -372,8 +372,6 @@ PACKAGE pkg_fpasim IS
   ---------------------------------------------------------------------
   -- dac_top
   ---------------------------------------------------------------------
-  -- user-defined: number of samples of a dac frame.
-  constant pkg_DAC_FRAME_SIZE                     : positive := 8;
   -- auto-computed: latency of the dynamic_shift_register module when the input delay is set to 0
   constant pkg_DAC_DYNAMIC_SHIFT_REGISTER_LATENCY : natural  := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
   -- hardcoded: latency of the "dac_frame_generator" module. This latency is equal to the "dynamic_shift_register" module when delay is 0

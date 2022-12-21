@@ -77,7 +77,6 @@ entity dac_top is
 end entity dac_top;
 
 architecture RTL of dac_top is
-  constant c_DAC_FRAME_SIZE : positive := work.pkg_fpasim.pkg_DAC_FRAME_SIZE;
 
   -------------------------------------------------------------------
   -- cross clock domain
@@ -149,10 +148,7 @@ begin
   --   . 1 clock latency
   --   . the dac_valid_r1 is synchronized with dac_rx when i_dac_delay = 0
   ---------------------------------------------------------------------
-  dac_frame_generator_INST : entity work.dac_frame_generator
-    generic map(
-      g_FRAME_SIZE => c_DAC_FRAME_SIZE  -- frame size. Possible values: [2;integer max value[
-    )
+  inst_dac_frame_generator : entity work.dac_frame_generator
     port map(
       i_clk        => i_clk,            -- clock signal
       i_rst        => i_rst,
@@ -164,7 +160,6 @@ begin
       -- output
       ---------------------------------------------------------------------
       o_sof        => dac_sof_r1,       -- first sample of the frame
-      o_eof        => open,             -- last sample of the frame
       o_data_valid => dac_valid_r1      -- output valid sample
     );
 
