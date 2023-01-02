@@ -17,13 +17,15 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   system_fpasim_top.vhd 
+--    @file                   system_fpasim_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 -- This module is the fpga top level
+-- -------------------------------------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -32,79 +34,80 @@ use ieee.numeric_std.all;
 entity system_fpasim_top is
   port(
     --  Opal Kelly inouts --
-    i_okUH        : in    std_logic_vector(4 downto 0);
-    o_okHU        : out   std_logic_vector(2 downto 0);
-    b_okUHU       : inout std_logic_vector(31 downto 0);
-    b_okAA        : inout std_logic;
+    i_okUH     : in    std_logic_vector(4 downto 0);
+    o_okHU     : out   std_logic_vector(2 downto 0);
+    b_okUHU    : inout std_logic_vector(31 downto 0);
+    b_okAA     : inout std_logic;
     ---------------------------------------------------------------------
     -- FMC: from the card
     ---------------------------------------------------------------------
-    -- TODO
-    i_board_id    : in    std_logic_vector(7 downto 0);  -- card board id 
+    i_board_id : in    std_logic_vector(7 downto 0);  -- card board id 
+    i_reset    : in    std_logic;
+
     ---------------------------------------------------------------------
     -- FMC: from the adc
     ---------------------------------------------------------------------
-    i_adc_clk_p   : in    std_logic;    -- differential clock p @250MHz
-    i_adc_clk_n   : in    std_logic;    -- differential clock n @250MHZ
+    i_adc_clk_p   : in  std_logic;      -- differential clock p @250MHz
+    i_adc_clk_n   : in  std_logic;      -- differential clock n @250MHZ
     -- adc_a
     -- bit P/N: 0-1
-    i_da0_p       : in    std_logic;
-    i_da0_n       : in    std_logic;
-    i_da2_p       : in    std_logic;
-    i_da2_n       : in    std_logic;
-    i_da4_p       : in    std_logic;
-    i_da4_n       : in    std_logic;
-    i_da6_p       : in    std_logic;
-    i_da6_n       : in    std_logic;
-    i_da8_p       : in    std_logic;
-    i_da8_n       : in    std_logic;
-    i_da10_p      : in    std_logic;
-    i_da10_n      : in    std_logic;
-    i_da12_p      : in    std_logic;
-    i_da12_n      : in    std_logic;
+    i_da0_p       : in  std_logic;
+    i_da0_n       : in  std_logic;
+    i_da2_p       : in  std_logic;
+    i_da2_n       : in  std_logic;
+    i_da4_p       : in  std_logic;
+    i_da4_n       : in  std_logic;
+    i_da6_p       : in  std_logic;
+    i_da6_n       : in  std_logic;
+    i_da8_p       : in  std_logic;
+    i_da8_n       : in  std_logic;
+    i_da10_p      : in  std_logic;
+    i_da10_n      : in  std_logic;
+    i_da12_p      : in  std_logic;
+    i_da12_n      : in  std_logic;
     -- adc_b
-    i_db0_p       : in    std_logic;
-    i_db0_n       : in    std_logic;
-    i_db2_p       : in    std_logic;
-    i_db2_n       : in    std_logic;
-    i_db4_p       : in    std_logic;
-    i_db4_n       : in    std_logic;
-    i_db6_p       : in    std_logic;
-    i_db6_n       : in    std_logic;
-    i_db8_p       : in    std_logic;
-    i_db8_n       : in    std_logic;
-    i_db10_p      : in    std_logic;
-    i_db10_n      : in    std_logic;
-    i_db12_p      : in    std_logic;
-    i_db12_n      : in    std_logic;
+    i_db0_p       : in  std_logic;
+    i_db0_n       : in  std_logic;
+    i_db2_p       : in  std_logic;
+    i_db2_n       : in  std_logic;
+    i_db4_p       : in  std_logic;
+    i_db4_n       : in  std_logic;
+    i_db6_p       : in  std_logic;
+    i_db6_n       : in  std_logic;
+    i_db8_p       : in  std_logic;
+    i_db8_n       : in  std_logic;
+    i_db10_p      : in  std_logic;
+    i_db10_n      : in  std_logic;
+    i_db12_p      : in  std_logic;
+    i_db12_n      : in  std_logic;
     ---------------------------------------------------------------------
     -- FMC: to sync
     ---------------------------------------------------------------------
-    o_ref_clk     : out   std_logic;
-    o_sync        : out   std_logic;
+    o_ref_clk     : out std_logic;
+    o_sync        : out std_logic;
     ---------------------------------------------------------------------
     -- FMC: to dac
     ---------------------------------------------------------------------
-    o_dac_clk_p   : out   std_logic;
-    o_dac_clk_n   : out   std_logic;
-    o_dac_frame_p : out   std_logic;
-    o_dac_frame_n : out   std_logic;
-    o_dac0_p      : out   std_logic;
-    o_dac0_n      : out   std_logic;
-    o_dac1_p      : out   std_logic;
-    o_dac1_n      : out   std_logic;
-    o_dac2_p      : out   std_logic;
-    o_dac2_n      : out   std_logic;
-    o_dac3_p      : out   std_logic;
-    o_dac3_n      : out   std_logic;
-    o_dac4_p      : out   std_logic;
-    o_dac4_n      : out   std_logic;
-    o_dac5_p      : out   std_logic;
-    o_dac5_n      : out   std_logic;
-    o_dac6_p      : out   std_logic;
-    o_dac6_n      : out   std_logic;
-    o_dac7_p      : out   std_logic;
-    o_dac7_n      : out   std_logic;
+    o_dac_clk_p   : out std_logic;
+    o_dac_clk_n   : out std_logic;
+    o_dac_frame_p : out std_logic;
+    o_dac_frame_n : out std_logic;
+    o_dac0_p      : out std_logic;
+    o_dac0_n      : out std_logic;
+    o_dac1_p      : out std_logic;
+    o_dac1_n      : out std_logic;
+    o_dac2_p      : out std_logic;
+    o_dac2_n      : out std_logic;
+    o_dac3_p      : out std_logic;
+    o_dac3_n      : out std_logic;
+    o_dac4_p      : out std_logic;
+    o_dac4_n      : out std_logic;
+    o_dac5_p      : out std_logic;
+    o_dac5_n      : out std_logic;
+    o_dac6_p      : out std_logic;
+    o_dac6_n      : out std_logic;
+    o_dac7_p      : out std_logic;
+    o_dac7_n      : out std_logic;
 
     ---------------------------------------------------------------------
     -- devices: spi links + specific signals
@@ -149,17 +152,24 @@ architecture RTL of system_fpasim_top is
   ---------------------------------------------------------------------
   -- clock generation
   ---------------------------------------------------------------------
-  signal adc_clk : std_logic;
-  signal ref_clk : std_logic;
-  signal dac_clk : std_logic;
-  signal clk     : std_logic;
-  signal locked  : std_logic;
+  signal adc_clk     : std_logic;
+  signal ref_clk     : std_logic;
+  signal dac_clk     : std_logic;
+  signal clk         : std_logic;
+  signal mmcm_locked : std_logic;
+
+  ---------------------------------------------------------------------
+  -- reset generation
+  ---------------------------------------------------------------------
+  signal mmcm_rst : std_logic;
 
   ---------------------------------------------------------------------
   -- fpasim_top
   ---------------------------------------------------------------------
   -- spi
   signal usb_clk                         : std_logic;
+  signal usb_rst                         : std_logic;
+  signal usb_rst_out                     : std_logic;
   signal usb_rst_status                  : std_logic;
   signal usb_debug_pulse                 : std_logic;
   -- tx
@@ -246,8 +256,32 @@ begin
       o_ref_clk => ref_clk,             -- ref output clock @62.5 MHz
       o_dac_clk => dac_clk,             -- dac output clock @500 MHz
       o_clk     => clk,                 -- sys output clock @333.33333 MHz
-      o_locked  => locked               -- not connected
+      o_locked  => mmcm_locked
       );
+
+  ---------------------------------------------------------------------
+  -- reset generation
+  ---------------------------------------------------------------------
+  reset_top_INST : entity work.reset_top
+    port map(
+      ---------------------------------------------------------------------
+      -- from the board
+      ---------------------------------------------------------------------
+      i_reset            => i_reset,
+      ---------------------------------------------------------------------
+      -- from/to the usb
+      ---------------------------------------------------------------------
+      i_usb_clk          => usb_clk,
+      i_usb_rst          => usb_rst,
+      o_usb_rst          => usb_rst_out,
+      ---------------------------------------------------------------------
+      -- from/to the mmcm
+      ---------------------------------------------------------------------
+      i_mmcm_slowest_clk => clk,
+      i_mmcm_locked      => mmcm_locked,
+      o_mmcm_rst         => mmcm_rst
+      );
+
 
   ---------------------------------------------------------------------
   -- top_fpasim
@@ -257,21 +291,23 @@ begin
       g_DEBUG => false
       )
     port map(
-      i_clk                             => clk,        -- system clock
-      i_adc_clk                         => adc_clk,    -- adc clock
-      i_ref_clk                         => ref_clk,    -- reference clock
-      i_dac_clk                         => dac_clk,    -- dac clock
+      i_clk      => clk,                -- system clock
+      i_rst      => mmcm_rst,           -- reset sync @ref_clk
+      i_adc_clk  => adc_clk,            -- adc clock
+      i_ref_clk  => ref_clk,            -- reference clock
+      i_dac_clk  => dac_clk,            -- dac clock
       ---------------------------------------------------------------------
       -- from the usb @i_usb_clk (clock included)
       ---------------------------------------------------------------------
-      i_okUH                            => i_okUH,
-      o_okHU                            => o_okHU,
-      b_okUHU                           => b_okUHU,
-      b_okAA                            => b_okAA,
+      i_okUH     => i_okUH,
+      o_okHU     => o_okHU,
+      b_okUHU    => b_okUHU,
+      b_okAA     => b_okAA,
       ---------------------------------------------------------------------
       -- from the board
       ---------------------------------------------------------------------
-      i_board_id                        => i_board_id,
+      i_board_id => i_board_id,
+
       ---------------------------------------------------------------------
       -- from/to the spi: @usb_clk
       ---------------------------------------------------------------------
@@ -295,6 +331,11 @@ begin
       -- errors/status
       i_spi_errors                      => spi_errors,
       i_spi_status                      => spi_status,
+      ---------------------------------------------------------------------
+      -- from/to regdecode @usb_clk
+      ---------------------------------------------------------------------
+      o_usb_rst                         => usb_rst,
+      i_usb_rst                         => usb_rst_out,
       ---------------------------------------------------------------------
       -- from adc
       ---------------------------------------------------------------------
