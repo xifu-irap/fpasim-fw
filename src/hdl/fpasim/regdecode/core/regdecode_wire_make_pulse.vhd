@@ -72,6 +72,7 @@ entity regdecode_wire_make_pulse is
     -- from/to the user:  @i_out_clk
     ---------------------------------------------------------------------
     i_out_clk          : in  std_logic;  -- output clock
+    i_out_rst          : in std_logic; -- reset @i_out_clk
     -- extracted command
     i_data_rd          : in  std_logic;
     o_data_valid       : out std_logic;
@@ -313,6 +314,7 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
+      i_out_rst         => i_out_rst,
       -- ram: wr
       i_data_rd         => rd_tmp2,
       o_data_valid      => data_valid_tmp2,  -- data valid

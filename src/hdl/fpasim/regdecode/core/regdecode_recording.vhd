@@ -57,8 +57,8 @@ entity regdecode_recording is
     ---------------------------------------------------------------------
     -- from/to the user:  @i_out_clk
     ---------------------------------------------------------------------
-    i_out_rst                    : in  std_logic;  -- output clock
     i_out_clk                    : in  std_logic;  -- output clock
+    i_out_rst                    : in  std_logic;  -- reset @i_out_clk
     -- register
     o_rec_valid                  : out std_logic;  -- register data valid
     o_rec_ctrl                   : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- register ctrl value
@@ -161,6 +161,7 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,
+      i_out_rst         => i_out_rst,
       -- ram: wr
       o_data_valid      => data_valid_tmp2,
       o_data            => data_tmp2,
@@ -204,8 +205,8 @@ begin
       ---------------------------------------------------------------------
       -- from the user:  @i_out_clk
       ---------------------------------------------------------------------
-      i_out_rst             => i_out_rst,
       i_out_clk             => i_out_clk,                -- output clock
+      i_out_rst             => i_out_rst,
       -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- data
       o_fifo_rd             => fifo_rd,                  -- read fifo

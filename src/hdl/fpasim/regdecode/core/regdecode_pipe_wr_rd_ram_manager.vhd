@@ -78,6 +78,7 @@ entity regdecode_pipe_wr_rd_ram_manager is
     -- from/to the user:  @i_out_clk
     ---------------------------------------------------------------------
     i_out_clk         : in  std_logic;  -- output clock
+    i_out_rst         : in std_logic; -- reset @i_out_clk
     -- ram: wr
     o_ram_wr_en       : out std_logic;  -- output write enable
     o_ram_wr_rd_addr  : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- output address (shared by the writting and the reading)
@@ -566,7 +567,7 @@ begin
       -- write side
       ---------------------------------------------------------------------
       i_wr_clk        => i_out_clk,
-      i_wr_rst        => i_rst,
+      i_wr_rst        => i_out_rst,
       i_wr_en         => wr_tmp2,
       i_wr_din        => data_tmp2,
       o_wr_full       => open,

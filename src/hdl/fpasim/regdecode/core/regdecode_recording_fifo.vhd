@@ -45,8 +45,8 @@ entity regdecode_recording_fifo is
     ---------------------------------------------------------------------
     -- from the user:  @i_out_clk
     ---------------------------------------------------------------------
-    i_out_rst             : in  std_logic;
     i_out_clk             : in  std_logic;  -- output clock
+    i_out_rst             : in  std_logic;  -- reset @i_out_clk
     -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     -- data
     o_fifo_rd             : out std_logic;  -- read fifo

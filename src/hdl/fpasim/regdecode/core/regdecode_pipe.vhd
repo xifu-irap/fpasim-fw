@@ -92,7 +92,8 @@ entity regdecode_pipe is
     ---------------------------------------------------------------------
     -- to the user: @i_out_clk
     ---------------------------------------------------------------------
-    i_out_clk         : in  std_logic;
+    i_out_clk         : in std_logic; -- output clock
+    i_out_rst         : in std_logic; -- reset @i_out_clk
 
     -- tes_pulse_shape
     -- ram: wr
@@ -403,6 +404,7 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
+      i_out_rst         => i_out_rst,
       -- ram: wr
       o_ram_wr_en       => tes_pulse_shape_ram_wr_en,  -- output write enable
       o_ram_wr_rd_addr  => tes_pulse_shape_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
@@ -470,6 +472,7 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
+      i_out_rst         => i_out_rst,
       -- ram: wr
       o_ram_wr_en       => amp_squid_tf_ram_wr_en,       -- output write enable
       o_ram_wr_rd_addr  => amp_squid_tf_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
@@ -537,6 +540,7 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
+      i_out_rst         => i_out_rst,
       -- ram: wr
       o_ram_wr_en       => mux_squid_tf_ram_wr_en,       -- output write enable
       o_ram_wr_rd_addr  => mux_squid_tf_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
@@ -604,6 +608,7 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
+      i_out_rst         => i_out_rst,
       -- ram: wr
       o_ram_wr_en       => tes_std_state_ram_wr_en,  -- output write enable
       o_ram_wr_rd_addr  => tes_std_state_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
@@ -671,6 +676,7 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
+      i_out_rst         => i_out_rst,
       -- ram: wr
       o_ram_wr_en       => mux_squid_offset_ram_wr_en,  -- output write enable
       o_ram_wr_rd_addr  => mux_squid_offset_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)

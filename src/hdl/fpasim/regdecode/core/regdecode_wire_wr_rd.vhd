@@ -60,6 +60,7 @@ entity regdecode_wire_wr_rd is
     -- from/to the user:  @i_out_clk
     ---------------------------------------------------------------------
     i_out_clk         : in  std_logic;  -- output clock
+    i_out_rst         : in std_logic;   -- reset @i_out_clk
     -- ram: wr
     o_data_valid      : out std_logic;  -- data valid
     o_data            : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0);  -- data
@@ -264,7 +265,7 @@ begin
       -- write side
       ---------------------------------------------------------------------
       i_wr_clk        => i_out_clk,
-      i_wr_rst        => i_rst,
+      i_wr_rst        => i_out_rst,
       i_wr_en         => wr_tmp2,
       i_wr_din        => data_tmp2,
       o_wr_full       => open,

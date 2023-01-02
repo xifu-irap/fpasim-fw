@@ -102,7 +102,6 @@ entity regdecode_top is
     g_DEBUG : boolean := false
     );
   port(
-    i_rst : in std_logic;               -- reset
 
     ---------------------------------------------------------------------
     -- from the usb @i_clk (clock included)
@@ -134,6 +133,9 @@ entity regdecode_top is
 
     i_spi_errors: in std_logic_vector(15 downto 0);
     i_spi_status: in std_logic_vector(7 downto 0);
+    -- to/from reset_top
+    i_usb_rst : in std_logic;               -- reset
+    o_usb_rst : out std_logic;               -- reset
     ---------------------------------------------------------------------
     -- from the board
     ---------------------------------------------------------------------
@@ -720,7 +722,7 @@ begin
       -- input @i_clk
       ---------------------------------------------------------------------
       i_clk           => usb_clk,       -- clock
-      i_rst           => i_rst,         -- reset
+      i_rst           => i_usb_rst,         -- reset
       i_rst_status    => usb_rst_status,
       i_debug_pulse   => usb_debug_pulse,
       -- from the trig in
@@ -746,6 +748,7 @@ begin
       -- to the user: @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk                         => i_out_clk,
+      i_out_rst                         => i_out_rst,
       -- tes_pulse_shape
       -- ram: wr
       o_tes_pulse_shape_ram_wr_en       => tes_pulse_shape_ram_wr_en,
@@ -882,7 +885,7 @@ begin
       -- from the regdecode: input @i_clk
       ---------------------------------------------------------------------
       i_clk             => usb_clk,
-      i_rst             => i_rst,
+      i_rst             => i_usb_rst,
       i_rst_status      => usb_rst_status,
       i_debug_pulse     => usb_debug_pulse,
       -- data
@@ -892,6 +895,7 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,
+      i_out_rst         => i_out_rst,
       -- ram: wr
       o_data_valid      => reg_data_valid_tmp2,
       o_data            => reg_data_tmp2,
@@ -944,7 +948,7 @@ begin
       -- from the regdecode: input @i_clk
       ---------------------------------------------------------------------
       i_clk             => usb_clk,
-      i_rst             => i_rst,
+      i_rst             => i_usb_rst,
       i_rst_status      => usb_rst_status,
       i_debug_pulse     => usb_debug_pulse,
       -- data
@@ -954,6 +958,7 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,
+      i_out_rst         => i_out_rst,
       -- ram: wr
       o_data_valid      => ctrl_data_valid_tmp2,
       o_data            => ctrl_data_tmp2,
@@ -1000,7 +1005,7 @@ begin
       -- from the regdecode: input @i_clk
       ---------------------------------------------------------------------
       i_clk             => usb_clk,
-      i_rst             => i_rst,
+      i_rst             => i_usb_rst,
       i_rst_status      => usb_rst_status,
       i_debug_pulse     => usb_debug_pulse,
       -- data
@@ -1010,6 +1015,7 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,
+      i_out_rst         => i_out_rst,
       -- ram: wr
       o_data_valid      => debug_ctrl_data_valid_tmp2,
       o_data            => debug_ctrl_data_tmp2,
@@ -1055,7 +1061,7 @@ begin
       -- from the regdecode: input @i_clk
       ---------------------------------------------------------------------
       i_clk              => usb_clk,
-      i_rst              => i_rst,
+      i_rst              => i_usb_rst,
       i_rst_status       => usb_rst_status,
       i_debug_pulse      => usb_debug_pulse,
       -- conf
@@ -1068,6 +1074,7 @@ begin
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk          => i_out_clk,
+      i_out_rst          => i_out_rst,
       -- ram: wr
       i_data_rd          => make_pulse_rd_tmp2,
       o_sof              => make_pulse_sof_tmp2,
@@ -1114,6 +1121,8 @@ begin
   rec_ctrl_tmp0  <= usb_wirein_rec_ctrl;
   rec_conf0_tmp0 <= usb_wirein_rec_conf0;
 
+  o_usb_rst      <= usb_wirein_rec_ctrl(pkg_CTRL_RST_IDX_H);-- get the reset field from the ctrl register
+
   regdecode_recording_INST : entity work.regdecode_recording
     generic map(
       g_DATA_WIDTH => i_reg_fifo_rec_adc_data'length
@@ -1123,7 +1132,7 @@ begin
       -- from the regdecode/usb: input @i_clk
       ---------------------------------------------------------------------
       i_clk                        => usb_clk,         -- clock
-      i_rst                        => i_rst,           -- reset
+      i_rst                        => i_usb_rst,           -- reset
       i_rst_status                 => usb_rst_status,  -- not connected  
       i_debug_pulse                => usb_debug_pulse,     -- not connected  
       -- data
@@ -1133,8 +1142,8 @@ begin
       ---------------------------------------------------------------------
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
-      i_out_rst                    => i_out_rst,
       i_out_clk                    => i_out_clk,
+      i_out_rst                    => i_out_rst,
       -- register
       o_rec_valid                  => rec_valid_tmp2,
       o_rec_ctrl                   => rec_ctrl_tmp2,
