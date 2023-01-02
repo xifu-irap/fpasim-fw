@@ -17,19 +17,18 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   clocking_top.vhd 
+--    @file                   clocking_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 --
--- This module instanciates a fpga specific mmcm to generate the different clocks of the design.
+-- This module instanciates a fpga specific mmcm to generate some design clocks.
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
-
 
 
 entity clocking_top is
@@ -43,10 +42,10 @@ entity clocking_top is
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
-    o_adc_clk : out std_logic;          -- adc output clock @250 MHz
-    o_ref_clk : out std_logic;          -- ref output clock @62.5 MHz
-    o_dac_clk : out std_logic;          -- dac output clock @500 MHz
-    o_clk     : out std_logic;          -- sys output clock @333.33333 MHz
+    o_adc_clk         : out std_logic;  -- adc output clock @250 MHz
+    o_ref_clk         : out std_logic;  -- ref output clock @62.5 MHz
+    o_dac_clk         : out std_logic;  -- dac output clock @500 MHz
+    o_clk             : out std_logic;  -- sys output clock @333.33333 MHz
 
     o_locked : out std_logic
     );
@@ -54,30 +53,15 @@ end entity clocking_top;
 
 architecture RTL of clocking_top is
 
-  component fpasim_clk_wiz_0
-    port
-      (                                 -- Clock in ports
-        -- Clock out ports
-        clk_out1  : out std_logic;
-        clk_out2  : out std_logic;
-        clk_out3  : out std_logic;
-        clk_out4  : out std_logic;
-        -- Status and control signals
-        locked    : out std_logic;
-        clk_in1_p : in  std_logic;
-        clk_in1_n : in  std_logic
-        );
-  end component;
-
-  signal adc_clk : std_logic;
-  signal ref_clk : std_logic;
-  signal dac_clk : std_logic;
-  signal clk     : std_logic;
-  signal locked  : std_logic;
+  signal adc_clk         : std_logic;
+  signal ref_clk         : std_logic;
+  signal dac_clk         : std_logic;
+  signal clk             : std_logic;
+  signal locked          : std_logic;
 
 begin
 
-  inst_fpasim_clk_wiz_0 : fpasim_clk_wiz_0
+  inst_fpasim_clk_wiz_0 : entity work.fpasim_clk_wiz_0
     port map(
       -- Clock out ports  
       clk_out1  => adc_clk,             -- output clock @250MHz
@@ -91,13 +75,13 @@ begin
       clk_in1_n => i_clk_n
       );
 
-    ---------------------------------------------------------------------
-    -- output
-    ---------------------------------------------------------------------
-    o_adc_clk <= adc_clk;
-    o_ref_clk <= ref_clk;
-    o_dac_clk <= dac_clk;
-    o_clk     <= clk;
-    o_locked  <= locked;
-    
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
+  o_adc_clk         <= adc_clk;
+  o_ref_clk         <= ref_clk;
+  o_dac_clk         <= dac_clk;
+  o_clk             <= clk;
+  o_locked          <= locked;
+
 end architecture RTL;
