@@ -81,9 +81,9 @@ set_property IOSTANDARD LVCMOS33 [get_ports b_okAA]
 ############################################################################
 ## User Reset
 ############################################################################
-# set_property PACKAGE_PIN G22 [get_ports {reset}]
-# set_property IOSTANDARD LVCMOS18 [get_ports {reset}]
-# set_property SLEW FAST [get_ports {reset}]
+set_property PACKAGE_PIN G22 [get_ports {i_reset}]
+set_property IOSTANDARD LVCMOS18 [get_ports {i_reset}]
+set_property SLEW FAST [get_ports {i_reset}]
 
 
 # FMC-A1 
