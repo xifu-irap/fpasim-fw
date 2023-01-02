@@ -40,6 +40,7 @@ entity fpasim_top is
     );
   port(
     i_clk     : in    std_logic;        -- system clock
+    i_rst     : in    std_logic;        -- reset 
     i_adc_clk : in    std_logic;        -- adc clock
     i_ref_clk : in    std_logic;        -- reference clock
     i_dac_clk : in    std_logic;        -- dac clock
@@ -74,6 +75,13 @@ entity fpasim_top is
     -- errors/status
     i_spi_errors         : in  std_logic_vector(15 downto 0);
     i_spi_status         : in  std_logic_vector(7 downto 0);
+
+    ---------------------------------------------------------------------
+    -- from/to regdecode @usb_clk
+    ---------------------------------------------------------------------
+    o_usb_rst           : out std_logic;
+    i_usb_rst           : in std_logic;
+
     ---------------------------------------------------------------------
     -- from the board
     ---------------------------------------------------------------------
@@ -203,9 +211,10 @@ architecture RTL of fpasim_top is
   signal usb_clk         : std_logic;
   signal usb_rst_status  : std_logic;
   signal usb_debug_pulse : std_logic;
+  signal usb_rst         : std_logic;
 
   -- ctrl register
-  signal rst : std_logic;
+  --signal rst : std_logic;
   signal en  : std_logic;
 
   -- make_pulse register
@@ -451,7 +460,6 @@ begin
       ---------------------------------------------------------------------
       -- from the usb @i_clk (clock included)
       ---------------------------------------------------------------------
-      i_rst   => '0',
       --  Opal Kelly inouts --
       i_okUH  => i_okUH,
       o_okHU  => o_okHU,
@@ -478,6 +486,10 @@ begin
       i_spi_errors => i_spi_errors,
       i_spi_status => i_spi_status,
 
+      -- to/from reset_top
+      i_usb_rst => i_usb_rst,
+      o_usb_rst => usb_rst,
+
       ---------------------------------------------------------------------
       -- from the board
       ---------------------------------------------------------------------
@@ -485,7 +497,7 @@ begin
       ---------------------------------------------------------------------
       -- from/to the user: @i_out_clk
       ---------------------------------------------------------------------
-      i_out_rst                         => '0',          -- TODO
+      i_out_rst                         => i_rst,        -- reset @i_clk
       i_out_clk                         => i_clk,        -- clock (user side)
       i_rst_status                      => rst_status,   -- reset error flag(s)
       i_debug_pulse                     => debug_pulse,  -- error mode (transparent vs capture). Possib
@@ -588,7 +600,7 @@ begin
       );
 
   -- ctrl register: extract fields
-  rst <= reg_ctrl(c_CTRL_RST_IDX_H);
+  -- rst <= reg_ctrl(c_CTRL_RST_IDX_H); -- this reset is managed by the reset_top module
   en  <= reg_ctrl(c_CTRL_EN_IDX_H);
 
   -- make_pulse register: extract fields
@@ -637,6 +649,9 @@ begin
 
   o_usb_rst_status  <= usb_rst_status;
   o_usb_debug_pulse <= usb_debug_pulse;
+
+  -- to the reset_top
+  o_usb_rst <= usb_rst;
 
   -- errors
   reg_wire_errors3(31 downto 16) <= (others => '0');
@@ -739,7 +754,7 @@ begin
       )
     port map(
       i_clk                     => i_clk,
-      i_rst                     => rst,
+      i_rst                     => i_rst,
       i_rst_status              => rst_status,
       i_debug_pulse             => debug_pulse,
       ---------------------------------------------------------------------
@@ -986,7 +1001,7 @@ begin
       -- input @i_clk
       ---------------------------------------------------------------------
       i_clk         => i_clk,
-      i_rst         => rst,
+      i_rst         => i_rst,
       -- from regdecode
       -----------------------------------------------------------------
       i_rst_status  => rst_status,
@@ -1024,7 +1039,7 @@ begin
       -- input @i_clk
       ---------------------------------------------------------------------
       i_clk         => i_clk,           -- clock
-      i_rst         => rst,             -- reset
+      i_rst         => i_rst,             -- reset
       -- from regdecode
       -----------------------------------------------------------------
       i_rst_status  => rst_status,
@@ -1065,7 +1080,7 @@ begin
       g_ADC_FIFO_OUT_DEPTH => pkg_REC_ADC_FIFO_OUT_DEPTH  -- depth of the FIFO (number of words). Must be a power of 2
       )
     port map(
-      i_rst                       => rst,
+      i_rst                       => i_rst,
       i_clk                       => i_clk,
       i_rst_status                => rst_status,
       i_debug_pulse               => debug_pulse,
