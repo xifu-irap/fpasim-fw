@@ -161,7 +161,13 @@ architecture RTL of system_fpasim_top is
   ---------------------------------------------------------------------
   -- reset generation
   ---------------------------------------------------------------------
-  signal mmcm_rst : std_logic;
+  signal rst             : std_logic;
+  signal adc_io_clk_rst  : std_logic;
+  signal adc_io_rst      : std_logic;
+  signal dac_io_clk_rst  : std_logic;
+  signal dac_io_rst      : std_logic;
+  signal sync_io_clk_rst : std_logic;
+  signal sync_io_rst     : std_logic;
 
   ---------------------------------------------------------------------
   -- fpasim_top
@@ -262,26 +268,46 @@ begin
   ---------------------------------------------------------------------
   -- reset generation
   ---------------------------------------------------------------------
-  reset_top_INST : entity work.reset_top
+  inst_reset_top : entity work.reset_top
     port map(
       ---------------------------------------------------------------------
       -- from the board
       ---------------------------------------------------------------------
-      i_reset            => i_reset,
+      i_reset           => i_reset,
       ---------------------------------------------------------------------
       -- from/to the usb
       ---------------------------------------------------------------------
-      i_usb_clk          => usb_clk,
-      i_usb_rst          => usb_rst,
-      o_usb_rst          => usb_rst_out,
+      i_usb_clk         => usb_clk,
+      i_usb_rst         => usb_rst,
+      o_usb_rst         => usb_rst_out,
       ---------------------------------------------------------------------
       -- from/to the mmcm
       ---------------------------------------------------------------------
-      i_mmcm_slowest_clk => clk,
-      i_mmcm_locked      => mmcm_locked,
-      o_mmcm_rst         => mmcm_rst
+      i_mmcm_clk        => clk,
+      i_mmcm_adc_clk    => adc_clk,
+      i_mmcm_dac_clk    => dac_clk,
+      i_mmcm_sync_clk   => ref_clk,
+      i_mmcm_locked     => mmcm_locked,
+      ---------------------------------------------------------------------
+      -- to the user
+      ---------------------------------------------------------------------
+      o_rst             => rst,
+      ---------------------------------------------------------------------
+      -- to the io_adc @i_mmcm_adc_clk
+      ---------------------------------------------------------------------
+      o_adc_io_clk_rst  => adc_io_clk_rst,
+      o_adc_io_rst      => adc_io_rst,
+      ---------------------------------------------------------------------
+      -- to the io_dac @i_mmcm_dac_clk
+      ---------------------------------------------------------------------
+      o_dac_io_clk_rst  => dac_io_clk_rst,
+      o_dac_io_rst      => dac_io_rst,
+      ---------------------------------------------------------------------
+      -- to the io_sync @i_mmcm_sync_clk
+      ---------------------------------------------------------------------
+      o_sync_io_clk_rst => sync_io_clk_rst,
+      o_sync_io_rst     => sync_io_rst
       );
-
 
   ---------------------------------------------------------------------
   -- top_fpasim
@@ -292,7 +318,7 @@ begin
       )
     port map(
       i_clk      => clk,                -- system clock
-      i_rst      => mmcm_rst,           -- reset sync @ref_clk
+      i_rst      => rst,                -- reset sync @ref_clk
       i_adc_clk  => adc_clk,            -- adc clock
       i_ref_clk  => ref_clk,            -- reference clock
       i_dac_clk  => dac_clk,            -- dac clock
@@ -365,81 +391,91 @@ begin
       ---------------------------------------------------------------------
       -- adc
       ---------------------------------------------------------------------
+      -- from the reset_top: @adc_clk
+      i_adc_io_clk_rst => adc_io_clk_rst,
+      i_adc_io_rst     => adc_io_rst,
       -- from MMCM 
-      i_adc_clk => adc_clk,
+      i_adc_clk        => adc_clk,
       -- from fpga pads: adc_a 
-      i_da0_p   => i_da0_p,
-      i_da0_n   => i_da0_n,
-      i_da2_p   => i_da2_p,
-      i_da2_n   => i_da2_n,
-      i_da4_p   => i_da4_p,
-      i_da4_n   => i_da4_n,
-      i_da6_p   => i_da6_p,
-      i_da6_n   => i_da6_n,
-      i_da8_p   => i_da8_p,
-      i_da8_n   => i_da8_n,
-      i_da10_p  => i_da10_p,
-      i_da10_n  => i_da10_n,
-      i_da12_p  => i_da12_p,
-      i_da12_n  => i_da12_n,
+      i_da0_p          => i_da0_p,
+      i_da0_n          => i_da0_n,
+      i_da2_p          => i_da2_p,
+      i_da2_n          => i_da2_n,
+      i_da4_p          => i_da4_p,
+      i_da4_n          => i_da4_n,
+      i_da6_p          => i_da6_p,
+      i_da6_n          => i_da6_n,
+      i_da8_p          => i_da8_p,
+      i_da8_n          => i_da8_n,
+      i_da10_p         => i_da10_p,
+      i_da10_n         => i_da10_n,
+      i_da12_p         => i_da12_p,
+      i_da12_n         => i_da12_n,
       -- from fpga pads: adc_b
-      i_db0_p   => i_db0_p,
-      i_db0_n   => i_db0_n,
-      i_db2_p   => i_db2_p,
-      i_db2_n   => i_db2_n,
-      i_db4_p   => i_db4_p,
-      i_db4_n   => i_db4_n,
-      i_db6_p   => i_db6_p,
-      i_db6_n   => i_db6_n,
-      i_db8_p   => i_db8_p,
-      i_db8_n   => i_db8_n,
-      i_db10_p  => i_db10_p,
-      i_db10_n  => i_db10_n,
-      i_db12_p  => i_db12_p,
-      i_db12_n  => i_db12_n,
+      i_db0_p          => i_db0_p,
+      i_db0_n          => i_db0_n,
+      i_db2_p          => i_db2_p,
+      i_db2_n          => i_db2_n,
+      i_db4_p          => i_db4_p,
+      i_db4_n          => i_db4_n,
+      i_db6_p          => i_db6_p,
+      i_db6_n          => i_db6_n,
+      i_db8_p          => i_db8_p,
+      i_db8_n          => i_db8_n,
+      i_db10_p         => i_db10_p,
+      i_db10_n         => i_db10_n,
+      i_db12_p         => i_db12_p,
+      i_db12_n         => i_db12_n,
 
 
       -- to user :
-      o_adc_valid   => adc_valid,
-      o_adc_a       => adc_a,
-      o_adc_b       => adc_b,
+      o_adc_valid       => adc_valid,
+      o_adc_a           => adc_a,
+      o_adc_b           => adc_b,
       ---------------------------------------------------------------------
       -- sync
       ---------------------------------------------------------------------
-      -- from the user: @clk_ref 
-      i_ref_clk     => ref_clk,
-      i_sync        => sync,
+      -- from the reset_top: @ref_clk
+      i_sync_io_clk_rst => sync_io_clk_rst,
+      i_sync_io_rst     => sync_io_rst,
+
+      -- from the user: @ref_ref 
+      i_ref_clk        => ref_clk,
+      i_sync           => sync,
       -- to the fpga pads 
-      o_ref_clk     => o_ref_clk,
-      o_sync        => o_sync,
+      o_ref_clk        => o_ref_clk,
+      o_sync           => o_sync,
       ---------------------------------------------------------------------
       -- dac
       ---------------------------------------------------------------------
+      -- from the reset_top: @dac_clk
+      i_dac_io_clk_rst => dac_io_clk_rst,
+      i_dac_io_rst     => dac_io_rst,
       -- from the user
-      i_dac_clk     => dac_clk,
-      i_dac_frame   => dac_frame,
-      i_dac         => dac,
+      i_dac_clk        => dac_clk,
+      i_dac_frame      => dac_frame,
+      i_dac            => dac,
       -- to the fpga pads
-      o_dac_clk_p   => o_dac_clk_p,
-      o_dac_clk_n   => o_dac_clk_n,
-      o_dac_frame_p => o_dac_frame_p,
-      o_dac_frame_n => o_dac_frame_n,
-      o_dac0_p      => o_dac0_p,
-      o_dac0_n      => o_dac0_n,
-      o_dac1_p      => o_dac1_p,
-      o_dac1_n      => o_dac1_n,
-      o_dac2_p      => o_dac2_p,
-      o_dac2_n      => o_dac2_n,
-      o_dac3_p      => o_dac3_p,
-      o_dac3_n      => o_dac3_n,
-      o_dac4_p      => o_dac4_p,
-      o_dac4_n      => o_dac4_n,
-      o_dac5_p      => o_dac5_p,
-      o_dac5_n      => o_dac5_n,
-      o_dac6_p      => o_dac6_p,
-      o_dac6_n      => o_dac6_n,
-      o_dac7_p      => o_dac7_p,
-      o_dac7_n      => o_dac7_n
+      o_dac_clk_p      => o_dac_clk_p,
+      o_dac_clk_n      => o_dac_clk_n,
+      o_dac_frame_p    => o_dac_frame_p,
+      o_dac_frame_n    => o_dac_frame_n,
+      o_dac0_p         => o_dac0_p,
+      o_dac0_n         => o_dac0_n,
+      o_dac1_p         => o_dac1_p,
+      o_dac1_n         => o_dac1_n,
+      o_dac2_p         => o_dac2_p,
+      o_dac2_n         => o_dac2_n,
+      o_dac3_p         => o_dac3_p,
+      o_dac3_n         => o_dac3_n,
+      o_dac4_p         => o_dac4_p,
+      o_dac4_n         => o_dac4_n,
+      o_dac5_p         => o_dac5_p,
+      o_dac5_n         => o_dac5_n,
+      o_dac6_p         => o_dac6_p,
+      o_dac6_n         => o_dac6_n,
+      o_dac7_p         => o_dac7_p,
+      o_dac7_n         => o_dac7_n
       );
 
   ---------------------------------------------------------------------
