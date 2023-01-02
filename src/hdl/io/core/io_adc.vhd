@@ -24,92 +24,113 @@
 -- -------------------------------------------------------------------------------------------------------------
 --!   @details                
 --
--- This module generates fpga specific IO component with an optional user-defined latency
---
--- Example0:
---   Input ports ->  fpga specific IO generation -> optionnal latency -> output ports
+-- This module generates fpga specific IO component
 --
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
-Library UNISIM;
+library UNISIM;
 use UNISIM.vcomponents.all;
 
 
 entity io_adc is
-   generic(
-      g_ADC_WIDTH     : positive := 7;  -- adc bus width (expressed in bits).Possible values [1;max integer value[
-      g_INPUT_LATENCY : natural  := 0   -- add latency after the input IO. Possible values: [0; max integer value[
-   );
-   port(
-      i_clk   : in  std_logic;          -- clock
-      ---------------------------------------------------------------------
-      -- input
-      ---------------------------------------------------------------------
-      i_adc_p : in  std_logic_vector(g_ADC_WIDTH - 1 downto 0); -- Diff_p buffer input
-      i_adc_n : in  std_logic_vector(g_ADC_WIDTH - 1 downto 0); -- Diff_n buffer input
+  generic(
+    g_ADC_A_WIDTH   : positive := 7;  -- adc bus width (expressed in bits).Possible values [1;max integer value[
+    g_ADC_B_WIDTH   : positive := 7;  -- adc bus width (expressed in bits).Possible values [1;max integer value[
+    g_INPUT_LATENCY : natural  := 0  -- add latency after the input IO. Possible values: [0; max integer value[
+    );
+  port(
+    ---------------------------------------------------------------------
+    -- input
+    ---------------------------------------------------------------------
+    -- input
+    i_clk        : in std_logic;        -- clock
+    -- from reset_top: @i_clk
+    i_io_clk_rst : in std_logic;  -- Clock reset: Reset connected to clocking elements in the circuit
+    i_io_rst     : in std_logic;  -- Reset connected to all other elements in the circuit
 
-      ---------------------------------------------------------------------
-      -- output
-      ---------------------------------------------------------------------
-      o_adc   : out std_logic_vector(g_ADC_WIDTH * 2 - 1 downto 0)
-   );
+    -- i_adc_a
+    i_adc_a_p : in std_logic_vector(g_ADC_A_WIDTH - 1 downto 0);  -- Diff_p buffer input
+    i_adc_a_n : in std_logic_vector(g_ADC_A_WIDTH - 1 downto 0);  -- Diff_n buffer input
+
+    -- i_adc_b
+    i_adc_b_p : in std_logic_vector(g_ADC_B_WIDTH - 1 downto 0);  -- Diff_p buffer input
+    i_adc_b_n : in std_logic_vector(g_ADC_B_WIDTH - 1 downto 0);  -- Diff_n buffer input
+
+    ---------------------------------------------------------------------
+    -- output
+    ---------------------------------------------------------------------
+    o_adc_a : out std_logic_vector(g_ADC_A_WIDTH * 2 - 1 downto 0);
+    o_adc_b : out std_logic_vector(g_ADC_B_WIDTH * 2 - 1 downto 0)
+    );
 end entity io_adc;
 
 architecture RTL of io_adc is
 
-   signal adc_tmp0 : std_logic_vector(o_adc'range);
-   signal adc_tmp1 : std_logic_vector(o_adc'range);
-
-   ---------------------------------------------------------------------
-   -- add pipeline
-   ---------------------------------------------------------------------
-   signal adc_tmp2 : std_logic_vector(o_adc'range);
+  ---------------------------------------------------------------------
+  -- io_adc_single
+  ---------------------------------------------------------------------
+  signal adc_a : std_logic_vector(o_adc_a'range);
+  signal adc_b : std_logic_vector(o_adc_b'range);
 
 begin
 
-   inst_selectio_wiz_adc : entity work.selectio_wiz_adc
-      port map(
-         data_in_from_pins_p => i_adc_p,
-         data_in_from_pins_n => i_adc_n,
-         data_in_to_device   => adc_tmp0,
-         clk_in              => i_clk,
-         sync_reset          => '0',
-         io_reset            => '0'
-      );
-
-   ---------------------------------------------------------------------
-   -- I/O interface:
-   -- bit remapping : see the selectio_wiz_adc_sim_netlist.vhdl from Xilinx ip compilation.
-   -- adc_tmp1(0) <= adc_tmp0(0); -- pos edge
-   -- adc_tmp1(1) <= adc_tmp0(7); -- neg edge
-   -- adc_tmp1(2) <= adc_tmp0(1); -- pos edge
-   -- adc_tmp1(3) <= adc_tmp0(8); -- neg edge
-   -- and so on
-   ---------------------------------------------------------------------
-   remapp_bit : for i in i_adc_p'range generate
-      adc_tmp1(2 * i)     <= adc_tmp0(i);
-      adc_tmp1(2 * i + 1) <= adc_tmp0(i + 7);
-   end generate remapp_bit;
-   ---------------------------------------------------------------------
-   -- optionnally add latency after input IO
-   ---------------------------------------------------------------------
-   inst_pipeliner_add_input_latency : entity work.pipeliner
-      generic map(
-         g_NB_PIPES   => g_INPUT_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
-         g_DATA_WIDTH => adc_tmp1'length -- width of the input/output data.  Possibles values: [1, integer max value[
+---------------------------------------------------------------------
+-- adc: a ways
+---------------------------------------------------------------------
+  inst_io_adc_single_a : entity work.io_adc_single
+    generic map(
+      g_ADC_WIDTH     => i_adc_a_p'length,  -- adc bus width (expressed in bits).Possible values [1;max integer value[
+      g_INPUT_LATENCY => g_INPUT_LATENCY  -- add latency after the input IO. Possible values: [0; max integer value[
       )
-      port map(
-         i_clk  => i_clk,               -- clock signal
-         i_data => adc_tmp1,            -- input data
-         o_data => adc_tmp2             -- output data with/without delay
+    port map(
+
+      i_clk        => i_clk,            -- clock
+      -- from reset_top: @i_clk
+      i_io_clk_rst => i_io_clk_rst,
+      i_io_rst     => i_io_rst,
+      ---------------------------------------------------------------------
+      -- input
+      ---------------------------------------------------------------------
+      i_adc_p      => i_adc_a_p,        -- Diff_p buffer input
+      i_adc_n      => i_adc_a_n,        -- Diff_n buffer input
+      ---------------------------------------------------------------------
+      -- output
+      ---------------------------------------------------------------------
+      o_adc        => adc_a
       );
 
-   ---------------------------------------------------------------------
-   -- output
-   ---------------------------------------------------------------------
-   o_adc <= adc_tmp2;
+---------------------------------------------------------------------
+-- adc: a ways
+---------------------------------------------------------------------
+  inst_io_adc_single_b : entity work.io_adc_single
+    generic map(
+      g_ADC_WIDTH     => i_adc_b_p'length,  -- adc bus width (expressed in bits).Possible values [1;max integer value[
+      g_INPUT_LATENCY => g_INPUT_LATENCY  -- add latency after the input IO. Possible values: [0; max integer value[
+      )
+    port map(
+      i_clk        => i_clk,            -- clock
+      -- from reset_top: @i_clk
+      i_io_clk_rst => i_io_clk_rst,
+      i_io_rst     => i_io_rst,
+      ---------------------------------------------------------------------
+      -- input
+      ---------------------------------------------------------------------
+      i_adc_p      => i_adc_b_p,        -- Diff_p buffer input
+      i_adc_n      => i_adc_b_n,        -- Diff_n buffer input
+      ---------------------------------------------------------------------
+      -- output
+      ---------------------------------------------------------------------
+      o_adc        => adc_b
+      );
+
+
+---------------------------------------------------------------------
+-- output
+---------------------------------------------------------------------
+  o_adc_a <= adc_a;
+  o_adc_b <= adc_b;
 
 end architecture RTL;

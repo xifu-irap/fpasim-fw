@@ -41,80 +41,94 @@ entity io_top is
     -- adc
     ---------------------------------------------------------------------
     -- from MMCM 
-    i_adc_clk     : in  std_logic;
+    i_adc_clk        : in  std_logic;
+    -- from the reset_top: @adc_clk
+    i_adc_io_clk_rst : in  std_logic;  -- Clock reset: Reset connected to clocking elements in the circuit
+    i_adc_io_rst     : in  std_logic;  -- Reset connected to all other elements in the circuit
     -- from fpga pads: adc_a 
-    i_da0_p       : in  std_logic;
-    i_da0_n       : in  std_logic;
-    i_da2_p       : in  std_logic;
-    i_da2_n       : in  std_logic;
-    i_da4_p       : in  std_logic;
-    i_da4_n       : in  std_logic;
-    i_da6_p       : in  std_logic;
-    i_da6_n       : in  std_logic;
-    i_da8_p       : in  std_logic;
-    i_da8_n       : in  std_logic;
-    i_da10_p      : in  std_logic;
-    i_da10_n      : in  std_logic;
-    i_da12_p      : in  std_logic;
-    i_da12_n      : in  std_logic;
+    i_da0_p          : in  std_logic;
+    i_da0_n          : in  std_logic;
+    i_da2_p          : in  std_logic;
+    i_da2_n          : in  std_logic;
+    i_da4_p          : in  std_logic;
+    i_da4_n          : in  std_logic;
+    i_da6_p          : in  std_logic;
+    i_da6_n          : in  std_logic;
+    i_da8_p          : in  std_logic;
+    i_da8_n          : in  std_logic;
+    i_da10_p         : in  std_logic;
+    i_da10_n         : in  std_logic;
+    i_da12_p         : in  std_logic;
+    i_da12_n         : in  std_logic;
     -- from fpga pads: adc_b
-    i_db0_p       : in  std_logic;
-    i_db0_n       : in  std_logic;
-    i_db2_p       : in  std_logic;
-    i_db2_n       : in  std_logic;
-    i_db4_p       : in  std_logic;
-    i_db4_n       : in  std_logic;
-    i_db6_p       : in  std_logic;
-    i_db6_n       : in  std_logic;
-    i_db8_p       : in  std_logic;
-    i_db8_n       : in  std_logic;
-    i_db10_p      : in  std_logic;
-    i_db10_n      : in  std_logic;
-    i_db12_p      : in  std_logic;
-    i_db12_n      : in  std_logic;
+    i_db0_p          : in  std_logic;
+    i_db0_n          : in  std_logic;
+    i_db2_p          : in  std_logic;
+    i_db2_n          : in  std_logic;
+    i_db4_p          : in  std_logic;
+    i_db4_n          : in  std_logic;
+    i_db6_p          : in  std_logic;
+    i_db6_n          : in  std_logic;
+    i_db8_p          : in  std_logic;
+    i_db8_n          : in  std_logic;
+    i_db10_p         : in  std_logic;
+    i_db10_n         : in  std_logic;
+    i_db12_p         : in  std_logic;
+    i_db12_n         : in  std_logic;
     -- to user : adc_a
-    o_adc_valid   : out std_logic;
-    o_adc_a       : out std_logic_vector(13 downto 0);
-    o_adc_b       : out std_logic_vector(13 downto 0);
-    
+    o_adc_valid      : out std_logic;
+    o_adc_a          : out std_logic_vector(13 downto 0);
+    o_adc_b          : out std_logic_vector(13 downto 0);
+
     ---------------------------------------------------------------------
     -- sync
     ---------------------------------------------------------------------
     -- from the user: @clk_ref 
-    i_ref_clk     : in  std_logic;
-    i_sync        : in  std_logic;
+    i_ref_clk : in std_logic;
+
+    -- from the reset_top: @ref_clk
+    i_sync_io_clk_rst : in std_logic;  -- Clock reset: Reset connected to clocking elements in the circuit
+    i_sync_io_rst     : in std_logic;  -- Reset connected to all other elements in the circuit
+
+    -- from the user
+    i_sync : in std_logic;
+
     -- to the fpga pads 
-    o_ref_clk     : out std_logic;
-    o_sync        : out std_logic;
+    o_ref_clk        : out std_logic;
+    o_sync           : out std_logic;
     ---------------------------------------------------------------------
     -- dac
     ---------------------------------------------------------------------
     -- from the user
-    i_dac_clk     : in  std_logic;
-    i_dac_frame   : in  std_logic;
-    i_dac         : in  std_logic_vector(15 downto 0);
+    i_dac_clk        : in  std_logic;
+    -- from the reset_top: @dac_clk
+    i_dac_io_clk_rst : in  std_logic;  -- Clock reset: Reset connected to clocking elements in the circuit
+    i_dac_io_rst     : in  std_logic;  -- Reset connected to all other elements in the circuit
+    -- from the user: @i_dac_clk
+    i_dac_frame      : in  std_logic;
+    i_dac            : in  std_logic_vector(15 downto 0);
     -- to the fpga pads
-    o_dac_clk_p   : out std_logic;
-    o_dac_clk_n   : out std_logic;
-    o_dac_frame_p : out std_logic;
-    o_dac_frame_n : out std_logic;
-    o_dac0_p      : out std_logic;
-    o_dac0_n      : out std_logic;
-    o_dac1_p      : out std_logic;
-    o_dac1_n      : out std_logic;
-    o_dac2_p      : out std_logic;
-    o_dac2_n      : out std_logic;
-    o_dac3_p      : out std_logic;
-    o_dac3_n      : out std_logic;
-    o_dac4_p      : out std_logic;
-    o_dac4_n      : out std_logic;
-    o_dac5_p      : out std_logic;
-    o_dac5_n      : out std_logic;
-    o_dac6_p      : out std_logic;
-    o_dac6_n      : out std_logic;
-    o_dac7_p      : out std_logic;
-    o_dac7_n      : out std_logic
-  );
+    o_dac_clk_p      : out std_logic;
+    o_dac_clk_n      : out std_logic;
+    o_dac_frame_p    : out std_logic;
+    o_dac_frame_n    : out std_logic;
+    o_dac0_p         : out std_logic;
+    o_dac0_n         : out std_logic;
+    o_dac1_p         : out std_logic;
+    o_dac1_n         : out std_logic;
+    o_dac2_p         : out std_logic;
+    o_dac2_n         : out std_logic;
+    o_dac3_p         : out std_logic;
+    o_dac3_n         : out std_logic;
+    o_dac4_p         : out std_logic;
+    o_dac4_n         : out std_logic;
+    o_dac5_p         : out std_logic;
+    o_dac5_n         : out std_logic;
+    o_dac6_p         : out std_logic;
+    o_dac6_n         : out std_logic;
+    o_dac7_p         : out std_logic;
+    o_dac7_n         : out std_logic
+    );
 end entity io_top;
 
 architecture RTL of io_top is
@@ -137,9 +151,10 @@ architecture RTL of io_top is
 
 begin
 
-  ---------------------------------------------------------------------
+---------------------------------------------------------------------
+-- io_adc
+---------------------------------------------------------------------
   -- adc_a
-  ---------------------------------------------------------------------
   adc_a_tmp0_p(6) <= i_da12_p;
   adc_a_tmp0_n(6) <= i_da12_n;
 
@@ -161,28 +176,7 @@ begin
   adc_a_tmp0_p(0) <= i_da0_p;
   adc_a_tmp0_n(0) <= i_da0_n;
 
-  inst_io_adc_a : entity work.io_adc
-    generic map(
-      g_ADC_WIDTH     => adc_a_tmp0_p'length,
-      g_INPUT_LATENCY => c_ADC_INPUT_LATENCY
-    )
-    port map(
-      i_clk   => i_adc_clk,             -- clock
-      ---------------------------------------------------------------------
-      -- input
-      ---------------------------------------------------------------------
-      i_adc_p => adc_a_tmp0_p,          -- Diff_p buffer input
-      i_adc_n => adc_a_tmp0_n,          -- Diff_n buffer input
-      ---------------------------------------------------------------------
-      -- output
-      ---------------------------------------------------------------------
-      o_adc   => adc_a_tmp1
-    );
-  o_adc_a <= adc_a_tmp1;
-
-  ---------------------------------------------------------------------
   -- adc_b
-  ---------------------------------------------------------------------
   adc_b_tmp0_p(6) <= i_db12_p;
   adc_b_tmp0_n(6) <= i_db12_n;
 
@@ -204,23 +198,35 @@ begin
   adc_b_tmp0_p(0) <= i_db0_p;
   adc_b_tmp0_n(0) <= i_db0_n;
 
-  inst_io_adc_b : entity work.io_adc
+  inst_io_adc : entity work.io_adc
     generic map(
-      g_ADC_WIDTH     => adc_b_tmp0_p'length,
-      g_INPUT_LATENCY => c_ADC_INPUT_LATENCY
-    )
+      g_ADC_A_WIDTH   => adc_a_tmp0_p'length,  -- adc bus width (expressed in bits).Possible values [1;max integer value[
+      g_ADC_B_WIDTH   => adc_b_tmp0_p'length,  -- adc bus width (expressed in bits).Possible values [1;max integer value[
+      g_INPUT_LATENCY => c_ADC_INPUT_LATENCY  -- add latency after the input IO. Possible values: [0; max integer value[
+      )
     port map(
-      i_clk   => i_adc_clk,             -- clock
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_adc_p => adc_b_tmp0_p,          -- Diff_p buffer input
-      i_adc_n => adc_b_tmp0_n,          -- Diff_n buffer input
+      --
+      i_clk        => i_adc_clk,        -- clock
+      -- from reset_top: @i_clk
+      i_io_clk_rst => i_adc_io_clk_rst,
+      i_io_rst     => i_adc_io_rst,
+      -- adc_a
+      i_adc_a_p    => adc_a_tmp0_p,     -- Diff_p buffer input
+      i_adc_a_n    => adc_a_tmp0_n,     -- Diff_n buffer input
+      -- adc_b
+      i_adc_b_p    => adc_b_tmp0_p,     -- Diff_p buffer input
+      i_adc_b_n    => adc_b_tmp0_n,     -- Diff_n buffer input
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      o_adc   => adc_b_tmp1
-    );
+      o_adc_a      => adc_a_tmp1,
+      o_adc_b      => adc_b_tmp1
+      );
+
+  o_adc_a <= adc_a_tmp1;
   o_adc_b <= adc_b_tmp1;
 
   o_adc_valid <= '1';
@@ -231,19 +237,22 @@ begin
   inst_io_sync : entity work.io_sync
     generic map(
       g_OUTPUT_LATENCY => c_SYNC_OUTPUT_LATENCY
-    )
+      )
     port map(
-      i_clk      => i_ref_clk,          -- clock
+      i_clk        => i_ref_clk,        -- clock
+      -- from reset_top: @i_ref_clk
+      i_io_clk_rst => i_sync_io_clk_rst,
+      i_io_rst     => i_sync_io_rst,
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_sync     => i_sync,
+      i_sync       => i_sync,
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      o_sync_clk => o_ref_clk,
-      o_sync     => o_sync
-    );
+      o_sync_clk   => o_ref_clk,
+      o_sync       => o_sync
+      );
 
   ---------------------------------------------------------------------
   -- dac
@@ -251,9 +260,12 @@ begin
   inst_io_dac : entity work.io_dac
     generic map(
       g_OUTPUT_LATENCY => c_DAC_OUTPUT_LATENCY
-    )
+      )
     port map(
       i_clk         => i_dac_clk,       -- clock
+      -- from reset_top: @i_dac_clk
+      i_io_clk_rst  => i_dac_io_clk_rst,
+      i_io_rst      => i_dac_io_rst,
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
@@ -282,6 +294,6 @@ begin
       o_dac6_n      => o_dac6_n,
       o_dac7_p      => o_dac7_p,
       o_dac7_n      => o_dac7_n
-    );
+      );
 
 end architecture RTL;
