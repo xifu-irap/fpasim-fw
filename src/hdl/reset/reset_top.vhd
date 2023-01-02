@@ -41,20 +41,44 @@ entity reset_top is
     ---------------------------------------------------------------------
     -- from the board
     ---------------------------------------------------------------------
-    i_reset   : in  std_logic; -- asynchronuous reset
+    i_reset   : in  std_logic;          -- asynchronuous reset
     ---------------------------------------------------------------------
     -- from/to the usb
     ---------------------------------------------------------------------
-    i_usb_clk : in  std_logic; -- clock @usb_clk
-    i_usb_rst : in  std_logic; -- reset @usb_clk
-    o_usb_rst : out std_logic; -- output reset with user-defined pulse_width @usb_clk
+    i_usb_clk : in  std_logic;          -- clock @usb_clk
+    i_usb_rst : in  std_logic;          -- reset @usb_clk
+    o_usb_rst : out std_logic;  -- output reset with user-defined pulse_width @usb_clk
 
     ---------------------------------------------------------------------
     -- from/to the mmcm
     ---------------------------------------------------------------------
-    i_mmcm_slowest_clk : in  std_logic; -- mmcm_clk (clock)
-    i_mmcm_locked      : in  std_logic; -- mmcm locked signal
-    o_mmcm_rst         : out std_logic -- output reset @i_mmcm_slowest_clk
+    i_mmcm_clk      : in  std_logic;    -- system clock
+    i_mmcm_adc_clk  : in  std_logic;    -- adc clock
+    i_mmcm_dac_clk  : in  std_logic;    -- dac clock
+    i_mmcm_sync_clk : in  std_logic;    -- sync/reference clock
+    i_mmcm_locked   : in  std_logic;    -- mmcm locked signal
+    ---------------------------------------------------------------------
+    -- to the user
+    ---------------------------------------------------------------------
+    o_rst           : out std_logic;    -- output reset @i_mmcm_clk
+
+    ---------------------------------------------------------------------
+    -- to the io_adc @i_mmcm_adc_clk
+    ---------------------------------------------------------------------
+    o_adc_io_clk_rst : out std_logic;  -- Clock reset: Reset connected to clocking elements in the circuit
+    o_adc_io_rst     : out std_logic;  -- Reset connected to all other elements in the circuit
+
+    ---------------------------------------------------------------------
+    -- to the io_dac @i_mmcm_dac_clk
+    ---------------------------------------------------------------------
+    o_dac_io_clk_rst : out std_logic;  -- Clock reset: Reset connected to clocking elements in the circuit
+    o_dac_io_rst     : out std_logic;  -- Reset connected to all other elements in the circuit
+
+    ---------------------------------------------------------------------
+    -- to the io_sync @i_mmcm_sync_clk
+    ---------------------------------------------------------------------
+    o_sync_io_clk_rst : out std_logic;  -- Clock reset: Reset connected to clocking elements in the circuit
+    o_sync_io_rst     : out std_logic  -- Reset connected to all other elements in the circuit
 
     );
 end entity reset_top;
@@ -69,10 +93,32 @@ architecture RTL of reset_top is
   signal usb_rst_tmp2 : std_logic;
 
   ---------------------------------------------------------------------
-  -- mmcm reset
+  -- user reset
   ---------------------------------------------------------------------
   signal mmcm_rst_tmp1 : std_logic;
   signal mmcm_rst_tmp2 : std_logic;
+
+  ---------------------------------------------------------------------
+  -- io_adc
+  ---------------------------------------------------------------------
+  signal adc_rst_tmp1   : std_logic;
+  signal adc_io_clk_rst : std_logic;
+  signal adc_io_rst     : std_logic;
+
+  ---------------------------------------------------------------------
+  -- io_dac
+  ---------------------------------------------------------------------
+  signal dac_rst_tmp1   : std_logic;
+  signal dac_io_clk_rst : std_logic;
+  signal dac_io_rst     : std_logic;
+
+  ---------------------------------------------------------------------
+  -- io_sync
+  ---------------------------------------------------------------------
+  signal sync_rst_tmp1   : std_logic;
+  signal sync_io_clk_rst : std_logic;
+  signal sync_io_rst     : std_logic;
+
 
 begin
 ---------------------------------------------------------------------
@@ -134,18 +180,18 @@ begin
       ---------------------------------------------------------------------
       -- source
       ---------------------------------------------------------------------
-      i_clk              => i_usb_clk,
-      i_rst              => usb_rst_r1,
+      i_clk => i_usb_clk,
+      i_rst => usb_rst_r1,
       ---------------------------------------------------------------------
       -- destination @i_clk
       ---------------------------------------------------------------------
-      o_rst              => usb_rst_tmp2
+      o_rst => usb_rst_tmp2
       );
 
   o_usb_rst <= usb_rst_tmp2;
 
 ---------------------------------------------------------------------
--- resynchronize usb_rst/mmcm_locked @i_mmcm_slowest_clk
+-- resynchronize usb_rst/mmcm_locked @i_mmcm_clk
 ---------------------------------------------------------------------
   mmcm_rst_tmp1 <= usb_rst_tmp2 or not(i_mmcm_locked);
 
@@ -173,10 +219,94 @@ begin
       ---------------------------------------------------------------------
       -- destination
       ---------------------------------------------------------------------
-      i_dest_clk => i_mmcm_slowest_clk,  -- Destination clock.
+      i_dest_clk => i_mmcm_clk,         -- Destination clock.
       o_dest_rst => mmcm_rst_tmp2  -- src_rst synchronized to the destination clock domain. This output is registered.
       );
 
-  o_mmcm_rst <= mmcm_rst_tmp2;
+  o_rst <= mmcm_rst_tmp2;
+
+  ---------------------------------------------------------------------
+  -- to io_adc
+  ---------------------------------------------------------------------
+  adc_rst_tmp1 <= usb_rst_tmp2;
+  inst_reset_io_adc : entity work.reset_io
+    generic map(
+      -- +---------------------------------------------------------------------------------------------------------------------+
+      -- | DEST_SYNC_FF         | Integer            | Range: 1 - max integer value. Default value = 4.                        |
+      -- |---------------------------------------------------------------------------------------------------------------------|
+      -- | Number of register stages used to define the reset pulse width
+      g_DEST_FF => 8
+      )
+    port map(
+      ---------------------------------------------------------------------
+      -- input
+      ---------------------------------------------------------------------
+      i_rst         => adc_rst_tmp1,    -- asynchronuous reset
+      ---------------------------------------------------------------------
+      -- from the mmcm
+      ---------------------------------------------------------------------
+      i_mmcm_clk    => i_mmcm_adc_clk,  -- mmcm_clk (clock)
+      i_mmcm_locked => i_mmcm_locked,   -- mmcm locked signal
+      o_io_clk_rst  => adc_io_clk_rst,  -- Clock reset: Reset connected to clocking elements in the circuit
+      o_io_rst      => adc_io_rst  -- Reset connected to all other elements in the circuit
+      );
+  o_adc_io_clk_rst <= adc_io_clk_rst;
+  o_adc_io_rst     <= adc_io_rst;
+
+  ---------------------------------------------------------------------
+  -- to io_dac
+  ---------------------------------------------------------------------
+  dac_rst_tmp1 <= usb_rst_tmp2;
+  inst_reset_io_dac : entity work.reset_io
+    generic map(
+      -- +---------------------------------------------------------------------------------------------------------------------+
+      -- | DEST_SYNC_FF         | Integer            | Range: 1 - max integer value. Default value = 4.                        |
+      -- |---------------------------------------------------------------------------------------------------------------------|
+      -- | Number of register stages used to define the reset pulse width
+      g_DEST_FF => 8
+      )
+    port map(
+      ---------------------------------------------------------------------
+      -- input
+      ---------------------------------------------------------------------
+      i_rst         => dac_rst_tmp1,    -- asynchronuous reset
+      ---------------------------------------------------------------------
+      -- from the mmcm
+      ---------------------------------------------------------------------
+      i_mmcm_clk    => i_mmcm_dac_clk,  -- mmcm_clk (clock)
+      i_mmcm_locked => i_mmcm_locked,   -- mmcm locked signal
+      o_io_clk_rst  => dac_io_clk_rst,  -- Clock reset: Reset connected to clocking elements in the circuit
+      o_io_rst      => dac_io_rst  -- Reset connected to all other elements in the circuit
+      );
+  o_dac_io_clk_rst <= dac_io_clk_rst;
+  o_dac_io_rst     <= dac_io_rst;
+
+  ---------------------------------------------------------------------
+  -- to io_sync
+  ---------------------------------------------------------------------
+  sync_rst_tmp1 <= usb_rst_tmp2;
+  inst_reset_io_sync : entity work.reset_io
+    generic map(
+      -- +---------------------------------------------------------------------------------------------------------------------+
+      -- | DEST_SYNC_FF         | Integer            | Range: 1 - max integer value. Default value = 4.                        |
+      -- |---------------------------------------------------------------------------------------------------------------------|
+      -- | Number of register stages used to define the reset pulse width
+      g_DEST_FF => 8
+      )
+    port map(
+      ---------------------------------------------------------------------
+      -- input
+      ---------------------------------------------------------------------
+      i_rst         => sync_rst_tmp1,   -- asynchronuous reset
+      ---------------------------------------------------------------------
+      -- from the mmcm
+      ---------------------------------------------------------------------
+      i_mmcm_clk    => i_mmcm_sync_clk,  -- mmcm_clk (clock)
+      i_mmcm_locked => i_mmcm_locked,   -- mmcm locked signal
+      o_io_clk_rst  => sync_io_clk_rst,  -- Clock reset: Reset connected to clocking elements in the circuit
+      o_io_rst      => sync_io_rst  -- Reset connected to all other elements in the circuit
+      );
+  o_sync_io_clk_rst <= sync_io_clk_rst;
+  o_sync_io_rst     <= sync_io_rst;
 
 end architecture RTL;
