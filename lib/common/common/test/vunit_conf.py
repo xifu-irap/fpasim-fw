@@ -183,6 +183,8 @@ class VunitConf:
         base_path_dic['src_io_path'] = str(Path(root_path, 'src/hdl/io'))
         base_path_dic['src_usb_path'] = str(Path(root_path, 'src/hdl/usb'))
         base_path_dic['src_utils_path'] = str(Path(root_path, 'src/hdl/utils'))
+        base_path_dic['src_reset_path'] = str(Path(root_path, 'src/hdl/reset'))
+        base_path_dic['src_spi_path'] = str(Path(root_path, 'src/hdl/spi'))
 
         base_path_dic['tb_path'] = str(Path(root_path, 'simu/tb'))
         base_path_dic['wave_path'] = str(Path(root_path, 'simu/wave'))
@@ -483,10 +485,13 @@ class VunitConf:
         filepath_list.append(str(Path(base_path, 'selectio_wiz_sync/selectio_wiz_sync.v')))
         filepath_list.append(str(Path(base_path, 'selectio_wiz_dac/selectio_wiz_dac_selectio_wiz.v')))
         filepath_list.append(str(Path(base_path, 'selectio_wiz_dac/selectio_wiz_dac.v')))
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_frame/selectio_wiz_dac_frame_selectio_wiz.v')))
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_frame/selectio_wiz_dac_frame.v')))
         filepath_list.append(str(Path(base_path, 'fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v')))
         filepath_list.append(str(Path(base_path, 'fpasim_clk_wiz_0/fpasim_clk_wiz_0.v')))
         filepath_list.append(str(Path(base_path, 'fpasim_top_ila_0/sim/fpasim_top_ila_0.vhd')))
         filepath_list.append(str(Path(base_path, 'fpasim_regdecode_top_ila_0/sim/fpasim_regdecode_top_ila_0.vhd')))
+
 
         # add the library name
         self._add_library(library_name_p=library_name)
@@ -633,7 +638,7 @@ class VunitConf:
         level0   = self._get_indentation_level(level_p=level_p)
         directory_name = directory_name_p.lower()
 
-        if directory_name in ['system', 'clocking', 'fpasim', 'io', 'utils', 'usb']:
+        if directory_name in ['system', 'clocking', 'fpasim', 'io', 'utils', 'usb','reset','spi']:
             # based on the _build_path method, build the dictionary keys
             key_name = 'src_' + directory_name + '_path'
             base_path = base_path_dic[key_name]
