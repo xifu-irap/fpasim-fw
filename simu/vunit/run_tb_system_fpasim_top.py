@@ -232,6 +232,8 @@ if __name__ == '__main__':
     obj.compile_src_directory(directory_name_p='fpasim',level_p=level1)
     obj.compile_src_directory(directory_name_p='usb',level_p=level1)
     obj.compile_src_directory(directory_name_p='io',level_p=level1)
+    obj.compile_src_directory(directory_name_p='reset',level_p=level1)
+    obj.compile_src_directory(directory_name_p='spi',level_p=level1)
 
     #####################################################
     # add testbench file

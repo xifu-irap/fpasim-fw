@@ -392,149 +392,31 @@ add wave -noupdate -group regdecode_pipe_rd_all -expand -group out /tb_system_fp
 add wave -noupdate -group regdecode_pipe_rd_all -expand -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_rd_all/o_fifo_data
 add wave -noupdate -group regdecode_pipe_rd_all -expand -group out -radix unsigned /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_rd_all/o_fifo_data_count
 add wave -noupdate -group regdecode_pipe_rd_all -expand -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_rd_all/o_fifo_empty
-add wave -noupdate -group regdecode_pipe_rd_all -expand -group error_status /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_rd_all/i_out_clk
-add wave -noupdate -group regdecode_pipe_rd_all -expand -group error_status /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_rd_all/i_rst_status
-add wave -noupdate -group regdecode_pipe_rd_all -expand -group error_status /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_rd_all/i_debug_pulse
-add wave -noupdate -group regdecode_pipe_rd_all -expand -group error_status -color Magenta -itemcolor Red /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_rd_all/o_errors
-add wave -noupdate -group regdecode_pipe_rd_all -expand -group error_status /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_regdecode_pipe/inst_regdecode_pipe_rd_all/o_status
-add wave -noupdate -divider tes
-add wave -noupdate -group tes_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_cmd_valid
-add wave -noupdate -group tes_top -radix unsigned /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_cmd_pulse_height
-add wave -noupdate -group tes_top -radix unsigned /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_cmd_pixel_id
-add wave -noupdate -group tes_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_cmd_time_shift
-add wave -noupdate -group tes_top -group ram_pulse_shape /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_pulse_shape_wr_en
-add wave -noupdate -group tes_top -group ram_pulse_shape -radix unsigned /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_pulse_shape_wr_rd_addr
-add wave -noupdate -group tes_top -group ram_pulse_shape -radix unsigned /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_pulse_shape_wr_data
-add wave -noupdate -group tes_top -group ram_pulse_shape /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_pulse_shape_rd_en
-add wave -noupdate -group tes_top -group ram_pulse_shape /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/o_pulse_shape_rd_valid
-add wave -noupdate -group tes_top -group ram_pulse_shape /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/o_pulse_shape_rd_data
-add wave -noupdate -group tes_top -group ram_steady_state /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_steady_state_wr_en
-add wave -noupdate -group tes_top -group ram_steady_state /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_steady_state_wr_rd_addr
-add wave -noupdate -group tes_top -group ram_steady_state /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_steady_state_wr_data
-add wave -noupdate -group tes_top -group ram_steady_state /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/i_steady_state_rd_en
-add wave -noupdate -group tes_top -group ram_steady_state /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/o_steady_state_rd_valid
-add wave -noupdate -group tes_top -group ram_steady_state /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_tes_top/o_steady_state_rd_data
-add wave -noupdate -divider mux_squid
-add wave -noupdate -group mux_squid_top -group generic /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/g_PIXEL_ID_WIDTH
-add wave -noupdate -group mux_squid_top -group generic /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/g_FRAME_ID_WIDTH
-add wave -noupdate -group mux_squid_top -group generic /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/g_MUX_SQUID_TF_RAM_ADDR_WIDTH
-add wave -noupdate -group mux_squid_top -group generic /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/g_PIXEL_RESULT_INPUT_WIDTH
-add wave -noupdate -group mux_squid_top -group generic /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/g_PIXEL_RESULT_OUTPUT_WIDTH
-add wave -noupdate -group mux_squid_top -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_clk
-add wave -noupdate -group mux_squid_top -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_rst_status
-add wave -noupdate -group mux_squid_top -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_debug_pulse
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_offset /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_mux_squid_offset_wr_en
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_offset /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_mux_squid_offset_wr_rd_addr
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_offset /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_mux_squid_offset_wr_data
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_offset /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_mux_squid_offset_rd_en
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_offset /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_mux_squid_offset_rd_valid
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_offset /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_mux_squid_offset_rd_data
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_tf /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_mux_squid_tf_wr_en
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_tf /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_mux_squid_tf_wr_rd_addr
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_tf /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_mux_squid_tf_wr_data
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_tf /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_mux_squid_tf_rd_en
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_tf /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_mux_squid_tf_rd_valid
-add wave -noupdate -group mux_squid_top -group in -group ram_mux_squid_tf /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_mux_squid_tf_rd_data
-add wave -noupdate -group mux_squid_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_pixel_sof
-add wave -noupdate -group mux_squid_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_pixel_eof
-add wave -noupdate -group mux_squid_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_pixel_valid
-add wave -noupdate -group mux_squid_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_pixel_id
-add wave -noupdate -group mux_squid_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_pixel_result
-add wave -noupdate -group mux_squid_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_frame_sof
-add wave -noupdate -group mux_squid_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_frame_eof
-add wave -noupdate -group mux_squid_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_frame_id
-add wave -noupdate -group mux_squid_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/i_mux_squid_feedback
-add wave -noupdate -group mux_squid_top -group output /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_pixel_sof
-add wave -noupdate -group mux_squid_top -group output /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_pixel_eof
-add wave -noupdate -group mux_squid_top -group output /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_pixel_valid
-add wave -noupdate -group mux_squid_top -group output /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_pixel_id
-add wave -noupdate -group mux_squid_top -group output /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_pixel_result
-add wave -noupdate -group mux_squid_top -group output /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_frame_sof
-add wave -noupdate -group mux_squid_top -group output /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_frame_eof
-add wave -noupdate -group mux_squid_top -group output /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_frame_id
-add wave -noupdate -group mux_squid_top -group output -group errors_status -color Magenta -itemcolor Red /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_errors
-add wave -noupdate -group mux_squid_top -group output -group errors_status /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_mux_squid_top/o_status
-add wave -noupdate -divider recording
-add wave -noupdate -group tmp /tb_system_fpasim_top/i_adc_clk_p
-add wave -noupdate -group tmp /tb_system_fpasim_top/i_adc_clk_n
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da0_p
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da0_n
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da2_p
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da2_n
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da4_p
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da4_n
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da6_p
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da6_n
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da8_p
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da8_n
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da10_p
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da10_n
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da12_p
-add wave -noupdate -group tmp -group da /tb_system_fpasim_top/i_da12_n
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db0_p
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db0_n
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db2_p
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db2_n
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db4_p
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db4_n
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db6_p
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db6_n
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db8_p
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db8_n
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db10_p
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db10_n
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db12_p
-add wave -noupdate -group tmp -group db /tb_system_fpasim_top/i_db12_n
-add wave -noupdate -group tmp -expand -group io_adc_a /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc_a/i_clk
-add wave -noupdate -group tmp -expand -group io_adc_a /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc_a/i_adc_p
-add wave -noupdate -group tmp -expand -group io_adc_a /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc_a/i_adc_n
-add wave -noupdate -group tmp -expand -group io_adc_a /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc_a/o_adc
-add wave -noupdate -group adc_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/i_adc_clk
-add wave -noupdate -group adc_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/i_adc_valid
-add wave -noupdate -group adc_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/i_adc1
-add wave -noupdate -group adc_top -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/i_adc0
-add wave -noupdate -group adc_top -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/i_clk
-add wave -noupdate -group adc_top -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/i_rst_status
-add wave -noupdate -group adc_top -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/i_debug_pulse
-add wave -noupdate -group adc_top -group in -group cmd /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/i_en
-add wave -noupdate -group adc_top -group in -group cmd /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/i_adc1_delay
-add wave -noupdate -group adc_top -group in -group cmd /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/i_adc0_delay
-add wave -noupdate -group adc_top -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/o_adc_valid
-add wave -noupdate -group adc_top -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/o_adc1
-add wave -noupdate -group adc_top -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/o_adc0
-add wave -noupdate -group adc_top -group errors /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/o_errors
-add wave -noupdate -group adc_top -group errors /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_adc_top/o_status
-add wave -noupdate -group recording_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/g_ADC_FIFO_OUT_DEPTH
-add wave -noupdate -group recording_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/i_rst
-add wave -noupdate -group recording_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/i_clk
-add wave -noupdate -group recording_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/i_rst_status
-add wave -noupdate -group recording_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/i_debug_pulse
-add wave -noupdate -group recording_adc -group in -group cmd /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/i_adc_cmd_start
-add wave -noupdate -group recording_adc -group in -group cmd -radix unsigned /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/i_adc_cmd_nb_words_by_block
-add wave -noupdate -group recording_adc -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/i_adc_data_valid
-add wave -noupdate -group recording_adc -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/i_adc_data1
-add wave -noupdate -group recording_adc -group in -group data /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/i_adc_data0
-add wave -noupdate -group recording_adc -group step1 /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/sm_state_r1
-add wave -noupdate -group recording_adc -group step1 /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/data_valid_r1
-add wave -noupdate -group recording_adc -group step1 /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/sof_r1
-add wave -noupdate -group recording_adc -group step1 /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/eof_r1
-add wave -noupdate -group recording_adc -group step1 -radix unsigned /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/cnt_frame_r1
-add wave -noupdate -group recording_adc -group step1 -radix unsigned /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/cnt_frame_max_r1
-add wave -noupdate -group recording_adc -group step1 /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/data1_r1
-add wave -noupdate -group recording_adc -group step1 /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/data0_r1
-add wave -noupdate -group recording_adc -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/i_fifo_adc_rd
-add wave -noupdate -group recording_adc -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/o_fifo_adc_sof
-add wave -noupdate -group recording_adc -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/o_fifo_adc_eof
-add wave -noupdate -group recording_adc -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/o_fifo_adc_data_valid
-add wave -noupdate -group recording_adc -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/o_fifo_adc_data
-add wave -noupdate -group recording_adc -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/o_fifo_adc_empty
-add wave -noupdate -group recording_adc -group errors -color Magenta -itemcolor Magenta /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/o_adc_errors
-add wave -noupdate -group recording_adc -group errors /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/o_adc_status
-add wave -noupdate -group recording_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_recording_top/inst_recording_adc/sm_state_next
+add wave -noupdate -divider reset
+add wave -noupdate -group reset_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/i_reset
+add wave -noupdate -group reset_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/i_usb_clk
+add wave -noupdate -group reset_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/i_usb_rst
+add wave -noupdate -group reset_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/o_usb_rst
+add wave -noupdate -group reset_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/i_mmcm_clk
+add wave -noupdate -group reset_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/i_mmcm_adc_clk
+add wave -noupdate -group reset_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/i_mmcm_dac_clk
+add wave -noupdate -group reset_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/i_mmcm_sync_clk
+add wave -noupdate -group reset_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/i_mmcm_locked
+add wave -noupdate -group reset_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/o_rst
+add wave -noupdate -group reset_top -group adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/o_adc_io_clk_rst
+add wave -noupdate -group reset_top -group adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/o_adc_io_rst
+add wave -noupdate -group reset_top -group dac /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/o_dac_io_clk_rst
+add wave -noupdate -group reset_top -group dac /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/o_dac_io_rst
+add wave -noupdate -group reset_top -group sync /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/o_sync_io_clk_rst
+add wave -noupdate -group reset_top -group sync /tb_system_fpasim_top/dut_system_fpasim_top/inst_reset_top/o_sync_io_rst
+add wave -noupdate -divider fpasim_top
+add wave -noupdate -group fpasim_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/i_adc_valid
+add wave -noupdate -group fpasim_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/i_adc_amp_squid_offset_correction
+add wave -noupdate -group fpasim_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/i_adc_mux_squid_feedback
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {8016000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {320050 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 352
+configure wave -namecolwidth 250
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
 configure wave -signalnamewidth 1
@@ -548,4 +430,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {7945640 ps} {8086360 ps}
+WaveRestoreZoom {315600 ps} {344400 ps}

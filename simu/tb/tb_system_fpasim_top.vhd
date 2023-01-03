@@ -69,7 +69,14 @@ architecture simulate of tb_system_fpasim_top is
   ---------------------------------------------------------------------
   -- module input signals
   ---------------------------------------------------------------------
+  --  Opal Kelly inouts --
+  signal i_okUH  : std_logic_vector(4 downto 0) := (others => '0');
+  signal o_okHU  : std_logic_vector(2 downto 0) := (others => '0');
+  signal b_okUHU : std_logic_vector(31 downto 0);
+  signal b_okAA  : std_logic                    := '0';
+
   -- FMC: from the card
+  signal i_reset     : std_logic                    := '0';
   signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');
   ---------------------------------------------------------------------
   -- FMC: from the adc
@@ -136,8 +143,36 @@ architecture simulate of tb_system_fpasim_top is
   signal o_dac7_p      : std_logic;  -- @suppress "signal o_dac7_p is never read"
   signal o_dac7_n      : std_logic;  -- @suppress "signal o_dac7_n is never read"
 
-  signal data0 : unsigned(13 downto 0) := (others => '0');
-  signal data1 : unsigned(13 downto 0) := (others => '0');
+  ---------------------------------------------------------------------
+  -- devices: spi links + specific signals
+  ---------------------------------------------------------------------
+  -- common: shared link between the spi
+  signal o_spi_sclk        : std_logic;  --  Shared SPI clock line
+  signal o_spi_sdata       : std_logic;  --  Shared SPI MOSI
+  -- CDCE: SPI
+  signal i_cdce_sdo        : std_logic := '0';  --  SPI MISO
+  signal o_cdce_n_en       : std_logic;  --  SPI chip select
+  -- CDCE: specific signals
+  signal i_cdce_pll_status : std_logic := '1';  --  pll_status : This pin is set high if the PLL is in lock.
+  signal o_cdce_n_reset    : std_logic;  --  reset_n or hold_n
+  signal o_cdce_n_pd       : std_logic;  --  power_down_n
+  signal o_ref_en          : std_logic;  --  enable the primary reference clock
+  -- ADC: SPI
+  signal i_adc_sdo         : std_logic := '0';  --  SPI MISO
+  signal o_adc_n_en        : std_logic;  --  SPI chip select
+  -- ADC: specific signals
+  signal o_adc_reset       : std_logic;  --  adc hardware reset
+  -- DAC: SPI
+  signal i_dac_sdo         : std_logic := '0';  --  SPI MISO
+  signal o_dac_n_en        : std_logic;  --  SPI chip select
+  -- DAC: specific signal
+  signal o_dac_tx_present  : std_logic;  --  enable tx acquisition
+  -- AMC: SPI (monitoring)
+  signal i_mon_sdo         : std_logic := '0';  --  SPI data out
+  signal o_mon_n_en        : std_logic;  --  SPI chip select
+  -- AMC : specific signals
+  signal i_mon_n_int       : std_logic := '0';  --  galr_n: Global analog input out-of-range alarm.
+  signal o_mon_n_reset     : std_logic;  --  reset_n: hardware reset
 
   ---------------------------------------------------------------------
   -- additional signals
@@ -146,11 +181,8 @@ architecture simulate of tb_system_fpasim_top is
   signal usb_clk : std_logic := '0';
   signal sys_clk : std_logic := '0';
 
-  --  Opal Kelly inouts --
-  signal i_okUH  : std_logic_vector(4 downto 0) := (others => '0');
-  signal o_okHU  : std_logic_vector(2 downto 0) := (others => '0');
-  signal b_okUHU : std_logic_vector(31 downto 0);
-  signal b_okAA  : std_logic                    := '0';
+  signal data0 : unsigned(13 downto 0) := (others => '0');
+  signal data1 : unsigned(13 downto 0) := (others => '0');
 
   ---------------------------------------------------------------------
   -- Clock definition
@@ -290,6 +322,11 @@ begin
     info("    c_FILEPATH_DATA_OUT2 = " & c_FILEPATH_DATA_OUT2);
     info("    c_FILEPATH_DATA_OUT3 = " & c_FILEPATH_DATA_OUT3);
     info("    c_FILEPATH_DATA_OUT4 = " & c_FILEPATH_DATA_OUT4);
+
+    --i_reset <= '1';
+    i_reset <= '0';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 16, i_margin => 12 ps);
+    i_reset <= '0';
 
     ---------------------------------------------------------------------
     -- add tempo
@@ -456,79 +493,111 @@ begin
   dut_system_fpasim_top : entity fpasim.system_fpasim_top
     port map(
       --  Opal Kelly inouts --
-      i_okUH        => i_okUH,
-      o_okHU        => o_okHU,
-      b_okUHU       => b_okUHU,
-      b_okAA        => b_okAA,
+      i_okUH            => i_okUH,
+      o_okHU            => o_okHU,
+      b_okUHU           => b_okUHU,
+      b_okAA            => b_okAA,
       ---------------------------------------------------------------------
       -- FMC: from the card
       ---------------------------------------------------------------------
-      i_board_id    => i_board_id,
+      i_board_id        => i_board_id,  -- card board id 
+      i_reset           => i_reset,
       ---------------------------------------------------------------------
       -- FMC: from the adc
       ---------------------------------------------------------------------
-      i_adc_clk_p   => i_adc_clk_p,     -- differential clock p @250MHz
-      i_adc_clk_n   => i_adc_clk_n,     -- differential clock n @250MHZ
+      i_adc_clk_p       => i_adc_clk_p,  -- differential clock p @250MHz
+      i_adc_clk_n       => i_adc_clk_n,  -- differential clock n @250MHZ
       -- adc_a
       -- bit P/N: 0-1
-      i_da0_p       => i_da0_p,
-      i_da0_n       => i_da0_n,
-      i_da2_p       => i_da2_p,
-      i_da2_n       => i_da2_n,
-      i_da4_p       => i_da4_p,
-      i_da4_n       => i_da4_n,
-      i_da6_p       => i_da6_p,
-      i_da6_n       => i_da6_n,
-      i_da8_p       => i_da8_p,
-      i_da8_n       => i_da8_n,
-      i_da10_p      => i_da10_p,
-      i_da10_n      => i_da10_n,
-      i_da12_p      => i_da12_p,
-      i_da12_n      => i_da12_n,
+      i_da0_p           => i_da0_p,
+      i_da0_n           => i_da0_n,
+      i_da2_p           => i_da2_p,
+      i_da2_n           => i_da2_n,
+      i_da4_p           => i_da4_p,
+      i_da4_n           => i_da4_n,
+      i_da6_p           => i_da6_p,
+      i_da6_n           => i_da6_n,
+      i_da8_p           => i_da8_p,
+      i_da8_n           => i_da8_n,
+      i_da10_p          => i_da10_p,
+      i_da10_n          => i_da10_n,
+      i_da12_p          => i_da12_p,
+      i_da12_n          => i_da12_n,
       -- adc_b
-      i_db0_p       => i_db0_p,
-      i_db0_n       => i_db0_n,
-      i_db2_p       => i_db2_p,
-      i_db2_n       => i_db2_n,
-      i_db4_p       => i_db4_p,
-      i_db4_n       => i_db4_n,
-      i_db6_p       => i_db6_p,
-      i_db6_n       => i_db6_n,
-      i_db8_p       => i_db8_p,
-      i_db8_n       => i_db8_n,
-      i_db10_p      => i_db10_p,
-      i_db10_n      => i_db10_n,
-      i_db12_p      => i_db12_p,
-      i_db12_n      => i_db12_n,
+      i_db0_p           => i_db0_p,
+      i_db0_n           => i_db0_n,
+      i_db2_p           => i_db2_p,
+      i_db2_n           => i_db2_n,
+      i_db4_p           => i_db4_p,
+      i_db4_n           => i_db4_n,
+      i_db6_p           => i_db6_p,
+      i_db6_n           => i_db6_n,
+      i_db8_p           => i_db8_p,
+      i_db8_n           => i_db8_n,
+      i_db10_p          => i_db10_p,
+      i_db10_n          => i_db10_n,
+      i_db12_p          => i_db12_p,
+      i_db12_n          => i_db12_n,
       ---------------------------------------------------------------------
       -- FMC: to sync
       ---------------------------------------------------------------------
-      o_ref_clk     => o_ref_clk,
-      o_sync        => o_sync,
+      o_ref_clk         => o_ref_clk,
+      o_sync            => o_sync,
       ---------------------------------------------------------------------
       -- FMC: to dac
       ---------------------------------------------------------------------
-      o_dac_clk_p   => o_dac_clk_p,
-      o_dac_clk_n   => o_dac_clk_n,
-      o_dac_frame_p => o_dac_frame_p,
-      o_dac_frame_n => o_dac_frame_n,
-      o_dac0_p      => o_dac0_p,
-      o_dac0_n      => o_dac0_n,
-      o_dac1_p      => o_dac1_p,
-      o_dac1_n      => o_dac1_n,
-      o_dac2_p      => o_dac2_p,
-      o_dac2_n      => o_dac2_n,
-      o_dac3_p      => o_dac3_p,
-      o_dac3_n      => o_dac3_n,
-      o_dac4_p      => o_dac4_p,
-      o_dac4_n      => o_dac4_n,
-      o_dac5_p      => o_dac5_p,
-      o_dac5_n      => o_dac5_n,
-      o_dac6_p      => o_dac6_p,
-      o_dac6_n      => o_dac6_n,
-      o_dac7_p      => o_dac7_p,
-      o_dac7_n      => o_dac7_n
+      o_dac_clk_p       => o_dac_clk_p,
+      o_dac_clk_n       => o_dac_clk_n,
+      o_dac_frame_p     => o_dac_frame_p,
+      o_dac_frame_n     => o_dac_frame_n,
+      o_dac0_p          => o_dac0_p,
+      o_dac0_n          => o_dac0_n,
+      o_dac1_p          => o_dac1_p,
+      o_dac1_n          => o_dac1_n,
+      o_dac2_p          => o_dac2_p,
+      o_dac2_n          => o_dac2_n,
+      o_dac3_p          => o_dac3_p,
+      o_dac3_n          => o_dac3_n,
+      o_dac4_p          => o_dac4_p,
+      o_dac4_n          => o_dac4_n,
+      o_dac5_p          => o_dac5_p,
+      o_dac5_n          => o_dac5_n,
+      o_dac6_p          => o_dac6_p,
+      o_dac6_n          => o_dac6_n,
+      o_dac7_p          => o_dac7_p,
+      o_dac7_n          => o_dac7_n,
+      ---------------------------------------------------------------------
+      -- devices: spi links + specific signals
+      ---------------------------------------------------------------------
+      -- common: shared link between the spi
+      o_spi_sclk        => o_spi_sclk,  -- Shared SPI clock line
+      o_spi_sdata       => o_spi_sdata,  -- Shared SPI MOSI
+      -- CDCE: SPI
+      i_cdce_sdo        => i_cdce_sdo,  -- SPI MISO
+      o_cdce_n_en       => o_cdce_n_en,  -- SPI chip select
+      -- CDCE: specific signals
+      i_cdce_pll_status => i_cdce_pll_status,  -- pll_status : This pin is set high if the PLL is in lock.
+      o_cdce_n_reset    => o_cdce_n_reset,     -- reset_n or hold_n
+      o_cdce_n_pd       => o_cdce_n_pd,  -- power_down_n
+      o_ref_en          => o_ref_en,    -- enable the primary reference clock
+      -- ADC: SPI
+      i_adc_sdo         => i_adc_sdo,   -- SPI MISO
+      o_adc_n_en        => o_adc_n_en,  -- SPI chip select
+      -- ADC: specific signals
+      o_adc_reset       => o_adc_reset,  -- adc hardware reset
+      -- DAC: SPI
+      i_dac_sdo         => i_dac_sdo,   -- SPI MISO
+      o_dac_n_en        => o_dac_n_en,  -- SPI chip select
+      -- DAC: specific signal
+      o_dac_tx_present  => o_dac_tx_present,   -- enable tx acquisition
+      -- AMC: SPI (monitoring)
+      i_mon_sdo         => i_mon_sdo,   -- SPI data out
+      o_mon_n_en        => o_mon_n_en,  -- SPI chip select
+      -- AMC : specific signals
+      i_mon_n_int       => i_mon_n_int,  -- galr_n: Global analog input out-of-range alarm.
+      o_mon_n_reset     => o_mon_n_reset       -- reset_n: hardware reset
       );
+
 
   ---------------------------------------------------------------------
   -- log: data out
