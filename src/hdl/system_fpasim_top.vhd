@@ -153,7 +153,7 @@ architecture RTL of system_fpasim_top is
   -- clock generation
   ---------------------------------------------------------------------
   signal adc_clk     : std_logic;
-  signal ref_clk     : std_logic;
+  signal sync_clk     : std_logic;
   signal dac_clk     : std_logic;
   signal clk         : std_logic;
   signal mmcm_locked : std_logic;
@@ -172,6 +172,9 @@ architecture RTL of system_fpasim_top is
   ---------------------------------------------------------------------
   -- fpasim_top
   ---------------------------------------------------------------------
+  -- common
+  signal rst_status                      : std_logic;
+  signal debug_pulse                     : std_logic;
   -- spi
   signal usb_clk                         : std_logic;
   signal usb_rst                         : std_logic;
@@ -199,13 +202,21 @@ architecture RTL of system_fpasim_top is
   signal adc_valid                       : std_logic;
   signal adc_amp_squid_offset_correction : std_logic_vector(13 downto 0);
   signal adc_mux_squid_feedback          : std_logic_vector(13 downto 0);
+  signal adc_errors          : std_logic_vector(15 downto 0);
+  signal adc_status          : std_logic_vector(7 downto 0);
 
   -- sync
+  signal sync_valid : std_logic;
   signal sync : std_logic;
+  signal sync_errors : std_logic_vector(15 downto 0);
+  signal sync_status : std_logic_vector(7 downto 0);
 
+  -- dac
   signal dac_valid : std_logic;
   signal dac_frame : std_logic;
   signal dac       : std_logic_vector(15 downto 0);
+  signal dac_errors       : std_logic_vector(15 downto 0);
+  signal dac_status       : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- ios
@@ -259,7 +270,7 @@ begin
       -- output
       ---------------------------------------------------------------------
       o_adc_clk => adc_clk,             -- adc output clock @250 MHz
-      o_ref_clk => ref_clk,             -- ref output clock @62.5 MHz
+      o_ref_clk => sync_clk,            -- sync/ref output clock @62.5 MHz
       o_dac_clk => dac_clk,             -- dac output clock @500 MHz
       o_clk     => clk,                 -- sys output clock @333.33333 MHz
       o_locked  => mmcm_locked
@@ -286,7 +297,7 @@ begin
       i_mmcm_clk        => clk,
       i_mmcm_adc_clk    => adc_clk,
       i_mmcm_dac_clk    => dac_clk,
-      i_mmcm_sync_clk   => ref_clk,
+      i_mmcm_sync_clk   => sync_clk,
       i_mmcm_locked     => mmcm_locked,
       ---------------------------------------------------------------------
       -- to the user
@@ -318,10 +329,7 @@ begin
       )
     port map(
       i_clk      => clk,                -- system clock
-      i_rst      => rst,                -- reset sync @ref_clk
-      i_adc_clk  => adc_clk,            -- adc clock
-      i_ref_clk  => ref_clk,            -- reference clock
-      i_dac_clk  => dac_clk,            -- dac clock
+      i_rst      => rst,                -- reset sync @sync_clk
       ---------------------------------------------------------------------
       -- from the usb @i_usb_clk (clock included)
       ---------------------------------------------------------------------
@@ -333,6 +341,11 @@ begin
       -- from the board
       ---------------------------------------------------------------------
       i_board_id => i_board_id,
+      ---------------------------------------------------------------------
+      -- to the IOs: @i_clk
+      ---------------------------------------------------------------------
+      o_rst_status => rst_status,
+      o_debug_pulse => debug_pulse,
 
       ---------------------------------------------------------------------
       -- from/to the spi: @usb_clk
@@ -363,21 +376,28 @@ begin
       o_usb_rst                         => usb_rst,
       i_usb_rst                         => usb_rst_out,
       ---------------------------------------------------------------------
-      -- from adc
+      -- from adc @i_clk
       ---------------------------------------------------------------------
       i_adc_valid                       => adc_valid,
       i_adc_amp_squid_offset_correction => adc_amp_squid_offset_correction,
       i_adc_mux_squid_feedback          => adc_mux_squid_feedback,
+      i_adc_errors                      => adc_errors,
+      i_adc_status                      => adc_status,
       ---------------------------------------------------------------------
-      -- output sync @clk_ref
+      -- output sync @i_clk
       ---------------------------------------------------------------------
+      o_sync_valid                      => sync_valid,
       o_sync                            => sync,
+      i_sync_errors                     => sync_errors,
+      i_sync_status                     => sync_status,
       ---------------------------------------------------------------------
-      -- output dac @i_clk_dac
+      -- output dac @i_clk
       ---------------------------------------------------------------------
-      o_dac_valid                       => dac_valid,  -- not connected
+      o_dac_valid                       => dac_valid,  
       o_dac_frame                       => dac_frame,
-      o_dac                             => dac
+      o_dac                             => dac,
+      i_dac_errors                      => dac_errors,
+      i_dac_status                      => dac_status
       );
 
   adc_amp_squid_offset_correction <= adc_a;
@@ -388,15 +408,23 @@ begin
   ---------------------------------------------------------------------
   inst_io_top : entity work.io_top
     port map(
+      -- from the mmcm
+      i_clk        => clk,
+      i_adc_clk        => adc_clk,
+      i_sync_clk   => sync_clk,
+      i_dac_clk    => dac_clk,
+
+      -- from the user: @i_clk
+      i_rst_status  => rst_status,
+      i_debug_pulse => debug_pulse,
+
       ---------------------------------------------------------------------
       -- adc
       ---------------------------------------------------------------------
       -- from the reset_top: @adc_clk
       i_adc_io_clk_rst => adc_io_clk_rst,
       i_adc_io_rst     => adc_io_rst,
-      -- from MMCM 
-      i_adc_clk        => adc_clk,
-      -- from fpga pads: adc_a 
+      -- from fpga pads: adc_a  @adc_clk
       i_da0_p          => i_da0_p,
       i_da0_n          => i_da0_n,
       i_da2_p          => i_da2_p,
@@ -411,7 +439,7 @@ begin
       i_da10_n         => i_da10_n,
       i_da12_p         => i_da12_p,
       i_da12_n         => i_da12_n,
-      -- from fpga pads: adc_b
+      -- from fpga pads: adc_b @adc_clk
       i_db0_p          => i_db0_p,
       i_db0_n          => i_db0_n,
       i_db2_p          => i_db2_p,
@@ -427,39 +455,53 @@ begin
       i_db12_p         => i_db12_p,
       i_db12_n         => i_db12_n,
 
-
-      -- to user :
+      -- to user: @i_clk
       o_adc_valid       => adc_valid,
       o_adc_a           => adc_a,
       o_adc_b           => adc_b,
+      o_adc_errors      => adc_errors,
+      o_adc_status      => adc_status,
       ---------------------------------------------------------------------
       -- sync
       ---------------------------------------------------------------------
-      -- from the reset_top: @ref_clk
+      -- from the reset_top: @sync_clk
       i_sync_io_clk_rst => sync_io_clk_rst,
       i_sync_io_rst     => sync_io_rst,
 
-      -- from the user: @ref_ref 
-      i_ref_clk        => ref_clk,
+      -- from/to the user: @clk 
+      i_sync_rst       => rst,
+      i_sync_valid     => sync_valid,
       i_sync           => sync,
-      -- to the fpga pads 
-      o_ref_clk        => o_ref_clk,
+      o_sync_errors    => sync_errors,
+      o_sync_status    => sync_status,
+
+      -- to the fpga pads: @sync_clk 
+      o_sync_clk       => o_ref_clk,
       o_sync           => o_sync,
       ---------------------------------------------------------------------
       -- dac
       ---------------------------------------------------------------------
+      -- from the user
+      i_dac_rst        => rst,
+      i_dac_valid      => dac_valid,
+      i_dac_frame      => dac_frame,
+      i_dac            => dac,
+      o_dac_errors     => dac_errors,
+      o_dac_status     => dac_status,
+
       -- from the reset_top: @dac_clk
       i_dac_io_clk_rst => dac_io_clk_rst,
       i_dac_io_rst     => dac_io_rst,
-      -- from the user
-      i_dac_clk        => dac_clk,
-      i_dac_frame      => dac_frame,
-      i_dac            => dac,
-      -- to the fpga pads
+      i_dac_rst_out    => '0', -- TODO
+
+      -- to the fpga pads: @i_dac_clk
+      -- dac clock @i_dac_clk
       o_dac_clk_p      => o_dac_clk_p,
       o_dac_clk_n      => o_dac_clk_n,
+      -- dac frame flag @i_dac_clk
       o_dac_frame_p    => o_dac_frame_p,
       o_dac_frame_n    => o_dac_frame_n,
+      -- dac data @i_dac_clk
       o_dac0_p         => o_dac0_p,
       o_dac0_n         => o_dac0_n,
       o_dac1_p         => o_dac1_p,

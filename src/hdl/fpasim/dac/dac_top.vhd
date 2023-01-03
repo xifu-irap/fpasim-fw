@@ -17,22 +17,23 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   dac_top.vhd 
+--    @file                   dac_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--   @details                
 --
--- This module generates frame flags and inserts zeros after each FIFO read.
--- The output data flow has the following structure:
+--   This module generates frame flags.
 --
--- Example0: we assume the dac frame is generated every 8 input dac samples and no latency between the input and the output
--- i_dac_valid:   1   1   1   1   1   1   1   1   
--- i_dac      :   a1  a2  a3  a4  a5  a6  a7  a8  
--- o_dac_valid:   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
--- o_dac_frame:   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1
--- o_dac      :   a1  0   a2  0   a3  0   a4  0   a5  0   a6  0   a7  0   a8  0   a9 
+--   The output data flow has the following structure:
+--
+--   Example0: After the startup, we assume the dac frame is inserte only once
+--     i_dac_valid:   1   1   1   1   1   1   1   1   
+--     i_dac      :   a1  a2  a3  a4  a5  a6  a7  a8  
+--     o_dac_valid:   1   1   1   1   1   1   1   1  
+--     o_dac_frame:   1   0   0   0   0   0   0   0   
+--     o_dac      :   a1  a2  a3  a4  a5  a6  a7  a8  
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -47,41 +48,27 @@ entity dac_top is
   );
   port(
     ---------------------------------------------------------------------
-    -- input @i_clk
+    -- input
     ---------------------------------------------------------------------
     i_clk         : in  std_logic;      -- clock
     i_rst         : in  std_logic;      -- reset
     -- from regdecode
     -----------------------------------------------------------------
-    i_rst_status  : in  std_logic;      -- reset error flag(s)
-    i_debug_pulse : in  std_logic;      -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
-    i_en          : in  std_logic;      -- enable
     i_dac_delay   : in  std_logic_vector(g_DAC_DELAY_WIDTH - 1 downto 0); -- delay to apply on the data path.
     -- input data 
     ---------------------------------------------------------------------
     i_dac_valid   : in  std_logic;      -- valid dac sample flag
     i_dac         : in  std_logic_vector(15 downto 0); -- dac sample
     ---------------------------------------------------------------------
-    -- output @i_clk_dac
+    -- output
     ---------------------------------------------------------------------
-    i_dac_clk     : in  std_logic;      -- dac clock
     o_dac_valid   : out std_logic;      -- valid dac sample
     o_dac_frame   : out std_logic;      -- first sample of a frame
-    o_dac         : out std_logic_vector(15 downto 0); -- output dac sample
-    ---------------------------------------------------------------------
-    -- errors/status @i_clk
-    --------------------------------------------------------------------- 
-    o_errors      : out std_logic_vector(15 downto 0); -- output errors
-    o_status      : out std_logic_vector(7 downto 0) -- output status
+    o_dac         : out std_logic_vector(15 downto 0) -- output dac sample
   );
 end entity dac_top;
 
 architecture RTL of dac_top is
-
-  -------------------------------------------------------------------
-  -- cross clock domain
-  -------------------------------------------------------------------
-  signal rst_sync : std_logic;
 
   ---------------------------------------------------------------------
   -- apply delay
@@ -90,41 +77,7 @@ architecture RTL of dac_top is
   signal dac_valid_r1 : std_logic;
   signal dac_rx       : std_logic_vector(i_dac'range);
 
-  ---------------------------------------------------------------------
-  -- dac_data_insert
-  ---------------------------------------------------------------------
-  signal dac_valid2 : std_logic;
-  signal dac_frame2 : std_logic;
-  signal dac2       : std_logic_vector(o_dac'range);
-  signal errors2    : std_logic_vector(o_errors'range);
-  signal status2    : std_logic_vector(o_status'range);
-
-  ---------------------------------------------------------------------
-  -- dac_data_insert
-  ---------------------------------------------------------------------
-  signal error3 : std_logic;
-
 begin
-  -------------------------------------------------------------------
-  -- cross clock domain
-  -------------------------------------------------------------------
-  inst_synchronous_reset_synchronizer_rst_dac : entity work.synchronous_reset_synchronizer
-    generic map(
-      g_DEST_SYNC_FF => 2,
-      g_INIT         => 1
-    )
-    port map(
-      ---------------------------------------------------------------------
-      -- source
-      ---------------------------------------------------------------------
-      i_src_rst  => i_rst,              -- Source reset signal
-      ---------------------------------------------------------------------
-      -- destination
-      ---------------------------------------------------------------------
-      i_dest_clk => i_dac_clk,          -- Destination clock.
-      o_dest_rst => rst_sync            -- src_rst synchronized to the destination clock domain. This output is registered.
-    );
-
 
   ---------------------------------------------------------------------
   -- apply a dynamic delay on the data path
@@ -163,66 +116,11 @@ begin
       o_data_valid => dac_valid_r1      -- output valid sample
     );
 
-  inst_dac_data_insert : entity work.dac_data_insert
-    generic map(
-      g_DAC_WIDTH => dac_rx'length
-    )
-    port map(
-      ---------------------------------------------------------------------
-      -- input @i_clk
-      ---------------------------------------------------------------------
-      i_clk         => i_clk,
-      i_rst         => i_rst,
-      i_rst_status  => i_rst_status,
-      i_debug_pulse => i_debug_pulse,
-      i_dac_valid   => dac_valid_r1,
-      i_dac_frame   => dac_sof_r1,
-      i_dac         => dac_rx,
-      ---------------------------------------------------------------------
-      -- output @i_dac_ckl
-      ---------------------------------------------------------------------
-      i_dac_clk     => i_dac_clk,
-      i_dac_rst     => rst_sync,
-      o_dac_valid   => dac_valid2,
-      o_dac_frame   => dac_frame2,
-      o_dac         => dac2,
-      ---------------------------------------------------------------------
-      -- errors/status @i_clk
-      ---------------------------------------------------------------------
-      o_errors      => errors2,
-      o_status      => status2
-    );
-
----------------------------------------------------------------------
--- check if no hole in the output data flow
----------------------------------------------------------------------
-  inst_dac_check_dataflow : entity work.dac_check_dataflow
-    port map(
-      ---------------------------------------------------------------------
-      -- input @i_dac_clk
-      ---------------------------------------------------------------------
-      i_dac_clk     => i_dac_clk,
-      i_dac_rst     => rst_sync,
-      i_dac_valid   => dac_valid2,
-      ---------------------------------------------------------------------
-      -- error @i_clk
-      ---------------------------------------------------------------------
-      i_clk         => i_clk,
-      i_rst_status  => i_rst_status,
-      i_debug_pulse => i_debug_pulse,
-      i_en          => i_en,
-      o_error       => error3
-    );
-
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
-  o_dac_valid <= dac_valid2;
-  o_dac_frame <= dac_frame2;
-  o_dac       <= dac2;
-
-  o_errors(15)          <= error3;
-  o_errors(14 downto 0) <= errors2(14 downto 0);
-  o_status              <= status2;
+  o_dac_valid <= dac_valid_r1;
+  o_dac_frame <= dac_sof_r1;
+  o_dac       <= dac_rx;
 
 end architecture RTL;

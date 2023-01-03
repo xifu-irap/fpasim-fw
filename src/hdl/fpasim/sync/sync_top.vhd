@@ -56,27 +56,26 @@ entity sync_top is
     i_rst_status  : in  std_logic;      -- reset error flag(s)
     i_debug_pulse : in  std_logic;      -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     i_sync_delay  : in  std_logic_vector(g_SYNC_DELAY_WIDTH - 1 downto 0); -- delay to apply on the data path.
+
     -- input data 
     ---------------------------------------------------------------------
     i_sync_valid  : in  std_logic;      -- valid sync sample
     i_sync        : in  std_logic;      -- sync sample
     ---------------------------------------------------------------------
-    -- output @i_ref_clk
+    -- output
     ---------------------------------------------------------------------
-    i_ref_clk     : in  std_logic;      -- destination clock
     o_sync_valid  : out std_logic;      -- valid sync sample
     o_sync        : out std_logic;      -- sync sample
     ---------------------------------------------------------------------
-    -- errors/status @i_clk
+    -- errors
     --------------------------------------------------------------------- 
-    o_errors      : out std_logic_vector(15 downto 0); -- output errors
-    o_status      : out std_logic_vector(7 downto 0) -- output status
+    o_errors      : out std_logic_vector(15 downto 0) -- output errors
   );
 end entity sync_top;
 
 architecture RTL of sync_top is
+
   constant c_DELAY_LATENCY     : natural := pkg_SYNC_DYNAMIC_SHIFT_REGISTER_LATENCY;
-  constant c_FIFO_READ_LATENCY : natural := pkg_SYNC_FIFO_READ_LATENCY;
   constant c_LATENCY_OUT       : natural := pkg_SYNC_OUT_LATENCY;
 
   ---------------------------------------------------------------------
@@ -92,31 +91,6 @@ architecture RTL of sync_top is
   signal sync_ry                  : std_logic;
   signal error_pulse_generator_r2 : std_logic;
 
-  ---------------------------------------------------------------------
-  -- FIFO
-  ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + 1 - 1;
-
-  constant c_FIFO_DEPTH : integer := 16; --see IP
-  constant c_FIFO_WIDTH : integer := c_IDX0_H + 1; --see IP
-
-  signal wr_rst_tmp0 : std_logic;
-  signal wr_tmp0     : std_logic;
-  signal data_tmp0   : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
-  --signal full0        : std_logic;
-  --signal wr_rst_busy0 : std_logic;
-
-  signal errors_sync0 : std_logic_vector(3 downto 0);
-  signal empty_sync0  : std_logic;
-
-  signal rd1       : std_logic;
-  signal data_tmp1 : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
-  signal empty1    : std_logic;
-  --signal rd_rst_busy1 : std_logic;
-
-  signal sync_valid1 : std_logic;
-  signal sync1       : std_logic;
 
   ---------------------------------------------------------------------
   -- output pipe
@@ -133,12 +107,7 @@ architecture RTL of sync_top is
   signal sync_valid2 : std_logic;
   signal sync2       : std_logic;
 
-  ---------------------------------------------------------------------
-  -- error latching
-  ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 3;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+
 
 begin
 
@@ -198,74 +167,22 @@ begin
     );
 
   ---------------------------------------------------------------------
-  -- clock domain crossing: 16 bits -> 8 bits
-  ---------------------------------------------------------------------
-  wr_tmp0             <= sync_valid_r2;
-  data_tmp0(c_IDX0_H) <= sync_ry;
-  wr_rst_tmp0         <= i_rst;
-  inst_fifo_async_with_error : entity work.fifo_async_with_error
-    generic map(
-      g_CDC_SYNC_STAGES   => 2,
-      g_FIFO_MEMORY_TYPE  => "auto",
-      g_FIFO_READ_LATENCY => c_FIFO_READ_LATENCY,
-      g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH,
-      g_READ_DATA_WIDTH   => data_tmp1'length,
-      g_READ_MODE         => "std",
-      g_RELATED_CLOCKS    => 0,
-      g_WRITE_DATA_WIDTH  => data_tmp0'length,
-      ---------------------------------------------------------------------
-      -- resynchronization: fifo errors/empty flag
-      ---------------------------------------------------------------------
-      g_SYNC_SIDE         => "wr"      -- define the clock side where status/errors is resynchronised. Possible value "wr" or "rd"
-
-    )
-    port map(
-      ---------------------------------------------------------------------
-      -- write side
-      ---------------------------------------------------------------------
-      i_wr_clk        => i_clk,
-      i_wr_rst        => wr_rst_tmp0,
-      i_wr_en         => wr_tmp0,
-      i_wr_din        => data_tmp0,
-      o_wr_full       => open,
-      o_wr_rst_busy   => open,
-      ---------------------------------------------------------------------
-      -- read side
-      ---------------------------------------------------------------------
-      i_rd_clk        => i_ref_clk,
-      i_rd_en         => rd1,
-      o_rd_dout_valid => sync_valid1,
-      o_rd_dout       => data_tmp1,
-      o_rd_empty      => empty1,
-      o_rd_rst_busy   => open,
-      ---------------------------------------------------------------------
-      -- resynchronized errors/status 
-      ---------------------------------------------------------------------
-      o_errors_sync   => errors_sync0,
-      o_empty_sync    => empty_sync0
-    );
-
-  rd1 <= '1' when empty1 = '0' else '0';
-
-  sync1 <= data_tmp1(c_IDX0_H) and sync_valid1;
-
-  ---------------------------------------------------------------------
   -- optionnal output pipe
   ---------------------------------------------------------------------
-  data_pipe_tmp1(c_PIPE_IDX1_H) <= sync_valid1;
-  data_pipe_tmp1(c_PIPE_IDX0_H) <= sync1;
+  data_pipe_tmp1(c_PIPE_IDX1_H) <= sync_valid_r2;
+  data_pipe_tmp1(c_PIPE_IDX0_H) <= sync_ry;
   inst_pipeliner : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_LATENCY_OUT,
       g_DATA_WIDTH => data_pipe_tmp1'length
     )
     port map(
-      i_clk  => i_ref_clk,
+      i_clk  => i_clk,
       i_data => data_pipe_tmp1,
       o_data => data_pipe_tmp2
     );
-  sync_valid2                   <= data_pipe_tmp2(c_PIPE_IDX1_H);
-  sync2                         <= data_pipe_tmp2(c_PIPE_IDX0_H);
+  sync_valid2  <= data_pipe_tmp2(c_PIPE_IDX1_H);
+  sync2        <= data_pipe_tmp2(c_PIPE_IDX0_H);
 
   ---------------------------------------------------------------------
   -- output
@@ -274,39 +191,14 @@ begin
   o_sync       <= sync2;
 
   ---------------------------------------------------------------------
-  -- Error latching
+  -- errors
   ---------------------------------------------------------------------
-  error_tmp(2) <= errors_sync0(2) or errors_sync0(3); -- fifo rst error
-  error_tmp(1) <= errors_sync0(1);      -- fifo rd empty error
-  error_tmp(0) <= errors_sync0(0);      -- fifo wr full error
-  gen_errors_latch : for i in error_tmp'range generate
-    inst_one_error_latch : entity work.one_error_latch
-      port map(
-        i_clk         => i_clk,
-        i_rst         => i_rst_status,
-        i_debug_pulse => i_debug_pulse,
-        i_error       => error_tmp(i),
-        o_error       => error_tmp_bis(i)
-      );
-  end generate gen_errors_latch;
+  o_errors(15 downto 1) <= (others => '0');
+  o_errors(0)           <= error_pulse_generator_r2;
 
-  o_errors(15 downto 5) <= (others => '0');
-  o_errors(4)           <= error_pulse_generator_r2;
-  o_errors(3)           <= '0';
-  o_errors(2)           <= error_tmp_bis(2); -- fifo rst error
-  o_errors(1)           <= error_tmp_bis(1); -- fifo rd empty error
-  o_errors(0)           <= error_tmp_bis(0); -- fifo wr full error
-
-  o_status(7 downto 1) <= (others => '0');
-  o_status(0)          <= empty_sync0;
-
-  ---------------------------------------------------------------------
-  -- for simulation only
-  ---------------------------------------------------------------------
+  -----------------------------------------------------------------------
+  ---- for simulation only
+  -----------------------------------------------------------------------
   assert not (error_pulse_generator_r2 = '1') report "[sync_top] => detect a input pulse during the output pulse generation " severity error;
-
-  assert not (error_tmp_bis(2) = '1') report "[sync_top] => FIFO is used before the end of the initialization " severity error;
-  assert not (error_tmp_bis(1) = '1') report "[sync_top] => FIFO read an empty FIFO" severity error;
-  assert not (error_tmp_bis(0) = '1') report "[sync_top] => FIFO write a full FIFO" severity error;
 
 end architecture RTL;

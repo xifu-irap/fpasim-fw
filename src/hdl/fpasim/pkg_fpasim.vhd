@@ -153,14 +153,12 @@ PACKAGE pkg_fpasim IS
   ---------------------------------------------------------------------
   -- adc_top
   ---------------------------------------------------------------------
-  -- user defined: Read FIFO latency. Possible values : [1, max integer value[ 
-  --   IMPORTANT: cross clock domain latency is not taken into account.
-  constant pkg_ADC_FIFO_READ_LATENCY              : natural := 1;
+  
   -- auto-computed: latency of the dynamic_shift_register module when the input delay is set to 0
   constant pkg_ADC_DYNAMIC_SHIFT_REGISTER_LATENCY : natural := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
   -- auto-computed: minimum latency of the "adc_top" module
   --    IMPORTANT: cross clock domain latency is not taken into account
-  constant pkg_ADC_TOP_LATENCY                    : natural := pkg_ADC_FIFO_READ_LATENCY + pkg_ADC_DYNAMIC_SHIFT_REGISTER_LATENCY;
+  constant pkg_ADC_TOP_LATENCY                    : natural := pkg_ADC_DYNAMIC_SHIFT_REGISTER_LATENCY;
 
   -------------------------------------------------------------------
   -- tes
@@ -396,21 +394,24 @@ PACKAGE pkg_fpasim IS
   constant pkg_SYNC_DYNAMIC_SHIFT_REGISTER_LATENCY : natural  := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
   -- hardcoded: latency of the "sync_pulse_generator" module
   constant pkg_SYNC_PULSE_GENERATOR_LATENCY        : natural  := 1;
-  -- user-defined: Read FIFO latency. Possible values : [1, max integer value[
-  constant pkg_SYNC_FIFO_READ_LATENCY              : natural  := 1;
   -- user-defined: optionnal output latency
   constant pkg_SYNC_OUT_LATENCY                    : natural  := 0;
   -- auto-computed: minimum latency of the "sync_top" module.
   --    IMPORTANT: cross clock domain latency is not taken into account
-  constant pkg_SYNC_TOP_LATENCY                    : natural  := pkg_SYNC_DYNAMIC_SHIFT_REGISTER_LATENCY + pkg_SYNC_PULSE_GENERATOR_LATENCY + pkg_SYNC_FIFO_READ_LATENCY + pkg_SYNC_OUT_LATENCY;
+  constant pkg_SYNC_TOP_LATENCY                    : natural  := pkg_SYNC_DYNAMIC_SHIFT_REGISTER_LATENCY + pkg_SYNC_PULSE_GENERATOR_LATENCY + pkg_SYNC_OUT_LATENCY;
 
   -------------------------------------------------------------------
   -- IOs
   -------------------------------------------------------------------
+  -- user defined: Read FIFO latency. Possible values : [1, max integer value[ 
+  --   IMPORTANT: cross clock domain latency is not taken into account.
+  constant pkg_IO_ADC_FIFO_READ_LATENCY              : natural := 1;
   -- user-defined: add latency after the input IOs. Possible values: [0;max integer value[
   constant pkg_IO_ADC_LATENCY  : natural := 1;
   -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
   constant pkg_IO_DAC_LATENCY  : natural := 1;
+  -- user-defined: Read FIFO latency. Possible values : [1, max integer value[
+  constant pkg_IO_SYNC_FIFO_READ_LATENCY  : natural  := 1;
   -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
   constant pkg_IO_SYNC_LATENCY : natural := 1;
 

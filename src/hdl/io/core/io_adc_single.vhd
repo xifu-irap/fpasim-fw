@@ -17,25 +17,22 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   io_adc_single.vhd 
+--    @file                   io_adc_single.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 --
--- This module generates fpga specific IO component with an optional user-defined latency
+--    This module generates fpga specific IO component with an optional user-defined latency
 --
--- Example0:
---   i_adc_p/n ->  fpga specific IO generation -> optionnal latency -> o_adc
+--    Example0:
+--      i_adc_p/n ->  fpga specific IO generation -> optionnal latency -> o_adc
 --
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
-
-library UNISIM;
-use UNISIM.vcomponents.all;
 
 
 entity io_adc_single is

@@ -17,14 +17,18 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   fpasim_top.vhd 
+--    @file                   fpasim_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
--- This module is the top_level of the fpasim
+--    @details 
+--               
+--    This module is the top_level of the fpasim functionnality
 --
+--    Note: the application reset is managed in the reset_top module in the upper level. 
+--       o_usb_rst -> reset_top -> i_rst
+--       o_usb_rst -> reset_top -> i_usb_rst
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -36,73 +40,83 @@ use work.pkg_regdecode.all;
 
 entity fpasim_top is
   generic(
-    g_DEBUG : boolean := true
+    g_DEBUG : boolean := false -- true: instantiate ILA, false: do nothing
     );
   port(
     i_clk     : in    std_logic;        -- system clock
     i_rst     : in    std_logic;        -- reset 
-    i_adc_clk : in    std_logic;        -- adc clock
-    i_ref_clk : in    std_logic;        -- reference clock
-    i_dac_clk : in    std_logic;        -- dac clock
     ---------------------------------------------------------------------
-    -- from the usb @sb_clk (clock included)
+    -- from the usb @usb_clk (clock included)
     ---------------------------------------------------------------------
     --  Opal Kelly inouts --
     i_okUH    : in    std_logic_vector(4 downto 0);
     o_okHU    : out   std_logic_vector(2 downto 0);
     b_okUHU   : inout std_logic_vector(31 downto 0);
     b_okAA    : inout std_logic;
+    ---------------------------------------------------------------------
+    -- from the board
+    ---------------------------------------------------------------------
+    i_board_id : in  std_logic_vector(7 downto 0); -- board id
+
+    ---------------------------------------------------------------------
+    -- to the IOs:@i_clk
+    ---------------------------------------------------------------------
+    o_rst_status : out std_logic; -- reset error flag(s)
+    o_debug_pulse : out std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     ---------------------------------------------------------------------
     -- from/to the spi: @usb_clk
     ---------------------------------------------------------------------
-    o_usb_clk            : out std_logic;
+    o_usb_clk            : out std_logic; -- clock @usb_clk
     -- tx
-    o_spi_rst            : out std_logic;
-    o_spi_en             : out std_logic;
-    o_spi_dac_tx_present : out std_logic;
-    o_spi_mode           : out std_logic;
-    o_spi_id             : out std_logic_vector(1 downto 0);
-    o_spi_cmd_valid      : out std_logic;
-    o_spi_cmd_wr_data    : out std_logic_vector(31 downto 0);
+    o_spi_rst            : out std_logic; -- reset the spi module
+    o_spi_en             : out std_logic; -- enable the spi module
+    o_spi_dac_tx_present : out std_logic; -- enable the dac
+    o_spi_mode           : out std_logic; -- 
+    o_spi_id             : out std_logic_vector(1 downto 0); -- select the spi module
+    o_spi_cmd_valid      : out std_logic; -- spi command valid
+    o_spi_cmd_wr_data    : out std_logic_vector(31 downto 0); -- spi command value
     -- rx
-    i_spi_rd_data_valid  : in  std_logic;
-    i_spi_rd_data        : in  std_logic_vector(31 downto 0);
-    i_reg_spi_status     : in  std_logic_vector(31 downto 0);
+    i_spi_rd_data_valid  : in  std_logic; -- spi read valid
+    i_spi_rd_data        : in  std_logic_vector(31 downto 0); -- spi read value
+    i_reg_spi_status     : in  std_logic_vector(31 downto 0); -- spi status for the register
     -- others
-    o_usb_rst_status     : out std_logic;
-    o_usb_debug_pulse    : out std_logic;
+    o_usb_rst_status     : out std_logic; -- rst status signal @i_usb_clk
+    o_usb_debug_pulse    : out std_logic; -- debug pulse signal @i_usb_clk
     -- errors/status
-    i_spi_errors         : in  std_logic_vector(15 downto 0);
-    i_spi_status         : in  std_logic_vector(7 downto 0);
+    i_spi_errors         : in  std_logic_vector(15 downto 0); -- spi errors
+    i_spi_status         : in  std_logic_vector(7 downto 0); -- spi status
 
     ---------------------------------------------------------------------
     -- from/to regdecode @usb_clk
     ---------------------------------------------------------------------
-    o_usb_rst           : out std_logic;
-    i_usb_rst           : in std_logic;
+    o_usb_rst           : out std_logic; -- reset @clk_usb (from register)
+    i_usb_rst           : in std_logic;  -- reset @clk_usb to used
 
     ---------------------------------------------------------------------
-    -- from the board
-    ---------------------------------------------------------------------
-    i_board_id           : in  std_logic_vector(7 downto 0);
-
-    ---------------------------------------------------------------------
-    -- from adc
+    -- from adc @i_clk
     ---------------------------------------------------------------------
     i_adc_valid                       : in  std_logic;  -- adc valid
     i_adc_amp_squid_offset_correction : in  std_logic_vector(13 downto 0);  -- adc_amp_squid_offset_correction value
     i_adc_mux_squid_feedback          : in  std_logic_vector(13 downto 0);  -- adc_mux_squid_feedback value
+    i_adc_errors                      : in std_logic_vector(15 downto 0);
+    i_adc_status                      : in std_logic_vector(7 downto 0);
     ---------------------------------------------------------------------
-    -- output sync @clk_ref
+    -- output sync @i_clk
     ---------------------------------------------------------------------
-    o_sync                            : out std_logic;  -- synchronization signal (pulse)
+    o_sync_valid   : out std_logic;  -- sync valid signal
+    o_sync         : out std_logic;  -- sync value (pulse)
+
+    i_sync_errors: out std_logic_vector(15 downto 0); -- sync_errors value
+    i_sync_status: out std_logic_vector(7 downto 0); -- sync_status value
     ---------------------------------------------------------------------
-    -- output dac @i_clk_dac
+    -- output dac @i_clk
     ---------------------------------------------------------------------
     o_dac_valid                       : out std_logic;  -- dac valid
     o_dac_frame                       : out std_logic;  -- dac frame
-    o_dac                             : out std_logic_vector(15 downto 0)  -- dac data
+    o_dac                             : out std_logic_vector(15 downto 0);  -- dac data
+    i_dac_errors                      : in std_logic_vector(15 downto 0);
+    i_dac_status                      : in std_logic_vector(7 downto 0)
     );
 end entity fpasim_top;
 
@@ -351,8 +365,6 @@ architecture RTL of fpasim_top is
   signal adc_valid0                       : std_logic;
   signal adc_mux_squid_feedback0          : std_logic_vector(i_adc_mux_squid_feedback'range);
   signal adc_amp_squid_offset_correction0 : std_logic_vector(i_adc_amp_squid_offset_correction'range);
-  signal adc_errors0                      : std_logic_vector(15 downto 0);
-  signal adc_status0                      : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- tes_top
@@ -428,6 +440,8 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   signal sync_valid5  : std_logic;  -- @suppress "signal sync_valid5 is never read"
   signal sync5        : std_logic;
+  signal sync_errors0_tmp : std_logic_vector(15 downto 0);
+
   signal sync_errors0 : std_logic_vector(15 downto 0);
   signal sync_status0 : std_logic_vector(7 downto 0);
 
@@ -499,8 +513,8 @@ begin
       ---------------------------------------------------------------------
       i_out_rst                         => i_rst,        -- reset @i_clk
       i_out_clk                         => i_clk,        -- clock (user side)
-      i_rst_status                      => rst_status,   -- reset error flag(s)
-      i_debug_pulse                     => debug_pulse,  -- error mode (transparent vs capture). Possib
+      i_rst_status                      => rst_status,   
+      i_debug_pulse                     => debug_pulse,  
       -- RAM configuration 
       ---------------------------------------------------------------------
       -- tes_pulse_shape
@@ -653,10 +667,20 @@ begin
   -- to the reset_top
   o_usb_rst <= usb_rst;
 
+  -- to the io_top
+  o_rst_status  <= rst_status;
+  o_debug_pulse <= debug_pulse;
+  
+  -- concatenate errors
+  sync_errors0(15 downto 5) <= i_sync_errors(15 downto 5);
+  sync_errors0(4)           <= sync_errors0_tmp(0);
+  sync_errors0(3 downto 0)  <= i_sync_errors(3 downto 0);
+  sync_status0              <= i_sync_status;
+
   -- errors
   reg_wire_errors3(31 downto 16) <= (others => '0');
   reg_wire_errors3(15 downto 0)  <= rec_adc_errors0;  -- recording
-
+  
   reg_wire_errors2(31 downto 16) <= sync_errors0;  -- sync top
   reg_wire_errors2(15 downto 0)  <= dac_errors0;   -- dac
 
@@ -664,7 +688,7 @@ begin
   reg_wire_errors1(15 downto 0)  <= mux_squid_errors0;  -- mux squid
 
   reg_wire_errors0(31 downto 16) <= tes_errors0;  -- tes
-  reg_wire_errors0(15 downto 0)  <= adc_errors0;  -- adc
+  reg_wire_errors0(15 downto 0)  <= i_adc_errors;  -- adc
 
   -- status
   reg_wire_status3(31 downto 24) <= (others => '0');
@@ -675,7 +699,7 @@ begin
   reg_wire_status2(31 downto 24) <= (others => '0');
   reg_wire_status2(23 downto 16) <= sync_status0;  -- sync top
   reg_wire_status2(15 downto 8)  <= (others => '0');
-  reg_wire_status2(7 downto 0)   <= dac_status0;   -- dac
+  reg_wire_status2(7 downto 0)   <= i_dac_status;   -- dac
 
   reg_wire_status1(31 downto 24) <= (others => '0');
   reg_wire_status1(23 downto 16) <= amp_squid_status0;  -- amp squid
@@ -685,7 +709,7 @@ begin
   reg_wire_status0(31 downto 24) <= (others => '0');
   reg_wire_status0(23 downto 16) <= tes_status0;  -- tes
   reg_wire_status0(15 downto 8)  <= (others => '0');
-  reg_wire_status0(7 downto 0)   <= adc_status0;  -- adc
+  reg_wire_status0(7 downto 0)   <= i_adc_status;  -- adc
 
   ---------------------------------------------------------------------
   -- adc
@@ -698,21 +722,18 @@ begin
       g_ADC0_DELAY_WIDTH => adc0_delay'length
       )
     port map(
+      i_clk         => i_clk,
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_adc_clk     => i_adc_clk,
       i_adc_valid   => i_adc_valid,
       i_adc1        => i_adc_mux_squid_feedback,
       i_adc0        => i_adc_amp_squid_offset_correction,
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      i_clk         => i_clk,
       -- from regdecode
       -----------------------------------------------------------------
-      i_rst_status  => rst_status,
-      i_debug_pulse => debug_pulse,
       i_en          => en,
       i_adc1_delay  => adc1_delay,
       i_adc0_delay  => adc0_delay,
@@ -720,12 +741,7 @@ begin
       -----------------------------------------------------------------
       o_adc_valid   => adc_valid0,
       o_adc1        => adc_mux_squid_feedback0,
-      o_adc0        => adc_amp_squid_offset_correction0,
-      ---------------------------------------------------------------------
-      -- errors/status
-      --------------------------------------------------------------------- 
-      o_errors      => adc_errors0,
-      o_status      => adc_status0
+      o_adc0        => adc_amp_squid_offset_correction0
       );
 
   ---------------------------------------------------------------------
@@ -998,34 +1014,31 @@ begin
       )
     port map(
       ---------------------------------------------------------------------
-      -- input @i_clk
+      -- input
       ---------------------------------------------------------------------
       i_clk         => i_clk,
       i_rst         => i_rst,
       -- from regdecode
       -----------------------------------------------------------------
-      i_rst_status  => rst_status,
-      i_debug_pulse => debug_pulse,
-      i_en          => en,
       i_dac_delay   => dac_delay,
       -- input data 
       ---------------------------------------------------------------------
       i_dac_valid   => pixel_valid3,
       i_dac         => pixel_result3,
       ---------------------------------------------------------------------
-      -- output @i_clk_dac
+      -- output
       ---------------------------------------------------------------------
-      i_dac_clk     => i_dac_clk,
       o_dac_valid   => dac_valid4,
       o_dac_frame   => dac_frame4,
-      o_dac         => dac4,
-      ---------------------------------------------------------------------
-      -- errors/status @i_clk
-      --------------------------------------------------------------------- 
-      o_errors      => dac_errors0,
-      o_status      => dac_status0
+      o_dac         => dac4
       );
 
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
+  o_dac_valid <= dac_valid4;
+  o_dac_frame <= dac_frame4;
+  o_dac       <= dac4;
   ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
@@ -1038,8 +1051,8 @@ begin
       ---------------------------------------------------------------------
       -- input @i_clk
       ---------------------------------------------------------------------
-      i_clk         => i_clk,           -- clock
-      i_rst         => i_rst,             -- reset
+      i_clk         => i_clk, 
+      i_rst         => i_rst, 
       -- from regdecode
       -----------------------------------------------------------------
       i_rst_status  => rst_status,
@@ -1050,27 +1063,21 @@ begin
       i_sync_valid  => pixel_valid3,
       i_sync        => frame_sof3,
       ---------------------------------------------------------------------
-      -- output @i_ref_clk
+      -- output
       ---------------------------------------------------------------------
-      i_ref_clk     => i_ref_clk,
-      o_sync_valid  => sync_valid5,     -- not connected
+      o_sync_valid  => sync_valid5,
       o_sync        => sync5,
       ---------------------------------------------------------------------
-      -- errors/status @i_clk
+      -- errors/status
       --------------------------------------------------------------------- 
-      o_errors      => sync_errors0,
-      o_status      => sync_status0
+      o_errors      => sync_errors0_tmp
       );
 
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
-  -- @i_clk_dac
-  o_dac_valid <= dac_valid4;
-  o_dac_frame <= dac_frame4;
-  o_dac       <= dac4;
-  -- @i_ref_clk
-  o_sync      <= sync5;
+  o_sync_valid <= sync_valid5;
+  o_sync       <= sync5;
 
   ---------------------------------------------------------------------
   -- Recording
