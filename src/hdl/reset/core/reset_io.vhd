@@ -54,8 +54,8 @@ entity reset_io is
     ---------------------------------------------------------------------
     -- from the mmcm
     ---------------------------------------------------------------------
-    i_mmcm_clk    : in  std_logic;      -- mmcm_clk (clock)
-    i_mmcm_locked : in  std_logic;      -- mmcm locked signal
+    i_clk         : in  std_logic;  -- clock
+    i_pll_status  : in  std_logic;  -- '1': pll locked, '0': pll unlocked
     o_io_clk_rst  : out std_logic;  -- Clock reset: Reset connected to clocking elements in the circuit
     o_io_rst      : out std_logic  -- Reset connected to all other elements in the circuit
 
@@ -71,6 +71,13 @@ architecture RTL of reset_io is
   signal io_clk_rst_tmp2 : std_logic;
 
   ---------------------------------------------------------------------
+  -- optional pipe
+  ---------------------------------------------------------------------
+  signal data_pipe_tmp0  : std_logic_vector(0 downto 0);
+  signal data_pipe_tmp1  : std_logic_vector(0 downto 0);
+  signal io_clk_rst_tmp3 : std_logic;
+
+  ---------------------------------------------------------------------
   -- synchronous_reset_pulse
   ---------------------------------------------------------------------
   signal io_rst_tmp3 : std_logic;
@@ -78,9 +85,9 @@ architecture RTL of reset_io is
 begin
 
 ---------------------------------------------------------------------
--- resynchronize i_rst/mmcm_locked @i_mmcm_clk
+-- resynchronize i_rst/mmcm_locked @i_clk
 ---------------------------------------------------------------------
-  io_clk_rst_tmp1 <= i_rst or not(i_mmcm_locked);
+  io_clk_rst_tmp1 <= i_rst or not(i_pll_status);
 
   inst_synchronous_reset_synchronizer_io_clk : entity work.synchronous_reset_synchronizer
     generic map(
@@ -106,11 +113,32 @@ begin
       ---------------------------------------------------------------------
       -- destination
       ---------------------------------------------------------------------
-      i_dest_clk => i_mmcm_clk,         -- Destination clock.
+      i_dest_clk => i_clk,         -- Destination clock.
       o_dest_rst => io_clk_rst_tmp2  -- src_rst synchronized to the destination clock domain. This output is registered.
       );
 
-  o_io_clk_rst <= io_clk_rst_tmp2;
+  ---------------------------------------------------------------------
+  -- optional pipe
+  ---------------------------------------------------------------------
+  data_pipe_tmp0(0) <= io_clk_rst_tmp2;
+
+  inst_pipeliner : entity work.pipeliner
+    generic map(
+      g_NB_PIPES   => 1,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => data_pipe_tmp0'length
+      )
+    port map(
+      i_clk  => i_clk,            
+      i_data => data_pipe_tmp0,   
+      o_data => data_pipe_tmp1     
+      );
+
+  io_clk_rst_tmp3 <= data_pipe_tmp1(0);
+
+---------------------------------------------------------------------
+-- output
+---------------------------------------------------------------------
+  o_io_clk_rst <= io_clk_rst_tmp3;
 
 
 ---------------------------------------------------------------------
@@ -134,14 +162,17 @@ begin
       ---------------------------------------------------------------------
       -- source
       ---------------------------------------------------------------------
-      i_clk => i_mmcm_clk,
-      i_rst => io_clk_rst_tmp2,
+      i_clk => i_clk,
+      i_rst => io_clk_rst_tmp3,
       ---------------------------------------------------------------------
       -- destination @i_clk
       ---------------------------------------------------------------------
       o_rst => io_rst_tmp3
       );
 
+---------------------------------------------------------------------
+-- output
+---------------------------------------------------------------------
   o_io_rst <= io_rst_tmp3;
 
 end architecture RTL;

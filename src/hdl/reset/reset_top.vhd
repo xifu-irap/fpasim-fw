@@ -188,6 +188,7 @@ begin
       o_rst => usb_rst_tmp2
       );
 
+  -- output
   o_usb_rst <= usb_rst_tmp2;
 
 ---------------------------------------------------------------------
@@ -223,6 +224,7 @@ begin
       o_dest_rst => mmcm_rst_tmp2  -- src_rst synchronized to the destination clock domain. This output is registered.
       );
 
+  -- output
   o_rst <= mmcm_rst_tmp2;
 
   ---------------------------------------------------------------------
@@ -241,15 +243,16 @@ begin
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_rst         => adc_rst_tmp1,    -- asynchronuous reset
+      i_rst        => adc_rst_tmp1,     -- asynchronuous reset
       ---------------------------------------------------------------------
       -- from the mmcm
       ---------------------------------------------------------------------
-      i_mmcm_clk    => i_mmcm_adc_clk,  -- mmcm_clk (clock)
-      i_mmcm_locked => i_mmcm_locked,   -- mmcm locked signal
-      o_io_clk_rst  => adc_io_clk_rst,  -- Clock reset: Reset connected to clocking elements in the circuit
-      o_io_rst      => adc_io_rst  -- Reset connected to all other elements in the circuit
+      i_clk        => i_mmcm_adc_clk,
+      i_pll_status => i_mmcm_locked,
+      o_io_clk_rst => adc_io_clk_rst,
+      o_io_rst     => adc_io_rst
       );
+  -- output
   o_adc_io_clk_rst <= adc_io_clk_rst;
   o_adc_io_rst     <= adc_io_rst;
 
@@ -269,15 +272,16 @@ begin
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_rst         => dac_rst_tmp1,    -- asynchronuous reset
+      i_rst        => dac_rst_tmp1,     -- asynchronuous reset
       ---------------------------------------------------------------------
       -- from the mmcm
       ---------------------------------------------------------------------
-      i_mmcm_clk    => i_mmcm_dac_clk,  -- mmcm_clk (clock)
-      i_mmcm_locked => i_mmcm_locked,   -- mmcm locked signal
-      o_io_clk_rst  => dac_io_clk_rst,  -- Clock reset: Reset connected to clocking elements in the circuit
-      o_io_rst      => dac_io_rst  -- Reset connected to all other elements in the circuit
+      i_clk        => i_mmcm_dac_clk,
+      i_pll_status => i_mmcm_locked,
+      o_io_clk_rst => dac_io_clk_rst,
+      o_io_rst     => dac_io_rst
       );
+  -- output
   o_dac_io_clk_rst <= dac_io_clk_rst;
   o_dac_io_rst     <= dac_io_rst;
 
@@ -297,15 +301,16 @@ begin
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_rst         => sync_rst_tmp1,   -- asynchronuous reset
+      i_rst        => sync_rst_tmp1,    -- asynchronuous reset
       ---------------------------------------------------------------------
       -- from the mmcm
       ---------------------------------------------------------------------
-      i_mmcm_clk    => i_mmcm_sync_clk,  -- mmcm_clk (clock)
-      i_mmcm_locked => i_mmcm_locked,   -- mmcm locked signal
-      o_io_clk_rst  => sync_io_clk_rst,  -- Clock reset: Reset connected to clocking elements in the circuit
-      o_io_rst      => sync_io_rst  -- Reset connected to all other elements in the circuit
+      i_clk        => i_mmcm_sync_clk,
+      i_pll_status => i_mmcm_locked,
+      o_io_clk_rst => sync_io_clk_rst,
+      o_io_rst     => sync_io_rst
       );
+  -- output
   o_sync_io_clk_rst <= sync_io_clk_rst;
   o_sync_io_rst     <= sync_io_rst;
 
