@@ -71,7 +71,7 @@ end entity synchronous_reset_pulse;
 architecture RTL of synchronous_reset_pulse is
 
   constant c_RST_INIT : std_logic := to_unsigned(g_INIT, 1)(0);
-  signal rst_pipe     : std_logic_vector(g_DEST_FF - 1 downto 0);
+  signal rst_pipe     : std_logic_vector(g_DEST_FF - 1 downto 0):= (others => c_RST_INIT);
 
 begin
 
