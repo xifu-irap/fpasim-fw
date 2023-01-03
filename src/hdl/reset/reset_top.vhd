@@ -155,7 +155,11 @@ begin
   p_rst_usb : process (i_usb_clk) is
   begin
     if rising_edge(i_usb_clk) then
-      usb_rst_r1 <= usb_rst_tmp1 or i_usb_rst;
+      if usb_rst_tmp1 = '1' or i_usb_rst = '1' then
+        usb_rst_r1 <= '1';
+      else
+        usb_rst_r1 <= '0';
+      end if;
     end if;
   end process p_rst_usb;
 
@@ -194,7 +198,7 @@ begin
 ---------------------------------------------------------------------
 -- resynchronize usb_rst/mmcm_locked @i_mmcm_clk
 ---------------------------------------------------------------------
-  mmcm_rst_tmp1 <= usb_rst_tmp2 or not(i_mmcm_locked);
+  mmcm_rst_tmp1 <= '1' when ((usb_rst_tmp2 = '1') or (i_mmcm_locked = '0')) else '0';
 
   inst_synchronous_reset_synchronizer_mmcm : entity work.synchronous_reset_synchronizer
     generic map(

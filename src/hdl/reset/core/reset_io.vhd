@@ -87,7 +87,7 @@ begin
 ---------------------------------------------------------------------
 -- resynchronize i_rst/mmcm_locked @i_clk
 ---------------------------------------------------------------------
-  io_clk_rst_tmp1 <= i_rst or not(i_pll_status);
+  io_clk_rst_tmp1 <= '1' when ((i_rst = '1') or (i_pll_status = '0')) else '0';
 
   inst_synchronous_reset_synchronizer_io_clk : entity work.synchronous_reset_synchronizer
     generic map(
