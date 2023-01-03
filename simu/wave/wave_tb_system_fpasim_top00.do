@@ -8,6 +8,11 @@ add wave -noupdate -group tb /tb_system_fpasim_top/o_data_valid
 add wave -noupdate -group tb /tb_system_fpasim_top/o_data_addr
 add wave -noupdate -group tb /tb_system_fpasim_top/o_data_data
 add wave -noupdate -group tb /tb_system_fpasim_top/o_data
+add wave -noupdate -group tb /tb_system_fpasim_top/sys_clk
+add wave -noupdate -group tb /tb_system_fpasim_top/i_adc_clk_p
+add wave -noupdate -group tb /tb_system_fpasim_top/i_adc_clk_n
+add wave -noupdate -group tb /tb_system_fpasim_top/data0
+add wave -noupdate -group tb /tb_system_fpasim_top/data1
 add wave -noupdate -divider reg_decode
 add wave -noupdate -group regdecode_top -group reg /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/o_reg_valid
 add wave -noupdate -group regdecode_top -group reg -group conf /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/o_reg_fpasim_gain
@@ -413,8 +418,24 @@ add wave -noupdate -divider fpasim_top
 add wave -noupdate -group fpasim_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/i_adc_valid
 add wave -noupdate -group fpasim_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/i_adc_amp_squid_offset_correction
 add wave -noupdate -group fpasim_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/i_adc_mux_squid_feedback
+add wave -noupdate -group io_adc -group selectio /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single_a/inst_selectio_wiz_adc/sync_reset
+add wave -noupdate -group io_adc -group selectio /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single_a/inst_selectio_wiz_adc/io_reset
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/i_io_clk_rst
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/i_io_rst
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/i_wr_clk
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/i_wr_rst
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/i_wr_en
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/i_wr_din
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/o_wr_full
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/o_wr_rst_busy
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/i_rd_clk
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/i_rd_en
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/o_rd_dout_valid
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/o_rd_dout
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/o_rd_empty
+add wave -noupdate -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_fifo_async_with_error/o_rd_rst_busy
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {320050 ps} 0}
+WaveRestoreCursors {{Cursor 1} {414000 ps} 0} {{Cursor 2} {386000 ps} 0} {{Cursor 4} {386000 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 250
 configure wave -valuecolwidth 100
@@ -430,4 +451,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {315600 ps} {344400 ps}
+WaveRestoreZoom {5661187672 ps} {5661245272 ps}

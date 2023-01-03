@@ -277,8 +277,12 @@ begin
   p_sys_clk : process is
   begin
     sys_clk <= '0';
+    i_adc_clk_p <= '0';
+    i_adc_clk_n <= '1';
     wait for c_CLK_PERIOD1 / 2;
     sys_clk <= '1';
+    i_adc_clk_p <= '1';
+    i_adc_clk_n <= '0';
     wait for c_CLK_PERIOD1 / 2;
   end process p_sys_clk;
 
@@ -445,13 +449,12 @@ begin
   ---------------------------------------------------------------------
   -- Data Generation
   ---------------------------------------------------------------------
-
-  data_gen : process(sys_clk) is
+  data_gen : process is
   begin
-    if rising_edge(sys_clk) then
       data0 <= data0 + 1;
       data1 <= data1 + 2;
-    end if;
+      wait until rising_edge(sys_clk);
+      wait for c_CLK_PERIOD1 / 4;
   end process data_gen;
 
   i_da0_p  <= data0(0);
@@ -487,8 +490,6 @@ begin
   ---------------------------------------------------------------------
   -- DUT
   ---------------------------------------------------------------------
-  i_adc_clk_p <= sys_clk;
-  i_adc_clk_n <= not (sys_clk);
 
   dut_system_fpasim_top : entity fpasim.system_fpasim_top
     port map(
