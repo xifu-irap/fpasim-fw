@@ -130,9 +130,6 @@ architecture RTL of recording_dac is
   signal eof_next : std_logic;
   signal eof_r1   : std_logic := '0';
 
-  signal sel_next : std_logic;
-  signal sel_r1   : std_logic;
-
   signal cnt_sample_next : unsigned(i_cmd_nb_words_by_block'range);
   signal cnt_frame_r1    : unsigned(i_cmd_nb_words_by_block'range) := (others => '0');
 
@@ -149,7 +146,7 @@ architecture RTL of recording_dac is
   signal wr_tmp0      : std_logic;
   signal data_tmp0    : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
   --signal full0        : std_logic;
-  signal wr_rst_busy0 : std_logic;
+  signal wr_rst_busy0 : std_logic; -- @suppress "signal wr_rst_busy0 is never read"
 
   signal rd1          : std_logic;
   signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
