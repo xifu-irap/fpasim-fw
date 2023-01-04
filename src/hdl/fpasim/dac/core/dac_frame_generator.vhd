@@ -101,7 +101,7 @@ begin
         else
           sm_state_next <= E_WAIT;
         end if;
-      when E_RUN =>
+      when E_RUN => -- @suppress "Dead state 'E_RUN': state does not have outgoing transitions"
         if i_data_valid = '1' then
           data_valid_next <= i_data_valid;
           sm_state_next <= E_RUN;
