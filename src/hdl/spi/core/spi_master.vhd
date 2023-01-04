@@ -65,11 +65,10 @@ entity spi_master is
       i_tx_data_valid : in  std_logic;  -- Start transmit ('0' = Inactive, '1' = Active)
       i_tx_data       : in  std_logic_vector(g_DATA_WIDTH -1 downto 0);  -- Data to transmit (stall on MSB)
       o_ready         : out std_logic;  -- Transmit link busy ('0' = Busy, '1' = Not Busy)
+      o_finish        : out std_logic;  -- pulse on finish (end of spi transaction: wr or rd)
       -- rd side
       o_rx_data_valid : out std_logic;  -- received data valid
       o_rx_data       : out std_logic_vector(g_DATA_WIDTH -1 downto 0);  -- received data
-      -- 
-      o_finish        : out std_logic;  -- pulse on finish (end of spi transaction: wr or rd)
       ---------------------------------------------------------------------
       -- spi interface
       ---------------------------------------------------------------------
@@ -106,7 +105,7 @@ architecture RTL of spi_master is
   signal tx_cs_n_r1   : std_logic;
 
   signal tx_data_valid_next : std_logic;
-  signal tx_data_valid_r1   : std_logic;
+  signal tx_data_valid_r1   : std_logic; -- @suppress "signal tx_data_valid_r1 is never read"
 
   signal tx_data_next : std_logic_vector(i_tx_data'range);
   signal tx_data_r1   : std_logic_vector(i_tx_data'range);
@@ -166,8 +165,8 @@ begin
       -- output
       ---------------------------------------------------------------------
       o_sclk              => sclk_tmp,
-      o_pulse_data_shift  => pulse_data_shift_tmp,
-      o_pulse_data_sample => pulse_data_sample_tmp
+      o_pulse_data_sample => pulse_data_sample_tmp,
+      o_pulse_data_shift  => pulse_data_shift_tmp
       );
 
 ---------------------------------------------------------------------
@@ -263,7 +262,7 @@ begin
         tx_cs_n_next     <= '1';
         finish_next      <= '1';
         sm_wr_state_next <= E_WAIT;
-      when others =>
+      when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
         sm_wr_state_next <= E_RST;
     end case;
   end process p_wr_decode_state;

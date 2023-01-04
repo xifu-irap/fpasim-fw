@@ -388,7 +388,7 @@ begin
         else
           sm_state_next <= E_WAIT_AMC;
         end if;
-      when others =>
+      when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -632,7 +632,7 @@ begin
       g_DATA_WIDTH => amc_spi_cmd_wr_data'length,
       g_INPUT_DELAY => 1
       )
-    port map(
+    port map( -- @suppress "The order of the associations is different from the declaration order"
       i_clk               => i_clk,
       i_rst               => i_rst,
       ---------------------------------------------------------------------
