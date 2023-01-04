@@ -466,7 +466,7 @@ begin
   mux_squid_tf_web    <= '0';
   mux_squid_tf_dinb   <= (others => '0');
   mux_squid_tf_enb    <= pixel_valid_rx;
-  mux_squid_tf_addrb  <= result_sub_rx;
+  mux_squid_tf_addrb  <= result_sub_rx; -- @suppress "Incorrect array size in assignment: expected (<g_MUX_SQUID_TF_RAM_ADDR_WIDTH>) but was (<13>)"
   mux_squid_tf_regceb <= pixel_valid_rx;
 
   -------------------------------------------------------------------
@@ -581,7 +581,7 @@ begin
       --------------------------------------------------------------
       -- output : S = a + B
       --------------------------------------------------------------
-      o_s   => result_rz
+      o_s   => result_rz -- @suppress "Incorrect array size in assignment: expected (<34>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
     );
 
   -----------------------------------------------------------------
