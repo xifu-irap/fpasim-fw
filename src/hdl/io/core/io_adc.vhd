@@ -113,8 +113,8 @@ architecture RTL of io_adc is
   signal errors_sync1 : std_logic_vector(3 downto 0);
   signal empty_sync1  : std_logic;
 
-  signal adc0_tmp1 : std_logic_vector(o_adc_a'range);
   signal adc1_tmp1 : std_logic_vector(o_adc_b'range);
+  signal adc0_tmp1 : std_logic_vector(o_adc_a'range);
 
   ---------------------------------------------------------------------
   -- error latching
@@ -231,8 +231,8 @@ begin
 -- output
 ---------------------------------------------------------------------
   o_adc_valid <= data_valid_tmp1;
-  o_adc_a     <= adc_a;
-  o_adc_b     <= adc_b;
+  o_adc_a     <= adc0_tmp1;
+  o_adc_b     <= adc1_tmp1;
 
   ---------------------------------------------------------------------
   -- Error latching
