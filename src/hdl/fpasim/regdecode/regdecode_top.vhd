@@ -94,7 +94,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
 use work.pkg_regdecode.all;
 
 entity regdecode_top is
@@ -146,8 +145,6 @@ entity regdecode_top is
     ---------------------------------------------------------------------
     i_out_rst     : in std_logic;       -- reset (user side)
     i_out_clk     : in std_logic;       -- clock (user side)
-    i_rst_status  : in std_logic;       -- reset error flag(s)
-    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possib
 
     -- RAM configuration 
     ---------------------------------------------------------------------
@@ -317,8 +314,7 @@ architecture RTL of regdecode_top is
   signal usb_wireout_spi_ctrl            : std_logic_vector(31 downto 0);
   signal usb_wireout_spi_conf            : std_logic_vector(31 downto 0);
   signal usb_wireout_spi_wr_data         : std_logic_vector(31 downto 0);
-  signal usb_wireout_spi_rd_data         : std_logic_vector(31 downto 0);
-  signal usb_wireout_spi_status          : std_logic_vector(31 downto 0);
+
   -- errors/status
   signal usb_wireout_sel_errors          : std_logic_vector(31 downto 0);
   signal usb_wireout_errors              : std_logic_vector(31 downto 0);
@@ -548,16 +544,16 @@ architecture RTL of regdecode_top is
   signal reg_fifo_rec_adc_rd : std_logic;
 
   -- to usb: register
-  signal usb_rec_valid              : std_logic;
+  signal usb_rec_valid              : std_logic; -- @suppress "signal usb_rec_valid is never read"
   signal usb_rec_ctrl               : std_logic_vector(usb_wireout_rec_ctrl'range);
   signal usb_rec_conf0              : std_logic_vector(usb_wireout_rec_conf0'range);
   -- to usb: fifo
   signal usb_fifo_adc_rd            : std_logic;  -- fifo read enable
-  signal usb_fifo_adc_sof           : std_logic;  -- fifo first sample
-  signal usb_fifo_adc_eof           : std_logic;  -- fifo last sample
-  signal usb_fifo_adc_data_valid    : std_logic;  -- fifo data valid
+  signal usb_fifo_adc_sof           : std_logic;  -- fifo first sample -- @suppress "signal usb_fifo_adc_sof is never read"
+  signal usb_fifo_adc_eof           : std_logic;  -- fifo last sample -- @suppress "signal usb_fifo_adc_eof is never read"
+  signal usb_fifo_adc_data_valid    : std_logic;  -- fifo data valid -- @suppress "signal usb_fifo_adc_data_valid is never read"
   signal usb_fifo_adc_data          : std_logic_vector(usb_pipeout_rec_fifo_adc_data'range);  -- fifo data
-  signal usb_fifo_adc_empty         : std_logic;  -- fifo empty flag
+  signal usb_fifo_adc_empty         : std_logic;  -- fifo empty flag -- @suppress "signal usb_fifo_adc_empty is never read"
   signal usb_fifo_adc_wr_data_count : std_logic_vector(15 downto 0);
 
   signal rec_errors1 : std_logic_vector(15 downto 0);
@@ -1049,7 +1045,7 @@ begin
   ---------------------------------------------------------------------
   make_pulse_data_valid_tmp0 <= trig_make_pulse_valid;
   make_pulse_data_tmp0       <= usb_wirein_make_pulse;
-  pixel_nb                   <= usb_wirein_tes_conf(c_TES_CONF_PIXEL_NB_IDX_H downto c_TES_CONF_PIXEL_NB_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_PIXEL_NB_WIDTH>) but was (<6>)"
+  pixel_nb                   <= usb_wirein_tes_conf(c_TES_CONF_PIXEL_NB_IDX_H downto c_TES_CONF_PIXEL_NB_IDX_L);   -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>) but was (<6>)"
 
   inst_regdecode_wire_make_pulse : entity work.regdecode_wire_make_pulse
     generic map(
@@ -1265,7 +1261,7 @@ begin
   ---------------------------------------------------------------------
   -- errors register
   ---------------------------------------------------------------------
-  error_sel <= usb_wirein_sel_errors(c_ERROR_SEL_IDX_H downto c_ERROR_SEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_SEL_WIDTH>) but was (<3>)"
+  error_sel <= usb_wirein_sel_errors(c_ERROR_SEL_IDX_H downto c_ERROR_SEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_SEL_WIDTH>) but was (<4>)"
   inst_regdecode_wire_errors : entity work.regdecode_wire_errors
     generic map(
       g_ERROR_SEL_WIDTH => error_sel'length

@@ -47,14 +47,7 @@ use ieee.numeric_std.all;
 entity regdecode_pipe_rd_all is
   generic(
     g_ADDR_WIDTH      : integer := 16;  -- define the address bus width
-    g_DATA_WIDTH      : integer := 16;  -- define the data bus width
-    -- +---------------------------------------------------------------------------------------------------------------------+
-    -- | CDC_SYNC_STAGES      | Integer            | Range: 2 - 8. Default value = 2.                                        |
-    -- |---------------------------------------------------------------------------------------------------------------------|
-    -- | Specifies the number of synchronization stages on the CDC path                                                      |
-    -- |                                                                                                                     |
-    -- |   Must be < 5 if FIFO_WRITE_DEPTH = 16       
-    g_CDC_SYNC_STAGES : integer := 2    -- resynchronized errors bits
+    g_DATA_WIDTH      : integer := 16  -- define the data bus width
     );
   port(
     i_clk         : in std_logic;       -- clock

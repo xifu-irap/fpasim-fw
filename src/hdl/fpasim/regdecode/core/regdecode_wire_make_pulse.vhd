@@ -197,7 +197,7 @@ begin
       when E_WAIT =>
         if i_make_pulse_valid = '1' then
           data_valid_next   <= '1';
-          pixel_id_max_next <= unsigned(i_pixel_nb) - 1;  -- 1 start @0  -- @suppress "Incorrect array size in assignment: expected (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>) but was (<g_PIXEL_NB_WIDTH>)"
+          pixel_id_max_next <= unsigned(i_pixel_nb) - 1;  -- 1 start @0  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<g_PIXEL_NB_WIDTH>)"
 
           if pixel_all_tmp = '1' then
             sof_next      <= '1';

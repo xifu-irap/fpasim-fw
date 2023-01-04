@@ -101,15 +101,15 @@ architecture RTL of regdecode_recording_fifo is
   signal wr_rst0       : std_logic;
   signal wr_tmp0       : std_logic;
   signal wr_data_tmp0  : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
-  signal wr_full0      : std_logic;
+  signal wr_full0      : std_logic; -- @suppress "signal wr_full0 is never read"
   signal wr_prog_full0 : std_logic;
-  signal wr_rst_busy0  : std_logic;
+  signal wr_rst_busy0  : std_logic; -- @suppress "signal wr_rst_busy0 is never read"
 
   signal rd1          : std_logic;
   signal data_valid1  : std_logic;
   signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
   signal empty1       : std_logic;
-  signal rd_rst_busy1 : std_logic;
+  signal rd_rst_busy1 : std_logic; -- @suppress "signal rd_rst_busy1 is never read"
 
   signal errors_sync1 : std_logic_vector(3 downto 0);
   signal empty_sync1  : std_logic;
@@ -128,15 +128,15 @@ architecture RTL of regdecode_recording_fifo is
   signal wr_tmp2        : std_logic;
   signal wr_data_tmp2   : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
   signal wr_data_count2 : std_logic_vector(c_WR_DATA_COUNT_WIDTH2 - 1 downto 0);
-  signal wr_full2       : std_logic;
+  signal wr_full2       : std_logic; -- @suppress "signal wr_full2 is never read"
   signal wr_prog_full2  : std_logic;
-  signal wr_rst_busy2   : std_logic;
+  signal wr_rst_busy2   : std_logic; -- @suppress "signal wr_rst_busy2 is never read"
 
   signal rd3          : std_logic;
   signal data_valid3  : std_logic;
   signal data_tmp3    : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
   signal empty3       : std_logic;
-  signal rd_rst_busy3 : std_logic;
+  signal rd_rst_busy3 : std_logic; -- @suppress "signal rd_rst_busy3 is never read"
 
   signal sof3  : std_logic;
   signal eof3  : std_logic;
@@ -166,7 +166,7 @@ begin
 
   wr_rst0                                          <= i_out_rst;
   wr_tmp0                                          <= i_fifo_data_valid;
-  wr_data_tmp0(c_FIFO_IDX2_H)                      <= i_fifo_eof;
+  wr_data_tmp0(c_FIFO_IDX2_H)                      <= i_fifo_sof;
   wr_data_tmp0(c_FIFO_IDX1_H)                      <= i_fifo_eof;
   wr_data_tmp0(c_FIFO_IDX0_H downto c_FIFO_IDX0_L) <= i_fifo_data;
 

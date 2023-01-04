@@ -719,9 +719,7 @@ begin
   inst_regdecode_pipe_rd_all : entity work.regdecode_pipe_rd_all
     generic map(
       g_ADDR_WIDTH      => fifo_addr'length,
-      g_DATA_WIDTH      => fifo_data'length,
-      -- resynchronized errors bits
-      g_CDC_SYNC_STAGES => 2
+      g_DATA_WIDTH      => fifo_data'length
       )
     port map(
       i_clk              => i_clk,
