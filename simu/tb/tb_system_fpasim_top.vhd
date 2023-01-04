@@ -77,7 +77,7 @@ architecture simulate of tb_system_fpasim_top is
 
   -- FMC: from the card
   signal i_reset     : std_logic                    := '0';
-  signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');
+  signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0'); -- @suppress "signal i_board_id is never written"
   ---------------------------------------------------------------------
   -- FMC: from the adc
   ---------------------------------------------------------------------
@@ -147,32 +147,32 @@ architecture simulate of tb_system_fpasim_top is
   -- devices: spi links + specific signals
   ---------------------------------------------------------------------
   -- common: shared link between the spi
-  signal o_spi_sclk        : std_logic;  --  Shared SPI clock line
-  signal o_spi_sdata       : std_logic;  --  Shared SPI MOSI
+  signal o_spi_sclk        : std_logic;   -- @suppress "signal o_spi_sclk is never read"
+  signal o_spi_sdata       : std_logic;   -- @suppress "signal o_spi_sdata is never read"
   -- CDCE: SPI
-  signal i_cdce_sdo        : std_logic := '0';  --  SPI MISO
-  signal o_cdce_n_en       : std_logic;  --  SPI chip select
+  signal i_cdce_sdo        : std_logic := '0';  -- @suppress "signal i_cdce_sdo is never written"
+  signal o_cdce_n_en       : std_logic;  -- @suppress "signal o_cdce_n_en is never read"
   -- CDCE: specific signals
-  signal i_cdce_pll_status : std_logic := '1';  --  pll_status : This pin is set high if the PLL is in lock.
-  signal o_cdce_n_reset    : std_logic;  --  reset_n or hold_n
-  signal o_cdce_n_pd       : std_logic;  --  power_down_n
-  signal o_ref_en          : std_logic;  --  enable the primary reference clock
+  signal i_cdce_pll_status : std_logic := '1';   -- @suppress "signal i_cdce_pll_status is never written"
+  signal o_cdce_n_reset    : std_logic;   -- @suppress "signal o_cdce_n_reset is never read"
+  signal o_cdce_n_pd       : std_logic;  -- @suppress "signal o_cdce_n_pd is never read"
+  signal o_ref_en          : std_logic;   -- @suppress "signal o_ref_en is never read"
   -- ADC: SPI
-  signal i_adc_sdo         : std_logic := '0';  --  SPI MISO
-  signal o_adc_n_en        : std_logic;  --  SPI chip select
+  signal i_adc_sdo         : std_logic := '0'; -- @suppress "signal i_adc_sdo is never written"
+  signal o_adc_n_en        : std_logic;  -- @suppress "signal o_adc_n_en is never read"
   -- ADC: specific signals
-  signal o_adc_reset       : std_logic;  --  adc hardware reset
+  signal o_adc_reset       : std_logic; -- @suppress "signal o_adc_reset is never read"
   -- DAC: SPI
-  signal i_dac_sdo         : std_logic := '0';  --  SPI MISO
-  signal o_dac_n_en        : std_logic;  --  SPI chip select
+  signal i_dac_sdo         : std_logic := '0';   -- @suppress "signal i_dac_sdo is never written"
+  signal o_dac_n_en        : std_logic;   -- @suppress "signal o_dac_n_en is never read"
   -- DAC: specific signal
-  signal o_dac_tx_present  : std_logic;  --  enable tx acquisition
+  signal o_dac_tx_present  : std_logic;   -- @suppress "signal o_dac_tx_present is never read"
   -- AMC: SPI (monitoring)
-  signal i_mon_sdo         : std_logic := '0';  --  SPI data out
-  signal o_mon_n_en        : std_logic;  --  SPI chip select
+  signal i_mon_sdo         : std_logic := '0';  -- @suppress "signal i_mon_sdo is never written"
+  signal o_mon_n_en        : std_logic;   -- @suppress "signal o_mon_n_en is never read"
   -- AMC : specific signals
-  signal i_mon_n_int       : std_logic := '0';  --  galr_n: Global analog input out-of-range alarm.
-  signal o_mon_n_reset     : std_logic;  --  reset_n: hardware reset
+  signal i_mon_n_int       : std_logic := '0';  -- @suppress "signal i_mon_n_int is never written"
+  signal o_mon_n_reset     : std_logic;  -- @suppress "signal o_mon_n_reset is never read"
 
   ---------------------------------------------------------------------
   -- additional signals
@@ -240,12 +240,12 @@ architecture simulate of tb_system_fpasim_top is
   constant c_CHECKER_RAM_TES_STEADY_STATE : checker_t := new_checker("check:ram:tes_steady_state");  -- @suppress "Expression does not result in a constant"
   constant c_CHECKER_RAM_MUX_SQUID_OFFSET : checker_t := new_checker("check:ram:mux_squid_offset");  -- @suppress "Expression does not result in a constant"
 
-  constant c_CHECKER_REG_CTRL            : checker_t := new_checker("check:reg:ctrl");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_REG_FPASIM_GAIN     : checker_t := new_checker("check:reg:fpasim_gain");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_REG_MUX_SQ_FB_DELAY : checker_t := new_checker("check:reg:mux_sq_fb_delay");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_REG_AMP_SQ_OF_DELAY : checker_t := new_checker("check:reg:amp_sq_of_delay");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_REG_ERROR_DELAY     : checker_t := new_checker("check:reg:error_delay");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_REG_RA_DELAY        : checker_t := new_checker("check:reg:ra_delay");  -- @suppress "Expression does not result in a constant"
+  -- constant c_CHECKER_REG_CTRL            : checker_t := new_checker("check:reg:ctrl");  -- @suppress "Expression does not result in a constant"
+  -- constant c_CHECKER_REG_FPASIM_GAIN     : checker_t := new_checker("check:reg:fpasim_gain");  -- @suppress "Expression does not result in a constant"
+  -- constant c_CHECKER_REG_MUX_SQ_FB_DELAY : checker_t := new_checker("check:reg:mux_sq_fb_delay");  -- @suppress "Expression does not result in a constant"
+  -- constant c_CHECKER_REG_AMP_SQ_OF_DELAY : checker_t := new_checker("check:reg:amp_sq_of_delay");  -- @suppress "Expression does not result in a constant"
+  -- constant c_CHECKER_REG_ERROR_DELAY     : checker_t := new_checker("check:reg:error_delay");  -- @suppress "Expression does not result in a constant"
+  -- constant c_CHECKER_REG_RA_DELAY        : checker_t := new_checker("check:reg:ra_delay");  -- @suppress "Expression does not result in a constant"
 
   signal usb_wr_if0 : opal_kelly_lib.pkg_front_panel.t_internal_wr_if := (
     hi_drive   => '0',
