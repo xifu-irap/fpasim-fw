@@ -94,7 +94,7 @@
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SELIO_CLK_IO_STD">LVDS_25</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SELIO_CLK_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SELIO_DDR_ALIGNMENT">SAME_EDGE_PIPELINED</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SELIO_IDDR_RST_TYPE">SYNC</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SELIO_IDDR_RST_TYPE">ASYNC</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SELIO_INTERFACE_TYPE">NETWORKING</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SELIO_ODDR_ALIGNMENT">SAME_EDGE</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SERIALIZATION_FACTOR">4</spirit:configurableElementValue>
@@ -145,7 +145,7 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SELIO_CLK_IO_STD">LVDS_25</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SELIO_CLK_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SELIO_DDR_ALIGNMENT">SAME_EDGE_PIPELINED</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SELIO_IDDR_RST_TYPE">SYNC</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SELIO_IDDR_RST_TYPE">ASYNC</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SELIO_INTERFACE_TYPE">NETWORKING</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SELIO_ODDR_ALIGNMENT">SAME_EDGE</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SERIALIZATION_FACTOR">4</spirit:configurableElementValue>
@@ -201,8 +201,7 @@
                   &quot;data_in_from_pins_n&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;size_left&quot;: &quot;6&quot;, &quot;size_right&quot;: &quot;0&quot;, &quot;driver_value&quot;: &quot;0&quot; } ],
                   &quot;clk_in&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;driver_value&quot;: &quot;0&quot; } ],
                   &quot;io_reset&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;driver_value&quot;: &quot;0&quot; } ],
-                  &quot;data_in_to_device&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;13&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
-                  &quot;sync_reset&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;driver_value&quot;: &quot;0&quot; } ]
+                  &quot;data_in_to_device&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;13&quot;, &quot;size_right&quot;: &quot;0&quot; } ]
                 },
                 &quot;interfaces&quot;: {
                   &quot;io_reset&quot;: {
@@ -211,22 +210,10 @@
                     &quot;mode&quot;: &quot;slave&quot;,
                     &quot;parameters&quot;: {
                       &quot;POLARITY&quot;: [ { &quot;value&quot;: &quot;ACTIVE_HIGH&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;usage&quot;: &quot;all&quot; } ],
-                      &quot;INSERT_VIP&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;user&quot;, &quot;format&quot;: &quot;long&quot;, &quot;usage&quot;: &quot;simulation.rtl&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ]
+                      &quot;INSERT_VIP&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;user&quot;, &quot;format&quot;: &quot;long&quot;, &quot;usage&quot;: &quot;simulation.rtl&quot;, &quot;is_static_object&quot;: false } ]
                     },
                     &quot;port_maps&quot;: {
                       &quot;RST&quot;: [ { &quot;physical_name&quot;: &quot;io_reset&quot; } ]
-                    }
-                  },
-                  &quot;sync_reset&quot;: {
-                    &quot;vlnv&quot;: &quot;xilinx.com:signal:reset:1.0&quot;,
-                    &quot;abstraction_type&quot;: &quot;xilinx.com:signal:reset_rtl:1.0&quot;,
-                    &quot;mode&quot;: &quot;slave&quot;,
-                    &quot;parameters&quot;: {
-                      &quot;POLARITY&quot;: [ { &quot;value&quot;: &quot;ACTIVE_HIGH&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;usage&quot;: &quot;all&quot; } ],
-                      &quot;INSERT_VIP&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;user&quot;, &quot;format&quot;: &quot;long&quot;, &quot;usage&quot;: &quot;simulation.rtl&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ]
-                    },
-                    &quot;port_maps&quot;: {
-                      &quot;RST&quot;: [ { &quot;physical_name&quot;: &quot;sync_reset&quot; } ]
                     }
                   },
                   &quot;Clk_in&quot;: {
@@ -234,14 +221,14 @@
                     &quot;abstraction_type&quot;: &quot;xilinx.com:signal:clock_rtl:1.0&quot;,
                     &quot;mode&quot;: &quot;slave&quot;,
                     &quot;parameters&quot;: {
-                      &quot;FREQ_HZ&quot;: [ { &quot;value&quot;: &quot;100000000&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;long&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;FREQ_TOLERANCE_HZ&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;long&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;PHASE&quot;: [ { &quot;value&quot;: &quot;0.0&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;float&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;CLK_DOMAIN&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;ASSOCIATED_BUSIF&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;ASSOCIATED_PORT&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;ASSOCIATED_RESET&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;INSERT_VIP&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;user&quot;, &quot;format&quot;: &quot;long&quot;, &quot;usage&quot;: &quot;simulation.rtl&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ]
+                      &quot;FREQ_HZ&quot;: [ { &quot;value&quot;: &quot;100000000&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;long&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;FREQ_TOLERANCE_HZ&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;long&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;PHASE&quot;: [ { &quot;value&quot;: &quot;0.0&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;float&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;CLK_DOMAIN&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;ASSOCIATED_BUSIF&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;ASSOCIATED_PORT&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;ASSOCIATED_RESET&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;INSERT_VIP&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;user&quot;, &quot;format&quot;: &quot;long&quot;, &quot;usage&quot;: &quot;simulation.rtl&quot;, &quot;is_static_object&quot;: false } ]
                     },
                     &quot;port_maps&quot;: {
                       &quot;CLK&quot;: [ { &quot;physical_name&quot;: &quot;clk_in&quot; } ]
@@ -252,7 +239,7 @@
                     &quot;abstraction_type&quot;: &quot;xilinx.com:signal:data_rtl:1.0&quot;,
                     &quot;mode&quot;: &quot;master&quot;,
                     &quot;parameters&quot;: {
-                      &quot;LAYERED_METADATA&quot;: [ { &quot;value&quot;: &quot;undef&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ]
+                      &quot;LAYERED_METADATA&quot;: [ { &quot;value&quot;: &quot;undef&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_static_object&quot;: false } ]
                     },
                     &quot;port_maps&quot;: {
                       &quot;DATA&quot;: [ { &quot;physical_name&quot;: &quot;data_in_to_device&quot; } ]

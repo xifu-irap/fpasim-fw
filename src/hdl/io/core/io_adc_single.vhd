@@ -77,23 +77,24 @@ begin
       data_in_from_pins_n => i_adc_n,
       data_in_to_device   => adc_tmp0,
       clk_in              => i_clk,
-      sync_reset          => i_io_clk_rst,
+      --sync_reset          => i_io_clk_rst,
       io_reset            => i_io_rst
       );
 
   ---------------------------------------------------------------------
   -- I/O interface:
-  -- bit remapping : see the selectio_wiz_adc_sim_netlist.vhdl from Xilinx ip compilation.
+  -- bit remapping : see the ip/xilinx/coregen/selectio_wiz_adc/selectio_wiz_adc_sim_netlist.vhdl from Xilinx ip compilation.
   -- adc_tmp1(0) <= adc_tmp0(0); -- pos edge
   -- adc_tmp1(1) <= adc_tmp0(7); -- neg edge
   -- adc_tmp1(2) <= adc_tmp0(1); -- pos edge
   -- adc_tmp1(3) <= adc_tmp0(8); -- neg edge
   -- and so on
   ---------------------------------------------------------------------
-  remapp_bit : for i in i_adc_p'range generate
-    adc_tmp1(2 * i)     <= adc_tmp0(i);
-    adc_tmp1(2 * i + 1) <= adc_tmp0(i + 7);
-  end generate remapp_bit;
+  --remapp_bit : for i in i_adc_p'range generate
+  --  adc_tmp1(2 * i)     <= adc_tmp0(i);
+  --  adc_tmp1(2 * i + 1) <= adc_tmp0(i + 7);
+  --end generate remapp_bit;
+  adc_tmp1 <= adc_tmp0;
   ---------------------------------------------------------------------
   -- optionnally add latency after input IO
   ---------------------------------------------------------------------
