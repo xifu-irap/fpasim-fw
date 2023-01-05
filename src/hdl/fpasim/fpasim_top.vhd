@@ -107,8 +107,8 @@ entity fpasim_top is
     o_sync_valid   : out std_logic;  -- sync valid signal
     o_sync         : out std_logic;  -- sync value (pulse)
 
-    i_sync_errors: out std_logic_vector(15 downto 0); -- sync_errors value
-    i_sync_status: out std_logic_vector(7 downto 0); -- sync_status value
+    i_sync_errors: in std_logic_vector(15 downto 0); -- sync_errors value
+    i_sync_status: in std_logic_vector(7 downto 0); -- sync_status value
     ---------------------------------------------------------------------
     -- output dac @i_clk
     ---------------------------------------------------------------------
@@ -137,7 +137,7 @@ architecture RTL of fpasim_top is
   -- ctrl 
   ---------------------------------------------------------------------
   constant c_CTRL_EN_IDX_H  : integer := pkg_CTRL_EN_IDX_H;
-  constant c_CTRL_RST_IDX_H : integer := pkg_CTRL_RST_IDX_H;
+  --constant c_CTRL_RST_IDX_H : integer := pkg_CTRL_RST_IDX_H;
 
   -- make pulse
   ---------------------------------------------------------------------
@@ -346,8 +346,6 @@ architecture RTL of fpasim_top is
   signal reg_spi_ctrl    : std_logic_vector(31 downto 0);
   signal reg_spi_conf    : std_logic_vector(31 downto 0);
   signal reg_spi_wr_data : std_logic_vector(31 downto 0);
-  -- from the user @usb_clk
-  signal reg_spi_status  : std_logic_vector(31 downto 0);
 
   signal reg_wire_errors3 : std_logic_vector(31 downto 0);
   signal reg_wire_errors2 : std_logic_vector(31 downto 0);
@@ -432,8 +430,6 @@ architecture RTL of fpasim_top is
   signal dac_valid4  : std_logic;
   signal dac_frame4  : std_logic;
   signal dac4        : std_logic_vector(o_dac'range);
-  signal dac_errors0 : std_logic_vector(15 downto 0);
-  signal dac_status0 : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- sync_top
@@ -513,8 +509,7 @@ begin
       ---------------------------------------------------------------------
       i_out_rst                         => i_rst,        -- reset @i_clk
       i_out_clk                         => i_clk,        -- clock (user side)
-      i_rst_status                      => rst_status,   
-      i_debug_pulse                     => debug_pulse,  
+
       -- RAM configuration 
       ---------------------------------------------------------------------
       -- tes_pulse_shape
@@ -682,7 +677,7 @@ begin
   reg_wire_errors3(15 downto 0)  <= rec_adc_errors0;  -- recording
   
   reg_wire_errors2(31 downto 16) <= sync_errors0;  -- sync top
-  reg_wire_errors2(15 downto 0)  <= dac_errors0;   -- dac
+  reg_wire_errors2(15 downto 0)  <= i_dac_errors;   -- dac
 
   reg_wire_errors1(31 downto 16) <= amp_squid_errors0;  -- amp squid
   reg_wire_errors1(15 downto 0)  <= mux_squid_errors0;  -- mux squid
