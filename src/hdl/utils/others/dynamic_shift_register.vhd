@@ -74,7 +74,7 @@ end entity dynamic_shift_register;
 
 architecture RTL of dynamic_shift_register is
 
-  signal addr_r : std_logic_vector(i_addr'range);
+  signal addr_r : std_logic_vector(i_addr'range) := (others => '0');
   signal srl_tmp : std_logic_vector(g_DATA_WIDTH-1 downto 0):= (others => '0');  -- intermediate signal between srl and register
 
   type t_array_slv is array (g_DATA_WIDTH-1 downto 0) of std_logic_vector(2**i_addr'length-1 downto 0);
