@@ -179,10 +179,13 @@ architecture simulate of tb_system_fpasim_top is
   ---------------------------------------------------------------------
   -- Clocks
   signal usb_clk : std_logic := '0';
-  signal sys_clk : std_logic := '0';
+  signal adc_clk : std_logic := '0';
 
   signal data0 : unsigned(13 downto 0) := (others => '0');
   signal data1 : unsigned(13 downto 0) := (others => '0');
+
+  signal data0_r1 : unsigned(13 downto 0) := (others => '0');
+  signal data1_r1 : unsigned(13 downto 0) := (others => '0');
 
   ---------------------------------------------------------------------
   -- Clock definition
@@ -274,17 +277,17 @@ begin
     wait for c_CLK_PERIOD0 / 2;
   end process p_usb_clk_gen;
 
-  p_sys_clk : process is
+  p_adc_clk : process is
   begin
-    sys_clk <= '0';
+    adc_clk <= '0';
     i_adc_clk_p <= '0';
     i_adc_clk_n <= '1';
     wait for c_CLK_PERIOD1 / 2;
-    sys_clk <= '1';
+    adc_clk <= '1';
     i_adc_clk_p <= '1';
     i_adc_clk_n <= '0';
     wait for c_CLK_PERIOD1 / 2;
-  end process p_sys_clk;
+  end process p_adc_clk;
 
   ---------------------------------------------------------------------
   -- master fsm
@@ -448,49 +451,92 @@ begin
 
   ---------------------------------------------------------------------
   -- Data Generation
+  --  the data computation is done on the rising edge.
+  --  the i_adc clock and the computation clock is dephased by 90 degree
   ---------------------------------------------------------------------
   data_gen : process is
   begin
+      -- compute a new value on the rising_edge
       data0 <= data0 + 1;
       data1 <= data1 + 2;
-      wait until rising_edge(sys_clk);
+      -- save the value
+      data0_r1 <= data0;
+      data1_r1 <= data1;
+      -- on the rising edge, keep only the even bit
+      i_da0_p  <= data0(0);
+      i_da0_n  <= not(data0(0));
+      i_da2_p  <= data0(2);
+      i_da2_n  <= not(data0(2));
+      i_da4_p  <= data0(4);
+      i_da4_n  <= not(data0(4));
+      i_da6_p  <= data0(6);
+      i_da6_n  <= not(data0(6));
+      i_da8_p  <= data0(8);
+      i_da8_n  <= not(data0(8));
+      i_da10_p <= data0(10);
+      i_da10_n <= not(data0(10));
+      i_da12_p <= data0(12);
+      i_da12_n <= not(data0(12));
+
+      i_db0_p  <= data1(0);
+      i_db0_n  <= not(data1(0));
+      i_db2_p  <= data1(2);
+      i_db2_n  <= not(data1(2));
+      i_db4_p  <= data1(4);
+      i_db4_n  <= not(data1(4));
+      i_db6_p  <= data1(6);
+      i_db6_n  <= not(data1(6));
+      i_db8_p  <= data1(8);
+      i_db8_n  <= not(data1(8));
+      i_db10_p <= data1(10);
+      i_db10_n <= not(data1(10));
+      i_db12_p <= data1(12);
+      i_db12_n <= not(data1(12));
+
+      wait until rising_edge(adc_clk);
+      -- add 90 degree dephasage
       wait for c_CLK_PERIOD1 / 4;
+      -- on the falling edge, keep only the odd bit (previously computed)
+      i_da0_p  <= data0_r1(1);
+      i_da0_n  <= not(data0_r1(1));
+      i_da2_p  <= data0_r1(3);
+      i_da2_n  <= not(data0_r1(3));
+      i_da4_p  <= data0_r1(5);
+      i_da4_n  <= not(data0_r1(5));
+      i_da6_p  <= data0_r1(7);
+      i_da6_n  <= not(data0_r1(7));
+      i_da8_p  <= data0_r1(9);
+      i_da8_n  <= not(data0_r1(9));
+      i_da10_p <= data0_r1(11);
+      i_da10_n <= not(data0_r1(11));
+      i_da12_p <= data0_r1(13);
+      i_da12_n <= not(data0_r1(13));
+
+      i_db0_p  <= data1_r1(1);
+      i_db0_n  <= not(data1_r1(1));
+      i_db2_p  <= data1_r1(3);
+      i_db2_n  <= not(data1_r1(3));
+      i_db4_p  <= data1_r1(5);
+      i_db4_n  <= not(data1_r1(5));
+      i_db6_p  <= data1_r1(7);
+      i_db6_n  <= not(data1_r1(7));
+      i_db8_p  <= data1_r1(9);
+      i_db8_n  <= not(data1_r1(9));
+      i_db10_p <= data1_r1(11);
+      i_db10_n <= not(data1_r1(11));
+      i_db12_p <= data1_r1(13);
+      i_db12_n <= not(data1_r1(13));
+
+      wait until falling_edge(adc_clk);
+      -- add 90 degree dephasage
+      wait for c_CLK_PERIOD1 / 4;
+
   end process data_gen;
 
-  i_da0_p  <= data0(0);
-  i_da0_n  <= data0(1);
-  i_da2_p  <= data0(2);
-  i_da2_n  <= data0(3);
-  i_da4_p  <= data0(4);
-  i_da4_n  <= data0(5);
-  i_da6_p  <= data0(6);
-  i_da6_n  <= data0(7);
-  i_da8_p  <= data0(8);
-  i_da8_n  <= data0(9);
-  i_da10_p <= data0(10);
-  i_da10_n <= data0(11);
-  i_da12_p <= data0(12);
-  i_da12_n <= data0(13);
-
-  i_db0_p  <= data1(0);
-  i_db0_n  <= data1(1);
-  i_db2_p  <= data1(2);
-  i_db2_n  <= data1(3);
-  i_db4_p  <= data1(4);
-  i_db4_n  <= data1(5);
-  i_db6_p  <= data1(6);
-  i_db6_n  <= data1(7);
-  i_db8_p  <= data1(8);
-  i_db8_n  <= data1(9);
-  i_db10_p <= data1(10);
-  i_db10_n <= data1(11);
-  i_db12_p <= data1(12);
-  i_db12_n <= data1(13);
 
   ---------------------------------------------------------------------
   -- DUT
   ---------------------------------------------------------------------
-
   dut_system_fpasim_top : entity fpasim.system_fpasim_top
     port map(
       --  Opal Kelly inouts --

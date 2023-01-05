@@ -90,11 +90,11 @@ begin
   -- adc_tmp1(3) <= adc_tmp0(8); -- neg edge
   -- and so on
   ---------------------------------------------------------------------
-  --remapp_bit : for i in i_adc_p'range generate
-  --  adc_tmp1(2 * i)     <= adc_tmp0(i);
-  --  adc_tmp1(2 * i + 1) <= adc_tmp0(i + 7);
-  --end generate remapp_bit;
-  adc_tmp1 <= adc_tmp0;
+  remapp_bit : for i in i_adc_p'range generate
+    adc_tmp1(2 * i)     <= adc_tmp0(i);
+    adc_tmp1(2 * i + 1) <= adc_tmp0(i + 7);
+  end generate remapp_bit;
+
   ---------------------------------------------------------------------
   -- optionnally add latency after input IO
   ---------------------------------------------------------------------
