@@ -17,7 +17,7 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   dac_data_insert.vhd 
+--!   @file                   io_dac_data_insert.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
@@ -41,7 +41,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 
-entity dac_data_insert is
+entity io_dac_data_insert is
   generic(
     g_DAC_WIDTH : positive := 16        -- dac bus width (expressed in bits). Possible values [1; max integer value[
   );
@@ -72,9 +72,9 @@ entity dac_data_insert is
     o_errors      : out std_logic_vector(15 downto 0); -- output errors
     o_status      : out std_logic_vector(7 downto 0) -- output status
   );
-end entity dac_data_insert;
+end entity io_dac_data_insert;
 
-architecture RTL of dac_data_insert is
+architecture RTL of io_dac_data_insert is
   ---------------------------------------------------------------------
   -- FIFO
   ---------------------------------------------------------------------
@@ -274,9 +274,9 @@ begin
   ---------------------------------------------------------------------
   -- for simulation only
   ---------------------------------------------------------------------
-  assert not (error_tmp_bis(2) = '1') report "[dac_data_insert] => FIFO is used before the end of the initialization " severity error;
-  assert not (error_tmp_bis(1) = '1') report "[dac_data_insert] => FIFO read an empty FIFO" severity error;
-  assert not (error_tmp_bis(0) = '1') report "[dac_data_insert] => FIFO write a full FIFO" severity error;
+  assert not (error_tmp_bis(2) = '1') report "[io_dac_data_insert] => FIFO is used before the end of the initialization " severity error;
+  assert not (error_tmp_bis(1) = '1') report "[io_dac_data_insert] => FIFO read an empty FIFO" severity error;
+  assert not (error_tmp_bis(0) = '1') report "[io_dac_data_insert] => FIFO write a full FIFO" severity error;
 
 
 
