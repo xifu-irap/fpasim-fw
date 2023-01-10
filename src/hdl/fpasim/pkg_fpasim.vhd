@@ -405,7 +405,7 @@ PACKAGE pkg_fpasim IS
   -------------------------------------------------------------------
   -- user defined: Read FIFO latency. Possible values : [1, max integer value[ 
   --   IMPORTANT: cross clock domain latency is not taken into account.
-  constant pkg_IO_ADC_FIFO_READ_LATENCY              : natural := 1;
+  constant pkg_IO_ADC_FIFO_READ_LATENCY              : natural := 2;
   -- user-defined: add latency after the input IOs. Possible values: [0;max integer value[
   constant pkg_IO_ADC_LATENCY  : natural := 1;
   -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
