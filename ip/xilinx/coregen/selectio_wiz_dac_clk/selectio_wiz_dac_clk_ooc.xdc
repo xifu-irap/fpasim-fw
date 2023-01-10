@@ -1,4 +1,6 @@
-# (c) Copyright 2012-2023 Xilinx, Inc. All rights reserved.
+
+# file: selectio_wiz_dac_clk_ooc.xdc
+# (c) Copyright 2009 - 2013 Xilinx, Inc. All rights reserved.
 # 
 # This file contains confidential and proprietary information
 # of Xilinx, Inc. and is protected under U.S. and
@@ -43,15 +45,13 @@
 # 
 # THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 # PART OF THIS FILE AT ALL TIMES.
-# 
-# DO NOT MODIFY THIS FILE.
-# #########################################################
-#
-# This XDC is used only in OOC mode for synthesis, implementation
-#
-# #########################################################
 
+#################
+#DEFAULT CLOCK CONSTRAINTS
 
-create_clock -period 10 -name clk [get_ports clk]
-
+############################################################
+# Clock Period Constraints                                 #
+############################################################
+create_clock -period 10 [get_ports clk_in]
+set_input_jitter [get_clocks -of_objects [get_ports clk_in]] 0.1
 
