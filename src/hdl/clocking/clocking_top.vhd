@@ -36,16 +36,18 @@ entity clocking_top is
     ---------------------------------------------------------------------
     -- input
     ---------------------------------------------------------------------
-    i_clk_p : in std_logic;             -- differential clock p @250MHz
-    i_clk_n : in std_logic;             -- differential clock n @250MHZ
+    i_clk : in std_logic;               -- differential clock @62.5MHz
 
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
-    o_adc_clk         : out std_logic;  -- adc output clock @250 MHz
-    o_ref_clk         : out std_logic;  -- ref output clock @62.5 MHz
-    o_dac_clk         : out std_logic;  -- dac output clock @500 MHz
-    o_clk             : out std_logic;  -- sys output clock @333.33333 MHz
+    o_ref_clk : out std_logic;          -- ref output clock @62.5 MHz
+    o_clk     : out std_logic;          -- sys output clock @300 MHz
+
+    o_dac_clk             : out std_logic;  -- dac output clock @500 MHz
+    o_dac_clk_div         : out std_logic;  -- dac output clock @125 MHz
+    o_dac_clk_phase90     : out std_logic;  -- dac output clock @500 MHz with 90° phase
+    o_dac_clk_div_phase90 : out std_logic;  -- dac output clock @125 MHz with 90° phase
 
     o_locked : out std_logic
     );
@@ -53,35 +55,55 @@ end entity clocking_top;
 
 architecture RTL of clocking_top is
 
-  signal adc_clk         : std_logic;
-  signal ref_clk         : std_logic;
-  signal dac_clk         : std_logic;
-  signal clk             : std_logic;
-  signal locked          : std_logic;
+  signal locked0              : std_logic;
+  ---------------------------------------------------------------------
+  -- inst_fpasim_clk_wiz_0
+  ---------------------------------------------------------------------
+  signal adc_clk             : std_logic;
+  signal ref_clk             : std_logic;
+  signal dac_clk             : std_logic;
+  signal dac_clk_div         : std_logic;
+  signal dac_clk_phase90     : std_logic;
+  signal dac_clk_div_phase90 : std_logic;
+  signal clk                 : std_logic;
+  signal locked              : std_logic;
 
 begin
+
+--inst_fpasim_clk_wiz_sys : entity work.fpasim_clk_wiz_sys
+--    port map(
+--      -- Clock out ports  
+--      clk_out1 => clk,                  -- output clock @300MHz
+--      -- Status and control signals                
+--      locked   => locked0,
+--      -- Clock in ports
+--      clk_in1  => i_clk                 -- input @62.5MHz
+--      );
 
   inst_fpasim_clk_wiz_0 : entity work.fpasim_clk_wiz_0
     port map(
       -- Clock out ports  
-      clk_out1  => adc_clk,             -- output clock @250MHz
-      clk_out2  => ref_clk,             -- output clock @62.5MHz
-      clk_out3  => dac_clk,             -- output clock @500MHz
-      clk_out4  => clk,                 -- output clock @333.33333MHz
+      clk_out1 => ref_clk,              -- output clock @62.5MHz
+      clk_out2 => clk,                  -- output clock @333.33333MHz
+      clk_out3 => dac_clk,      -- output clock @500MHz with no output buffer
+      clk_out4 => dac_clk_phase90,  -- output clock @500MHz with 90° phase with no output buffer
+      clk_out5 => dac_clk_div,  -- output clock @125Mhz with no output buffer
+      clk_out6 => dac_clk_div_phase90,  -- output clock @125MHz with 90° phase with no output buffer
       -- Status and control signals                
-      locked    => locked,
+      locked   => locked,
       -- Clock in ports
-      clk_in1_p => i_clk_p,
-      clk_in1_n => i_clk_n
+      clk_in1  => i_clk                 -- input @62.5MHz
       );
 
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
-  o_adc_clk         <= adc_clk;
-  o_ref_clk         <= ref_clk;
-  o_dac_clk         <= dac_clk;
-  o_clk             <= clk;
-  o_locked          <= locked;
+  o_ref_clk             <= ref_clk;
+  o_clk                 <= clk;
+  o_dac_clk             <= dac_clk;
+  o_dac_clk_div         <= dac_clk_div;
+  o_dac_clk_phase90     <= dac_clk_phase90;
+  o_dac_clk_div_phase90 <= dac_clk_div_phase90;
+  o_locked              <= locked;
 
 end architecture RTL;
