@@ -35,13 +35,20 @@ use work.pkg_fpasim.all;
 entity io_top is
   port(
     -- from the mmcm
-    i_clk      : in std_logic;          -- system clock
-    i_sync_clk : in std_logic;          -- sync/ref clock
-    i_adc_clk  : in std_logic;          -- adc clock
-    i_dac_clk  : in  std_logic;         -- dac clock
+    i_clk                 : in  std_logic;  -- system clock
+    i_sync_clk            : in  std_logic;  -- sync/ref clock
+    i_dac_clk             : in  std_logic;  -- dac clock
+    i_dac_clk_div         : in  std_logic;
+    i_dac_clk_phase90     : in  std_logic;
+    i_dac_clk_div_phase90 : in  std_logic;
+    -- to the MMCM
+    o_adc_clk_div         : out std_logic;
+    -- from the FPGA pads
+    i_adc_clk_p           : in  std_logic;  -- adc clock_p
+    i_adc_clk_n           : in  std_logic;  -- adc clock_n
 
     -- from the user: @i_clk
-    i_rst_status  : in std_logic;  -- reset error flag(s)
+    i_rst_status  : in std_logic;       -- reset error flag(s)
     i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     ---------------------------------------------------------------------
@@ -81,11 +88,11 @@ entity io_top is
     i_db12_p         : in  std_logic;
     i_db12_n         : in  std_logic;
     -- to user: @i_clk
-    o_adc_valid      : out std_logic; -- adc data valid
-    o_adc_a          : out std_logic_vector(13 downto 0); -- adc data (channel a)
-    o_adc_b          : out std_logic_vector(13 downto 0); -- adc data (channel b)
-    o_adc_errors     : out std_logic_vector(15 downto 0); -- adc errors
-    o_adc_status     : out std_logic_vector(7 downto 0);  -- adc status
+    o_adc_valid      : out std_logic;   -- adc data valid
+    o_adc_a          : out std_logic_vector(13 downto 0);  -- adc data (channel a)
+    o_adc_b          : out std_logic_vector(13 downto 0);  -- adc data (channel b)
+    o_adc_errors     : out std_logic_vector(15 downto 0);  -- adc errors
+    o_adc_status     : out std_logic_vector(7 downto 0);   -- adc status
 
     ---------------------------------------------------------------------
     -- sync
@@ -95,11 +102,11 @@ entity io_top is
     i_sync_io_rst     : in std_logic;  -- Reset connected to all other elements in the circuit
 
     -- input: from/to the user @i_clk
-    i_sync_rst    : in  std_logic; -- sync reset
-    i_sync_valid  : in  std_logic; -- sync data valid
-    i_sync        : in  std_logic; -- sync data
-    o_sync_errors : out std_logic_vector(15 downto 0); -- sync errors
-    o_sync_status : out std_logic_vector(7 downto 0); -- sync status
+    i_sync_rst    : in  std_logic;                      -- sync reset
+    i_sync_valid  : in  std_logic;                      -- sync data valid
+    i_sync        : in  std_logic;                      -- sync data
+    o_sync_errors : out std_logic_vector(15 downto 0);  -- sync errors
+    o_sync_status : out std_logic_vector(7 downto 0);   -- sync status
 
     -- to the fpga pads : @sync_clk
     o_sync_clk : out std_logic;         -- sync/ref clock
@@ -109,42 +116,42 @@ entity io_top is
     -- dac
     ---------------------------------------------------------------------
     -- from/to the user: @i_clk
-    i_dac_rst        : in  std_logic;
-    i_dac_valid      : in  std_logic; -- dac data valid
-    i_dac_frame      : in  std_logic; -- dac frame flag
-    i_dac            : in  std_logic_vector(15 downto 0); -- dac data value
-    o_dac_errors     : out std_logic_vector(15 downto 0); -- dac errors
-    o_dac_status     : out std_logic_vector(7 downto 0);  -- dac status
+    i_dac_rst    : in  std_logic;
+    i_dac_valid  : in  std_logic;                      -- dac data valid
+    i_dac_frame  : in  std_logic;                      -- dac frame flag
+    i_dac        : in  std_logic_vector(15 downto 0);  -- dac data value
+    o_dac_errors : out std_logic_vector(15 downto 0);  -- dac errors
+    o_dac_status : out std_logic_vector(7 downto 0);   -- dac status
 
     -- from the reset_top: @i_dac_clk
-    i_dac_io_clk_rst : in  std_logic;  -- Clock reset: Reset connected to clocking elements in the circuit
-    i_dac_io_rst     : in  std_logic;  -- Reset connected to all other elements in the circuit
-    i_dac_rst_out    : in  std_logic;  -- Reset (application)
+    i_dac_io_clk_rst : in std_logic;  -- Clock reset: Reset connected to clocking elements in the circuit
+    i_dac_io_rst     : in std_logic;  -- Reset connected to all other elements in the circuit
+    i_dac_rst_out    : in std_logic;    -- Reset (application)
 
     -- to the fpga pads: @i_dac_clk
     -- dac clock @i_dac_clk
-    o_dac_clk_p      : out std_logic;
-    o_dac_clk_n      : out std_logic;
+    o_dac_clk_p   : out std_logic;
+    o_dac_clk_n   : out std_logic;
     -- dac frame flag @i_dac_clk
-    o_dac_frame_p    : out std_logic;
-    o_dac_frame_n    : out std_logic;
+    o_dac_frame_p : out std_logic;
+    o_dac_frame_n : out std_logic;
     -- dac data @i_dac_clk
-    o_dac0_p         : out std_logic;
-    o_dac0_n         : out std_logic;
-    o_dac1_p         : out std_logic;
-    o_dac1_n         : out std_logic;
-    o_dac2_p         : out std_logic;
-    o_dac2_n         : out std_logic;
-    o_dac3_p         : out std_logic;
-    o_dac3_n         : out std_logic;
-    o_dac4_p         : out std_logic;
-    o_dac4_n         : out std_logic;
-    o_dac5_p         : out std_logic;
-    o_dac5_n         : out std_logic;
-    o_dac6_p         : out std_logic;
-    o_dac6_n         : out std_logic;
-    o_dac7_p         : out std_logic;
-    o_dac7_n         : out std_logic
+    o_dac0_p      : out std_logic;
+    o_dac0_n      : out std_logic;
+    o_dac1_p      : out std_logic;
+    o_dac1_n      : out std_logic;
+    o_dac2_p      : out std_logic;
+    o_dac2_n      : out std_logic;
+    o_dac3_p      : out std_logic;
+    o_dac3_n      : out std_logic;
+    o_dac4_p      : out std_logic;
+    o_dac4_n      : out std_logic;
+    o_dac5_p      : out std_logic;
+    o_dac5_n      : out std_logic;
+    o_dac6_p      : out std_logic;
+    o_dac6_n      : out std_logic;
+    o_dac7_p      : out std_logic;
+    o_dac7_n      : out std_logic
     );
 end entity io_top;
 
@@ -160,11 +167,12 @@ architecture RTL of io_top is
   signal adc_a_tmp0_n            : std_logic_vector(6 downto 0);
   signal adc_b_tmp0_p            : std_logic_vector(6 downto 0);
   signal adc_b_tmp0_n            : std_logic_vector(6 downto 0);
-  
+
   -- output
-  signal adc_valid : std_logic;
-  signal adc_a     : std_logic_vector(o_adc_a'range);
-  signal adc_b     : std_logic_vector(o_adc_b'range);
+  signal adc_clk_div : std_logic;
+  signal adc_valid   : std_logic;
+  signal adc_a       : std_logic_vector(o_adc_a'range);
+  signal adc_b       : std_logic_vector(o_adc_b'range);
 
   signal adc_errors : std_logic_vector(o_adc_errors'range);
   signal adc_status : std_logic_vector(o_adc_status'range);
@@ -241,16 +249,19 @@ begin
       -- input
       ---------------------------------------------------------------------
       --
-      i_clk         => i_adc_clk,       -- clock
+      i_clk_p      => i_adc_clk_p,      -- clock
+      i_clk_n      => i_adc_clk_n,      -- clock
       -- from reset_top: @i_clk
-      i_io_clk_rst  => i_adc_io_clk_rst,
-      i_io_rst      => i_adc_io_rst,
+      i_io_clk_rst => i_adc_io_clk_rst,
+      i_io_rst     => i_adc_io_rst,
       -- adc_a
-      i_adc_a_p     => adc_a_tmp0_p,    -- Diff_p buffer input
-      i_adc_a_n     => adc_a_tmp0_n,    -- Diff_n buffer input
+      i_adc_a_p    => adc_a_tmp0_p,     -- Diff_p buffer input
+      i_adc_a_n    => adc_a_tmp0_n,     -- Diff_n buffer input
       -- adc_b
-      i_adc_b_p     => adc_b_tmp0_p,    -- Diff_p buffer input
-      i_adc_b_n     => adc_b_tmp0_n,    -- Diff_n buffer input
+      i_adc_b_p    => adc_b_tmp0_p,     -- Diff_p buffer input
+      i_adc_b_n    => adc_b_tmp0_n,     -- Diff_n buffer input
+
+      o_clk_div     => adc_clk_div,
       ---------------------------------------------------------------------
       -- output@ i_out_clk
       ---------------------------------------------------------------------
@@ -269,9 +280,10 @@ begin
       );
 
   -- to the user
-  o_adc_valid <= adc_valid;
-  o_adc_a     <= adc_a;
-  o_adc_b     <= adc_b;
+  o_adc_clk_div <= adc_clk_div;
+  o_adc_valid   <= adc_valid;
+  o_adc_a       <= adc_a;
+  o_adc_b       <= adc_b;
 
   o_adc_errors <= adc_errors;
   o_adc_status <= adc_status;
@@ -329,19 +341,23 @@ begin
       ---------------------------------------------------------------------
       -- input: @i_clk
       ---------------------------------------------------------------------
-      i_clk         => i_clk,       -- clock
+      i_clk         => i_clk,           -- clock
       i_rst         => i_dac_rst,
       i_rst_status  => i_rst_status,
       i_debug_pulse => i_debug_pulse,
       i_dac_valid   => i_dac_valid,
       i_dac_frame   => i_dac_frame,
       i_dac         => i_dac,
-      
+
       ---------------------------------------------------------------------
       -- output: i_out_clk
       ---------------------------------------------------------------------
-      i_out_clk    => i_dac_clk,
-      i_out_rst    => i_dac_rst_out,
+      i_out_clk             => i_dac_clk,
+      i_out_clk_div         => i_dac_clk_div,
+      i_out_clk_phase90     => i_dac_clk_phase90,
+      i_out_clk_div_phase90 => i_dac_clk_div_phase90,
+
+      i_out_rst     => i_dac_rst_out,
       -- from reset_top: @i_dac_clk
       i_io_clk_rst  => i_dac_io_clk_rst,
       i_io_rst      => i_dac_io_rst,
@@ -366,11 +382,11 @@ begin
       o_dac6_n      => o_dac6_n,
       o_dac7_p      => o_dac7_p,
       o_dac7_n      => o_dac7_n,
-    ---------------------------------------------------------------------
-    -- output/status: @i_clk
-    ---------------------------------------------------------------------
-    o_errors => dac_errors,
-    o_status => dac_status
+      ---------------------------------------------------------------------
+      -- output/status: @i_clk
+      ---------------------------------------------------------------------
+      o_errors      => dac_errors,
+      o_status      => dac_status
       );
 
   -- output
