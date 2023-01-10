@@ -487,6 +487,8 @@ class VunitConf:
         filepath_list.append(str(Path(base_path, 'selectio_wiz_dac/selectio_wiz_dac.v')))
         filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_frame/selectio_wiz_dac_frame_selectio_wiz.v')))
         filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_frame/selectio_wiz_dac_frame.v')))
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_clk/selectio_wiz_dac_clk_selectio_wiz.v')))
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_clk/selectio_wiz_dac_clk.v')))
         filepath_list.append(str(Path(base_path, 'fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v')))
         filepath_list.append(str(Path(base_path, 'fpasim_clk_wiz_0/fpasim_clk_wiz_0.v')))
         filepath_list.append(str(Path(base_path, 'fpasim_top_ila_0/sim/fpasim_top_ila_0.vhd')))
