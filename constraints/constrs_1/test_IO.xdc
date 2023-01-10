@@ -37,21 +37,42 @@
 # usb @100.8 MHz
 ###############################################################################################################
 create_clock -period 9.920 -name okUH0 [get_ports {i_okUH[0]}]
+create_clock -period 4 -name adc_clk [get_ports {i_adc_clk_p}]
 
 ###############################################################################################################
 # rename auto-derived clock
 ###############################################################################################################
-set usb_clk [get_clocks -of_objects [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/mmcm0/CLKOUT0]]
+set usb_clk_in_pin [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/mmcm0/CLKIN1]
+set usb_clk_out_pin  [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/mmcm0/CLKOUT0]
+# set usb_clk [get_clocks -of_objects [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/mmcm0/CLKOUT0]]
 set mmcm_clk_in_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKIN1]
-set mmcm_clk_adc_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT0]
-set mmcm_clk_ref_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT1]
-set mmcm_clk_dac_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT2]
-set mmcm_clk_sys_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT3]
+set mmcm_clk_ref_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT0]
+set mmcm_clk_sys_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT1]
+set mmcm_dac_clk_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT2]
+set mmcm_dac_clk_out_90_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT3]
+set mmcm_dac_clk_div_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT4]
+set mmcm_dac_clk_div_90_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT5]
 
-create_generated_clock -name adc_clk -source $mmcm_clk_in_pin $mmcm_clk_adc_out_pin
+
+# rename clock
 create_generated_clock -name ref_clk -source $mmcm_clk_in_pin $mmcm_clk_ref_out_pin
-create_generated_clock -name dac_clk -source $mmcm_clk_in_pin $mmcm_clk_dac_out_pin
+create_generated_clock -name dac_clk -source $mmcm_clk_in_pin $mmcm_dac_clk_out_pin
+create_generated_clock -name dac_clk_phase90 -source $mmcm_clk_in_pin $mmcm_dac_clk_out_90_pin
+create_generated_clock -name dac_clk_div -source $mmcm_clk_in_pin $mmcm_dac_clk_div_out_pin
+create_generated_clock -name dac_clk_div_phase90 -source $mmcm_clk_in_pin $mmcm_dac_clk_div_90_out_pin
 create_generated_clock -name clk -source $mmcm_clk_in_pin $mmcm_clk_sys_out_pin
+create_generated_clock -name usb_clk -source $usb_clk_in_pin $usb_clk_out_pin
+
+# set_property CLOCK_DELAY_GROUP clock_delay_group_clk_dac_feedback [get_nets-of_objects
+# [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/clkf_buf/O] ]
+# set_property CLOCK_DELAY_GROUP clock_delay_group_clk_dac [get_nets-of_objects
+# [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/clkout2_buf/O] ]
+# set_property CLOCK_DELAY_GROUP clock_delay_group_clk_dac_phase90 [get_nets-of_objects
+# [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/clkout5_buf/O] ]
+
+# set_property USER_CLOCK_ROOT {X0Y4} [get_nets inst_clocking_top/inst_fpasim_clk_wiz_0/inst/clkf_buf]
+# set_property USER_CLOCK_ROOT {X0Y4} [get_nets inst_clocking_top/inst_fpasim_clk_wiz_0/inst/clkout2_buf]
+# set_property USER_CLOCK_ROOT {X0Y4} [get_nets inst_clocking_top/inst_fpasim_clk_wiz_0/inst/clkout5_buf]
 
 ###############################################################################################################
 # Unrelated asynchronuous clocks
@@ -61,16 +82,24 @@ create_generated_clock -name clk -source $mmcm_clk_in_pin $mmcm_clk_sys_out_pin
 ###############################################################################################################
 # ODDR : forward clock
 ###############################################################################################################
-create_generated_clock -name gen_dac_clk_out -multiply_by 1 -source [get_pins inst_io_top/inst_io_dac/gen_io_dac.inst_selectio_wiz_dac/inst/oddr_inst/C] [get_ports {o_dac_clk_p}]
+create_generated_clock -name gen_dac_clk_out -multiply_by 1 -source [get_pins inst_io_top/inst_io_dac/gen_io_dac_clk.inst_selectio_wiz_dac_clk/clk_in] [get_ports {o_dac_clk_p}]
 create_generated_clock -name gen_sync_clk_out -multiply_by 1 -source [get_pins inst_io_top/inst_io_sync/gen_io_sync.inst_selectio_wiz_sync/inst/oddr_inst/C] [get_ports {o_ref_clk}]
 # usb_clk(100.8MHz) -> to max spi clock (20MHz) => multiply_by
 # create_generated_clock -name gen_spi_clk -divide_by 5 -source [get_ports i_okUH[0]] [get_ports {o_spi_sclk}]
 # create_generated_clock -name gen_ref_clk -multiply_by 1  -source [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT1] [get_ports {o_ref_clk}]
 
+set_multicycle_path 0 -from [get_clocks dac_clk] -to [get_clocks gen_dac_clk_out]
+set_multicycle_path -1 -hold -from [get_clocks dac_clk] -to [get_clocks gen_dac_clk_out]
+set_false_path -setup -rise_from [get_clocks dac_clk] -fall_to [get_clocks gen_dac_clk_out]
+set_false_path -setup -fall_from [get_clocks dac_clk] -rise_to [get_clocks gen_dac_clk_out]
+set_false_path -hold -rise_from [get_clocks dac_clk] -rise_to [get_clocks gen_dac_clk_out]   
+set_false_path -hold -fall_from [get_clocks dac_clk] -fall_to [get_clocks gen_dac_clk_out]
 ###############################################################################################################
 # usb: constraints register/Q on register/clk
 ###############################################################################################################
-create_generated_clock -name usb_clk_regQ_on_clk_pin -source [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/core0/core0/a0/d0/lc4da648cb12eeeb24e4d199c1195ed93_reg[4]/C] -divide_by 2 [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/core0/core0/a0/d0/lc4da648cb12eeeb24e4d199c1195ed93_reg[4]/Q];
+set usb_src [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/core0/core0/a0/d0/lc4da648cb12eeeb24e4d199c1195ed93_reg[4]/C]
+set usb_dest [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/core0/core0/a0/d0/lc4da648cb12eeeb24e4d199c1195ed93_reg[4]/Q]
+create_generated_clock -name usb_clk_regQ_on_clk_pin -source $usb_src -divide_by 2 $usb_dest;
 
 ###############################################################################################################
 # usb (input ports)
@@ -92,7 +121,8 @@ create_generated_clock -name usb_clk_regQ_on_clk_pin -source [get_pins inst_fpas
 # data     __XXXX____Rise_Data____XXXX__
 #
 
-set input_clock         $usb_clk;      # Name of input clock
+set input_clock         usb_clk;      # Name of input clock
+# set input_clock         $usb_clk;      # Name of input clock
 set input_clock_period  9.9;    # Period of input clock
 set dv_bre              2.000;             # Data valid before the rising clock edge
 set dv_are              2.000;             # Data valid after the rising clock edge
@@ -126,8 +156,9 @@ set_input_delay -clock $input_clock -min $dv_are                              [g
 # create_generated_clock -name <gen_clock_name> -multiply_by 1 -source [get_pins <source_pin>] [get_ports <output_clock_port>]
 # gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".	
 
-set fwclk        $usb_clk;     # forwarded clock name (generated using create_generated_clock at output clock port)        
-set tsu          4.000;            # destination device setup time requirement
+# set fwclk        $usb_clk;     # forwarded clock name (generated using create_generated_clock at output clock port)        
+set fwclk        usb_clk;     # forwarded clock name (generated using create_generated_clock at output clock port)        
+set tsu          2.000;            # destination device setup time requirement
 set thd          0.500;            # destination device hold time requirement
 set trce_dly_max 0.000;            # maximum board trace delay
 set trce_dly_min 0.000;            # minimum board trace delay
@@ -168,8 +199,8 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 # data     _XXXX____Rise_Data____XXXX____Fall_Data____XXXX_
 #
 
-# set input_clock         adc_clk;      # Name of input clock
-set input_clock         i_adc_clk_p;      # Name of input clock
+set input_clock         adc_clk;      # Name of input clock
+# set input_clock         i_adc_clk_p;      # Name of input clock
 set input_clock_period  4;                # Period of input clock (full-period)
 set dv_bre              0.8;             # Data valid before the rising clock edge
 set dv_are              0.8;             # Data valid after the rising clock edge
@@ -312,7 +343,7 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 # create_generated_clock -name <gen_clock_name> -multiply_by 1 -source [get_pins <source_pin>] [get_ports <output_clock_port>]
 # gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".	
 
-set fwclk        $usb_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)        
+set fwclk        usb_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)        
 set tsu          2.5;           # destination device setup time requirement
 set thd          2.5;           # destination device hold time requirement
 set trce_dly_max 0.000;            # maximum board trace delay
@@ -344,7 +375,7 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 # data     __XXXX____Rise_Data____XXXX__
 #
 
-set input_clock         $usb_clk;      # Name of input clock
+set input_clock         usb_clk;      # Name of input clock
 set input_clock_period  10;              # Period of input clock
 set dv_bre              2.5;          # Data valid before the rising clock edge
 set dv_are              2.500;          # Data valid after the rising clock edge
@@ -355,36 +386,18 @@ set_input_delay -clock $input_clock -max [expr $input_clock_period - $dv_bre] [g
 set_input_delay -clock $input_clock -min $dv_are                              [get_ports $input_ports];
 
 ##################################################################################
-# others (input ports)
+# others (input ports): asynchronuous ports
 ##################################################################################
-# Center-Aligned Rising Edge Source Synchronous Inputs 
-#
-# For a center-aligned Source Synchronous interface, the clock
-# transition is aligned with the center of the data valid window.
-# The same clock edge is used for launching and capturing the
-# data. The constraints below rely on the default timing
-# analysis (setup = 1 cycle, hold = 0 cycle).
-#
-# input    ____           __________    
-# clock        |_________|          |_____
-#                        |                 
-#                 dv_bre | dv_are    
-#                <------>|<------>  
-#          __    ________|________    __
-# data     __XXXX____Rise_Data____XXXX__
-#
 
-set input_clock         $usb_clk;      # Name of input clock
-set input_clock_period  11;    # Period of input clock
-set dv_bre              5.000;             # Data valid before the rising clock edge
-set dv_are              5.000;             # Data valid after the rising clock edge
-set input_ports         {i_board_id*};     # List of input ports
-
-# Input Delay Constraint
-set_input_delay -clock $input_clock -max [expr $input_clock_period - $dv_bre] [get_ports $input_ports];
-set_input_delay -clock $input_clock -min $dv_are                              [get_ports $input_ports];
-
-
+set_false_path -from [get_ports "i_board_id*"]
+set_false_path -from [get_ports "i_reset"]
+# set a delay = usb_clk period
+# set_max_delay 9.9 -datapath_only -from [get_ports "i_cdce_pll_status"]
+# set_max_delay 9.9 -datapath_only -from [get_ports "i_mon_n_int"]
+# set_max_delay 9.9 -datapath_only -from [get_ports "i_adc_sdo"]
+# set_max_delay 9.9 -datapath_only -from [get_ports "i_mon_sdo"]
+# set_max_delay 9.9 -datapath_only -from [get_ports "i_cdce_sdo"]
+# set_max_delay 9.9 -datapath_only -from [get_ports "i_dac_sdo"]
 ##################################################################################
 # SPI: IO
 #   use IO register when possible
@@ -423,20 +436,20 @@ set_property IOB true [get_ports o_sync]
 # usb: IO
 ##################################################################################
 # set_property IOB true [get_ports i_okUH*] # connected to a mmcm
-set_property IOB true [get_ports o_okHU*]
-set_property IOB true [get_ports b_okUHU*]
-set_property IOB true [get_ports b_okAA]
+# set_property IOB true [get_ports o_okHU*]
+# set_property IOB true [get_ports b_okUHU*]
+# set_property IOB true [get_ports b_okAA]
 
 ##################################################################################
 # adc: IO
 ##################################################################################
 # set_property IOB true [get_ports i_adc_clk_p]
-set_property IOB true [get_ports i_da*_p]
-set_property IOB true [get_ports i_db*_p]
+# set_property IOB true [get_ports i_da*_p]
+# set_property IOB true [get_ports i_db*_p]
 
 ##################################################################################
 # dac: IO
 ##################################################################################
-set_property IOB true [get_ports o_dac_clk_p]
-set_property IOB true [get_ports o_dac_frame_p]
-set_property IOB true [get_ports o_dac*_p]
+# set_property IOB true [get_ports o_dac_clk_p]
+# set_property IOB true [get_ports o_dac_frame_p]
+# set_property IOB true [get_ports o_dac*_p]
