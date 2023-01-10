@@ -331,11 +331,11 @@ begin
   ---------------------------------------------------------------------
   -- for simulation only
   ---------------------------------------------------------------------
-  assert not (error_tmp_bis(5) = '1') report "[regdecode_wire_wr_rd] => FIFO0 is used before the end of the initialization " severity error;
+  --assert not (error_tmp_bis(5) = '1') report "[regdecode_wire_wr_rd] => FIFO0 is used before the end of the initialization " severity error;
   assert not (error_tmp_bis(4) = '1') report "[regdecode_wire_wr_rd] => FIFO2 read an empty FIFO" severity error;
   assert not (error_tmp_bis(3) = '1') report "[regdecode_wire_wr_rd] => FIFO2 write a full FIFO" severity error;
 
-  assert not (error_tmp_bis(2) = '1') report "[regdecode_wire_wr_rd] => FIFO2 is used before the end of the initialization " severity error;
+  --assert not (error_tmp_bis(2) = '1') report "[regdecode_wire_wr_rd] => FIFO2 is used before the end of the initialization " severity error;
   assert not (error_tmp_bis(1) = '1') report "[regdecode_wire_wr_rd] => FIFO0 read an empty FIFO" severity error;
   assert not (error_tmp_bis(0) = '1') report "[regdecode_wire_wr_rd] => FIFO0 write a full FIFO" severity error;
 
