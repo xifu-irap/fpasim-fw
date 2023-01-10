@@ -38,9 +38,9 @@ use ieee.numeric_std.all;
 
 entity spi_top is
   port (
-    i_clk         : in std_logic;  -- clock
-    i_rst         : in std_logic;  -- reset
-    i_rst_status  : in std_logic;  -- reset error flag(s)
+    i_clk         : in std_logic;       -- clock
+    i_rst         : in std_logic;       -- reset
+    i_rst_status  : in std_logic;       -- reset error flag(s)
     i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     ---------------------------------------------------------------------
@@ -58,12 +58,12 @@ entity spi_top is
     o_spi_rd_data        : out std_logic_vector(31 downto 0);  -- read data
     o_spi_ready          : out std_logic;  -- 1: all spi links are ready,0: one of the spi link is busy
 
-    o_reg_spi_status     : out std_logic_vector(31 downto 0);
+    o_reg_spi_status : out std_logic_vector(31 downto 0);
     ---------------------------------------------------------------------
     -- errors/status
     ---------------------------------------------------------------------
-    o_errors : out std_logic_vector(15 downto 0);
-    o_status : out std_logic_vector(7 downto 0);
+    o_errors         : out std_logic_vector(15 downto 0);
+    o_status         : out std_logic_vector(7 downto 0);
 
     ---------------------------------------------------------------------
     -- from/to the IOs
@@ -77,10 +77,10 @@ entity spi_top is
     o_cdce_n_en : out std_logic;        -- SPI chip select
 
     -- CDCE: specific signals
-    i_cdce_pll_status : in std_logic;      -- pll_status : This pin is set high if the PLL is in lock.
-    o_cdce_n_reset    : out std_logic;     -- reset_n or hold_n
-    o_cdce_n_pd       : out std_logic;     -- power_down_n
-    o_ref_en          : out std_logic;     -- enable the primary reference clock
+    i_cdce_pll_status : in  std_logic;  -- pll_status : This pin is set high if the PLL is in lock.
+    o_cdce_n_reset    : out std_logic;  -- reset_n or hold_n
+    o_cdce_n_pd       : out std_logic;  -- power_down_n
+    o_ref_en          : out std_logic;  -- enable the primary reference clock
 
     -- ADC: SPI
     i_adc_sdo   : in  std_logic;        -- SPI MISO
@@ -388,7 +388,7 @@ begin
         else
           sm_state_next <= E_WAIT_AMC;
         end if;
-      when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -506,7 +506,7 @@ begin
   cdce_spi_cmd_wr_data       <= tx_data_r1;
   inst_spi_cdce72010 : entity work.spi_cdce72010
     generic map(
-      g_DATA_WIDTH => cdce_spi_cmd_wr_data'length,
+      g_DATA_WIDTH  => cdce_spi_cmd_wr_data'length,
       g_INPUT_DELAY => 1
       )
     port map(
@@ -533,12 +533,12 @@ begin
       ---------------------------------------------------------------------
       -- spi signal
       i_cdce_sdo          => i_cdce_sdo,  -- SPI MISO
-      o_spi_sclk          => cdce_spi_clk,      -- SPI clock
-      o_cdce_n_en         => cdce_spi_cs_n_en,  -- SPI chip select 
-      o_spi_sdata         => cdce_spi_mosi,     -- SPI MOSI
+      o_spi_sclk          => cdce_spi_clk,       -- SPI clock
+      o_cdce_n_en         => cdce_spi_cs_n_en,   -- SPI chip select 
+      o_spi_sdata         => cdce_spi_mosi,      -- SPI MOSI
       -- CDCE specific signals
-      i_cdce_pll_status   => i_cdce_pll_status, -- pll_status : This pin is set high if the PLL is in lock.
-      o_cdce_n_reset      => cdce_n_reset,      -- reset_n or hold_n
+      i_cdce_pll_status   => i_cdce_pll_status,  -- pll_status : This pin is set high if the PLL is in lock.
+      o_cdce_n_reset      => cdce_n_reset,       -- reset_n or hold_n
       o_cdce_n_pd         => cdce_n_pd,   -- power_down_n
       o_ref_en            => cdce_ref_en  -- enable the primary reference clock
       );
@@ -629,10 +629,10 @@ begin
 
   inst_spi_amc7823 : entity work.spi_amc7823
     generic map(
-      g_DATA_WIDTH => amc_spi_cmd_wr_data'length,
+      g_DATA_WIDTH  => amc_spi_cmd_wr_data'length,
       g_INPUT_DELAY => 1
       )
-    port map( -- @suppress "The order of the associations is different from the declaration order"
+    port map(  -- @suppress "The order of the associations is different from the declaration order"
       i_clk               => i_clk,
       i_rst               => i_rst,
       ---------------------------------------------------------------------
@@ -681,9 +681,10 @@ begin
   o_errors(15 downto 1) <= (others => '0');
   o_errors(0)           <= error_tmp_bis(0);
 
-  o_status(2) <= cdce_status(0);
-  o_status(1) <= amc_status(0);
-  o_status(0) <= ready_r1;
+  o_status(7 downto 3) <= (others => '0');
+  o_status(2)          <= cdce_status(0);
+  o_status(1)          <= amc_status(0);
+  o_status(0)          <= ready_r1;
 
   ---------------------------------------------------------------------
   -- for simulation only
