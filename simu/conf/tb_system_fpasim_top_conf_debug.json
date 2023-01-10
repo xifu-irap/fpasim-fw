@@ -42,8 +42,8 @@
     "output_tb_filename": "py_usb_data.csv",
     "cmd_list": [
       "usb_ctrl;wr;rst=1",
-      "usb_trig;wr;ctrl_valid=1",
       "usb_ctrl;wr;rst=0",
+      "nop;wr;delay=32",
       "usb_trig;wr;ctrl_valid=1",
       "usb_fpgasim_gain;wr;gain=1",
       "usb_mux_sq_fb_delay;wr;delay=2",

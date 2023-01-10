@@ -416,20 +416,47 @@ add wave -noupdate -divider fpasim_top
 add wave -noupdate -group fpasim_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/i_adc_valid
 add wave -noupdate -group fpasim_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/i_adc_amp_squid_offset_correction
 add wave -noupdate -group fpasim_top /tb_system_fpasim_top/dut_system_fpasim_top/inst_fpasim_top/i_adc_mux_squid_feedback
-add wave -noupdate -group io_adc_single_a -expand -group tb -radix unsigned /tb_system_fpasim_top/data0
-add wave -noupdate -group io_adc_single_a -expand -group tb -radix unsigned /tb_system_fpasim_top/data0_r1
-add wave -noupdate -group io_adc_single_a -expand -group tb -radix unsigned /tb_system_fpasim_top/data1
-add wave -noupdate -group io_adc_single_a -expand -group tb /tb_system_fpasim_top/data1_r1
-add wave -noupdate -group io_adc_single_a /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single_a/i_clk
-add wave -noupdate -group io_adc_single_a /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single_a/i_io_clk_rst
-add wave -noupdate -group io_adc_single_a /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single_a/i_io_rst
-add wave -noupdate -group io_adc_single_a /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single_a/i_adc_p
-add wave -noupdate -group io_adc_single_a /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single_a/i_adc_n
-add wave -noupdate -group io_adc_single_a -group step /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single_a/adc_tmp0
-add wave -noupdate -group io_adc_single_a -group step /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single_a/adc_tmp1
-add wave -noupdate -group io_adc_single_a -radix unsigned /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single_a/o_adc
+add wave -noupdate -expand -group selectio_wiz_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/inst_selectio_wiz_adc/SYS_W
+add wave -noupdate -expand -group selectio_wiz_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/inst_selectio_wiz_adc/DEV_W
+add wave -noupdate -expand -group selectio_wiz_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/inst_selectio_wiz_adc/data_in_from_pins_p
+add wave -noupdate -expand -group selectio_wiz_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/inst_selectio_wiz_adc/data_in_from_pins_n
+add wave -noupdate -expand -group selectio_wiz_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/inst_selectio_wiz_adc/data_in_to_device
+add wave -noupdate -expand -group selectio_wiz_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/inst_selectio_wiz_adc/bitslip
+add wave -noupdate -expand -group selectio_wiz_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/inst_selectio_wiz_adc/clk_in_p
+add wave -noupdate -expand -group selectio_wiz_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/inst_selectio_wiz_adc/clk_in_n
+add wave -noupdate -expand -group selectio_wiz_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/inst_selectio_wiz_adc/clk_div_out
+add wave -noupdate -expand -group selectio_wiz_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/inst_selectio_wiz_adc/clk_reset
+add wave -noupdate -expand -group selectio_wiz_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/inst_selectio_wiz_adc/io_reset
+add wave -noupdate -expand -group io_adc_single_a -expand -group tb -radix unsigned /tb_system_fpasim_top/data0
+add wave -noupdate -expand -group io_adc_single_a -expand -group tb -radix unsigned /tb_system_fpasim_top/data0_r1
+add wave -noupdate -expand -group io_adc_single_a -expand -group tb -radix unsigned /tb_system_fpasim_top/data1
+add wave -noupdate -expand -group io_adc_single_a -expand -group tb /tb_system_fpasim_top/data1_r1
+add wave -noupdate -expand -group io_adc_single_a -expand -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/i_clk_p
+add wave -noupdate -expand -group io_adc_single_a -expand -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/i_clk_n
+add wave -noupdate -expand -group io_adc_single_a -expand -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/i_io_clk_rst
+add wave -noupdate -expand -group io_adc_single_a -expand -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/i_io_rst
+add wave -noupdate -expand -group io_adc_single_a -expand -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/i_adc_a_p
+add wave -noupdate -expand -group io_adc_single_a -expand -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/i_adc_a_n
+add wave -noupdate -expand -group io_adc_single_a -expand -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/i_adc_b_p
+add wave -noupdate -expand -group io_adc_single_a -expand -group in /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/i_adc_b_n
+add wave -noupdate -expand -group io_adc_single_a -expand -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/o_clk_div
+add wave -noupdate -expand -group io_adc_single_a -expand -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/o_adc_a
+add wave -noupdate -expand -group io_adc_single_a -expand -group out /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/inst_io_adc_single/o_adc_b
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/i_clk_p
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/i_clk_n
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/i_io_clk_rst
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/i_io_rst
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/o_clk_div
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/i_out_clk
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/i_rst_status
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/i_debug_pulse
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/o_adc_valid
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/o_adc_a
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/o_adc_b
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/o_errors
+add wave -noupdate -expand -group io_adc /tb_system_fpasim_top/dut_system_fpasim_top/inst_io_top/inst_io_adc/o_status
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {18270100 ps} 0}
+WaveRestoreCursors {{Cursor 1} {27488 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
@@ -445,4 +472,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {20277600 ps} {20341600 ps}
+WaveRestoreZoom {0 ps} {128 ns}
