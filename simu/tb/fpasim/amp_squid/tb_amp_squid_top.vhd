@@ -158,7 +158,7 @@ architecture simulate of tb_amp_squid_top is
   signal data_count_overflow_out : std_logic; -- @suppress "signal data_count_overflow_out is never read"
 
   signal data_stop : std_logic := '0';
-  signal data_out_error : std_logic_vector(0 downto 0);
+  signal data_out_error : std_logic_vector(0 downto 0); -- @suppress "signal data_out_error is never read"
 
   ---------------------------------------------------------------------
   -- filepath definition

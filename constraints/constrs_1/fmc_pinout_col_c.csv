@@ -24,8 +24,8 @@ C22;DAC_D6_P;LVDS_25;o_dac6_p;F17;;
 C23;DAC_D6_N;LVDS_25;o_dac6_n;E17;;
 C24;;;;;;
 C25;;;;;;
-C26;MON_N_EN;LVCMOS25;;D9;;
-C27;MON_N_RESET;LVCMOS25;;D8;;
+C26;MON_N_EN;LVCMOS25;o_mon_n_en;D9;;
+C27;MON_N_RESET;LVCMOS25;o_mon_n_reset;D8;;
 C28;;;;;;
 C29;;;;;;
 C30;I2C_SCL;LVCMOS25;;;;check voltage

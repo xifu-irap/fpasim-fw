@@ -75,22 +75,22 @@ architecture RTL of mult_sfixed is
     -----------------------------------------------------------------
     -- step1: add 1 sign bit
     -----------------------------------------------------------------
-    signal a_r1    : sfixed(a_tmp'high downto a_tmp'low);
-    signal b_r1    : sfixed(b_tmp'high downto b_tmp'low);
+    signal a_r1    : sfixed(a_tmp'high downto a_tmp'low):= (others => '0');
+    signal b_r1    : sfixed(b_tmp'high downto b_tmp'low):= (others => '0');
 
     ---------------------------------------------------------------------
     -- step2:
     --   mult_r2 = a_r1 * b_r1
     ---------------------------------------------------------------------
-    signal mult_r2 : sfixed(sfixed_high(a_r1, '*', b_r1) downto sfixed_low(a_r1, '*', b_r1));
+    signal mult_r2 : sfixed(sfixed_high(a_r1, '*', b_r1) downto sfixed_low(a_r1, '*', b_r1)):= (others => '0');
 
     ---------------------------------------------------------------------
     -- step3
     -- p_r3 = mult_r2
     ---------------------------------------------------------------------
-    signal p_r3 : sfixed(mult_r2'range);
+    signal p_r3 : sfixed(mult_r2'range):= (others => '0');
 
-    signal p_r4 : sfixed(mult_r2'range);
+    signal p_r4 : sfixed(mult_r2'range):= (others => '0');
 
     -----------------------------------------------------------------
     -- truncate: 

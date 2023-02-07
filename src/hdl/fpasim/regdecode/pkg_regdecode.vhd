@@ -17,42 +17,43 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   pkg_regdecode.vhd 
+--    @file                   pkg_regdecode.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
---!
---! This package defines all constants used by the regdecode function. 
+--    @details                
+-- 
+--  This package defines all constants associtated to the regdecode function and its sub-functions.
+-- 
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_utils;
-use fpasim.pkg_fpasim.all;
+
+use work.pkg_utils;
+use work.pkg_fpasim.all;
 
 PACKAGE pkg_regdecode IS
 
     ---------------------------------------------------------------------
     -- 
     ---------------------------------------------------------------------
-    -- user-defined: FPGA version
-    constant pkg_FPGA_VERSION_VALUE : integer := 1;
+    -- user-defined: Firmware version
+    constant pkg_FIRMWARE_VERSION_VALUE : integer := 2;
 
-    -- user-defined: FPGA ID (name)
-    constant pkg_FPGA_ID_CHAR3 : character := 'f'; -- ascii character
-    constant pkg_FPGA_ID_CHAR2 : character := 'p'; -- ascii character
-    constant pkg_FPGA_ID_CHAR1 : character := 'a'; -- ascii character
-    constant pkg_FPGA_ID_CHAR0 : character := ' '; -- ascii character
+    -- user-defined: FIRMWARE ID (name)
+    constant pkg_FIRMWARE_ID_CHAR3 : character := 'f'; -- ascii character
+    constant pkg_FIRMWARE_ID_CHAR2 : character := 'p'; -- ascii character
+    constant pkg_FIRMWARE_ID_CHAR1 : character := 'a'; -- ascii character
+    constant pkg_FIRMWARE_ID_CHAR0 : character := ' '; -- ascii character
 
     -- auto-computed: fpga id
-    constant pkg_FPGA_ID      : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR3), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR2), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR1), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FPGA_ID_CHAR0), 8));
+    constant pkg_FIRMWARE_ID      : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR3), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR2), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR1), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR0), 8));
     -- auto-computed: fpga version
-    constant pkg_FPGA_VERSION : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(pkg_FPGA_VERSION_VALUE, 32));
+    constant pkg_FIRMWARE_VERSION : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(pkg_FIRMWARE_VERSION_VALUE, 32));
 
     -------------------------------------------------------------------
     -- pipe
@@ -100,19 +101,19 @@ PACKAGE pkg_regdecode IS
 
     -- trig in
     ---------------------------------------------------------------------
-    -- user-defined: debug valid (bit index)
+    -- user-defined: spi_valid (bit index)
+    constant pkg_TRIGIN_SPI_VALID_IDX_H : integer := 24;
+    -- user-defined: rec_valid (bit index)
+    constant pkg_TRIGIN_REC_VALID_IDX_H : integer := 20;
+    -- user-defined: debug_valid (bit index)
     constant pkg_TRIGIN_DEBUG_VALID_IDX_H : integer := 16;
-
-    -- user-defined: ctrl valid (bit index)
+    -- user-defined: ctrl_valid (bit index)
     constant pkg_TRIGIN_CTRL_VALID_IDX_H : integer := 12;
-
-    -- user-defined: read all (bit index)
+    -- user-defined: read_all (bit index)
     constant pkg_TRIGIN_READ_ALL_VALID_IDX_H : integer := 8;
-
-    -- user-defined: make pulse valid (bit index)
+    -- user-defined: make_pulse valid (bit index)
     constant pkg_TRIGIN_MAKE_PULSE_VALID_IDX_H : integer := 4;
-
-    -- user-defined: reg valid (bit index)
+    -- user-defined: reg_valid (bit index)
     constant pkg_TRIGIN_REG_VALID_IDX_H : integer := 0;
 
     -- wire in/wire out
@@ -139,7 +140,7 @@ PACKAGE pkg_regdecode IS
     -- user-defined: time shift (bit index low)
     constant pkg_MAKE_PULSE_TIME_SHIFT_IDX_L : integer := 16;
     -- auto-computed: time shift width
-    constant pkg_MAKE_PULSE_TIME_SHIFT_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_value(pkg_PULSE_SHAPE_OVERSAMPLE);
+    constant pkg_MAKE_PULSE_TIME_SHIFT_WIDTH : integer := work.pkg_utils.pkg_width_from_value(pkg_PULSE_SHAPE_OVERSAMPLE);
     -- auto-computed : time shift (bit index high)
     constant pkg_MAKE_PULSE_TIME_SHIFT_IDX_H : integer := pkg_MAKE_PULSE_TIME_SHIFT_IDX_L + pkg_MAKE_PULSE_TIME_SHIFT_WIDTH - 1;
 
@@ -158,7 +159,7 @@ PACKAGE pkg_regdecode IS
     -- user-defined: fpasim_gain (bit index low)
     constant pkg_FPASIM_GAIN_IDX_L : integer := 0;
     -- auto-computed: fpasim_gain width
-    constant pkg_FPASIM_GAIN_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_FPASIM_GAIN_IDX_H, i_idx_low => pkg_FPASIM_GAIN_IDX_L);
+    constant pkg_FPASIM_GAIN_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_FPASIM_GAIN_IDX_H, i_idx_low => pkg_FPASIM_GAIN_IDX_L);
 
 
     -- user-defined: mux_sq_fb_delay
@@ -168,7 +169,7 @@ PACKAGE pkg_regdecode IS
     -- user-defined: mux_sq_fb_delay (bit index low)
     constant pkg_MUX_SQ_FB_DELAY_IDX_L : integer := 0;
     -- auto-computed: mux_sq_fb_delay width
-    constant pkg_MUX_SQ_FB_DELAY_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_MUX_SQ_FB_DELAY_IDX_H, i_idx_low => pkg_MUX_SQ_FB_DELAY_IDX_L);
+    constant pkg_MUX_SQ_FB_DELAY_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_MUX_SQ_FB_DELAY_IDX_H, i_idx_low => pkg_MUX_SQ_FB_DELAY_IDX_L);
 
     -- user-defined: amp_sq_of_delay
     ---------------------------------------------------------------------
@@ -177,7 +178,7 @@ PACKAGE pkg_regdecode IS
     -- user-defined: amp_sq_of_delay (bit index low)
     constant pkg_AMP_SQ_OF_DELAY_IDX_L : integer := 0;
     -- auto-computed: amp_sq_of_delay width
-    constant pkg_AMP_SQ_OF_DELAY_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_AMP_SQ_OF_DELAY_IDX_H, i_idx_low => pkg_AMP_SQ_OF_DELAY_IDX_L);
+    constant pkg_AMP_SQ_OF_DELAY_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_AMP_SQ_OF_DELAY_IDX_H, i_idx_low => pkg_AMP_SQ_OF_DELAY_IDX_L);
 
     ---------------------------------------------------------------------
     -- user-defined: error_delay
@@ -187,7 +188,7 @@ PACKAGE pkg_regdecode IS
     -- user-defined: error_delay (bit index low)
     constant pkg_ERROR_DELAY_IDX_L : integer := 0;
     -- auto-computed: error_delay width
-    constant pkg_ERROR_DELAY_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_ERROR_DELAY_IDX_H, i_idx_low => pkg_ERROR_DELAY_IDX_L);
+    constant pkg_ERROR_DELAY_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_ERROR_DELAY_IDX_H, i_idx_low => pkg_ERROR_DELAY_IDX_L);
 
     ---------------------------------------------------------------------
     -- user-defined: ra_delay
@@ -197,7 +198,7 @@ PACKAGE pkg_regdecode IS
     -- user-defined: ra_delay (bit index low)
     constant pkg_RA_DELAY_IDX_L : integer := 0;
     -- auto-computed: ra_delay width
-    constant pkg_RA_DELAY_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_RA_DELAY_IDX_H, i_idx_low => pkg_RA_DELAY_IDX_L);
+    constant pkg_RA_DELAY_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_RA_DELAY_IDX_H, i_idx_low => pkg_RA_DELAY_IDX_L);
 
     -- user-defined: tes_conf 
     ---------------------------------------------------------------------
@@ -206,21 +207,55 @@ PACKAGE pkg_regdecode IS
     -- user-defined: pixel_nb (bit index low)
     constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L : integer := 24;
     -- auto-computed: pixel_nb width
-    constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);
+    constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);
 
     -- user-defined: pixel_length (bit index high)
     constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H : integer := 22;
     -- user-defined: pixel_length (bit index low)
     constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L : integer := 16;
     -- auto-computed: pixel_length width
-    constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H, i_idx_low => pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L);
+    constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H, i_idx_low => pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L);
 
     -- user-defined: frame_length (bit index high)
     constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H : integer := 12;
     -- user-defined: frame_length (bit index low)
     constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L : integer := 0;
     -- auto-computed: frame_length width
-    constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);
+    constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);
+
+    -- user-defined: rec_ctrl
+    ---------------------------------------------------------------------
+    -- user-defined: rec_adc_en (bit index high)
+    constant pkg_REC_CTRL_ADC_EN_IDX_H : integer := 0;
+
+    -- user-defined: rec_conf0
+    ---------------------------------------------------------------------
+    -- user-defined: rec_adc_nb_word32b (bit index high)
+    constant pkg_REC_CONF0_ADC_NB_WORD32b_IDX_H : integer := 15;
+    -- user-defined: rec_adc_nb_word32b (bit index low)
+    constant pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L : integer := 0;
+    -- auto-computed: rec_adc_nb_word32b width
+    constant pkg_REC_CONF0_ADC_NB_WORD32b_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_REC_CONF0_ADC_NB_WORD32b_IDX_H, i_idx_low => pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L);
+
+    -- user-defined: spi_conf
+    ---------------------------------------------------------------------
+    -- user-defined: spi_mode (bit index high)
+    constant pkg_SPI_CTRL_EN_IDX_H : integer := 0;
+    constant pkg_SPI_CTRL_RST_IDX_H : integer := 1;
+
+    -- user-defined: spi_mode (bit index high)
+    constant pkg_SPI_CONF_MODE_IDX_H : integer := 0;
+
+    -- user-defined: spi_id (bit index high)
+    constant pkg_SPI_CONF_ID_IDX_H : integer := 5;
+    -- user-defined: spi_id (bit index low)
+    constant pkg_SPI_CONF_ID_IDX_L : integer := 4;
+    -- auto-computed: spi_id width
+    constant pkg_SPI_CONF_ID_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_SPI_CONF_ID_IDX_H, i_idx_low => pkg_SPI_CONF_ID_IDX_L);
+
+    -- user-defined: dac_tx_enable (bit index high)
+    constant pkg_SPI_CONF_DAC_TX_ENABLE_IDX_H : integer := 8;
+    
 
     -- user-defined: debug_ctrl 
     ---------------------------------------------------------------------
@@ -232,11 +267,12 @@ PACKAGE pkg_regdecode IS
     -- user-defined: error_sel
     ---------------------------------------------------------------------
     -- user-defined: error_sel (bit index high)
-    constant pkg_ERROR_SEL_IDX_H : integer := 2;
+    constant pkg_ERROR_SEL_IDX_H : integer := 3;
     -- user-defined: error_sel (bit index low)
     constant pkg_ERROR_SEL_IDX_L : integer := 0;
     -- auto-computed: error_sel width
-    constant pkg_ERROR_SEL_WIDTH : integer := fpasim.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_ERROR_SEL_IDX_H, i_idx_low => pkg_ERROR_SEL_IDX_L);
+    constant pkg_ERROR_SEL_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_ERROR_SEL_IDX_H, i_idx_low => pkg_ERROR_SEL_IDX_L);
 
+    
 END pkg_regdecode;
 

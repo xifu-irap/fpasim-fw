@@ -17,26 +17,26 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   pkg_fpasim.vhd 
+--   @file                   pkg_fpasim.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
--- This package defines all constant used by the fpasim function. 
--- These constants configure the bus width of the differents functions.
+--   @details                
 --
--- Note: Frame and column are interchangeable
+--   This package defines all constants associted to the fpasim function and its sub-functions. 
+--
+--
+--    Note: Frame and column names are interchangeable
 --
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
 use ieee.math_real.all;
 
-library fpasim;
-use fpasim.pkg_utils;
+use work.pkg_utils;
 
-PACKAGE pkg_fpasim IS
+package pkg_fpasim is
 
   -------------------------------------------------------------------
   -- common
@@ -56,30 +56,30 @@ PACKAGE pkg_fpasim IS
 
   -- pixel
   -- user-defined: maximal number of pixels by column authorized by the design (must be a power of 2)
-  constant pkg_MUX_FACT_MAX           : positive := 64;
+  constant pkg_MUX_FACT_MAX                 : positive := 64;
   -- parameter renaming
-  constant pkg_NB_PIXEL_BY_FRAME_MAX           : positive := pkg_MUX_FACT_MAX;
+  constant pkg_NB_PIXEL_BY_FRAME_MAX        : positive := pkg_MUX_FACT_MAX;
   -- user-defined: maximum number of samples by pixel authorized by the design (must be a power of 2)
   --   IMPORTANT: the corresponding time depends on the data sampling frequency and the expected pixel frequency.
-  constant pkg_NB_SAMPLE_BY_PIXEL_MAX         : positive := 64;
+  constant pkg_NB_SAMPLE_BY_PIXEL_MAX       : positive := 64;
   -- auto-computed:  minimal bus width (expressed in bits) to represent the pkg_PIXEL_SIZE value
-  constant pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH        : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_NB_SAMPLE_BY_PIXEL_MAX);
+  constant pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH : natural  := work.pkg_utils.pkg_width_from_value(pkg_NB_SAMPLE_BY_PIXEL_MAX);
   -- user-defined: number of frames by pulse_shape
   --   Note: This value is equal to the number of value of a pulse shape
-  constant pkg_NB_FRAME_BY_PULSE_SHAPE               : positive := 2048;
+  constant pkg_NB_FRAME_BY_PULSE_SHAPE      : positive := 2048;
   -- user-defined: define the oversample factor of each word of the pulse shape memory
-  constant pkg_PULSE_SHAPE_OVERSAMPLE : natural  := 16;
+  constant pkg_PULSE_SHAPE_OVERSAMPLE       : natural  := 16;
 
-    -- auto-computed:  minimal bus width (expressed in bits) to represent the c_MUX_FACT value
-    constant pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH : natural := fpasim.pkg_utils.pkg_width_from_value(pkg_NB_PIXEL_BY_FRAME_MAX);
+  -- auto-computed:  minimal bus width (expressed in bits) to represent the c_MUX_FACT value
+  constant pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH : natural := work.pkg_utils.pkg_width_from_value(pkg_NB_PIXEL_BY_FRAME_MAX);
 
-    -- frame
-    -- auto-computed:  minimal bus width (expressed in bits) to represent the pkg_FRAME_NB value
-    constant pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_NB_FRAME_BY_PULSE_SHAPE);
-    -- auto-computed : number of samples by frame
-    constant pkg_NB_SAMPLE_BY_FRAME     : positive := pkg_NB_PIXEL_BY_FRAME_MAX * pkg_NB_SAMPLE_BY_PIXEL_MAX;
-    -- auto-computed: minimal bus width (expressed in bits) to represent the pkg_FRAME_SIZE value
-    constant pkg_NB_SAMPLE_BY_FRAME_WIDTH    : natural  := fpasim.pkg_utils.pkg_width_from_value(pkg_NB_SAMPLE_BY_FRAME);
+  -- frame
+  -- auto-computed:  minimal bus width (expressed in bits) to represent the pkg_FRAME_NB value
+  constant pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH : natural  := work.pkg_utils.pkg_width_from_value(pkg_NB_FRAME_BY_PULSE_SHAPE);
+  -- auto-computed : number of samples by frame
+  constant pkg_NB_SAMPLE_BY_FRAME            : positive := pkg_NB_PIXEL_BY_FRAME_MAX * pkg_NB_SAMPLE_BY_PIXEL_MAX;
+  -- auto-computed: minimal bus width (expressed in bits) to represent the pkg_FRAME_SIZE value
+  constant pkg_NB_SAMPLE_BY_FRAME_WIDTH      : natural  := work.pkg_utils.pkg_width_from_value(pkg_NB_SAMPLE_BY_FRAME);
 
   ---------------------------------------------------------------------
   -- RAM
@@ -92,7 +92,7 @@ PACKAGE pkg_fpasim IS
   -- auto-computed: number of words
   constant pkg_TES_PULSE_SHAPE_RAM_NB_WORDS     : positive := pkg_PULSE_SHAPE_OVERSAMPLE * pkg_NB_FRAME_BY_PULSE_SHAPE;
   -- auto-computed: ram address bus width
-  constant pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH   : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_TES_PULSE_SHAPE_RAM_NB_WORDS);
+  constant pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_TES_PULSE_SHAPE_RAM_NB_WORDS);
   -- user-defined: ram data bus width
   constant pkg_TES_PULSE_SHAPE_RAM_DATA_WIDTH   : positive := 16;
 
@@ -104,7 +104,7 @@ PACKAGE pkg_fpasim IS
   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
   constant pkg_TES_STD_STATE_RAM_NB_WORDS     : positive := pkg_NB_PIXEL_BY_FRAME_MAX;
   -- auto-computed: ram address bus width
-  constant pkg_TES_STD_STATE_RAM_ADDR_WIDTH   : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_TES_STD_STATE_RAM_NB_WORDS);
+  constant pkg_TES_STD_STATE_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_TES_STD_STATE_RAM_NB_WORDS);
   -- user-defined: ram data bus width
   constant pkg_TES_STD_STATE_RAM_DATA_WIDTH   : positive := 16;
 
@@ -116,7 +116,7 @@ PACKAGE pkg_fpasim IS
   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
   constant pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS     : positive := pkg_NB_PIXEL_BY_FRAME_MAX;
   -- auto-computed: ram address bus width
-  constant pkg_MUX_SQUID_OFFSET_RAM_ADDR_WIDTH   : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_NB_PIXEL_BY_FRAME_MAX);
+  constant pkg_MUX_SQUID_OFFSET_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_NB_PIXEL_BY_FRAME_MAX);
   -- user-defined: data bus width
   constant pkg_MUX_SQUID_OFFSET_RAM_DATA_WIDTH   : positive := 16;
 
@@ -128,7 +128,7 @@ PACKAGE pkg_fpasim IS
   -- user-defined: number of words.
   constant pkg_MUX_SQUID_TF_RAM_NB_WORDS     : positive := 2 ** 13;
   -- auto-computed: ram address bus width
-  constant pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH   : positive := fpasim.pkg_utils.pkg_width_from_value(pkg_MUX_SQUID_TF_RAM_NB_WORDS);
+  constant pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_MUX_SQUID_TF_RAM_NB_WORDS);
   -- user-defined: ram data bus width
   constant pkg_MUX_SQUID_TF_RAM_DATA_WIDTH   : positive := 16;
 
@@ -140,9 +140,10 @@ PACKAGE pkg_fpasim IS
   -- user-defined: number of words.
   constant pkg_AMP_SQUID_TF_RAM_NB_WORDS     : natural := 2 ** 14;
   -- auto-computed: ram address bus width
-  constant pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH   : natural := fpasim.pkg_utils.pkg_width_from_value(pkg_AMP_SQUID_TF_RAM_NB_WORDS);
+  constant pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH   : natural := work.pkg_utils.pkg_width_from_value(pkg_AMP_SQUID_TF_RAM_NB_WORDS);
   -- user-defined: ram data bus width
   constant pkg_AMP_SQUID_TF_RAM_DATA_WIDTH   : natural := 16;
+
 
   ---------------------------------------------------------------------
   -- regdecode
@@ -153,14 +154,12 @@ PACKAGE pkg_fpasim IS
   ---------------------------------------------------------------------
   -- adc_top
   ---------------------------------------------------------------------
-  -- user defined: Read FIFO latency. Possible values : [1, max integer value[ 
-  --   IMPORTANT: cross clock domain latency is not taken into account.
-  constant pkg_ADC_FIFO_READ_LATENCY              : natural := 1;
+
   -- auto-computed: latency of the dynamic_shift_register module when the input delay is set to 0
   constant pkg_ADC_DYNAMIC_SHIFT_REGISTER_LATENCY : natural := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
   -- auto-computed: minimum latency of the "adc_top" module
   --    IMPORTANT: cross clock domain latency is not taken into account
-  constant pkg_ADC_TOP_LATENCY                    : natural := pkg_ADC_FIFO_READ_LATENCY + pkg_ADC_DYNAMIC_SHIFT_REGISTER_LATENCY;
+  constant pkg_ADC_TOP_LATENCY                    : natural := pkg_ADC_DYNAMIC_SHIFT_REGISTER_LATENCY;
 
   -------------------------------------------------------------------
   -- tes
@@ -176,7 +175,7 @@ PACKAGE pkg_fpasim IS
   -- user-defined : add an additionnal output latency
   constant pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY : natural := 0;
   -- auto-computed: latency of the "tes_signalling_generator" module
-  constant pkg_TES_SIGNALLING_GENERATOR_LATENCY     : natural := pkg_TES_SIGNALLING_GENERATOR_FSM_LATENCY + pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY; -- number of pipes of the "tes_signalling_generator"
+  constant pkg_TES_SIGNALLING_GENERATOR_LATENCY     : natural := pkg_TES_SIGNALLING_GENERATOR_FSM_LATENCY + pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY;  -- number of pipes of the "tes_signalling_generator"
 
   -- auto-computed: latency of the "tes_signalling" module
   constant pkg_TES_SIGNALLING_LATENCY : natural := pkg_TES_SIGNALLING_GENERATOR_LATENCY;
@@ -224,10 +223,10 @@ PACKAGE pkg_fpasim IS
   constant pkg_TES_MULT_SUB_Q_WIDTH_S : positive := pkg_TES_MULT_SUB_Q_M_S + pkg_TES_MULT_SUB_Q_N_S;
 
   -- hardcode: latency of the "mult_sub_sfixed" module
-  constant pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY : natural := pkg_MULT_SUB_SFIXED_LATENCY; -- number of pipes to compute the result
+  constant pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY : natural := pkg_MULT_SUB_SFIXED_LATENCY;  -- number of pipes to compute the result
 
   -- user-defined: enable the overflow checking
-  constant pkg_TES_PULSE_MANAGER_COMPUTATION_SIM_EN : boolean := TRUE;
+  constant pkg_TES_PULSE_MANAGER_COMPUTATION_SIM_EN : boolean := true;
 
   -- auto-computed: latency of the "tes_pulse_manager" module
   constant pkg_TES_PULSE_MANAGER_LATENCY : natural := pkg_TES_PULSE_MANAGER_FSM_LATENCY + pkg_TES_PULSE_MANAGER_ADDR_COMPUTE_LATENCY + pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY + pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY;
@@ -334,9 +333,9 @@ PACKAGE pkg_fpasim IS
   -- mult
   -- result
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_AMP_SQUID_MULT_Q_M_A     : positive := 17; -- user defined: number of bits used for the integer part of the value ( sign bit included)
+  constant pkg_AMP_SQUID_MULT_Q_M_A     : positive := 17;  -- user defined: number of bits used for the integer part of the value ( sign bit included)
   -- user-defined: number of fraction bits
-  constant pkg_AMP_SQUID_MULT_Q_N_A     : natural  := 0; -- user defined: number of fraction bits
+  constant pkg_AMP_SQUID_MULT_Q_N_A     : natural  := 0;  -- user defined: number of fraction bits
   -- auto-computed: bus width
   constant pkg_AMP_SQUID_MULT_Q_WIDTH_A : positive := pkg_AMP_SQUID_MULT_Q_M_A + pkg_AMP_SQUID_MULT_Q_N_A;
 
@@ -372,49 +371,54 @@ PACKAGE pkg_fpasim IS
   ---------------------------------------------------------------------
   -- dac_top
   ---------------------------------------------------------------------
-  -- user-defined: number of samples of a dac frame.
-  constant pkg_DAC_FRAME_SIZE                     : positive := 8;
-  -- auto-computed: latency of the dynamic_shift_register module when the input delay is set to 0
-  constant pkg_DAC_DYNAMIC_SHIFT_REGISTER_LATENCY : natural  := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
   -- hardcoded: latency of the "dac_frame_generator" module. This latency is equal to the "dynamic_shift_register" module when delay is 0
-  constant pkg_DAC_FRAME_GENERATOR_LATENCY        : natural  := 1;
+  constant pkg_DAC_FRAME_GENERATOR_LATENCY        : natural := 1;
+  -- auto-computed: latency of the dynamic_shift_register module when the input delay is set to 0
+  constant pkg_DAC_DYNAMIC_SHIFT_REGISTER_LATENCY : natural := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
+  -- auto-computed: latency of the "dac_top" from the input port to the input of the last pipeliner.
+  constant pkg_DAC_LATENCY_TMP                    : natural := pkg_DAC_FRAME_GENERATOR_LATENCY + pkg_DAC_DYNAMIC_SHIFT_REGISTER_LATENCY;
 
-  -- hardcoded: latency of the "dac_data_insert" module.
-  --   IMPORTANT: cross clock domain latency is not taken into account.
-  constant pkg_DAC_DATA_INSERT_LATENCY    : natural := 1;
-  -- hardcoded: latency of the "dac_check_dataflow" module.
-  --   Note: Don't contribute to the data path
-  constant pkg_DAC_CHECK_DATAFLOW_LATENCY : natural := 1;
-  -- auto-computed: minimum latency of the "dac_top" module
-  --    IMPORTANT: cross clock domain latency is not taken into account
-  constant pkg_DAC_TOP_LATENCY            : natural := pkg_DAC_DYNAMIC_SHIFT_REGISTER_LATENCY + pkg_DAC_FRAME_GENERATOR_LATENCY + pkg_DAC_DATA_INSERT_LATENCY;
 
   ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
-  -- user-defined: width of the sync pulse (expressed in number of clock cycles). Possible values: [1;integer max value[
-  constant pkg_SYNC_PULSE_DURATION                 : positive := 1;
-  -- auto-computed: latency of the dynamic_shift_register module when the input delay is set to 0
-  constant pkg_SYNC_DYNAMIC_SHIFT_REGISTER_LATENCY : natural  := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
+  -- user-defined: width of the sync pulse (expressed in number of clock cycles) on the FPGA pin. Possible values: [1;integer max value[
+  constant pkg_SYNC_PULSE_DURATION                 : positive := 4;
   -- hardcoded: latency of the "sync_pulse_generator" module
   constant pkg_SYNC_PULSE_GENERATOR_LATENCY        : natural  := 1;
-  -- user-defined: Read FIFO latency. Possible values : [1, max integer value[
-  constant pkg_SYNC_FIFO_READ_LATENCY              : natural  := 1;
-  -- user-defined: optionnal output latency
-  constant pkg_SYNC_OUT_LATENCY                    : natural  := 0;
-  -- auto-computed: minimum latency of the "sync_top" module.
-  --    IMPORTANT: cross clock domain latency is not taken into account
-  constant pkg_SYNC_TOP_LATENCY                    : natural  := pkg_SYNC_DYNAMIC_SHIFT_REGISTER_LATENCY + pkg_SYNC_PULSE_GENERATOR_LATENCY + pkg_SYNC_FIFO_READ_LATENCY + pkg_SYNC_OUT_LATENCY;
+  -- auto-computed: latency of the dynamic_shift_register module when the input delay is set to 0
+  constant pkg_SYNC_DYNAMIC_SHIFT_REGISTER_LATENCY : natural  := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
 
-  -------------------------------------------------------------------
-  -- IOs
-  -------------------------------------------------------------------
-  -- user-defined: add latency after the input IOs. Possible values: [0;max integer value[
-  constant pkg_IO_ADC_LATENCY  : natural := 1;
-  -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
-  constant pkg_IO_DAC_LATENCY  : natural := 1;
-  -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
-  constant pkg_IO_SYNC_LATENCY : natural := 1;
+  -- auto-computed: latency of the "sync_top" from the input port to the input of the last pipeliner.
+  constant pkg_SYNC_LATENCY_TMP : natural := pkg_SYNC_DYNAMIC_SHIFT_REGISTER_LATENCY + pkg_SYNC_PULSE_GENERATOR_LATENCY;
 
-END pkg_fpasim;
+  ---------------------------------------------------------------------
+  -- to facilitate the debugging, sync_top and dac_top should have the
+  -- same latency when the delay(dynamic_shift_register) = 0
+  -- So, the latency of the dac_top output pipeliner must take into account:
+  --    . the latency of the dac_top upstream function
+  --    . the latency of the sync_top upstream function
+  -- And, the latency of the sync_top output pipeliner must take into account:
+  --    . the latency of the dac_top upstream function
+  --    . the latency of the sync_top upstream function
+  ---------------------------------------------------------------------
+  -- auto-computed: latency of the dac_top output pipeliner to be synchronized to the sync_top ouptput
+  constant pkg_DAC_OUT_LATENCY : natural := abs(pkg_DAC_LATENCY_TMP - work.pkg_utils.max(pkg_DAC_LATENCY_TMP, pkg_SYNC_LATENCY_TMP));
+  -- auto-computed: latency of the "dac_top" module.
+  --constant pkg_DAC_TOP_LATENCY            : natural := pkg_DAC_FRAME_GENERATOR_LATENCY + pkg_DAC_DYNAMIC_SHIFT_REGISTER_LATENCY;
+  constant pkg_DAC_TOP_LATENCY : natural := pkg_DAC_LATENCY_TMP + pkg_DAC_OUT_LATENCY;
+
+  -- auto-computed: latency of the sync_top output pipeliner to be synchronized to the dac_top ouptput
+  constant pkg_SYNC_OUT_LATENCY : natural := abs(pkg_SYNC_LATENCY_TMP - work.pkg_utils.max(pkg_DAC_LATENCY_TMP, pkg_SYNC_LATENCY_TMP));
+  -- auto-computed: latency of the "sync_top" module.
+  --constant pkg_SYNC_TOP_LATENCY                    : natural  := pkg_SYNC_DYNAMIC_SHIFT_REGISTER_LATENCY + pkg_SYNC_PULSE_GENERATOR_LATENCY + pkg_SYNC_OUT_LATENCY;
+  constant pkg_SYNC_TOP_LATENCY : natural := pkg_SYNC_LATENCY_TMP + pkg_SYNC_OUT_LATENCY;
+
+  ---------------------------------------------------------------------
+  -- Recording
+  ---------------------------------------------------------------------
+  -- user-defined: number of 32 bit-words in the output FIFO (must be a multiple of the usb3 minimum packet size)
+  constant pkg_REC_ADC_FIFO_OUT_DEPTH : integer := 16384;
+
+end pkg_fpasim;
 

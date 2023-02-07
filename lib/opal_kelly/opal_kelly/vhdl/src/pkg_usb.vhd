@@ -90,51 +90,51 @@ package pkg_usb is
   -- pkg_usb_wr
   ---------------------------------------------------------------------
   procedure pkg_usb_wr(
-    signal   i_clk              : in std_logic;
-    signal   i_start_wr         : in std_logic;
+    signal i_clk                       : in    std_logic;
+    signal i_start_wr                  : in    std_logic;
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath_wr               : in string;
-    i_csv_separator             : in character;
+    i_filepath_wr                      : in    string;
+    i_csv_separator                    : in    character;
     --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
     --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
     --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
     --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
     --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_USB_WR_ADDR_TYP  : in string := "HEX";
-    constant i_USB_WR_DATA_TYP  : in string := "HEX";
+    constant i_USB_WR_ADDR_TYP         : in    string := "HEX";
+    constant i_USB_WR_DATA_TYP         : in    string := "HEX";
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   i_wr_ready         : in std_logic;
+    signal i_wr_ready                  : in    std_logic;
     ---------------------------------------------------------------------
     -- usb
     ---------------------------------------------------------------------
-    variable b_front_panel_conf : inout t_front_panel_conf;
-    signal   o_internal_wr_if   : out t_internal_wr_if;
-    signal   i_internal_rd_if   : in t_internal_rd_if;
+    variable b_front_panel_conf        : inout t_front_panel_conf;
+    signal o_internal_wr_if            : out   t_internal_wr_if;
+    signal i_internal_rd_if            : in    t_internal_rd_if;
     ---------------------------------------------------------------------
     -- Vunit Scoreboard objects
     ---------------------------------------------------------------------
-    constant i_sb_reg_data         : in checker_t;
-    constant i_sb_ram_tes_pulse_shape         : in checker_t;
-    constant i_sb_ram_amp_squid_tf         : in checker_t;
-    constant i_sb_ram_mux_squid_tf         : in checker_t;
-    constant i_sb_ram_tes_steady_state         : in checker_t;
-    constant i_sb_ram_mux_offset         : in checker_t;
+    constant i_sb_reg_data             : in    checker_t;
+    constant i_sb_ram_tes_pulse_shape  : in    checker_t;
+    constant i_sb_ram_amp_squid_tf     : in    checker_t;
+    constant i_sb_ram_mux_squid_tf     : in    checker_t;
+    constant i_sb_ram_tes_steady_state : in    checker_t;
+    constant i_sb_ram_mux_offset       : in    checker_t;
     ---------------------------------------------------------------------
     -- data
     ---------------------------------------------------------------------
-    signal   o_reg_id           : out integer;
-    signal   o_data_valid       : out std_logic;
-    signal   o_data             : out std_logic_vector(31 downto 0);
+    signal o_reg_id                    : out   integer;
+    signal o_data_valid                : out   std_logic;
+    signal o_data                      : out   std_logic_vector(31 downto 0);
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_wr_finish        : out std_logic;
-    signal   o_error            : out std_logic_vector(0 downto 0)
-  );
+    signal o_wr_finish                 : out   std_logic;
+    signal o_error                     : out   std_logic_vector(0 downto 0)
+    );
 
 end package pkg_usb;
 
@@ -144,51 +144,51 @@ package body pkg_usb is
   -- pkg_usb_wr
   ---------------------------------------------------------------------
   procedure pkg_usb_wr(
-    signal   i_clk                : in std_logic;
-    signal   i_start_wr           : in std_logic;
+    signal i_clk                       : in    std_logic;
+    signal i_start_wr                  : in    std_logic;
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath_wr               : in string;
-    i_csv_separator             : in character;
+    i_filepath_wr                      : in    string;
+    i_csv_separator                    : in    character;
     --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
     --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
     --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
     --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
     --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_USB_WR_ADDR_TYP  : in string := "HEX";
-    constant i_USB_WR_DATA_TYP  : in string := "HEX";
+    constant i_USB_WR_ADDR_TYP         : in    string := "HEX";
+    constant i_USB_WR_DATA_TYP         : in    string := "HEX";
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   i_wr_ready           : in std_logic;
+    signal i_wr_ready                  : in    std_logic;
     ---------------------------------------------------------------------
     -- usb
     ---------------------------------------------------------------------
-    variable b_front_panel_conf : inout t_front_panel_conf;
-    signal   o_internal_wr_if     : out t_internal_wr_if;
-    signal   i_internal_rd_if     : in t_internal_rd_if;
+    variable b_front_panel_conf        : inout t_front_panel_conf;
+    signal o_internal_wr_if            : out   t_internal_wr_if;
+    signal i_internal_rd_if            : in    t_internal_rd_if;
     ---------------------------------------------------------------------
     -- Vunit Scoreboard objects
     ---------------------------------------------------------------------
-    constant i_sb_reg_data         : in checker_t;
-    constant i_sb_ram_tes_pulse_shape         : in checker_t;
-    constant i_sb_ram_amp_squid_tf         : in checker_t;
-    constant i_sb_ram_mux_squid_tf         : in checker_t;
-    constant i_sb_ram_tes_steady_state         : in checker_t;
-    constant i_sb_ram_mux_offset         : in checker_t;
+    constant i_sb_reg_data             : in    checker_t;
+    constant i_sb_ram_tes_pulse_shape  : in    checker_t;
+    constant i_sb_ram_amp_squid_tf     : in    checker_t;
+    constant i_sb_ram_mux_squid_tf     : in    checker_t;
+    constant i_sb_ram_tes_steady_state : in    checker_t;
+    constant i_sb_ram_mux_offset       : in    checker_t;
     ---------------------------------------------------------------------
     -- data
     ---------------------------------------------------------------------
-    signal   o_reg_id             : out integer;
-    signal   o_data_valid         : out std_logic;
-    signal   o_data               : out std_logic_vector(31 downto 0);
+    signal o_reg_id                    : out   integer;
+    signal o_data_valid                : out   std_logic;
+    signal o_data                      : out   std_logic_vector(31 downto 0);
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_wr_finish          : out std_logic;
-    signal   o_error              : out std_logic_vector(0 downto 0)
-  ) is
+    signal o_wr_finish                 : out   std_logic;
+    signal o_error                     : out   std_logic_vector(0 downto 0)
+    ) is
     variable v_csv_file : t_csv_file_reader;
 
     type t_state is (E_RST, E_WAIT_WR, E_RUN, E_PIPE_OUT_DATA_COMPARE, E_DELAY, E_END);
@@ -198,62 +198,62 @@ package body pkg_usb is
     ---------------------------------------------------------------------
     -- file data
     ---------------------------------------------------------------------
-    variable v_file_reg_id          : integer                                            := 0; -- reg_id value from file
-    variable v_file_opal_kelly_addr : std_logic_vector(7 downto 0)                       := (others => '0'); -- address value from file
-    variable v_file_data            : std_logic_vector(i_internal_rd_if.hi_datain'range) := (others => '0'); -- data value from file
+    variable v_file_reg_id          : integer                                            := 0;  -- reg_id value from file
+    variable v_file_opal_kelly_addr : std_logic_vector(7 downto 0)                       := (others => '0');  -- address value from file
+    variable v_file_data            : std_logic_vector(i_internal_rd_if.hi_datain'range) := (others => '0');  -- data value from file
 
     ---------------------------------------------------------------------
     -- generate v_first pulse on reg_id change
     ---------------------------------------------------------------------
-    variable v_file_reg_id_last     : integer := 0; -- last reg_id value
-    variable v_first_reg_id         : integer := 0; -- 1: detect a difference of reg_id between the current one and the last one, 0: no difference
+    variable v_file_reg_id_last : integer := 0;  -- last reg_id value
+    variable v_first_reg_id     : integer := 0;  -- 1: detect a difference of reg_id between the current one and the last one, 0: no difference
 
     ---------------------------------------------------------------------
     -- variable associated to the pipe command
     ---------------------------------------------------------------------
-    variable v_pipe_length_byte  : integer := 0; -- number of bytes to write in the pipe (must be a multiple of 16 bytes: usb3 opal kelly limitation)
+    variable v_pipe_length_byte : integer := 0;  -- number of bytes to write in the pipe (must be a multiple of 16 bytes: usb3 opal kelly limitation)
 
-    constant c_PIPE_RD_WORD_MAX : integer := 4; -- pipe buffer size in reading (expressed in 32 bit-words)
-    variable v_pipe_rd_cnt_word     : integer := 0; -- count the number of 32 bits-word to read
-    variable v_pipe_rd_cnt_index    : integer := 0; -- count the number total of read 32 bit-words
-    variable v_pipe_rd_trig         : integer := 0; -- 1: the pipe need to be read, 0: otherwise
+    constant c_PIPE_RD_WORD_MAX  : integer := 4;  -- pipe buffer size in reading (expressed in 32 bit-words)
+    variable v_pipe_rd_cnt_word  : integer := 0;  -- count the number of 32 bits-word to read
+    variable v_pipe_rd_cnt_index : integer := 0;  -- count the number total of read 32 bit-words
+    variable v_pipe_rd_trig      : integer := 0;  -- 1: the pipe need to be read, 0: otherwise
 
-    type t_pipe_array is array (0 to c_PIPE_RD_WORD_MAX - 1) of std_logic_vector(i_internal_rd_if.hi_datain'range); -- should be an array of 32 bit vectors
-    variable v_pipe_rd_data_file : t_pipe_array := (others => (others => '0')); -- array of 32 bit-words read from the file
-    variable v_pipe_rd_data      : t_pipe_array := (others => (others => '0')); -- array of 32 bit-words read from the usb
+    type t_pipe_array is array (0 to c_PIPE_RD_WORD_MAX - 1) of std_logic_vector(i_internal_rd_if.hi_datain'range);  -- should be an array of 32 bit vectors
+    variable v_pipe_rd_data_file : t_pipe_array := (others => (others => '0'));  -- array of 32 bit-words read from the file
+    variable v_pipe_rd_data      : t_pipe_array := (others => (others => '0'));  -- array of 32 bit-words read from the usb
 
-    constant c_PIPE_WR_WORD_CNT_MAX : integer := 4; -- pipe buffer size in writting (expressed in 32 bit-words)
-    variable v_pipe_wr_word_cnt     : integer := 0; -- count the number of 32 bit-words to write in pipe_in
+    constant c_PIPE_WR_WORD_CNT_MAX : integer := 4;  -- pipe buffer size in writting (expressed in 32 bit-words)
+    variable v_pipe_wr_word_cnt     : integer := 0;  -- count the number of 32 bit-words to write in pipe_in
 
     ---------------------------------------------------------------------
     -- variables associated to the nop command
     ---------------------------------------------------------------------
-    variable v_nop_delay         : integer := 0; -- delay value
-    variable v_nop_delay_cnt_max : integer := 0; -- maximum clock cycle
-    variable v_nop_delay_cnt     : integer := 0; -- count the number of clock cycle
-    variable v_nop_delay_trig    : integer := 0; -- 1: add delay, 0: do nothing
+    variable v_nop_delay         : integer := 0;  -- delay value
+    variable v_nop_delay_cnt_max : integer := 0;  -- maximum clock cycle
+    variable v_nop_delay_cnt     : integer := 0;  -- count the number of clock cycle
+    variable v_nop_delay_trig    : integer := 0;  -- 1: add delay, 0: do nothing
 
     ---------------------------------------------------------------------
     -- variables associated to the wire
     ---------------------------------------------------------------------
-    constant c_WIRE_NO_MASK : std_logic_vector(i_internal_rd_if.hi_datain'range) := x"ffff_ffff"; -- wire mask value
+    constant c_WIRE_NO_MASK : std_logic_vector(i_internal_rd_if.hi_datain'range) := x"ffff_ffff";  -- wire mask value
 
-    variable v_wire_cnt      : integer := 0; -- count the max number of wire_out
-    variable v_wire_data_out : std_logic_vector(i_internal_rd_if.hi_datain'range); -- read wire data from usb
-    variable v_wire_data1    : integer; -- read wire from file (converted into integer)
-    variable v_wire_data2    : integer; -- read wire from usb (converted into integer)
+    variable v_wire_cnt      : integer := 0;  -- count the max number of wire_out
+    variable v_wire_data_out : std_logic_vector(i_internal_rd_if.hi_datain'range);  -- read wire data from usb
+    variable v_wire_data1    : integer;  -- read wire from file (converted into integer)
+    variable v_wire_data2    : integer;  -- read wire from usb (converted into integer)
 
     ---------------------------------------------------------------------
     -- output variable associated to the output signals
     ---------------------------------------------------------------------
-    variable v_valid_out : std_logic                                          := '0'; -- data valid to output
-    variable v_data_out  : std_logic_vector(i_internal_rd_if.hi_datain'range) := (others => '0');-- data to output
-    variable v_error     : std_logic_vector(o_error'range)                    := (others => '0'); -- error to output
-    variable v_wr_finish : std_logic                                          := '0'; -- '1': the file is read, '0': otherwise
+    variable v_valid_out : std_logic                                          := '0';  -- data valid to output
+    variable v_data_out  : std_logic_vector(i_internal_rd_if.hi_datain'range) := (others => '0');  -- data to output
+    variable v_error     : std_logic_vector(o_error'range)                    := (others => '0');  -- error to output
+    variable v_wr_finish : std_logic                                          := '0';  -- '1': the file is read, '0': otherwise
 
   begin
 
-    while c_TEST = true loop            -- @suppress "Redundant boolean equality check with true"
+    while c_TEST = true loop  -- @suppress "Redundant boolean equality check with true"
       v_valid_out := '0';
       case v_fsm_state is
 
@@ -265,7 +265,7 @@ package body pkg_usb is
             b_front_panel_conf => b_front_panel_conf,
             o_internal_wr_if   => o_internal_wr_if,
             i_internal_rd_if   => i_internal_rd_if
-          );
+            );
           v_fsm_state := E_WAIT_WR;
 
         when E_WAIT_WR =>
@@ -276,7 +276,7 @@ package body pkg_usb is
             -- skip the header
             v_csv_file.readline(void);
 
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then  -- @suppress "Redundant boolean equality check with true"
               v_wr_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
@@ -373,11 +373,11 @@ package body pkg_usb is
                   v_pipe_length_byte := 4 * c_PIPE_WR_WORD_CNT_MAX;
                   WriteToPipeIn(
                     i_ep               => v_file_opal_kelly_addr,
-                    i_length           => v_pipe_length_byte, --write length expressed in bytes
+                    i_length           => v_pipe_length_byte,  --write length expressed in bytes
                     b_front_panel_conf => b_front_panel_conf,
                     o_internal_wr_if   => o_internal_wr_if,
                     i_internal_rd_if   => i_internal_rd_if
-                  );
+                    );
                   v_pipe_wr_word_cnt := 0;
                 else
                   v_pipe_wr_word_cnt := v_pipe_wr_word_cnt + 1;
@@ -395,9 +395,9 @@ package body pkg_usb is
                   i_data           => v_file_data,
                   o_internal_wr_if => o_internal_wr_if,
                   i_internal_rd_if => i_internal_rd_if
-                );
+                  );
 
-              when 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 208 | 209 =>
+              when 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 212 | 213 | 224 | 225 =>
                 ---------------------------------------------------------------------
                 -- wire in
                 ---------------------------------------------------------------------
@@ -426,10 +426,16 @@ package body pkg_usb is
                   if v_file_reg_id = 207 then
                     info("[pkg_usb_wr] : Set TES_CONF Register: " & to_string(v_file_data));
                   end if;
-                  if v_file_reg_id = 208 then
+                  if v_file_reg_id = 212 then
+                    info("[pkg_usb_wr] : Set REC_CTRL Register: " & to_string(v_file_data));
+                  end if;
+                  if v_file_reg_id = 213 then
+                    info("[pkg_usb_wr] : Set REC_CONF0 Register: " & to_string(v_file_data));
+                  end if;
+                  if v_file_reg_id = 224 then
                     info("[pkg_usb_wr] : Set DEBUG_CTRL Register: " & to_string(v_file_data));
                   end if;
-                  if v_file_reg_id = 209 then
+                  if v_file_reg_id = 225 then
                     info("[pkg_usb_wr] : Set ERROR_SEL Register: " & to_string(v_file_data));
                   end if;
                 end if;
@@ -439,14 +445,14 @@ package body pkg_usb is
                   i_val              => v_file_data,
                   i_mask             => c_WIRE_NO_MASK,
                   b_front_panel_conf => b_front_panel_conf
-                );
+                  );
 
                 UpdateWireIns(
                   b_front_panel_conf => b_front_panel_conf,
                   o_internal_wr_if   => o_internal_wr_if,
                   i_internal_rd_if   => i_internal_rd_if);
 
-              when 300 | 301 | 302 | 303 | 304 =>
+              when 300 | 301 | 302 | 303 | 304 | 305 =>
                 ---------------------------------------------------------------------
                 -- pipe out
                 ---------------------------------------------------------------------
@@ -467,6 +473,9 @@ package body pkg_usb is
                   if v_file_reg_id = 304 then
                     info("[pkg_usb_wr] : Get mux_squid_offset ram");
                   end if;
+                  if v_file_reg_id = 305 then
+                    info("[pkg_usb_wr] : Get adc recording");
+                  end if;
                 end if;
 
                 -- Save an array of words from file (must be a multiple of 16 bytes for the opal kelly usb3)
@@ -486,14 +495,14 @@ package body pkg_usb is
                     b_front_panel_conf => b_front_panel_conf,
                     o_internal_wr_if   => o_internal_wr_if,
                     i_internal_rd_if   => i_internal_rd_if
-                  );
+                    );
 
                 else
                   v_pipe_rd_trig     := 0;
                   v_pipe_rd_cnt_word := v_pipe_rd_cnt_word + 1;
                 end if;
 
-              when 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 508 | 509 | 510 | 511 | 512 | 529 | 530 | 531 =>
+              when 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 511 | 512 | 513 | 517 | 524 | 525 | 526 | 527 | 529 | 530 | 531 =>
                 ---------------------------------------------------------------------
                 -- wire out
                 ---------------------------------------------------------------------
@@ -522,19 +531,28 @@ package body pkg_usb is
                   if v_file_reg_id = 507 then
                     info("[pkg_usb_wr] : Get TES_CONF Register");
                   end if;
-                  if v_file_reg_id = 508 then
+                  if v_file_reg_id = 511 then
                     info("[pkg_usb_wr] : Get DATA_COUNT Register");
                   end if;
-                  if v_file_reg_id = 509 then
+                  if v_file_reg_id = 512 then
+                    info("[pkg_usb_wr] : Get REC_CTRL Register: ");
+                  end if;
+                  if v_file_reg_id = 513 then
+                    info("[pkg_usb_wr] : Get REC_CONF0 Register: ");
+                  end if;
+                  if v_file_reg_id = 517 then
+                    info("[pkg_usb_wr] : Get REC_DATA_COUNT Register");
+                  end if;
+                  if v_file_reg_id = 524 then
                     info("[pkg_usb_wr] : Get DEBUG_CTRL Register");
                   end if;
-                  if v_file_reg_id = 510 then
+                  if v_file_reg_id = 525 then
                     info("[pkg_usb_wr] : Get ERROR_SEL Register");
                   end if;
-                  if v_file_reg_id = 511 then
+                  if v_file_reg_id = 526 then
                     info("[pkg_usb_wr] : Get ERRORS Register");
                   end if;
-                  if v_file_reg_id = 512 then
+                  if v_file_reg_id = 527 then
                     info("[pkg_usb_wr] : Get STATUS Register");
                   end if;
                   if v_file_reg_id = 529 then
@@ -552,12 +570,12 @@ package body pkg_usb is
                   b_front_panel_conf => b_front_panel_conf,
                   o_internal_wr_if   => o_internal_wr_if,
                   i_internal_rd_if   => i_internal_rd_if
-                );
+                  );
                 GetWireOutValue(
                   i_ep               => v_file_opal_kelly_addr,
                   b_front_panel_conf => b_front_panel_conf,
                   o_result           => v_wire_data_out
-                );
+                  );
 
                 v_wire_data1 := to_integer(unsigned(v_file_data));
                 v_wire_data2 := to_integer(unsigned(v_wire_data_out));
@@ -586,19 +604,28 @@ package body pkg_usb is
                 if v_file_reg_id = 507 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get TES_CONF Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
-                if v_file_reg_id = 508 then
+                if v_file_reg_id = 511 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get DATA_COUNT Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
-                if v_file_reg_id = 509 then
+                if v_file_reg_id = 512 then
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get REC_CTRL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                end if;
+                if v_file_reg_id = 513 then
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get REC_CONF0 Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                end if;
+                if v_file_reg_id = 517 then
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get REC_DATA_COUNT Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                end if;
+                if v_file_reg_id = 524 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get DEBUG_CTRL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
-                if v_file_reg_id = 510 then
+                if v_file_reg_id = 525 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get ERROR_SEL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
-                if v_file_reg_id = 511 then
+                if v_file_reg_id = 526 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get ERRORS Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
-                if v_file_reg_id = 512 then
+                if v_file_reg_id = 527 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get STATUS Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
 
@@ -631,7 +658,7 @@ package body pkg_usb is
             if v_error(0) = '1' then
               info("[pkg_usb_wr]: error: v_file_reg_id is out of range");
             end if;
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then  -- @suppress "Redundant boolean equality check with true"
               v_wr_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
@@ -683,10 +710,10 @@ package body pkg_usb is
 
           if v_pipe_rd_cnt_word = (c_PIPE_RD_WORD_MAX - 1) then
             v_pipe_rd_cnt_word := 0;
-            v_fsm_state     := E_RUN;
+            v_fsm_state        := E_RUN;
           else
             v_pipe_rd_cnt_word := v_pipe_rd_cnt_word + 1;
-            v_fsm_state     := E_PIPE_OUT_DATA_COMPARE;
+            v_fsm_state        := E_PIPE_OUT_DATA_COMPARE;
           end if;
 
         when E_DELAY =>
@@ -704,7 +731,7 @@ package body pkg_usb is
           v_wr_finish := '1';
           v_fsm_state := E_END;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
           v_fsm_state := E_RST;
 
       end case;

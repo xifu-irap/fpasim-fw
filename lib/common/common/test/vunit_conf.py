@@ -183,6 +183,9 @@ class VunitConf:
         base_path_dic['src_io_path'] = str(Path(root_path, 'src/hdl/io'))
         base_path_dic['src_usb_path'] = str(Path(root_path, 'src/hdl/usb'))
         base_path_dic['src_utils_path'] = str(Path(root_path, 'src/hdl/utils'))
+        base_path_dic['src_reset_path'] = str(Path(root_path, 'src/hdl/reset'))
+        base_path_dic['src_spi_path'] = str(Path(root_path, 'src/hdl/spi'))
+        base_path_dic['src_sim_path'] = str(Path(root_path, 'src/hdl/sim'))
 
         base_path_dic['tb_path'] = str(Path(root_path, 'simu/tb'))
         base_path_dic['wave_path'] = str(Path(root_path, 'simu/wave'))
@@ -479,14 +482,29 @@ class VunitConf:
         filepath_list = []
         filepath_list.append(str(Path(base_path, 'selectio_wiz_adc/selectio_wiz_adc_selectio_wiz.v')))
         filepath_list.append(str(Path(base_path, 'selectio_wiz_adc/selectio_wiz_adc.v')))
+        
         filepath_list.append(str(Path(base_path, 'selectio_wiz_sync/selectio_wiz_sync_selectio_wiz.v')))
         filepath_list.append(str(Path(base_path, 'selectio_wiz_sync/selectio_wiz_sync.v')))
+
         filepath_list.append(str(Path(base_path, 'selectio_wiz_dac/selectio_wiz_dac_selectio_wiz.v')))
         filepath_list.append(str(Path(base_path, 'selectio_wiz_dac/selectio_wiz_dac.v')))
+
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_frame/selectio_wiz_dac_frame_selectio_wiz.v')))
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_frame/selectio_wiz_dac_frame.v')))
+
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_clk/selectio_wiz_dac_clk_selectio_wiz.v')))
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_clk/selectio_wiz_dac_clk.v')))
+
         filepath_list.append(str(Path(base_path, 'fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v')))
         filepath_list.append(str(Path(base_path, 'fpasim_clk_wiz_0/fpasim_clk_wiz_0.v')))
+
+        filepath_list.append(str(Path(base_path, 'system_fpasim_top_ila/sim/system_fpasim_top_ila.vhd')))
         filepath_list.append(str(Path(base_path, 'fpasim_top_ila_0/sim/fpasim_top_ila_0.vhd')))
         filepath_list.append(str(Path(base_path, 'fpasim_regdecode_top_ila_0/sim/fpasim_regdecode_top_ila_0.vhd')))
+        filepath_list.append(str(Path(base_path, 'fpasim_spi_device_select_ila/sim/fpasim_spi_device_select_ila.vhd')))
+        
+        filepath_list.append(str(Path(base_path, 'fpasim_spi_device_select_vio/sim/fpasim_spi_device_select_vio.vhd')))
+
 
         # add the library name
         self._add_library(library_name_p=library_name)
@@ -633,7 +651,7 @@ class VunitConf:
         level0   = self._get_indentation_level(level_p=level_p)
         directory_name = directory_name_p.lower()
 
-        if directory_name in ['system', 'clocking', 'fpasim', 'io', 'utils', 'usb']:
+        if directory_name in ['system', 'clocking', 'fpasim', 'io', 'utils', 'usb','reset','spi','sim']:
             # based on the _build_path method, build the dictionary keys
             key_name = 'src_' + directory_name + '_path'
             base_path = base_path_dic[key_name]
@@ -816,6 +834,37 @@ class VunitConf:
         
         return filepath_list
 
+    def get_ram_filepath(self,filename_list_p, level_p=None):
+        """
+        This method returns a list of conf ram filepath
+        :param filename_list_p: (list of string) define a list of filename to search
+        :param level_p: (integer >= 0) define the level of indentation of the message to print
+        :return: (list of string) list of filepath
+        """
+        base_path_dic = self.base_path_dic
+        base_path = base_path_dic['src_path']
+        display_obj = self.display_obj
+        filename_list = filename_list_p
+        level0 = self._get_indentation_level(level_p=level_p)
+        level1 = level0 + 1
+        level2 = level0 + 2
+
+        str0 = "VunitConf.get_ram_filepath"
+        display_obj.display_title(msg_p=str0, level_p=level0)
+        str0 = 'Search in base_path='+base_path
+        display_obj.display(msg_p=str0, level_p=level1)
+
+        obj = FilepathListBuilder()
+        obj.set_file_extension(file_extension_list_p=['.mem'])
+        filepath_list = []
+        for filename in filename_list:
+            str0 = 'Searched filename='+filename
+            display_obj.display(msg_p=str0,level_p=level2)
+            filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
+            filepath_list.append(filepath)
+        
+        return filepath_list
+
     def get_data_filepath(self,filename_p, level_p=None):
         """
         This method returns a list of data filepath
@@ -876,7 +925,7 @@ class VunitConf:
 
         return filepath
 
-    def create_directory(self, path_p, level_p=None):
+    def _create_directory(self, path_p, level_p=None):
         """
         This function create the directory tree defined by the "path" argument (if not exist)
         :param path_p: (string) -> path to the directory to create
@@ -884,15 +933,20 @@ class VunitConf:
         :return: None
         """
         display_obj = self.display_obj
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
+        level1 = level0 + 1
 
         if not os.path.exists(path_p):
             os.makedirs(path_p)
-            msg0 = "Directory ", path_p, " Created "
+            msg0 = "Create Directory: "
             display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
+            msg0 = path_p
+            display_obj.display(msg_p=msg0, level_p=level1, color_p='green')
         else:
-            msg0 = "Warning: Directory ", path_p, " already exists"
+            msg0 = "Warning: Directory already exists: "
             display_obj.display(msg_p=msg0, level_p=level0, color_p='yellow')
+            msg0 = path_p
+            display_obj.display(msg_p=msg0, level_p=level1, color_p='yellow')
 
         return None
 
@@ -903,19 +957,18 @@ class VunitConf:
         into a specific directory in order to be "seen" by the simulator
         Note: 
            This method is used for Xilinx IP which uses RAM
-           This method should be called before the VunitConf.pre_config method (if necessary)
+           This method should be called before the pre_config method (if necessary)
         :param filepath_list_p: (list of strings) -> list of filepaths
         :return: None
         """
         self.filepath_list_mif = filepath_list_p
         return None
 
-    def _copy_mif_files(self, output_path_p, debug_p, level_p=None):
+    def _copy_mif_files(self, output_path_p, level_p=None):
         """
-        copy a list of *.mif files into the Vunit simulation directory ("./Vunit_out/modelsim")
+        copy a list of init files such as *.mif and/or *.mem into the Vunit simulation directory ("./Vunit_out/modelsim")
         Note: the expected destination directory is "./Vunit_out/modelsim"
         :param output_path_p: (string) -> output path provided by the Vunit library
-        :param debug_p: (string) -> print debug_p message if the value is 'true'
         :param level_p:   (integer >= 0) define the level of indentation of the message to print
         :return: None
         """
@@ -923,20 +976,19 @@ class VunitConf:
         script_name = self.script_name
         output_path = output_path_p
         level0   = self._get_indentation_level(level_p=level_p)
+        level1 = level0 + 1
 
         # get absolute path
         script_path = Path(output_path).resolve()
         # move into the hierarchy : vunit_out/modelsim
-        output_path = str(script_path.parents[1]) + sep + "modelsim"
-        if debug_p == 'true':
-            msg0 = script_name + "copy the *.mif into the Vunit simulation directory"
-            display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
+        output_path = str(Path(script_path.parents[1],"modelsim"))
 
         # copy each files
+        msg0 = script_name + ": Copy the IP init files into the Vunit output simulation directory"
+        display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
         for filepath in self.filepath_list_mif:
-            if debug_p == 'true':
-                msg0 = script_name + "the filepath :" + filepath + " is copied to " + output_path
-                display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
+            msg0 =  'Copy: ' + filepath + " to " + output_path
+            display_obj.display(msg_p=msg0, level_p=level1, color_p='green')
             copy(filepath, output_path)
 
         return None
@@ -979,6 +1031,7 @@ class VunitConf:
         2 actions are provided:
             . execute a python script with a predefined set of command line arguments
             . copy the "mif files" into the Vunit simulation director for the compatible Xilinx IP
+        Note: This method is the main entry point for the Vunit library
         :param output_path: (string) Vunit Output Simulation Path (auto-computed by Vunit)
         :return: boolean
         """
@@ -1001,8 +1054,8 @@ class VunitConf:
         # .output directory for the output data files
         tb_input_base_path = str(Path(output_path,'inputs').resolve())
         tb_output_base_path = str(Path(output_path,'outputs').resolve())
-        self.create_directory(path_p=tb_input_base_path,level_p = level1)
-        self.create_directory(path_p=tb_output_base_path,level_p =level1)
+        self._create_directory(path_p=tb_input_base_path,level_p = level1)
+        self._create_directory(path_p=tb_output_base_path,level_p =level1)
 
         # launch a python script to generate data and commands
         if script_filepath is not None:
@@ -1034,7 +1087,7 @@ class VunitConf:
 
         # copy the mif files into the Vunit simulation directory
         if self.filepath_list_mif is not None:
-            self._copy_mif_files(output_path_p=output_path, debug_p='true')
+            self._copy_mif_files(output_path_p=output_path, level_p=level1)
 
         # return True is mandatory for Vunit
         return True

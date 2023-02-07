@@ -328,10 +328,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library xpm;
-use xpm.vcomponents.all;
-
-library fpasim;
 
 entity fifo_async_with_error_prog_full is
   generic(
@@ -622,7 +618,7 @@ begin
   ---------------------------------------------------------------------
   -- instanciate fifo
   ---------------------------------------------------------------------
-  inst_fifo_async_with_prog_full : entity fpasim.fifo_async_with_prog_full
+  inst_fifo_async_with_prog_full : entity work.fifo_async_with_prog_full
     generic map(
       g_CDC_SYNC_STAGES   => g_CDC_SYNC_STAGES,
       g_FIFO_MEMORY_TYPE  => g_FIFO_MEMORY_TYPE,
@@ -662,7 +658,7 @@ begin
   data_wr_tmp0(2) <= wr_rst_busy;
   data_wr_tmp0(1) <= wr_full;
   data_wr_tmp0(0) <= i_wr_en;
-  inst_pipeliner_wr : entity fpasim.pipeliner
+  inst_pipeliner_wr : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_DELAY_FLAG,
       g_DATA_WIDTH => data_wr_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -679,7 +675,7 @@ begin
   data_rd_tmp0(2) <= rd_rst_busy;
   data_rd_tmp0(1) <= rd_empty;
   data_rd_tmp0(0) <= i_rd_en;
-  inst_pipeliner_rd : entity fpasim.pipeliner
+  inst_pipeliner_rd : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_DELAY_FLAG,
       g_DATA_WIDTH => data_rd_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -768,7 +764,7 @@ begin
     wr_en_flag  <= '1' when wr_r = '1' and wr_rst_busy_flag = '0' else '0';
     wr_din_flag <= data_r;
 
-    inst_fifo_async_flag : entity fpasim.fifo_async
+    inst_fifo_async_flag : entity work.fifo_async
       generic map(
         g_CDC_SYNC_STAGES   => g_CDC_SYNC_STAGES,
         g_FIFO_MEMORY_TYPE  => "distributed",
@@ -814,7 +810,7 @@ begin
     ---------------------------------------------------------------------
     data_wr_out_tmp0(1) <= error_wr_rst_sync;
     data_wr_out_tmp0(0) <= error_wr_full_sync;
-    inst_pipeliner_wr_out : entity fpasim.pipeliner
+    inst_pipeliner_wr_out : entity work.pipeliner
       generic map(
         g_NB_PIPES   => c_DELAY_OUT,
         g_DATA_WIDTH => data_wr_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -831,7 +827,7 @@ begin
     data_rd_out_tmp0(2) <= rd_empty_sync;
     data_rd_out_tmp0(1) <= error_rd_rst_sync;
     data_rd_out_tmp0(0) <= error_rd_empty_sync;
-    inst_pipeliner_rd_out : entity fpasim.pipeliner
+    inst_pipeliner_rd_out : entity work.pipeliner
       generic map(
         g_NB_PIPES   => c_DELAY_OUT,
         g_DATA_WIDTH => data_rd_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -883,7 +879,7 @@ begin
     wr_en_flag  <= '1' when wr_r = '1' and wr_rst_busy_flag = '0' else '0';
     wr_din_flag <= data_r;
 
-    inst_fifo_async_flag : entity fpasim.fifo_async
+    inst_fifo_async_flag : entity work.fifo_async
       generic map(
         g_CDC_SYNC_STAGES   => g_CDC_SYNC_STAGES,
         g_FIFO_MEMORY_TYPE  => "distributed",
@@ -930,7 +926,7 @@ begin
     ---------------------------------------------------------------------
     data_wr_out_tmp0(1) <= error_wr_rst_sync;
     data_wr_out_tmp0(0) <= error_wr_full_sync;
-    inst_pipeliner_wr_out : entity fpasim.pipeliner
+    inst_pipeliner_wr_out : entity work.pipeliner
       generic map(
         g_NB_PIPES   => c_DELAY_OUT,
         g_DATA_WIDTH => data_wr_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -947,7 +943,7 @@ begin
     data_rd_out_tmp0(2) <= rd_empty_sync;
     data_rd_out_tmp0(1) <= error_rd_rst_sync;
     data_rd_out_tmp0(0) <= error_rd_empty_sync;
-    inst_pipeliner_rd_out : entity fpasim.pipeliner
+    inst_pipeliner_rd_out : entity work.pipeliner
       generic map(
         g_NB_PIPES   => c_DELAY_OUT,
         g_DATA_WIDTH => data_rd_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[

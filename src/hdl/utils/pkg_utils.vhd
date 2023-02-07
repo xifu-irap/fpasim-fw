@@ -17,13 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   pkg_utils.vhd 
+--   @file                   pkg_utils.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
--- This package defines commonly used function/procedure
+--   @details                
+--
+--   This package defines commonly used function/procedure
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -50,6 +51,15 @@ PACKAGE pkg_utils IS
   ---------------------------------------------------------------------
   function pkg_width_from_indexes(i_idx_high : in integer; i_idx_low : in integer) return integer;
 
+  ---------------------------------------------------------------------
+  -- This function return the max value of 2 input integers
+  ---------------------------------------------------------------------
+  function max(i_value0: in integer ; i_value1 : in integer) return integer;
+
+  ---------------------------------------------------------------------
+  -- This function return the min value of 2 input integers
+  ---------------------------------------------------------------------
+  function min(i_value0: in integer ; i_value1 : in integer) return integer;
 
 END pkg_utils;
 
@@ -84,6 +94,34 @@ end;
     variable v_result : integer;
   begin 
     v_result := (i_idx_high - i_idx_low) + 1;
+    return v_result;
+  end;
+
+  ---------------------------------------------------------------------
+  -- This function return the max value of 2 input integers
+  ---------------------------------------------------------------------
+  function max(i_value0: in integer; i_value1 : in integer) return integer is
+    variable v_result : integer;
+  begin
+    if i_value0 > i_value1 then
+       v_result:= i_value0;
+    else
+      v_result := i_value1;
+    end if;
+    return v_result;
+  end;
+
+   ---------------------------------------------------------------------
+  -- This function return the min value of 2 input integers
+  ---------------------------------------------------------------------
+  function min(i_value0: in integer; i_value1 : in integer) return integer is
+    variable v_result : integer;
+  begin
+    if i_value0 < i_value1 then
+       v_result:= i_value0;
+    else
+      v_result := i_value1;
+    end if;
     return v_result;
   end;
 

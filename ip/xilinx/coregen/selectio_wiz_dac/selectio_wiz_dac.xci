@@ -63,7 +63,7 @@
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CLK_BUF">BUFIO2</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CLK_DELAY">NONE</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CLK_EN">false</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CLK_FWD">true</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CLK_FWD">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CLK_FWD_IO_STD">LVDS_25</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CLK_FWD_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CLK_IO_STD">LVCMOS18</spirit:configurableElementValue>
@@ -71,8 +71,8 @@
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CLK_TAP">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CLK_TAP_reset">FROM_ZERO</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CLK_TAP_wrap">STAY_AT_LIMIT</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CONFIG_CLK_FWD">true</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_DATA_RATE_STRING">2</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_CONFIG_CLK_FWD">false</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_DATA_RATE_STRING">8</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_DDR_ALIGNMENT">C0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_DDR_CLK_BUF">BUFR</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_DEVICE">2</spirit:configurableElementValue>
@@ -97,11 +97,11 @@
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SELIO_IDDR_RST_TYPE">ASYNC</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SELIO_INTERFACE_TYPE">NETWORKING</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SELIO_ODDR_ALIGNMENT">SAME_EDGE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SERIALIZATION_FACTOR">4</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SYSTEM_DATA_WIDTH">9</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SERIALIZATION_FACTOR">8</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_SYSTEM_DATA_WIDTH">8</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_TRAIN_CONSTANT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_USE_PHASE_DETECTOR">false</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_USE_SERIALIZATION">false</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_USE_SERIALIZATION">true</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_USE_TEMPLATE">Custom</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.c_component_name">selectio_wiz_dac</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.ACTIVE_EDGE">RISING</spirit:configurableElementValue>
@@ -117,14 +117,14 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_BUF">BUFIO2</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_DELAY">NONE</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_EN">false</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_FWD">true</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_FWD">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_FWD_IO_STD">LVDS_25</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_FWD_SER">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_FWD_SIG_TYPE">DIFF</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_IO_STD">LVCMOS18</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_SIG_TYPE">SINGLE</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CLK_TAP">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CONFIG_CLK_FWD">true</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.CONFIG_CLK_FWD">false</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.Component_Name">selectio_wiz_dac</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.DDR_ALIGNMENT">C0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.DDR_CLK_BUF">BUFR</spirit:configurableElementValue>
@@ -148,11 +148,11 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SELIO_IDDR_RST_TYPE">ASYNC</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SELIO_INTERFACE_TYPE">NETWORKING</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SELIO_ODDR_ALIGNMENT">SAME_EDGE</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SERIALIZATION_FACTOR">4</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SYSTEM_DATA_WIDTH">9</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SERIALIZATION_FACTOR">8</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.SYSTEM_DATA_WIDTH">8</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.TRAIN_CONSTANT">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_PHASE_DETECTOR">false</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_SERIALIZATION">false</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_SERIALIZATION">true</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.USE_TEMPLATE">Custom</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.ARCHITECTURE">kintex7</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.BASE_BOARD_PART"/>
@@ -184,6 +184,7 @@
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.BUS_SIG_TYPE" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.CLK_FWD" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.CLK_FWD_IO_STD" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.CLK_FWD_SER" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.CLK_FWD_SIG_TYPE" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.CONFIG_CLK_FWD" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.SELIO_ACTIVE_EDGE" xilinx:valueSource="user"/>
@@ -195,20 +196,19 @@
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.SELIO_INTERFACE_TYPE" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.SERIALIZATION_FACTOR" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.SYSTEM_DATA_WIDTH" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.USE_SERIALIZATION" xilinx:valueSource="user"/>
           </xilinx:configElementInfos>
           <xilinx:boundaryDescriptionInfo>
             <xilinx:boundaryDescription xilinx:boundaryDescriptionJSON="{
               &quot;schema&quot;: &quot;xilinx.com:schema:json_boundary:1.0&quot;,
               &quot;boundary&quot;: {
                 &quot;ports&quot;: {
-                  &quot;data_out_to_pins_p&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;8&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
-                  &quot;data_out_to_pins_n&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;8&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;data_out_to_pins_p&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;7&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;data_out_to_pins_n&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;7&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
                   &quot;clk_in&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;driver_value&quot;: &quot;0&quot; } ],
-                  &quot;data_out_from_device&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;size_left&quot;: &quot;17&quot;, &quot;size_right&quot;: &quot;0&quot;, &quot;driver_value&quot;: &quot;0&quot; } ],
-                  &quot;clk_reset&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;driver_value&quot;: &quot;0&quot; } ],
-                  &quot;io_reset&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;driver_value&quot;: &quot;0&quot; } ],
-                  &quot;clk_to_pins_p&quot;: [ { &quot;direction&quot;: &quot;out&quot; } ],
-                  &quot;clk_to_pins_n&quot;: [ { &quot;direction&quot;: &quot;out&quot; } ]
+                  &quot;clk_div_in&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;driver_value&quot;: &quot;0&quot; } ],
+                  &quot;data_out_from_device&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;size_left&quot;: &quot;63&quot;, &quot;size_right&quot;: &quot;0&quot;, &quot;driver_value&quot;: &quot;0&quot; } ],
+                  &quot;io_reset&quot;: [ { &quot;direction&quot;: &quot;in&quot;, &quot;driver_value&quot;: &quot;0&quot; } ]
                 },
                 &quot;interfaces&quot;: {
                   &quot;io_reset&quot;: {
@@ -217,22 +217,10 @@
                     &quot;mode&quot;: &quot;slave&quot;,
                     &quot;parameters&quot;: {
                       &quot;POLARITY&quot;: [ { &quot;value&quot;: &quot;ACTIVE_HIGH&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;usage&quot;: &quot;all&quot; } ],
-                      &quot;INSERT_VIP&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;user&quot;, &quot;format&quot;: &quot;long&quot;, &quot;usage&quot;: &quot;simulation.rtl&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ]
+                      &quot;INSERT_VIP&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;user&quot;, &quot;format&quot;: &quot;long&quot;, &quot;usage&quot;: &quot;simulation.rtl&quot;, &quot;is_static_object&quot;: false } ]
                     },
                     &quot;port_maps&quot;: {
                       &quot;RST&quot;: [ { &quot;physical_name&quot;: &quot;io_reset&quot; } ]
-                    }
-                  },
-                  &quot;clk_reset&quot;: {
-                    &quot;vlnv&quot;: &quot;xilinx.com:signal:reset:1.0&quot;,
-                    &quot;abstraction_type&quot;: &quot;xilinx.com:signal:reset_rtl:1.0&quot;,
-                    &quot;mode&quot;: &quot;slave&quot;,
-                    &quot;parameters&quot;: {
-                      &quot;POLARITY&quot;: [ { &quot;value&quot;: &quot;ACTIVE_HIGH&quot;, &quot;value_src&quot;: &quot;constant&quot;, &quot;usage&quot;: &quot;all&quot; } ],
-                      &quot;INSERT_VIP&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;user&quot;, &quot;format&quot;: &quot;long&quot;, &quot;usage&quot;: &quot;simulation.rtl&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ]
-                    },
-                    &quot;port_maps&quot;: {
-                      &quot;RST&quot;: [ { &quot;physical_name&quot;: &quot;clk_reset&quot; } ]
                     }
                   },
                   &quot;Clk_in&quot;: {
@@ -240,14 +228,14 @@
                     &quot;abstraction_type&quot;: &quot;xilinx.com:signal:clock_rtl:1.0&quot;,
                     &quot;mode&quot;: &quot;slave&quot;,
                     &quot;parameters&quot;: {
-                      &quot;FREQ_HZ&quot;: [ { &quot;value&quot;: &quot;100000000&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;long&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;FREQ_TOLERANCE_HZ&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;long&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;PHASE&quot;: [ { &quot;value&quot;: &quot;0.0&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;float&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;CLK_DOMAIN&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;ASSOCIATED_BUSIF&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;ASSOCIATED_PORT&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;ASSOCIATED_RESET&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;INSERT_VIP&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;user&quot;, &quot;format&quot;: &quot;long&quot;, &quot;usage&quot;: &quot;simulation.rtl&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ]
+                      &quot;FREQ_HZ&quot;: [ { &quot;value&quot;: &quot;100000000&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;long&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;FREQ_TOLERANCE_HZ&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;long&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;PHASE&quot;: [ { &quot;value&quot;: &quot;0.0&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;float&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;CLK_DOMAIN&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;ASSOCIATED_BUSIF&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;ASSOCIATED_PORT&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;ASSOCIATED_RESET&quot;: [ { &quot;value&quot;: &quot;&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_static_object&quot;: false } ],
+                      &quot;INSERT_VIP&quot;: [ { &quot;value&quot;: &quot;0&quot;, &quot;resolve_type&quot;: &quot;user&quot;, &quot;format&quot;: &quot;long&quot;, &quot;usage&quot;: &quot;simulation.rtl&quot;, &quot;is_static_object&quot;: false } ]
                     },
                     &quot;port_maps&quot;: {
                       &quot;CLK&quot;: [ { &quot;physical_name&quot;: &quot;clk_in&quot; } ]
@@ -258,23 +246,10 @@
                     &quot;abstraction_type&quot;: &quot;xilinx.com:signal:data_rtl:1.0&quot;,
                     &quot;mode&quot;: &quot;slave&quot;,
                     &quot;parameters&quot;: {
-                      &quot;LAYERED_METADATA&quot;: [ { &quot;value&quot;: &quot;undef&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ]
+                      &quot;LAYERED_METADATA&quot;: [ { &quot;value&quot;: &quot;undef&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;is_static_object&quot;: false } ]
                     },
                     &quot;port_maps&quot;: {
                       &quot;DATA&quot;: [ { &quot;physical_name&quot;: &quot;data_out_from_device&quot; } ]
-                    }
-                  },
-                  &quot;diff_clk_to_pins&quot;: {
-                    &quot;vlnv&quot;: &quot;xilinx.com:interface:diff_clock:1.0&quot;,
-                    &quot;abstraction_type&quot;: &quot;xilinx.com:interface:diff_clock_rtl:1.0&quot;,
-                    &quot;mode&quot;: &quot;master&quot;,
-                    &quot;parameters&quot;: {
-                      &quot;CAN_DEBUG&quot;: [ { &quot;value&quot;: &quot;false&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;bool&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ],
-                      &quot;FREQ_HZ&quot;: [ { &quot;value&quot;: &quot;100000000&quot;, &quot;resolve_type&quot;: &quot;generated&quot;, &quot;format&quot;: &quot;long&quot;, &quot;is_ips_inferred&quot;: true, &quot;is_static_object&quot;: false } ]
-                    },
-                    &quot;port_maps&quot;: {
-                      &quot;CLK_N&quot;: [ { &quot;physical_name&quot;: &quot;clk_to_pins_n&quot; } ],
-                      &quot;CLK_P&quot;: [ { &quot;physical_name&quot;: &quot;clk_to_pins_p&quot; } ]
                     }
                   }
                 }

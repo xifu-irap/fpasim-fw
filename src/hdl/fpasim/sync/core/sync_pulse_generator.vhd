@@ -39,8 +39,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_utils;
+use work.pkg_utils;
 
 entity sync_pulse_generator is
   generic(
@@ -70,7 +69,7 @@ end entity sync_pulse_generator;
 
 architecture RTL of sync_pulse_generator is
 
-  constant c_CNT_WIDTH : integer                            := fpasim.pkg_utils.pkg_width_from_value(g_PULSE_DURATION);
+  constant c_CNT_WIDTH : integer                            := work.pkg_utils.pkg_width_from_value(g_PULSE_DURATION);
   constant c_CNT_MAX   : unsigned(c_CNT_WIDTH - 1 downto 0) := to_unsigned(g_PULSE_DURATION - 1, c_CNT_WIDTH);
 
   signal trig_tmp : std_logic;
@@ -80,19 +79,19 @@ architecture RTL of sync_pulse_generator is
   ---------------------------------------------------------------------
   type t_state is (E_RST, E_WAIT, E_RUN);
   signal sm_state_next : t_state;
-  signal sm_state_reg  : t_state;
+  signal sm_state_r1  : t_state:= E_RST;
 
   signal data_valid_next : std_logic;
-  signal data_valid_r1   : std_logic;
+  signal data_valid_r1   : std_logic:= '0';
 
   signal data_next : std_logic;
-  signal data_r1   : std_logic;
+  signal data_r1   : std_logic:= '0';
 
   signal cnt_next : unsigned(c_CNT_WIDTH - 1 downto 0);
-  signal cnt_r1   : unsigned(c_CNT_WIDTH - 1 downto 0);
+  signal cnt_r1   : unsigned(c_CNT_WIDTH - 1 downto 0):= (others => '0');
 
-  signal error_r1   : std_logic;
   signal error_next : std_logic;
+  signal error_r1   : std_logic := '0';
 
   ---------------------------------------------------------------------
   -- error latching
@@ -109,13 +108,13 @@ begin
   ---------------------------------------------------------------------
   -- fsm
   ---------------------------------------------------------------------
-  p_state_decode : process(cnt_r1, data_r1, sm_state_reg, trig_tmp) is
+  p_state_decode : process(cnt_r1, data_r1, sm_state_r1, trig_tmp) is
   begin
     data_valid_next <= '0';
     cnt_next        <= cnt_r1;
     data_next       <= data_r1;
     error_next      <= '0';
-    case sm_state_reg is
+    case sm_state_r1 is
       when E_RST =>
         cnt_next      <= (others => '0');
         sm_state_next <= E_WAIT;
@@ -131,6 +130,8 @@ begin
             sm_state_next <= E_RUN;
           end if;
         else
+          cnt_next      <= (others => '0');
+          data_next     <= '0';
           sm_state_next <= E_WAIT;
         end if;
 
@@ -160,9 +161,9 @@ begin
   begin
     if rising_edge(i_clk) then
       if i_rst = '1' then
-        sm_state_reg <= E_RST;
+        sm_state_r1 <= E_RST;
       else
-        sm_state_reg <= sm_state_next;
+        sm_state_r1 <= sm_state_next;
       end if;
       data_valid_r1 <= data_valid_next;
       data_r1       <= data_next;
@@ -182,7 +183,7 @@ begin
   ---------------------------------------------------------------------
   error_tmp(0) <= error_r1;
   gen_errors_latch : for i in error_tmp'range generate
-    inst_one_error_latch : entity fpasim.one_error_latch
+    inst_one_error_latch : entity work.one_error_latch
       port map(
         i_clk         => i_clk,
         i_rst         => i_rst_status,

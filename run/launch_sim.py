@@ -235,6 +235,13 @@ if __name__ == '__main__':
             # Default: False
             cmd.append("-v")
 
+            # Export project information to a JSON file.
+            # cmd.append("--export-json")
+            # cmd.append("compiled_file.json")
+
+            # Only list all files in compile order
+            # cmd.append("-f")
+
 
             if verbosity == 2:
                 msg = 'generated command: ' + ' '.join(cmd)

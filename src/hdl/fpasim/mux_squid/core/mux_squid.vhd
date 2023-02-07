@@ -37,8 +37,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_fpasim.all;
+use work.pkg_fpasim.all;
 
 entity mux_squid is
   generic(
@@ -252,7 +251,7 @@ begin
   pixel_result_tmp       <= std_logic_vector(resize(unsigned(i_pixel_result), pixel_result_tmp'length));
   mux_squid_feedback_tmp <= std_logic_vector(resize(unsigned(i_mux_squid_feedback), mux_squid_feedback_tmp'length));
 
-  inst_sub_sfixed_mux_squid : entity fpasim.sub_sfixed
+  inst_sub_sfixed_mux_squid : entity work.sub_sfixed
     generic map(
       -- port A: AMD Q notation (fixed point)
       g_Q_M_A => pkg_MUX_SQUID_SUB_Q_M_A,
@@ -285,7 +284,7 @@ begin
   data_pipe_tmp0(c_IDX2_H)                 <= i_pixel_sof;
   data_pipe_tmp0(c_IDX1_H)                 <= i_pixel_eof;
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
-  inst_pipeliner_sync_with_sub_sfixed_mux_squid_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_sub_sfixed_mux_squid_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_MUX_SQUID_SUB_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -311,7 +310,7 @@ begin
 
   mux_squid_offset_regcea <= '1';
 
-  inst_tdpram_mux_squid_offset : entity fpasim.tdpram
+  inst_tdpram_mux_squid_offset : entity work.tdpram
     generic map(
       -- port A
       g_ADDR_WIDTH_A       => mux_squid_offset_addra'length,
@@ -331,8 +330,8 @@ begin
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_MUX_SQUID_OFFSET,
-      g_MEMORY_INIT_FILE   => "none",
-      g_MEMORY_INIT_PARAM  => "0"
+      g_MEMORY_INIT_FILE   => "mux_squid_offset.mem",
+      g_MEMORY_INIT_PARAM  => ""
     )
     port map(
       ---------------------------------------------------------------------
@@ -367,7 +366,7 @@ begin
   -------------------------------------------------------------------
   -- sync with rd RAM output
   -------------------------------------------------------------------
-  inst_pipeliner_sync_with_tdpram_mux_squid_offset_outa : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_tdpram_mux_squid_offset_outa : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -387,7 +386,7 @@ begin
   -- RAM check
   ---------------------------------------------------------------------
 
-  inst_ram_check_sdpram_mux_squid_offset : entity fpasim.ram_check
+  inst_ram_check_sdpram_mux_squid_offset : entity work.ram_check
     generic map(
       g_WR_ADDR_WIDTH => mux_squid_offset_addra'length,
       g_RD_ADDR_WIDTH => mux_squid_offset_addrb'length
@@ -417,7 +416,7 @@ begin
 
   mux_squid_tf_regcea <= '1';
 
-  inst_tdpram_mux_squid_tf : entity fpasim.tdpram
+  inst_tdpram_mux_squid_tf : entity work.tdpram
     generic map(
       -- port A
       g_ADDR_WIDTH_A       => mux_squid_tf_addra'length,
@@ -437,8 +436,8 @@ begin
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_MUX_SQUID_TF,
-      g_MEMORY_INIT_FILE   => "none",
-      g_MEMORY_INIT_PARAM  => "0"
+      g_MEMORY_INIT_FILE   => "mux_squid_tf.mem",
+      g_MEMORY_INIT_PARAM  => ""
     )
     port map(
       ---------------------------------------------------------------------
@@ -467,13 +466,13 @@ begin
   mux_squid_tf_web    <= '0';
   mux_squid_tf_dinb   <= (others => '0');
   mux_squid_tf_enb    <= pixel_valid_rx;
-  mux_squid_tf_addrb  <= result_sub_rx;
+  mux_squid_tf_addrb  <= result_sub_rx; -- @suppress "Incorrect array size in assignment: expected (<g_MUX_SQUID_TF_RAM_ADDR_WIDTH>) but was (<13>)"
   mux_squid_tf_regceb <= pixel_valid_rx;
 
   -------------------------------------------------------------------
   -- sync with rd RAM output
   -------------------------------------------------------------------
-  inst_pipeliner_sync_with_tdpram_mux_squid_tf_outa : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_tdpram_mux_squid_tf_outa : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_MUX_SQUID_TF_RAM_A_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -492,7 +491,7 @@ begin
   ---------------------------------------------------------------------
   -- check RAM
   ---------------------------------------------------------------------
-  inst_ram_check_sdpram_mux_squid_tf : entity fpasim.ram_check
+  inst_ram_check_sdpram_mux_squid_tf : entity work.ram_check
     generic map(
       g_WR_ADDR_WIDTH => mux_squid_tf_addra'length,
       g_RD_ADDR_WIDTH => mux_squid_tf_addrb'length
@@ -519,7 +518,7 @@ begin
   data_pipe_tmp2(c_IDX2_H)                 <= pixel_sof_rx;
   data_pipe_tmp2(c_IDX1_H)                 <= pixel_eof_rx;
   data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_rx;
-  inst_pipeliner_sync_with_sdpram_mux_squid_tf_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_sdpram_mux_squid_tf_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_MUX_SQUID_TF_RAM_B_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp2'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -539,7 +538,7 @@ begin
   -- sync with sub_sfixed_mux_squid out
   -----------------------------------------------------------------
 
-  inst_pipeliner_sync_with_sdpram_mux_squid_tf2_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_sdpram_mux_squid_tf2_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => mux_squid_offset_doutb'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -560,7 +559,7 @@ begin
   -- no conversion => width unchanged
   mux_squid_offset_tmp <= mux_squid_offset_ry;
 
-  inst_add_sfixed_mux_squid_offset_and_tf : entity fpasim.add_sfixed
+  inst_add_sfixed_mux_squid_offset_and_tf : entity work.add_sfixed
     generic map(
       -- port A: AMD Q notation (fixed point)
       g_Q_M_A => pkg_MUX_SQUID_ADD_Q_M_A,
@@ -582,7 +581,7 @@ begin
       --------------------------------------------------------------
       -- output : S = a + B
       --------------------------------------------------------------
-      o_s   => result_rz
+      o_s   => result_rz -- @suppress "Incorrect array size in assignment: expected (<34>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
     );
 
   -----------------------------------------------------------------
@@ -592,7 +591,7 @@ begin
   data_pipe_tmp4(c_IDX2_H)                 <= pixel_sof_ry;
   data_pipe_tmp4(c_IDX1_H)                 <= pixel_eof_ry;
   data_pipe_tmp4(c_IDX0_H downto c_IDX0_L) <= pixel_id_ry;
-  inst_pipeliner_sync_with_add_sfixed_mux_squid_offset_and_tf_out : entity fpasim.pipeliner
+  inst_pipeliner_sync_with_add_sfixed_mux_squid_offset_and_tf_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => pkg_MUX_SQUID_ADD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp4'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -623,7 +622,7 @@ begin
   error_tmp(1) <= mux_squid_tf_error;
   error_tmp(0) <= mux_squid_offset_error;
   error_flag_mng : for i in error_tmp'range generate
-    inst_one_error_latch : entity fpasim.one_error_latch
+    inst_one_error_latch : entity work.one_error_latch
       port map(
         i_clk         => i_clk,
         i_rst         => i_rst_status,

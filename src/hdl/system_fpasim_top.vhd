@@ -17,173 +17,226 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   system_fpasim_top.vhd 
+--    @file                   system_fpasim_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 -- This module is the fpga top level
+-- -------------------------------------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
+library unisim;
+use UNISIM.vcomponents.all;
+
+use work.pkg_system_fpasim_debug.all;
 
 entity system_fpasim_top is
+  generic (
+    g_DEBUG : boolean := pkg_SYSTEM_FPASIM_TOP_DEBUG
+    );
   port(
+    --i_clk_to_fpga_p : in std_logic;
+    --i_clk_to_fpga_n : in std_logic;
     --  Opal Kelly inouts --
-    okUH          : in    std_logic_vector(4 downto 0);
-    okHU          : out   std_logic_vector(2 downto 0);
-    okUHU         : inout std_logic_vector(31 downto 0);
-    okAA          : inout std_logic;
+    i_okUH  : in    std_logic_vector(4 downto 0);
+    o_okHU  : out   std_logic_vector(2 downto 0);
+    b_okUHU : inout std_logic_vector(31 downto 0);
+    b_okAA  : inout std_logic;
     ---------------------------------------------------------------------
     -- FMC: from the card
     ---------------------------------------------------------------------
-    -- TODO
-    i_board_id     : in std_logic_vector(7 downto 0); -- card board id 
+    --i_board_id : in    std_logic_vector(7 downto 0);  -- card board id 
+
     ---------------------------------------------------------------------
     -- FMC: from the adc
     ---------------------------------------------------------------------
-    i_adc_clk_p   : in    std_logic;    -- differential clock p @250MHz
-    i_adc_clk_n   : in    std_logic;    -- differential clock n @250MHZ
+    i_adc_clk_p   : in  std_logic;      -- differential clock p @250MHz
+    i_adc_clk_n   : in  std_logic;      -- differential clock n @250MHZ
     -- adc_a
     -- bit P/N: 0-1
-    i_da0_p       : in    std_logic;
-    i_da0_n       : in    std_logic;
-    i_da2_p       : in    std_logic;
-    i_da2_n       : in    std_logic;
-    i_da4_p       : in    std_logic;
-    i_da4_n       : in    std_logic;
-    i_da6_p       : in    std_logic;
-    i_da6_n       : in    std_logic;
-    i_da8_p       : in    std_logic;
-    i_da8_n       : in    std_logic;
-    i_da10_p      : in    std_logic;
-    i_da10_n      : in    std_logic;
-    i_da12_p      : in    std_logic;
-    i_da12_n      : in    std_logic;
+    i_da0_p       : in  std_logic;
+    i_da0_n       : in  std_logic;
+    i_da2_p       : in  std_logic;
+    i_da2_n       : in  std_logic;
+    i_da4_p       : in  std_logic;
+    i_da4_n       : in  std_logic;
+    i_da6_p       : in  std_logic;
+    i_da6_n       : in  std_logic;
+    i_da8_p       : in  std_logic;
+    i_da8_n       : in  std_logic;
+    i_da10_p      : in  std_logic;
+    i_da10_n      : in  std_logic;
+    i_da12_p      : in  std_logic;
+    i_da12_n      : in  std_logic;
     -- adc_b
-    i_db0_p       : in    std_logic;
-    i_db0_n       : in    std_logic;
-    i_db2_p       : in    std_logic;
-    i_db2_n       : in    std_logic;
-    i_db4_p       : in    std_logic;
-    i_db4_n       : in    std_logic;
-    i_db6_p       : in    std_logic;
-    i_db6_n       : in    std_logic;
-    i_db8_p       : in    std_logic;
-    i_db8_n       : in    std_logic;
-    i_db10_p      : in    std_logic;
-    i_db10_n      : in    std_logic;
-    i_db12_p      : in    std_logic;
-    i_db12_n      : in    std_logic;
+    i_db0_p       : in  std_logic;
+    i_db0_n       : in  std_logic;
+    i_db2_p       : in  std_logic;
+    i_db2_n       : in  std_logic;
+    i_db4_p       : in  std_logic;
+    i_db4_n       : in  std_logic;
+    i_db6_p       : in  std_logic;
+    i_db6_n       : in  std_logic;
+    i_db8_p       : in  std_logic;
+    i_db8_n       : in  std_logic;
+    i_db10_p      : in  std_logic;
+    i_db10_n      : in  std_logic;
+    i_db12_p      : in  std_logic;
+    i_db12_n      : in  std_logic;
     ---------------------------------------------------------------------
     -- FMC: to sync
     ---------------------------------------------------------------------
-    o_ref_clk     : out   std_logic;
-    o_sync        : out   std_logic;
+    o_ref_clk     : out std_logic;
+    o_sync        : out std_logic;
     ---------------------------------------------------------------------
     -- FMC: to dac
     ---------------------------------------------------------------------
-    o_dac_clk_p   : out   std_logic;
-    o_dac_clk_n   : out   std_logic;
-    o_dac_frame_p : out   std_logic;
-    o_dac_frame_n : out   std_logic;
-    o_dac0_p      : out   std_logic;
-    o_dac0_n      : out   std_logic;
-    o_dac1_p      : out   std_logic;
-    o_dac1_n      : out   std_logic;
-    o_dac2_p      : out   std_logic;
-    o_dac2_n      : out   std_logic;
-    o_dac3_p      : out   std_logic;
-    o_dac3_n      : out   std_logic;
-    o_dac4_p      : out   std_logic;
-    o_dac4_n      : out   std_logic;
-    o_dac5_p      : out   std_logic;
-    o_dac5_n      : out   std_logic;
-    o_dac6_p      : out   std_logic;
-    o_dac6_n      : out   std_logic;
-    o_dac7_p      : out   std_logic;
-    o_dac7_n      : out   std_logic
-  );
+    o_dac_clk_p   : out std_logic;
+    o_dac_clk_n   : out std_logic;
+    o_dac_frame_p : out std_logic;
+    o_dac_frame_n : out std_logic;
+    o_dac0_p      : out std_logic;
+    o_dac0_n      : out std_logic;
+    o_dac1_p      : out std_logic;
+    o_dac1_n      : out std_logic;
+    o_dac2_p      : out std_logic;
+    o_dac2_n      : out std_logic;
+    o_dac3_p      : out std_logic;
+    o_dac3_n      : out std_logic;
+    o_dac4_p      : out std_logic;
+    o_dac4_n      : out std_logic;
+    o_dac5_p      : out std_logic;
+    o_dac5_n      : out std_logic;
+    o_dac6_p      : out std_logic;
+    o_dac6_n      : out std_logic;
+    o_dac7_p      : out std_logic;
+    o_dac7_n      : out std_logic;
+
+    ---------------------------------------------------------------------
+    -- devices: spi links + specific signals
+    ---------------------------------------------------------------------
+    -- common: shared link between the spi
+    o_spi_sclk  : out std_logic;        -- Shared SPI clock line
+    o_spi_sdata : out std_logic;        -- Shared SPI MOSI
+
+    -- CDCE: SPI
+    i_cdce_sdo  : in  std_logic;        -- SPI MISO
+    o_cdce_n_en : out std_logic;        -- SPI chip select
+
+    -- CDCE: specific signals
+    i_cdce_pll_status : in  std_logic;  -- pll_status : This pin is set high if the PLL is in lock.
+    o_cdce_n_reset    : out std_logic;  -- reset_n or hold_n
+    o_cdce_n_pd       : out std_logic;  -- power_down_n
+    o_ref_en          : out std_logic;  -- enable the primary reference clock
+
+    -- ADC: SPI
+    i_adc_sdo   : in  std_logic;        -- SPI MISO
+    o_adc_n_en  : out std_logic;        -- SPI chip select
+    -- ADC: specific signals
+    o_adc_reset : out std_logic;        -- adc hardware reset
+
+    -- DAC: SPI
+    i_dac_sdo        : in  std_logic;   -- SPI MISO
+    o_dac_n_en       : out std_logic;   -- SPI chip select
+    -- DAC: specific signal
+    o_dac_tx_present : out std_logic;   -- enable tx acquisition
+
+    -- AMC: SPI (monitoring)
+    i_mon_sdo     : in  std_logic;      -- SPI data out
+    o_mon_n_en    : out std_logic;      -- SPI chip select
+    -- AMC : specific signals
+    i_mon_n_int   : in  std_logic;  -- galr_n: Global analog input out-of-range alarm.
+    o_mon_n_reset : out std_logic;      -- reset_n: hardware reset
+
+    ---------------------------------------------------------------------
+    -- leds
+    ---------------------------------------------------------------------
+    o_leds : out std_logic_vector(3 downto 2)
+    );
 end entity system_fpasim_top;
 
 architecture RTL of system_fpasim_top is
 
+  --signal board_id : std_logic_vector(i_board_id'range);
+  signal board_id : std_logic_vector(7 downto 0);
+
   ---------------------------------------------------------------------
   -- clock generation
   ---------------------------------------------------------------------
-  signal adc_clk : std_logic;
-  signal ref_clk : std_logic;
-  signal dac_clk : std_logic;
-  signal clk     : std_logic;
-  signal locked  : std_logic;
+  signal adc_clk_div         : std_logic;
+  signal sync_clk            : std_logic;
+  signal dac_clk             : std_logic;
+  signal dac_clk_div         : std_logic;
+  signal dac_clk_phase90     : std_logic;
+  signal dac_clk_div_phase90 : std_logic;
+  signal sys_clk             : std_logic;
+  signal mmcm_locked         : std_logic;
 
   ---------------------------------------------------------------------
-  -- usb 
+  -- reset generation
   ---------------------------------------------------------------------
+  signal sys_rst            : std_logic;
+  signal adc_io_clk_rst     : std_logic;
+  signal adc_io_rst         : std_logic;
+  signal dac_io_clk_rst     : std_logic; -- @suppress "signal dac_io_clk_rst is never read"
+  signal dac_io_rst         : std_logic;
+  signal dac_io_rst_phase90 : std_logic;
+  signal sync_io_clk_rst    : std_logic;
+  signal sync_io_rst        : std_logic;
 
-  -- from the user @o_usb_clk
   ---------------------------------------------------------------------
-  -- pipe
-  signal usb_pipeout_fifo_rd         : std_logic;
-  signal usb_pipeout_fifo_data       : std_logic_vector(31 downto 0);
-  -- trig
-  signal usb_trigout_data            : std_logic_vector(31 downto 0);
-  -- wire
-  signal usb_wireout_fifo_data_count : std_logic_vector(31 downto 0);
-  signal usb_wireout_ctrl            : std_logic_vector(31 downto 0);
-  signal usb_wireout_make_pulse      : std_logic_vector(31 downto 0);
-  signal usb_wireout_fpasim_gain     : std_logic_vector(31 downto 0);
-  signal usb_wireout_mux_sq_fb_delay : std_logic_vector(31 downto 0);
-  signal usb_wireout_amp_sq_of_delay : std_logic_vector(31 downto 0);
-  signal usb_wireout_error_delay     : std_logic_vector(31 downto 0);
-  signal usb_wireout_ra_delay        : std_logic_vector(31 downto 0);
-  signal usb_wireout_tes_conf        : std_logic_vector(31 downto 0);
-  signal usb_wireout_debug_ctrl      : std_logic_vector(31 downto 0);
-  signal usb_wireout_fpga_id         : std_logic_vector(31 downto 0);
-  signal usb_wireout_fpga_version    : std_logic_vector(31 downto 0);
-  signal usb_wireout_board_id        : std_logic_vector(31 downto 0);
+  -- fpasim_top
+  ---------------------------------------------------------------------
+  -- common
+  signal rst_status                      : std_logic;
+  signal debug_pulse                     : std_logic;
+  -- spi
+  signal usb_clk                         : std_logic;
+  signal usb_rst                         : std_logic;
+  signal usb_rst_out                     : std_logic;
+  signal usb_rst_status                  : std_logic;
+  signal usb_debug_pulse                 : std_logic;
+  -- tx
+  signal spi_rst                         : std_logic;
+  signal spi_en                          : std_logic;
+  signal spi_cmd_valid                   : std_logic;
+  signal spi_dac_tx_present              : std_logic;
+  signal spi_mode                        : std_logic;
+  signal spi_id                          : std_logic_vector(1 downto 0);
+  signal spi_cmd_wr_data                 : std_logic_vector(31 downto 0);
+  -- rx
+  signal spi_rd_data_valid               : std_logic;
+  signal spi_rd_data                     : std_logic_vector(31 downto 0);
+  --signal spi_ready                       : std_logic;
+  -- status: register
+  signal reg_spi_status                  : std_logic_vector(31 downto 0);
   -- errors/status
-  signal usb_wireout_errors          : std_logic_vector(31 downto 0);
-  signal usb_wireout_sel_errors      : std_logic_vector(31 downto 0);
-  signal usb_wireout_status          : std_logic_vector(31 downto 0);
-
-  -- to the user @o_usb_clk
-  ---------------------------------------------------------------------
-  signal usb_clk                    : std_logic;
-  -- pipe
-  signal usb_pipein_fifo_valid      : std_logic;
-  signal usb_pipein_fifo            : std_logic_vector(31 downto 0);
-  -- trig
-  signal usb_trigin_data            : std_logic_vector(31 downto 0);
-  -- wire
-  signal usb_wirein_ctrl            : std_logic_vector(31 downto 0);
-  signal usb_wirein_make_pulse      : std_logic_vector(31 downto 0);
-  signal usb_wirein_fpasim_gain     : std_logic_vector(31 downto 0);
-  signal usb_wirein_mux_sq_fb_delay : std_logic_vector(31 downto 0);
-  signal usb_wirein_amp_sq_of_delay : std_logic_vector(31 downto 0);
-  signal usb_wirein_error_delay     : std_logic_vector(31 downto 0);
-  signal usb_wirein_ra_delay        : std_logic_vector(31 downto 0);
-  signal usb_wirein_tes_conf        : std_logic_vector(31 downto 0);
-  signal usb_wirein_debug_ctrl      : std_logic_vector(31 downto 0);
-  signal usb_wirein_sel_errors      : std_logic_vector(31 downto 0);
-
-  ---------------------------------------------------------------------
-  -- fpasim
-  ---------------------------------------------------------------------
+  signal spi_errors                      : std_logic_vector(15 downto 0);
+  signal spi_status                      : std_logic_vector(7 downto 0);
   -- adc
   signal adc_valid                       : std_logic;
   signal adc_amp_squid_offset_correction : std_logic_vector(13 downto 0);
   signal adc_mux_squid_feedback          : std_logic_vector(13 downto 0);
+  signal adc_errors                      : std_logic_vector(15 downto 0);
+  signal adc_status                      : std_logic_vector(7 downto 0);
 
   -- sync
-  signal sync : std_logic;
+  signal sync_valid  : std_logic;
+  signal sync        : std_logic;
+  signal sync_errors : std_logic_vector(15 downto 0);
+  signal sync_status : std_logic_vector(7 downto 0);
 
-  signal dac_valid : std_logic;
-  signal dac_frame : std_logic;
-  signal dac       : std_logic_vector(15 downto 0);
+  -- dac
+  signal dac_valid  : std_logic;
+  signal dac_frame  : std_logic;
+  signal dac        : std_logic_vector(15 downto 0);
+  signal dac_errors : std_logic_vector(15 downto 0);
+  signal dac_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- ios
@@ -191,160 +244,193 @@ architecture RTL of system_fpasim_top is
   signal adc_a : std_logic_vector(13 downto 0);
   signal adc_b : std_logic_vector(13 downto 0);
 
+  ---------------------------------------------------------------------
+  -- spi
+  ---------------------------------------------------------------------
+  -- common: shared link between the spi
+  signal spi_sclk  : std_logic;         -- Shared SPI clock line
+  signal spi_sdata : std_logic;         -- Shared SPI MOSI
+
+  -- CDCE: SPI
+  signal cdce_n_en : std_logic;         -- SPI chip select
+
+  -- CDCE: specific signals
+  signal cdce_n_reset : std_logic;      -- reset_n or hold_n
+  signal cdce_n_pd    : std_logic;      -- power_down_n
+  signal ref_en       : std_logic;      -- enable the primary reference clock
+
+  -- ADC: SPI
+  signal adc_n_en  : std_logic;         -- SPI chip select
+  -- ADC: specific signals
+  signal adc_reset : std_logic;         -- adc hardware reset
+
+  -- DAC: SPI
+  signal dac_n_en       : std_logic;    -- SPI chip select
+  -- DAC: specific signal
+  signal dac_tx_present : std_logic;    -- enable tx acquisition
+
+  -- AMC: SPI (monitoring)
+  signal mon_n_en    : std_logic;       -- SPI chip select
+  -- AMC : specific signals
+  signal mon_n_reset : std_logic;       -- reset_n: hardware reset
+
+  ---------------------------------------------------------------------
+  -- leds
+  ---------------------------------------------------------------------
+  signal count_pulse_r1 : unsigned(30 downto 0) := (others => '0');
+  signal pulse          : std_logic;
+
 begin
 
   ---------------------------------------------------------------------
   -- clock generation
   ---------------------------------------------------------------------
-  inst_clocking_top : entity fpasim.clocking_top
+  inst_clocking_top : entity work.clocking_top
     port map(
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_clk_p   => i_adc_clk_p,         -- differential clock p @250MHz
-      i_clk_n   => i_adc_clk_n,         -- differential clock n @250MHZ
+      i_clk                 => adc_clk_div,      -- clock @62.5MHz
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      o_adc_clk => adc_clk,             -- adc output clock @250 MHz
-      o_ref_clk => ref_clk,             -- ref output clock @62.5 MHz
-      o_dac_clk => dac_clk,             -- dac output clock @500 MHz
-      o_clk     => clk,                 -- sys output clock @333.33333 MHz
-      o_locked  => locked               -- not connected
-    );
+      o_ref_clk             => sync_clk,  -- sync/ref output clock @62.5 MHz
+      o_sys_clk             => sys_clk,   -- sys output clock @250 MHz
+      o_dac_clk             => dac_clk,   -- dac output clock @500 MHz
+      o_dac_clk_div         => dac_clk_div,      -- dac output clock @125 MHz
+      o_dac_clk_phase90     => dac_clk_phase90,  -- dac output clock @500 MHz with 90° phase
+      o_dac_clk_div_phase90 => dac_clk_div_phase90,  -- dac output clock @125 MHz with 90° phase
+      o_locked              => mmcm_locked
+      );
 
-  -----------------------------------------------------------------
-  -- usb
-  -----------------------------------------------------------------
-  usb_wireout_board_id <= std_logic_vector(resize(unsigned(i_board_id),usb_wireout_board_id'length) );
-  inst_usb_opal_kelly : entity fpasim.usb_opal_kelly
+  ---------------------------------------------------------------------
+  -- reset generation
+  ---------------------------------------------------------------------
+  inst_reset_top : entity work.reset_top
     port map(
-      --  Opal Kelly inouts --
-      okUH                          => okUH,
-      okHU                          => okHU,
-      okUHU                         => okUHU,
-      okAA                          => okAA,
       ---------------------------------------------------------------------
-      -- from the user @o_usb_clk
+      -- from/to the usb
       ---------------------------------------------------------------------
-      -- pipe
-      o_usb_pipeout_fifo_rd         => usb_pipeout_fifo_rd,
-      i_usb_pipeout_fifo_data       => usb_pipeout_fifo_data,
-      i_usb_wireout_fifo_data_count => usb_wireout_fifo_data_count,
-      -- trig
-      i_usb_trigout_data            => usb_trigout_data,
-      -- wire
-      i_usb_wireout_ctrl            => usb_wireout_ctrl,
-      i_usb_wireout_make_pulse      => usb_wireout_make_pulse,
-      i_usb_wireout_fpasim_gain     => usb_wireout_fpasim_gain,
-      i_usb_wireout_mux_sq_fb_delay => usb_wireout_mux_sq_fb_delay,
-      i_usb_wireout_amp_sq_of_delay => usb_wireout_amp_sq_of_delay,
-      i_usb_wireout_error_delay     => usb_wireout_error_delay,
-      i_usb_wireout_ra_delay        => usb_wireout_ra_delay,
-      i_usb_wireout_tes_conf        => usb_wireout_tes_conf,
-      i_usb_wireout_debug_ctrl      => usb_wireout_debug_ctrl,
-      i_usb_wireout_fpga_id         => usb_wireout_fpga_id,
-      i_usb_wireout_fpga_version    => usb_wireout_fpga_version,
-      i_usb_wireout_board_id        => usb_wireout_board_id,
-      -- errors/status
-      i_usb_wireout_sel_errors      => usb_wireout_sel_errors,
-      i_usb_wireout_errors          => usb_wireout_errors,
-      i_usb_wireout_status          => usb_wireout_status,
+      i_usb_clk             => usb_clk,
+      i_usb_rst             => usb_rst,
+      o_usb_rst             => usb_rst_out,
       ---------------------------------------------------------------------
-      -- to the user @o_usb_clk
+      -- from/to the mmcm
       ---------------------------------------------------------------------
-      o_usb_clk                     => usb_clk,
-      -- pipe
-      o_usb_pipein_fifo_valid       => usb_pipein_fifo_valid,
-      o_usb_pipein_fifo             => usb_pipein_fifo,
-      -- trig
-      o_usb_trigin_data             => usb_trigin_data,
-      -- wire
-      o_usb_wirein_ctrl             => usb_wirein_ctrl,
-      o_usb_wirein_make_pulse       => usb_wirein_make_pulse,
-      o_usb_wirein_fpasim_gain      => usb_wirein_fpasim_gain,
-      o_usb_wirein_mux_sq_fb_delay  => usb_wirein_mux_sq_fb_delay,
-      o_usb_wirein_amp_sq_of_delay  => usb_wirein_amp_sq_of_delay,
-      o_usb_wirein_error_delay      => usb_wirein_error_delay,
-      o_usb_wirein_ra_delay         => usb_wirein_ra_delay,
-      o_usb_wirein_tes_conf         => usb_wirein_tes_conf,
-      o_usb_wirein_debug_ctrl       => usb_wirein_debug_ctrl,
-      o_usb_wirein_sel_errors       => usb_wirein_sel_errors -- wirein select errors/status
-    );
+      i_sys_clk             => sys_clk,
+      i_adc_clk_div         => adc_clk_div,
+      i_dac_clk_div         => dac_clk_div,
+      i_dac_clk_div_phase90 => dac_clk_div_phase90,
+      i_sync_clk            => sync_clk,
+      i_mmcm_locked         => mmcm_locked,
+      ---------------------------------------------------------------------
+      -- to the user
+      ---------------------------------------------------------------------
+      o_sys_rst             => sys_rst,
+      ---------------------------------------------------------------------
+      -- to the io_adc @i_adc_clk_div
+      ---------------------------------------------------------------------
+      o_adc_io_clk_rst      => adc_io_clk_rst,
+      o_adc_io_rst          => adc_io_rst,
+      ---------------------------------------------------------------------
+      -- to the io_dac @i_dac_clk_div
+      ---------------------------------------------------------------------
+      o_dac_io_clk_rst      => dac_io_clk_rst,-- not connected
+      o_dac_io_rst          => dac_io_rst,
+      ---------------------------------------------------------------------
+      -- to the io_dac @i_dac_clk_div_phase90
+      ---------------------------------------------------------------------
+      o_dac_io_rst_phase90  => dac_io_rst_phase90,
+      ---------------------------------------------------------------------
+      -- to the io_sync @i_sync_clk
+      ---------------------------------------------------------------------
+      o_sync_io_clk_rst     => sync_io_clk_rst,
+      o_sync_io_rst         => sync_io_rst
+      );
 
+  -- TODO: connect to input port
+  --board_id <= i_board_id;
+  board_id <= (others => '0');
   ---------------------------------------------------------------------
   -- top_fpasim
   ---------------------------------------------------------------------
-  inst_fpasim_top : entity fpasim.fpasim_top
+  inst_fpasim_top : entity work.fpasim_top
     generic map(
-      g_DEBUG => false
-    )
-    port map(
-      i_clk                             => clk, -- system clock
-      i_adc_clk                         => adc_clk, -- adc clock
-      i_ref_clk                         => ref_clk, -- reference clock
-      i_dac_clk                         => dac_clk, -- dac clock
-      i_usb_clk                         => usb_clk, -- usb clock
+      g_FPASIM_DEBUG        => pkg_FPASIM_TOP_DEBUG,
+      g_REGDECODE_TOP_DEBUG => pkg_REGDECODE_TOP_DEBUG
+      )
+    port map( -- @suppress "The order of the associations is different from the declaration order"
+      i_clk         => sys_clk,         -- system clock
+      i_rst         => sys_rst,         -- reset sync @sync_clk
       ---------------------------------------------------------------------
-      -- from the usb @i_usb_clk
+      -- from the usb @i_usb_clk (clock included)
       ---------------------------------------------------------------------
-      -- trig
-      i_usb_pipein_fifo_valid           => usb_pipein_fifo_valid,
-      i_usb_pipein_fifo                 => usb_pipein_fifo,
-      -- trig
-      i_usb_trigin_data                 => usb_trigin_data,
-      -- wire
-      i_usb_wirein_ctrl                 => usb_wirein_ctrl,
-      i_usb_wirein_make_pulse           => usb_wirein_make_pulse,
-      i_usb_wirein_fpasim_gain          => usb_wirein_fpasim_gain,
-      i_usb_wirein_mux_sq_fb_delay      => usb_wirein_mux_sq_fb_delay,
-      i_usb_wirein_amp_sq_of_delay      => usb_wirein_amp_sq_of_delay,
-      i_usb_wirein_error_delay          => usb_wirein_error_delay,
-      i_usb_wirein_ra_delay             => usb_wirein_ra_delay,
-      i_usb_wirein_tes_conf             => usb_wirein_tes_conf,
-      i_usb_wirein_debug_ctrl           => usb_wirein_debug_ctrl,
-      i_usb_wirein_sel_errors           => usb_wirein_sel_errors,
+      i_okUH        => i_okUH,
+      o_okHU        => o_okHU,
+      b_okUHU       => b_okUHU,
+      b_okAA        => b_okAA,
       ---------------------------------------------------------------------
-      -- to the usb @o_usb_clk
+      -- from the board
       ---------------------------------------------------------------------
-      -- pipe
-      i_usb_pipeout_fifo_rd             => usb_pipeout_fifo_rd,
-      o_usb_pipeout_fifo_data           => usb_pipeout_fifo_data,
-      o_usb_wireout_fifo_data_count     => usb_wireout_fifo_data_count,
-      -- trig
-      o_usb_trigout_data                => usb_trigout_data,
-      -- wire
-      o_usb_wireout_ctrl                => usb_wireout_ctrl,
-      o_usb_wireout_make_pulse          => usb_wireout_make_pulse,
-      o_usb_wireout_fpasim_gain         => usb_wireout_fpasim_gain,
-      o_usb_wireout_mux_sq_fb_delay     => usb_wireout_mux_sq_fb_delay,
-      o_usb_wireout_amp_sq_of_delay     => usb_wireout_amp_sq_of_delay,
-      o_usb_wireout_error_delay         => usb_wireout_error_delay,
-      o_usb_wireout_ra_delay            => usb_wireout_ra_delay,
-      o_usb_wireout_tes_conf            => usb_wireout_tes_conf,
-      o_usb_wireout_debug_ctrl          => usb_wireout_debug_ctrl,
-      o_usb_wireout_fpga_id             => usb_wireout_fpga_id,
-      o_usb_wireout_fpga_version        => usb_wireout_fpga_version,
-      o_usb_wireout_sel_errors          => usb_wireout_sel_errors,
-      o_usb_wireout_errors              => usb_wireout_errors,
-      o_usb_wireout_status              => usb_wireout_status,
+      i_board_id    => board_id,
       ---------------------------------------------------------------------
-      -- from adc
+      -- to the IOs: @i_clk
+      ---------------------------------------------------------------------
+      o_rst_status  => rst_status,
+      o_debug_pulse => debug_pulse,
+
+      ---------------------------------------------------------------------
+      -- from/to the spi: @usb_clk
+      ---------------------------------------------------------------------
+      o_usb_clk                         => usb_clk,
+      o_usb_rst_status                  => usb_rst_status,
+      o_usb_debug_pulse                 => usb_debug_pulse,
+      --tx
+      o_spi_rst                         => spi_rst,
+      o_spi_en                          => spi_en,
+      o_spi_dac_tx_present              => spi_dac_tx_present,
+      o_spi_id                          => spi_id,
+      o_spi_mode                        => spi_mode,
+      -- command
+      o_spi_cmd_valid                   => spi_cmd_valid,
+      o_spi_cmd_wr_data                 => spi_cmd_wr_data,
+      -- rx
+      i_spi_rd_data_valid               => spi_rd_data_valid,
+      i_spi_rd_data                     => spi_rd_data,
+      i_reg_spi_status                  => reg_spi_status,
+      --i_spi_ready                       => spi_ready,
+      -- errors/status
+      i_spi_errors                      => spi_errors,
+      i_spi_status                      => spi_status,
+      ---------------------------------------------------------------------
+      -- from/to regdecode @usb_clk
+      ---------------------------------------------------------------------
+      o_usb_rst                         => usb_rst,
+      i_usb_rst                         => usb_rst_out,
+      ---------------------------------------------------------------------
+      -- from adc @i_clk
       ---------------------------------------------------------------------
       i_adc_valid                       => adc_valid,
       i_adc_amp_squid_offset_correction => adc_amp_squid_offset_correction,
       i_adc_mux_squid_feedback          => adc_mux_squid_feedback,
+      i_adc_errors                      => adc_errors,
+      i_adc_status                      => adc_status,
       ---------------------------------------------------------------------
-      -- output sync @clk_ref
+      -- output sync @i_clk
       ---------------------------------------------------------------------
+      o_sync_valid                      => sync_valid,
       o_sync                            => sync,
+      i_sync_errors                     => sync_errors,
+      i_sync_status                     => sync_status,
       ---------------------------------------------------------------------
-      -- output dac @i_clk_dac
+      -- output dac @i_clk
       ---------------------------------------------------------------------
-      o_dac_valid                       => dac_valid, -- not connected
+      o_dac_valid                       => dac_valid,
       o_dac_frame                       => dac_frame,
-      o_dac                             => dac
-    );
+      o_dac                             => dac,
+      i_dac_errors                      => dac_errors,
+      i_dac_status                      => dac_status
+      );
 
   adc_amp_squid_offset_correction <= adc_a;
   adc_mux_squid_feedback          <= adc_b;
@@ -352,71 +438,109 @@ begin
   ---------------------------------------------------------------------
   -- Xilinx IOs
   ---------------------------------------------------------------------
-
-  inst_io_top : entity fpasim.io_top
+  inst_io_top : entity work.io_top
     port map(
+      -- from the mmcm
+      i_sys_clk             => sys_clk,
+      i_sync_clk            => sync_clk,
+      i_dac_clk             => dac_clk,
+      i_dac_clk_div         => dac_clk_div,
+      i_dac_clk_phase90     => dac_clk_phase90,
+      i_dac_clk_div_phase90 => dac_clk_div_phase90,
+      -- to mmcm
+      o_adc_clk_div         => adc_clk_div,
+      -- from the fpga pads
+      i_adc_clk_p           => i_adc_clk_p,
+      i_adc_clk_n           => i_adc_clk_n,
+
+      -- from the user: @i_sys_clk
+      i_rst_status  => rst_status,
+      i_debug_pulse => debug_pulse,
+
       ---------------------------------------------------------------------
       -- adc
       ---------------------------------------------------------------------
-      -- from MMCM 
-      i_adc_clk     => adc_clk,
-      -- from fpga pads: adc_a 
-      i_da0_p       => i_da0_p,
-      i_da0_n       => i_da0_n,
-      i_da2_p       => i_da2_p,
-      i_da2_n       => i_da2_n,
-      i_da4_p       => i_da4_p,
-      i_da4_n       => i_da4_n,
-      i_da6_p       => i_da6_p,
-      i_da6_n       => i_da6_n,
-      i_da8_p       => i_da8_p,
-      i_da8_n       => i_da8_n,
-      i_da10_p      => i_da10_p,
-      i_da10_n      => i_da10_n,
-      i_da12_p      => i_da12_p,
-      i_da12_n      => i_da12_n,
-      -- from fpga pads: adc_b
-      i_db0_p       => i_db0_p,
-      i_db0_n       => i_db0_n,
-      i_db2_p       => i_db2_p,
-      i_db2_n       => i_db2_n,
-      i_db4_p       => i_db4_p,
-      i_db4_n       => i_db4_n,
-      i_db6_p       => i_db6_p,
-      i_db6_n       => i_db6_n,
-      i_db8_p       => i_db8_p,
-      i_db8_n       => i_db8_n,
-      i_db10_p      => i_db10_p,
-      i_db10_n      => i_db10_n,
-      i_db12_p      => i_db12_p,
-      i_db12_n      => i_db12_n,
+      -- from the reset_top: @i_adc_clk_div
+      i_adc_io_clk_rst => adc_io_clk_rst,
+      i_adc_io_rst     => adc_io_rst,
+      -- from fpga pads: adc_a  @i_adc_clk_p/n
+      i_da0_p          => i_da0_p,
+      i_da0_n          => i_da0_n,
+      i_da2_p          => i_da2_p,
+      i_da2_n          => i_da2_n,
+      i_da4_p          => i_da4_p,
+      i_da4_n          => i_da4_n,
+      i_da6_p          => i_da6_p,
+      i_da6_n          => i_da6_n,
+      i_da8_p          => i_da8_p,
+      i_da8_n          => i_da8_n,
+      i_da10_p         => i_da10_p,
+      i_da10_n         => i_da10_n,
+      i_da12_p         => i_da12_p,
+      i_da12_n         => i_da12_n,
+      -- from fpga pads: adc_b @i_adc_clk_p/n
+      i_db0_p          => i_db0_p,
+      i_db0_n          => i_db0_n,
+      i_db2_p          => i_db2_p,
+      i_db2_n          => i_db2_n,
+      i_db4_p          => i_db4_p,
+      i_db4_n          => i_db4_n,
+      i_db6_p          => i_db6_p,
+      i_db6_n          => i_db6_n,
+      i_db8_p          => i_db8_p,
+      i_db8_n          => i_db8_n,
+      i_db10_p         => i_db10_p,
+      i_db10_n         => i_db10_n,
+      i_db12_p         => i_db12_p,
+      i_db12_n         => i_db12_n,
 
-
-      -- to user :
-      o_adc_valid   => adc_valid,
-      o_adc_a       => adc_a,
-      o_adc_b       => adc_b,
+      -- to user: @i_sys_clk
+      o_adc_valid       => adc_valid,
+      o_adc_a           => adc_a,
+      o_adc_b           => adc_b,
+      o_adc_errors      => adc_errors,
+      o_adc_status      => adc_status,
       ---------------------------------------------------------------------
       -- sync
       ---------------------------------------------------------------------
-      -- from the user: @clk_ref 
-      i_ref_clk     => ref_clk,
+      -- from the reset_top: @sync_clk
+      i_sync_io_clk_rst => sync_io_clk_rst,
+      i_sync_io_rst     => sync_io_rst,
+
+      -- from/to the user: @sys_clk 
+      i_sync_rst    => sys_rst,
+      i_sync_valid  => sync_valid,
       i_sync        => sync,
-      -- to the fpga pads 
-      o_ref_clk     => o_ref_clk,
-      o_sync        => o_sync,
+      o_sync_errors => sync_errors,
+      o_sync_status => sync_status,
+
+      -- to the fpga pads: @sync_clk 
+      o_sync_clk   => o_ref_clk,
+      o_sync       => o_sync,
       ---------------------------------------------------------------------
       -- dac
       ---------------------------------------------------------------------
       -- from the user
-      i_dac_clk     => dac_clk,
-      i_dac_frame   => dac_frame,
-      i_dac         => dac,
-      -- to the fpga pads
+      i_dac_rst    => sys_rst,
+      i_dac_valid  => dac_valid,
+      i_dac_frame  => dac_frame,
+      i_dac        => dac,
+      o_dac_errors => dac_errors,
+      o_dac_status => dac_status,
+
+      -- from the reset_top: @i_dac_clk_div
+      i_dac_io_rst         => dac_io_rst,
+      -- from the reset_top: @i_dac_clk_div_phase90
+      i_dac_io_rst_phase90 => dac_io_rst_phase90,
+
+      -- to the fpga pads: @i_dac_clk
+      -- dac clock @i_dac_clk
       o_dac_clk_p   => o_dac_clk_p,
       o_dac_clk_n   => o_dac_clk_n,
+      -- dac frame flag @i_dac_clk
       o_dac_frame_p => o_dac_frame_p,
       o_dac_frame_n => o_dac_frame_n,
+      -- dac data @i_dac_clk
       o_dac0_p      => o_dac0_p,
       o_dac0_n      => o_dac0_n,
       o_dac1_p      => o_dac1_p,
@@ -433,6 +557,183 @@ begin
       o_dac6_n      => o_dac6_n,
       o_dac7_p      => o_dac7_p,
       o_dac7_n      => o_dac7_n
-    );
+      );
+
+  ---------------------------------------------------------------------
+  -- spi interface
+  ---------------------------------------------------------------------
+  inst_spi_top : entity work.spi_top
+    generic map(
+      g_DEBUG => pkg_SPI_TOP_DEBUG
+      )
+    port map(
+      i_clk                => usb_clk,  -- clock
+      i_rst                => spi_rst,  -- reset
+      i_rst_status         => usb_rst_status,  -- reset error flag(s)
+      i_debug_pulse        => usb_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+      ---------------------------------------------------------------------
+      -- command
+      ---------------------------------------------------------------------
+      -- input
+      i_spi_en             => spi_en,
+      i_spi_dac_tx_present => spi_dac_tx_present,  -- 1:enable data tx, 0: otherwise
+      i_spi_mode           => spi_mode,     -- 1:wr, 0:rd
+      i_spi_id             => spi_id,  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
+      i_spi_cmd_valid      => spi_cmd_valid,   -- command valid
+      i_spi_cmd_wr_data    => spi_cmd_wr_data,  -- data to write
+      -- output
+      o_spi_rd_data_valid  => spi_rd_data_valid,  -- read data valid
+      o_spi_rd_data        => spi_rd_data,  -- read data
+      o_spi_ready          => open,  -- 1: all spi links are ready,0: one of the spi link is busy
+      o_reg_spi_status     => reg_spi_status,  -- 1: all spi links are ready,0: one of the spi link is busy
+      ---------------------------------------------------------------------
+      -- errors/status
+      ---------------------------------------------------------------------
+      o_errors             => spi_errors,
+      o_status             => spi_status,
+      ---------------------------------------------------------------------
+      -- from/to the IOs
+      ---------------------------------------------------------------------
+      -- common: shared link between the spi
+      o_spi_sclk           => spi_sclk,     -- Shared SPI clock line
+      o_spi_sdata          => spi_sdata,    -- Shared SPI MOSI
+      -- CDCE: SPI
+      i_cdce_sdo           => i_cdce_sdo,   -- SPI MISO
+      o_cdce_n_en          => cdce_n_en,    -- SPI chip select
+      -- CDCE: specific signals
+      i_cdce_pll_status    => i_cdce_pll_status,  -- pll_status : This pin is set high if the PLL is in lock.
+      o_cdce_n_reset       => cdce_n_reset,    -- reset_n or hold_n
+      o_cdce_n_pd          => cdce_n_pd,    -- power_down_n
+      o_ref_en             => ref_en,   -- enable the primary reference clock
+      -- ADC: SPI
+      i_adc_sdo            => i_adc_sdo,    -- SPI MISO
+      o_adc_n_en           => adc_n_en,     -- SPI chip select
+      -- ADC: specific signals
+      o_adc_reset          => adc_reset,    -- adc hardware reset
+      -- DAC: SPI
+      i_dac_sdo            => i_dac_sdo,    -- SPI MISO
+      o_dac_n_en           => dac_n_en,     -- SPI chip select
+      -- DAC: specific signal
+      o_dac_tx_present     => dac_tx_present,  -- enable tx acquisition
+      -- AMC: SPI (monitoring)
+      i_mon_sdo            => i_mon_sdo,    -- SPI data out
+      o_mon_n_en           => mon_n_en,     -- SPI chip select
+      -- AMC : specific signals
+      i_mon_n_int          => i_mon_n_int,  -- galr_n: Global analog input out-of-range alarm.
+      o_mon_n_reset        => mon_n_reset   -- reset_n: hardware reset
+      );
+
+---------------------------------------------------------------------
+-- output
+---------------------------------------------------------------------
+-- common: shared link between the spi
+  o_spi_sclk     <= spi_sclk;           -- Shared SPI clock line
+  o_spi_sdata    <= spi_sdata;          -- Shared SPI MOSI
+--cdce
+  o_cdce_n_en    <= cdce_n_en;          -- SPI chip select
+  o_cdce_n_reset <= cdce_n_reset;       -- reset_n or hold_n
+  o_cdce_n_pd    <= cdce_n_pd;          -- power_down_n
+  o_ref_en       <= ref_en;             -- enable the primary reference clock
+
+--adc
+  o_adc_n_en  <= adc_n_en;              -- SPI chip select
+  o_adc_reset <= adc_reset;             -- adc hardware reset
+
+--dac
+  o_dac_n_en       <= dac_n_en;         -- SPI chip select
+  o_dac_tx_present <= dac_tx_present;   -- enable tx acquisition
+
+--amc
+  o_mon_n_en    <= mon_n_en;            -- SPI chip select
+  o_mon_n_reset <= mon_n_reset;         -- reset_n: hardware reset
+
+---------------------------------------------------------------------
+-- leds
+---------------------------------------------------------------------
+  p_clock : process (adc_clk_div) is
+  begin
+    if rising_edge(adc_clk_div) then
+      count_pulse_r1 <= count_pulse_r1 + 1;
+    end if;
+  end process p_clock;
+  pulse <= count_pulse_r1(count_pulse_r1'high);
+
+  o_leds(3) <= pulse;
+  o_leds(2) <= mmcm_locked;
+--o_leds(1) <= '0'; -- TODO: temporary used by o_sync
+--o_leds(0) <= '0'; -- TODO: temporary used by o_ref_clk
+
+---------------------------------------------------------------------
+-- debug
+---------------------------------------------------------------------
+  gen_debug : if g_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
+    signal count_r1 : unsigned(31 downto 0) := (others => '0');
+    signal pulse_r1 : std_logic             := '0';
+
+    signal count_r2 : unsigned(31 downto 0) := (others => '0');
+    signal pulse_r2 : std_logic             := '0';
+
+    signal clk_tmp : std_logic;
+  begin
+    --inst_fpasim_top_ila_0 : entity work.fpasim_top_ila_0
+    --     port map(
+    --       clk                  => sys_clk,
+    --       -- probe0
+    --       probe0(3)            => sync_valid,
+    --       probe0(2)            => dac_frame,
+    --       probe0(1)            => dac_valid,
+    --       probe0(0)            => adc_valid,
+    --      -- probe1
+    --       probe1(27 downto 14) => adc_b,
+    --       probe1(13 downto 0)  => adc_a,
+    --       -- probe2
+    --       probe2(17)  => sys_rst,
+    --       probe2(16)  => sync,
+    --       probe2(15 downto 0)  => dac
+    --     );
+
+    p_count : process (adc_clk_div) is
+    begin
+      if rising_edge(adc_clk_div) then
+        count_r1 <= count_r1 + 1;
+        pulse_r1 <= not(pulse_r1);
+      end if;
+    end process p_count;
+
+    inst_system_fpasim_top_ila : entity work.system_fpasim_top_ila
+      port map(
+        clk                 => usb_clk,
+        -- probe0
+        probe0(32)          => pulse_r1,
+        probe0(31 downto 0) => std_logic_vector(count_r1),
+        -- probe1
+        probe1(32)          => pulse_r2,
+        probe1(31 downto 0) => std_logic_vector(count_r2)
+        );
+
+
+--inst_IBUFDS : IBUFDS
+--   generic map (
+--      DIFF_TERM => True, -- Differential Termination 
+--      IBUF_LOW_PWR => TRUE, -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
+--      IOSTANDARD => "DEFAULT")
+--   port map (
+--      O => clk_tmp,  -- Buffer output
+--      I => i_clk_to_fpga_p,  -- Diff_p buffer input (connect directly to top-level port)
+--      IB => i_clk_to_fpga_n -- Diff_n buffer input (connect directly to top-level port)
+--   );
+
+    --  p_count2: process (clk_tmp) is
+    --begin
+    --  if rising_edge(clk_tmp) then
+    p_count2 : process (adc_clk_div) is
+    begin
+      if rising_edge(adc_clk_div) then
+        count_r2 <= count_r2 + 1;
+        pulse_r2 <= not(pulse_r2);
+      end if;
+    end process p_count2;
+
+  end generate gen_debug;
 
 end architecture RTL;

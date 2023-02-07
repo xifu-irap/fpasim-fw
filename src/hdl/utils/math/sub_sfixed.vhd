@@ -75,14 +75,14 @@ architecture RTL of sub_sfixed is
     -----------------------------------------------------------------
     -- step1: add 1 sign bit
     -----------------------------------------------------------------
-    signal a_r1    : sfixed(a_tmp'high downto a_tmp'low);
-    signal b_r1    : sfixed(b_tmp'high downto b_tmp'low);
+    signal a_r1    : sfixed(a_tmp'high downto a_tmp'low):= (others => '0');
+    signal b_r1    : sfixed(b_tmp'high downto b_tmp'low):= (others => '0');
 
     ---------------------------------------------------------------------
     -- step3:
     --   res_r2 = a_r1 - b_r1
     ---------------------------------------------------------------------
-    signal res_r2 : sfixed(sfixed_high(a_r1, '-', b_r1) downto sfixed_low(a_r1, '-', b_r1));
+    signal res_r2 : sfixed(sfixed_high(a_r1, '-', b_r1) downto sfixed_low(a_r1, '-', b_r1)):= (others => '0');
 
     -----------------------------------------------------------------
     -- truncate: 

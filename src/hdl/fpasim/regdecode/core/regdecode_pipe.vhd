@@ -53,112 +53,112 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-use fpasim.pkg_regdecode.all;
-use fpasim.pkg_fpasim.all;
+use work.pkg_regdecode.all;
+use work.pkg_fpasim.all;
 
 entity regdecode_pipe is
   generic(
     g_ADDR_WIDTH : integer := 16;       -- define the address bus width
     g_DATA_WIDTH : integer := 16        -- define the data bus width
-  );
+    );
   port(
     ---------------------------------------------------------------------
     -- input @i_clk
     ---------------------------------------------------------------------
-    i_clk                             : in  std_logic; -- clock
-    i_rst                             : in  std_logic; -- reset
+    i_clk         : in std_logic;       -- clock
+    i_rst         : in std_logic;       -- reset
+    i_rst_status  : in std_logic;       -- reset error flag(s)
+    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possib
 
     -- from the trig in
-    i_start_auto_rd                   : in  std_logic; -- enable the auto generation of memory reading address
+    i_start_auto_rd : in std_logic;  -- enable the auto generation of memory reading address
 
     -- from the pipe in
-    i_data_valid                      :     std_logic; -- write enable
-    i_addr                            :     std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- input address
-    i_data                            :     std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- input data
+    i_data_valid : std_logic;           -- write enable
+    i_addr       : std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- input address
+    i_data       : std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- input data
 
     ---------------------------------------------------------------------
     -- to the pipe out: @i_clk
     ---------------------------------------------------------------------
-    i_fifo_rd                         : in  std_logic;
-    o_fifo_sof                        : out std_logic; -- first sample of one of memories
-    o_fifo_eof                        : out std_logic; -- last sample of one of memories
-    o_fifo_data_valid                 : out std_logic; -- data valid
-    o_fifo_addr                       : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address
-    o_fifo_data                       : out std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data
-    o_fifo_empty                      : out std_logic; -- fifo empty flag
-    o_fifo_data_count                 : out std_logic_vector(15 downto 0);
+    i_fifo_rd         : in  std_logic;
+    o_fifo_sof        : out std_logic;  -- first sample of one of memories
+    o_fifo_eof        : out std_logic;  -- last sample of one of memories
+    o_fifo_data_valid : out std_logic;  -- data valid
+    o_fifo_addr       : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- address
+    o_fifo_data       : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- data
+    o_fifo_empty      : out std_logic;  -- fifo empty flag
+    o_fifo_data_count : out std_logic_vector(15 downto 0);
     ---------------------------------------------------------------------
     -- to the user: @i_out_clk
     ---------------------------------------------------------------------
-    i_out_clk                         : in  std_logic;
-    i_rst_status                      : in  std_logic; -- reset error flag(s)
-    i_debug_pulse                     : in  std_logic; -- error mode (transparent vs capture). Possib
+    i_out_clk         : in std_logic; -- output clock
+    i_out_rst         : in std_logic; -- reset @i_out_clk
 
     -- tes_pulse_shape
     -- ram: wr
-    o_tes_pulse_shape_ram_wr_en       : out std_logic; -- output write enable
-    o_tes_pulse_shape_ram_wr_rd_addr  : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- output address (shared by the writting and the reading)
-    o_tes_pulse_shape_ram_wr_data     : out std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- output data
+    o_tes_pulse_shape_ram_wr_en      : out std_logic;  -- output write enable
+    o_tes_pulse_shape_ram_wr_rd_addr : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- output address (shared by the writting and the reading)
+    o_tes_pulse_shape_ram_wr_data    : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- output data
     -- ram: rd
-    o_tes_pulse_shape_ram_rd_en       : out std_logic; -- output read enable
-    i_tes_pulse_shape_ram_rd_valid    : in  std_logic; -- input read valid
-    i_tes_pulse_shape_ram_rd_data     : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- input data
+    o_tes_pulse_shape_ram_rd_en      : out std_logic;  -- output read enable
+    i_tes_pulse_shape_ram_rd_valid   : in  std_logic;  -- input read valid
+    i_tes_pulse_shape_ram_rd_data    : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- input data
 
     -- amp_squid_tf
     -- ram: wr
-    o_amp_squid_tf_ram_wr_en          : out std_logic; -- output write enable
-    o_amp_squid_tf_ram_wr_rd_addr     : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- output address (shared by the writting and the reading)
-    o_amp_squid_tf_ram_wr_data        : out std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- output data
+    o_amp_squid_tf_ram_wr_en          : out std_logic;  -- output write enable
+    o_amp_squid_tf_ram_wr_rd_addr     : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- output address (shared by the writting and the reading)
+    o_amp_squid_tf_ram_wr_data        : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- output data
     -- ram: rd
-    o_amp_squid_tf_ram_rd_en          : out std_logic; -- output read enable
-    i_amp_squid_tf_ram_rd_valid       : in  std_logic; -- input read valid
+    o_amp_squid_tf_ram_rd_en          : out std_logic;  -- output read enable
+    i_amp_squid_tf_ram_rd_valid       : in  std_logic;  -- input read valid
     i_amp_squid_tf_ram_rd_data        : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);
     -- mux_squid_tf
     -- ram: wr
-    o_mux_squid_tf_ram_wr_en          : out std_logic; -- output write enable
-    o_mux_squid_tf_ram_wr_rd_addr     : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- output address (shared by the writting and the reading)
-    o_mux_squid_tf_ram_wr_data        : out std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- output data
+    o_mux_squid_tf_ram_wr_en          : out std_logic;  -- output write enable
+    o_mux_squid_tf_ram_wr_rd_addr     : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- output address (shared by the writting and the reading)
+    o_mux_squid_tf_ram_wr_data        : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- output data
     -- ram: rd
-    o_mux_squid_tf_ram_rd_en          : out std_logic; -- output read enable
-    i_mux_squid_tf_ram_rd_valid       : in  std_logic; -- input read valid
+    o_mux_squid_tf_ram_rd_en          : out std_logic;  -- output read enable
+    i_mux_squid_tf_ram_rd_valid       : in  std_logic;  -- input read valid
     i_mux_squid_tf_ram_rd_data        : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);
     -- tes_std_state
     -- ram: wr
-    o_tes_std_state_ram_wr_en         : out std_logic; -- output write enable
-    o_tes_std_state_ram_wr_rd_addr    : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- output address (shared by the writting and the reading)
-    o_tes_std_state_ram_wr_data       : out std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- output data
+    o_tes_std_state_ram_wr_en         : out std_logic;  -- output write enable
+    o_tes_std_state_ram_wr_rd_addr    : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- output address (shared by the writting and the reading)
+    o_tes_std_state_ram_wr_data       : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- output data
     -- ram: rd
-    o_tes_std_state_ram_rd_en         : out std_logic; -- output read enable
-    i_tes_std_state_ram_rd_valid      : in  std_logic; -- input read valid
+    o_tes_std_state_ram_rd_en         : out std_logic;  -- output read enable
+    i_tes_std_state_ram_rd_valid      : in  std_logic;  -- input read valid
     i_tes_std_state_ram_rd_data       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);
     -- mux_squid_offset
     -- ram: wr
-    o_mux_squid_offset_ram_wr_en      : out std_logic; -- output write enable
-    o_mux_squid_offset_ram_wr_rd_addr : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- output address (shared by the writting and the reading)
-    o_mux_squid_offset_ram_wr_data    : out std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- output data
+    o_mux_squid_offset_ram_wr_en      : out std_logic;  -- output write enable
+    o_mux_squid_offset_ram_wr_rd_addr : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- output address (shared by the writting and the reading)
+    o_mux_squid_offset_ram_wr_data    : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- output data
     -- ram: rd
-    o_mux_squid_offset_ram_rd_en      : out std_logic; -- output read enable
-    i_mux_squid_offset_ram_rd_valid   : in  std_logic; -- input read valid
+    o_mux_squid_offset_ram_rd_en      : out std_logic;  -- output read enable
+    i_mux_squid_offset_ram_rd_valid   : in  std_logic;  -- input read valid
     i_mux_squid_offset_ram_rd_data    : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);
     ---------------------------------------------------------------------
-    -- errors/status @i_out_clk
+    -- errors/status @i_clk
     ---------------------------------------------------------------------
     -- errors
-    o_errors5                         : out std_logic_vector(15 downto 0); -- rd all: output errors
-    o_errors4                         : out std_logic_vector(15 downto 0); -- mux squid offset: output errors
-    o_errors3                         : out std_logic_vector(15 downto 0); -- tes std state: output errors
-    o_errors2                         : out std_logic_vector(15 downto 0); -- mux squid tf: output errors
-    o_errors1                         : out std_logic_vector(15 downto 0); -- amp squid tf: output errors
-    o_errors0                         : out std_logic_vector(15 downto 0); -- tes pulse shape: output errors
+    o_errors5                         : out std_logic_vector(15 downto 0);  -- rd all: output errors
+    o_errors4                         : out std_logic_vector(15 downto 0);  -- mux squid offset: output errors
+    o_errors3                         : out std_logic_vector(15 downto 0);  -- tes std state: output errors
+    o_errors2                         : out std_logic_vector(15 downto 0);  -- mux squid tf: output errors
+    o_errors1                         : out std_logic_vector(15 downto 0);  -- amp squid tf: output errors
+    o_errors0                         : out std_logic_vector(15 downto 0);  -- tes pulse shape: output errors
     -- status
-    o_status5                         : out std_logic_vector(7 downto 0); -- rd all: output status
-    o_status4                         : out std_logic_vector(7 downto 0); -- mux squid offset: output status
-    o_status3                         : out std_logic_vector(7 downto 0); -- tes std state: output status
-    o_status2                         : out std_logic_vector(7 downto 0); -- mux squid tf: output status
-    o_status1                         : out std_logic_vector(7 downto 0); -- amp squid tf: output status
-    o_status0                         : out std_logic_vector(7 downto 0) -- tes pulse shape: output status
-  );
+    o_status5                         : out std_logic_vector(7 downto 0);  -- rd all: output status
+    o_status4                         : out std_logic_vector(7 downto 0);  -- mux squid offset: output status
+    o_status3                         : out std_logic_vector(7 downto 0);  -- tes std state: output status
+    o_status2                         : out std_logic_vector(7 downto 0);  -- mux squid tf: output status
+    o_status1                         : out std_logic_vector(7 downto 0);  -- amp squid tf: output status
+    o_status0                         : out std_logic_vector(7 downto 0)  -- tes pulse shape: output status
+    );
 end entity regdecode_pipe;
 
 architecture RTL of regdecode_pipe is
@@ -224,7 +224,7 @@ architecture RTL of regdecode_pipe is
   signal tes_pulse_shape_fifo_data       : std_logic_vector(i_data'range);
   signal tes_pulse_shape_fifo_empty      : std_logic;
 
-  -- errors/status @ i_out_clk
+  -- errors/status @ i_clk
   ---------------------------------------------------------------------
   signal tes_pulse_shape_errors : std_logic_vector(15 downto 0);
   signal tes_pulse_shape_status : std_logic_vector(7 downto 0);
@@ -249,7 +249,7 @@ architecture RTL of regdecode_pipe is
   signal amp_squid_tf_fifo_data       : std_logic_vector(i_data'range);
   signal amp_squid_tf_fifo_empty      : std_logic;
 
-  -- errors/status @ i_out_clk
+  -- errors/status @ i_clk
   ---------------------------------------------------------------------
   signal amp_squid_tf_errors : std_logic_vector(15 downto 0);
   signal amp_squid_tf_status : std_logic_vector(7 downto 0);
@@ -274,7 +274,7 @@ architecture RTL of regdecode_pipe is
   signal mux_squid_tf_fifo_data       : std_logic_vector(i_data'range);
   signal mux_squid_tf_fifo_empty      : std_logic;
 
-  -- errors/status @ i_out_clk
+  -- errors/status @ i_clk
   ---------------------------------------------------------------------
   signal mux_squid_tf_errors : std_logic_vector(15 downto 0);
   signal mux_squid_tf_status : std_logic_vector(7 downto 0);
@@ -299,7 +299,7 @@ architecture RTL of regdecode_pipe is
   signal tes_std_state_fifo_data       : std_logic_vector(i_data'range);
   signal tes_std_state_fifo_empty      : std_logic;
 
-  -- errors/status @ i_out_clk
+  -- errors/status @ i_clk
   ---------------------------------------------------------------------
   signal tes_std_state_errors : std_logic_vector(15 downto 0);
   signal tes_std_state_status : std_logic_vector(7 downto 0);
@@ -324,7 +324,7 @@ architecture RTL of regdecode_pipe is
   signal mux_squid_offset_fifo_data       : std_logic_vector(i_data'range);
   signal mux_squid_offset_fifo_empty      : std_logic;
 
-  -- errors/status @ i_out_clk
+  -- errors/status @ i_clk
   ---------------------------------------------------------------------
   signal mux_squid_offset_errors : std_logic_vector(15 downto 0);
   signal mux_squid_offset_status : std_logic_vector(7 downto 0);
@@ -348,11 +348,11 @@ begin
   ---------------------------------------------------------------------
   -- select the memory to write
   ---------------------------------------------------------------------
-  inst_regdecode_pipe_addr_decode : entity fpasim.regdecode_pipe_addr_decode
+  inst_regdecode_pipe_addr_decode : entity work.regdecode_pipe_addr_decode
     generic map(
       g_ADDR_WIDTH => i_addr'length,
       g_DATA_WIDTH => i_data'length
-    )
+      )
     port map(
       i_clk                    => i_clk,
       ---------------------------------------------------------------------
@@ -371,47 +371,48 @@ begin
       o_mux_squid_offset_wr_en => mux_squid_offset_wr_en0,
       o_addr                   => addr0,
       o_data                   => data0
-    );
+      );
 
   ---------------------------------------------------------------------
   -- tes pulse shape
   ---------------------------------------------------------------------
-  inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape : entity fpasim.regdecode_pipe_wr_rd_ram_manager
+  inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape : entity work.regdecode_pipe_wr_rd_ram_manager
     generic map(
       -- RAM
       g_RAM_NB_WORDS   => c_TES_PULSE_SHAPE_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_TES_PULSE_SHAPE_RAM_A_RD_LATENCY, -- define the RAM latency during the reading
+      g_RAM_RD_LATENCY => c_TES_PULSE_SHAPE_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
       -- input
-      g_ADDR_WIDTH     => addr0'length, -- define the input address bus width
+      g_ADDR_WIDTH     => addr0'length,  -- define the input address bus width
       g_DATA_WIDTH     => data0'length  -- define the input data bus width
-    )
+      )
     port map(
       ---------------------------------------------------------------------
       -- from the regdecode: input @i_clk
       ---------------------------------------------------------------------
       i_clk             => i_clk,       -- clock
       i_rst             => i_rst,       -- reset
+      i_rst_status      => i_rst_status,   -- reset error flag(s)
+      i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
-      i_start_auto_rd   => i_start_auto_rd, -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_TES_PULSE_SHAPE_ADDR_RANGE_MIN, -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
+      i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
+      i_addr_range_min  => c_TES_PULSE_SHAPE_ADDR_RANGE_MIN,  -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
       -- data
-      i_data_valid      => tes_pulse_shape_wr_en0, -- input data valid
+      i_data_valid      => tes_pulse_shape_wr_en0,     -- input data valid
       i_addr            => addr0,       -- input address
       i_data            => data0,       -- input data
       ---------------------------------------------------------------------
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
-      i_rst_status      => i_rst_status, -- reset error flag(s)
-      i_debug_pulse     => i_debug_pulse, -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+      i_out_rst         => i_out_rst,
       -- ram: wr
-      o_ram_wr_en       => tes_pulse_shape_ram_wr_en, -- output write enable
-      o_ram_wr_rd_addr  => tes_pulse_shape_ram_wr_rd_addr, -- output address (shared by the writting and the reading)
-      o_ram_wr_data     => tes_pulse_shape_ram_wr_data, -- output data
+      o_ram_wr_en       => tes_pulse_shape_ram_wr_en,  -- output write enable
+      o_ram_wr_rd_addr  => tes_pulse_shape_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
+      o_ram_wr_data     => tes_pulse_shape_ram_wr_data,     -- output data
       -- ram: rd
-      o_ram_rd_en       => tes_pulse_shape_ram_rd_en, -- output read enable
-      i_ram_rd_valid    => i_tes_pulse_shape_ram_rd_valid, -- input read valid
-      i_ram_rd_data     => i_tes_pulse_shape_ram_rd_data, -- input data
+      o_ram_rd_en       => tes_pulse_shape_ram_rd_en,  -- output read enable
+      i_ram_rd_valid    => i_tes_pulse_shape_ram_rd_valid,  -- input read valid
+      i_ram_rd_data     => i_tes_pulse_shape_ram_rd_data,   -- input data
       ---------------------------------------------------------------------
       -- to the regdecode: @i_clk
       ---------------------------------------------------------------------
@@ -423,11 +424,11 @@ begin
       o_fifo_data       => tes_pulse_shape_fifo_data,
       o_fifo_empty      => tes_pulse_shape_fifo_empty,
       ---------------------------------------------------------------------
-      -- errors/status @ i_out_clk
+      -- errors/status @ i_clk
       ---------------------------------------------------------------------
       o_errors          => tes_pulse_shape_errors,
       o_status          => tes_pulse_shape_status
-    );
+      );
 
   -- output
   -- ram: wr
@@ -443,42 +444,43 @@ begin
   ---------------------------------------------------------------------
   -- amp_squid_tf
   ---------------------------------------------------------------------
-  inst_regdecode_pipe_wr_rd_ram_manager_amp_squid_tf : entity fpasim.regdecode_pipe_wr_rd_ram_manager
+  inst_regdecode_pipe_wr_rd_ram_manager_amp_squid_tf : entity work.regdecode_pipe_wr_rd_ram_manager
     generic map(
       -- RAM
       g_RAM_NB_WORDS   => c_AMP_SQUID_TF_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_AMP_SQUID_TF_RAM_A_RD_LATENCY, -- define the RAM latency during the reading
+      g_RAM_RD_LATENCY => c_AMP_SQUID_TF_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
       -- input
-      g_ADDR_WIDTH     => addr0'length, -- define the input address bus width
+      g_ADDR_WIDTH     => addr0'length,  -- define the input address bus width
       g_DATA_WIDTH     => data0'length  -- define the input data bus width
-    )
+      )
     port map(
       ---------------------------------------------------------------------
       -- from the regdecode: input @i_clk
       ---------------------------------------------------------------------
       i_clk             => i_clk,       -- clock
       i_rst             => i_rst,       -- reset
+      i_rst_status      => i_rst_status,   -- reset error flag(s)
+      i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
-      i_start_auto_rd   => i_start_auto_rd, -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_AMP_SQUID_TF_ADDR_RANGE_MIN, -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
+      i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
+      i_addr_range_min  => c_AMP_SQUID_TF_ADDR_RANGE_MIN,  -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
       -- data
-      i_data_valid      => amp_squid_tf_wr_en0, -- input data valid
+      i_data_valid      => amp_squid_tf_wr_en0,          -- input data valid
       i_addr            => addr0,       -- input address
       i_data            => data0,       -- input data
       ---------------------------------------------------------------------
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
-      i_rst_status      => i_rst_status, -- reset error flag(s)
-      i_debug_pulse     => i_debug_pulse, -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+      i_out_rst         => i_out_rst,
       -- ram: wr
-      o_ram_wr_en       => amp_squid_tf_ram_wr_en, -- output write enable
-      o_ram_wr_rd_addr  => amp_squid_tf_ram_wr_rd_addr, -- output address (shared by the writting and the reading)
-      o_ram_wr_data     => amp_squid_tf_ram_wr_data, -- output data
+      o_ram_wr_en       => amp_squid_tf_ram_wr_en,       -- output write enable
+      o_ram_wr_rd_addr  => amp_squid_tf_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
+      o_ram_wr_data     => amp_squid_tf_ram_wr_data,     -- output data
       -- ram: rd
-      o_ram_rd_en       => amp_squid_tf_ram_rd_en, -- output read enable
-      i_ram_rd_valid    => i_amp_squid_tf_ram_rd_valid, -- input read valid
-      i_ram_rd_data     => i_amp_squid_tf_ram_rd_data, -- input data
+      o_ram_rd_en       => amp_squid_tf_ram_rd_en,       -- output read enable
+      i_ram_rd_valid    => i_amp_squid_tf_ram_rd_valid,  -- input read valid
+      i_ram_rd_data     => i_amp_squid_tf_ram_rd_data,   -- input data
       ---------------------------------------------------------------------
       -- to the regdecode: @i_clk
       ---------------------------------------------------------------------
@@ -490,11 +492,11 @@ begin
       o_fifo_data       => amp_squid_tf_fifo_data,
       o_fifo_empty      => amp_squid_tf_fifo_empty,
       ---------------------------------------------------------------------
-      -- errors/status @ i_out_clk
+      -- errors/status @ i_clk
       ---------------------------------------------------------------------
       o_errors          => amp_squid_tf_errors,
       o_status          => amp_squid_tf_status
-    );
+      );
 
   -- output
   -- ram: wr
@@ -510,42 +512,43 @@ begin
   ---------------------------------------------------------------------
   -- mux_squid_tf
   ---------------------------------------------------------------------
-  inst_regdecode_pipe_wr_rd_ram_manager_mux_squid_tf : entity fpasim.regdecode_pipe_wr_rd_ram_manager
+  inst_regdecode_pipe_wr_rd_ram_manager_mux_squid_tf : entity work.regdecode_pipe_wr_rd_ram_manager
     generic map(
       -- RAM
       g_RAM_NB_WORDS   => c_MUX_SQUID_TF_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_MUX_SQUID_TF_RAM_A_RD_LATENCY, -- define the RAM latency during the reading
+      g_RAM_RD_LATENCY => c_MUX_SQUID_TF_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
       -- input
-      g_ADDR_WIDTH     => addr0'length, -- define the input address bus width
+      g_ADDR_WIDTH     => addr0'length,  -- define the input address bus width
       g_DATA_WIDTH     => data0'length
-    )
+      )
     port map(
       ---------------------------------------------------------------------
       -- from the regdecode: input @i_clk
       ---------------------------------------------------------------------
       i_clk             => i_clk,       -- clock
       i_rst             => i_rst,       -- reset
+      i_rst_status      => i_rst_status,   -- reset error flag(s)
+      i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
-      i_start_auto_rd   => i_start_auto_rd, -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_MUX_SQUID_TF_ADDR_RANGE_MIN, -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
+      i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
+      i_addr_range_min  => c_MUX_SQUID_TF_ADDR_RANGE_MIN,  -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
       -- data
-      i_data_valid      => mux_squid_tf_wr_en0, -- input data valid
+      i_data_valid      => mux_squid_tf_wr_en0,          -- input data valid
       i_addr            => addr0,       -- input address
       i_data            => data0,       -- input data
       ---------------------------------------------------------------------
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
-      i_rst_status      => i_rst_status, -- reset error flag(s)
-      i_debug_pulse     => i_debug_pulse, -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+      i_out_rst         => i_out_rst,
       -- ram: wr
-      o_ram_wr_en       => mux_squid_tf_ram_wr_en, -- output write enable
-      o_ram_wr_rd_addr  => mux_squid_tf_ram_wr_rd_addr, -- output address (shared by the writting and the reading)
-      o_ram_wr_data     => mux_squid_tf_ram_wr_data, -- output data
+      o_ram_wr_en       => mux_squid_tf_ram_wr_en,       -- output write enable
+      o_ram_wr_rd_addr  => mux_squid_tf_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
+      o_ram_wr_data     => mux_squid_tf_ram_wr_data,     -- output data
       -- ram: rd
-      o_ram_rd_en       => mux_squid_tf_ram_rd_en, -- output read enable
-      i_ram_rd_valid    => i_mux_squid_tf_ram_rd_valid, -- input read valid
-      i_ram_rd_data     => i_mux_squid_tf_ram_rd_data, -- input data
+      o_ram_rd_en       => mux_squid_tf_ram_rd_en,       -- output read enable
+      i_ram_rd_valid    => i_mux_squid_tf_ram_rd_valid,  -- input read valid
+      i_ram_rd_data     => i_mux_squid_tf_ram_rd_data,   -- input data
       ---------------------------------------------------------------------
       -- to the regdecode: @i_clk
       ---------------------------------------------------------------------
@@ -557,11 +560,11 @@ begin
       o_fifo_data       => mux_squid_tf_fifo_data,
       o_fifo_empty      => mux_squid_tf_fifo_empty,
       ---------------------------------------------------------------------
-      -- errors/status @ i_out_clk
+      -- errors/status @ i_clk
       ---------------------------------------------------------------------
       o_errors          => mux_squid_tf_errors,
       o_status          => mux_squid_tf_status
-    );
+      );
 
   -- output
   -- ram: wr
@@ -577,42 +580,43 @@ begin
   ---------------------------------------------------------------------
   -- tes_std_state
   ---------------------------------------------------------------------
-  inst_regdecode_pipe_wr_rd_ram_manager_tes_std_state : entity fpasim.regdecode_pipe_wr_rd_ram_manager
+  inst_regdecode_pipe_wr_rd_ram_manager_tes_std_state : entity work.regdecode_pipe_wr_rd_ram_manager
     generic map(
       -- RAM
       g_RAM_NB_WORDS   => c_TES_STD_STATE_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_TES_STD_STATE_RAM_A_RD_LATENCY, -- define the RAM latency during the reading
+      g_RAM_RD_LATENCY => c_TES_STD_STATE_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
       -- input
-      g_ADDR_WIDTH     => addr0'length, -- define the input address bus width
+      g_ADDR_WIDTH     => addr0'length,  -- define the input address bus width
       g_DATA_WIDTH     => data0'length
-    )
+      )
     port map(
       ---------------------------------------------------------------------
       -- from the regdecode: input @i_clk
       ---------------------------------------------------------------------
       i_clk             => i_clk,       -- clock
       i_rst             => i_rst,       -- reset
+      i_rst_status      => i_rst_status,   -- reset error flag(s)
+      i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
-      i_start_auto_rd   => i_start_auto_rd, -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_TES_STD_STATE_ADDR_RANGE_MIN, -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
+      i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
+      i_addr_range_min  => c_TES_STD_STATE_ADDR_RANGE_MIN,  -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
       -- data
-      i_data_valid      => tes_std_state_wr_en0, -- input data valid
+      i_data_valid      => tes_std_state_wr_en0,     -- input data valid
       i_addr            => addr0,       -- input address
       i_data            => data0,       -- input data
       ---------------------------------------------------------------------
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
-      i_rst_status      => i_rst_status, -- reset error flag(s)
-      i_debug_pulse     => i_debug_pulse, -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+      i_out_rst         => i_out_rst,
       -- ram: wr
-      o_ram_wr_en       => tes_std_state_ram_wr_en, -- output write enable
-      o_ram_wr_rd_addr  => tes_std_state_ram_wr_rd_addr, -- output address (shared by the writting and the reading)
-      o_ram_wr_data     => tes_std_state_ram_wr_data, -- output data
+      o_ram_wr_en       => tes_std_state_ram_wr_en,  -- output write enable
+      o_ram_wr_rd_addr  => tes_std_state_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
+      o_ram_wr_data     => tes_std_state_ram_wr_data,     -- output data
       -- ram: rd
-      o_ram_rd_en       => tes_std_state_ram_rd_en, -- output read enable
-      i_ram_rd_valid    => i_tes_std_state_ram_rd_valid, -- input read valid
-      i_ram_rd_data     => i_tes_std_state_ram_rd_data, -- input data
+      o_ram_rd_en       => tes_std_state_ram_rd_en,  -- output read enable
+      i_ram_rd_valid    => i_tes_std_state_ram_rd_valid,  -- input read valid
+      i_ram_rd_data     => i_tes_std_state_ram_rd_data,   -- input data
       ---------------------------------------------------------------------
       -- to the regdecode: @i_clk
       ---------------------------------------------------------------------
@@ -624,11 +628,11 @@ begin
       o_fifo_data       => tes_std_state_fifo_data,
       o_fifo_empty      => tes_std_state_fifo_empty,
       ---------------------------------------------------------------------
-      -- errors/status @ i_out_clk
+      -- errors/status @ i_clk
       ---------------------------------------------------------------------
       o_errors          => tes_std_state_errors,
       o_status          => tes_std_state_status
-    );
+      );
 
   -- output
   -- ram: wr
@@ -644,42 +648,43 @@ begin
   ---------------------------------------------------------------------
   -- mux_squid_offset
   ---------------------------------------------------------------------
-  inst_regdecode_pipe_wr_rd_ram_manager_mux_squid_offset : entity fpasim.regdecode_pipe_wr_rd_ram_manager
+  inst_regdecode_pipe_wr_rd_ram_manager_mux_squid_offset : entity work.regdecode_pipe_wr_rd_ram_manager
     generic map(
       -- RAM
       g_RAM_NB_WORDS   => c_MUX_SQUID_OFFSET_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY, -- define the RAM latency during the reading
+      g_RAM_RD_LATENCY => c_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
       -- input
-      g_ADDR_WIDTH     => addr0'length, -- define the input address bus width
+      g_ADDR_WIDTH     => addr0'length,  -- define the input address bus width
       g_DATA_WIDTH     => data0'length
-    )
+      )
     port map(
       ---------------------------------------------------------------------
       -- from the regdecode: input @i_clk
       ---------------------------------------------------------------------
       i_clk             => i_clk,       -- clock
       i_rst             => i_rst,       -- reset
+      i_rst_status      => i_rst_status,   -- reset error flag(s)
+      i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
-      i_start_auto_rd   => i_start_auto_rd, -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN, -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
+      i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
+      i_addr_range_min  => c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN,  -- minimal address range -- @suppress "Incorrect array size in assignment: expected (<g_ADDR_WIDTH>) but was (<16>)"
       -- data
-      i_data_valid      => mux_squid_offset_wr_en0, -- input data valid
+      i_data_valid      => mux_squid_offset_wr_en0,     -- input data valid
       i_addr            => addr0,       -- input address
       i_data            => data0,       -- input data
       ---------------------------------------------------------------------
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
       i_out_clk         => i_out_clk,   -- output clock
-      i_rst_status      => i_rst_status, -- reset error flag(s)
-      i_debug_pulse     => i_debug_pulse, -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+      i_out_rst         => i_out_rst,
       -- ram: wr
-      o_ram_wr_en       => mux_squid_offset_ram_wr_en, -- output write enable
-      o_ram_wr_rd_addr  => mux_squid_offset_ram_wr_rd_addr, -- output address (shared by the writting and the reading)
-      o_ram_wr_data     => mux_squid_offset_ram_wr_data, -- output data
+      o_ram_wr_en       => mux_squid_offset_ram_wr_en,  -- output write enable
+      o_ram_wr_rd_addr  => mux_squid_offset_ram_wr_rd_addr,  -- output address (shared by the writting and the reading)
+      o_ram_wr_data     => mux_squid_offset_ram_wr_data,     -- output data
       -- ram: rd
-      o_ram_rd_en       => mux_squid_offset_ram_rd_en, -- output read enable
-      i_ram_rd_valid    => i_mux_squid_offset_ram_rd_valid, -- input read valid
-      i_ram_rd_data     => i_mux_squid_offset_ram_rd_data, -- input data
+      o_ram_rd_en       => mux_squid_offset_ram_rd_en,  -- output read enable
+      i_ram_rd_valid    => i_mux_squid_offset_ram_rd_valid,  -- input read valid
+      i_ram_rd_data     => i_mux_squid_offset_ram_rd_data,   -- input data
       ---------------------------------------------------------------------
       -- to the regdecode: @i_clk
       ---------------------------------------------------------------------
@@ -691,11 +696,11 @@ begin
       o_fifo_data       => mux_squid_offset_fifo_data,
       o_fifo_empty      => mux_squid_offset_fifo_empty,
       ---------------------------------------------------------------------
-      -- errors/status @ i_out_clk
+      -- errors/status @ i_clk
       ---------------------------------------------------------------------
       o_errors          => mux_squid_offset_errors,
       o_status          => mux_squid_offset_status
-    );
+      );
 
   -- output
   -- ram: wr
@@ -711,16 +716,16 @@ begin
   ---------------------------------------------------------------------
   -- to pipe_out, read sequencially and complety the 5 inputs
   ---------------------------------------------------------------------
-  inst_regdecode_pipe_rd_all : entity fpasim.regdecode_pipe_rd_all
+  inst_regdecode_pipe_rd_all : entity work.regdecode_pipe_rd_all
     generic map(
       g_ADDR_WIDTH      => fifo_addr'length,
-      g_DATA_WIDTH      => fifo_data'length,
-      -- resynchronized errors bits
-      g_CDC_SYNC_STAGES => 2
-    )
+      g_DATA_WIDTH      => fifo_data'length
+      )
     port map(
       i_clk              => i_clk,
       i_rst              => i_rst,
+      i_rst_status       => i_rst_status,
+      i_debug_pulse      => i_debug_pulse,
       -- input0
       o_fifo_rd0         => tes_pulse_shape_fifo_rd,
       i_fifo_sof0        => tes_pulse_shape_fifo_sof,
@@ -773,14 +778,11 @@ begin
       o_fifo_data_count  => fifo_data_count,
       o_fifo_empty       => fifo_empty,
       ---------------------------------------------------------------------
-      -- errors/status @i_out_clk
+      -- errors/status @i_clk
       ---------------------------------------------------------------------
-      i_out_clk          => i_out_clk,
-      i_rst_status       => i_rst_status,
-      i_debug_pulse      => i_debug_pulse,
       o_errors           => pipe_rd_all_errors,
       o_status           => pipe_rd_all_status
-    );
+      );
 
   ---------------------------------------------------------------------
   -- output: to the pipe out

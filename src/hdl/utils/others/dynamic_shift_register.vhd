@@ -17,36 +17,31 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   dynamic_shift_register.vhd 
+--    @file                   dynamic_shift_register.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--   @details                
 --
 -- This module dynamically adds 1 or several consecutive registers on the data path.
 -- It has the following characteristics:
 --    . The pipeline depth is defined by (2**i_addr)
---    . if i_data_valid = '1' then
---          . the input data is shifted (to the left)
---          . the number of registers (delay) between the input data port and the output data port is defined by (i_addr + 1)
---    . if i_data_valid = '0' then no change is applied.
+--    . the input data is shifted (to the left)
+--    . the number of registers (delay) between the input data port and the output data port is defined by (i_addr + 1)
 --
 --    Example0:
 --      .i_addr       |  0                                   |
---      .i_data_valid |  1  0  1  0  1  0  1  0  1  0  1  0  |
 --      .i_data       |  a0    a1    a2    a3    a4    a5    |
 --      .o_data       |  xx    a0    a1    a2    a3    a4    |
 --
 --    Example1:
 --      .i_addr       |  1                                   |
---      .i_data_valid |  1  0  1  0  1  0  1  0  1  0  1  0  |
 --      .i_data       |  a0    a1    a2    a3    a4    a5    |
 --      .o_data       |  xx    xx    a0    a1    a2    a3    |
 --
 --    Example2:
 --      .i_addr       |  2                                   |
---      .i_data_valid |  1  0  1  0  1  0  1  0  1  0  1  0  |
 --      .i_data       |  a0    a1    a2    a3    a4    a5    |
 --      .o_data       |  xx    xx    xx    a0    a1    a2    |
 --
@@ -64,7 +59,6 @@ entity dynamic_shift_register is
     );
   port (
     i_clk        : in std_logic; -- clock signal
-    i_data_valid : in std_logic; -- input data valid
     i_data       : in std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- input data
     i_addr       : in std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- input address (dynamically select the depth of the pipeline)
 
@@ -74,7 +68,7 @@ end entity dynamic_shift_register;
 
 architecture RTL of dynamic_shift_register is
 
-  signal addr_r : std_logic_vector(i_addr'range);
+  signal addr_r : std_logic_vector(i_addr'range) := (others => '0');
   signal srl_tmp : std_logic_vector(g_DATA_WIDTH-1 downto 0):= (others => '0');  -- intermediate signal between srl and register
 
   type t_array_slv is array (g_DATA_WIDTH-1 downto 0) of std_logic_vector(2**i_addr'length-1 downto 0);
@@ -92,11 +86,9 @@ begin
   begin
     if rising_edge(i_clk) then
       addr_r <= i_addr;
-      if i_data_valid = '1' then
         for i in 0 to g_DATA_WIDTH - 1 loop
           shift_r(i) <= shift_r(i)(2**i_addr'length-2 downto 0) & i_data(i);
         end loop;
-      end if;
     end if;
   end process p_shift_input_data;
 

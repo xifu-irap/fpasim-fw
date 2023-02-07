@@ -41,7 +41,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
 
 entity ram_check is
   generic(
@@ -103,7 +102,7 @@ begin
   data_pipe_tmp0(c_IDX2_H)                 <= i_wr;
   data_pipe_tmp0(c_IDX1_H downto c_IDX1_L) <= i_rd_addr;
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_wr_addr;
-  inst_pipeliner : entity fpasim.pipeliner
+  inst_pipeliner : entity work.pipeliner
     generic map(
       g_NB_PIPES   => 1,
       g_DATA_WIDTH => data_pipe_tmp0'length

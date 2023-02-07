@@ -1,0 +1,552 @@
+// -------------------------------------------------------------------------------------------------------------
+//                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
+// -------------------------------------------------------------------------------------------------------------
+//                              This file is part of the ATHENA X-IFU DRE Focal Plane Assembly simulator.
+//
+//                              fpasim-fw is free software: you can redistribute it and/or modify
+//                              it under the terms of the GNU General Public License as published by
+//                              the Free Software Foundation, either version 3 of the License, or
+//                              (at your option) any later version.
+//
+//                              This program is distributed in the hope that it will be useful,
+//                              but WITHOUT ANY WARRANTY; without even the implied warranty of
+//                              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//                              GNU General Public License for more details.
+//
+//                              You should have received a copy of the GNU General Public License
+//                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// -------------------------------------------------------------------------------------------------------------
+//    email                   kenji.delarosa@alten.com
+//    @file                   fpasim_test_check_tmtc_link.dscript
+// -------------------------------------------------------------------------------------------------------------
+//    Automatic Generation    No
+//    Code Rules Reference
+// -------------------------------------------------------------------------------------------------------------
+//    @details
+//
+//   This javascript generates spi commands in order to initialize the ads62P49 (ADCs) registers.
+//
+//   Note:
+//      . Tested with javascript
+//
+// -------------------------------------------------------------------------------------------------------------
+
+// import javascript
+include("./fpasim/display.dscript");
+include("./fpasim/fpasim_address.dscript");
+include("./fpasim/fpasim_tools.dscript");
+
+function reset(level_p,mode_p,verbosity_p)
+{
+	// default function parameter values
+    if (typeof(level_p)==='undefined') level_p = 0;
+    if (typeof(mode_p)==='undefined') mode_p = 0;
+    if (typeof(verbosity_p)==='undefined') verbosity_p = 0;
+
+    level0 = level_p;
+    level1 = level_p + 1;
+
+    // Reset: CTRL
+	msg = "Reset: CTRL"
+	display(msg_p=msg,level_p=level0,mode_p=mode_p);
+    rst = 1;
+    en = 0;
+    data = (rst << 1) + en;
+    addr = FPASIM_ADDR_WIREIN['CTRL'];
+    msg = [
+		"rst: 0x"+convert_int_to_str_hex(value_p=rst,width_p=1),
+		"en: 0x"+convert_int_to_str_hex(value_p=en,width_p=1)
+			];
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+    sendToFPA_debugSetWireIn(addr ,data);
+
+    // Reset SPI_CTRL
+	msg = "Reset: SPI_CTRL"
+	display(msg_p=msg,level_p=level0,mode_p=mode_p);
+    rst = 1;
+    en = 0;
+    data = (rst << 1) + en;
+    addr = FPASIM_ADDR_WIREIN['SPI_CTRL'];
+    msg = [
+		"rst: 0x"+convert_int_to_str_hex(value_p=rst,width_p=1),
+		"en: 0x"+convert_int_to_str_hex(value_p=en,width_p=1)
+			];
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+    sendToFPA_debugSetWireIn(addr ,data);
+
+    // Reset DEBUG_CTRL
+	msg = "Reset: DEBUG_CTRL"
+	display(msg_p=msg,level_p=level0,mode_p=mode_p);
+    rst_status = 1;
+    debug_pulse = 0;
+    data = (rst_status << 1) + en;
+    addr = FPASIM_ADDR_WIREIN['DEBUG_CTRL'];
+    msg = [
+		"rst_status: 0x"+convert_int_to_str_hex(value_p=rst_status,width_p=1),
+		"debug_pulse: 0x"+convert_int_to_str_hex(value_p=debug_pulse,width_p=1)
+			];
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+    sendToFPA_debugSetWireIn(addr ,data);
+
+    // Set tempo: 
+	msg = "Set tempo"
+	display(msg_p=msg,level_p=level0,mode_p=mode_p);
+	waitMs(100);
+
+    // Reset: CTRL
+	msg = "Reset: CTRL"
+	display(msg_p=msg,level_p=level0,mode_p=mode_p);
+    rst = 0;
+    en = 0;
+    data = (rst << 1) + en;
+    addr = FPASIM_ADDR_WIREIN['CTRL'];
+    msg = [
+		"rst: 0x"+convert_int_to_str_hex(value_p=rst,width_p=1),
+		"en: 0x"+convert_int_to_str_hex(value_p=en,width_p=1)
+			];
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+    sendToFPA_debugSetWireIn(addr ,data);
+
+    // Reset SPI_CTRL
+	msg = "Reset: SPI_CTRL"
+	display(msg_p=msg,level_p=level0,mode_p=mode_p);
+    rst = 0;
+    en = 0;
+    data = (rst << 1) + en;
+    addr = FPASIM_ADDR_WIREIN['SPI_CTRL'];
+    msg = [
+		"rst: 0x"+convert_int_to_str_hex(value_p=rst,width_p=1),
+		"en: 0x"+convert_int_to_str_hex(value_p=en,width_p=1)
+			];
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+    sendToFPA_debugSetWireIn(addr ,data);
+
+    // Reset DEBUG_CTRL
+	msg = "Reset: DEBUG_CTRL"
+	display(msg_p=msg,level_p=level0,mode_p=mode_p);
+    rst_status = 0;
+    debug_pulse = 0;
+    data = (rst_status << 1) + en;
+    addr = FPASIM_ADDR_WIREIN['DEBUG_CTRL'];
+    msg = [
+		"rst_status: 0x"+convert_int_to_str_hex(value_p=rst_status,width_p=1),
+		"debug_pulse: 0x"+convert_int_to_str_hex(value_p=debug_pulse,width_p=1)
+			];
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+    sendToFPA_debugSetWireIn(addr ,data);
+
+}
+
+function test_wire_random(level_p,mode_p,verbosity_p)
+{
+	// default function parameter values
+    if (typeof(level_p)==='undefined') level_p = 0;
+    if (typeof(mode_p)==='undefined') mode_p = 0;
+    if (typeof(verbosity_p)==='undefined') verbosity_p = 0;
+
+     //
+    level0 = level_p;
+	level1 = level0 + 1;
+	level2 = level0 + 2;
+
+	reset();
+
+	/*
+	 Print the test description
+	*/
+	msg = "FPASIM : Check Wire registers with random values";
+	display_title(msg_p=msg,level_p=level0,mode_p=0);
+	mask_rst = 0xFFFFFFFFD; // keeps all bits except reset
+	mask_en = 0xFFFFFFFFE; // keeps all bits except en
+	wr_dic={}
+	wr_dic['CTRL']       = 0xABCDEF01 & mask_rst & mask_en;
+	wr_dic['MAKE_PULSE'] = 0xBCDEF012;
+	wr_dic['FPASIM_GAIN'] = 0xCDEF0123;
+	wr_dic['MUX_SQ_FB_DELAY'] = 0xDEF01234;
+	wr_dic['AMP_SQ_OF_DELAY'] = 0xEF012345;
+	wr_dic['ERROR_DELAY'] = 0xF0123456;
+	wr_dic['RA_DELAY'] = 0x01234567;
+	wr_dic['TES_CONF'] = 0x12345678;
+	wr_dic['REC_CTRL'] = 0x23456789 & mask_en;
+	wr_dic['REC_CONF0'] = 0x3456789A;
+	wr_dic['SPI_CTRL'] = 0x456789AB & mask_rst & mask_en;
+	wr_dic['SPI_CONF'] = 0x56789ABC;
+	wr_dic['SPI_WR_DATA'] = 0x6789ABCD;
+	wr_dic['DEBUG_CTRL'] = 0x789ABCDE;
+	wr_dic['ERROR_SEL'] = 0x89ABCDEF;
+
+    // write wire in
+	for(var key in wr_dic) {
+  			var value = wr_dic[key];
+			msg = "Set " + key;
+			display(msg_p=msg,level_p=level1,mode_p=mode_p);
+			addr = FPASIM_ADDR_WIREIN[key];
+			msg = [
+				"data: 0x"+convert_int_to_str_hex(value_p=value,width_p=32)
+			];
+			display(msg_p=msg,level_p=level2,mode_p=mode_p);
+			sendToFPA_debugSetWireIn(addr ,data);
+			}
+
+	/*
+	 set trig for each group of registers
+	 */
+	msg = "Set TRIG: reg_valid=1";
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	addr = FPASIM_ADDR_TRIGIN['TRIG'];
+	pos = FPASIM_POS_TRIGIN['reg_valid'];
+    sendToFPA_debugSetTriggerIn(addr,pos);
+
+	msg = "Set TRIG: make_pulse=1";
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	addr = FPASIM_ADDR_TRIGIN['TRIG'];
+    pos = FPASIM_POS_TRIGIN['make_pulse'];
+    sendToFPA_debugSetTriggerIn(addr,pos);
+
+	msg = "Set TRIG: ctrl_valid=1";
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	addr = FPASIM_ADDR_TRIGIN['TRIG'];
+    pos = FPASIM_POS_TRIGIN['ctrl_valid'];
+    sendToFPA_debugSetTriggerIn(addr,pos);
+
+    msg = "Set TRIG: debug_valid=1";
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	addr = FPASIM_ADDR_TRIGIN['TRIG'];
+    pos = FPASIM_POS_TRIGIN['debug_valid'];
+    sendToFPA_debugSetTriggerIn(addr,pos);
+
+    msg = "Set TRIG: rec_valid=1";
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	addr = FPASIM_ADDR_TRIGIN['TRIG'];
+    pos = FPASIM_POS_TRIGIN['rec_valid'];
+    sendToFPA_debugSetTriggerIn(addr,pos);
+
+    msg = "Set TRIG: spi_valid=1";
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	addr = FPASIM_ADDR_TRIGIN['TRIG'];
+    pos = FPASIM_POS_TRIGIN['spi_valid'];
+    sendToFPA_debugSetTriggerIn(addr,pos);
+
+    msg = "Set tempo";
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	waitMs(100);
+
+
+	// read wire out
+	for(var key in wr_dic) {
+			// retrieve the write data: key/data
+  			value0 = wr_dic[key];
+			msg = "Get " + key;
+			display(msg_p=msg,level_p=level1,mode_p=mode_p);
+  			// print('value00: ',value0);
+			// retrieve the read data
+			rd_dic = get_fpasim_wireout(reg_name_p=key,level_p=level2,mode_p=0,verbosity_p=1);
+			rd_value = rd_dic['data'];
+			msg_error = 'Check: '+ key;
+			check_equal(value0_p=value0, value1_p=rd_value, msg_error_p=msg_error, level_p=level2, mode_p=0);
+			}
+
+	/*
+	 check additional registers
+	*/
+	value0 = 0x0;
+	key = 'DATA_COUNT';
+	msg = "Get " + key;
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	// retrieve the read data
+	rd_dic = get_fpasim_wireout(reg_name_p=key,level_p=level2,mode_p=0,verbosity_p=1);
+	rd_value = rd_dic['data'];
+	msg_error = 'Check: '+ key;
+	check_equal(value0_p=value0, value1_p=rd_value, msg_error_p=msg_error, level_p=level2, mode_p=0);
+
+	value0 = 0x0;
+	key = 'REC_DATA_COUNT';
+	msg = "Get " + key;
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	// retrieve the read data
+	rd_dic = get_fpasim_wireout(reg_name_p=key,level_p=level2,mode_p=0,verbosity_p=1);
+	rd_value = rd_dic['data'];
+	msg_error = 'Check: '+ key;
+	check_equal(value0_p=value0, value1_p=rd_value, msg_error_p=msg_error, level_p=level2, mode_p=0);
+
+}
+
+function test_wire(level_p,mode_p,verbosity_p)
+{
+	// default function parameter values
+    if (typeof(level_p)==='undefined') level_p = 0;
+    if (typeof(mode_p)==='undefined') mode_p = 0;
+    if (typeof(verbosity_p)==='undefined') verbosity_p = 0;
+
+    //
+    level0 = level_p;
+	level1 = level0 + 1;
+	level2 = level0 + 2;
+
+	/*
+	 Print the test description
+	*/
+	msg = "FPASIM : Check Wire registers";
+	display_title(msg_p=msg,level_p=level0,mode_p=0);
+
+	// configuration: CTRL
+	msg = "Set CTRL register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	ctrl_value = 0xFFFF0000;
+	msg = '0x' + convert_int_to_str_hex(value_p=ctrl_value,width_p=32);
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_configureControl(ctrl_value);
+
+	// configuration: MAKE_PULSE
+	msg = "Set MAKE_PULSE register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	make_pulse_pixelId = 0x1;
+	make_pulse_timeShift = 0x2;
+	make_pulse_pulseHeigth = 0x3;
+	msg = [
+		"pixel_id: 0x"+convert_int_to_str_hex(value_p=make_pulse_pixelId,width_p=8),
+		"timeShift: 0x"+convert_int_to_str_hex(value_p=make_pulse_timeShift,width_p=8),
+		"pulseHeigth: 0x"+convert_int_to_str_hex(value_p=make_pulse_pulseHeigth,width_p=16)
+	];
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_makePulse(pixelId= make_pulse_pixelId, timeShift= make_pulse_timeShift, pulseHeigth= make_pulse_pulseHeigth);
+
+	// configuration: FPASIM_GAIN
+	msg = "Set FPASIM_GAIN register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	fpasim_gain = 0x4;
+	msg = "gain: 0x"+ convert_int_to_str_hex(value_p=fpasim_gain,width_p=32);
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_configureGain(fpasim_gain);
+
+	// configuration: MUX_SQ_FB_DELAY
+	msg = "Set MUX_SQ_FB_DELAY register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	mux_sq_fb_delay = 0x5;
+	msg = 'delay: 0x' + convert_int_to_str_hex(value_p=mux_sq_fb_delay,width_p=32);
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_configureMuxDelay(mux_sq_fb_delay);
+
+	// configuration: MUX_SQ_FB_DELAY
+	msg = "Set AMP_SQ_OF_DELAY register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	amp_sq_of_delay = 0x6;
+	msg = 'delay: 0x' + convert_int_to_str_hex(value_p=amp_sq_of_delay,width_p=32);
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_configureAmpDelay(amp_sq_of_delay);
+
+	// configuration: ERROR_DELAY
+	msg = "Set ERROR_DELAY register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	error_delay = 0x7;
+	msg = 'delay: 0x' + convert_int_to_str_hex(value_p=error_delay,width_p=32);
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_configureErrorDelay(error_delay);
+
+	// configuration: RA_DELAY
+	msg = "Set RA_DELAY register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	ra_delay = 0x8;
+	msg = 'delay: 0x' + convert_int_to_str_hex(value_p=ra_delay,width_p=32);
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_configureErrorDelay(ra_delay);
+
+	// configuration: TES_CONF
+	msg = "Set TES_CONF register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	tes_conf_nbPixels = 34-1; // add -1 because we start from 0
+	tes_conf_nbSamplesPerPixel = 40-1; // add -1 because we start from 0
+	tes_conf_totalFrameSize = tes_conf_nbPixels*tes_conf_nbSamplesPerPixel - 1; // add -1 because we start from 0
+	msg = [
+		"nbPixels: 0x"+convert_int_to_str_hex(value_p=tes_conf_nbPixels,width_p=8),
+		"nbSamplesPerPixel: 0x"+convert_int_to_str_hex(value_p=tes_conf_nbSamplesPerPixel,width_p=8),
+		"totalFrameSize: 0x"+convert_int_to_str_hex(value_p=tes_conf_totalFrameSize,width_p=16)
+	];
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_configureTES_conf(nbPixels=tes_conf_nbPixels,nbSamplesPerPixel=tes_conf_nbSamplesPerPixel, totalFrameSize=tes_conf_totalFrameSize);
+
+	// configuration: SPI_CTRL
+	msg = "Set SPI_CTRL register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	en = 1; 
+	rst = 0;
+	data = (rst << 1) + en;
+	addr = FPASIM_ADDR_WIREIN['SPI_CTRL'];
+	msg = [
+		"en: 0x"+convert_int_to_str_hex(value_p=en,width_p=1),
+		"rst: 0x"+convert_int_to_str_hex(value_p=rst,width_p=1)
+	];
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_debugSetWireIn(addr ,data);
+
+	// configuration: SPI_CTRL
+	msg = "Set SPI_CONF register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	spi_mode = 0; 
+	spi_id = 0;
+	spi_dac_tx_en = 0;
+	data = (spi_dac_tx_en << 8) + (spi_id << 4) + spi_mode;
+	addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+	msg = [
+		"spi_mode: 0x"+convert_int_to_str_hex(value_p=spi_mode,width_p=1),
+		"spi_id: 0x"+convert_int_to_str_hex(value_p=spi_id,width_p=3),
+		"spi_dac_tx_en: 0x"+convert_int_to_str_hex(value_p=spi_dac_tx_en,width_p=1)
+	];
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_debugSetWireIn(addr ,data);
+
+	// configuration: SPI_WR_DATA
+	msg = "Set SPI_WR_DATA register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	spi_mode = 0; 
+	spi_id = 0;
+	spi_data = 0x9ABDCEF1;
+	data = spi_data;
+	addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
+	msg = [
+		"data: 0x"+convert_int_to_str_hex(value_p=data,width_p=32)
+	];
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_debugSetWireIn(addr ,data);
+
+	// configuration: REC_CTRL
+	msg = "Set REC_CTRL register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	mask_rst = 0xFFFFFFFE // don't touch the en bit
+	rec_ctrl_data = 0x9ABCEF1 & mask_rst;
+	data = rec_ctrl_data;
+	addr = FPASIM_ADDR_WIREIN['REC_CTRL'];
+	msg = [
+		"data: 0x"+convert_int_to_str_hex(value_p=data,width_p=32)
+	];
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_debugSetWireIn(addr ,data);
+
+	// configuration: REC_CONF0
+	msg = "Set REC_CONF0 register"
+	display(msg_p=msg,level_p=level1,mode_p=mode_p);
+	mask_rst = 0xFFFFFFFE // don't touch the en bit
+	rec_ctrl_data = 0x9ABCEF1 & mask_rst;
+	data = rec_ctrl_data;
+	addr = FPASIM_ADDR_WIREIN['REC_CONF0'];
+	msg = [
+		"data: 0x"+convert_int_to_str_hex(value_p=data,width_p=32)
+	];
+	display(msg_p=msg,level_p=level2,mode_p=mode_p);
+	sendToFPA_debugSetWireIn(addr ,data);
+
+
+
+    //TODO: read and check CTRL
+    //TODO: read and ckeck MAKE_PULSE
+    //TODO: read and ckeck FPASIM_GAIN
+    //TODO: read and ckeck MUX_SQ_FB_DELAY
+    //TODO: read and ckeck AMP_SQ_OF_DELAY
+    //TODO: read and ckeck ERROR_DELAY
+    //TODO: read and ckeck RA_DELAY
+    //TODO: read and ckeck TES_CONF
+    //TODO: read and ckeck SPI_CTRL
+    //TODO: read and ckeck SPI_CONF
+    //TODO: read and ckeck SPI_WR_DATA
+
+
+
+}
+
+function main()
+{
+
+
+	level0 = 0;
+	level1 = level0 + 1;
+	level2 = level0 + 2;
+
+	mode_p = 0;
+	verbosity_p = 0;
+
+	reset();
+
+	test_wire_random(level_p=level0,mode_p=mode_p,verbosity_p=verbosity_p);
+
+	/*
+	 Print the test info
+	*/
+	msg = "FPASIM Test info:";
+	display_title(msg_p=msg,level_p=level0,mode_p=0);
+
+	// get the operator name
+	operator_name=get_operator_name();
+	msg = "Operator Name: "+ operator_name;
+	display(msg_p=msg,level_p=level0,mode_p=0);
+	// get the session
+	session_name=get_session_name();
+	msg = "Session: "+ session_name;
+	display(msg_p=msg,level_p=level0,mode_p=0);
+	// Print the current date
+	date = maDate()
+	msg = "Date: "+ date;
+	display(msg_p=msg,level_p=level0,mode_p=0);
+
+	// get board id
+	reg_name = 'BOARD_ID';
+	msg = reg_name + ": ";
+	display(msg_p=msg,level_p=level0,mode_p=0);
+	wr_dic = get_fpasim_wireout(reg_name_p=reg_name,level_p=level1,mode_p=0,verbosity_p=1);
+	// get firmware id
+	reg_name = 'FIRMWARE_ID';
+	msg = reg_name + ": ";
+	display(msg_p=msg,level_p=level0,mode_p=0);
+	wr_dic = get_fpasim_wireout(reg_name_p=reg_name,level_p=level1,mode_p=0,verbosity_p=1);
+	// get firmware version
+	reg_name = 'FIRMWARE_VERSION';
+	msg = reg_name + ": ";
+	display(msg_p=msg,level_p=level0,mode_p=0);
+	wr_dic = get_fpasim_wireout(reg_name_p=reg_name,level_p=level1,mode_p=0,verbosity_p=1);
+
+
+	/*
+	 Print the test description
+	*/
+	msg = "FPASIM Test: check tmtc link";
+	display_title(msg_p=msg,level_p=level0,mode_p=0);
+
+	msg = "Contexte et objet du test";
+	display_subtitle(msg_p=msg,level_p=level1,mode_p=0);
+
+	msg = [
+	      "Certains parametres de fonctionnement du FPAsim peuvent se regler par commandes depuis le XIFU Studio.",
+	      "Les parametres de ces commandes sont stockes dans des registres du FPAsim et ils peuvent etre relus.",
+	      "L'objet de ce test est de verifier la communication entre le FPAsim et le XIFU Studio en programmant et en relisant le contenu des registres du FPAsim."
+	      ];
+	display(msg_p=msg,level_p=level2,mode_p=0);
+
+	msg = "Deroulement du test"
+	display_subtitle(msg_p=msg,level_p=level1,mode_p=0);
+	msg = [
+		"Lire le contenu des registres du FPAsim et verifier qu'il correspond aux valeurs par defauts (en particulier le champs qui correspond à la version du firmware)",
+		"Configurer les registres du FPAsim avec des valeurs differentes des valeurs par defaut.",
+	    "Lire le contenu des registres du FPAsim et verifier que l'on retrouve le contenu qui vient d'etre envoye."
+	      ];
+	display(msg_p=msg,level_p=level2,mode_p=0);
+
+	msg = "Criteres de succes"
+	display_subtitle(msg_p=msg,level_p=level1,mode_p=0);
+	msg = [
+		"La premiere lecture des registres correspond aux valeurs par defauts du firmware.",
+	     "La deuxieme lecture des registres correspond aux valeurs programmees dans le firmware."
+	      ];
+	display(msg_p=msg,level_p=level2,mode_p=0);
+
+
+}
+
+
+main();
+
+
+
+
+
+
+
+

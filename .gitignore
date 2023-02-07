@@ -29,6 +29,12 @@
 /project/vivado00/fpasim.runs/**/*.xdc
 /project/vivado00/fpasim.runs/**/*.vds
 /project/vivado00/fpasim.runs/**/__synthesis_is_complete__
+/project/vivado00/fpasim.runs/**/*.mmi
+/project/vivado00/fpasim.runs/**/*.bit
+/project/vivado00/fpasim.runs/**/*.ltx
+/project/vivado00/fpasim.runs/**/*.lpr
+/project/vivado00/fpasim.runs/**/*.wpc
+/project/vivado00/fpasim.runs/**/.Xil/*
 # Untracked no necessary Xilinx IP Files
 /ip/xilinx/coregen/*/*.*
 /ip/xilinx/coregen/*/**/*.*
@@ -55,6 +61,12 @@
 external_libraries.json
 language_version.json
 library_mapping.json
+.settings
+.project
+.library_mapping.xml
 
 # untracked temporary Vunit test
 /simu/vunit/tmp_test
+
+# untracked auto-generated simulation file
+launch_sim_processed.json

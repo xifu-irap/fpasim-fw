@@ -36,8 +36,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library fpasim;
-
 entity dac_check_dataflow is
   port(
     ---------------------------------------------------------------------
@@ -136,7 +134,7 @@ begin
   ---------------------------------------------------------------------
   errors_tmp0(0) <= error_r1;
   gen_errors_sync : for i in errors_tmp0'range generate
-    inst_single_bit_synchronizer_empty_error : entity fpasim.single_bit_synchronizer
+    inst_single_bit_synchronizer_empty_error : entity work.single_bit_synchronizer
       generic map(
         -- +---------------------------------------------------------------------------------------------------------------------+
         -- | DEST_SYNC_FF         | Integer            | Range: 2 - 10. Default value = 4.                                       |
@@ -170,7 +168,7 @@ begin
   ---------------------------------------------------------------------
   error_tmp(0) <= '1' when errors_tmp0_sync(0) = '1' and i_en = '1' else '0'; -- error
   error_flag_mng : for i in error_tmp'range generate
-    inst_one_error_latch : entity fpasim.one_error_latch
+    inst_one_error_latch : entity work.one_error_latch
       port map(
         i_clk         => i_clk,
         i_rst         => i_rst_status,

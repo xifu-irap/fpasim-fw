@@ -44,84 +44,74 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-
 entity regdecode_pipe_rd_all is
   generic(
     g_ADDR_WIDTH      : integer := 16;  -- define the address bus width
-    g_DATA_WIDTH      : integer := 16;  -- define the data bus width
-    -- +---------------------------------------------------------------------------------------------------------------------+
-    -- | CDC_SYNC_STAGES      | Integer            | Range: 2 - 8. Default value = 2.                                        |
-    -- |---------------------------------------------------------------------------------------------------------------------|
-    -- | Specifies the number of synchronization stages on the CDC path                                                      |
-    -- |                                                                                                                     |
-    -- |   Must be < 5 if FIFO_WRITE_DEPTH = 16       
-    g_CDC_SYNC_STAGES : integer := 2    -- resynchronized errors bits
-  );
+    g_DATA_WIDTH      : integer := 16  -- define the data bus width
+    );
   port(
-    i_clk              : in  std_logic; -- clock
-    i_rst              : in  std_logic; -- reset 
+    i_clk         : in std_logic;       -- clock
+    i_rst         : in std_logic;       -- reset 
+    i_rst_status  : in std_logic;       -- reset error flag(s)
+    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     -- input0
-    o_fifo_rd0         : out std_logic; -- fifo read enable 
-    i_fifo_sof0        : in  std_logic; -- fifo first sample 
-    i_fifo_eof0        : in  std_logic; -- fifo last sample
-    i_fifo_data_valid0 : in  std_logic; -- fifo data valid
-    i_fifo_addr0       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
-    i_fifo_data0       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
-    i_fifo_empty0      : in  std_logic; -- fifo empty flag
+    o_fifo_rd0         : out std_logic;  -- fifo read enable 
+    i_fifo_sof0        : in  std_logic;  -- fifo first sample 
+    i_fifo_eof0        : in  std_logic;  -- fifo last sample
+    i_fifo_data_valid0 : in  std_logic;  -- fifo data valid
+    i_fifo_addr0       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- address value
+    i_fifo_data0       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- data value
+    i_fifo_empty0      : in  std_logic;  -- fifo empty flag
     -- input1
-    o_fifo_rd1         : out std_logic; -- fifo read enable
-    i_fifo_sof1        : in  std_logic; -- fifo first sample
-    i_fifo_eof1        : in  std_logic; -- fifo last sample
-    i_fifo_data_valid1 : in  std_logic; -- fifo data valid
-    i_fifo_addr1       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
-    i_fifo_data1       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
-    i_fifo_empty1      : in  std_logic; -- fifo empty flag
+    o_fifo_rd1         : out std_logic;  -- fifo read enable
+    i_fifo_sof1        : in  std_logic;  -- fifo first sample
+    i_fifo_eof1        : in  std_logic;  -- fifo last sample
+    i_fifo_data_valid1 : in  std_logic;  -- fifo data valid
+    i_fifo_addr1       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- address value
+    i_fifo_data1       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- data value
+    i_fifo_empty1      : in  std_logic;  -- fifo empty flag
     -- input2
-    o_fifo_rd2         : out std_logic; -- fifo read enable
-    i_fifo_sof2        : in  std_logic; -- fifo first sample
-    i_fifo_eof2        : in  std_logic; -- fifo last sample
-    i_fifo_data_valid2 : in  std_logic; -- fifo data valid
-    i_fifo_addr2       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
-    i_fifo_data2       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
-    i_fifo_empty2      : in  std_logic; -- fifo empty flag
+    o_fifo_rd2         : out std_logic;  -- fifo read enable
+    i_fifo_sof2        : in  std_logic;  -- fifo first sample
+    i_fifo_eof2        : in  std_logic;  -- fifo last sample
+    i_fifo_data_valid2 : in  std_logic;  -- fifo data valid
+    i_fifo_addr2       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- address value
+    i_fifo_data2       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- data value
+    i_fifo_empty2      : in  std_logic;  -- fifo empty flag
     -- input3
-    o_fifo_rd3         : out std_logic; -- fifo read enable
-    i_fifo_sof3        : in  std_logic; -- fifo first sample
-    i_fifo_eof3        : in  std_logic; -- fifo last sample
-    i_fifo_data_valid3 : in  std_logic; -- fifo data valid
-    i_fifo_addr3       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
-    i_fifo_data3       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
-    i_fifo_empty3      : in  std_logic; -- fifo empty flag
+    o_fifo_rd3         : out std_logic;  -- fifo read enable
+    i_fifo_sof3        : in  std_logic;  -- fifo first sample
+    i_fifo_eof3        : in  std_logic;  -- fifo last sample
+    i_fifo_data_valid3 : in  std_logic;  -- fifo data valid
+    i_fifo_addr3       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- address value
+    i_fifo_data3       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- data value
+    i_fifo_empty3      : in  std_logic;  -- fifo empty flag
     -- input4
-    o_fifo_rd4         : out std_logic; -- fifo read enable
-    i_fifo_sof4        : in  std_logic; -- fifo first sample
-    i_fifo_eof4        : in  std_logic; -- fifo last sample
-    i_fifo_data_valid4 : in  std_logic; -- fifo data valid
-    i_fifo_addr4       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
-    i_fifo_data4       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
-    i_fifo_empty4      : in  std_logic; -- fifo empty flag
+    o_fifo_rd4         : out std_logic;  -- fifo read enable
+    i_fifo_sof4        : in  std_logic;  -- fifo first sample
+    i_fifo_eof4        : in  std_logic;  -- fifo last sample
+    i_fifo_data_valid4 : in  std_logic;  -- fifo data valid
+    i_fifo_addr4       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- address value
+    i_fifo_data4       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- data value
+    i_fifo_empty4      : in  std_logic;  -- fifo empty flag
     ---------------------------------------------------------------------
     -- to the pipe out: @i_clk
     ---------------------------------------------------------------------
-    i_fifo_rd          : in  std_logic; -- fifo read enable
-    o_fifo_sof         : out std_logic; -- fifo first sample
-    o_fifo_eof         : out std_logic; -- fifo last sample
-    o_fifo_data_valid  : out std_logic; -- fifo data valid
-    o_fifo_addr        : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
-    o_fifo_data        : out std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- data value
-    o_fifo_data_count  : out std_logic_vector(15 downto 0); -- data value
-    o_fifo_empty       : out std_logic; -- fifo empty flag
+    i_fifo_rd          : in  std_logic;  -- fifo read enable
+    o_fifo_sof         : out std_logic;  -- fifo first sample
+    o_fifo_eof         : out std_logic;  -- fifo last sample
+    o_fifo_data_valid  : out std_logic;  -- fifo data valid
+    o_fifo_addr        : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- address value
+    o_fifo_data        : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- data value
+    o_fifo_data_count  : out std_logic_vector(15 downto 0);  -- data value
+    o_fifo_empty       : out std_logic;  -- fifo empty flag
     ---------------------------------------------------------------------
-    -- errors/status @i_out_clk
+    -- errors/status @i_clk
     ---------------------------------------------------------------------
-    i_out_clk          : in  std_logic;
-    i_rst_status       : in  std_logic; -- reset error flag(s)
-    i_debug_pulse      : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
-    o_errors           : out std_logic_vector(15 downto 0); -- output errors
-    o_status           : out std_logic_vector(7 downto 0) -- output status
-  );
+    o_errors           : out std_logic_vector(15 downto 0);  -- output errors
+    o_status           : out std_logic_vector(7 downto 0)    -- output status
+    );
 end entity regdecode_pipe_rd_all;
 
 architecture RTL of regdecode_pipe_rd_all is
@@ -176,10 +166,10 @@ architecture RTL of regdecode_pipe_rd_all is
   constant c_FIFO_IDX3_H : integer := c_FIFO_IDX3_L + 1 - 1;
 
   -- find the power of 2 superior to the g_DELAY
-  constant c_FIFO_DEPTH0          : integer := 16; --see IP
-  constant c_PROG_FULL_THRESH0    : integer := c_FIFO_DEPTH0 - 6; --see IP
-  constant c_FIFO_WIDTH0          : integer := c_FIFO_IDX3_H + 1; --see IP
-  constant c_WR_DATA_COUNT_WIDTH0 : integer := fpasim.pkg_utils.pkg_width_from_value(c_FIFO_DEPTH0) + 1; --see IP
+  constant c_FIFO_DEPTH0          : integer := 16;                 --see IP
+  constant c_PROG_FULL_THRESH0    : integer := c_FIFO_DEPTH0 - 6;  --see IP
+  constant c_FIFO_WIDTH0          : integer := c_FIFO_IDX3_H + 1;  --see IP
+  constant c_WR_DATA_COUNT_WIDTH0 : integer := work.pkg_utils.pkg_width_from_value(c_FIFO_DEPTH0) + 1;  --see IP
 
   signal wr_tmp0        : std_logic;
   signal data_tmp0      : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
@@ -202,11 +192,6 @@ architecture RTL of regdecode_pipe_rd_all is
   signal errors_sync : std_logic_vector(3 downto 0);
   signal empty_sync  : std_logic;
 
-  ---------------------------------------------------------------------
-  -- resynchronized errors/empty on the i_out_clk
-  ---------------------------------------------------------------------
-  signal errors_resync : std_logic_vector(3 downto 0);
-  signal empty_resync  : std_logic;
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
@@ -307,7 +292,7 @@ begin
           rd4_next <= '0';
         end if;
 
-      when others =>                    -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -393,7 +378,7 @@ begin
   data_tmp0(c_FIFO_IDX1_H downto c_FIFO_IDX1_L) <= addr_rx;
   data_tmp0(c_FIFO_IDX0_H downto c_FIFO_IDX0_L) <= data_rx;
 
-  inst_fifo_sync_with_error_prog_full_wr_count : entity fpasim.fifo_sync_with_error_prog_full_wr_count
+  inst_fifo_sync_with_error_prog_full_wr_count : entity work.fifo_sync_with_error_prog_full_wr_count
     generic map(
       g_FIFO_MEMORY_TYPE    => "distributed",
       g_FIFO_READ_LATENCY   => 1,
@@ -403,7 +388,7 @@ begin
       g_READ_MODE           => "std",
       g_WRITE_DATA_WIDTH    => data_tmp0'length,
       g_WR_DATA_COUNT_WIDTH => c_WR_DATA_COUNT_WIDTH0
-    )
+      )
     port map(
       ---------------------------------------------------------------------
       -- write side
@@ -429,7 +414,7 @@ begin
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync,
       o_empty_sync    => empty_sync
-    );
+      );
   rd1        <= i_fifo_rd;
   fifo_sof1  <= data_tmp1(c_FIFO_IDX3_H);
   fifo_eof1  <= data_tmp1(c_FIFO_IDX2_H);
@@ -450,102 +435,30 @@ begin
   ---------------------------------------------------------------------
   -- Error latching
   ---------------------------------------------------------------------
-  gen_bit_synchronizer : if True generate
-    signal data_tmp      : std_logic_vector(4 downto 0);
-    signal wr_r          : std_logic;
-    signal data_r        : std_logic_vector(4 downto 0);
-
-    signal wr_en_flag       : std_logic;
-    signal wr_din_flag      : std_logic_vector(4 downto 0);
-    -- signal wr_full_flag     : std_logic;
-    signal wr_rst_busy_flag : std_logic;
-    signal rd_en_flag       : std_logic;
-    signal rd_dout_flag     : std_logic_vector(4 downto 0);
-    signal rd_empty_flag    : std_logic;
-    signal rd_rst_busy_flag : std_logic;
-
-  begin
-    data_tmp(4)          <= empty_sync;
-    data_tmp(3 downto 0) <= errors_sync;
-
-    p_detect_change : process(i_clk) is
-    begin
-      if rising_edge(i_clk) then
-        data_r <= data_tmp;
-        if data_r /= data_tmp then
-          wr_r <= '1';
-        else
-          wr_r <= '0';
-        end if;
-      end if;
-    end process p_detect_change;
-
-    wr_en_flag  <= '1' when wr_r = '1' and wr_rst_busy_flag = '0' else '0';
-    wr_din_flag <= data_r;
-
-    inst_fifo_async_flag : entity fpasim.fifo_async
-      generic map(
-        g_CDC_SYNC_STAGES   => g_CDC_SYNC_STAGES,
-        g_FIFO_MEMORY_TYPE  => "distributed",
-        g_FIFO_READ_LATENCY => 1,
-        g_FIFO_WRITE_DEPTH  => 16,
-        g_READ_DATA_WIDTH   => wr_din_flag'length,
-        g_READ_MODE         => "std",
-        g_RELATED_CLOCKS    => 0,
-        g_WRITE_DATA_WIDTH  => wr_din_flag'length
-      )
-      port map(
-        ---------------------------------------------------------------------
-        -- write side
-        ---------------------------------------------------------------------
-        i_wr_clk        => i_clk,
-        i_wr_rst        => '0',
-        i_wr_en         => wr_en_flag,
-        i_wr_din        => wr_din_flag,
-        o_wr_full       => open,
-        o_wr_rst_busy   => wr_rst_busy_flag,
-        ---------------------------------------------------------------------
-        -- read side
-        ---------------------------------------------------------------------
-        i_rd_clk        => i_out_clk,
-        i_rd_en         => rd_en_flag,
-        o_rd_dout_valid => open,
-        o_rd_dout       => rd_dout_flag,
-        o_rd_empty      => rd_empty_flag,
-        o_rd_rst_busy   => rd_rst_busy_flag
-      );
-
-    rd_en_flag <= '1' when rd_empty_flag = '0' and rd_rst_busy_flag = '0' else '0';
-
-    -- resync
-    empty_resync  <= rd_dout_flag(4);
-    errors_resync <= rd_dout_flag(3 downto 0);
-  end generate gen_bit_synchronizer;
-
-  error_tmp(2) <= errors_resync(2) or errors_resync(3); -- fifo rst error
-  error_tmp(1) <= errors_resync(1);     -- fifo rd empty error
-  error_tmp(0) <= errors_resync(0);     -- fifo wr full error
+  error_tmp(2) <= errors_sync(2) or errors_sync(3);  -- fifo rst error
+  error_tmp(1) <= errors_sync(1);                    -- fifo rd empty error
+  error_tmp(0) <= errors_sync(0);                    -- fifo wr full error
   gen_errors_latch : for i in error_tmp'range generate
-    inst_one_error_latch : entity fpasim.one_error_latch
+    inst_one_error_latch : entity work.one_error_latch
       port map(
-        i_clk         => i_out_clk,
+        i_clk         => i_clk,
         i_rst         => i_rst_status,
         i_debug_pulse => i_debug_pulse,
         i_error       => error_tmp(i),
         o_error       => error_tmp_bis(i)
-      );
+        );
   end generate gen_errors_latch;
 
   o_errors(15 downto 6) <= (others => '0');
   o_errors(5)           <= '0';
   o_errors(4)           <= '0';
   o_errors(3)           <= '0';
-  o_errors(2)           <= error_tmp_bis(2); -- fifo rst error
-  o_errors(1)           <= error_tmp_bis(1); -- fifo rd empty error
-  o_errors(0)           <= error_tmp_bis(0); -- fifo wr full error
+  o_errors(2)           <= error_tmp_bis(2);  -- fifo rst error
+  o_errors(1)           <= error_tmp_bis(1);  -- fifo rd empty error
+  o_errors(0)           <= error_tmp_bis(0);  -- fifo wr full error
 
   o_status(7 downto 1) <= (others => '0');
-  o_status(0)          <= empty_resync; -- fifo empty
+  o_status(0)          <= empty_sync;   -- fifo empty
 
   ---------------------------------------------------------------------
   -- for simulation only

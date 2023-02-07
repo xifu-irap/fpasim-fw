@@ -49,8 +49,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library fpasim;
-
 entity tes_signalling_generator is
   generic(
     g_BLOCK_LENGTH_WIDTH : positive := 16; -- block bus width (expressed in bits). Possible values: [1; integer max value[
@@ -232,7 +230,7 @@ begin
   data_tmp0(c_IDX1_H)                 <= data_valid_r1;
   data_tmp0(c_IDX0_H downto c_IDX0_L) <= std_logic_vector(cnt_id_r1);
 
-  inst_pipeliner_add_latency : entity fpasim.pipeliner
+  inst_pipeliner_add_latency : entity work.pipeliner
     generic map(
       g_NB_PIPES   => g_LATENCY_OUT,
       g_DATA_WIDTH => data_tmp0'length

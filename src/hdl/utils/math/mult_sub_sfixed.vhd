@@ -80,22 +80,22 @@ architecture RTL of mult_sub_sfixed is
     -----------------------------------------------------------------
     -- step1: 
     -----------------------------------------------------------------
-    signal a_r1    : sfixed(a_tmp'range);
-    signal b_r1    : sfixed(b_tmp'range);
-    signal c_r1    : sfixed(c_tmp'range);
+    signal a_r1    : sfixed(a_tmp'range):= (others => '0');
+    signal b_r1    : sfixed(b_tmp'range):= (others => '0');
+    signal c_r1    : sfixed(c_tmp'range):= (others => '0');
     ---------------------------------------------------------------------
     -- step2: 
     --    mult_r2 = a*b
     --    c_r2 = c_r1
     ---------------------------------------------------------------------
-    signal mult_r2 : sfixed(sfixed_high(a_r1, '*', b_r1) downto sfixed_low(a_r1, '*', b_r1));
-    signal c_r2    : sfixed(c_r1'range);
+    signal mult_r2 : sfixed(sfixed_high(a_r1, '*', b_r1) downto sfixed_low(a_r1, '*', b_r1)):= (others => '0');
+    signal c_r2    : sfixed(c_r1'range):= (others => '0');
 
     ---------------------------------------------------------------------
     -- step3:
     --   res_r3 = c_r2 - mult_r2
     ---------------------------------------------------------------------
-    signal res_r3 : sfixed(sfixed_high(c_r2, '-', mult_r2) downto sfixed_low(c_r2, '-', mult_r2));
+    signal res_r3 : sfixed(sfixed_high(c_r2, '-', mult_r2) downto sfixed_low(c_r2, '-', mult_r2)):= (others => '0');
 
     -----------------------------------------------------------------
     -- truncate: 

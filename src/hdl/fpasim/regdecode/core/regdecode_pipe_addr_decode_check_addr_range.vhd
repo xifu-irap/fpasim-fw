@@ -34,26 +34,26 @@ use ieee.numeric_std.all;
 
 entity regdecode_pipe_addr_decode_check_addr_range is
   generic(
-    g_ADDR_RANGE_WIDTH : integer := 16; -- input address bus range width
+    g_ADDR_RANGE_WIDTH : integer := 16;  -- input address bus range width
     g_ADDR_WIDTH       : integer := 16  -- input address bus width
-  );
+    );
   port(
     i_clk            : in  std_logic;   -- clock
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    i_addr_range_min : in  std_logic_vector(g_ADDR_RANGE_WIDTH - 1 downto 0); -- define the lowest possible address
-    i_addr_range_max : in  std_logic_vector(g_ADDR_RANGE_WIDTH - 1 downto 0); -- define the highest possible address
+    i_addr_range_min : in  std_logic_vector(g_ADDR_RANGE_WIDTH - 1 downto 0);  -- define the lowest possible address
+    i_addr_range_max : in  std_logic_vector(g_ADDR_RANGE_WIDTH - 1 downto 0);  -- define the highest possible address
     ---------------------------------------------------------------------
     -- input data
     ---------------------------------------------------------------------
     i_data_valid     : in  std_logic;   -- input address valid
-    i_addr           : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0); -- address value
+    i_addr           : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- address value
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
     o_data_valid     : out std_logic    -- write enable
-  );
+    );
 end entity regdecode_pipe_addr_decode_check_addr_range;
 
 architecture RTL of regdecode_pipe_addr_decode_check_addr_range is

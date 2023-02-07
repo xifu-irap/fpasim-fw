@@ -1,0 +1,188 @@
+// -------------------------------------------------------------------------------------------------------------
+//                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
+// -------------------------------------------------------------------------------------------------------------
+//                              This file is part of the ATHENA X-IFU DRE Focal Plane Assembly simulator.
+//
+//                              fpasim-fw is free software: you can redistribute it and/or modify
+//                              it under the terms of the GNU General Public License as published by
+//                              the Free Software Foundation, either version 3 of the License, or
+//                              (at your option) any later version.
+//
+//                              This program is distributed in the hope that it will be useful,
+//                              but WITHOUT ANY WARRANTY; without even the implied warranty of
+//                              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//                              GNU General Public License for more details.
+//
+//                              You should have received a copy of the GNU General Public License
+//                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// -------------------------------------------------------------------------------------------------------------
+//    email                   kenji.delarosa@alten.com
+//    @file                   ADS62P49.py
+// -------------------------------------------------------------------------------------------------------------
+//    Automatic Generation    No
+//    Code Rules Reference
+// -------------------------------------------------------------------------------------------------------------
+//    @details
+//
+//   This javscript generates spi commands in order to initialize the ads62P49 (ADCs) registers.
+//
+//   Note:
+//      . Tested with javascript
+//
+// -------------------------------------------------------------------------------------------------------------
+include("./fpasim/CDCE72010.dscript");
+include("./fpasim/ADS62P49.dscript");
+include("./fpasim/AMC7823.dscript");
+include("./fpasim/DAC3283.dscript");
+include("./fpasim/fpasim_tools.dscript");
+
+function get_amc()
+{
+		// SPI_CTRL
+		en = 1
+		rst = 0
+		data = (rst << 1) + (en << 0)
+		sendToFPA_debugSetWireIn(0x12,data)
+
+		// SPI_CONF
+		// mode
+		//   1: wr
+		//   0: rd
+		mode = 0
+		// id
+		//   0: cdce (cdce72010)
+		//   1: adc (ads62p49)
+		//   2: dac (dac3283)
+		//   3: amc (amc7823)
+		id = 3
+		// dac_tx_enble to set to '1' at the end of the dac_configuration
+		spi_dac_tx_enable = 0
+		data = (spi_dac_tx_enable << 8 ) + (id << 4) + (mode << 0)
+		sendToFPA_debugSetWireIn(0x13,data)
+
+		// SPI_WR_DATA
+
+		//  mode
+		//   0: write
+		//   1: read
+		mode = 1
+		// page
+		//  '00': page0
+		//  '01':page1
+		//  '10': reserved
+		//  '11': reserved
+		page = parseInt( '00', 2 );
+		// start address
+		//   5 bits
+		start_addr = 0x00
+		// end address
+		end_addr = 0x0000
+
+		cmd = (mode << 15) + (page << 12) + (start_addr<<6) + (end_addr)
+		// reverse bit order
+		//cmd = parseInt('0000000010101001',2)
+		// data
+		//   16 bits
+		reg_value = 0x0000
+		// MSB bits sends first
+		data = (cmd << 16) + reg_value
+
+		sendToFPA_debugSetWireIn(0x14,data)
+
+		sendToFPA_debugSetTriggerIn(0x40,24)  // flush  config
+		waitMs(100)
+
+}
+
+function test_cdce()
+{
+cdce_init_device();
+//###############################################################
+    // config10
+    //###############################################################
+    // [27:14]: R/W: div_m[13:0]
+    // [13:0]: R/W: div_n[13:0]
+    //div_n = parseInt('00000101111111',2); // VCXO Divider N (382)
+    //div_m = parseInt('00001001110000',2); // Reference Divider M (624)
+	
+	div_n = 382; // VCXO Divider N (382)
+    div_m = 624; // Reference Divider M (624)
+	
+    cdce_set_config10(                    div_n_p= div_n,                 div_m_p= div_m);
+				 
+					 
+		//value1 = (div_n << 14);
+        //value0 = (div_m << 0);
+        //value = value1 + value0;
+		//data_p = value;
+		//spi_cmd = (data_p << 4) + addr_p;
+		//print("spi_cmd before reverse: ",spi_cmd);
+
+        // reverse bit order:
+        // addr0 addr1 .... bit0 ... bit26 bit27
+        //spi_cmd = reverse_bit_order(value_p=spi_cmd, width_p=32);
+		//print("spi_cmd to send: ",spi_cmd);
+print("");					 
+			CDCE72010_get_reg_value(reg_name_p='reg10',level_p=2,mode_p=0,verbosity_p=1);		 
+print("");
+
+}
+
+function test_adc()
+{
+	adc_init_device();
+	
+	rst = 0;  //  Software reset applied – resets all internal registers and self-clears to 0.
+    serial_out = 0; //0: Serial readout disabled. SDOUT is forced low by the device (and not put in high impedance state).1:Serial readout enabled, Pin SDOUT functions as serial data readout.
+	adc_write_command(addr_p=0x0,data_p=0x0);
+	tmp = getText("Send the write command", "");
+	data = parseInt('01000110',2);
+	adc_write_command(addr_p=0x50,data_p=data);
+    adc_write_command(addr_p=0x0,data_p=0x1);
+	tmp = getText("Send the READ command", "");
+	print("rd_adc");
+	value = adc_read_command(addr_p =0x50 );
+	print("value: ",value);
+	
+
+}
+
+function test_dac()
+{
+    dac_init_device();
+	dac_set_config23(qmc_offsetb_p=0,sif4_ena_p=1,clkpath_sleep_a_p=0,clkpath_sleep_b_p=0);
+	iotest_pattern0 = parseInt('11000111',2);
+    dac_set_config9(iotest_pattern0_p=iotest_pattern0);
+	tmp = getText("Send the READ command", "");
+	value = dac_read_command(addr_p=0x09);
+	print("value: ",value);
+	
+
+}
+
+//get_amc();
+/*
+verbosity = 1;
+level = 0;
+mode = 0;
+CDCE72010_configure(verbosity_p=verbosity);
+ADS62P49_configure(level_p=level,mode_p=mode,verbosity_p=verbosity);
+AMC7823_configure(verbosity_p=verbosity);
+*/
+ //amc_get_adc(adc_id_p=0,level_p=0,mode_p=0,verbosity_p=1);
+ // amc_get_adc(adc_id_p=8,level_p=0,mode_p=0,verbosity_p=1);
+
+//test_cdce();
+//test_adc();
+test_dac();
+//CDCE72010_configure_100M(verbosity_p=0);
+
+
+print("");
+print("Read All wire_out");
+getLatestValue("FPA_WireOutValues");
+for (i=0; i < 32;++i)
+	{
+	print((0x20+i).toString(16)+ ": ",FPA_WireOutValues[i].toString(16));
+}
+

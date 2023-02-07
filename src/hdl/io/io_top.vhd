@@ -17,130 +17,213 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   io_top.vhd 
+--    @file                   io_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 --
--- This module is the top_level of the fpga specific IO component generation
+--    This module does the following steps:
+--      . ADC:
+--         . deserializes data on ADC IO from @i_adc_clk to @o_adc_clk_div
+--         . pass data word from @o_adc_clk_div to the @sys_clk (async FIFO)
+--      . DAC:
+--         . pass data words from @sys_clk to the @dac_clk_div (async FIFO)
+--         . serializes data words from @dac_clk_div to the IOs (@dac_clk)
+--         . generate "clock word" @dac_clk_div_phase90
+--         . serializes "clock word" from @dac_clk_div_phase90 to the IOs (@dac_clk_phase90)
+--      . SYNC:
+--         . pass data words from @sys_clk to the @sync_clk
+--         . send data to the IOs (@sync_clk)
+--         . send clock to the IOs (@sync_clk)
 --
 -- -------------------------------------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 
-library UNISIM;
-use UNISIM.vcomponents.all;
-
-library fpasim;
-use fpasim.pkg_fpasim.all;
 
 entity io_top is
   port(
+    -- from the mmcm
+    i_sys_clk             : in  std_logic;  -- system clock
+    i_sync_clk            : in  std_logic;  -- sync/ref clock
+    i_dac_clk             : in  std_logic;  -- dac data clock (IO pin side)
+    i_dac_clk_div         : in  std_logic;  -- dac data div clock (IO user side)
+    i_dac_clk_phase90     : in  std_logic;  -- dac clock (IO pin side)
+    i_dac_clk_div_phase90 : in  std_logic;  -- dac div clock (IO user side)
+    -- to the MMCM
+    o_adc_clk_div         : out std_logic;  -- adc div data clock (IO user side)
+    -- from the FPGA pads
+    i_adc_clk_p           : in  std_logic;  -- adc clock_p (IO pin side)
+    i_adc_clk_n           : in  std_logic;  -- adc clock_n (IO pin side)
+
+    -- from the user: @i_sys_clk
+    i_rst_status  : in std_logic;       -- reset error flag(s)
+    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+
     ---------------------------------------------------------------------
     -- adc
     ---------------------------------------------------------------------
-    -- from MMCM 
-    i_adc_clk     : in  std_logic;
-    -- from fpga pads: adc_a 
-    i_da0_p       : in  std_logic;
-    i_da0_n       : in  std_logic;
-    i_da2_p       : in  std_logic;
-    i_da2_n       : in  std_logic;
-    i_da4_p       : in  std_logic;
-    i_da4_n       : in  std_logic;
-    i_da6_p       : in  std_logic;
-    i_da6_n       : in  std_logic;
-    i_da8_p       : in  std_logic;
-    i_da8_n       : in  std_logic;
-    i_da10_p      : in  std_logic;
-    i_da10_n      : in  std_logic;
-    i_da12_p      : in  std_logic;
-    i_da12_n      : in  std_logic;
-    -- from fpga pads: adc_b
-    i_db0_p       : in  std_logic;
-    i_db0_n       : in  std_logic;
-    i_db2_p       : in  std_logic;
-    i_db2_n       : in  std_logic;
-    i_db4_p       : in  std_logic;
-    i_db4_n       : in  std_logic;
-    i_db6_p       : in  std_logic;
-    i_db6_n       : in  std_logic;
-    i_db8_p       : in  std_logic;
-    i_db8_n       : in  std_logic;
-    i_db10_p      : in  std_logic;
-    i_db10_n      : in  std_logic;
-    i_db12_p      : in  std_logic;
-    i_db12_n      : in  std_logic;
-    -- to user : adc_a
-    o_adc_valid   : out std_logic;
-    o_adc_a       : out std_logic_vector(13 downto 0);
-    o_adc_b       : out std_logic_vector(13 downto 0);
-    
+    -- from the reset_top: @i_adc_clk_div
+    i_adc_io_clk_rst : in std_logic;  -- small pulse reset
+    i_adc_io_rst     : in std_logic;  -- large pulse reset
+    -- from fpga pads: adc_a  @i_adc_clk_p/n
+    i_da0_p          : in std_logic;    -- input differential_p adc_a (lane0)
+    i_da0_n          : in std_logic;    -- input differential_n adc_a (lane0)
+
+    i_da2_p : in std_logic;             -- input differential_p adc_a (lane1)
+    i_da2_n : in std_logic;             -- input differential_n adc_a (lane1)
+
+    i_da4_p : in std_logic;             -- input differential_p adc_a (lane2)
+    i_da4_n : in std_logic;             -- input differential_n adc_a (lane2)
+
+    i_da6_p : in std_logic;             -- input differential_p adc_a (lane3)
+    i_da6_n : in std_logic;             -- input differential_n adc_a (lane3)
+
+    i_da8_p : in std_logic;             -- input differential_p adc_a (lane4)
+    i_da8_n : in std_logic;             -- input differential_n adc_a (lane4)
+
+    i_da10_p : in std_logic;            -- input differential_p adc_a (lane5)
+    i_da10_n : in std_logic;            -- input differential_n adc_a (lane5)
+
+    i_da12_p : in std_logic;            -- input differential_p adc_a (lane6)
+    i_da12_n : in std_logic;            -- input differential_n adc_a (lane6)
+
+    -- from fpga pads: adc_b @i_adc_clk_p/n
+    i_db0_p : in std_logic;             -- input differential_p adc_b (lane0)
+    i_db0_n : in std_logic;             -- input differential_n adc_b (lane0)
+
+    i_db2_p : in std_logic;             -- input differential_p adc_b (lane1)
+    i_db2_n : in std_logic;             -- input differential_n adc_b (lane1)
+
+    i_db4_p : in std_logic;             -- input differential_p adc_b (lane2)
+    i_db4_n : in std_logic;             -- input differential_n adc_b (lane2)
+
+    i_db6_p : in std_logic;             -- input differential_p adc_b (lane3)
+    i_db6_n : in std_logic;             -- input differential_n adc_b (lane3)
+
+    i_db8_p : in std_logic;             -- input differential_p adc_b (lane4)
+    i_db8_n : in std_logic;             -- input differential_n adc_b (lane4)
+
+    i_db10_p : in std_logic;            -- input differential_p adc_b (lane5)
+    i_db10_n : in std_logic;            -- input differential_n adc_b (lane5)
+
+    i_db12_p     : in  std_logic;       -- input differential_p adc_b (lane6)
+    i_db12_n     : in  std_logic;       -- input differential_n adc_b (lane6)
+    -- to user: @i_sys_clk
+    o_adc_valid  : out std_logic;       -- adc data valid
+    o_adc_a      : out std_logic_vector(13 downto 0);  -- adc data (channel a)
+    o_adc_b      : out std_logic_vector(13 downto 0);  -- adc data (channel b)
+    o_adc_errors : out std_logic_vector(15 downto 0);  -- adc errors
+    o_adc_status : out std_logic_vector(7 downto 0);   -- adc status
+
     ---------------------------------------------------------------------
     -- sync
     ---------------------------------------------------------------------
-    -- from the user: @clk_ref 
-    i_ref_clk     : in  std_logic;
-    i_sync        : in  std_logic;
-    -- to the fpga pads 
-    o_ref_clk     : out std_logic;
-    o_sync        : out std_logic;
+    -- from the reset_top: @sync_clk
+    i_sync_io_clk_rst : in std_logic;  -- small pulse reset
+    i_sync_io_rst     : in std_logic;  -- large pulse reset
+
+    -- input: from/to the user @i_sys_clk
+    i_sync_rst    : in  std_logic;                      -- sync reset
+    i_sync_valid  : in  std_logic;                      -- sync data valid
+    i_sync        : in  std_logic;                      -- sync data
+    o_sync_errors : out std_logic_vector(15 downto 0);  -- sync errors
+    o_sync_status : out std_logic_vector(7 downto 0);   -- sync status
+
+    -- to the fpga pads : @sync_clk
+    o_sync_clk : out std_logic;         -- sync/ref clock
+    o_sync     : out std_logic;         -- sync signal value
+
     ---------------------------------------------------------------------
     -- dac
     ---------------------------------------------------------------------
-    -- from the user
-    i_dac_clk     : in  std_logic;
-    i_dac_frame   : in  std_logic;
-    i_dac         : in  std_logic_vector(15 downto 0);
-    -- to the fpga pads
-    o_dac_clk_p   : out std_logic;
-    o_dac_clk_n   : out std_logic;
-    o_dac_frame_p : out std_logic;
-    o_dac_frame_n : out std_logic;
-    o_dac0_p      : out std_logic;
-    o_dac0_n      : out std_logic;
-    o_dac1_p      : out std_logic;
-    o_dac1_n      : out std_logic;
-    o_dac2_p      : out std_logic;
-    o_dac2_n      : out std_logic;
-    o_dac3_p      : out std_logic;
-    o_dac3_n      : out std_logic;
-    o_dac4_p      : out std_logic;
-    o_dac4_n      : out std_logic;
-    o_dac5_p      : out std_logic;
-    o_dac5_n      : out std_logic;
-    o_dac6_p      : out std_logic;
-    o_dac6_n      : out std_logic;
-    o_dac7_p      : out std_logic;
-    o_dac7_n      : out std_logic
-  );
+    -- from/to the user: @i_clk
+    i_dac_rst    : in  std_logic;
+    i_dac_valid  : in  std_logic;                      -- dac data valid
+    i_dac_frame  : in  std_logic;                      -- dac frame flag
+    i_dac        : in  std_logic_vector(15 downto 0);  -- dac data value
+    o_dac_errors : out std_logic_vector(15 downto 0);  -- dac errors
+    o_dac_status : out std_logic_vector(7 downto 0);   -- dac status
+
+    -- from the reset_top: @i_dac_clk_div
+    i_dac_io_rst         : in std_logic;  -- large pulse reset
+    -- from the reset_top: @i_dac_clk_div_phase90
+    i_dac_io_rst_phase90 : in std_logic;  -- large pulse reset
+
+    -- to the fpga pads: @i_dac_clk
+    -- dac clock @i_dac_clk
+    o_dac_clk_p   : out std_logic;      -- output differential_p dac clock
+    o_dac_clk_n   : out std_logic;      -- output differential_n dac clock 
+    -- dac frame flag @i_dac_clk
+    o_dac_frame_p : out std_logic;      -- output differential_p dac frame
+    o_dac_frame_n : out std_logic;      -- output differential_n dac frame
+    -- dac data @i_dac_clk
+    o_dac0_p      : out std_logic;  -- output differential_p dac data (bit0)
+    o_dac0_n      : out std_logic;  -- output differential_n dac data (bit0)
+
+    o_dac1_p : out std_logic;  -- output differential_p dac data (bit1)
+    o_dac1_n : out std_logic;  -- output differential_n dac data (bit1)
+
+    o_dac2_p : out std_logic;  -- output differential_p dac data (bit2)
+    o_dac2_n : out std_logic;  -- output differential_n dac data (bit2)
+
+    o_dac3_p : out std_logic;  -- output differential_p dac data (bit3)
+    o_dac3_n : out std_logic;  -- output differential_n dac data (bit3)
+
+    o_dac4_p : out std_logic;  -- output differential_p dac data (bit4)
+    o_dac4_n : out std_logic;  -- output differential_n dac data (bit4)
+
+    o_dac5_p : out std_logic;  -- output differential_p dac data (bit5)
+    o_dac5_n : out std_logic;  -- output differential_n dac data (bit5)
+
+    o_dac6_p : out std_logic;  -- output differential_p dac data (bit6)
+    o_dac6_n : out std_logic;  -- output differential_n dac data (bit6)
+
+    o_dac7_p : out std_logic;  -- output differential_p dac data (bit7)
+    o_dac7_n : out std_logic   -- output differential_n dac data (bit7)
+    );
 end entity io_top;
 
 architecture RTL of io_top is
-  constant c_ADC_INPUT_LATENCY   : natural := pkg_IO_ADC_LATENCY;
-  constant c_SYNC_OUTPUT_LATENCY : natural := pkg_IO_SYNC_LATENCY;
-  constant c_DAC_OUTPUT_LATENCY  : natural := pkg_IO_DAC_LATENCY;
-  ---------------------------------------------------------------------
-  -- adc_a
-  ---------------------------------------------------------------------
-  signal adc_a_tmp0_p            : std_logic_vector(6 downto 0);
-  signal adc_a_tmp0_n            : std_logic_vector(6 downto 0);
-  signal adc_a_tmp1              : std_logic_vector(o_adc_a'range);
 
   ---------------------------------------------------------------------
-  -- adc_b
+  -- io_adc_top
   ---------------------------------------------------------------------
+  -- input
+  signal adc_a_tmp0_p : std_logic_vector(6 downto 0);
+  signal adc_a_tmp0_n : std_logic_vector(6 downto 0);
   signal adc_b_tmp0_p : std_logic_vector(6 downto 0);
   signal adc_b_tmp0_n : std_logic_vector(6 downto 0);
-  signal adc_b_tmp1   : std_logic_vector(o_adc_b'range);
+
+  -- output
+  signal adc_clk_div : std_logic;
+  signal adc_valid   : std_logic;
+  signal adc_a       : std_logic_vector(o_adc_a'range);
+  signal adc_b       : std_logic_vector(o_adc_b'range);
+
+  signal adc_errors : std_logic_vector(o_adc_errors'range);
+  signal adc_status : std_logic_vector(o_adc_status'range);
+
+  ---------------------------------------------------------------------
+  -- io_sync_top
+  ---------------------------------------------------------------------
+  signal sync_errors : std_logic_vector(o_sync_errors'range);
+  signal sync_status : std_logic_vector(o_sync_status'range);
+
+  ---------------------------------------------------------------------
+  -- io_dac_top
+  ---------------------------------------------------------------------
+  signal dac_errors : std_logic_vector(o_dac_errors'range);
+  signal dac_status : std_logic_vector(o_dac_status'range);
 
 begin
 
-  ---------------------------------------------------------------------
+---------------------------------------------------------------------
+-- io_adc
+---------------------------------------------------------------------
   -- adc_a
-  ---------------------------------------------------------------------
   adc_a_tmp0_p(6) <= i_da12_p;
   adc_a_tmp0_n(6) <= i_da12_n;
 
@@ -162,28 +245,7 @@ begin
   adc_a_tmp0_p(0) <= i_da0_p;
   adc_a_tmp0_n(0) <= i_da0_n;
 
-  inst_io_adc_a : entity fpasim.io_adc
-    generic map(
-      g_ADC_WIDTH     => adc_a_tmp0_p'length,
-      g_INPUT_LATENCY => c_ADC_INPUT_LATENCY
-    )
-    port map(
-      i_clk   => i_adc_clk,             -- clock
-      ---------------------------------------------------------------------
-      -- input
-      ---------------------------------------------------------------------
-      i_adc_p => adc_a_tmp0_p,          -- Diff_p buffer input
-      i_adc_n => adc_a_tmp0_n,          -- Diff_n buffer input
-      ---------------------------------------------------------------------
-      -- output
-      ---------------------------------------------------------------------
-      o_adc   => adc_a_tmp1
-    );
-  o_adc_a <= adc_a_tmp1;
-
-  ---------------------------------------------------------------------
   -- adc_b
-  ---------------------------------------------------------------------
   adc_b_tmp0_p(6) <= i_db12_p;
   adc_b_tmp0_n(6) <= i_db12_n;
 
@@ -205,84 +267,153 @@ begin
   adc_b_tmp0_p(0) <= i_db0_p;
   adc_b_tmp0_n(0) <= i_db0_n;
 
-  inst_io_adc_b : entity fpasim.io_adc
+  inst_io_adc : entity work.io_adc
     generic map(
-      g_ADC_WIDTH     => adc_b_tmp0_p'length,
-      g_INPUT_LATENCY => c_ADC_INPUT_LATENCY
-    )
+      g_ADC_A_WIDTH => adc_a_tmp0_p'length,  -- adc bus width (expressed in bits).Possible values [1;max integer value[
+      g_ADC_B_WIDTH => adc_b_tmp0_p'length  -- adc bus width (expressed in bits).Possible values [1;max integer value[
+      )
     port map(
-      i_clk   => i_adc_clk,             -- clock
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_adc_p => adc_b_tmp0_p,          -- Diff_p buffer input
-      i_adc_n => adc_b_tmp0_n,          -- Diff_n buffer input
-      ---------------------------------------------------------------------
-      -- output
-      ---------------------------------------------------------------------
-      o_adc   => adc_b_tmp1
-    );
-  o_adc_b <= adc_b_tmp1;
+      --
+      i_adc_clk_p  => i_adc_clk_p,      -- clock
+      i_adc_clk_n  => i_adc_clk_n,      -- clock
+      -- adc_a
+      i_adc_a_p    => adc_a_tmp0_p,     -- Diff_p buffer input
+      i_adc_a_n    => adc_a_tmp0_n,     -- Diff_n buffer input
+      -- adc_b
+      i_adc_b_p    => adc_b_tmp0_p,     -- Diff_p buffer input
+      i_adc_b_n    => adc_b_tmp0_n,     -- Diff_n buffer input
 
-  o_adc_valid <= '1';
+      -- from reset_top: @i_adc_clk_div
+      i_io_clk_rst => i_adc_io_clk_rst,
+      i_io_rst     => i_adc_io_rst,
+      o_adc_clk_div => adc_clk_div,
+      ---------------------------------------------------------------------
+      -- output@ i_out_clk
+      ---------------------------------------------------------------------
+      i_out_clk     => i_sys_clk,
+      i_rst_status  => i_rst_status,
+      i_debug_pulse => i_debug_pulse,
+      o_adc_valid   => adc_valid,
+      o_adc_a       => adc_a,
+      o_adc_b       => adc_b,
+
+      ---------------------------------------------------------------------
+      -- errors/status: @i_out_clk
+      ---------------------------------------------------------------------
+      o_errors => adc_errors,
+      o_status => adc_status
+      );
+
+  -- to the user
+  o_adc_clk_div <= adc_clk_div;
+  o_adc_valid   <= adc_valid;
+  o_adc_a       <= adc_a;
+  o_adc_b       <= adc_b;
+
+  o_adc_errors <= adc_errors;
+  o_adc_status <= adc_status;
+
+
 
   ---------------------------------------------------------------------
   -- sync
   ---------------------------------------------------------------------
-  inst_io_sync : entity fpasim.io_sync
-    generic map(
-      g_OUTPUT_LATENCY => c_SYNC_OUTPUT_LATENCY
-    )
+  inst_io_sync : entity work.io_sync
     port map(
-      i_clk      => i_ref_clk,          -- clock
+
       ---------------------------------------------------------------------
-      -- input
+      -- input: @i_clk
       ---------------------------------------------------------------------
-      i_sync     => i_sync,
+      i_clk         => i_sys_clk,
+      i_rst         => i_sync_rst,
+      i_rst_status  => i_rst_status,
+      i_debug_pulse => i_debug_pulse,
+      i_sync_valid  => i_sync_valid,
+      i_sync        => i_sync,
+
       ---------------------------------------------------------------------
-      -- output
+      -- output: @i_out_clk
       ---------------------------------------------------------------------
-      o_sync_clk => o_ref_clk,
-      o_sync     => o_sync
-    );
+      i_out_clk    => i_sync_clk,       -- clock
+      -- from reset_top: @i_sync_clk
+      i_io_clk_rst => i_sync_io_clk_rst,
+      i_io_rst     => i_sync_io_rst,
+      -- data
+      o_sync_clk   => o_sync_clk,
+      o_sync       => o_sync,
+      ---------------------------------------------------------------------
+      -- errors/status
+      ---------------------------------------------------------------------
+      o_errors     => sync_errors,
+      o_status     => sync_status
+      );
+
+  -- output
+  o_sync_errors <= sync_errors;
+  o_sync_status <= sync_status;
 
   ---------------------------------------------------------------------
   -- dac
   ---------------------------------------------------------------------
-  inst_io_dac : entity fpasim.io_dac
-    generic map(
-      g_OUTPUT_LATENCY => c_DAC_OUTPUT_LATENCY
-    )
+  inst_io_dac : entity work.io_dac
     port map(
-      i_clk         => i_dac_clk,       -- clock
       ---------------------------------------------------------------------
-      -- input
+      -- input: @i_clk
       ---------------------------------------------------------------------
+      i_clk         => i_sys_clk,       -- clock
+      i_rst         => i_dac_rst,
+      i_rst_status  => i_rst_status,
+      i_debug_pulse => i_debug_pulse,
+      i_dac_valid   => i_dac_valid,
       i_dac_frame   => i_dac_frame,
       i_dac         => i_dac,
+
       ---------------------------------------------------------------------
-      -- output
+      -- output: i_out_clk
       ---------------------------------------------------------------------
-      o_dac_clk_p   => o_dac_clk_p,
-      o_dac_clk_n   => o_dac_clk_n,
-      o_dac_frame_p => o_dac_frame_p,
-      o_dac_frame_n => o_dac_frame_n,
-      o_dac0_p      => o_dac0_p,
-      o_dac0_n      => o_dac0_n,
-      o_dac1_p      => o_dac1_p,
-      o_dac1_n      => o_dac1_n,
-      o_dac2_p      => o_dac2_p,
-      o_dac2_n      => o_dac2_n,
-      o_dac3_p      => o_dac3_p,
-      o_dac3_n      => o_dac3_n,
-      o_dac4_p      => o_dac4_p,
-      o_dac4_n      => o_dac4_n,
-      o_dac5_p      => o_dac5_p,
-      o_dac5_n      => o_dac5_n,
-      o_dac6_p      => o_dac6_p,
-      o_dac6_n      => o_dac6_n,
-      o_dac7_p      => o_dac7_p,
-      o_dac7_n      => o_dac7_n
-    );
+      i_out_clk             => i_dac_clk,
+      i_out_clk_div         => i_dac_clk_div,
+      i_out_clk_phase90     => i_dac_clk_phase90,
+      i_out_clk_div_phase90 => i_dac_clk_div_phase90,
+
+      -- from reset_top: @i_out_clk_div
+      i_io_rst         => i_dac_io_rst,
+      -- from reset_top: @i_out_clk_div_phase90
+      i_io_rst_phase90 => i_dac_io_rst_phase90,
+      -- to pads:
+      o_dac_clk_p      => o_dac_clk_p,
+      o_dac_clk_n      => o_dac_clk_n,
+      o_dac_frame_p    => o_dac_frame_p,
+      o_dac_frame_n    => o_dac_frame_n,
+      o_dac0_p         => o_dac0_p,
+      o_dac0_n         => o_dac0_n,
+      o_dac1_p         => o_dac1_p,
+      o_dac1_n         => o_dac1_n,
+      o_dac2_p         => o_dac2_p,
+      o_dac2_n         => o_dac2_n,
+      o_dac3_p         => o_dac3_p,
+      o_dac3_n         => o_dac3_n,
+      o_dac4_p         => o_dac4_p,
+      o_dac4_n         => o_dac4_n,
+      o_dac5_p         => o_dac5_p,
+      o_dac5_n         => o_dac5_n,
+      o_dac6_p         => o_dac6_p,
+      o_dac6_n         => o_dac6_n,
+      o_dac7_p         => o_dac7_p,
+      o_dac7_n         => o_dac7_n,
+      ---------------------------------------------------------------------
+      -- output/status: @i_clk
+      ---------------------------------------------------------------------
+      o_errors         => dac_errors,
+      o_status         => dac_status
+      );
+
+  -- output
+  o_dac_errors <= dac_errors;
+  o_dac_status <= dac_status;
+
 
 end architecture RTL;

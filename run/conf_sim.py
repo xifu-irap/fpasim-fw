@@ -789,6 +789,104 @@ if __name__ == '__main__':
     # save the individual test for further use (sequence building)
     solo_test_dic[test_name] = test_dic0
 
+    # 8: individual test
+    ############################################################################
+    # search run python script file
+    # tb_name = 'tb_fmc150_controler'
+    # test_name = 'tb_fmc150_controler_conf_debug'
+    # obj = FilepathListBuilder()
+    # obj.set_file_extension(file_extension_list_p=['.py'])
+    # vunit_basepath = str(Path(root_path, 'simu/vunit'))
+    # run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    # # generate individual test
+    # vunit_outpath = str(Path(root_path, 'vunit_out'))
+    # test0 = DUT()
+    # test0.add_description(text_p="")
+    # test0.set_name(name_p=tb_name)
+    # # test0.add_conf_filename(filename_p="tb_system_fpasim_top_conf_debug.json")
+    # test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    # test0.set_script_filename(filename_p="")
+    # test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    # test0.set_vunit_outpath(path_p=vunit_outpath)
+    # test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    # test_dic0 = test0.get_dic(level_p=level2)
+    # # save the individual test for further use (sequence building)
+    # solo_test_dic[test_name] = test_dic0
+
+    # 9: individual test
+    ############################################################################
+    # search run python script file
+    # tb_name = 'tb_spi_master'
+    # test_name = 'tb_spi_master_conf_debug'
+    # obj = FilepathListBuilder()
+    # obj.set_file_extension(file_extension_list_p=['.py'])
+    # vunit_basepath = str(Path(root_path, 'simu/vunit'))
+    # run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    # # generate individual test
+    # vunit_outpath = str(Path(root_path, 'vunit_out'))
+    # test0 = DUT()
+    # test0.add_description(text_p="")
+    # test0.set_name(name_p=tb_name)
+    # # test0.add_conf_filename(filename_p="tb_system_fpasim_top_conf_debug.json")
+    # test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    # test0.set_script_filename(filename_p="")
+    # test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    # test0.set_vunit_outpath(path_p=vunit_outpath)
+    # test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    # test_dic0 = test0.get_dic(level_p=level2)
+    # # save the individual test for further use (sequence building)
+    # solo_test_dic[test_name] = test_dic0
+
+    # 10: individual test
+    ############################################################################
+    # search run python script file
+    tb_name = 'tb_spi_top'
+    test_name = 'tb_spi_top_conf_debug'
+    obj = FilepathListBuilder()
+    obj.set_file_extension(file_extension_list_p=['.py'])
+    vunit_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    # generate individual test
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
+    test0 = DUT()
+    test0.add_description(text_p="")
+    test0.set_name(name_p=tb_name)
+    # test0.add_conf_filename(filename_p="tb_system_fpasim_top_conf_debug.json")
+    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    test0.set_script_filename(filename_p="")
+    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_outpath(path_p=vunit_outpath)
+    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test_dic0 = test0.get_dic(level_p=level2)
+    # save the individual test for further use (sequence building)
+    solo_test_dic[test_name] = test_dic0
+
+    # 10: individual test
+    ############################################################################
+    # search run python script file
+    tb_name = 'tb_fpga_system_fpasim_top'
+    test_name = 'tb_fpga_system_fpasim_top_debug'
+    obj = FilepathListBuilder()
+    obj.set_file_extension(file_extension_list_p=['.py'])
+    vunit_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    # generate individual test
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
+    test0 = DUT()
+    test0.add_description(text_p="")
+    test0.set_name(name_p=tb_name)
+    # test0.add_conf_filename(filename_p="tb_system_fpasim_top_conf_debug.json")
+    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    test0.set_script_filename(filename_p="")
+    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_outpath(path_p=vunit_outpath)
+    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test_dic0 = test0.get_dic(level_p=level2)
+    # save the individual test for further use (sequence building)
+    solo_test_dic[test_name] = test_dic0
+
+
+
     ############################################################################
     # Section6 : Define 1 or several list of individual tests
     ############################################################################
@@ -801,6 +899,10 @@ if __name__ == '__main__':
     json_data["test0_tb_mux_squid_top_debug"] = [solo_test_dic['tb_mux_squid_top_debug']]
     json_data["test0_tb_amp_squid_top_debug"] = [solo_test_dic['tb_amp_squid_top_debug']]
     json_data["test0_tb_system_fpasim_top_debug"] = [solo_test_dic['tb_system_fpasim_top_conf_debug']]
+    # json_data["test0_tb_fmc150_controler_conf_debug"] = [solo_test_dic['tb_fmc150_controler_conf_debug']]
+    # json_data["test0_tb_spi_master_conf_debug"] = [solo_test_dic['tb_spi_master_conf_debug']]
+    json_data["test0_tb_spi_top_debug"] = [solo_test_dic['tb_spi_top_conf_debug']]
+    json_data["test0_tb_fpga_system_fpasim_top_debug"] = [solo_test_dic['tb_fpga_system_fpasim_top_debug']]
 
     ############################################################################
     # Section7: Output the result in an output json file

@@ -312,11 +312,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library xpm;
-use xpm.vcomponents.all;
-
-library fpasim;
-
 entity fifo_sync_with_error is
   generic(
     -- +---------------------------------------------------------------------------------------------------------------------+
@@ -577,7 +572,7 @@ begin
   ---------------------------------------------------------------------
   -- instanciate fifo_sync
   ---------------------------------------------------------------------
-  inst_fifo_sync : entity fpasim.fifo_sync
+  inst_fifo_sync : entity work.fifo_sync
     generic map(
       g_FIFO_MEMORY_TYPE  => g_FIFO_MEMORY_TYPE,
       g_FIFO_READ_LATENCY => g_FIFO_READ_LATENCY,
@@ -612,7 +607,7 @@ begin
   data_wr_tmp0(2) <= wr_rst_busy;
   data_wr_tmp0(1) <= wr_full;
   data_wr_tmp0(0) <= i_wr_en;
-  inst_pipeliner_wr : entity fpasim.pipeliner
+  inst_pipeliner_wr : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_DELAY_FLAG,
       g_DATA_WIDTH => data_wr_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -629,7 +624,7 @@ begin
   data_rd_tmp0(2) <= rd_rst_busy;
   data_rd_tmp0(1) <= rd_empty;
   data_rd_tmp0(0) <= i_rd_en;
-  inst_pipeliner_rd : entity fpasim.pipeliner
+  inst_pipeliner_rd : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_DELAY_FLAG,
       g_DATA_WIDTH => data_rd_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -686,7 +681,7 @@ begin
   ---------------------------------------------------------------------
   data_wr_out_tmp0(1) <= error_wr_rst_ry;
   data_wr_out_tmp0(0) <= error_wr_full_ry;
-  inst_pipeliner_wr_out : entity fpasim.pipeliner
+  inst_pipeliner_wr_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_DELAY_OUT,
       g_DATA_WIDTH => data_wr_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
@@ -703,7 +698,7 @@ begin
   data_rd_out_tmp0(2) <= rd_empty_ry;
   data_rd_out_tmp0(1) <= error_rd_rst_ry;
   data_rd_out_tmp0(0) <= error_rd_empty_ry;
-  inst_pipeliner_rd_out : entity fpasim.pipeliner
+  inst_pipeliner_rd_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => c_DELAY_OUT,
       g_DATA_WIDTH => data_rd_out_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[

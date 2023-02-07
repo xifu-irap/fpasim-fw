@@ -43,6 +43,7 @@ import os
 import shutil
 import random
 import copy
+import shutil
 
 
 
@@ -206,12 +207,7 @@ class SystemFpasimTopDataGen:
         fid = open(output_tb_filepath,'w')
 
         description_list = []
-        description_list.append("pipe_in: opal_kelly_type=0")
-        description_list.append("wire_in: opal_kelly_type=1")
-        description_list.append("trig_in: opal_kelly_type=2")
-        description_list.append("pipe_out: opal_kelly_type=10")
-        description_list.append("wire_out: opal_kelly_type=11")
-        description_list.append("trig_out: opal_kelly_type=12")
+        description_list.append("the reg_id is used to select the wire_in or the wire_out .....")
         description = ', '.join(description_list)
 
         fid.write("reg_id")
@@ -459,60 +455,62 @@ class SystemFpasimTopDataGen:
         :return: None
         """
         display_obj = self.display_obj
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
+        level1 = level0 + 1
 
         if not os.path.exists(path_p):
             os.makedirs(path_p)
-            msg0 = "Directory ", path_p, " Created "
+            msg0 = "Create Directory: "
             display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
+            msg0 = path_p
+            display_obj.display(msg_p=msg0, level_p=level1, color_p='green')
         else:
-            msg0 = "Warning: Directory ", path_p, " already exists"
+            msg0 = "Warning: Directory already exists: "
             display_obj.display(msg_p=msg0, level_p=level0, color_p='yellow')
+            msg0 = path_p
+            display_obj.display(msg_p=msg0, level_p=level1, color_p='yellow')
 
         return None
 
     def set_mif_files(self, filepath_list_p):
         """
         This method stores a list of *.mif files.
-        For Modelsim/Questa simulator, these *.mif files must be copied
+        For Modelsim/Questa simulator, these *.mif files will be copied
         into a specific directory in order to be "seen" by the simulator
         Note: 
            This method is used for Xilinx IP which uses RAM
-           This method should be called before the SystemFpasimTopDataGen.pre_config method (if necessary)
+           This method should be called before the pre_config method (if necessary)
         :param filepath_list_p: (list of strings) -> list of filepaths
         :return: None
         """
         self.filepath_list_mif = filepath_list_p
         return None
 
-    def _copy_mif_files(self, output_path_p, debug_p, level_p=None):
+    def _copy_mif_files(self, output_path_p, level_p=None):
         """
-        copy a list of *.mif files into the Vunit simulation directory ("./Vunit_out/modelsim")
+        copy a list of init files such as *.mif and/or *.mem into the Vunit simulation directory ("./Vunit_out/modelsim")
         Note: the expected destination directory is "./Vunit_out/modelsim"
         :param output_path_p: (string) -> output path provided by the Vunit library
-        :param debug_p: (string) -> print debug_p message if the value is 'true'
         :param level_p:   (integer >= 0) define the level of indentation of the message to print
         :return: None
         """
         display_obj = self.display_obj
-        script_name = self.script_name
         output_path = output_path_p
         level0   = self._get_indentation_level(level_p=level_p)
+        level1 = level0 + 1
 
         # get absolute path
         script_path = Path(output_path).resolve()
         # move into the hierarchy : vunit_out/modelsim
-        output_path = str(script_path.parents[1]) + sep + "modelsim"
-        if debug_p == 'true':
-            msg0 = script_name + "copy the *.mif into the Vunit simulation directory"
-            display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
+        output_path = str(Path(script_path.parents[1],"modelsim"))
 
         # copy each files
+        msg0 =  "[SystemFpasimTopDataGen._copy_mif_files]: Copy the IP init files into the Vunit output simulation directory"
+        display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
         for filepath in self.filepath_list_mif:
-            if debug_p == 'true':
-                msg0 = script_name + "the filepath :" + filepath + " is copied to " + output_path
-                display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
-            copy(filepath, output_path)
+            msg0 =  'Copy: ' + filepath + " to " + output_path
+            display_obj.display(msg_p=msg0, level_p=level1, color_p='green')
+            shutil.copy(filepath, output_path)
 
         return None
 
@@ -547,9 +545,9 @@ class SystemFpasimTopDataGen:
         self._create_directory(path_p=tb_input_base_path,level_p = level1)
         self._create_directory(path_p=tb_output_base_path,level_p =level1)
 
-        #copy the mif files into the Vunit simulation directory
+        # copy the mif files into the Vunit simulation directory
         if self.filepath_list_mif is not None:
-            self._copy_mif_files(output_path_p=output_path, debug_p='true')
+            self._copy_mif_files(output_path_p=output_path, level_p=level1)
 
         ##########################################################
         # generate files
