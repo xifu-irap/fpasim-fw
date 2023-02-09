@@ -42,6 +42,9 @@ from common import TesModel
 import json
 import os
 import shutil
+import random
+import copy
+import shutil
 
 
 class TesTopDataGen:
@@ -481,7 +484,6 @@ class TesTopDataGen:
         :return: None
         """
         display_obj = self.display_obj
-        script_name = self.script_name
         output_path = output_path_p
         level0   = self._get_indentation_level(level_p=level_p)
         level1 = level0 + 1
@@ -492,12 +494,12 @@ class TesTopDataGen:
         output_path = str(Path(script_path.parents[1],"modelsim"))
 
         # copy each files
-        msg0 = script_name + ": Copy the IP init files into the Vunit output simulation directory"
+        msg0 =  "[TesTopDataGen._copy_mif_files]: Copy the IP init files into the Vunit output simulation directory"
         display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
         for filepath in self.filepath_list_mif:
             msg0 =  'Copy: ' + filepath + " to " + output_path
             display_obj.display(msg_p=msg0, level_p=level1, color_p='green')
-            copy(filepath, output_path)
+            shutil.copy(filepath, output_path)
 
         return None
 

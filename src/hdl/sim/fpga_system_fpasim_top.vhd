@@ -24,6 +24,22 @@
 -- -------------------------------------------------------------------------------------------------------------
 --    @details                
 --
+--    This module is the top_level for the co-simulation. 
+--    The input i_make_pulse command has the following structure:
+--        . [31]: pixel_all:
+--            . '1': the FPGA will auto-generate commands by overwriting the pixel_id field from 0 to (nb_pixel_by_frame - 1) with nb_pixel_by_frame defined in the TES_CONF registers. The pulse_height and time_shift values are shared against the auto-generated commands.
+--            . '0': do nothing
+--        . [29:24]: pixel_id: pixel_id value. The range is [0; nb_pixel_by_frame - 1] with nb_pixel_by_frame defined in the TES_CONF registers 
+--            . This field is valid only if pixel_all bit is set to '0'. 
+--        . [19:16]: time_shift: time_shift value. By design, the range is [0;15].
+--            . This value defined the address offset to apply to the tes_pulse_shape RAM.
+--        . [10:0]: pulse_height: amplitude factor applied to the pulse_shape amplitude. The formula is: percentage = pulse_height/(2**16-1)
+--           . 0x0000 => 0% of the pulse_shape amplitude in the FPGA.
+--           . 0xFFFF => 100% of the pulse_shape amplitude in the FPGA.
+--    
+--    Note:
+--     . This file should only be used for simulation.
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 
@@ -32,57 +48,56 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 library opal_kelly_lib;
-context opal_kelly_lib.opal_kelly_context;
+use opal_kelly_lib.pkg_front_panel.all;
 
 library common_lib;
-context common_lib.common_context;
-
+use common_lib.pkg_common.all;
 
 entity fpga_system_fpasim_top is
   generic (
     -- ADC
     g_ADC_VPP            : natural := 2;  -- ADC differential input voltage ( Vpp expressed in Volts)
-    g_ADC_DELAY          : natural := 0;  -- ADC conversion delay
+    g_ADC_DELAY          : natural := 0;  -- ADC conversion delay (expressed in number of clock cycles @i_adc_clk). The range is: [0;max integer value[)
     -- DAC
     g_DAC_VPP            : natural := 2;  -- DAC differential output voltage ( Vpp expressed in Volts)
-    g_DAC_DELAY          : natural := 0;  -- DAC conversion delay
+    g_DAC_DELAY          : natural := 0;  -- DAC conversion delay (expressed in number of clock cycles @i_dac_clk). The range is: [0;max integer value[)
     -- design parameters
     g_FPASIM_GAIN        : natural := 3;  -- 0:0.25, 1:0.5, 3:1, 4:1.5, 5:2, 6:3, 7:4
-    g_MUX_SQ_FB_DELAY    : natural := 3;  -- [0;(2**6) - 1]
-    g_AMP_SQ_OF_DELAY    : natural := 3;  -- [0;(2**6) - 1]
-    g_ERROR_DELAY        : natural := 3;  -- [0;(2**6) - 1]
-    g_RA_DELAY           : natural := 4;  -- [0;(2**6) - 1]
-    g_NB_PIXEL_BY_FRAME  : natural := 34;
-    g_NB_SAMPLE_BY_PIXEL : natural := 40
+    g_MUX_SQ_FB_DELAY    : natural := 3;  -- delay on the adc0 input path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
+    g_AMP_SQ_OF_DELAY    : natural := 3;  -- delay on the adc1 input path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
+    g_ERROR_DELAY        : natural := 3;  -- delay on the dac output path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
+    g_RA_DELAY           : natural := 4;  -- delay on the sync output path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
+    g_NB_PIXEL_BY_FRAME  : natural := 34;  -- number of pixels by column
+    g_NB_SAMPLE_BY_PIXEL : natural := 40  -- number of pixels by pixels
     );
   port (
 
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    i_make_pulse_valid : in  std_logic;
-    i_make_pulse       : in  std_logic_vector(31 downto 0);
-    o_auto_conf_busy   : out std_logic;
-    o_ready            : out std_logic;
+    i_make_pulse_valid : in  std_logic; -- make pulse command valid
+    i_make_pulse       : in  std_logic_vector(31 downto 0); -- make pulse command
+    o_auto_conf_busy   : out std_logic; -- '1': auto-configuration is in progress, '0': end of the auto-configuration
+    o_ready            : out std_logic; -- '1': ready to receive a make pulse command, '0': otherwise
     ---------------------------------------------------------------------
     -- ADC
     ---------------------------------------------------------------------
-    i_adc_clk_phase    : in std_logic;
-    i_adc_clk          : in  std_logic;
-    i_adc0_real        : in  real;
-    i_adc1_real        : in  real;
+    i_adc_clk_phase    : in  std_logic; -- adc clock (for the clock path): i_adc_clk_phase = i_adc_clk + 90 degree
+    i_adc_clk          : in  std_logic; -- adc clock (for the data path)
+    i_adc0_real        : in  real; --  adc0 value (mux_squid_feedback)
+    i_adc1_real        : in  real; --  adc1 value (amp_squid_offset_correction)
 
     ---------------------------------------------------------------------
     -- to sync
     ---------------------------------------------------------------------
-    o_ref_clk : out std_logic;
-    o_sync    : out std_logic;
+    o_ref_clk : out std_logic; -- reference clock @62.5Mhz
+    o_sync    : out std_logic; -- pulse at the beginning of the first pixel of a column (@o_ref_clk)
 
     ---------------------------------------------------------------------
     -- to DAC
     ---------------------------------------------------------------------
-    o_dac_real_valid : out std_logic;
-    o_dac_real       : out real
+    o_dac_real_valid : out std_logic; --  dac valid
+    o_dac_real       : out real       --  dac value
     );
 end entity fpga_system_fpasim_top;
 
@@ -127,12 +142,12 @@ architecture RTL of fpga_system_fpasim_top is
   constant c_WIRE_NO_MASK            : std_logic_vector(31 downto 0) := x"ffff_ffff";  -- wire mask value
 
   function uint_to_stdv (
-     constant value_p :  integer; width_p: integer
-     )
-     return std_logic_vector is
-     variable v_value_vect : std_logic_vector(width_p - 1 downto 0);
+    constant value_p : integer; width_p : integer
+    )
+    return std_logic_vector is
+    variable v_value_vect : std_logic_vector(width_p - 1 downto 0);
   begin
-    v_value_vect := std_logic_vector(to_unsigned(value_p,width_p));
+    v_value_vect := std_logic_vector(to_unsigned(value_p, width_p));
     return v_value_vect;
   end function uint_to_stdv;
 
@@ -167,7 +182,7 @@ begin
   -- master fsm
   ---------------------------------------------------------------------
   p_master_fsm : process is
-    variable v_opal_kelly_addr : std_logic_vector(7 downto 0)                       := (others => '0');  -- address value from file
+    variable v_opal_kelly_addr : std_logic_vector(7 downto 0)  := (others => '0');  -- address value from file
     variable v_data            : integer;  -- data value from file
     variable v_data_vect       : std_logic_vector(31 downto 0) := (others => '0');  -- data value from file
   begin
@@ -178,7 +193,7 @@ begin
     -- set Ctrl: enable reset
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"00";
-    v_data_vect            := x"0000_0002";  -- reset bit to '1'
+    v_data_vect       := x"0000_0002";  -- reset bit to '1'
     SetWireInValue(
       i_ep               => v_opal_kelly_addr,
       i_val              => v_data_vect,
@@ -197,7 +212,7 @@ begin
     -- set Ctrl: disable reset
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"00";
-    v_data_vect            := x"0000_0000";  -- reset bit to '1'
+    v_data_vect       := x"0000_0000";  -- reset bit to '1'
     SetWireInValue(
       i_ep               => v_opal_kelly_addr,
       i_val              => v_data_vect,
@@ -215,12 +230,12 @@ begin
     ---------------------------------------------------------------------
     pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 16, i_margin => 12 ps);
 
-     ---------------------------------------------------------------------
+    ---------------------------------------------------------------------
     -- set FPASIM_GAIN
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"02";
     v_data            := g_FPASIM_GAIN;  -- reset bit to '1'
-    v_data_vect := uint_to_stdv(value_p=> v_data,width_p=> 32);
+    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
     SetWireInValue(
       i_ep               => v_opal_kelly_addr,
       i_val              => v_data_vect,
@@ -240,7 +255,7 @@ begin
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"03";
     v_data            := g_MUX_SQ_FB_DELAY;
-    v_data_vect := uint_to_stdv(value_p=> v_data,width_p=> 32);
+    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
     SetWireInValue(
       i_ep               => v_opal_kelly_addr,
       i_val              => v_data_vect,
@@ -260,7 +275,7 @@ begin
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"04";
     v_data            := g_AMP_SQ_OF_DELAY;
-    v_data_vect := uint_to_stdv(value_p=> v_data,width_p=> 32);
+    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
     SetWireInValue(
       i_ep               => v_opal_kelly_addr,
       i_val              => v_data_vect,
@@ -280,7 +295,7 @@ begin
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"05";
     v_data            := g_ERROR_DELAY;
-    v_data_vect := uint_to_stdv(value_p=> v_data,width_p=> 32);
+    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
     SetWireInValue(
       i_ep               => v_opal_kelly_addr,
       i_val              => v_data_vect,
@@ -300,7 +315,7 @@ begin
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"06";
     v_data            := g_RA_DELAY;
-    v_data_vect := uint_to_stdv(value_p=> v_data,width_p=> 32);
+    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
     SetWireInValue(
       i_ep               => v_opal_kelly_addr,
       i_val              => v_data_vect,
@@ -319,8 +334,8 @@ begin
     -- set TES_CONF
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"07";
-    v_data            := ((g_NB_PIXEL_BY_FRAME - 1) * (2**24)) + ((g_NB_SAMPLE_BY_PIXEL - 1) *(2**16)) + ((g_NB_PIXEL_BY_FRAME*g_NB_SAMPLE_BY_PIXEL - 1) );  -- reset bit to '1'
-    v_data_vect := uint_to_stdv(value_p=> v_data,width_p=> 32);
+    v_data            := ((g_NB_PIXEL_BY_FRAME - 1) * (2**24)) + ((g_NB_SAMPLE_BY_PIXEL - 1) *(2**16)) + ((g_NB_PIXEL_BY_FRAME*g_NB_SAMPLE_BY_PIXEL - 1));  -- reset bit to '1'
+    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
     SetWireInValue(
       i_ep               => v_opal_kelly_addr,
       i_val              => v_data_vect,
@@ -351,7 +366,7 @@ begin
     -- set Ctrl: enable
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"00";
-    v_data_vect            := x"0000_0001";  -- enable bit to '1'
+    v_data_vect       := x"0000_0001";  -- enable bit to '1'
     SetWireInValue(
       i_ep               => v_opal_kelly_addr,
       i_val              => v_data_vect,
@@ -371,7 +386,7 @@ begin
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"40";
     v_data            := 2**12;
-    v_data_vect := uint_to_stdv(value_p=> v_data,width_p=> 32);
+    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
     ActivateTriggerIn_by_data(
       i_ep             => v_opal_kelly_addr,
       i_data           => v_data_vect,
@@ -389,7 +404,7 @@ begin
         -- set Make pulse
         ---------------------------------------------------------------------
         v_opal_kelly_addr := x"01";
-        v_data_vect            := i_make_pulse;
+        v_data_vect       := i_make_pulse;
         SetWireInValue(
           i_ep               => v_opal_kelly_addr,
           i_val              => v_data_vect,
@@ -407,7 +422,7 @@ begin
         ---------------------------------------------------------------------
         v_opal_kelly_addr := x"40";
         v_data            := 2**4;
-        v_data_vect := uint_to_stdv(value_p=> v_data,width_p=> 32);
+        v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
         ActivateTriggerIn_by_data(
           i_ep             => v_opal_kelly_addr,
           i_data           => v_data_vect,

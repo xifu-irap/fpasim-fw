@@ -528,6 +528,7 @@ class SystemFpasimTopDataGen:
         display_obj   = self.display_obj
         conf_filepath = self.conf_filepath
         verbosity     = self.verbosity
+        vunit_conf_obj = self.vunit_conf_obj
 
         output_path = output_path
         level0      = self.level
@@ -548,6 +549,12 @@ class SystemFpasimTopDataGen:
         # copy the mif files into the Vunit simulation directory
         if self.filepath_list_mif is not None:
             self._copy_mif_files(output_path_p=output_path, level_p=level1)
+
+        ############################################
+        # Generate Modelsim/Questa compilation file: *.do
+        #   This file is for example purpose
+        #do_filepath = str(Path(output_path,'fpasim_compile.do'))
+        #vunit_conf_obj.save_do_file(filepath_p=do_filepath)
 
         ##########################################################
         # generate files

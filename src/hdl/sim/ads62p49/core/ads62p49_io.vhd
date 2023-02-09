@@ -24,10 +24,8 @@
 -- -------------------------------------------------------------------------------------------------------------
 --    @details                
 --
---    This module convert a float to signed value (2's complement) + add an optional output delay
+--    This module sends data to the IOs.
 --
--- DAC_RES = 2*g_REF/2**14
--- real_value = value * DAC_res
 -- -------------------------------------------------------------------------------------------------------------
 
 
@@ -40,49 +38,61 @@ use UNISIM.vcomponents.all;
 
 entity ads62p49_io is
   port (
-    i_clk_phase       : in  std_logic;
-    i_clk       : in  std_logic;
+    i_clk_phase : in  std_logic; -- adc clock (for the clock path): i_clk_phase = i_clk + 90 degree
+    i_clk       : in  std_logic; -- adc clock (for the data path)
     ---------------------------------------------------------------------
     -- from the user: inputs
     ---------------------------------------------------------------------
-    i_adc0      : in  std_logic_vector(13 downto 0);
-    i_adc1      : in  std_logic_vector(13 downto 0);
+    i_adc0      : in  std_logic_vector(13 downto 0); -- adc0 value
+    i_adc1      : in  std_logic_vector(13 downto 0); -- adc1 value
     ---------------------------------------------------------------------
     -- to the pads: @i_clk
     ---------------------------------------------------------------------
-    o_adc_clk_p : out std_logic;
-    o_adc_clk_n : out std_logic;
+    o_adc_clk_p : out std_logic; -- differential_p clock adc
+    o_adc_clk_n : out std_logic; -- differential_n clock adc
     -- adc0
-    o_da0_p     : out std_logic;
-    o_da0_n     : out std_logic;
-    o_da2_p     : out std_logic;
-    o_da2_n     : out std_logic;
-    o_da4_p     : out std_logic;
-    o_da4_n     : out std_logic;
-    o_da6_p     : out std_logic;
-    o_da6_n     : out std_logic;
-    o_da8_p     : out std_logic;
-    o_da8_n     : out std_logic;
-    o_da10_p    : out std_logic;
-    o_da10_n    : out std_logic;
-    o_da12_p    : out std_logic;
-    o_da12_n    : out std_logic;
+    o_da0_p     : out std_logic; --  differential_p adc_a (lane0)
+    o_da0_n     : out std_logic; --  differential_n adc_a (lane0)
+
+    o_da2_p     : out std_logic; --  differential_p adc_a (lane1)
+    o_da2_n     : out std_logic; --  differential_n adc_a (lane1)
+
+    o_da4_p     : out std_logic; --  differential_p adc_a (lane2)
+    o_da4_n     : out std_logic; --  differential_n adc_a (lane2)
+
+    o_da6_p     : out std_logic; --  differential_p adc_a (lane3)
+    o_da6_n     : out std_logic; --  differential_n adc_a (lane3)
+
+    o_da8_p     : out std_logic; --  differential_p adc_a (lane4)
+    o_da8_n     : out std_logic; --  differential_n adc_a (lane4)
+
+    o_da10_p    : out std_logic; --  differential_p adc_a (lane5)
+    o_da10_n    : out std_logic; --  differential_n adc_a (lane5)
+
+    o_da12_p    : out std_logic; --  differential_p adc_a (lane6)
+    o_da12_n    : out std_logic; --  differential_n adc_a (lane5)
 
     -- adc1
-    o_db0_p  : out std_logic;
-    o_db0_n  : out std_logic;
-    o_db2_p  : out std_logic;
-    o_db2_n  : out std_logic;
-    o_db4_p  : out std_logic;
-    o_db4_n  : out std_logic;
-    o_db6_p  : out std_logic;
-    o_db6_n  : out std_logic;
-    o_db8_p  : out std_logic;
-    o_db8_n  : out std_logic;
-    o_db10_p : out std_logic;
-    o_db10_n : out std_logic;
-    o_db12_p : out std_logic;
-    o_db12_n : out std_logic
+    o_db0_p  : out std_logic; --  differential_p adc_b (lane0)
+    o_db0_n  : out std_logic; --  differential_n adc_b (lane0)
+
+    o_db2_p  : out std_logic; --  differential_p adc_b (lane1)
+    o_db2_n  : out std_logic; --  differential_n adc_b (lane1)
+
+    o_db4_p  : out std_logic; --  differential_p adc_b (lane2)
+    o_db4_n  : out std_logic; --  differential_n adc_b (lane2)
+
+    o_db6_p  : out std_logic; --  differential_p adc_b (lane3)
+    o_db6_n  : out std_logic; --  differential_n adc_b (lane3)
+
+    o_db8_p  : out std_logic; --  differential_p adc_b (lane4)
+    o_db8_n  : out std_logic; --  differential_n adc_b (lane4)
+
+    o_db10_p : out std_logic; --  differential_p adc_b (lane5)
+    o_db10_n : out std_logic; --  differential_n adc_b (lane5)
+
+    o_db12_p : out std_logic; --  differential_p adc_b (lane6)
+    o_db12_n : out std_logic --  differential_n adc_b (lane6)
     );
 end entity ads62p49_io;
 
@@ -110,7 +120,7 @@ begin
         IS_D2_INVERTED => '0',
         SRTYPE         => "ASYNC"
         )
-      port map ( -- @suppress "The order of the associations is different from the declaration order"
+      port map (  -- @suppress "The order of the associations is different from the declaration order"
         C  => i_clk_phase,
         CE => '1',
         D1 => '1',
@@ -121,7 +131,7 @@ begin
         );
 
     inst_OBUFDS : OBUFDS
-      generic map ( -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
+      generic map (  -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
         IOSTANDARD => "DEFAULT",        -- Specify the output I/O standard
         SLEW       => "SLOW")           -- Specify the output slew rate
       port map (
@@ -136,9 +146,9 @@ begin
 
 -- adc0
   gen_adc0_user_to_pads : if true generate
-    signal data_in_even    : std_logic_vector(6 downto 0);
-    signal data_in_odd    : std_logic_vector(6 downto 0);
-    signal data_tmp    : std_logic_vector(6 downto 0);
+    signal data_in_even : std_logic_vector(6 downto 0);
+    signal data_in_odd  : std_logic_vector(6 downto 0);
+    signal data_tmp     : std_logic_vector(6 downto 0);
 
     signal data_out_p : std_logic_vector(6 downto 0);
     signal data_out_n : std_logic_vector(6 downto 0);
@@ -163,31 +173,31 @@ begin
 
     gen_io : for i in data_in_even'range generate
 
-         inst_ODDR : ODDR
-           generic map(
-              DDR_CLK_EDGE => "OPPOSITE_EDGE", -- "OPPOSITE_EDGE" or "SAME_EDGE" 
-              INIT => '0',   -- Initial value for Q port ('1' or '0')
-              SRTYPE => "SYNC") -- Reset Type ("ASYNC" or "SYNC")
-           port map (
-              Q => data_tmp(i),   -- 1-bit DDR output
-              C => i_clk,    -- 1-bit clock input
-              CE => '1',  -- 1-bit clock enable input
-              D1 => data_in_odd(i),  -- 1-bit data input (positive edge)
-              D2 => data_in_even(i),  -- 1-bit data input (negative edge)
-              --D1 => data_in_even(i),  -- 1-bit data input (positive edge)
-              --D2 => data_in_odd(i),  -- 1-bit data input (negative edge)
-              R => '0',    -- 1-bit reset input
-              S => '0'     -- 1-bit set input
-           );
+      inst_ODDR : ODDR
+        generic map(
+          DDR_CLK_EDGE => "OPPOSITE_EDGE",  -- "OPPOSITE_EDGE" or "SAME_EDGE" 
+          INIT         => '0',  -- Initial value for Q port ('1' or '0')
+          SRTYPE       => "SYNC")       -- Reset Type ("ASYNC" or "SYNC")
+        port map (
+          Q  => data_tmp(i),            -- 1-bit DDR output
+          C  => i_clk,                  -- 1-bit clock input
+          CE => '1',                    -- 1-bit clock enable input
+          D1 => data_in_odd(i),         -- 1-bit data input (positive edge)
+          D2 => data_in_even(i),        -- 1-bit data input (negative edge)
+          --D1 => data_in_even(i),  -- 1-bit data input (positive edge)
+          --D2 => data_in_odd(i),  -- 1-bit data input (negative edge)
+          R  => '0',                    -- 1-bit reset input
+          S  => '0'                     -- 1-bit set input
+          );
 
       inst_OBUFDS : OBUFDS
-        generic map ( -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
+        generic map (  -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
           IOSTANDARD => "DEFAULT",      -- Specify the output I/O standard
           SLEW       => "SLOW")         -- Specify the output slew rate
         port map (
           O  => data_out_p(i),  -- Diff_p output (connect directly to top-level port)
           OB => data_out_n(i),  -- Diff_n output (connect directly to top-level port)
-          I  => data_tmp(i)              -- Buffer input 
+          I  => data_tmp(i)             -- Buffer input 
           );
     end generate gen_io;
 
@@ -218,9 +228,9 @@ begin
 
 -- adc1
   gen_adc1_user_to_pads : if true generate
-    signal data_in_even    : std_logic_vector(6 downto 0);
-    signal data_in_odd    : std_logic_vector(6 downto 0);
-    signal data_tmp    : std_logic_vector(6 downto 0);
+    signal data_in_even : std_logic_vector(6 downto 0);
+    signal data_in_odd  : std_logic_vector(6 downto 0);
+    signal data_tmp     : std_logic_vector(6 downto 0);
 
     signal data_out_p : std_logic_vector(6 downto 0);
     signal data_out_n : std_logic_vector(6 downto 0);
@@ -245,31 +255,31 @@ begin
 
     gen_io : for i in data_in_even'range generate
 
-         inst_ODDR : ODDR
-           generic map(
-              DDR_CLK_EDGE => "OPPOSITE_EDGE", -- "OPPOSITE_EDGE" or "SAME_EDGE" 
-              INIT => '0',   -- Initial value for Q port ('1' or '0')
-              SRTYPE => "SYNC") -- Reset Type ("ASYNC" or "SYNC")
-           port map (
-              Q => data_tmp(i),   -- 1-bit DDR output
-              C => i_clk,    -- 1-bit clock input
-              CE => '1',  -- 1-bit clock enable input
-              --D1 => data_in_even(i),  -- 1-bit data input (positive edge)
-              --D2 => data_in_odd(i),  -- 1-bit data input (negative edge)
-              D1 => data_in_odd(i),  -- 1-bit data input (positive edge)
-              D2 => data_in_even(i),  -- 1-bit data input (negative edge)
-              R => '0',    -- 1-bit reset input
-              S => '0'     -- 1-bit set input
-           );
+      inst_ODDR : ODDR
+        generic map(
+          DDR_CLK_EDGE => "OPPOSITE_EDGE",  -- "OPPOSITE_EDGE" or "SAME_EDGE" 
+          INIT         => '0',  -- Initial value for Q port ('1' or '0')
+          SRTYPE       => "SYNC")       -- Reset Type ("ASYNC" or "SYNC")
+        port map (
+          Q  => data_tmp(i),            -- 1-bit DDR output
+          C  => i_clk,                  -- 1-bit clock input
+          CE => '1',                    -- 1-bit clock enable input
+          --D1 => data_in_even(i),  -- 1-bit data input (positive edge)
+          --D2 => data_in_odd(i),  -- 1-bit data input (negative edge)
+          D1 => data_in_odd(i),         -- 1-bit data input (positive edge)
+          D2 => data_in_even(i),        -- 1-bit data input (negative edge)
+          R  => '0',                    -- 1-bit reset input
+          S  => '0'                     -- 1-bit set input
+          );
 
       inst_OBUFDS : OBUFDS
-        generic map ( -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
+        generic map (  -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
           IOSTANDARD => "DEFAULT",      -- Specify the output I/O standard
           SLEW       => "SLOW")         -- Specify the output slew rate
         port map (
           O  => data_out_p(i),  -- Diff_p output (connect directly to top-level port)
           OB => data_out_n(i),  -- Diff_n output (connect directly to top-level port)
-          I  => data_tmp(i)              -- Buffer input 
+          I  => data_tmp(i)             -- Buffer input 
           );
     end generate gen_io;
 

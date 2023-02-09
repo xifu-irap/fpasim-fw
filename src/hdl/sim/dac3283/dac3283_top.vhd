@@ -24,6 +24,11 @@
 -- -------------------------------------------------------------------------------------------------------------
 --    @details                
 --
+--    This file is the top_level of the dac3283 (DAC) model.    
+--
+--    Note
+--      . It should be used only for the simulation
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 
@@ -33,39 +38,48 @@ use ieee.std_logic_1164.all;
 
 entity dac3283_top is
   generic (
-    g_DAC_VPP :  natural := 2;  -- DAC differential output voltage ( Vpp expressed in Volts)
-    g_DAC_DELAY :  natural := 59  -- DAC conversion delay
+    g_DAC_VPP   : natural := 2;  -- DAC differential output voltage ( Vpp expressed in Volts)
+    g_DAC_DELAY : natural := 59  -- DAC conversion delay (expressed in number of clock cycles @i_dac_clk). The range is: [0;max integer value[)
     );
   port (
     ---------------------------------------------------------------------
     -- from pads
     ---------------------------------------------------------------------
-    i_dac_clk_p   : in std_logic;
-    i_dac_clk_n   : in std_logic;
-    i_dac_frame_p : in std_logic;
-    i_dac_frame_n : in std_logic;
-    i_dac0_p      : in std_logic;
-    i_dac0_n      : in std_logic;
-    i_dac1_p      : in std_logic;
-    i_dac1_n      : in std_logic;
-    i_dac2_p      : in std_logic;
-    i_dac2_n      : in std_logic;
-    i_dac3_p      : in std_logic;
-    i_dac3_n      : in std_logic;
-    i_dac4_p      : in std_logic;
-    i_dac4_n      : in std_logic;
-    i_dac5_p      : in std_logic;
-    i_dac5_n      : in std_logic;
-    i_dac6_p      : in std_logic;
-    i_dac6_n      : in std_logic;
-    i_dac7_p      : in std_logic;
-    i_dac7_n      : in std_logic;
+    i_dac_clk_p : in std_logic;         -- differential_p dac clock
+    i_dac_clk_n : in std_logic;         -- differential_n dac clock 
+
+    i_dac_frame_p : in std_logic;       -- differential_p dac frame
+    i_dac_frame_n : in std_logic;       -- differential_n dac frame
+
+    i_dac0_p : in std_logic;            -- differential_p dac data (lane0)
+    i_dac0_n : in std_logic;            -- differential_n dac data (lane0)
+
+    i_dac1_p : in std_logic;            -- differential_p dac data (lane1)
+    i_dac1_n : in std_logic;            -- differential_n dac data (lane1)
+
+    i_dac2_p : in std_logic;            -- differential_p dac data (lane2)
+    i_dac2_n : in std_logic;            -- differential_n dac data (lane2)
+
+    i_dac3_p : in std_logic;            -- differential_p dac data (lane3)
+    i_dac3_n : in std_logic;            -- differential_n dac data (lane3)
+
+    i_dac4_p : in std_logic;            -- differential_p dac data (lane4)
+    i_dac4_n : in std_logic;            -- differential_n dac data (lane4)
+
+    i_dac5_p : in std_logic;            -- differential_p dac data (lane5)
+    i_dac5_n : in std_logic;            -- differential_n dac data (lane5)
+
+    i_dac6_p : in std_logic;            -- differential_p dac data (lane6)
+    i_dac6_n : in std_logic;            -- differential_n dac data (lane6)
+
+    i_dac7_p : in std_logic;            -- differential_p dac data (lane7)
+    i_dac7_n : in std_logic;            -- differential_n dac data (lane7)
 
     ---------------------------------------------------------------------
     -- to sim 
     ---------------------------------------------------------------------
-    o_dac_real_valid : out std_logic;
-    o_dac_real  : out real
+    o_dac_real_valid : out std_logic;   -- dac data valid
+    o_dac_real       : out real         -- dac value
 
     );
 end entity dac3283_top;
@@ -84,8 +98,8 @@ architecture RTL of dac3283_top is
   signal dac0_valid : std_logic;
   signal dac0       : std_logic_vector(15 downto 0);
 
-  signal dac1_valid : std_logic; -- @suppress "signal dac1_valid is never read"
-  signal dac1       : std_logic_vector(15 downto 0); -- @suppress "signal dac1 is never read"
+  signal dac1_valid : std_logic;  -- @suppress "signal dac1_valid is never read"
+  signal dac1       : std_logic_vector(15 downto 0);  -- @suppress "signal dac1 is never read"
 
 begin
 
@@ -130,7 +144,7 @@ begin
 ---------------------------------------------------------------------
   inst_dac3283_demux : entity work.dac3283_demux
     generic map(
-      g_DAC_DELAY => g_DAC_DELAY  -- DAC conversion delay
+      g_DAC_DELAY => g_DAC_DELAY        -- DAC conversion delay
       )
     port map(
       i_clk        => dac_clk,
@@ -149,22 +163,22 @@ begin
       o_dac1       => dac1              -- not connected
       );
 
-    ---------------------------------------------------------------------
-    -- dac3283_convert
-    ---------------------------------------------------------------------
+  ---------------------------------------------------------------------
+  -- dac3283_convert
+  ---------------------------------------------------------------------
   inst_dac3283_convert : entity work.dac3283_convert
     generic map(
       g_DAC_VPP => g_DAC_VPP  -- DAC differential output voltage ( Vpp expressed in Volts)
       )
     port map(
 
-      i_data_valid => dac0_valid,
-      i_data       => dac0,
+      i_data_valid      => dac0_valid,
+      i_data            => dac0,
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
       o_data_real_valid => o_dac_real_valid,
-      o_data_real  => o_dac_real
+      o_data_real       => o_dac_real
       );
 
 end architecture RTL;

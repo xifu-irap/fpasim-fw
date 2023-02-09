@@ -23,6 +23,9 @@
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
 --    @details                
+--    
+--    The input data stream is a Time-division multiplexing signal (dac0-dac1-dac0-dac1).
+--    By using the frame signal, this module extracts for each dacs its associated data.
 --
 --    Note:
 --     . The adc0 output is associated to the I ways of the dac3283 datasheet
@@ -35,25 +38,26 @@ use ieee.std_logic_1164.all;
 
 entity dac3283_demux is
   generic (
-    g_DAC_DELAY : natural := 0  -- DAC conversion delay
+    g_DAC_DELAY : natural := 0  -- DAC conversion delay (expressed in number of clock cycles @i_clk). The range is: [0;max integer value[)
     );
   port (
 
-    i_clk       : in std_logic;
-    i_rst       : in std_logic;
+    i_clk       : in std_logic; -- clock
+    i_rst       : in std_logic; -- reset
     ---------------------------------------------------------------------
     -- input
     ---------------------------------------------------------------------
-    i_dac_frame : in std_logic;
-    i_dac       : in std_logic_vector(15 downto 0);
+    i_dac_frame : in std_logic; -- dac frame
+    i_dac       : in std_logic_vector(15 downto 0); -- dac value
 
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
-    o_dac0_valid : out std_logic;
-    o_dac0       : out std_logic_vector(15 downto 0);
-    o_dac1_valid : out std_logic;
-    o_dac1       : out std_logic_vector(15 downto 0)
+    o_dac0_valid : out std_logic; -- dac0 data valid
+    o_dac0       : out std_logic_vector(15 downto 0); -- dac0 data value
+
+    o_dac1_valid : out std_logic;-- dac1 data valid
+    o_dac1       : out std_logic_vector(15 downto 0) -- dac1 data value
     );
 end entity dac3283_demux;
 
@@ -68,16 +72,16 @@ architecture RTL of dac3283_demux is
   signal sm_state_r1   : t_state := E_RST;
 
   signal data_valid0_next : std_logic;
-  signal data_valid0_r1   : std_logic:= '0';
+  signal data_valid0_r1   : std_logic := '0';
 
   signal data0_next : std_logic_vector(o_dac0'range);
-  signal data0_r1   : std_logic_vector(o_dac0'range):= (others => '0');
+  signal data0_r1   : std_logic_vector(o_dac0'range) := (others => '0');
 
   signal data_valid1_next : std_logic;
-  signal data_valid1_r1   : std_logic:= '0';
+  signal data_valid1_r1   : std_logic := '0';
 
   signal data1_next : std_logic_vector(o_dac1'range);
-  signal data1_r1   : std_logic_vector(o_dac1'range):= (others => '0');
+  signal data1_r1   : std_logic_vector(o_dac1'range) := (others => '0');
 
 ---------------------------------------------------------------------
 -- optional output delay
@@ -113,7 +117,7 @@ begin
     data0_next       <= data0_r1;
     data_valid1_next <= '0';
     data1_next       <= data1_r1;
-    
+
     case sm_state_r1 is
       when E_RST =>
         sm_state_next <= E_WAIT;
@@ -137,7 +141,7 @@ begin
         data1_next       <= i_dac;
         sm_state_next    <= E_RUN0;
 
-      when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;

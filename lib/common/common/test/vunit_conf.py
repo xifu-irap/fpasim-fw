@@ -33,6 +33,9 @@
 #       . If a new path need to be added, update VunitConf._build_path method with the new path.
 #        Then, the user can create a new method by copying an existing method code in order to use the new added path
 #       . This script was tested with python 3.10
+#
+# Important: get_src_do_compile function is not functional
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -127,6 +130,14 @@ class VunitConf:
         # build the list of paths (project tree structure)
         self._build_path()
 
+        # build GenDoFile object
+        # self.obj_do = GenDoFile()
+        # 
+        self.do_ext_lib_list = []
+        self.do_lib_list = []
+        self.do_list = []
+        self.do_filepath_list = []
+
     def _extract_test_param_from_json(self):
         """
         This method retrieves parameters of the individual test from the json file
@@ -196,6 +207,7 @@ class VunitConf:
         base_path_dic['vivado_glbl_path'] = str(Path(vivado_path, 'data/verilog/src'))
 
         self.base_path_dic = base_path_dic
+        self.root_path = root_path
         
         return None
 
@@ -235,6 +247,12 @@ class VunitConf:
             display_obj.display_subtitle(msg_p=library_name_p + ': Added external library', level_p=level0)
             VU.add_external_library(library_name=library_name_p, path=path_p)
             display_obj.display(msg_p=path_p, level_p=level1)
+
+            # build the external library
+            path = path_p.replace('\\','/')
+            str0 = " ".join(["vmap",library_name_p,path])
+            self.do_ext_lib_list.append(str0)
+            # obj_do.add_external_library(library_name_p=library_name_p,path_p=path_p)
         return None
 
     def _add_library(self, library_name_p):
@@ -254,6 +272,11 @@ class VunitConf:
         # add the library if not already defined
         if found == 0:
             VU.add_library(library_name_p)
+
+            # obj_do.add_library(library_name_p=library_name_p)
+            # Define the library
+            str0 = " ".join(["vlib",library_name_p])
+            self.do_lib_list.append(str0)
         return None
 
     def set_verbosity(self, verbosity_p):
@@ -331,6 +354,7 @@ class VunitConf:
         :return: None
         """
         self.VU = vunit_object_p
+        # self.obj_do.set_vunit(vunit_object_p=vunit_object_p)
         return None
 
     def set_indentation_level(self, level_p):
@@ -396,6 +420,20 @@ class VunitConf:
             path = str(Path(file_tmp.name).resolve())
             msg0 = library_name + ':' + version + ":" + path
             display_obj.display(msg_p=msg0, level_p=level1)
+
+            # build the external library
+            suffix = Path(filepath).suffix
+            filepath = filepath.replace('\\','/')
+            if suffix == '.vhd':
+                str0 = " ".join(['vcom','-work',library_name,'-'+version,filepath])
+            elif suffix == '.v':
+                str0 = " ".join(['vlog','-work',library_name,filepath])
+            elif suffix == '.sv':
+                str0 = " ".join(['vlog','-work',library_name,filepath])
+            self.do_list.append(str0)
+            self.do_filepath_list.append(filepath)
+            # obj_do.add_source_file(filepath_p=filepath,library_name_p=library_name,version_p=version)
+
         return None
 
     def compile_glbl_lib(self, name_p='vivado_glbl', library_name_p='fpasim', version_p='2008', level_p=None):
@@ -1089,5 +1127,154 @@ class VunitConf:
         if self.filepath_list_mif is not None:
             self._copy_mif_files(output_path_p=output_path, level_p=level1)
 
+        # write do_file
+        do_filepath = str(Path(output_path,'fpasim_compile.do'))
+        self.save_do_file(filepath_p=do_filepath,level_p=level0)
+
         # return True is mandatory for Vunit
         return True
+
+    def save_do_file(self,filepath_p,level_p=0):
+
+        VU = self.VU
+        display_obj   = self.display_obj
+        root_path =self.root_path
+        
+        level0 = level_p
+        level1 = level_p + 1
+
+        str0 = "VunitConf.save_do_file"
+        display_obj.display_title(msg_p=str0, level_p=level0)
+        str0 = "do_filepath: "+filepath_p
+        display_obj.display(msg_p=str0, level_p=level1)
+
+        
+
+
+
+        do_cmd_list = []
+        do_cmd_list.append("###################### Parameters ######################")
+        root_path = root_path.replace('\\','/')
+        do_cmd = " ".join(["quietly","set","PR_DIR",root_path])
+        do_cmd_list.append(do_cmd)
+        do_cmd_list.append("\n")
+
+        # write external compiled lib
+        do_cmd_list.append("###################### External Compiled libraries ######################")
+        do_cmd_list.extend(self.do_ext_lib_list)
+        do_cmd_list.append("\n")
+
+        # write libraries
+        do_cmd_list.append("###################### Source files libraries ######################")
+        do_cmd_list.extend(self.do_lib_list)
+        do_cmd_list.append("\n")
+
+        def element_exists(list_p, element_p):
+            # Try to get the index of the element in the list
+            index = -1
+            try:
+                index = list_p.index(element_p)
+                 # If the element is found, return True
+                return index
+            # If a ValueError is raised, the element is not in the list
+            except ValueError:
+                # Return False in this case
+                return -1
+
+        def get_src_do_compile(filepath_p,library_name_p,version_p):
+            filepath = filepath_p
+            library_name = library_name_p
+            version = version_p
+
+
+            compile_lib_list = []
+            compile_lib_list.append('xilinx_vip')
+            compile_lib_list.append('xpm')
+            compile_lib_list.append('unisims_ver')
+            compile_lib_list.append('unisim')
+            compile_lib_list.append('unimacro')
+            compile_lib_list.append('unimacro_ver')
+            compile_lib_list.append('unifast')
+            compile_lib_list.append('secureip')
+            str2 = ''
+            for name in compile_lib_list:
+                str2 = str2 + " -L "+name
+
+            compile_lib_list = []
+            compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/xilinx_vip')
+            compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/xpm')
+            compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/unisims_ver')
+            compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/unisim')
+            compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/unimacro')
+            compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/unimacro_ver')
+            compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/unifast')
+            compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/secureip')
+            str1 = ''
+            for name in compile_lib_list:
+                str1 = str1 + ' +incdir+'+'"'+name+'"'
+
+            str1 = ""
+            str2 = ""
+
+            suffix = Path(filepath).suffix
+            filepath = filepath.replace('\\','/')
+            if suffix == '.vhd':
+                str0 = " ".join(['vcom','-work',library_name,'-'+version,filepath])
+            elif suffix == '.v':
+                str0 = " ".join(['vlog','-work',library_name,filepath,str1,str2])
+            elif suffix == '.sv':
+                str0 = " ".join(['vlog','-work',library_name,filepath,str1,str2])
+            return str0
+
+        # print("test**************************************************************\n")
+        
+        do_cmd_list.append("###################### Source files ######################")
+
+        print("orderedfilepath")
+        SourceFile_list = VU.get_compile_order()
+        ordered_filepath_list = []
+        for source in SourceFile_list:
+            filepath = str(Path(source.name).resolve())
+            library_name = source.library.name
+            vhdl_standard = source.vhdl_standard
+
+            filepath = filepath.replace('\\','/')
+            ordered_filepath_list.append(filepath)
+            # print(filepath,library_name,vhdl_standard)
+            str0 = get_src_do_compile(filepath_p=filepath,library_name_p=library_name,version_p=vhdl_standard)
+            str0 = str0.replace(root_path,"${PR_DIR}")
+            do_cmd_list.append(str0)
+            # str0 = 'modelsim.vlog_flags'
+            # str0 = 'modelsim.vcom_flags'
+            # print(source.get_compile_option(str0))
+            
+
+        # print("get libraries")
+        # library_list = VU.get_libraries()
+        # for lib in library_list:
+        #     name = lib.name
+        #     print(name)
+
+        # print("filepath\n")
+        # for filepath in self.do_filepath_list:
+        #     print(filepath)
+
+        # for orderedfilepath in ordered_filepath_list:           
+        #     index = element_exists(list_p=self.do_filepath_list,element_p=orderedfilepath)
+        #     if index == -1:
+        #         pass
+        #         print(orderedfilepath+" :doesnt exist")
+        #     else:
+        #         line = self.do_list[index]
+        #         do_cmd_list.append(line)
+        
+
+        ##########################################
+        # write in the output file
+        ##########################################
+        fid = open(filepath_p,'w')
+        for line in do_cmd_list:
+            # replace path by variables
+            fid.write(line)
+            fid.write('\n')
+        fid.close()

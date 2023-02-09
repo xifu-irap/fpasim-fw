@@ -24,8 +24,13 @@
 -- -------------------------------------------------------------------------------------------------------------
 --    @details                
 --
---    Note: the spi/leds signals of the system_fpasim_top are not necessary for the co-simulation with the demux
---   
+--    This module wraps the fpasim function with the DAC and ADC model.
+--
+--    Note: 
+--      . This file should be used during the co-simulation phase
+--      . The spi/leds signals of the system_fpasim_top are not necessary for the co-simulation with the demux
+--      . This file should only be used for simulation.
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 
@@ -36,40 +41,40 @@ use ieee.std_logic_1164.all;
 entity fpga_system_fpasim is
   generic (
     -- ADC
-    g_ADC_VPP   :  natural := 2;  -- ADC differential input voltage ( Vpp expressed in Volts)
-    g_ADC_DELAY :  natural := 0;  -- ADC conversion delay
+    g_ADC_VPP   : natural := 2;  -- ADC differential input voltage ( Vpp expressed in Volts)
+    g_ADC_DELAY : natural := 0;  -- ADC conversion delay (expressed in number of clock cycles @i_adc_clk). The range is: [0;max integer value[)
     -- DAC
-    g_DAC_VPP   :  natural := 2;  -- DAC differential output voltage ( Vpp expressed in Volts)
-    g_DAC_DELAY :  natural := 0  -- DAC conversion delay
+    g_DAC_VPP   : natural := 2;  -- DAC differential output voltage ( Vpp expressed in Volts)
+    g_DAC_DELAY : natural := 0   -- DAC conversion delay (expressed in number of clock cycles @i_dac_clk). The range is: [0;max integer value[)
 
     );
   port (
 
     --  Opal Kelly inouts --
-    i_okUH     : in    std_logic_vector(4 downto 0);
-    o_okHU     : out   std_logic_vector(2 downto 0);
-    b_okUHU    : inout std_logic_vector(31 downto 0);
-    b_okAA     : inout std_logic;
+    i_okUH  : in    std_logic_vector(4 downto 0);
+    o_okHU  : out   std_logic_vector(2 downto 0);
+    b_okUHU : inout std_logic_vector(31 downto 0);
+    b_okAA  : inout std_logic;
 
     ---------------------------------------------------------------------
     -- ADC
     ---------------------------------------------------------------------
-    i_adc_clk_phase   : in std_logic;
-    i_adc_clk   : in std_logic;
-    i_adc0_real : in real;
-    i_adc1_real : in real;
+    i_adc_clk_phase : in std_logic; -- adc clock (for the clock signal): i_adc_clk_phase = i_adc_clk + 90 degree
+    i_adc_clk       : in std_logic; -- adc clock (for the data)
+    i_adc0_real     : in real; --  adc0 value (mux_squid_feedback)
+    i_adc1_real     : in real; --  adc1 value (amp_squid_offset_correction)
 
     ---------------------------------------------------------------------
     -- to sync
     ---------------------------------------------------------------------
-    o_ref_clk : out std_logic;
-    o_sync    : out std_logic;
+    o_ref_clk : out std_logic; -- reference clock
+    o_sync    : out std_logic; -- pulse at the beginning of the first pixel of a column (@o_ref_clk)
 
     ---------------------------------------------------------------------
     -- DAC
     ---------------------------------------------------------------------
-    o_dac_real_valid : out std_logic;
-    o_dac_real       : out real
+    o_dac_real_valid : out std_logic; --  dac valid
+    o_dac_real       : out real       --  dac value
     );
 end entity fpga_system_fpasim;
 
@@ -79,44 +84,44 @@ architecture RTL of fpga_system_fpasim is
 -- ads62p49_top
 ---------------------------------------------------------------------
   signal adc_clk_p : std_logic;
-    signal adc_clk_n : std_logic;
-    -- adc0
-   signal da0_p     : std_logic;
-   signal da0_n     : std_logic;
-   signal da2_p     : std_logic;
-   signal da2_n     : std_logic;
-   signal da4_p     : std_logic;
-   signal da4_n     : std_logic;
-   signal da6_p     : std_logic;
-   signal da6_n     : std_logic;
-   signal da8_p     : std_logic;
-   signal da8_n     : std_logic;
-   signal da10_p    : std_logic;
-   signal da10_n    : std_logic;
-   signal da12_p    : std_logic;
-   signal da12_n    : std_logic;
+  signal adc_clk_n : std_logic;
+  -- adc0
+  signal da0_p     : std_logic;
+  signal da0_n     : std_logic;
+  signal da2_p     : std_logic;
+  signal da2_n     : std_logic;
+  signal da4_p     : std_logic;
+  signal da4_n     : std_logic;
+  signal da6_p     : std_logic;
+  signal da6_n     : std_logic;
+  signal da8_p     : std_logic;
+  signal da8_n     : std_logic;
+  signal da10_p    : std_logic;
+  signal da10_n    : std_logic;
+  signal da12_p    : std_logic;
+  signal da12_n    : std_logic;
 
-    -- adc1
-   signal db0_p  : std_logic;
-   signal db0_n  : std_logic;
-   signal db2_p  : std_logic;
-   signal db2_n  : std_logic;
-   signal db4_p  : std_logic;
-   signal db4_n  : std_logic;
-   signal db6_p  : std_logic;
-   signal db6_n  : std_logic;
-   signal db8_p  : std_logic;
-   signal db8_n  : std_logic;
-   signal db10_p : std_logic;
-   signal db10_n : std_logic;
-   signal db12_p : std_logic;
-   signal db12_n : std_logic;
+  -- adc1
+  signal db0_p  : std_logic;
+  signal db0_n  : std_logic;
+  signal db2_p  : std_logic;
+  signal db2_n  : std_logic;
+  signal db4_p  : std_logic;
+  signal db4_n  : std_logic;
+  signal db6_p  : std_logic;
+  signal db6_n  : std_logic;
+  signal db8_p  : std_logic;
+  signal db8_n  : std_logic;
+  signal db10_p : std_logic;
+  signal db10_n : std_logic;
+  signal db12_p : std_logic;
+  signal db12_n : std_logic;
 
 ---------------------------------------------------------------------
 -- system_fpasim_top
 ---------------------------------------------------------------------
-  signal  i_clk_to_fpga_p : std_logic; -- @suppress "signal i_clk_to_fpga_p is never written"
-  signal  i_clk_to_fpga_n : std_logic; -- @suppress "signal i_clk_to_fpga_n is never written"
+  signal i_clk_to_fpga_p : std_logic;  -- @suppress "signal i_clk_to_fpga_p is never written"
+  signal i_clk_to_fpga_n : std_logic;  -- @suppress "signal i_clk_to_fpga_n is never written"
 
   signal dac_clk_p   : std_logic;
   signal dac_clk_n   : std_logic;
@@ -140,39 +145,39 @@ architecture RTL of fpga_system_fpasim is
   signal dac7_n      : std_logic;
 
 -- common: shared link between the spi
-  signal spi_sclk  : std_logic;        -- @suppress "signal spi_sclk is never read"
-  signal spi_sdata : std_logic;       -- @suppress "signal spi_sdata is never read"
+  signal spi_sclk  : std_logic;  -- @suppress "signal spi_sclk is never read"
+  signal spi_sdata : std_logic;  -- @suppress "signal spi_sdata is never read"
 
   -- CDCE: SPI
-  signal cdce_sdo  : std_logic := '0';   -- @suppress "signal cdce_sdo is never written"
-  signal cdce_n_en : std_logic;          -- @suppress "signal cdce_n_en is never read"
+  signal cdce_sdo  : std_logic := '0';  -- @suppress "signal cdce_sdo is never written"
+  signal cdce_n_en : std_logic;  -- @suppress "signal cdce_n_en is never read"
 
   -- CDCE: specific signals
-  signal cdce_pll_status : std_logic := '0';   -- @suppress "signal cdce_pll_status is never written"
-  signal cdce_n_reset    : std_logic;    -- @suppress "signal cdce_n_reset is never read"
-  signal cdce_n_pd       : std_logic;    -- @suppress "signal cdce_n_pd is never read"
-  signal ref_en          : std_logic;    -- @suppress "signal ref_en is never read"
+  signal cdce_pll_status : std_logic := '0';  -- @suppress "signal cdce_pll_status is never written"
+  signal cdce_n_reset    : std_logic;  -- @suppress "signal cdce_n_reset is never read"
+  signal cdce_n_pd       : std_logic;  -- @suppress "signal cdce_n_pd is never read"
+  signal ref_en          : std_logic;  -- @suppress "signal ref_en is never read"
 
   -- ADC: SPI
-  signal adc_sdo   : std_logic := '0';   -- @suppress "signal adc_sdo is never written"
-  signal adc_n_en  : std_logic;          -- @suppress "signal adc_n_en is never read"
+  signal adc_sdo   : std_logic := '0';  -- @suppress "signal adc_sdo is never written"
+  signal adc_n_en  : std_logic;  -- @suppress "signal adc_n_en is never read"
   -- ADC: specific signals
-  signal adc_reset : std_logic;          -- @suppress "signal adc_reset is never read"
+  signal adc_reset : std_logic;  -- @suppress "signal adc_reset is never read"
 
   -- DAC: SPI
-  signal dac_sdo        : std_logic := '0';   -- @suppress "signal dac_sdo is never written"
-  signal dac_n_en       : std_logic;          -- @suppress "signal dac_n_en is never read"
+  signal dac_sdo        : std_logic := '0';  -- @suppress "signal dac_sdo is never written"
+  signal dac_n_en       : std_logic;  -- @suppress "signal dac_n_en is never read"
   -- DAC: specific signal
-  signal dac_tx_present : std_logic;          -- @suppress "signal dac_tx_present is never read"
+  signal dac_tx_present : std_logic;  -- @suppress "signal dac_tx_present is never read"
 
   -- AMC: SPI (monitoring)
-  signal mon_sdo     : std_logic := '0';   -- @suppress "signal mon_sdo is never written"
-  signal mon_n_en    : std_logic;        -- @suppress "signal mon_n_en is never read"
+  signal mon_sdo     : std_logic := '0';  -- @suppress "signal mon_sdo is never written"
+  signal mon_n_en    : std_logic;  -- @suppress "signal mon_n_en is never read"
   -- AMC : specific signals
-  signal mon_n_int   : std_logic := '0';   -- @suppress "signal mon_n_int is never written"
-  signal mon_n_reset : std_logic;        -- @suppress "signal mon_n_reset is never read"
+  signal mon_n_int   : std_logic := '0';  -- @suppress "signal mon_n_int is never written"
+  signal mon_n_reset : std_logic;  -- @suppress "signal mon_n_reset is never read"
   -- leds
-  signal leds        : std_logic_vector(3 downto 2); -- @suppress "signal leds is never read"
+  signal leds        : std_logic_vector(3 downto 2);  -- @suppress "signal leds is never read"
 
   ---------------------------------------------------------------------
   -- dac3283_top
@@ -188,52 +193,52 @@ begin
   inst_ads62p49_top : entity work.ads62p49_top
     generic map(
       g_ADC_VPP   => g_ADC_VPP,  -- ADC differential input voltage ( Vpp expressed in Volts)
-      g_ADC_RES   => 14,         -- ADC resolution
-      g_ADC_DELAY => g_ADC_DELAY -- ADC latency
+      g_ADC_RES   => 14,               -- ADC resolution (expressed in bits)
+      g_ADC_DELAY => g_ADC_DELAY        -- ADC latency (expressed in number of clock periods) @i_adc_clk. The range is [0;max integer[
       )
     port map(
       ---------------------------------------------------------------------
       -- inputs
       ---------------------------------------------------------------------
-      i_adc_clk_phase   => i_adc_clk_phase,
-      i_adc_clk   => i_adc_clk,
-      i_adc0_real => i_adc0_real,
-      i_adc1_real => i_adc1_real,
+      i_adc_clk_phase => i_adc_clk_phase,
+      i_adc_clk       => i_adc_clk,
+      i_adc0_real     => i_adc0_real,
+      i_adc1_real     => i_adc1_real,
       ---------------------------------------------------------------------
       -- outputs
       ---------------------------------------------------------------------
-      o_adc_clk_p => adc_clk_p,
-      o_adc_clk_n => adc_clk_n,
+      o_adc_clk_p     => adc_clk_p,
+      o_adc_clk_n     => adc_clk_n,
       -- adc0
-      o_da0_p     => da0_p,
-      o_da0_n     => da0_n,
-      o_da2_p     => da2_p,
-      o_da2_n     => da2_n,
-      o_da4_p     => da4_p,
-      o_da4_n     => da4_n,
-      o_da6_p     => da6_p,
-      o_da6_n     => da6_n,
-      o_da8_p     => da8_p,
-      o_da8_n     => da8_n,
-      o_da10_p    => da10_p,
-      o_da10_n    => da10_n,
-      o_da12_p    => da12_p,
-      o_da12_n    => da12_n,
+      o_da0_p         => da0_p,
+      o_da0_n         => da0_n,
+      o_da2_p         => da2_p,
+      o_da2_n         => da2_n,
+      o_da4_p         => da4_p,
+      o_da4_n         => da4_n,
+      o_da6_p         => da6_p,
+      o_da6_n         => da6_n,
+      o_da8_p         => da8_p,
+      o_da8_n         => da8_n,
+      o_da10_p        => da10_p,
+      o_da10_n        => da10_n,
+      o_da12_p        => da12_p,
+      o_da12_n        => da12_n,
       -- adc1
-      o_db0_p     => db0_p,
-      o_db0_n     => db0_n,
-      o_db2_p     => db2_p,
-      o_db2_n     => db2_n,
-      o_db4_p     => db4_p,
-      o_db4_n     => db4_n,
-      o_db6_p     => db6_p,
-      o_db6_n     => db6_n,
-      o_db8_p     => db8_p,
-      o_db8_n     => db8_n,
-      o_db10_p    => db10_p,
-      o_db10_n    => db10_n,
-      o_db12_p    => db12_p,
-      o_db12_n    => db12_n
+      o_db0_p         => db0_p,
+      o_db0_n         => db0_n,
+      o_db2_p         => db2_p,
+      o_db2_n         => db2_n,
+      o_db4_p         => db4_p,
+      o_db4_n         => db4_n,
+      o_db6_p         => db6_p,
+      o_db6_n         => db6_n,
+      o_db8_p         => db8_p,
+      o_db8_n         => db8_n,
+      o_db10_p        => db10_p,
+      o_db10_n        => db10_n,
+      o_db12_p        => db12_p,
+      o_db12_n        => db12_n
       );
 
 ---------------------------------------------------------------------
@@ -244,13 +249,11 @@ begin
       g_DEBUG => false
       )
     port map(
-      --i_clk_to_fpga_p   => i_clk_to_fpga_p, -- to delete
-      --i_clk_to_fpga_n   => i_clk_to_fpga_n, -- to delete
       --  Opal Kelly inouts --
-      i_okUH            => i_okUH, 
-      o_okHU            => o_okHU, 
+      i_okUH            => i_okUH,
+      o_okHU            => o_okHU,
       b_okUHU           => b_okUHU,
-      b_okAA            => b_okAA, 
+      b_okAA            => b_okAA,
       ---------------------------------------------------------------------
       -- FMC: from the card
       ---------------------------------------------------------------------

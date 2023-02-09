@@ -54,9 +54,6 @@ entity io_top is
     i_dac_clk_div_phase90 : in  std_logic;  -- dac div clock (IO user side)
     -- to the MMCM
     o_adc_clk_div         : out std_logic;  -- adc div data clock (IO user side)
-    -- from the FPGA pads
-    i_adc_clk_p           : in  std_logic;  -- adc clock_p (IO pin side)
-    i_adc_clk_n           : in  std_logic;  -- adc clock_n (IO pin side)
 
     -- from the user: @i_sys_clk
     i_rst_status  : in std_logic;       -- reset error flag(s)
@@ -68,49 +65,53 @@ entity io_top is
     -- from the reset_top: @i_adc_clk_div
     i_adc_io_clk_rst : in std_logic;  -- small pulse reset
     i_adc_io_rst     : in std_logic;  -- large pulse reset
+
+    -- from the FPGA pads
+    i_adc_clk_p           : in  std_logic;  -- differential_p clock adc (IO pin side)
+    i_adc_clk_n           : in  std_logic;  -- differential_n clock adc (IO pin side)
     -- from fpga pads: adc_a  @i_adc_clk_p/n
-    i_da0_p          : in std_logic;    -- input differential_p adc_a (lane0)
-    i_da0_n          : in std_logic;    -- input differential_n adc_a (lane0)
+    i_da0_p          : in std_logic;    --  differential_p adc_a (lane0)
+    i_da0_n          : in std_logic;    --  differential_n adc_a (lane0)
 
-    i_da2_p : in std_logic;             -- input differential_p adc_a (lane1)
-    i_da2_n : in std_logic;             -- input differential_n adc_a (lane1)
+    i_da2_p : in std_logic;             --  differential_p adc_a (lane1)
+    i_da2_n : in std_logic;             --  differential_n adc_a (lane1)
 
-    i_da4_p : in std_logic;             -- input differential_p adc_a (lane2)
-    i_da4_n : in std_logic;             -- input differential_n adc_a (lane2)
+    i_da4_p : in std_logic;             --  differential_p adc_a (lane2)
+    i_da4_n : in std_logic;             --  differential_n adc_a (lane2)
 
-    i_da6_p : in std_logic;             -- input differential_p adc_a (lane3)
-    i_da6_n : in std_logic;             -- input differential_n adc_a (lane3)
+    i_da6_p : in std_logic;             --  differential_p adc_a (lane3)
+    i_da6_n : in std_logic;             --  differential_n adc_a (lane3)
 
-    i_da8_p : in std_logic;             -- input differential_p adc_a (lane4)
-    i_da8_n : in std_logic;             -- input differential_n adc_a (lane4)
+    i_da8_p : in std_logic;             --  differential_p adc_a (lane4)
+    i_da8_n : in std_logic;             --  differential_n adc_a (lane4)
 
-    i_da10_p : in std_logic;            -- input differential_p adc_a (lane5)
-    i_da10_n : in std_logic;            -- input differential_n adc_a (lane5)
+    i_da10_p : in std_logic;            --  differential_p adc_a (lane5)
+    i_da10_n : in std_logic;            --  differential_n adc_a (lane5)
 
-    i_da12_p : in std_logic;            -- input differential_p adc_a (lane6)
-    i_da12_n : in std_logic;            -- input differential_n adc_a (lane6)
+    i_da12_p : in std_logic;            --  differential_p adc_a (lane6)
+    i_da12_n : in std_logic;            --  differential_n adc_a (lane6)
 
     -- from fpga pads: adc_b @i_adc_clk_p/n
-    i_db0_p : in std_logic;             -- input differential_p adc_b (lane0)
-    i_db0_n : in std_logic;             -- input differential_n adc_b (lane0)
+    i_db0_p : in std_logic;             --  differential_p adc_b (lane0)
+    i_db0_n : in std_logic;             --  differential_n adc_b (lane0)
 
-    i_db2_p : in std_logic;             -- input differential_p adc_b (lane1)
-    i_db2_n : in std_logic;             -- input differential_n adc_b (lane1)
+    i_db2_p : in std_logic;             --  differential_p adc_b (lane1)
+    i_db2_n : in std_logic;             --  differential_n adc_b (lane1)
 
-    i_db4_p : in std_logic;             -- input differential_p adc_b (lane2)
-    i_db4_n : in std_logic;             -- input differential_n adc_b (lane2)
+    i_db4_p : in std_logic;             --  differential_p adc_b (lane2)
+    i_db4_n : in std_logic;             --  differential_n adc_b (lane2)
 
-    i_db6_p : in std_logic;             -- input differential_p adc_b (lane3)
-    i_db6_n : in std_logic;             -- input differential_n adc_b (lane3)
+    i_db6_p : in std_logic;             --  differential_p adc_b (lane3)
+    i_db6_n : in std_logic;             --  differential_n adc_b (lane3)
 
-    i_db8_p : in std_logic;             -- input differential_p adc_b (lane4)
-    i_db8_n : in std_logic;             -- input differential_n adc_b (lane4)
+    i_db8_p : in std_logic;             --  differential_p adc_b (lane4)
+    i_db8_n : in std_logic;             --  differential_n adc_b (lane4)
 
-    i_db10_p : in std_logic;            -- input differential_p adc_b (lane5)
-    i_db10_n : in std_logic;            -- input differential_n adc_b (lane5)
+    i_db10_p : in std_logic;            --  differential_p adc_b (lane5)
+    i_db10_n : in std_logic;            --  differential_n adc_b (lane5)
 
-    i_db12_p     : in  std_logic;       -- input differential_p adc_b (lane6)
-    i_db12_n     : in  std_logic;       -- input differential_n adc_b (lane6)
+    i_db12_p     : in  std_logic;       --  differential_p adc_b (lane6)
+    i_db12_n     : in  std_logic;       --  differential_n adc_b (lane6)
     -- to user: @i_sys_clk
     o_adc_valid  : out std_logic;       -- adc data valid
     o_adc_a      : out std_logic_vector(13 downto 0);  -- adc data (channel a)
@@ -154,35 +155,35 @@ entity io_top is
 
     -- to the fpga pads: @i_dac_clk
     -- dac clock @i_dac_clk
-    o_dac_clk_p   : out std_logic;      -- output differential_p dac clock
-    o_dac_clk_n   : out std_logic;      -- output differential_n dac clock 
+    o_dac_clk_p   : out std_logic;      --  differential_p dac clock
+    o_dac_clk_n   : out std_logic;      --  differential_n dac clock 
     -- dac frame flag @i_dac_clk
-    o_dac_frame_p : out std_logic;      -- output differential_p dac frame
-    o_dac_frame_n : out std_logic;      -- output differential_n dac frame
+    o_dac_frame_p : out std_logic;      --  differential_p dac frame
+    o_dac_frame_n : out std_logic;      --  differential_n dac frame
     -- dac data @i_dac_clk
-    o_dac0_p      : out std_logic;  -- output differential_p dac data (bit0)
-    o_dac0_n      : out std_logic;  -- output differential_n dac data (bit0)
+    o_dac0_p      : out std_logic;  --  differential_p dac data (lane0)
+    o_dac0_n      : out std_logic;  --  differential_n dac data (lane0)
 
-    o_dac1_p : out std_logic;  -- output differential_p dac data (bit1)
-    o_dac1_n : out std_logic;  -- output differential_n dac data (bit1)
+    o_dac1_p : out std_logic;  --  differential_p dac data (lane1)
+    o_dac1_n : out std_logic;  --  differential_n dac data (lane1)
 
-    o_dac2_p : out std_logic;  -- output differential_p dac data (bit2)
-    o_dac2_n : out std_logic;  -- output differential_n dac data (bit2)
+    o_dac2_p : out std_logic;  --  differential_p dac data (lane2)
+    o_dac2_n : out std_logic;  --  differential_n dac data (lane2)
 
-    o_dac3_p : out std_logic;  -- output differential_p dac data (bit3)
-    o_dac3_n : out std_logic;  -- output differential_n dac data (bit3)
+    o_dac3_p : out std_logic;  --  differential_p dac data (lane3)
+    o_dac3_n : out std_logic;  --  differential_n dac data (lane3)
 
-    o_dac4_p : out std_logic;  -- output differential_p dac data (bit4)
-    o_dac4_n : out std_logic;  -- output differential_n dac data (bit4)
+    o_dac4_p : out std_logic;  --  differential_p dac data (lane4)
+    o_dac4_n : out std_logic;  --  differential_n dac data (lane4)
 
-    o_dac5_p : out std_logic;  -- output differential_p dac data (bit5)
-    o_dac5_n : out std_logic;  -- output differential_n dac data (bit5)
+    o_dac5_p : out std_logic;  --  differential_p dac data (lane5)
+    o_dac5_n : out std_logic;  --  differential_n dac data (lane5)
 
-    o_dac6_p : out std_logic;  -- output differential_p dac data (bit6)
-    o_dac6_n : out std_logic;  -- output differential_n dac data (bit6)
+    o_dac6_p : out std_logic;  --  differential_p dac data (lane6)
+    o_dac6_n : out std_logic;  --  differential_n dac data (lane6)
 
-    o_dac7_p : out std_logic;  -- output differential_p dac data (bit7)
-    o_dac7_n : out std_logic   -- output differential_n dac data (bit7)
+    o_dac7_p : out std_logic;  --  differential_p dac data (lane7)
+    o_dac7_n : out std_logic   --  differential_n dac data (lane7)
     );
 end entity io_top;
 

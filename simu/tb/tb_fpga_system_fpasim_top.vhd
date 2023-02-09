@@ -37,7 +37,7 @@ library vunit_lib;
 context vunit_lib.vunit_context;
 
 library common_lib;
-context common_lib.common_context;
+use common_lib.pkg_common.all;
 
 use ieee.fixed_pkg.all;
 use ieee.fixed_float_types.all;

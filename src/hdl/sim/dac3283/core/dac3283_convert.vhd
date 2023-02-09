@@ -24,7 +24,11 @@
 -- -------------------------------------------------------------------------------------------------------------
 --    @details                
 --
---    
+--    This module converts an input std_logic_vector (2s'complement) into a real value.    
+--
+--    Note: 
+--      . This module is not synthesizable (only for simulation).
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -41,14 +45,14 @@ entity dac3283_convert is
   port (
 
 
-    i_data_valid : in std_logic;
-    i_data       : in std_logic_vector(15 downto 0);
+    i_data_valid : in std_logic; -- data valid
+    i_data       : in std_logic_vector(15 downto 0); -- data value
 
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
-    o_data_real_valid : out std_logic;
-    o_data_real       : out real
+    o_data_real_valid : out std_logic; -- data valid
+    o_data_real       : out real -- data value
     );
 end entity dac3283_convert;
 
