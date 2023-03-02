@@ -101,6 +101,8 @@ entity tes_top is
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
+    o_pulse_sof               : out std_logic;     -- first processed sample of a pulse
+    o_pulse_eof               : out std_logic;     -- last processed sample of a pulse
     o_pixel_sof               : out std_logic; -- first pixel sample
     o_pixel_eof               : out std_logic; -- last pixel sample
     o_pixel_valid             : out std_logic; -- valid pixel sample
@@ -145,6 +147,8 @@ architecture RTL of tes_top is
   signal steady_state_rd_valid1 : std_logic;
   signal steady_state_rd_data1  : std_logic_vector(o_steady_state_rd_data'range);
 
+  signal pulse_sof1    : std_logic;
+  signal pulse_eof1    : std_logic;
   signal pixel_sof1    : std_logic;
   signal pixel_eof1    : std_logic;
   signal pixel_id1     : std_logic_vector(o_pixel_id'range);
@@ -275,6 +279,8 @@ begin
       ---------------------------------------------------------------------
       -- output data
       ---------------------------------------------------------------------
+      o_pulse_sof               => pulse_sof1,
+      o_pulse_eof               => pulse_eof1,
       o_pixel_sof               => pixel_sof1, -- tag the first sample of the pixel
       o_pixel_eof               => pixel_eof1, -- tag the last sample of the pixel
       o_pixel_id                => pixel_id1, -- id of the pixel
@@ -320,6 +326,8 @@ begin
   o_steady_state_rd_valid <= steady_state_rd_valid1;
   o_steady_state_rd_data  <= steady_state_rd_data1;
 
+  o_pulse_sof    <= pulse_sof1;
+  o_pulse_eof    <= pulse_eof1;
   o_pixel_sof    <= pixel_sof1;
   o_pixel_eof    <= pixel_eof1;
   o_pixel_valid  <= pixel_valid1;

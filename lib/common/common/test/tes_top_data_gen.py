@@ -237,11 +237,11 @@ class TesTopDataGen:
         nb_frame_by_pulse_tmp  = json_data["register"]["value"]["nb_frame_by_pulse"]
         nb_pulse_tmp           = json_data["register"]["value"]["nb_pulse"]
 
-        # compute values start from 1 (instead of 0)
-        nb_sample_by_pixel = nb_sample_by_pixel_tmp + 1
-        nb_pixel_by_frame  = nb_pixel_by_frame_tmp + 1
-        nb_frame_by_pulse  = nb_frame_by_pulse_tmp + 1
-        nb_pulse           = nb_pulse_tmp + 1
+        # compute values start from 1
+        nb_sample_by_pixel = nb_sample_by_pixel_tmp
+        nb_pixel_by_frame  = nb_pixel_by_frame_tmp
+        nb_frame_by_pulse  = nb_frame_by_pulse_tmp
+        nb_pulse           = nb_pulse_tmp
 
         # auto-compute the VDHL expected nb_samples_by_frame value (start from 0)
         nb_samples_by_frame_tmp = nb_sample_by_pixel * nb_pixel_by_frame - 1

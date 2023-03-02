@@ -34,7 +34,7 @@
 // import libraries
 include("./fpasim/utils_tools.dscript");
 include("./fpasim/fpasim_address.dscript");
-include("./fpasim/fpasim_tools.dscript");
+//include("./fpasim/fpasim_tools.dscript");
 
 // define the SPI device registers
 const ADC_ADDR = {};

@@ -3445,6 +3445,19 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
 
     // Enable the SPI on the FPGA board
     dac_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+	
+	//---------------------------------------------------------------------
+    // write in the SPI_CONF register
+    //---------------------------------------------------------------------
+    const mode = 0; // 0: rd, 1: wr
+    const spi_id = 0; // 0: cdce,1: adc, 2: dac, 3: amc
+    const spi_dac_tx_enable = 0;
+    const data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
+
+    msg = "Disable the DAC TX";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+    sendToFPA_debugSetWireIn(addr, data);
 
     //###############################################################
     // dac_config0

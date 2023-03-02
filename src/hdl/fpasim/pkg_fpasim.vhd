@@ -173,7 +173,7 @@ package pkg_fpasim is
   -- hardcoded: latency of the fsm of the "tes_signalling_generator" module
   constant pkg_TES_SIGNALLING_GENERATOR_FSM_LATENCY : natural := 1;
   -- user-defined : add an additionnal output latency
-  constant pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY : natural := 0;
+  constant pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY : natural := 1;
   -- auto-computed: latency of the "tes_signalling_generator" module
   constant pkg_TES_SIGNALLING_GENERATOR_LATENCY     : natural := pkg_TES_SIGNALLING_GENERATOR_FSM_LATENCY + pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY;  -- number of pipes of the "tes_signalling_generator"
 

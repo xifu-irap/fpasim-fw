@@ -131,6 +131,8 @@ architecture simulate of tb_tes_top is
 
   -- output
   ---------------------------------------------------------------------
+  signal o_pulse_sof    : std_logic;
+  signal o_pulse_eof    : std_logic;
   signal o_pixel_sof    : std_logic;
   signal o_pixel_eof    : std_logic;
   signal o_pixel_valid  : std_logic;
@@ -267,7 +269,9 @@ begin
   -- master fsm
   ---------------------------------------------------------------------
   p_master_fsm : process is
-    variable val_v : integer := 0;
+    variable v_val  : integer := 0;
+    variable v_test : integer := 0;
+    variable v_cnt  : integer := 0;
 
   begin
     if runner_cfg'length > 0 then
@@ -422,8 +426,18 @@ begin
     -- Wait end of input data generation
     ---------------------------------------------------------------------
     info("wait end of data generation");
-    wait until rising_edge(i_clk) and data_gen_finish = '1';
+
+    while v_test = 0 loop
+     if data_gen_finish = '1' then
+       v_test := 1;
+     end if;
+     if o_pixel_valid = '1' and o_frame_sof = '1' then
+        info("Frame"&to_string(to_integer(unsigned(o_frame_id) ) ) );
+     end if;
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    end loop;
+
+      --wait until rising_edge(i_clk) and data_gen_finish = '1';
 
     ---------------------------------------------------------------------
     -- End of simulation: wait few more clock cycles
@@ -438,9 +452,9 @@ begin
     ---------------------------------------------------------------------
     -- errors checking
     info("Check results:");
-    val_v := to_integer(unsigned(o_errors));
+    v_val := to_integer(unsigned(o_errors));
 
-    check_equal(c_CHECKER_ERRORS, 0, val_v, result("checker output errors"));
+    check_equal(c_CHECKER_ERRORS, 0, v_val, result("checker output errors"));
     check_equal(c_CHECKER_DATA_COUNT, data_count_in, data_count_out, result("checker input/output data count"));
 
     -- summary
@@ -851,6 +865,8 @@ begin
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
+      o_pulse_sof               => o_pulse_sof,  -- first processed sample of a new command
+      o_pulse_eof               => o_pulse_eof,  -- first processed sample of a new command
       o_pixel_sof               => o_pixel_sof, -- first pixel sample
       o_pixel_eof               => o_pixel_eof, -- last pixel sample
       o_pixel_valid             => o_pixel_valid, -- valid pixel sample
@@ -877,6 +893,7 @@ begin
     o_count      => data_count_out,
     o_overflow   => data_count_overflow_out -- not connected
   );
+
 
   ---------------------------------------------------------------------
   -- log: data out

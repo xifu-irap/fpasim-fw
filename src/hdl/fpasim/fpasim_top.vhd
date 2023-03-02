@@ -40,59 +40,59 @@ use work.pkg_regdecode.all;
 
 entity fpasim_top is
   generic(
-    g_FPASIM_DEBUG        : boolean := false; -- true: instantiate ILA, false: do nothing
-    g_REGDECODE_TOP_DEBUG : boolean := false -- true: instantiate ILA, false: do nothing
+    g_FPASIM_DEBUG        : boolean := false;  -- true: instantiate ILA, false: do nothing
+    g_REGDECODE_TOP_DEBUG : boolean := false  -- true: instantiate ILA, false: do nothing
     );
   port(
-    i_clk     : in    std_logic;        -- system clock
-    i_rst     : in    std_logic;        -- reset 
+    i_clk      : in    std_logic;       -- system clock
+    i_rst      : in    std_logic;       -- reset 
     ---------------------------------------------------------------------
     -- from the usb @usb_clk (clock included)
     ---------------------------------------------------------------------
     --  Opal Kelly inouts --
-    i_okUH    : in    std_logic_vector(4 downto 0);
-    o_okHU    : out   std_logic_vector(2 downto 0);
-    b_okUHU   : inout std_logic_vector(31 downto 0);
-    b_okAA    : inout std_logic;
+    i_okUH     : in    std_logic_vector(4 downto 0);
+    o_okHU     : out   std_logic_vector(2 downto 0);
+    b_okUHU    : inout std_logic_vector(31 downto 0);
+    b_okAA     : inout std_logic;
     ---------------------------------------------------------------------
     -- from the board
     ---------------------------------------------------------------------
-    i_board_id : in  std_logic_vector(7 downto 0); -- board id
+    i_board_id : in    std_logic_vector(7 downto 0);  -- board id
 
     ---------------------------------------------------------------------
     -- to the IOs:@i_clk
     ---------------------------------------------------------------------
-    o_rst_status : out std_logic; -- reset error flag(s)
+    o_rst_status  : out std_logic;      -- reset error flag(s)
     o_debug_pulse : out std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     ---------------------------------------------------------------------
     -- from/to the spi: @usb_clk
     ---------------------------------------------------------------------
-    o_usb_clk            : out std_logic; -- clock @usb_clk
+    o_usb_clk            : out std_logic;  -- clock @usb_clk
     -- tx
-    o_spi_rst            : out std_logic; -- reset the spi module
-    o_spi_en             : out std_logic; -- enable the spi module
-    o_spi_dac_tx_present : out std_logic; -- enable the dac
-    o_spi_mode           : out std_logic; -- 
-    o_spi_id             : out std_logic_vector(1 downto 0); -- select the spi module
-    o_spi_cmd_valid      : out std_logic; -- spi command valid
-    o_spi_cmd_wr_data    : out std_logic_vector(31 downto 0); -- spi command value
+    o_spi_rst            : out std_logic;  -- reset the spi module
+    o_spi_en             : out std_logic;  -- enable the spi module
+    o_spi_dac_tx_present : out std_logic;  -- enable the dac
+    o_spi_mode           : out std_logic;  -- 
+    o_spi_id             : out std_logic_vector(1 downto 0);  -- select the spi module
+    o_spi_cmd_valid      : out std_logic;  -- spi command valid
+    o_spi_cmd_wr_data    : out std_logic_vector(31 downto 0);  -- spi command value
     -- rx
-    i_spi_rd_data_valid  : in  std_logic; -- spi read valid
-    i_spi_rd_data        : in  std_logic_vector(31 downto 0); -- spi read value
-    i_reg_spi_status     : in  std_logic_vector(31 downto 0); -- spi status for the register
+    i_spi_rd_data_valid  : in  std_logic;  -- spi read valid
+    i_spi_rd_data        : in  std_logic_vector(31 downto 0);  -- spi read value
+    i_reg_spi_status     : in  std_logic_vector(31 downto 0);  -- spi status for the register
     -- others
-    o_usb_rst_status     : out std_logic; -- rst status signal @i_usb_clk
-    o_usb_debug_pulse    : out std_logic; -- debug pulse signal @i_usb_clk
+    o_usb_rst_status     : out std_logic;  -- rst status signal @i_usb_clk
+    o_usb_debug_pulse    : out std_logic;  -- debug pulse signal @i_usb_clk
     -- errors/status
-    i_spi_errors         : in  std_logic_vector(15 downto 0); -- spi errors
-    i_spi_status         : in  std_logic_vector(7 downto 0); -- spi status
+    i_spi_errors         : in  std_logic_vector(15 downto 0);  -- spi errors
+    i_spi_status         : in  std_logic_vector(7 downto 0);  -- spi status
 
     ---------------------------------------------------------------------
     -- from/to regdecode @usb_clk
     ---------------------------------------------------------------------
-    o_usb_rst           : out std_logic; -- reset @clk_usb (from register)
-    i_usb_rst           : in std_logic;  -- reset @clk_usb to used
+    o_usb_rst : out std_logic;          -- reset @clk_usb (from register)
+    i_usb_rst : in  std_logic;          -- reset @clk_usb to used
 
     ---------------------------------------------------------------------
     -- from adc @i_clk
@@ -100,24 +100,24 @@ entity fpasim_top is
     i_adc_valid                       : in  std_logic;  -- adc valid
     i_adc_amp_squid_offset_correction : in  std_logic_vector(13 downto 0);  -- adc_amp_squid_offset_correction value
     i_adc_mux_squid_feedback          : in  std_logic_vector(13 downto 0);  -- adc_mux_squid_feedback value
-    i_adc_errors                      : in std_logic_vector(15 downto 0);
-    i_adc_status                      : in std_logic_vector(7 downto 0);
+    i_adc_errors                      : in  std_logic_vector(15 downto 0);
+    i_adc_status                      : in  std_logic_vector(7 downto 0);
     ---------------------------------------------------------------------
     -- output sync @i_clk
     ---------------------------------------------------------------------
-    o_sync_valid   : out std_logic;  -- sync valid signal
-    o_sync         : out std_logic;  -- sync value (pulse)
+    o_sync_valid                      : out std_logic;  -- sync valid signal
+    o_sync                            : out std_logic;  -- sync value (pulse)
 
-    i_sync_errors: in std_logic_vector(15 downto 0); -- sync_errors value
-    i_sync_status: in std_logic_vector(7 downto 0); -- sync_status value
+    i_sync_errors : in  std_logic_vector(15 downto 0);  -- sync_errors value
+    i_sync_status : in  std_logic_vector(7 downto 0);   -- sync_status value
     ---------------------------------------------------------------------
     -- output dac @i_clk
     ---------------------------------------------------------------------
-    o_dac_valid                       : out std_logic;  -- dac valid
-    o_dac_frame                       : out std_logic;  -- dac frame
-    o_dac                             : out std_logic_vector(15 downto 0);  -- dac data
-    i_dac_errors                      : in std_logic_vector(15 downto 0);
-    i_dac_status                      : in std_logic_vector(7 downto 0)
+    o_dac_valid   : out std_logic;                      -- dac valid
+    o_dac_frame   : out std_logic;                      -- dac frame
+    o_dac         : out std_logic_vector(15 downto 0);  -- dac data
+    i_dac_errors  : in  std_logic_vector(15 downto 0);
+    i_dac_status  : in  std_logic_vector(7 downto 0)
     );
 end entity fpasim_top;
 
@@ -137,7 +137,7 @@ architecture RTL of fpasim_top is
 
   -- ctrl 
   ---------------------------------------------------------------------
-  constant c_CTRL_EN_IDX_H  : integer := pkg_CTRL_EN_IDX_H;
+  constant c_CTRL_EN_IDX_H : integer := pkg_CTRL_EN_IDX_H;
   --constant c_CTRL_RST_IDX_H : integer := pkg_CTRL_RST_IDX_H;
 
   -- make pulse
@@ -230,7 +230,7 @@ architecture RTL of fpasim_top is
 
   -- ctrl register
   --signal rst : std_logic;
-  signal en  : std_logic;
+  signal en : std_logic;
 
   -- make_pulse register
   signal cmd_valid        : std_logic;
@@ -368,6 +368,8 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- tes_top
   ---------------------------------------------------------------------
+  signal pulse_sof1    : std_logic;
+  signal pulse_eof1    : std_logic;
   signal pixel_sof1    : std_logic;
   signal pixel_eof1    : std_logic;
   signal pixel_valid1  : std_logic;
@@ -428,15 +430,15 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- dac_top
   ---------------------------------------------------------------------
-  signal dac_valid4  : std_logic;
-  signal dac_frame4  : std_logic;
-  signal dac4        : std_logic_vector(o_dac'range);
+  signal dac_valid4 : std_logic;
+  signal dac_frame4 : std_logic;
+  signal dac4       : std_logic_vector(o_dac'range);
 
   ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
-  signal sync_valid5  : std_logic;  -- @suppress "signal sync_valid5 is never read"
-  signal sync5        : std_logic;
+  signal sync_valid5      : std_logic;  -- @suppress "signal sync_valid5 is never read"
+  signal sync5            : std_logic;
   signal sync_errors0_tmp : std_logic_vector(15 downto 0);
 
   signal sync_errors0 : std_logic_vector(15 downto 0);
@@ -504,12 +506,12 @@ begin
       ---------------------------------------------------------------------
       -- from the board
       ---------------------------------------------------------------------
-      i_board_id                        => i_board_id,
+      i_board_id => i_board_id,
       ---------------------------------------------------------------------
       -- from/to the user: @i_out_clk
       ---------------------------------------------------------------------
-      i_out_rst                         => i_rst,        -- reset @i_clk
-      i_out_clk                         => i_clk,        -- clock (user side)
+      i_out_rst  => i_rst,              -- reset @i_clk
+      i_out_clk  => i_clk,              -- clock (user side)
 
       -- RAM configuration 
       ---------------------------------------------------------------------
@@ -611,7 +613,7 @@ begin
 
   -- ctrl register: extract fields
   -- rst <= reg_ctrl(c_CTRL_RST_IDX_H); -- this reset is managed by the reset_top module
-  en  <= reg_ctrl(c_CTRL_EN_IDX_H);
+  en <= reg_ctrl(c_CTRL_EN_IDX_H);
 
   -- make_pulse register: extract fields
   cmd_valid            <= reg_make_pulse_valid;
@@ -666,7 +668,7 @@ begin
   -- to the io_top
   o_rst_status  <= rst_status;
   o_debug_pulse <= debug_pulse;
-  
+
   -- concatenate errors
   sync_errors0(15 downto 5) <= i_sync_errors(15 downto 5);
   sync_errors0(4)           <= sync_errors0_tmp(0);
@@ -676,14 +678,14 @@ begin
   -- errors
   reg_wire_errors3(31 downto 16) <= (others => '0');
   reg_wire_errors3(15 downto 0)  <= rec_adc_errors0;  -- recording
-  
+
   reg_wire_errors2(31 downto 16) <= sync_errors0;  -- sync top
-  reg_wire_errors2(15 downto 0)  <= i_dac_errors;   -- dac
+  reg_wire_errors2(15 downto 0)  <= i_dac_errors;  -- dac
 
   reg_wire_errors1(31 downto 16) <= amp_squid_errors0;  -- amp squid
   reg_wire_errors1(15 downto 0)  <= mux_squid_errors0;  -- mux squid
 
-  reg_wire_errors0(31 downto 16) <= tes_errors0;  -- tes
+  reg_wire_errors0(31 downto 16) <= tes_errors0;   -- tes
   reg_wire_errors0(15 downto 0)  <= i_adc_errors;  -- adc
 
   -- status
@@ -695,7 +697,7 @@ begin
   reg_wire_status2(31 downto 24) <= (others => '0');
   reg_wire_status2(23 downto 16) <= sync_status0;  -- sync top
   reg_wire_status2(15 downto 8)  <= (others => '0');
-  reg_wire_status2(7 downto 0)   <= i_dac_status;   -- dac
+  reg_wire_status2(7 downto 0)   <= i_dac_status;  -- dac
 
   reg_wire_status1(31 downto 24) <= (others => '0');
   reg_wire_status1(23 downto 16) <= amp_squid_status0;  -- amp squid
@@ -703,7 +705,7 @@ begin
   reg_wire_status1(7 downto 0)   <= mux_squid_status0;  -- mux squid
 
   reg_wire_status0(31 downto 24) <= (others => '0');
-  reg_wire_status0(23 downto 16) <= tes_status0;  -- tes
+  reg_wire_status0(23 downto 16) <= tes_status0;   -- tes
   reg_wire_status0(15 downto 8)  <= (others => '0');
   reg_wire_status0(7 downto 0)   <= i_adc_status;  -- adc
 
@@ -718,26 +720,26 @@ begin
       g_ADC0_DELAY_WIDTH => adc0_delay'length
       )
     port map(
-      i_clk         => i_clk,
+      i_clk        => i_clk,
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_adc_valid   => i_adc_valid,
-      i_adc1        => i_adc_mux_squid_feedback,
-      i_adc0        => i_adc_amp_squid_offset_correction,
+      i_adc_valid  => i_adc_valid,
+      i_adc1       => i_adc_mux_squid_feedback,
+      i_adc0       => i_adc_amp_squid_offset_correction,
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
       -- from regdecode
       -----------------------------------------------------------------
-      i_en          => en,
-      i_adc1_delay  => adc1_delay,
-      i_adc0_delay  => adc0_delay,
+      i_en         => en,
+      i_adc1_delay => adc1_delay,
+      i_adc0_delay => adc0_delay,
       -- output
       -----------------------------------------------------------------
-      o_adc_valid   => adc_valid0,
-      o_adc1        => adc_mux_squid_feedback0,
-      o_adc0        => adc_amp_squid_offset_correction0
+      o_adc_valid  => adc_valid0,
+      o_adc1       => adc_mux_squid_feedback0,
+      o_adc0       => adc_amp_squid_offset_correction0
       );
 
   ---------------------------------------------------------------------
@@ -807,6 +809,8 @@ begin
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
+      o_pulse_sof               => pulse_sof1,         -- not connected
+      o_pulse_eof               => pulse_eof1,         -- not connected
       o_pixel_sof               => pixel_sof1,
       o_pixel_eof               => pixel_eof1,
       o_pixel_valid             => pixel_valid1,
@@ -1012,21 +1016,21 @@ begin
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_clk         => i_clk,
-      i_rst         => i_rst,
+      i_clk       => i_clk,
+      i_rst       => i_rst,
       -- from regdecode
       -----------------------------------------------------------------
-      i_dac_delay   => dac_delay,
+      i_dac_delay => dac_delay,
       -- input data 
       ---------------------------------------------------------------------
-      i_dac_valid   => pixel_valid3,
-      i_dac         => pixel_result3,
+      i_dac_valid => pixel_valid3,
+      i_dac       => pixel_result3,
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      o_dac_valid   => dac_valid4,
-      o_dac_frame   => dac_frame4,
-      o_dac         => dac4
+      o_dac_valid => dac_valid4,
+      o_dac_frame => dac_frame4,
+      o_dac       => dac4
       );
 
   ---------------------------------------------------------------------
@@ -1047,8 +1051,8 @@ begin
       ---------------------------------------------------------------------
       -- input @i_clk
       ---------------------------------------------------------------------
-      i_clk         => i_clk, 
-      i_rst         => i_rst, 
+      i_clk         => i_clk,
+      i_rst         => i_rst,
       -- from regdecode
       -----------------------------------------------------------------
       i_rst_status  => rst_status,
@@ -1114,24 +1118,116 @@ begin
       );
 
 
-
-
   ---------------------------------------------------------------------
   -- debug
   ---------------------------------------------------------------------
   gen_debug : if g_FPASIM_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
-  -- inst_fpasim_top_ila_0 : entity work.fpasim_top_ila_0
-  --   port map(
-  --     clk                 => i_clk,
-  --     probe0              => pixel_result3,
-  --     probe1(21)          => pixel_sof3,
-  --     probe1(20)          => pixel_eof3,
-  --     probe1(19)          => pixel_valid3,
-  --     probe1(18)          => frame_sof3,
-  --     probe1(17)          => frame_eof3,
-  --     probe1(16 downto 6) => frame_id3,
-  --     probe1(5 downto 0)  => pixel_id3
-  --   );
+
+    signal debug_frame_id_pulse_sof_r1 : std_logic_vector(frame_id1'range);
+    signal debug_frame_id_pulse_eof_r1 : std_logic_vector(frame_id1'range);
+
+    signal debug_pulse_cnt_r1     : unsigned(23 downto 0)         := (others => '0');
+    signal debug_pulse_cnt_r1_tmp : std_logic_vector(23 downto 0) := (others => '0');
+
+    signal debug_trig  : std_logic;
+    signal debug_en_r1 : std_logic := '0';
+
+    signal debug_sample_pixel_cnt_r1  : unsigned(15 downto 0);
+    signal debug_sample_pixel_cnt_tmp : std_logic_vector(15 downto 0);
+    signal debug_sample_frame_cnt_r1  : unsigned(15 downto 0);
+    signal debug_sample_frame_cnt_tmp : std_logic_vector(15 downto 0);
+
+  begin
+
+    debug_trig <= '1' when unsigned(pixel_id1) = to_unsigned(0, pixel_id1'length) else '0';
+
+    p_statistics : process (i_clk) is
+    begin
+      if rising_edge(i_clk) then
+        if pulse_sof1 = '1' and debug_trig = '1' then
+          debug_frame_id_pulse_sof_r1 <= frame_id1;
+        end if;
+
+        if pulse_eof1 = '1' and debug_trig = '1' then
+          debug_frame_id_pulse_eof_r1 <= frame_id1;
+        end if;
+
+        if pulse_sof1 = '1' and debug_trig = '1' and pixel_valid1 = '1' then
+          debug_en_r1        <= '1';
+          debug_pulse_cnt_r1 <= (others => '0');
+        elsif pulse_eof1 = '1' and debug_trig = '1' then
+          debug_en_r1 <= '0';
+        elsif pixel_valid1 = '1' and debug_en_r1 = '1' then
+          debug_pulse_cnt_r1 <= debug_pulse_cnt_r1 + 1;
+        end if;
+
+        if pixel_sof1 = '1' then
+          debug_sample_pixel_cnt_r1 <= (others => '0');
+        elsif pixel_valid1 = '1' then
+          debug_sample_pixel_cnt_r1 <= debug_sample_pixel_cnt_r1 + 1;
+        end if;
+
+        if frame_sof1 = '1' then
+          debug_sample_frame_cnt_r1 <= (others => '0');
+        elsif pixel_valid1 = '1' then
+          debug_sample_frame_cnt_r1 <= debug_sample_frame_cnt_r1 + 1;
+        end if;
+
+      end if;
+    end process p_statistics;
+
+    debug_pulse_cnt_r1_tmp     <= std_logic_vector(debug_pulse_cnt_r1);
+    debug_sample_pixel_cnt_tmp <= std_logic_vector(debug_sample_pixel_cnt_r1);
+    debug_sample_frame_cnt_tmp <= std_logic_vector(debug_sample_frame_cnt_r1);
+
+    inst_fpasim_top_ila_0 : entity work.fpasim_top_ila_0
+      port map(
+        clk => i_clk,
+
+        -- probe0
+        probe0(26)          => i_adc_valid,
+        probe0(25)          => i_rst,
+        probe0(24)          => sync5,
+        probe0(23)          => sync_valid5,
+        probe0(22)          => dac_valid4,
+        probe0(21)          => pixel_sof3,
+        probe0(20)          => pixel_eof3,
+        probe0(19)          => pixel_valid3,
+        probe0(18)          => frame_sof3,
+        probe0(17)          => frame_eof3,
+        probe0(16 downto 6) => frame_id3,
+        probe0(5 downto 0)  => pixel_id3,
+
+        -- probe1
+        probe1(32)           => dac_frame4,
+        probe1(31 downto 16) => dac4,
+        probe1(15 downto 0)  => pixel_result3,
+
+        -- probe2
+        probe2(27 downto 14) => i_adc_amp_squid_offset_correction,
+        probe2(13 downto 0)  => i_adc_mux_squid_feedback,
+
+        -- probe3
+        probe3(24)          => debug_en_r1,
+        probe3(23)          => pulse_sof1,
+        probe3(22)          => pulse_eof1,
+        probe3(21)          => pixel_sof1,
+        probe3(20)          => pixel_eof1,
+        probe3(19)          => pixel_valid1,
+        probe3(18)          => frame_sof1,
+        probe3(17)          => frame_eof1,
+        probe3(16 downto 6) => frame_id1,
+        probe3(5 downto 0)  => pixel_id1,
+
+        -- probe4
+        probe4(45 downto 22) => debug_pulse_cnt_r1_tmp,
+        probe4(21 downto 11) => debug_frame_id_pulse_sof_r1,
+        probe4(10 downto 0)  => debug_frame_id_pulse_eof_r1,
+        -- probe5
+        probe5(31 downto 16) => debug_sample_pixel_cnt_tmp,
+        probe5(15 downto 0)  => debug_sample_frame_cnt_tmp
+
+        );
   end generate gen_debug;
 
 end architecture RTL;
