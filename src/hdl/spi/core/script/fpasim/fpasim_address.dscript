@@ -23,26 +23,33 @@
 //    Code Rules Reference    
 // -------------------------------------------------------------------------------------------------------------
 //    @details                
+//    
+//    This script lists:
+//      . The available addresses in the {name, address value} dictionnary format for the:
+//			. wire in
+//          . wire out
+//          . trig in
+//      . The bit position of the trig_in
 //
 // -------------------------------------------------------------------------------------------------------------
 
 /*
  Trig in address
  */
- const FPASIM_ADDR_TRIGIN = {};
- FPASIM_ADDR_TRIGIN['TRIG'] = 0x40;
+const FPASIM_ADDR_TRIGIN = {};
+FPASIM_ADDR_TRIGIN['TRIG'] = 0x40;
 
- /*
-  position of trig bit in trig_in
- */
- const FPASIM_POS_TRIGIN = {};
- FPASIM_POS_TRIGIN['reg_valid'] = 0;
- FPASIM_POS_TRIGIN['make_pulse'] = 4;
- FPASIM_POS_TRIGIN['rd_all'] = 8;
- FPASIM_POS_TRIGIN['ctrl_valid'] = 12;
- FPASIM_POS_TRIGIN['debug_valid'] = 16;
- FPASIM_POS_TRIGIN['rec_valid'] = 20;
- FPASIM_POS_TRIGIN['spi_valid'] = 24;
+/*
+ position of trig bit in trig_in
+*/
+const FPASIM_POS_TRIGIN = {};
+FPASIM_POS_TRIGIN['reg_valid'] = 0;
+FPASIM_POS_TRIGIN['make_pulse'] = 4;
+FPASIM_POS_TRIGIN['rd_all'] = 8;
+FPASIM_POS_TRIGIN['ctrl_valid'] = 12;
+FPASIM_POS_TRIGIN['debug_valid'] = 16;
+FPASIM_POS_TRIGIN['rec_valid'] = 20;
+FPASIM_POS_TRIGIN['spi_valid'] = 24;
 
 /*
   Wire in addresses
@@ -83,7 +90,7 @@ FPASIM_ADDR_WIREIN['ERROR_SEL'] = 0x19; // 25
 
 
 /*
-  Wire out address
+  Wire out addresses
 */
 const FPASIM_ADDR_WIREOUT = {};
 FPASIM_ADDR_WIREOUT['CTRL'] = 0x20; // 0
@@ -118,5 +125,3 @@ FPASIM_ADDR_WIREOUT['STATUS'] = 0x3B; // 27
 FPASIM_ADDR_WIREOUT['BOARD_ID'] = 0x3D; // 29
 FPASIM_ADDR_WIREOUT['FIRMWARE_ID'] = 0x3E; // 30
 FPASIM_ADDR_WIREOUT['FIRMWARE_VERSION'] = 0x3F; // 31
-
- 

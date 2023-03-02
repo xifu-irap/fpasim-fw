@@ -37,9 +37,9 @@ use ieee.numeric_std.all;
 
 
 entity spi_device_select is
-generic (
-   g_DEBUG : boolean := false
-   );
+  generic (
+    g_DEBUG : boolean := false
+    );
   port (
     i_clk         : in std_logic;       -- clock
     i_rst         : in std_logic;       -- reset
@@ -129,16 +129,16 @@ architecture RTL of spi_device_select is
   signal amc_data_valid_r1   : std_logic;
 
   signal spi_clk_next : std_logic;
-  signal spi_clk_r1   : std_logic:= '0';
+  signal spi_clk_r1   : std_logic := '0';
 
   signal spi_mosi_next : std_logic;
-  signal spi_mosi_r1   : std_logic:= '0';
+  signal spi_mosi_r1   : std_logic := '0';
 
   signal rd_data_valid_next : std_logic;
-  signal rd_data_valid_r1   : std_logic:= '0';
+  signal rd_data_valid_r1   : std_logic := '0';
 
   signal rd_data_next : std_logic_vector(o_spi_rd_data'range);
-  signal rd_data_r1   : std_logic_vector(o_spi_rd_data'range):= (others => '0');
+  signal rd_data_r1   : std_logic_vector(o_spi_rd_data'range) := (others => '0');
 
   signal tx_wr_rd_en_r1        : std_logic;
   signal dac_spi_tx_present_r1 : std_logic;
@@ -148,12 +148,12 @@ architecture RTL of spi_device_select is
   signal error_r1   : std_logic;
 
   signal ready_next : std_logic;
-  signal ready_r1   : std_logic:= '0';
+  signal ready_r1   : std_logic := '0';
 
   ---------------------------------------------------------------------
   -- sync with fsm output
   ---------------------------------------------------------------------
- 
+
 
   signal cdce_spi_cs_n_en1 : std_logic;
   signal adc_spi_cs_n1     : std_logic;
@@ -256,8 +256,8 @@ architecture RTL of spi_device_select is
   -- debug
   ---------------------------------------------------------------------
   signal debug_cdce_n_reset1 : std_logic;
-  signal debug_cdce_n_pd1 : std_logic;
-  signal debug_cdce_ref_en1 : std_logic;
+  signal debug_cdce_n_pd1    : std_logic;
+  signal debug_cdce_ref_en1  : std_logic;
 
 begin
 
@@ -443,12 +443,12 @@ begin
   -- tx pipeline
   ---------------------------------------------------------------------
   -- init path with zeros (according the signal see the corresponding spi_xxx module)
-  gen_tx_pipe_with_init_0: if true generate
-   signal tx_data_tmp0 : std_logic_vector(1 downto 0);
-   signal tx_data_tmp1 : std_logic_vector(1 downto 0);
+  gen_tx_pipe_with_init_0 : if true generate
+    signal tx_data_tmp0 : std_logic_vector(1 downto 0);
+    signal tx_data_tmp1 : std_logic_vector(1 downto 0);
   begin
-  tx_data_tmp0(1) <= dac_tx_present;
-  tx_data_tmp0(0) <= adc_reset;
+    tx_data_tmp0(1) <= dac_tx_present;
+    tx_data_tmp0(0) <= adc_reset;
     inst_pipeliner_sync_with_fsm_out : entity work.pipeliner
       generic map(
         g_NB_PIPES   => 1,
@@ -459,25 +459,25 @@ begin
         i_data => tx_data_tmp0,
         o_data => tx_data_tmp1
         );
-  dac_tx_present1   <= tx_data_tmp1(1);
-  adc_reset1        <= tx_data_tmp1(0);
+    dac_tx_present1 <= tx_data_tmp1(1);
+    adc_reset1      <= tx_data_tmp1(0);
   end generate gen_tx_pipe_with_init_0;
 
   -- init path with ones  (according the signal see the corresponding spi_xxx module)
-  gen_tx_pipe_with_init_1: if true generate
+  gen_tx_pipe_with_init_1 : if true generate
     signal tx_data_tmp0 : std_logic_vector(7 downto 0);
     signal tx_data_tmp1 : std_logic_vector(7 downto 0);
   begin
-  tx_data_tmp0(7) <= amc_mon_n_reset;
-  tx_data_tmp0(6) <= cdce_n_reset;
-  tx_data_tmp0(5) <= cdce_n_pd;
-  tx_data_tmp0(4) <= cdce_ref_en;
-  -- spi_cs_n
-  tx_data_tmp0(3) <= amc_spi_cs_n;
-  tx_data_tmp0(2) <= dac_spi_cs_n;
-  tx_data_tmp0(1) <= adc_spi_cs_n;
-  tx_data_tmp0(0) <= cdce_spi_cs_n_en;
-    
+    tx_data_tmp0(7) <= amc_mon_n_reset;
+    tx_data_tmp0(6) <= cdce_n_reset;
+    tx_data_tmp0(5) <= cdce_n_pd;
+    tx_data_tmp0(4) <= cdce_ref_en;
+    -- spi_cs_n
+    tx_data_tmp0(3) <= amc_spi_cs_n;
+    tx_data_tmp0(2) <= dac_spi_cs_n;
+    tx_data_tmp0(1) <= adc_spi_cs_n;
+    tx_data_tmp0(0) <= cdce_spi_cs_n_en;
+
     inst_pipeliner_sync_with_fsm_out : entity work.pipeliner_with_init
       generic map(
         g_INIT       => '1',
@@ -489,17 +489,17 @@ begin
         i_data => tx_data_tmp0,
         o_data => tx_data_tmp1
         );
-  -- specific signals
-  amc_mon_n_reset1  <= tx_data_tmp1(7);
-  
-  cdce_n_reset1     <= tx_data_tmp1(6);
-  cdce_n_pd1        <= tx_data_tmp1(5);
-  cdce_ref_en1      <= tx_data_tmp1(4);
-  -- spi_cs_n
-  amc_spi_cs_n1     <= tx_data_tmp1(3);
-  dac_spi_cs_n1     <= tx_data_tmp1(2);
-  adc_spi_cs_n1     <= tx_data_tmp1(1);
-  cdce_spi_cs_n_en1 <= tx_data_tmp1(0);
+    -- specific signals
+    amc_mon_n_reset1 <= tx_data_tmp1(7);
+
+    cdce_n_reset1     <= tx_data_tmp1(6);
+    cdce_n_pd1        <= tx_data_tmp1(5);
+    cdce_ref_en1      <= tx_data_tmp1(4);
+    -- spi_cs_n
+    amc_spi_cs_n1     <= tx_data_tmp1(3);
+    dac_spi_cs_n1     <= tx_data_tmp1(2);
+    adc_spi_cs_n1     <= tx_data_tmp1(1);
+    cdce_spi_cs_n_en1 <= tx_data_tmp1(0);
 
   end generate gen_tx_pipe_with_init_1;
 
@@ -512,15 +512,19 @@ begin
   o_spi_sdata <= spi_mosi_r1;
 
   -- CDCE: spi
-  o_cdce_n_en    <= cdce_spi_cs_n_en1;
+  o_cdce_n_en <= cdce_spi_cs_n_en1;
   -- CDCE: specific signals
-  o_cdce_n_reset <= cdce_n_reset1;
-  o_cdce_n_pd    <= cdce_n_pd1;
-  o_ref_en       <= cdce_ref_en1;
-  -- TODO : to comment at the end of the debugging
-  --o_cdce_n_reset <= debug_cdce_n_reset1;
-  --o_cdce_n_pd    <= debug_cdce_n_pd1;
-  --o_ref_en       <= debug_cdce_ref_en1;
+  not_gen_vio_debug : if g_DEBUG = false generate
+    o_cdce_n_reset <= cdce_n_reset1;
+    o_cdce_n_pd    <= cdce_n_pd1;
+    o_ref_en       <= cdce_ref_en1;
+  end generate not_gen_vio_debug;
+
+  gen_vio_debug : if g_DEBUG = true generate
+    o_cdce_n_reset <= debug_cdce_n_reset1;
+    o_cdce_n_pd    <= debug_cdce_n_pd1;
+    o_ref_en       <= debug_cdce_ref_en1;
+  end generate gen_vio_debug;
 
 
   -- ADC: spi
@@ -734,48 +738,49 @@ begin
 ---------------------------------------------------------------------
 -- debug
 ---------------------------------------------------------------------
-gen_debug: if g_DEBUG = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_debug : if g_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
 
-begin
+  begin
 
-fpasim_spi_device_select_vio_inst : entity work.fpasim_spi_device_select_vio
-  PORT MAP (
-    CLK => i_clk,
-    probe_out0(0) => debug_cdce_n_reset1,
-    probe_out1(0) => debug_cdce_n_pd1,
-    probe_out2(0) => debug_cdce_ref_en1
-  );
+    fpasim_spi_device_select_vio_inst : entity work.fpasim_spi_device_select_vio
+      port map (
+        CLK           => i_clk,
+        probe_out0(0) => debug_cdce_n_reset1,
+        probe_out1(0) => debug_cdce_n_pd1,
+        probe_out2(0) => debug_cdce_ref_en1
+        );
 
 
-inst_fpasim_spi_device_select_ila : entity work.fpasim_spi_device_select_ila
-       port map(
-         clk                  => i_clk,
-         -- probe0
-         probe0(7)            => rd_data_valid_r1,
-         probe0(6)            => i_rst,
-         probe0(5)            => i_spi_en,
-         probe0(4)            => i_spi_cmd_valid,
-         probe0(3)            => cdce_data_valid_r1,
-         probe0(2)            => adc_data_valid_r1,
-         probe0(1)            => dac_data_valid_r1,
-         probe0(0)            => amc_data_valid_r1,
-         -- probe1
-         probe1(11)            => i_dac_sdo,
-         probe1(10)            => i_adc_sdo,
-         probe1(9)            => i_cdce_sdo,
-         probe1(8)            => amc_spi_cs_n1,
-         probe1(7)            => dac_spi_cs_n1,
-         probe1(6)            => cdce_spi_cs_n_en1,
-         probe1(5)            => adc_spi_cs_n1,
-         probe1(4)            => i_mon_sdo,
-         probe1(3 downto 2)   => i_spi_id,
-         probe1(1)            => spi_clk_r1,
-         probe1(0)            => spi_mosi_r1,
-         -- probe2
-         probe2(31 downto 0)  => rd_data_r1
+    inst_fpasim_spi_device_select_ila : entity work.fpasim_spi_device_select_ila
+      port map(
+        clk                 => i_clk,
+        -- probe0
+        probe0(8)           => dac_tx_present,
+        probe0(7)           => rd_data_valid_r1,
+        probe0(6)           => i_rst,
+        probe0(5)           => i_spi_en,
+        probe0(4)           => i_spi_cmd_valid,
+        probe0(3)           => cdce_data_valid_r1,
+        probe0(2)           => adc_data_valid_r1,
+        probe0(1)           => dac_data_valid_r1,
+        probe0(0)           => amc_data_valid_r1,
+        -- probe1
+        probe1(11)          => i_dac_sdo,
+        probe1(10)          => i_adc_sdo,
+        probe1(9)           => i_cdce_sdo,
+        probe1(8)           => amc_spi_cs_n1,
+        probe1(7)           => dac_spi_cs_n1,
+        probe1(6)           => cdce_spi_cs_n_en1,
+        probe1(5)           => adc_spi_cs_n1,
+        probe1(4)           => i_mon_sdo,
+        probe1(3 downto 2)  => i_spi_id,
+        probe1(1)           => spi_clk_r1,
+        probe1(0)           => spi_mosi_r1,
+        -- probe2
+        probe2(31 downto 0) => rd_data_r1
 
-       );
-  
-end generate gen_debug;
-  
+        );
+
+  end generate gen_debug;
+
 end architecture RTL;

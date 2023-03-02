@@ -980,6 +980,8 @@ begin
 
   -- output: to the user
   ---------------------------------------------------------------------
+   o_usb_rst      <= usb_wirein_ctrl(pkg_CTRL_RST_IDX_H);-- get the reset field from the ctrl register
+
   o_reg_ctrl_valid <= ctrl_data_valid_tmp2;
   o_reg_ctrl       <= ctrl_data_tmp2;
 
@@ -1117,7 +1119,7 @@ begin
   rec_ctrl_tmp0  <= usb_wirein_rec_ctrl;
   rec_conf0_tmp0 <= usb_wirein_rec_conf0;
 
-  o_usb_rst      <= usb_wirein_rec_ctrl(pkg_CTRL_RST_IDX_H);-- get the reset field from the ctrl register
+ 
 
   regdecode_recording_INST : entity work.regdecode_recording
     generic map(
@@ -1331,18 +1333,8 @@ begin
   -- debug
   ---------------------------------------------------------------------
   gen_debug_ila : if g_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
-   signal count_r1 : unsigned(31 downto 0):= (others => '0');
-   signal sys_clk_div2 : std_logic:= '0';
 
   begin
-
-     p_count: process (i_out_clk) is
-     begin
-       if rising_edge(i_out_clk) then
-         count_r1 <= count_r1 + 1;
-         sys_clk_div2 <= not(sys_clk_div2);
-       end if;
-     end process p_count;
 
 
      inst_fpasim_regdecode_top_ila_0 : entity work.fpasim_regdecode_top_ila_0
@@ -1358,35 +1350,49 @@ begin
          probe0(2)            => trig_rd_all_valid,
          probe0(1)            => trig_make_pulse_valid,
          probe0(0)            => trig_reg_valid,
+         
          -- probe1
-         probe1(5)            => pipeout_rd,
-         probe1(4)            => pipeout_sof,
-         probe1(3)            => pipeout_eof,
-         probe1(2)            => pipeout_valid,
-         probe1(1)            => pipeout_empty,
-         probe1(0)            => pipein_valid0,
+         probe1(127 downto 96) => usb_wirein_ctrl,
+         probe1(95 downto 64) => usb_wireout_ctrl,
+         probe1(63 downto 32) => usb_wirein_make_pulse,
+         probe1(31 downto 0) => usb_wireout_make_pulse,
+
          -- probe2
-         probe2(31 downto 16) => pipein_addr0,
-         probe2(15 downto 0)  => pipein_data0,
+         probe2(127 downto 96) => i_reg_spi_rd_data,
+         probe2(95 downto 64) => usb_wirein_spi_wr_data,
+         probe2(63 downto 32) => usb_wirein_spi_conf,
+         probe2(31 downto 0) => usb_wirein_spi_ctrl
+       );
+
+       inst_fpasim_regdecode_top_ila_1 : entity work.fpasim_regdecode_top_ila_1
+       port map(
+         clk                  => usb_clk,
+
+             -- probe0
+         probe0(5)            => pipeout_rd,
+         probe0(4)            => pipeout_sof,
+         probe0(3)            => pipeout_eof,
+         probe0(2)            => pipeout_valid,
+         probe0(1)            => pipeout_empty,
+         probe0(0)            => pipein_valid0,
+
+         -- probe1
+         probe1(31 downto 16) => pipein_addr0,
+         probe1(15 downto 0)  => pipein_data0,
+         -- probe2
+         probe2(47 downto 32) => pipeout_data_count,
+         probe2(31 downto 16) => pipeout_addr,
+         probe2(15 downto 0)  => pipeout_data,
+
          -- probe3
-         probe3(47 downto 32) => pipeout_data_count,
-         probe3(31 downto 16) => pipeout_addr,
-         probe3(15 downto 0)  => pipeout_data,
+         probe3(4) => usb_fifo_adc_empty,
+         probe3(3) => usb_fifo_adc_rd,
+         probe3(2) => usb_fifo_adc_sof,
+         probe3(1) => usb_fifo_adc_eof,
+         probe3(0) => usb_fifo_adc_data_valid,
          -- probe4
-         probe4(127 downto 96) => usb_wireout_tes_conf,
-         probe4(95 downto 64) => usb_wirein_tes_conf,
-         probe4(63 downto 32) => usb_wireout_error_delay,
-         probe4(31 downto 0) => usb_wirein_error_delay,
-
-         -- probe5
-         probe5(127 downto 96) => i_reg_spi_rd_data,
-         probe5(95 downto 64) => usb_wirein_spi_wr_data,
-         probe5(63 downto 32) => usb_wirein_spi_conf,
-         probe5(31 downto 0) => usb_wirein_spi_ctrl,
-
-         -- probe6
-         probe6(32) => sys_clk_div2,
-         probe6(31 downto 0) => std_logic_vector(count_r1)
+         probe4(47 downto 32) => usb_fifo_adc_wr_data_count,
+         probe4(31 downto 0) => usb_fifo_adc_data
 
        );
 

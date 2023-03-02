@@ -17,7 +17,7 @@
 //                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // -------------------------------------------------------------------------------------------------------------
 //    email                   kenji.delarosa@alten.com
-//    @file                    CDCE72010.dscript
+//    @file                   amc7823.dscript
 // -------------------------------------------------------------------------------------------------------------
 //    Automatic Generation    No
 //    Code Rules Reference
@@ -32,24 +32,51 @@
 // -------------------------------------------------------------------------------------------------------------
 
 // import libraries
-include("./fpasim/display.dscript");
+include("./fpasim/utils_tools.dscript");
 include("./fpasim/fpasim_address.dscript");
 
 
-// const AMC_ADDR = {};
-// AMC_ADDR['reg0'] = 0x00;
-// AMC_ADDR['reg1'] = 0x01;
-// AMC_ADDR['reg2'] = 0x02;
-// AMC_ADDR['reg3'] = 0x03;
-// AMC_ADDR['reg4'] = 0x04;
-// AMC_ADDR['reg5'] = 0x05;
-// AMC_ADDR['reg6'] = 0x06;
-// AMC_ADDR['reg7'] = 0x07;
-// AMC_ADDR['reg8'] = 0x08;
-// AMC_ADDR['reg9'] = 0x09;
-// AMC_ADDR['reg10'] = 0x0A;
-// AMC_ADDR['reg11'] = 0x0B;
-// AMC_ADDR['reg12'] = 0x0C;
+const AMC_ADDR = {};
+AMC_ADDR['reg0'] = 0x00;
+AMC_ADDR['reg1'] = 0x01;
+AMC_ADDR['reg2'] = 0x02;
+AMC_ADDR['reg3'] = 0x03;
+AMC_ADDR['reg4'] = 0x04;
+AMC_ADDR['reg5'] = 0x05;
+AMC_ADDR['reg6'] = 0x06;
+AMC_ADDR['reg7'] = 0x07;
+AMC_ADDR['reg8'] = 0x08;
+AMC_ADDR['reg9'] = 0x09;
+AMC_ADDR['reg10'] = 0x0A;
+AMC_ADDR['reg11'] = 0x0B;
+AMC_ADDR['reg12'] = 0x0C;
+AMC_ADDR['reg13'] = 0x0D;
+AMC_ADDR['reg14'] = 0x0E;
+AMC_ADDR['reg15'] = 0x0F;
+AMC_ADDR['reg16'] = 0x10;
+AMC_ADDR['reg17'] = 0x11;
+AMC_ADDR['reg18'] = 0x12;
+AMC_ADDR['reg19'] = 0x13;
+AMC_ADDR['reg20'] = 0x14;
+AMC_ADDR['reg21'] = 0x15;
+AMC_ADDR['reg22'] = 0x16;
+AMC_ADDR['reg23'] = 0x17;
+AMC_ADDR['reg24'] = 0x18;
+AMC_ADDR['reg25'] = 0x19;
+AMC_ADDR['reg26'] = 0x1A;
+AMC_ADDR['reg27'] = 0x1B;
+AMC_ADDR['reg28'] = 0x1C;
+AMC_ADDR['reg29'] = 0x1D;
+AMC_ADDR['reg30'] = 0x1E;
+AMC_ADDR['reg31'] = 0x1F;
+
+// verbosity min to display register access
+const c_AMC_REG_VERBOSITY_MIN = 0;
+// verbosity min to display (addr,data)
+const c_AMC_ADDR_VERBOSITY_MIN = 1;
+// verbosity min to display register bit
+const c_AMC_BIT_VERBOSITY_MIN = c_AMC_ADDR_VERBOSITY_MIN + 1;
+
 
 /**
   This function reverse the bit orders.
@@ -60,702 +87,2492 @@ include("./fpasim/fpasim_address.dscript");
   4        | 3 ("0111")         | 14 ("1110")       |
   5        | 1 ("00001")        | 16 ("10000")      |
 
-  * @param {number} value_p - value where to reverse bit
-  * @param {number} width_p - width of the input value (expressed in bits)
-  * @return {number} value with the bit reverse
+  * @param {number} value_p - data where to reverse bit
+  * @param {number} width_p - width of the input data (expressed in bits)
+  * @return {number} data with the bit reverse
 
 */
-function reverse_bit_order(value_p,width_p)
-{
-  res = 0;
-  bit_max_pos = width_p - 1;
-    for (i = 0; i<width_p;i++)
-  {
-        // get bit value (LSB first)
-        value = (value_p >> i) & 0x1;
-        res = res + value*Math.pow(2,bit_max_pos - i);
-  }
+function reverse_bit_order(value_p, width_p) {
+    res = 0;
+    bit_max_pos = width_p - 1;
+    for (i = 0; i < width_p; i++) {
+        // get bit data (LSB first)
+        data = (value_p >> i) & 0x1;
+        res = res + data * Math.pow(2, bit_max_pos - i);
+    }
 
     return res;
 
 }
 
 
-    /*
-    FPGA specifics:
-     Initialize the spi links
-    */    
-    function amc_init_device()
-    {
-        //---------------------------------------------------------------------
-        //-- write in the SPI_CTRL register 
-        //---------------------------------------------------------------------
+/*
+FPGA specifics:
+ Initialize the spi links
+*/
+function amc_spi_enable(level_p, mode_p, verbosity_p) {
 
-        // reset the spi links
-        // rst = 1;
-        // en = 0;
-        // data = (rst << 1) + en;
-        // sendToFPA_debugSetWireIn(0x12,data);
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
 
-        //---------------------------------------------------------------------
-        //-- write in the SPI_CTRL register 
-        //---------------------------------------------------------------------
-        
-        // en the spi links
-        rst = 0;
-        en = 1;
-        data = (rst << 1) + en;
-        addr = FPASIM_ADDR_WIREIN['SPI_CTRL'];
-        sendToFPA_debugSetWireIn(addr ,data);
-    }
+    const level0 = level_p;
 
-    /**
-    * FPGA specifics: 
-        Build the expected spi command
-        Build the expected fpga register accesses
-    */
-    function amc_write_command(addr_p,data_p,page_p)
-      {
+    //---------------------------------------------------------------------
+    //-- write in the SPI_CTRL register 
+    //---------------------------------------------------------------------
 
-        //---------------------------------------------------------------------
-        // write in the SPI_CONF register
-        //---------------------------------------------------------------------
-        mode = 1; // 0: rd, 1: wr
-        spi_id = 3; // 0: cdce,1: adc, 2: dac, 3: amc
-        spi_dac_tx_enable = 0;
-        data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
-        addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
-        sendToFPA_debugSetWireIn(addr,data);
+    // reset the spi links
+    // rst = 1;
+    // en = 0;
+    // data = (rst << 1) + en;
+    // sendToFPA_debugSetWireIn(0x12,data);
 
-        //---------------------------------------------------------------------
-        // build the SPI commands
-        //    (see amc7823 datasheet) 
-        //---------------------------------------------------------------------
-        mode = 0; // 0:wr, 1:rd
-        page = page_p // 0: page0, 1: page1
-        start_addr = addr_p // start address: 5 bits
-        end_addr = 0x00
+    //---------------------------------------------------------------------
+    //-- write in the SPI_CTRL register 
+    //---------------------------------------------------------------------
 
-        spi_cmd = (mode << 15) + (page << 12) + (start_addr<<6) + (end_addr);
-        // MSB send first
-        //  spi_cmd[15:0]
-        //  spi_data[15:0]
-        spi_data = (spi_cmd << 16) + data_p;
-        addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
-        //---------------------------------------------------------------------
-        // write in the SPI_WR_DATA register
-        //---------------------------------------------------------------------
-        sendToFPA_debugSetWireIn(addr,spi_data);
+    // en the spi links
+    const rst = 0;
+    const en = 1;
+    const data = (rst << 1) + en;
+    const addr = FPASIM_ADDR_WIREIN['SPI_CTRL'];
+    sendToFPA_debugSetWireIn(addr, data);
 
-        //---------------------------------------------------------------------
-        // write in the TRIG register
-        //  => activate the spi_valid bit
-        //---------------------------------------------------------------------
-        addr = FPASIM_ADDR_TRIGIN['TRIG'];
-        pos =  FPASIM_POS_TRIGIN['spi_valid'];
-        sendToFPA_debugSetTriggerIn(addr,pos);
-        waitMs(100);
-
-      }
-
-      function amc_read_command(addr_p,page_p)
-      {
-
-        //---------------------------------------------------------------------
-        // write in the SPI_CONF register
-        //---------------------------------------------------------------------
-        mode = 0; // 0: rd, 1: wr
-        spi_id = 3; // 0: cdce,1: adc, 2: dac, 3: amc
-        spi_dac_tx_enable = 0;
-        data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
-        addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
-        sendToFPA_debugSetWireIn(addr,data);
-
-        //---------------------------------------------------------------------
-        // build the SPI commands
-        //    (see amc7823 datasheet) 
-        //---------------------------------------------------------------------
-        mode = 1; // 0:wr, 1:rd
-        page = page_p // 0: page0, 1: page1
-        start_addr = addr_p // start address: 5 bits
-        end_addr = 0x00
-
-        spi_cmd = (mode << 15) + (page << 12) + (start_addr<<6) + (end_addr);
-        // MSB send first
-        //  spi_cmd[15:0]
-        //  spi_data[15:0]
-        spi_data = (spi_cmd << 16) + 0x0000;
-        addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
-        //---------------------------------------------------------------------
-        // write in the SPI_WR_DATA register
-        //---------------------------------------------------------------------
-        sendToFPA_debugSetWireIn(addr,spi_data);
-
-        //---------------------------------------------------------------------
-        // write in the TRIG register
-        //  => activate the spi_valid bit
-        //---------------------------------------------------------------------
-        addr = FPASIM_ADDR_TRIGIN['TRIG'];
-        pos =  FPASIM_POS_TRIGIN['spi_valid'];
-        sendToFPA_debugSetTriggerIn(addr,pos);
-        waitMs(100);
-        //---------------------------------------------------------------------
-        // Read wire out registers
-        //---------------------------------------------------------------------
-        getLatestValue("FPA_WireOutValues");
-
-        return FPA_WireOutValues[21];
-
-      }
-
-    /**
-     * #############################################################
-     *  set the amc_set_gpio register
-     * ##############################################################
-     *  [11:08]: R/W: iomod_p[3:0]
-     *  [05:00]: R/W: iost_p[5:0]
-      */
-    function amc_set_gpio(iomod_p,iost_p)
-    {
-
-
-        cmt = 'amc_set_gpio'
-        value1 = (parseInt('1111',2) << 12) + (parseInt('11',2) << 6)
-        value0 = (iomod_p << 8) + iost_p
-
-        value = value1 +  value0;
-        page = 0
-
-        amc_write_command(addr_p=0x0A,data_p=value,page_p=page)
-    }
-
-    /**
-     * ##############################################################
-     *  set the dac(s) register
-     * ##############################################################
-     *  [11:0]: R/W: dac[11:0]
-     *  dac_id_p: (0 to 7)
-    */
-    function amc_set_dac(dac_p,dac_id_p)
-    {
-
-
-        cmt = 'amc_set_dac';
-        value0 = dac_p;
-
-        value = value0;
-        page = 1;
-
-        switch(dac_id_p) 
-        {
-          case 0:
-            addr = 0x00;
-            break;
-          case 1:
-            addr = 0x01;
-            break;
-        case 2:
-            addr = 0x02;
-            break;
-        case 3:
-            addr = 0x03;
-            break;
-        case 4:
-            addr = 0x04;
-            break;
-        case 5:
-            addr = 0x05;
-            break;
-        case 6:
-            addr = 0x06;
-            break;
-        default: // dac_id_p == 6
-            addr = 0x07;
-            break;
-        } 
-
-        amc_write_command(addr_p=addr,data_p=value,page_p=page);
-    }
-
-
-    /**
-    * ##############################################################
-    *  set the dac_load register
-    * ##############################################################
-    *  RW
-    */
-    function amc_set_dac_load()
-    {
-
-      
-        cmt = 'amc_set_dac_load'
-        value0 = 0xBB00;
-
-        value = value0;
-        page = 1
-        addr = 0x08;
-
-        amc_write_command(addr_p=addr,data_p=value,page_p=page)
-    }
-
-    /**
-    * ##############################################################
-    *  set the dac_conf(s) register
-    * ##############################################################
-    *  [15:8]: R/W: slda_p[7:0]
-    *  [7:0]: R/W: gdac_p[7:0]
-    */
-    function amc_set_dac_conf(slda_p,gdac_p)
-    {
-
-        cmt = 'amc_set_dac_conf'
-        value0 = (slda_p << 8) + gdac_p
-
-        value = value0
-        page = 1
-        addr = 0x09;
-
-        amc_write_command(addr_p=addr,data_p=value,page_p=page)
-
-    }
-    /**
-    * ##############################################################
-    *  set the amc_set_amc_status_conf register
-    * ##############################################################
-    *  [14]: R/W: rstc_p[0]
-    *  [13]: R/W: davf_p[0]
-    *  [7]: R/W: sref_p[0]
-    *  [6]: R/W: gref_p[0]
-    *  [5]: R/W: ecnvt_p[0]
-    */
-    function amc_set_amc_status_conf(rstc_p,davf_p,sref_p,gref_p,ecnvt_p)
-    {
-
-
-        cmt = 'amc_set_amc_status_conf'
-        value1 = (rstc_p << 14) + (davf_p << 13)
-        value0 = (sref_p << 7) + (gref_p << 6) + (ecnvt_p << 5) 
-
-        value = value1 + value0
-        page = 1
-        addr = 0x0A;
-
-        amc_write_command(addr_p=addr,data_p=value,page_p=page)
-    }
-
-    /**
-    * ##############################################################
-    *  set the amc_set_adc_ctrl register
-    * ##############################################################
-    *  [15]: R/W: cmode_p[0]
-    *  [11:8]: R/W: sa_p[3:0]: The channel address of the first analog input to be converted (
-    *  [7:4]: R/W: ea_p[3:0]:  The channel address of the last analog input to be converted
-    */
-    function amc_set_adc_ctrl(cmode_p,sa_p,ea_p)
-    {
-
-        cmt = 'amc_set_adc_ctrl'
-        value1 = (cmode_p << 15) + (sa_p << 8)
-        value0 = (ea_p << 4)
-
-        value = value1 + value0
-        page = 1
-        addr = 0x0B;
-
-        amc_write_command(addr_p=addr,data_p=value,page_p=page)
-    }
-
-    /**
-    * ##############################################################
-    *  set the amc_set_reset register
-    * ##############################################################
-    */
-    function amc_set_reset()
-    {
-
-
-        cmt = 'amc_set_reset'
-        value0 = 0xBB30
-
-        value = value0
-        page = 1
-        addr = 0x0C;
-
-        amc_write_command(addr_p=addr,data_p=value,page_p=page)
-    }
-
-    /*
-    * ##############################################################
-    *  set the amc_set_power_down register
-    * ##############################################################
-    *  [15]: R/W: padc_p[0]
-    *  [14:7]: R/W: pdac_p[7:0]
-    *  [6]: R/W: pts_p[0]
-    *  [5]: R/W: prefb_p[0]
-    */
-    function amc_set_power_down( padc_p, pdac_p, pts_p, prefb_p)
-    {
-
-
-        cmt = 'amc_set_power_down'
-        value1 = (padc_p << 15) + (pdac_p << 7)
-        value0 = (pts_p << 6) + (prefb_p << 5)
-
-        value = value1 + value0
-        page = 1
-        addr = 0x0D;
-
-        amc_write_command(addr_p=addr,data_p=value,page_p=page)
-    }
-
-    /*
-    * ##############################################################
-    *  set the amc_set_threshold_hi register
-    * ##############################################################
-    *  [11:0]: R/W: threshold_p[11:0]
-    *  threshold_id_p (0 to 3)
-    */
-    function amc_set_threshold_hi(threshold_p,threshold_id_p)
-    {
-
-
-        cmt = 'amc_set_threshold_hi'
-        value0 = threshold_p
-
-        value =  value0
-        page = 1
-        switch(threshold_id_p)
-        {
-
-        case 0:
-            addr = 0x0E;
-            break;
-        case 1:
-            addr = 0x10;
-            break;
-        case  2:
-            addr = 0x12;
-            break;
-        default: // threshold_id = 3
-            addr = 0x14;
-            break;
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[dac_init_device]: Enable the SPI";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
-
-        amc_write_command(addr_p=addr,data_p=value,page_p=page)
     }
+}
 
-    /**
-    * ##############################################################
-    *  set the amc_set_threshold_lo register
-    * ##############################################################
-    *  [11:0]: R/W: threshold_p[11:0]
-    *  threshold_id_p (0 to 3)
-    */
-    function amc_set_threshold_lo(threshold_p,threshold_id_p)
-    {
+/**
+* FPGA specifics: 
+    Build the expected spi command
+    Build the expected fpga register accesses
+*/
+function amc_write_command(addr_p, data_p, page_p) {
 
+    //---------------------------------------------------------------------
+    // write in the SPI_CONF register
+    //---------------------------------------------------------------------
+    mode = 1; // 0: rd, 1: wr
+    spi_id = 3; // 0: cdce,1: adc, 2: dac, 3: amc
+    spi_dac_tx_enable = 0;
+    data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
+    addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+    sendToFPA_debugSetWireIn(addr, data);
 
-        cmt = 'amc_set_threshold_lo'
-        value0 = threshold_p
+    //---------------------------------------------------------------------
+    // build the SPI commands
+    //    (see amc7823 datasheet) 
+    //---------------------------------------------------------------------
+    mode = 0; // 0:wr, 1:rd
+    page = page_p // 0: page0, 1: page1
+    start_addr = addr_p // start address: 5 bits
+    end_addr = 0x00
 
-        value =  value0
-        page = 1
-        switch(threshold_id_p)
-        {
+    spi_cmd = (mode << 15) + (page << 12) + (start_addr << 6) + (end_addr);
+    // MSB send first
+    //  spi_cmd[15:0]
+    //  spi_data[15:0]
+    spi_data = (spi_cmd << 16) + data_p;
+    addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
+    //---------------------------------------------------------------------
+    // write in the SPI_WR_DATA register
+    //---------------------------------------------------------------------
+    sendToFPA_debugSetWireIn(addr, spi_data);
 
-        case 0:
-            addr = 0x0F;
-            break;
-        case 1:
-            addr = 0x11;
-            break;
-        case  2:
-            addr = 0x13;
-            break;
-        default: // threshold_id = 3
-            addr = 0x15;
-            break;
-        }
+    //---------------------------------------------------------------------
+    // write in the TRIG register
+    //  => activate the spi_valid bit
+    //---------------------------------------------------------------------
+    addr = FPASIM_ADDR_TRIGIN['TRIG'];
+    pos = FPASIM_POS_TRIGIN['spi_valid'];
+    sendToFPA_debugSetTriggerIn(addr, pos);
+    waitMs(100);
 
-        amc_write_command(addr_p=addr,data_p=value,page_p=page)
-    }
+}
 
-    /**
-     * #############################################################
-     *  set the amc_get_gpio register
-     * ##############################################################
-     *  [11:08]: R/W: iomod_p[3:0]
-     *  [05:00]: R/W: iost_p[5:0]
-      */
-    function amc_get_gpio(level_p,mode_p,verbosity_p)
-    {
+function amc_read_command(addr_p, page_p) {
 
-        // default function parameter values
-    if (typeof(level_p)==='undefined') level_p = 0;
-    if (typeof(mode_p)==='undefined') mode_p = 0;
-    if (typeof(verbosity_p)==='undefined') verbosity_p = 0;
+    //---------------------------------------------------------------------
+    // write in the SPI_CONF register
+    //---------------------------------------------------------------------
+    mode = 0; // 0: rd, 1: wr
+    spi_id = 3; // 0: cdce,1: adc, 2: dac, 3: amc
+    spi_dac_tx_enable = 0;
+    data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
+    addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+    sendToFPA_debugSetWireIn(addr, data);
 
-    level0 = level_p;
-    level1 = level_p + 1;
+    //---------------------------------------------------------------------
+    // build the SPI commands
+    //    (see amc7823 datasheet) 
+    //---------------------------------------------------------------------
+    mode = 1; // 0:wr, 1:rd
+    page = page_p // 0: page0, 1: page1
+    start_addr = addr_p // start address: 5 bits
+    end_addr = 0x00
 
+    spi_cmd = (mode << 15) + (page << 12) + (start_addr << 6) + (end_addr);
+    // MSB send first
+    //  spi_cmd[15:0]
+    //  spi_data[15:0]
+    spi_data = (spi_cmd << 16) + 0x0000;
+    addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
+    //---------------------------------------------------------------------
+    // write in the SPI_WR_DATA register
+    //---------------------------------------------------------------------
+    sendToFPA_debugSetWireIn(addr, spi_data);
 
-    // get the wireout values
+    //---------------------------------------------------------------------
+    // write in the TRIG register
+    //  => activate the spi_valid bit
+    //---------------------------------------------------------------------
+    addr = FPASIM_ADDR_TRIGIN['TRIG'];
+    pos = FPASIM_POS_TRIGIN['spi_valid'];
+    sendToFPA_debugSetTriggerIn(addr, pos);
+    waitMs(100);
+    //---------------------------------------------------------------------
+    // Read wire out registers
+    //---------------------------------------------------------------------
     getLatestValue("FPA_WireOutValues");
 
-        cmt = 'amc_get_gpio'
-        value = amc_read_command(addr_p=0x0A,page_p=page)
+    return FPA_WireOutValues[21];
 
-        iomod_p = ((value >> 8) & 0xF);
-        iost_p = ((value >> 0) & 0x1F);
+}
+
+/**
+ * #############################################################
+ *  set the amc_set_gpio register
+ * ##############################################################
+ *  [11:08]: R/W: iomod_p[3:0]
+ *     . IOMOD-n = 0: Analog input out-of-range detection mode. In this mode, GPIO-n (n = 0, 1, 2, 3) work as
+ *          analog input out-of-range indicators, denoted as output pins ALR-n. The status of each pin
+ *          ALR-n is set by bit ALR-n of the ALR Register. The ALR-n pin is low when the
+ *          corresponding ALR-n bit is '1', and is high-impedance when ALR-n is '0'.
+ *     . IOMOD-n = 1: GPIO mode. In this mode, pin GPIO-n works as general digital I/O (bidirectional). When
+ *          the pin is output, the status is determined by the corresponding bit IOST-n; it is highimpedance
+ *          for IOST-n = 1, and logic low for IOST-n = 0. When the pin is input, reading
+ *          this bit acquires the digital logic value present at the pin. GPIO data are preserved during
+ *          all power-down conditions.
+ *  [05:00]: R/W: iost_p[5:0]:
+ *       I/O STATUS bit of the GPIO-n pin. If the GPIO-n pin works as a general-purpose I/O, this
+ *      bit indicates the actual logic value present at the pin when reading the bit. It also sets the
+ *      state of the corresponding GPIO-n pin (high-impedance for IOST-n = 1, logic low for
+ *      IOST-n = 0) when writing to the bit. An external pull-up resistor is required when using pin
+ *      GPIO-n as an output.
+ *      If the GPIO-n pin works as an analog input out-of-range indicator, then bit IOST-n is a
+ *      complement of the corresponding bit ALR-n in the ALR Register. Writing the IOST-n bit
+ *      does not cause any change. Note that only GPIO-0, GPIO-1, GPIO-2, and GPIO-3 can be
+ *      configured as out-of-range indicators.
+ *      44 Submit Documentation Feedback Copyright © 2005–2012, Texas Instruments Incorporated
+ *      Product Folder Link(s): AMC7823
+ *      AMC7823
+ *      www.ti.com SLAS453F –APRIL 2005–REVISED MARCH 2012
+ *      To avoid loss of alarm information in bits IOST-n during power-down of the ADC, change to direct conversion
+ *      mode (see ADC Control Register) before power-down and do not issue a convert command while the ADC is
+ *      powered down.
+ */
+function amc_set_gpio(iomod_p, iost_p, level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
 
 
-        msg_field = [
-                'data : 0x'+convert_int_to_str_hex(value_p=value,width_p=32),
-                'iomod_p: 0x'+convert_int_to_str_hex(value_p=iomod_p,width_p=4),
-                'iost_p: 0x'+convert_int_to_str_hex(value_p=iost_p,width_p=6)
-                ];
-      /*
-        print field values
-    */
-      if (verbosity_p > 0)
-      {
-        msg = "DATA : " + data.toString(16);
-        display(msg_p=msg, level_p=level0, mode_p=mode_p);
-        display(msg_p=msg_field, level_p=level0, mode_p=mode_p);
-      }
-      return value;
+    const data1 = (parseInt('1111', 2) << 12) + (parseInt('11', 2) << 6);
+    const data0 = (iomod_p << 8) + iost_p;
+
+    const data = data1 + data0;
+    const page = 0;
+
+    const addr = AMC_ADDR['reg10'];
+    amc_write_command(addr_p = addr, data_p = data, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_set_gpio]: Set the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "iomod_p", bit_value_p = iomod_p, bit_width_p = 4, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "iost_p", bit_value_p = iost_p, bit_width_p = 6, level_p = level2, mode_p = mode_p);
+        }
     }
+}
 
+/**
+ * ##############################################################
+ *  set the dac(s) register
+ * ##############################################################
+ *  [14:12]: R/W: och_p[2:0]
+ *      . DAC Address. Read-only. Writing these bits does not cause any change.
+ *  [11:0]: R/W: dac_p[11:0]:
+ *       . In a write operation, these data bits are written into the DAC Data-n Register. However, in
+ *         (WRITE/READ) a read operation, the data bits are returned from the DAC-n Latch, not from the DAC-n
+ *         Data Register
+ *  dac_id_p: (0 to 7)
+ *
+ */
+function amc_set_dac(dac_p, dac_id_p, level_p, mode_p, verbosity_p) {
 
-    /**
-     * ##############################################################
-     *  set the amc_get_adc register
-     * ##############################################################
-     *  dac_id_p: (0 to 7)
-    */
-    function amc_get_adc(adc_id_p,level_p,mode_p,verbosity_p)
-    {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
 
-		// default function parameter values
-    if (typeof(level_p)==='undefined') level_p = 0;
-    if (typeof(mode_p)==='undefined') mode_p = 0;
-    if (typeof(verbosity_p)==='undefined') verbosity_p = 0;
-        cmt = 'amc_get_adc';
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
 
-        page = 0;
+    const data0 = dac_p;
 
-        switch(adc_id_p) 
-        {
-          case 0:
-            addr = 0x00;
+    const data = data0;
+    const page = 1;
+
+    switch (dac_id_p) {
+        case 0:
+            addr = AMC_ADDR['reg0'];
             break;
-          case 1:
-            addr = 0x01;
+        case 1:
+            addr = AMC_ADDR['reg1'];
             break;
         case 2:
-            addr = 0x02;
+            addr = AMC_ADDR['reg2'];
             break;
         case 3:
-            addr = 0x03;
+            addr = AMC_ADDR['reg3'];
             break;
         case 4:
-            addr = 0x04;
+            addr = AMC_ADDR['reg4'];
             break;
         case 5:
-            addr = 0x05;
+            addr = AMC_ADDR['reg5'];
             break;
         case 6:
-            addr = 0x06;
+            addr = AMC_ADDR['reg6'];
+            break;
+        default: // dac_id_p == 6
+            addr = AMC_ADDR['reg7'];
+            break;
+    }
+
+    amc_write_command(addr_p = addr, data_p = data, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_set_dac" + dac_id_p.toString(16) + "]: Set the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "dac_p", bit_value_p = data, bit_width_p = 12, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+}
+
+
+/**
+ * ##############################################################
+ *  set the dac_load register
+ * ##############################################################
+ *  [15:00]: value_p[15:00] = 0xBB00
+ *    The data word 0xBB00 (shown above) written into the LOAD DAC Register generates ILDAC, the internal load
+ *    DAC signal. ILDAC and the external ELDAC signal work in a similar manner. ILDAC shifts data from the DAC-n
+ *    Data register to the DAC-n Latch and updates the output for all DAC-n with the corresponding SLDA-n bit set to
+ *    '1'. Other codes written to this register do not generate ILDAC and have no impact on any DAC-n. The LOAD
+ *    DAC Register is cleared after ILDAC is generated. The register is also cleared after power-on or reset.
+ *
+ */
+function amc_set_dac_load(level_p, mode_p, verbosity_p) {
+
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const data0 = 0xBB00;
+
+    const data = data0;
+    const page = 1
+
+
+    const addr = AMC_ADDR['reg8'];
+    amc_write_command(addr_p = addr, data_p = data, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_set_dac_load]: Set the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "load_dac_p", bit_value_p = data, bit_width_p = 16, level_p = level2, mode_p = mode_p);
+        }
+    }
+}
+
+/**
+ * ##############################################################
+ *  set the dac_conf register
+ * ##############################################################
+ *  [15:8]: R/W: slda_p[7:0]
+ *     DAC Synchronous Load Enable bit.
+ *    SLDA-n = '1': Synchronous Load enabled. When the synchronous load DAC signal occurs, DAC-n
+ *    Latch is loaded with the value of the corresponding DAC-n Data Register, and the output of DACn
+ *    is updated immediately. This load signal can be the rising edge of the external signal ELDAC or
+ *    the internal load signal ILDAC. Writing the data word 0xBB00 into the LOAD DAC Register
+ *    generates ILDAC. A write command to the DAC-n Data Register updates that register only, and
+ *    does not change the DAC-n output.
+ *    SLDA-n = '0': Asynchronous Load enabled. A write command to the DAC-n Data Register
+ *    immediately updates DAC-n Latch and the output of DAC-n. The synchronous load DAC signal
+ *    (ILDAC or ELDAC) does not affect DAC-n.
+ *  [7:0]: R/W: gdac_p[7:0]
+ *    DAC-n Output Buffer Amplifier Gain bit.
+ *    GDAC-n = '1': The gain of the DAC-n output buffer amplifier is equal to 2.
+ *    GDAC-n = '0': The gain of the DAC-n output buffer amplifier is equal to 1.
+ */
+function amc_set_dac_conf(slda_p, gdac_p, level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const data0 = (slda_p << 8) + gdac_p;
+
+    const data = data0;
+    const page = 1;
+
+    const addr = AMC_ADDR['reg9'];
+    amc_write_command(addr_p = addr, data_p = data, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_set_dac_conf]: Set the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "gdac_p", bit_value_p = gdac_p, bit_width_p = 8, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "slda_p", bit_value_p = slda_p, bit_width_p = 8, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+}
+/**
+ * ##############################################################
+ *  set the amc_set_amc_status_conf register
+ * ##############################################################
+ *  [14]: R/W: rstc_p[0]
+ *     RESET Complete Bit. This bit is set to '1' on power-up or reset. This bit can be cleared by writing
+ *     '0' to this location. The host cannot set this bit to '1'. This bit allows the host to determine if the
+ *     part has been configured after power-up, or if a reset has occurred to the AMC7823 without
+ *     knowledge of the host.
+ *  [13]: R/W: davf_p[0]
+ *     ADC Data Available Flag. For direct-mode only. Always cleared (set to '0') in auto-mode (see ADC
+ *    Control Register).
+ *    DAVF = 1: The ADC conversions are complete and new data are available.
+ *    DAVF = 0: The ADC conversion is in progress (data is not ready) or the ADC is in Auto-Mode.
+ *    In direct-mode, bit DAVF sets the pin DAV. DAV goes low when DAVF = 1, and goes high when
+ *    DAVF = 0. In auto-mode, DAVF is always cleared to '0'. However, a 2μs pulse (active low)
+ *    appears on the DAV pin when the input with ending address [EA3:EA0] is converted. DAVF is
+ *    cleared to '0' in one of three ways: (1) reading the ADC Data Register; (2) starting a new ADC
+ *    conversion; or (3) writing '0' to this bit.
+ *  [7]: R/W: sref_p[0]
+ *     Select Reference bit.
+ *     SREF = 0 (default condition): The internal reference is selected as the chip reference. It is
+ *     connected to pin 21, EXT_REF_IN, by a 10kΩ resistor.
+ *     SREF = 1: The internal reference is de-selected and disconnected from pin 21 (EXT_REF_IN).
+ *     Pin 21 floats unless an external reference is applied. Always set SREF bit to '1' when an external
+ *     reference is applied; otherwise, the external reference must sink or source current. The current
+ *     value is the voltage difference between the external and internal reference divided by a 10kΩ
+ *     resistance.
+ *     SREF also provides information to the precision current source and is used to configure that
+ *     source (see the Precision Current Source section for details). After power-on or reset, SREF is
+ *     cleared to '0'.
+ *  [6]: R/W: gref_p[0]
+ *    Gain of the internal reference voltage (VREF). This bit selects one of two preset values for the
+ *    internal reference voltage, but has no effect on the external reference. GREF also provides
+ *    information to the precision current source and is used to configure that source (see the Precision
+ *    Current Source section for details).
+ *    GREF = 0: The internal reference voltage is +1.25V.
+ *    GREF = 1: The internal reference voltage is +2.5V.
+ *    When an external reference is used and SREF is set to '1', GREF has no impact on the reference.
+ *    However, if SREF is cleared to '0', a 10kΩ resistor is connected between pin 21, EXT_REF_IN,
+ *    and one of the two internal reference values dictated by the value of GREF. In this case, the
+ *    external reference must be able to drive the 10kΩ load. The full-scale range of the ADC input is
+ *    equal to 2 x VREF. To avoid ADC input saturation, GREF must be cleared to '0' when AVDD is less
+ *    than +5V and the internal reference is used. After power-on or reset, GREF is cleared to '0'.
+ *    Table 9 specifies the ADC input range as a function of bits GREF and SREF.
+ *  [5]: R/W: ecnvt_p[0]
+ *    Enable CONVERT (external conversion trigger). This bit specifies the ADC trigger mode. When
+ *    ECNVT = '1', CONVERT is enabled. The ADC is in external trigger mode. The low-to-high
+ *    transition of the external trigger signal CONVERT triggers the ADC conversions. A write command
+ *    to the ADC Control Register does not initiate conversion, but rather specifies the group of inputs
+ *    to convert. After triggered by CONVERT, the AMC7823 sequentially accesses each analog input
+ *    one time. The bits [SA3:SA0] of the ADC Control Register comprise the channel address of the
+ *    first analog input accessed; [EA3:EA0] is the last analog input accessed. When the conversion
+ *    finishes, the ADC is idle and waits for a new CONVERT or a new command. With an external
+ *    trigger, the ADC always works in direct-mode (see the ADC Control Register section).
+ *    When ECNVT = '0', CONVERT is disabled. The internal ADC trigger is used. A write command to
+ *    the ADC Control Register generates the internal trigger and initiates ADC conversion. With an
+ *    internal trigger, the ADC can work in either direct-mode or auto-mode (see the ADC Operation
+ *    and ADC Control Register sections). Table 10 summarizes the ADC conversion mode
+ *    configuration.
+ *    After power-on or reset, DAVF, SREF, GREF, and ECNVT are cleared to '0'; RSTC is set to '1'.
+ */
+function amc_set_amc_status_conf(rstc_p, davf_p, sref_p, gref_p, ecnvt_p, level_p, mode_p, verbosity_p) {
+
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const data1 = (rstc_p << 14) + (davf_p << 13);
+    const data0 = (sref_p << 7) + (gref_p << 6) + (ecnvt_p << 5);
+
+    const data = data1 + data0;
+    const page = 1;
+
+    const addr = AMC_ADDR['reg10'];
+    amc_write_command(addr_p = addr, data_p = data, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_set_dac_conf]: Set the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "rstc_p", bit_value_p = rstc_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "davf_p", bit_value_p = davf_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "sref_p", bit_value_p = sref_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "gref_p", bit_value_p = gref_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "ecnvt_p", bit_value_p = ecnvt_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+        }
+    }
+}
+
+/**
+ * ##############################################################
+ *  set the amc_set_adc_ctrl register
+ * ##############################################################
+ *  [15]: R/W: cmode_p[0]
+ *    ADC Conversion Mode bit. This bit selects between the two operating conversion modes (direct
+ *    or auto) when the Internal trigger is active. This bit is always cleared to '0' (direct-mode) when an
+ *    external trigger is active.
+ *    CMODE = '0': Direct-mode. The analog inputs from [SA3:SA0] to [EA3:EA0] are converted
+ *    sequentially (see Table 12) one time, [SA3:SA0] first and [EA3;EA0] last. When one set of
+ *    conversions is complete, the ADC is idle and waits for a new trigger. The external trigger is
+ *    restricted to this mode of operation only.
+ *    CMODE = '1': Auto-mode. The analog inputs from [SA3:SA0] to [EA3:EA0] are converted
+ *    sequentially (see Table 12) and repeatedly, [SA3:SA0] first and [EA3;EA0] last. When one set of
+ *    conversions is complete, the ADC multiplexer returns to the starting address [SA3:SA0] and
+ *    repeats the process. Repetitive conversions continue until auto-mode is halted by rewriting the
+ *    ADC Control Register to direct
+ *  [11:8]: R/W: sa_p[3:0]: 
+ *    The channel address of the first analog input to be converted (see Table 12).
+ *  [7:4]: R/W: ea_p[3:0]
+ *    The channel address of the last analog input to be converted (see Table 12).
+ */
+function amc_set_adc_ctrl(cmode_p, sa_p, ea_p, level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const data1 = (cmode_p << 15) + (sa_p << 8);
+    const data0 = (ea_p << 4);
+
+    const data = data1 + data0;
+    const page = 1;
+
+    const addr = AMC_ADDR['reg11'];
+    amc_write_command(addr_p = addr, data_p = data, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_set_adc_ctrl]: Set the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "cmode_p", bit_value_p = cmode_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "sa_p", bit_value_p = sa_p, bit_width_p = 4, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "ea_p", bit_value_p = ea_p, bit_width_p = 4, level_p = level2, mode_p = mode_p);
+        }
+    }
+}
+
+/**
+ * ##############################################################
+ *  set the amc_set_reset register
+ * ##############################################################
+ * [15:0]: value_p[15:0]: 0xBB30
+ *    The AMC7823 has a special RESET Register that performs the software equivalent function of the device
+ *    RESET pin. To invoke a system reset, write the data word 0xBB3X to this register. Only the upper 12 bits are
+ *    significant; the lowest four bits are Don’t Care.
+ */
+function amc_set_reset(level_p, mode_p, verbosity_p) {
+
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const data0 = 0xBB30;
+
+    const data = data0;
+    const page = 1;
+
+    const addr = AMC_ADDR['reg12'];
+    amc_write_command(addr_p = addr, data_p = data, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_set_reset]: Set the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "reset_p", bit_value_p = data, bit_width_p = 16, level_p = level2, mode_p = mode_p);
+        }
+    }
+}
+
+/*
+ * ##############################################################
+ *  set the amc_set_power_down register
+ * ##############################################################
+ *  [15]: R/W: padc_p[0]
+ *     ADC power-down control bit.
+ *    PADC = '0': The ADC is in power-down mode and ADC conversion is halted.
+ *    PADC = '1': The ADC is in normal operating mode.
+ *  [14:7]: R/W: pdac_p[7:0]
+ *     PDAC-n = '0': DAC-n output buffer amplifier is in power-down mode. The output pin
+ *    of DAC-n is internally switched from the buffer output to analog ground through an
+ *    internal 5kΩ resistor. Each DAC output buffer may be independently powered down.
+ *    (See the DAC Operation section for details.)
+ *    PDAC-n = '1' and PREFB = '1': DAC-n is in normal operating mode.
+ *  [6]: R/W: pts_p[0]
+ *     Precision current source power-down control bit.
+ *    PTS = '0': Precision current source is in power-down mode and the current output is
+ *    zero.
+ *    PTS = '1': Precision current source is in normal operating mode (see the Precision
+ *    Current Source section for details).
+ *  [5]: R/W: prefb_p[0]
+ *     Reference buffer amplifier power-down control bit. This bit controls the power-down
+ *    condition of the amplifier that supplies a buffered reference voltage to all DAC-n
+ *    resistor strings and to the precision current source. This bit also provides
+ *    configuration information to the precision current source (see the Precision Current
+ *    Source Configuration table, Table 7).
+ *    PREFB = '0': Reference buffer amplifier is in power-down mode. All DACs are
+ *    inoperative. The precision current source may be used only if GREF = '0' (see the
+ *    Precision Current Source Configuration table, Table 7).
+ *    PREFB = '1': Reference buffer amplifier is powered on. This mode is required for
+ *    any DAC-n operation. The precision current source may be used with either value of
+ *    GREF.
+ */
+function amc_set_power_down(padc_p, pdac_p, pts_p, prefb_p, level_p, mode_p, verbosity_p) {
+
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+
+    const data1 = (padc_p << 15) + (pdac_p << 7);
+    const data0 = (pts_p << 6) + (prefb_p << 5);
+
+    const data = data1 + data0;
+    const page = 1;
+
+
+    const addr = AMC_ADDR['reg13'];
+    amc_write_command(addr_p = addr, data_p = data, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_set_power_down]: Set the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "padc_p", bit_value_p = padc_p, bit_width_p = 16, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "pdac_p", bit_value_p = pdac_p, bit_width_p = 8, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "pts_p", bit_value_p = pts_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "prefb_p", bit_value_p = prefb_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+        }
+    }
+}
+
+/*
+ * ##############################################################
+ *  set the amc_set_threshold_hi register
+ * ##############################################################
+ *  [11:0]: R/W: threshold_p[11:0]
+ *    Data bits of the upper bound threshold of the nth analog input. All bits are set to '1'
+ *    after power-on or reset.
+ *  threshold_id_p (0 to 3)
+ */
+function amc_set_threshold_hi(threshold_p, threshold_id_p, level_p, mode_p, verbosity_p) {
+
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const data0 = threshold_p;
+
+    const data = data0;
+    const page = 1;
+    switch (threshold_id_p) {
+
+        case 0:
+            addr = AMC_ADDR['reg14'];
+            break;
+        case 1:
+            addr = AMC_ADDR['reg16'];
+            break;
+        case 2:
+            addr = AMC_ADDR['reg18'];
+            break;
+        default: // threshold_id = 3
+            addr = AMC_ADDR['reg20'];
+            break;
+    }
+
+    amc_write_command(addr_p = addr, data_p = data, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_set_threshold_hi" + threshold_id_p.toString(16) + "]: Set the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "threshold_hi_p", bit_value_p = threshold_p, bit_width_p = 12, level_p = level2, mode_p = mode_p);
+        }
+    }
+}
+
+/**
+ * ##############################################################
+ *  set the amc_set_threshold_lo register
+ * ##############################################################
+ *  [11:0]: R/W: threshold_p[11:0]
+ *     Data bits of the lower bound threshold of the nth analog input. This register is
+ *    cleared to '0' after power-on or reset.
+ *  threshold_id_p (0 to 3)
+ */
+function amc_set_threshold_lo(threshold_p, threshold_id_p, level_p, mode_p, verbosity_p) {
+
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const data0 = threshold_p;
+
+    const data = data0;
+    const page = 1;
+    switch (threshold_id_p) {
+
+        case 0:
+            addr = AMC_ADDR['reg15'];
+            break;
+        case 1:
+            addr = AMC_ADDR['reg17'];
+            break;
+        case 2:
+            addr = AMC_ADDR['reg19'];
+            break;
+        default: // threshold_id = 3
+            addr = AMC_ADDR['reg21'];
+            break;
+    }
+
+    amc_write_command(addr_p = addr, data_p = data, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_set_threshold_lo" + threshold_id_p.toString(16) + "]: Set the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "threshold_lo_p", bit_value_p = threshold_p, bit_width_p = 12, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+
+
+}
+
+/**
+ * #############################################################
+ *  Get the amc_get_adc0 register
+ * ##############################################################
+ *  [15:12]: ich_p[3:0]
+ *    Analog Input Channel number
+ *  [11:00]: adc_p[11:0]
+ *     Value of the conversion result. The data are updated when the conversion of the input
+ *    [EA3:EA0] finishes; see the ADC Operation section for details.
+ */
+function amc_get_adc0(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 0;
+    // see the fmc150-user-manual.pdf (page 15)
+    const text = "(3.3V analog)"
+    const factor = 2.0;
+
+    const addr = AMC_ADDR['reg0'];
+    const data0 = amc_read_command(addr_p = addr, page_p = page);
+    const data = factor * data0;
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_adc0]: Get the register value " + text;
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "ich_p", bit_pos_p = 12, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "adc_p", bit_pos_p = 0, bit_width_p = 12, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * #############################################################
+ *  Get the amc_get_adc1 register
+ * ##############################################################
+ *  [15:12]: ich_p[3:0]
+ *    Analog Input Channel number
+ *  [11:00]: adc_p[11:0]
+ *     Value of the conversion result. The data are updated when the conversion of the input
+ *    [EA3:EA0] finishes; see the ADC Operation section for details.
+ */
+function amc_get_adc1(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 0;
+    // see the fmc150-user-manual.pdf (page 15)
+    const text = "(3.3V clock)"
+    const factor = 2.0;
+
+    const addr = AMC_ADDR['reg1'];
+    const data0 = amc_read_command(addr_p = addr, page_p = page);
+    const data = factor * data0;
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_adc1]: Get the register value " + text;
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "ich_p", bit_pos_p = 12, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "adc_p", bit_pos_p = 0, bit_width_p = 12, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * #############################################################
+ *  Get the amc_get_adc2 register
+ * ##############################################################
+ *  [15:12]: ich_p[3:0]
+ *    Analog Input Channel number
+ *  [11:00]: adc_p[11:0]
+ *     Value of the conversion result. The data are updated when the conversion of the input
+ *    [EA3:EA0] finishes; see the ADC Operation section for details.
+ */
+function amc_get_adc2(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 0;
+    // see the fmc150-user-manual.pdf (page 15)
+    const text = "(1.8V Analog)"
+    const factor = 1.0;
+
+    const addr = AMC_ADDR['reg2'];
+    const data0 = amc_read_command(addr_p = addr, page_p = page);
+    const data = factor * data0;
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_adc2]: Get the register value " + text;
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "ich_p", bit_pos_p = 12, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "adc_p", bit_pos_p = 0, bit_width_p = 12, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * #############################################################
+ *  Get the amc_get_adc3 register
+ * ##############################################################
+ *  [15:12]: ich_p[3:0]
+ *    Analog Input Channel number
+ *  [11:00]: adc_p[11:0]
+ *     Value of the conversion result. The data are updated when the conversion of the input
+ *    [EA3:EA0] finishes; see the ADC Operation section for details.
+ */
+function amc_get_adc3(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 0;
+    // see the fmc150-user-manual.pdf (page 15)
+    const text = "(1.8V Digital)"
+    const factor = 1.0;
+
+    const addr = AMC_ADDR['reg3'];
+    const data0 = amc_read_command(addr_p = addr, page_p = page);
+    const data = factor * data0;
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_adc3]: Get the register value " + text;
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "ich_p", bit_pos_p = 12, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "adc_p", bit_pos_p = 0, bit_width_p = 12, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * #############################################################
+ *  Get the amc_get_adc4 register
+ * ##############################################################
+ *  [15:12]: ich_p[3:0]
+ *    Analog Input Channel number
+ *  [11:00]: adc_p[11:0]
+ *     Value of the conversion result. The data are updated when the conversion of the input
+ *    [EA3:EA0] finishes; see the ADC Operation section for details.
+ */
+function amc_get_adc4(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 0;
+    // see the fmc150-user-manual.pdf (page 15)
+    const text = "(12V)";
+    const factor = 5.7;
+
+    const addr = AMC_ADDR['reg4'];
+    const data0 = amc_read_command(addr_p = addr, page_p = page);
+    const data = factor * data0;
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_adc4]: Get the register value " + text;
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "ich_p", bit_pos_p = 12, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "adc_p", bit_pos_p = 0, bit_width_p = 12, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * #############################################################
+ *  Get the amc_get_adc5 register
+ * ##############################################################
+ *  [15:12]: ich_p[3:0]
+ *    Analog Input Channel number
+ *  [11:00]: adc_p[11:0]
+ *     Value of the conversion result. The data are updated when the conversion of the input
+ *    [EA3:EA0] finishes; see the ADC Operation section for details.
+ */
+function amc_get_adc5(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 0;
+    // see the fmc150-user-manual.pdf (page 15)
+    const text = "(3.3V)";
+    const factor = 2.0;
+
+    const addr = AMC_ADDR['reg5'];
+    const data0 = amc_read_command(addr_p = addr, page_p = page);
+    const data = factor * data0;
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_adc5]: Get the register value " + text;
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "ich_p", bit_pos_p = 12, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "adc_p", bit_pos_p = 0, bit_width_p = 12, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * #############################################################
+ *  Get the amc_get_adc6 register
+ * ##############################################################
+ *  [15:12]: ich_p[3:0]
+ *    Analog Input Channel number
+ *  [11:00]: adc_p[11:0]
+ *     Value of the conversion result. The data are updated when the conversion of the input
+ *    [EA3:EA0] finishes; see the ADC Operation section for details.
+ */
+function amc_get_adc6(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 0;
+    // see the fmc150-user-manual.pdf (page 15)
+    const text = "VADJ";
+    const factor = 2.0;
+
+    const addr = AMC_ADDR['reg6'];
+    const data0 = amc_read_command(addr_p = addr, page_p = page);
+    const data = factor * data0;
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_adc6]: Get the register value " + text;
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "ich_p", bit_pos_p = 12, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "adc_p", bit_pos_p = 0, bit_width_p = 12, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * #############################################################
+ *  Get the amc_get_adc7 register
+ * ##############################################################
+ *  [15:12]: ich_p[3:0]
+ *    Analog Input Channel number
+ *  [11:00]: adc_p[11:0]
+ *     Value of the conversion result. The data are updated when the conversion of the input
+ *    [EA3:EA0] finishes; see the ADC Operation section for details.
+ */
+function amc_get_adc7(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 0;
+    // see the fmc150-user-manual.pdf (page 15)
+    const text = "3.8V";
+    const factor = 2.0;
+
+    const addr = AMC_ADDR['reg7'];
+    const data0 = amc_read_command(addr_p = addr, page_p = page);
+    const data = factor * data0;
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_adc7]: Get the register value " + text;
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "ich_p", bit_pos_p = 12, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "adc_p", bit_pos_p = 0, bit_width_p = 12, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * #############################################################
+ *  Get the amc_get_adc8 register
+ * ##############################################################
+ *  [15:12]: ich_p[3:0]
+ *    Analog Input Channel number
+ *  [11:00]: adc_p[11:0]
+ *     Value of the conversion result. The data are updated when the conversion of the input
+ *    [EA3:EA0] finishes; see the ADC Operation section for details.
+ */
+function amc_get_adc8(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 0;
+    // see the fmc150-user-manual.pdf (page 15)
+    const text = "(temperature)";
+    const factor = 1.0;
+
+    const addr = AMC_ADDR['reg8'];
+    const data0 = amc_read_command(addr_p = addr, page_p = page);
+    const data = factor * data0;
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_adc8]: Get the register value " + text;
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "ich_p", bit_pos_p = 12, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "adc_p", bit_pos_p = 0, bit_width_p = 12, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+
+/**
+ * ##############################################################
+ *  Get the amc_get_adc(i) register
+ * ##############################################################
+ *  [15:12]: ich_p[3:0]
+ *    Analog Input Channel number
+ *  [11:00]: adc_p[11:0]
+ *     Value of the conversion result. The data are updated when the conversion of the input
+ *    [EA3:EA0] finishes; see the ADC Operation section for details.
+ *  adc_id_p: (0 to 7)
+ */
+function amc_get_adc(adc_id_p, level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+
+    switch (adc_id_p) {
+        case 0:
+            data = amc_get_adc0(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+            break;
+        case 1:
+            data = amc_get_adc1(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+            break;
+        case 2:
+            data = amc_get_adc2(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+            break;
+        case 3:
+            data = amc_get_adc3(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+            break;
+        case 4:
+            data = amc_get_adc4(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+            break;
+        case 5:
+            data = amc_get_adc5(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+            break;
+        case 6:
+            data = amc_get_adc6(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
             break;
         case 7:
-            addr = 0x07;
+            data = amc_get_adc7(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
             break;
         default: // adc_id_p = 8
-            addr = 0x08;
+            data = amc_get_adc8(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
             break;
-        } 
-
-        value = amc_read_command(addr_p=addr,page_p=page);
-        ich_p = (value >> 12) & 0xF;
-        adc_p = (value >> 0) & 0xFFF;
-
-        msg_field = [
-                'data : 0x'+convert_int_to_str_hex(value_p=value,width_p=32),
-                'ich_p: 0x'+convert_int_to_str_hex(value_p=ich_p,width_p=4),
-                'adc_p: 0x'+convert_int_to_str_hex(value_p=adc_p,width_p=12)
-                ];
-				
-				 /*
-        print field values
-    */
-      if (verbosity_p > 0)
-      {
-        msg = "DATA : " + data.toString(16);
-        display(msg_p=msg, level_p=level0, mode_p=mode_p);
-        display(msg_p=msg_field, level_p=level0, mode_p=mode_p);
-      }
-      return value;
     }
+
+    return data;
+}
+
+
+/**
+ * #############################################################
+ *  Get the amc_get_alr register
+ * ##############################################################
+ *  [11:08]: R/W: alr_p[3:0]
+ *     nth analog input out-of-range status flag. These bits are read-only. Writing ALR-n
+ *    bits has no effect.
+ *    ALR-n = '1' when the nth analog input is out-of-range.
+ *    ALR-n = '0' when the nth analog input is not out-of-range. ALR-n is always '0' when
+ *    following conditions hold: the value of Threshold-Low-n Register is equal to '0', and
+ *    the Threshold-Hi-n Register is equal to the full-scale value of the input.
+ */
+function amc_get_alr(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 0;
+
+    const addr = AMC_ADDR['reg9'];
+    const data = amc_read_command(addr_p = addr, page_p = page)
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_alr]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "alr_p", bit_pos_p = 8, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+
+/**
+ * #############################################################
+ *  Get the amc_get_gpio register
+ * ##############################################################
+ *  [11:08]: R/W: iomod_p[3:0]
+ *     . IOMOD-n = 0: Analog input out-of-range detection mode. In this mode, GPIO-n (n = 0, 1, 2, 3) work as
+ *          analog input out-of-range indicators, denoted as output pins ALR-n. The status of each pin
+ *          ALR-n is set by bit ALR-n of the ALR Register. The ALR-n pin is low when the
+ *          corresponding ALR-n bit is '1', and is high-impedance when ALR-n is '0'.
+ *     . IOMOD-n = 1: GPIO mode. In this mode, pin GPIO-n works as general digital I/O (bidirectional). When
+ *          the pin is output, the status is determined by the corresponding bit IOST-n; it is highimpedance
+ *          for IOST-n = 1, and logic low for IOST-n = 0. When the pin is input, reading
+ *          this bit acquires the digital logic value present at the pin. GPIO data are preserved during
+ *          all power-down conditions.
+ *  [05:00]: R/W: iost_p[5:0]:
+ *       I/O STATUS bit of the GPIO-n pin. If the GPIO-n pin works as a general-purpose I/O, this
+ *      bit indicates the actual logic value present at the pin when reading the bit. It also sets the
+ *      state of the corresponding GPIO-n pin (high-impedance for IOST-n = 1, logic low for
+ *      IOST-n = 0) when writing to the bit. An external pull-up resistor is required when using pin
+ *      GPIO-n as an output.
+ *      If the GPIO-n pin works as an analog input out-of-range indicator, then bit IOST-n is a
+ *      complement of the corresponding bit ALR-n in the ALR Register. Writing the IOST-n bit
+ *      does not cause any change. Note that only GPIO-0, GPIO-1, GPIO-2, and GPIO-3 can be
+ *      configured as out-of-range indicators.
+ *      44 Submit Documentation Feedback Copyright © 2005–2012, Texas Instruments Incorporated
+ *      Product Folder Link(s): AMC7823
+ *      AMC7823
+ *      www.ti.com SLAS453F –APRIL 2005–REVISED MARCH 2012
+ *      To avoid loss of alarm information in bits IOST-n during power-down of the ADC, change to direct conversion
+ *      mode (see ADC Control Register) before power-down and do not issue a convert command while the ADC is
+ *      powered down.
+ */
+function amc_get_gpio(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 0;
+
+    const addr = AMC_ADDR['reg10'];
+    const data = amc_read_command(addr_p = addr, page_p = page)
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_gpio]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "iomod_p", bit_pos_p = 8, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "iost_p", bit_pos_p = 0, bit_width_p = 6, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+
+
+
+/**
+ * ##############################################################
+ *  Get the amc_get_dac(i) register
+ * ##############################################################
+ *  [14:12]: R/W: och_p[2:0]
+ *      . DAC Address. Read-only. Writing these bits does not cause any change.
+ *  [11:0]: R/W: dac_p[11:0]:
+ *       . In a write operation, these data bits are written into the DAC Data-n Register. However, in
+ *         (WRITE/READ) a read operation, the data bits are returned from the DAC-n Latch, not from the DAC-n
+ *         Data Register
+ *  dac_id_p: (0 to 7)
+ */
+function amc_get_dac(dac_id_p, level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 1;
+
+    switch (dac_id_p) {
+        case 0:
+            addr = AMC_ADDR['reg0'];
+            break;
+        case 1:
+            addr = AMC_ADDR['reg1'];
+            break;
+        case 2:
+            addr = AMC_ADDR['reg2'];
+            break;
+        case 3:
+            addr = AMC_ADDR['reg3'];
+            break;
+        case 4:
+            addr = AMC_ADDR['reg4'];
+            break;
+        case 5:
+            addr = AMC_ADDR['reg5'];
+            break;
+        case 6:
+            addr = AMC_ADDR['reg6'];
+            break;
+        default: // dac_id_p = 7
+            addr = AMC_ADDR['reg7'];
+            break;
+    }
+
+    const data = amc_read_command(addr_p = addr, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_dac" + adc_id_p.toString(16) + "]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "och_p", bit_pos_p = 12, bit_width_p = 3, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "dac_p", bit_pos_p = 0, bit_width_p = 12, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+    return data;
+}
+
+/**
+ * #############################################################
+ *  Get the amc_get_load_dac register
+ * ##############################################################
+ *  [15:00]: value_p[15:00] = 0xBB00
+ *    The data word 0xBB00 (shown above) written into the LOAD DAC Register generates ILDAC, the internal load
+ *    DAC signal. ILDAC and the external ELDAC signal work in a similar manner. ILDAC shifts data from the DAC-n
+ *    Data register to the DAC-n Latch and updates the output for all DAC-n with the corresponding SLDA-n bit set to
+ *    '1'. Other codes written to this register do not generate ILDAC and have no impact on any DAC-n. The LOAD
+ *    DAC Register is cleared after ILDAC is generated. The register is also cleared after power-on or reset.
+ *
+ */
+function amc_get_load_dac(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 1;
+
+    const addr = AMC_ADDR['reg8'];
+    const data = amc_read_command(addr_p = addr, page_p = page)
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_load_dac]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "value_p", bit_pos_p = 0, bit_width_p = 16, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * #############################################################
+ *  Get the amc_get_dac_conf register
+ * ##############################################################
+ *  [15:8]: R/W: slda_p[7:0]
+ *     DAC Synchronous Load Enable bit.
+ *    SLDA-n = '1': Synchronous Load enabled. When the synchronous load DAC signal occurs, DAC-n
+ *    Latch is loaded with the value of the corresponding DAC-n Data Register, and the output of DACn
+ *    is updated immediately. This load signal can be the rising edge of the external signal ELDAC or
+ *    the internal load signal ILDAC. Writing the data word 0xBB00 into the LOAD DAC Register
+ *    generates ILDAC. A write command to the DAC-n Data Register updates that register only, and
+ *    does not change the DAC-n output.
+ *    SLDA-n = '0': Asynchronous Load enabled. A write command to the DAC-n Data Register
+ *    immediately updates DAC-n Latch and the output of DAC-n. The synchronous load DAC signal
+ *    (ILDAC or ELDAC) does not affect DAC-n.
+ *  [7:0]: R/W: gdac_p[7:0]
+ *    DAC-n Output Buffer Amplifier Gain bit.
+ *    GDAC-n = '1': The gain of the DAC-n output buffer amplifier is equal to 2.
+ *    GDAC-n = '0': The gain of the DAC-n output buffer amplifier is equal to 1.
+ */
+function amc_get_dac_conf(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 1;
+
+    const addr = AMC_ADDR['reg9'];
+    const data = amc_read_command(addr_p = addr, page_p = page)
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_dac_conf]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "slda_p", bit_pos_p = 8, bit_width_p = 8, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "gdac_p", bit_pos_p = 0, bit_width_p = 8, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * ##############################################################
+ *  Get the amc_get_amc_status_conf register
+ * ##############################################################
+ *  [14]: R/W: rstc_p[0]
+ *     RESET Complete Bit. This bit is set to '1' on power-up or reset. This bit can be cleared by writing
+ *     '0' to this location. The host cannot set this bit to '1'. This bit allows the host to determine if the
+ *     part has been configured after power-up, or if a reset has occurred to the AMC7823 without
+ *     knowledge of the host.
+ *  [13]: R/W: davf_p[0]
+ *     ADC Data Available Flag. For direct-mode only. Always cleared (set to '0') in auto-mode (see ADC
+ *    Control Register).
+ *    DAVF = 1: The ADC conversions are complete and new data are available.
+ *    DAVF = 0: The ADC conversion is in progress (data is not ready) or the ADC is in Auto-Mode.
+ *    In direct-mode, bit DAVF sets the pin DAV. DAV goes low when DAVF = 1, and goes high when
+ *    DAVF = 0. In auto-mode, DAVF is always cleared to '0'. However, a 2μs pulse (active low)
+ *    appears on the DAV pin when the input with ending address [EA3:EA0] is converted. DAVF is
+ *    cleared to '0' in one of three ways: (1) reading the ADC Data Register; (2) starting a new ADC
+ *    conversion; or (3) writing '0' to this bit.
+ *  [7]: R/W: sref_p[0]
+ *     Select Reference bit.
+ *     SREF = 0 (default condition): The internal reference is selected as the chip reference. It is
+ *     connected to pin 21, EXT_REF_IN, by a 10kΩ resistor.
+ *     SREF = 1: The internal reference is de-selected and disconnected from pin 21 (EXT_REF_IN).
+ *     Pin 21 floats unless an external reference is applied. Always set SREF bit to '1' when an external
+ *     reference is applied; otherwise, the external reference must sink or source current. The current
+ *     value is the voltage difference between the external and internal reference divided by a 10kΩ
+ *     resistance.
+ *     SREF also provides information to the precision current source and is used to configure that
+ *     source (see the Precision Current Source section for details). After power-on or reset, SREF is
+ *     cleared to '0'.
+ *  [6]: R/W: gref_p[0]
+ *    Gain of the internal reference voltage (VREF). This bit selects one of two preset values for the
+ *    internal reference voltage, but has no effect on the external reference. GREF also provides
+ *    information to the precision current source and is used to configure that source (see the Precision
+ *    Current Source section for details).
+ *    GREF = 0: The internal reference voltage is +1.25V.
+ *    GREF = 1: The internal reference voltage is +2.5V.
+ *    When an external reference is used and SREF is set to '1', GREF has no impact on the reference.
+ *    However, if SREF is cleared to '0', a 10kΩ resistor is connected between pin 21, EXT_REF_IN,
+ *    and one of the two internal reference values dictated by the value of GREF. In this case, the
+ *    external reference must be able to drive the 10kΩ load. The full-scale range of the ADC input is
+ *    equal to 2 x VREF. To avoid ADC input saturation, GREF must be cleared to '0' when AVDD is less
+ *    than +5V and the internal reference is used. After power-on or reset, GREF is cleared to '0'.
+ *    Table 9 specifies the ADC input range as a function of bits GREF and SREF.
+ *  [5]: R/W: ecnvt_p[0]
+ *    Enable CONVERT (external conversion trigger). This bit specifies the ADC trigger mode. When
+ *    ECNVT = '1', CONVERT is enabled. The ADC is in external trigger mode. The low-to-high
+ *    transition of the external trigger signal CONVERT triggers the ADC conversions. A write command
+ *    to the ADC Control Register does not initiate conversion, but rather specifies the group of inputs
+ *    to convert. After triggered by CONVERT, the AMC7823 sequentially accesses each analog input
+ *    one time. The bits [SA3:SA0] of the ADC Control Register comprise the channel address of the
+ *    first analog input accessed; [EA3:EA0] is the last analog input accessed. When the conversion
+ *    finishes, the ADC is idle and waits for a new CONVERT or a new command. With an external
+ *    trigger, the ADC always works in direct-mode (see the ADC Control Register section).
+ *    When ECNVT = '0', CONVERT is disabled. The internal ADC trigger is used. A write command to
+ *    the ADC Control Register generates the internal trigger and initiates ADC conversion. With an
+ *    internal trigger, the ADC can work in either direct-mode or auto-mode (see the ADC Operation
+ *    and ADC Control Register sections). Table 10 summarizes the ADC conversion mode
+ *    configuration.
+ *    After power-on or reset, DAVF, SREF, GREF, and ECNVT are cleared to '0'; RSTC is set to '1'.
+ */
+
+function amc_get_amc_status_conf(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 1;
+
+    const addr = AMC_ADDR['reg10'];
+    const data = amc_read_command(addr_p = addr, page_p = page)
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_amc_status_conf]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "rstc_p", bit_pos_p = 14, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "davf_p", bit_pos_p = 13, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "sref_p", bit_pos_p = 7, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "gref_p", bit_pos_p = 6, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "ecnvt_p", bit_pos_p = 5, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * ##############################################################
+ *  Get the amc_get_adc_ctrl register
+ * ##############################################################
+ *  [15]: R/W: cmode_p[0]
+ *    ADC Conversion Mode bit. This bit selects between the two operating conversion modes (direct
+ *    or auto) when the Internal trigger is active. This bit is always cleared to '0' (direct-mode) when an
+ *    external trigger is active.
+ *    CMODE = '0': Direct-mode. The analog inputs from [SA3:SA0] to [EA3:EA0] are converted
+ *    sequentially (see Table 12) one time, [SA3:SA0] first and [EA3;EA0] last. When one set of
+ *    conversions is complete, the ADC is idle and waits for a new trigger. The external trigger is
+ *    restricted to this mode of operation only.
+ *    CMODE = '1': Auto-mode. The analog inputs from [SA3:SA0] to [EA3:EA0] are converted
+ *    sequentially (see Table 12) and repeatedly, [SA3:SA0] first and [EA3;EA0] last. When one set of
+ *    conversions is complete, the ADC multiplexer returns to the starting address [SA3:SA0] and
+ *    repeats the process. Repetitive conversions continue until auto-mode is halted by rewriting the
+ *    ADC Control Register to direct
+ *  [11:8]: R/W: sa_p[3:0]: 
+ *    The channel address of the first analog input to be converted (see Table 12).
+ *  [7:4]: R/W: ea_p[3:0]
+ *    The channel address of the last analog input to be converted (see Table 12).
+ */
+
+function amc_get_adc_ctrl(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 1;
+
+    const addr = AMC_ADDR['reg11'];
+    const data = amc_read_command(addr_p = addr, page_p = page)
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_adc_ctrl]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "cmode_p", bit_pos_p = 15, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "sa_p", bit_pos_p = 8, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "ea_p", bit_pos_p = 4, bit_width_p = 4, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * ##############################################################
+ *  Get the amc_get_reset register
+ * ##############################################################
+ * [15:0]: value_p[15:0]: 0xBB30
+ *    The AMC7823 has a special RESET Register that performs the software equivalent function of the device
+ *    RESET pin. To invoke a system reset, write the data word 0xBB3X to this register. Only the upper 12 bits are
+ *    significant; the lowest four bits are Don’t Care.
+ */
+function amc_get_reset(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 1;
+
+    const addr = AMC_ADDR['reg12'];
+    const data = amc_read_command(addr_p = addr, page_p = page)
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_reset]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "value_p", bit_pos_p = 0, bit_width_p = 16, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/*
+ * ##############################################################
+ *  Get the amc_get_power_down register
+ * ##############################################################
+ *  [15]: R/W: padc_p[0]
+ *     ADC power-down control bit.
+ *    PADC = '0': The ADC is in power-down mode and ADC conversion is halted.
+ *    PADC = '1': The ADC is in normal operating mode.
+ *  [14:7]: R/W: pdac_p[7:0]
+ *     PDAC-n = '0': DAC-n output buffer amplifier is in power-down mode. The output pin
+ *    of DAC-n is internally switched from the buffer output to analog ground through an
+ *    internal 5kΩ resistor. Each DAC output buffer may be independently powered down.
+ *    (See the DAC Operation section for details.)
+ *    PDAC-n = '1' and PREFB = '1': DAC-n is in normal operating mode.
+ *  [6]: R/W: pts_p[0]
+ *     Precision current source power-down control bit.
+ *    PTS = '0': Precision current source is in power-down mode and the current output is
+ *    zero.
+ *    PTS = '1': Precision current source is in normal operating mode (see the Precision
+ *    Current Source section for details).
+ *  [5]: R/W: prefb_p[0]
+ *     Reference buffer amplifier power-down control bit. This bit controls the power-down
+ *    condition of the amplifier that supplies a buffered reference voltage to all DAC-n
+ *    resistor strings and to the precision current source. This bit also provides
+ *    configuration information to the precision current source (see the Precision Current
+ *    Source Configuration table, Table 7).
+ *    PREFB = '0': Reference buffer amplifier is in power-down mode. All DACs are
+ *    inoperative. The precision current source may be used only if GREF = '0' (see the
+ *    Precision Current Source Configuration table, Table 7).
+ *    PREFB = '1': Reference buffer amplifier is powered on. This mode is required for
+ *    any DAC-n operation. The precision current source may be used with either value of
+ *    GREF.
+ */
+
+function amc_get_power_down(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 1;
+
+    const addr = AMC_ADDR['reg13'];
+    const data = amc_read_command(addr_p = addr, page_p = page)
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_power_down]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "padc_p", bit_pos_p = 15, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "pdac_p", bit_pos_p = 7, bit_width_p = 8, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "pts_p", bit_pos_p = 6, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "prefb_p", bit_pos_p = 5, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/*
+ * ##############################################################
+ *  Get the amc_get_threshold_hi register
+ * ##############################################################
+ *  [11:0]: R/W: threshold_p[11:0]
+ *    Data bits of the upper bound threshold of the nth analog input. All bits are set to '1'
+ *    after power-on or reset.
+ *  threshold_id_p (0 to 3)
+ */
+function amc_get_threshold_hi(threshold_id_p, level_p, mode_p, verbosity_p) {
+
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 1;
+    switch (threshold_id_p) {
+
+        case 0:
+            addr = AMC_ADDR['reg14'];
+            break;
+        case 1:
+            addr = AMC_ADDR['reg16'];
+            break;
+        case 2:
+            addr = AMC_ADDR['reg18'];
+            break;
+        default: // threshold_id = 3
+            addr = AMC_ADDR['reg20'];
+            break;
+    }
+
+    const data = amc_read_command(addr_p = addr, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_threshold_hi" + threshold_id_p.toString(16) + "]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "threshold_hi_p", bit_value_p = threshold_p, bit_width_p = 12, level_p = level2, mode_p = mode_p);
+        }
+    }
+}
+
+/**
+ * ##############################################################
+ *  Get the amc_get_threshold_lo register
+ * ##############################################################
+ *  [11:0]: R/W: threshold_p[11:0]
+ *     Data bits of the lower bound threshold of the nth analog input. This register is
+ *    cleared to '0' after power-on or reset.
+ *  threshold_id_p (0 to 3)
+ */
+function amc_get_threshold_lo(threshold_id_p, level_p, mode_p, verbosity_p) {
+
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 1;
+    switch (threshold_id_p) {
+
+        case 0:
+            addr = AMC_ADDR['reg15'];
+            break;
+        case 1:
+            addr = AMC_ADDR['reg17'];
+            break;
+        case 2:
+            addr = AMC_ADDR['reg19'];
+            break;
+        default: // threshold_id = 3
+            addr = AMC_ADDR['reg21'];
+            break;
+    }
+
+    const data = amc_read_command(addr_p = addr, page_p = page);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_threshold_lo" + threshold_id_p.toString(16) + "]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "threshold_lo_p", bit_value_p = threshold_p, bit_width_p = 12, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+
+
+}
+
+/**
+ * ##############################################################
+ *  Get the amc_get_part_rev_number register
+ * ##############################################################
+ * [15:0]: value_p[15:0]: 0xE000
+ */
+function amc_get_part_rev_number(level_p, mode_p, verbosity_p) {
+
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const page = 1;
+
+    const addr = AMC_ADDR['reg30'];
+    const data = amc_read_command(addr_p = addr, page_p = page)
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
+            msg = "[amc_get_part_rev_number]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "value_p", bit_pos_p = 0, bit_width_p = 16, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+
+function adc_display_hk(level_p, mode_p, verbosity_p) {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+
+    amc_get_adc(adc_ip_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_adc(adc_ip_p = 1, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_adc(adc_ip_p = 2, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_adc(adc_ip_p = 3, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_adc(adc_ip_p = 4, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_adc(adc_ip_p = 5, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_adc(adc_ip_p = 6, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_adc(adc_ip_p = 7, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_adc(adc_ip_p = 8, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+
+
+}
+
+function adc_display_all_config(level_p, mode_p, verbosity_p) {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+
+    adc_display_hk(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    amc_get_alr(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_gpio(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_dac(dac_id_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_dac(dac_id_p = 1, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_dac(dac_id_p = 2, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_dac(dac_id_p = 3, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_dac(dac_id_p = 4, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_dac(dac_id_p = 5, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_dac(dac_id_p = 6, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_dac(dac_id_p = 7, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    amc_get_load_dac(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_dac_conf(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_amc_status_conf(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_adc_ctrl(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_reset(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_power_down(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    amc_get_threshold_hi(threshold_id_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_threshold_hi(threshold_id_p = 1, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_threshold_hi(threshold_id_p = 2, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_threshold_hi(threshold_id_p = 3, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    amc_get_threshold_lo(threshold_id_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_threshold_lo(threshold_id_p = 1, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_threshold_lo(threshold_id_p = 2, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    amc_get_threshold_lo(threshold_id_p = 3, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    amc_get_part_rev_number(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+}
 
 
 
 //###############################################################
 // Configure the CDCE72010 Device
 //###############################################################
-function AMC7823_configure(verbosity_p)
-    {
+function AMC7823_configure(level_p, mode_p, verbosity_p) {
 
-	if (typeof(verbosity_p)==='undefined') verbosity_p = 0;
+    // default function parameter values
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
 
-    amc_init_device();
+    const level0 = level_p;
+    const level1 = level_p + 1;
 
-   /**
+    msg = "AMC7823_configure";
+    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+    // Enable the SPI on the FPGA board
+    amc_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    /**
      * #############################################################
      *  set the amc_set_gpio register
      * ##############################################################
      *  [11:08]: R/W: iomod_p[3:0]
-     *  [05:00]: R/W: iost_p[5:0]
-      */
-    iomod = parseInt('1111',2);
-    iost = parseInt('111111',2);
-    amc_set_gpio(iomod_p=iomod,iost_p=iost);
+     *     . IOMOD-n = 0: Analog input out-of-range detection mode. In this mode, GPIO-n (n = 0, 1, 2, 3) work as
+     *          analog input out-of-range indicators, denoted as output pins ALR-n. The status of each pin
+     *          ALR-n is set by bit ALR-n of the ALR Register. The ALR-n pin is low when the
+     *          corresponding ALR-n bit is '1', and is high-impedance when ALR-n is '0'.
+     *     . IOMOD-n = 1: GPIO mode. In this mode, pin GPIO-n works as general digital I/O (bidirectional). When
+     *          the pin is output, the status is determined by the corresponding bit IOST-n; it is highimpedance
+     *          for IOST-n = 1, and logic low for IOST-n = 0. When the pin is input, reading
+     *          this bit acquires the digital logic value present at the pin. GPIO data are preserved during
+     *          all power-down conditions.
+     *  [05:00]: R/W: iost_p[5:0]:
+     *       I/O STATUS bit of the GPIO-n pin. If the GPIO-n pin works as a general-purpose I/O, this
+     *      bit indicates the actual logic value present at the pin when reading the bit. It also sets the
+     *      state of the corresponding GPIO-n pin (high-impedance for IOST-n = 1, logic low for
+     *      IOST-n = 0) when writing to the bit. An external pull-up resistor is required when using pin
+     *      GPIO-n as an output.
+     *      If the GPIO-n pin works as an analog input out-of-range indicator, then bit IOST-n is a
+     *      complement of the corresponding bit ALR-n in the ALR Register. Writing the IOST-n bit
+     *      does not cause any change. Note that only GPIO-0, GPIO-1, GPIO-2, and GPIO-3 can be
+     *      configured as out-of-range indicators.
+     *      44 Submit Documentation Feedback Copyright © 2005–2012, Texas Instruments Incorporated
+     *      Product Folder Link(s): AMC7823
+     *      AMC7823
+     *      www.ti.com SLAS453F –APRIL 2005–REVISED MARCH 2012
+     *      To avoid loss of alarm information in bits IOST-n during power-down of the ADC, change to direct conversion
+     *      mode (see ADC Control Register) before power-down and do not issue a convert command while the ADC is
+     *      powered down.
+     */
+    iomod = parseInt('1111', 2);
+    iost = parseInt('111111', 2);
+    amc_set_gpio(
+        iomod_p = iomod, iost_p = iost,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
     /**
-    * ##############################################################
-    *  set the amc_set_amc_status_conf register
-    * ##############################################################
-    *  [14]: R/W: rstc_p[0]
-    *  [13]: R/W: davf_p[0]
-    *  [7]: R/W: sref_p[0]
-    *  [6]: R/W: gref_p[0]
-    *  [5]: R/W: ecnvt_p[0]
-    */
+     * ##############################################################
+     *  set the amc_set_amc_status_conf register
+     * ##############################################################
+     *  [14]: R/W: rstc_p[0]
+     *     RESET Complete Bit. This bit is set to '1' on power-up or reset. This bit can be cleared by writing
+     *     '0' to this location. The host cannot set this bit to '1'. This bit allows the host to determine if the
+     *     part has been configured after power-up, or if a reset has occurred to the AMC7823 without
+     *     knowledge of the host.
+     *  [13]: R/W: davf_p[0]
+     *     ADC Data Available Flag. For direct-mode only. Always cleared (set to '0') in auto-mode (see ADC
+     *    Control Register).
+     *    DAVF = 1: The ADC conversions are complete and new data are available.
+     *    DAVF = 0: The ADC conversion is in progress (data is not ready) or the ADC is in Auto-Mode.
+     *    In direct-mode, bit DAVF sets the pin DAV. DAV goes low when DAVF = 1, and goes high when
+     *    DAVF = 0. In auto-mode, DAVF is always cleared to '0'. However, a 2μs pulse (active low)
+     *    appears on the DAV pin when the input with ending address [EA3:EA0] is converted. DAVF is
+     *    cleared to '0' in one of three ways: (1) reading the ADC Data Register; (2) starting a new ADC
+     *    conversion; or (3) writing '0' to this bit.
+     *  [7]: R/W: sref_p[0]
+     *     Select Reference bit.
+     *     SREF = 0 (default condition): The internal reference is selected as the chip reference. It is
+     *     connected to pin 21, EXT_REF_IN, by a 10kΩ resistor.
+     *     SREF = 1: The internal reference is de-selected and disconnected from pin 21 (EXT_REF_IN).
+     *     Pin 21 floats unless an external reference is applied. Always set SREF bit to '1' when an external
+     *     reference is applied; otherwise, the external reference must sink or source current. The current
+     *     value is the voltage difference between the external and internal reference divided by a 10kΩ
+     *     resistance.
+     *     SREF also provides information to the precision current source and is used to configure that
+     *     source (see the Precision Current Source section for details). After power-on or reset, SREF is
+     *     cleared to '0'.
+     *  [6]: R/W: gref_p[0]
+     *    Gain of the internal reference voltage (VREF). This bit selects one of two preset values for the
+     *    internal reference voltage, but has no effect on the external reference. GREF also provides
+     *    information to the precision current source and is used to configure that source (see the Precision
+     *    Current Source section for details).
+     *    GREF = 0: The internal reference voltage is +1.25V.
+     *    GREF = 1: The internal reference voltage is +2.5V.
+     *    When an external reference is used and SREF is set to '1', GREF has no impact on the reference.
+     *    However, if SREF is cleared to '0', a 10kΩ resistor is connected between pin 21, EXT_REF_IN,
+     *    and one of the two internal reference values dictated by the value of GREF. In this case, the
+     *    external reference must be able to drive the 10kΩ load. The full-scale range of the ADC input is
+     *    equal to 2 x VREF. To avoid ADC input saturation, GREF must be cleared to '0' when AVDD is less
+     *    than +5V and the internal reference is used. After power-on or reset, GREF is cleared to '0'.
+     *    Table 9 specifies the ADC input range as a function of bits GREF and SREF.
+     *  [5]: R/W: ecnvt_p[0]
+     *    Enable CONVERT (external conversion trigger). This bit specifies the ADC trigger mode. When
+     *    ECNVT = '1', CONVERT is enabled. The ADC is in external trigger mode. The low-to-high
+     *    transition of the external trigger signal CONVERT triggers the ADC conversions. A write command
+     *    to the ADC Control Register does not initiate conversion, but rather specifies the group of inputs
+     *    to convert. After triggered by CONVERT, the AMC7823 sequentially accesses each analog input
+     *    one time. The bits [SA3:SA0] of the ADC Control Register comprise the channel address of the
+     *    first analog input accessed; [EA3:EA0] is the last analog input accessed. When the conversion
+     *    finishes, the ADC is idle and waits for a new CONVERT or a new command. With an external
+     *    trigger, the ADC always works in direct-mode (see the ADC Control Register section).
+     *    When ECNVT = '0', CONVERT is disabled. The internal ADC trigger is used. A write command to
+     *    the ADC Control Register generates the internal trigger and initiates ADC conversion. With an
+     *    internal trigger, the ADC can work in either direct-mode or auto-mode (see the ADC Operation
+     *    and ADC Control Register sections). Table 10 summarizes the ADC conversion mode
+     *    configuration.
+     *    After power-on or reset, DAVF, SREF, GREF, and ECNVT are cleared to '0'; RSTC is set to '1'.
+     */
     rstc = 0;
     davf = 0;
     sref = 0;
     gref = 0;
     ecnvt = 0;
-    amc_set_amc_status_conf(rstc_p = rstc,davf_p = davf,sref_p=sref,gref_p=gref,ecnvt_p=ecnvt);
+    amc_set_amc_status_conf(
+        rstc_p = rstc, davf_p = davf, sref_p = sref, gref_p = gref, ecnvt_p = ecnvt,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
     /**
-    * ##############################################################
-    *  set the amc_set_adc_ctrl register
-    * ##############################################################
-    *  [15]: R/W: cmode_p[0]
-    *  [11:8]: R/W: sa_p[3:0]: The channel address of the first analog input to be converted (
-    *  [7:4]: R/W: ea_p[3:0]:  The channel address of the last analog input to be converted
-    */
-    cmode = 1;// 0: direct mode, 1: auto-mode
-    sa = parseInt('0000',2); // adc0
-    ea = parseInt('1000',2); // adc8
-    amc_set_adc_ctrl(cmode_p = cmode,sa_p=sa,ea_p = ea);
+     * ##############################################################
+     *  set the amc_set_adc_ctrl register
+     * ##############################################################
+     *  [15]: R/W: cmode_p[0]
+     *    ADC Conversion Mode bit. This bit selects between the two operating conversion modes (direct
+     *    or auto) when the Internal trigger is active. This bit is always cleared to '0' (direct-mode) when an
+     *    external trigger is active.
+     *    CMODE = '0': Direct-mode. The analog inputs from [SA3:SA0] to [EA3:EA0] are converted
+     *    sequentially (see Table 12) one time, [SA3:SA0] first and [EA3;EA0] last. When one set of
+     *    conversions is complete, the ADC is idle and waits for a new trigger. The external trigger is
+     *    restricted to this mode of operation only.
+     *    CMODE = '1': Auto-mode. The analog inputs from [SA3:SA0] to [EA3:EA0] are converted
+     *    sequentially (see Table 12) and repeatedly, [SA3:SA0] first and [EA3;EA0] last. When one set of
+     *    conversions is complete, the ADC multiplexer returns to the starting address [SA3:SA0] and
+     *    repeats the process. Repetitive conversions continue until auto-mode is halted by rewriting the
+     *    ADC Control Register to direct
+     *  [11:8]: R/W: sa_p[3:0]: 
+     *    The channel address of the first analog input to be converted (see Table 12).
+     *  [7:4]: R/W: ea_p[3:0]
+     *    The channel address of the last analog input to be converted (see Table 12).
+     */
+    cmode = 1; // 0: direct mode, 1: auto-mode
+    sa = parseInt('0000', 2); // adc0
+    ea = parseInt('1000', 2); // adc8
+    amc_set_adc_ctrl(
+        cmode_p = cmode, sa_p = sa, ea_p = ea,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
     /*
-    * ##############################################################
-    *  set the amc_set_power_down register
-    * ##############################################################
-    *  [15]: R/W: padc_p[0]
-    *  [14:7]: R/W: pdac_p[7:0]
-    *  [6]: R/W: pts_p[0]
-    *  [5]: R/W: prefb_p[0]
-    */
-    padc = 1;// 0: adc is power down, 1: adc is in normal mode
-    pdac = parseInt('0000_0000',2);//0: DACi is power down,1 + (prefb = 1) = DAC is normal mode
-    pts = 0;//0: Precision current source is in power-down mode and the current output is zero, 1:Precision current source is in normal operating mode
-    prefb = 0;//0: Reference buffer amplifier is in power-down mode, 1:Reference buffer amplifier is powered on
-    amc_set_power_down(padc_p=padc, pdac_p=pdac, pts_p=pts, prefb_p=prefb);
+     * ##############################################################
+     *  set the amc_set_power_down register
+     * ##############################################################
+     *  [15]: R/W: padc_p[0]
+     *     ADC power-down control bit.
+     *    PADC = '0': The ADC is in power-down mode and ADC conversion is halted.
+     *    PADC = '1': The ADC is in normal operating mode.
+     *  [14:7]: R/W: pdac_p[7:0]
+     *     PDAC-n = '0': DAC-n output buffer amplifier is in power-down mode. The output pin
+     *    of DAC-n is internally switched from the buffer output to analog ground through an
+     *    internal 5kΩ resistor. Each DAC output buffer may be independently powered down.
+     *    (See the DAC Operation section for details.)
+     *    PDAC-n = '1' and PREFB = '1': DAC-n is in normal operating mode.
+     *  [6]: R/W: pts_p[0]
+     *     Precision current source power-down control bit.
+     *    PTS = '0': Precision current source is in power-down mode and the current output is
+     *    zero.
+     *    PTS = '1': Precision current source is in normal operating mode (see the Precision
+     *    Current Source section for details).
+     *  [5]: R/W: prefb_p[0]
+     *     Reference buffer amplifier power-down control bit. This bit controls the power-down
+     *    condition of the amplifier that supplies a buffered reference voltage to all DAC-n
+     *    resistor strings and to the precision current source. This bit also provides
+     *    configuration information to the precision current source (see the Precision Current
+     *    Source Configuration table, Table 7).
+     *    PREFB = '0': Reference buffer amplifier is in power-down mode. All DACs are
+     *    inoperative. The precision current source may be used only if GREF = '0' (see the
+     *    Precision Current Source Configuration table, Table 7).
+     *    PREFB = '1': Reference buffer amplifier is powered on. This mode is required for
+     *    any DAC-n operation. The precision current source may be used with either value of
+     *    GREF.
+     */
+    padc = 1; // 0: adc is power down, 1: adc is in normal mode
+    pdac = parseInt('0000_0000', 2); //0: DACi is power down,1 + (prefb = 1) = DAC is normal mode
+    pts = 0; //0: Precision current source is in power-down mode and the current output is zero, 1:Precision current source is in normal operating mode
+    prefb = 0; //0: Reference buffer amplifier is in power-down mode, 1:Reference buffer amplifier is powered on
+    amc_set_power_down(
+        padc_p = padc, pdac_p = pdac, pts_p = pts, prefb_p = prefb,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
     /*
-    * ##############################################################
-    *  set the amc_set_threshold_hi register
-    * ##############################################################
-    *  [11:0]: R/W: threshold_p[11:0]
-    *  threshold_id_p (0 to 3)
-    */
+     * ##############################################################
+     *  set the amc_set_threshold_hi register
+     * ##############################################################
+     *  [11:0]: R/W: threshold_p[11:0]
+     *    Data bits of the upper bound threshold of the nth analog input. All bits are set to '1'
+     *    after power-on or reset.
+     *  threshold_id_p (0 to 3)
+     */
     threshold = 0x0B16;
     threshold_id = 0;
-    amc_set_threshold_hi(threshold_p=threshold,threshold_id_p=threshold_id);
+    amc_set_threshold_hi(
+        threshold_p = threshold, threshold_id_p = threshold_id,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
-     /**
-    * ##############################################################
-    *  set the amc_set_threshold_lo register
-    * ##############################################################
-    *  [11:0]: R/W: threshold_p[11:0]
-    *  threshold_id_p (0 to 3)
-    */
+    /**
+     * ##############################################################
+     *  set the amc_set_threshold_lo register
+     * ##############################################################
+     *  [11:0]: R/W: threshold_p[11:0]
+     *     Data bits of the lower bound threshold of the nth analog input. This register is
+     *    cleared to '0' after power-on or reset.
+     *  threshold_id_p (0 to 3)
+     */
     threshold = 0x0A08;
     threshold_id = 0;
-    amc_set_threshold_lo(threshold_p=threshold,threshold_id_p=threshold_id);
+    amc_set_threshold_lo(
+        threshold_p = threshold, threshold_id_p = threshold_id,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
     /*
-    * ##############################################################
-    *  set the amc_set_threshold_hi register
-    * ##############################################################
-    *  [11:0]: R/W: threshold_p[11:0]
-    *  threshold_id_p (0 to 3)
-    */
+     * ##############################################################
+     *  set the amc_set_threshold_hi register
+     * ##############################################################
+     *  [11:0]: R/W: threshold_p[11:0]
+     *    Data bits of the upper bound threshold of the nth analog input. All bits are set to '1'
+     *    after power-on or reset.
+     *  threshold_id_p (0 to 3)
+     */
     threshold = 0x0B16;
     threshold_id = 1;
-    amc_set_threshold_hi(threshold_p=threshold,threshold_id_p=threshold_id);
+    amc_set_threshold_hi(
+        threshold_p = threshold, threshold_id_p = threshold_id,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
-     /**
-    * ##############################################################
-    *  set the amc_set_threshold_lo register
-    * ##############################################################
-    *  [11:0]: R/W: threshold_p[11:0]
-    *  threshold_id_p (0 to 3)
-    */
+    /**
+     * ##############################################################
+     *  set the amc_set_threshold_lo register
+     * ##############################################################
+     *  [11:0]: R/W: threshold_p[11:0]
+     *     Data bits of the lower bound threshold of the nth analog input. This register is
+     *    cleared to '0' after power-on or reset.
+     *  threshold_id_p (0 to 3)
+     */
     threshold = 0x0A08;
     threshold_id = 1;
-    amc_set_threshold_lo(threshold_p=threshold,threshold_id_p=threshold_id);
+    amc_set_threshold_lo(
+        threshold_p = threshold, threshold_id_p = threshold_id,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
     /*
-    * ##############################################################
-    *  set the amc_set_threshold_hi register
-    * ##############################################################
-    *  [11:0]: R/W: threshold_p[11:0]
-    *  threshold_id_p (0 to 3)
-    */
+     * ##############################################################
+     *  set the amc_set_threshold_hi register
+     * ##############################################################
+     *  [11:0]: R/W: threshold_p[11:0]
+     *    Data bits of the upper bound threshold of the nth analog input. All bits are set to '1'
+     *    after power-on or reset.
+     *  threshold_id_p (0 to 3)
+     */
     threshold = 0x0C18;
     threshold_id = 2;
-    amc_set_threshold_hi(threshold_p=threshold,threshold_id_p=threshold_id);
+    amc_set_threshold_hi(
+        threshold_p = threshold, threshold_id_p = threshold_id,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
-     /**
-    * ##############################################################
-    *  set the amc_set_threshold_lo register
-    * ##############################################################
-    *  [11:0]: R/W: threshold_p[11:0]
-    *  threshold_id_p (0 to 3)
-    */
+    /**
+     * ##############################################################
+     *  set the amc_set_threshold_lo register
+     * ##############################################################
+     *  [11:0]: R/W: threshold_p[11:0]
+     *     Data bits of the lower bound threshold of the nth analog input. This register is
+     *    cleared to '0' after power-on or reset.
+     *  threshold_id_p (0 to 3)
+     */
     threshold = 0x0AF1;
     threshold_id = 2;
-    amc_set_threshold_lo(threshold_p=threshold,threshold_id_p=threshold_id);
+    amc_set_threshold_lo(
+        threshold_p = threshold, threshold_id_p = threshold_id,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
     /*
-    * ##############################################################
-    *  set the amc_set_threshold_hi register
-    * ##############################################################
-    *  [11:0]: R/W: threshold_p[11:0]
-    *  threshold_id_p (0 to 3)
-    */
+     * ##############################################################
+     *  set the amc_set_threshold_hi register
+     * ##############################################################
+     *  [11:0]: R/W: threshold_p[11:0]
+     *    Data bits of the upper bound threshold of the nth analog input. All bits are set to '1'
+     *    after power-on or reset.
+     *  threshold_id_p (0 to 3)
+     */
     threshold = 0x0C18;
     threshold_id = 3;
-    amc_set_threshold_hi(threshold_p=threshold,threshold_id_p=threshold_id);
+    amc_set_threshold_hi(
+        threshold_p = threshold, threshold_id_p = threshold_id,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
-     /**
-    * ##############################################################
-    *  set the amc_set_threshold_lo register
-    * ##############################################################
-    *  [11:0]: R/W: threshold_p[11:0]
-    *  threshold_id_p (0 to 3)
-    */
+    /**
+     * ##############################################################
+     *  set the amc_set_threshold_lo register
+     * ##############################################################
+     *  [11:0]: R/W: threshold_p[11:0]
+     *     Data bits of the lower bound threshold of the nth analog input. This register is
+     *    cleared to '0' after power-on or reset.
+     *  threshold_id_p (0 to 3)
+     */
     threshold = 0x0AF1;
     threshold_id = 3;
-    amc_set_threshold_lo(threshold_p=threshold,threshold_id_p=threshold_id);
-    
+    amc_set_threshold_lo(
+        threshold_p = threshold, threshold_id_p = threshold_id,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
 
 
-
-
-
-    }
+}

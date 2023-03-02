@@ -304,6 +304,7 @@ begin
       when E_WAIT =>
         cnt_next <= (others => '0');
         if i_start_auto_rd = '1' then
+        -- auto read data in the RAM
           sof_next        <= '1';
           data_valid_next <= '1';
           sel_wr_next     <= '0';
@@ -316,6 +317,7 @@ begin
           end if;
           sm_state_next <= E_AUTO_RD;
         else
+        -- write data in the RAM
           sof_next        <= '0';
           eof_next        <= '0';
           data_valid_next <= i_data_valid;

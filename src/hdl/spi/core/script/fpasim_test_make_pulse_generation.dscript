@@ -1,0 +1,285 @@
+// -------------------------------------------------------------------------------------------------------------
+//                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
+// -------------------------------------------------------------------------------------------------------------
+//                              This file is part of the ATHENA X-IFU DRE Focal Plane Assembly simulator.
+//
+//                              fpasim-fw is free software: you can redistribute it and/or modify
+//                              it under the terms of the GNU General Public License as published by
+//                              the Free Software Foundation, either version 3 of the License, or
+//                              (at your option) any later version.
+//
+//                              This program is distributed in the hope that it will be useful,
+//                              but WITHOUT ANY WARRANTY; without even the implied warranty of
+//                              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//                              GNU General Public License for more details.
+//
+//                              You should have received a copy of the GNU General Public License
+//                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// -------------------------------------------------------------------------------------------------------------
+//    email                   kenji.delarosa@alten.com
+//    @file                   fpasim_test_make_pulse_generation.dscript
+// -------------------------------------------------------------------------------------------------------------
+//    Automatic Generation    No
+//    Code Rules Reference
+// -------------------------------------------------------------------------------------------------------------
+//    @details
+//
+//   This javascript does the following steps:
+//      1. configure the spi devices
+//      2. reset the FPGA functions
+//      3. configure the FPASIM functions
+//      4. generate few make_pulse command
+//      4. generate few make_pulse_all command
+//
+//
+// -------------------------------------------------------------------------------------------------------------
+
+// import javascript
+include("./fpasim/utils_tools.dscript");
+include("./fpasim/fpasim_address.dscript");
+include("./fpasim/fpasim_tools.dscript");
+
+
+function script_info(level_p, mode_p, verbosity_p)
+{
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+     /*
+     Print the test info
+    */
+    msg = "Script info:";
+    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+    // get the operator name
+    operator_name = get_operator_name();
+    msg = "Operator Name: " + operator_name;
+    display(msg_p = msg, level_p = level0, mode_p = mode_p);
+    // get the session
+    session_name = get_session_name();
+    msg = "Session: " + session_name;
+    display(msg_p = msg, level_p = level0, mode_p = mode_p);
+    // Print the current date
+    date = maDate()
+    msg = "Date: " + date;
+    display(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+    // get board id
+    reg_name = 'BOARD_ID';
+    msg = reg_name + ": ";
+    display(msg_p = msg, level_p = level0, mode_p = mode_p);
+    data = fpasim_get_wireout_by_name(reg_name_p = reg_name, level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+    // get firmware id
+    reg_name = 'FIRMWARE_ID';
+    msg = reg_name + ": ";
+    display(msg_p = msg, level_p = level0, mode_p = mode_p);
+    data = fpasim_get_wireout_by_name(reg_name_p = reg_name, level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+    // get firmware version
+    reg_name = 'FIRMWARE_VERSION';
+    msg = reg_name + ": ";
+    display(msg_p = msg, level_p = level0, mode_p = mode_p);
+    data = fpasim_get_wireout_by_name(reg_name_p = reg_name, level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+
+}
+
+function main() {
+
+
+    const level0 = 0;
+    const level1 = level0 + 1;
+    const level2 = level0 + 2;
+
+    const mode_p = 0;
+    const verbosity_p = 0;
+
+    /* 
+    ***************************************************************************
+    * display the test description
+    ***************************************************************************
+    */ 
+    msg = "Test description";
+    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+    msg = "This test is used to realize electrical measurement or visualization on the following ouptput:";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    msg = [
+            "sync/ref ouptput",
+            "dac output",
+            ""];
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
+
+    msg= "This test does the following steps:"
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+     msg= [
+     "1. configure the spi devices",
+     "2. reset the FPGA functions",
+     "3. configure the FPASIM functions",
+     "4. generate few make_pulse command",
+     "4. generate few make_pulse_all command"
+     ]
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
+
+
+    /* 
+    ***************************************************************************
+    * display the script info
+    ***************************************************************************
+    */ 
+    script_info(level_p=level0,mode_p=mode_p,verbosity_p=2);
+
+     /* 
+    ***************************************************************************
+    * configure spi devices
+    ***************************************************************************
+    */ 
+    msg = "Configure spi devices";
+    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+    configure_fmc150_spi_device(level_p=level1,mode_p=mode_p,verbosity_p=verbosity_p);
+
+     /* 
+    ***************************************************************************
+    * reset the fpasim function
+    ***************************************************************************
+    */ 
+    msg = "Reset the fpasim function";
+    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+    fpasim_reset(level_p=level1, mode_p=mode_p, verbosity_p=verbosity_p);
+
+
+    /* 
+    ***************************************************************************
+    * Configure the FPASIM functions
+    ***************************************************************************
+    */ 
+    msg = "Configure the fpasim function";
+    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+    // set the register: FPASIM_Gain
+    fpasim_gain = 0x4;
+    msg = "Set register: FPASIM_GAIN";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    sendToFPA_configureGain(fpasim_gain);
+
+    // set the register: MUX_SQ_FB_DELAY
+    mux_sq_fb_delay = 0x5;
+    msg = "Set register: MUX_SQ_FB_DELAY";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    sendToFPA_configureMuxDelay(mux_sq_fb_delay);
+
+    // set the register: AMP_SQ_OF_DELAY
+    amp_sq_of_delay = 0x6;
+    msg = "Set register: AMP_SQ_OF_DELAY";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    sendToFPA_configureAmpDelay(amp_sq_of_delay);
+
+    // set the register: ERROR_DELAY
+    error_delay = 0x7;
+    msg = "Set register: ERROR_DELAY";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    sendToFPA_configureErrorDelay(error_delay);
+
+    // set the register: RA_DELAY
+    ra_delay = 0x8;
+    msg = "Set register: RA_DELAY";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    sendToFPA_configureErrorDelay(ra_delay);
+
+    // set the register: TES_CONF
+    nbPixels = 34 - 1; // add -1 because we start from 0
+    nbSamplesPerPixel = 40 - 1; // add -1 because we start from 0
+    totalFrameSize = nbPixels * nbSamplesPerPixel - 1; // add -1 because we start from 0
+    msg = "Set register: TES_CONF";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    sendToFPA_configureTES_conf(nbPixels = nbPixels, nbSamplesPerPixel = nbSamplesPerPixel, totalFrameSize = totalFrameSize);
+
+    // Enable the fpasim funcion
+    rst = 0;
+    en = 0;
+    data = fpasim_build_ctrl(rst_p=rst, en_p=en); 
+    msg = "Enable the FPASIM function";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    sendToFPA_configureControl(data);
+
+
+    /* 
+    ***************************************************************************
+    * Generate make_pulse commands
+    ***************************************************************************
+    */ 
+   tempo = 1000; // tempo (in ms) between the make_pulse command
+   nb_iteration     = 5; // number of make_pulse command
+   msg0 = "nb_iteration= "+nb_iteration.toString(10)+", tempo= "+nb_iteration.toString(10);
+   msg = "Generate make_pulse commands: "+msg0 ; 
+   display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+   // declare tab
+   pixel_id_tab     = array(nb_iteration);
+   time_shift_tab   = array(nb_iteration);
+   pulse_height_tab = array(nb_iteration);
+
+   // user-defined: edit indivual tab values.
+
+   // loop
+   for (i = 0;i< nb_iteration;i++)
+   {
+    iter = i+1;
+    msg = 'iteration: '+iter.toString(10)+'/'+nb_iteration.toString(10);
+
+    pixel_id     = pixel_id[i];
+    time_shift   = time_shift_tab[i];
+    pulse_height = pulse_height_tab[i];
+
+    sendToFPA_makePulse(pixelId=pixel_id,timeShift=time_shift,pulseHeigth=pulse_height);
+
+    waitMs(tempo);
+   }
+
+
+   /* 
+    ***************************************************************************
+    * Generate make_pulses commands
+    ***************************************************************************
+    */ 
+   tempo = 1000; // tempo (in ms) between the make_pulse command
+   nb_iteration     = 5; // number of make_pulse command
+   msg0 = "nb_iteration= "+nb_iteration.toString(10)+", tempo= "+nb_iteration.toString(10);
+   msg = "Generate make_pulses commands: "+msg0 ; 
+   display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+   // declare
+   time_shift_tab   = array(nb_iteration);
+   pulse_height_tab = array(nb_iteration);
+
+   // user-defined: edit indivual tab values.
+
+
+   // loop
+   for (i = 0;i< nb_iteration;i++)
+   {
+    iter = i+1;
+    msg = 'iteration: '+iter.toString(10)+'/'+nb_iteration.toString(10);
+
+    time_shift   = time_shift_tab[i];
+    pulse_height = pulse_height_tab[i];
+
+    sendToFPA_makePulses(timeShift=time_shift,pulseHeigth=pulse_height);
+
+    waitMs(tempo);
+   }
+
+   /* 
+    ***************************************************************************
+    * End of Test
+    ***************************************************************************
+    */ 
+    msg = "End of Test";
+    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+}
+
+main();

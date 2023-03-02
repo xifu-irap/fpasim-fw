@@ -692,27 +692,9 @@ begin
     signal count_r1 : unsigned(31 downto 0) := (others => '0');
     signal pulse_r1 : std_logic             := '0';
 
-    signal count_r2 : unsigned(31 downto 0) := (others => '0');
-    signal pulse_r2 : std_logic             := '0';
-
     signal clk_tmp : std_logic;
   begin
-    --inst_fpasim_top_ila_0 : entity work.fpasim_top_ila_0
-    --     port map(
-    --       clk                  => sys_clk,
-    --       -- probe0
-    --       probe0(3)            => sync_valid,
-    --       probe0(2)            => dac_frame,
-    --       probe0(1)            => dac_valid,
-    --       probe0(0)            => adc_valid,
-    --      -- probe1
-    --       probe1(27 downto 14) => adc_b,
-    --       probe1(13 downto 0)  => adc_a,
-    --       -- probe2
-    --       probe2(17)  => sys_rst,
-    --       probe2(16)  => sync,
-    --       probe2(15 downto 0)  => dac
-    --     );
+
 
     p_count : process (adc_clk_div) is
     begin
@@ -728,33 +710,13 @@ begin
         -- probe0
         probe0(32)          => pulse_r1,
         probe0(31 downto 0) => std_logic_vector(count_r1),
+
         -- probe1
-        probe1(32)          => pulse_r2,
-        probe1(31 downto 0) => std_logic_vector(count_r2)
+        probe1(1) => usb_rst_out,
+        probe1(0) => sys_rst
         );
 
 
---inst_IBUFDS : IBUFDS
---   generic map (
---      DIFF_TERM => True, -- Differential Termination 
---      IBUF_LOW_PWR => TRUE, -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
---      IOSTANDARD => "DEFAULT")
---   port map (
---      O => clk_tmp,  -- Buffer output
---      I => i_clk_to_fpga_p,  -- Diff_p buffer input (connect directly to top-level port)
---      IB => i_clk_to_fpga_n -- Diff_n buffer input (connect directly to top-level port)
---   );
-
-    --  p_count2: process (clk_tmp) is
-    --begin
-    --  if rising_edge(clk_tmp) then
-    p_count2 : process (adc_clk_div) is
-    begin
-      if rising_edge(adc_clk_div) then
-        count_r2 <= count_r2 + 1;
-        pulse_r2 <= not(pulse_r2);
-      end if;
-    end process p_count2;
 
   end generate gen_debug;
 
