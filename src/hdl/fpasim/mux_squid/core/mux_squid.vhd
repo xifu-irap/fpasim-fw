@@ -24,12 +24,12 @@
 -- -------------------------------------------------------------------------------------------------------------
 --    @details                
 --
--- This module performs the following mux_squid computation steps:
---   . addr0 = i_pixel_result - i_mux_squid_feedback
---   . S0 = MUX_SQUID_TF(addr0): use the addr value to read a pre-loaded RAM
---   . addr1 = id_pixel_id
---   . offset =  MUX_SQUID_OFFSET(addr1): use the addr value to read a pre-loaded RAM
---   . o_pixel_result = S0 + offset
+--    This module performs the following mux_squid computation steps:
+--      . addr0 = i_pixel_result - i_mux_squid_feedback
+--      . S0 = MUX_SQUID_TF(addr0): use the addr value to read a pre-loaded RAM
+--      . addr1 = id_pixel_id
+--      . offset =  MUX_SQUID_OFFSET(addr1): use the addr value to read a pre-loaded RAM
+--      . o_pixel_result = S0 + offset
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -228,14 +228,14 @@ architecture RTL of mux_squid is
 
 begin
 
-  assert not ((i_pixel_result'length) /= ((pixel_result_tmp'length) - 1) )  report "[mux_squid]: pixel result => input port width and sfixed package definition width doesn't match." severity error;
+  assert not ((i_pixel_result'length) /= ((pixel_result_tmp'length)) )  report "[mux_squid]: pixel result => input port width and sfixed package definition width doesn't match." severity error;
   assert not ((i_mux_squid_feedback'length) /= (mux_squid_feedback_tmp'length)) report "[mux_squid]: mux_squid_feedback => input port width and sfixed package definition width doesn't match." severity error;
 
   -------------------------------------------------------------------
   -- sub_sfixed_mux_squid_out
   -------------------------------------------------------------------
-  -- unsigned to signed conversion: sign bit extension (add a sign bit)
-  pixel_result_tmp       <= std_logic_vector(resize(unsigned(i_pixel_result), pixel_result_tmp'length));
+  -- we assume i_pixel_result is always >=0 => set the sign bit (MSB bits) to '0' 
+  pixel_result_tmp       <= '0' & i_pixel_result(i_pixel_result'high - 1 downto 0);
   mux_squid_feedback_tmp <= i_mux_squid_feedback;
 
   inst_sub_sfixed_mux_squid : entity work.sub_sfixed

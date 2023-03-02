@@ -380,7 +380,7 @@ begin
 
   inst_fifo_sync_with_error_prog_full_wr_count : entity work.fifo_sync_with_error_prog_full_wr_count
     generic map(
-      g_FIFO_MEMORY_TYPE    => "distributed",
+      g_FIFO_MEMORY_TYPE    => "auto",
       g_FIFO_READ_LATENCY   => 1,
       g_FIFO_WRITE_DEPTH    => c_FIFO_DEPTH0,
       g_PROG_FULL_THRESH    => c_PROG_FULL_THRESH0,

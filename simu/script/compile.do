@@ -179,6 +179,7 @@ vcom -work fpasim  -93 \
 "${PR_DIR}/src/hdl/fpasim/regdecode/core/regdecode_pipe_rd_all.vhd" \
 "${PR_DIR}/src/hdl/fpasim/regdecode/core/regdecode_pipe.vhd" \
 "${PR_DIR}/src/hdl/fpasim/regdecode/core/regdecode_wire_wr_rd.vhd" \
+"${PR_DIR}/src/hdl/fpasim/regdecode/core/regdecode_wire_rd.vhd" \
 
 vcom -work fpasim  -2008 \
 "${PR_DIR}/ip/xilinx/xpm/fifo/fifo_async_with_prog_full_wr_count.vhd" \
@@ -198,6 +199,7 @@ vcom -work fpasim  -2008 \
 vcom -work fpasim  -93 \
 "${PR_DIR}/src/hdl/fpasim/tes/core/tes_signalling_generator.vhd" \
 "${PR_DIR}/src/hdl/fpasim/tes/core/tes_signalling.vhd" \
+"${PR_DIR}/src/hdl/fpasim/tes/core/tes_negative_output_detection.vhd" \
 
 vcom -work fpasim  -2008 \
 "${PR_DIR}/ip/xilinx/xpm/fifo/fifo_sync_with_prog_full.vhd" \

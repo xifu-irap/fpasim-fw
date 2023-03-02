@@ -572,6 +572,44 @@
         }
       }
     },
+    "@usb_fpasim_status": {
+      "description_list": [
+      "This command is used to access to the DATA_COUNT register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/pipe_out_data_count : number of 32 bit-words currently in the pipe_out FIFO. This FIFO is used to store the read FPASIM RAM content",
+      "         :param value (integer >=0): number of 32 bit-words in the pipe_out FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param field/make_pulse_data_count : number of 32 bit-words currently in the make_pulse FIFO. This",
+      "         :param value (integer >=0): number of 32 bit-words in the make_pulse FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "rd": {
+        "usb_addr": "0x2A",
+        "reg_id": 510
+      },
+      "field": {
+        "tes_neg_out_pixel_id ": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        },
+        "tes_neg_out_erro": {
+          "value": 0,
+          "bit_pos_min": 8,
+          "width": 1
+        }
+      }
+    },
     "@usb_data_count": {
       "description_list": [
       "This command is used to access to the DATA_COUNT register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",

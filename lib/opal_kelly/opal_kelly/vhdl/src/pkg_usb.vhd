@@ -517,7 +517,7 @@ package body pkg_usb is
                   v_pipe_rd_cnt_word := v_pipe_rd_cnt_word + 1;
                 end if;
 
-              when 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 511 | 512 | 513 | 517 | 524 | 525 | 526 | 527 | 529 | 530 | 531 =>
+              when 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 510 | 511 | 512 | 513 | 517 | 524 | 525 | 526 | 527 | 529 | 530 | 531 =>
                 ---------------------------------------------------------------------
                 -- wire out
                 ---------------------------------------------------------------------
@@ -546,6 +546,10 @@ package body pkg_usb is
                   if v_file_reg_id = 507 then
                     info("[pkg_usb_wr] : Get TES_CONF Register");
                   end if;
+                  if v_file_reg_id = 510 then
+                    info("[pkg_usb_wr] : Get FPASIM_STATUS Register");
+                  end if;
+
                   if v_file_reg_id = 511 then
                     info("[pkg_usb_wr] : Get DATA_COUNT Register");
                   end if;
@@ -640,6 +644,9 @@ package body pkg_usb is
                 end if;
                 if v_file_reg_id = 507 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get TES_CONF Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                end if;
+                if v_file_reg_id = 510 then
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FPASIM_STATUS Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 511 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get DATA_COUNT Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));

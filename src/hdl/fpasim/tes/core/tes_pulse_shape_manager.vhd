@@ -24,16 +24,16 @@
 -- -------------------------------------------------------------------------------------------------------------
 --   @details                
 --
--- From a user-defined command, this module tracks the computation history of the associated pixel.
--- With one state machine and a mechanism of parameters' table, the module can simulate nb_pixel independent state machine (one by pixel).
--- if a previous command was received for the current pixel, this module performs the following tes computation steps:
---   . computation of the addr0
---      . at t=0: addr0 = i_cmd_time_shift
---      . at t/=0: addr0 = addr0 + time_shift_max (until all pulse_shape sample was processed)
---   . pulse_shape = TES_PULSE_SHAPE(addr0): use the addr value to read a pre-loaded RAM
---   . addr1 = i_pixel_id
---   . steady_state =  TES_STD_STATE(addr1): use the addr value to read a pre-loaded RAM
---   . o_pixel_result = steady_state - (pulse_shape * i_cmd_pulse_height)
+--   From a user-defined command, this module tracks the computation history of the associated pixel.
+--   With one state machine and a mechanism of parameters' table, the module can simulate nb_pixel independent state machine (one by pixel).
+--   if a previous command was received for the current pixel, this module performs the following tes computation steps:
+--     . computation of the addr0
+--        . at t=0: addr0 = i_cmd_time_shift
+--        . at t/=0: addr0 = addr0 + time_shift_max (until all pulse_shape sample was processed)
+--     . pulse_shape = TES_PULSE_SHAPE(addr0): use the addr value to read a pre-loaded RAM
+--     . addr1 = i_pixel_id
+--     . steady_state =  TES_STD_STATE(addr1): use the addr value to read a pre-loaded RAM
+--     . o_pixel_result = steady_state - (pulse_shape * i_cmd_pulse_height)
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -113,6 +113,13 @@ entity tes_pulse_shape_manager is
     o_pixel_id     : out std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id
     o_pixel_valid  : out std_logic;     -- valid pixel result
     o_pixel_result : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0);  -- pixel result
+
+    ---------------------------------------------------------------------
+    -- output: detect negative output value
+    ---------------------------------------------------------------------
+    o_tes_pixel_neg_out_valid    : out std_logic;
+    o_tes_pixel_neg_out_error    : out std_logic;
+    o_tes_pixel_neg_out_pixel_id : out std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
 
     -----------------------------------------------------------------
     -- errors/status
@@ -365,6 +372,18 @@ architecture RTL of tes_pulse_shape_manager is
   signal pixel_eof_ry   : std_logic;
   signal pixel_valid_ry : std_logic;
   signal pixel_id_ry    : std_logic_vector(i_pixel_id'range);
+
+  ---------------------------------------------------------------------
+  -- detecte output negative value
+  ---------------------------------------------------------------------
+  signal sign_value       : std_logic;
+  signal error_sign_value : std_logic;
+
+  signal pixel_neg_out_valid    : std_logic;
+  signal pixel_neg_out_error    : std_logic;
+  signal pixel_neg_out_pixel_id : std_logic_vector(i_pixel_id'range);
+
+
 
   ---------------------------------------------------------------------
   -- error latching
@@ -959,6 +978,37 @@ begin
   o_pixel_valid  <= pixel_valid_ry;
   o_pixel_id     <= pixel_id_ry;
   o_pixel_result <= result_ry;
+
+  ---------------------------------------------------------------------
+  -- detect output negative value
+  ---------------------------------------------------------------------
+  sign_value <= result_ry(result_ry'high);
+  tes_negative_output_detection_INST : entity work.tes_negative_output_detection
+    generic map(
+      -- command
+      g_PIXEL_ID_WIDTH => pixel_id_ry'length  -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[
+      )
+    port map(
+      i_clk                    => i_clk,      -- clock 
+      i_rst                    => i_rst,      -- reset 
+      i_rst_status             => i_rst_status,         -- reset error flag(s) 
+      ---------------------------------------------------------------------
+      -- input
+      ---------------------------------------------------------------------
+      i_pixel_valid            => pixel_valid_ry,       -- pixel valid
+      i_pixel_result_sign      => sign_value,  -- sign of the pixel result
+      i_pixel_id               => pixel_id_ry,          -- pixel id
+      ---------------------------------------------------------------------
+      -- output
+      ---------------------------------------------------------------------
+      o_pixel_neg_out_valid    => pixel_neg_out_valid,  -- valid negative output
+      o_pixel_neg_out_error    => pixel_neg_out_error,  -- negative output detection
+      o_pixel_neg_out_pixel_id => pixel_neg_out_pixel_id  -- pixel id when a negative output is detected
+      );
+
+  o_tes_pixel_neg_out_valid    <= pixel_neg_out_valid;
+  o_tes_pixel_neg_out_error    <= pixel_neg_out_error;
+  o_tes_pixel_neg_out_pixel_id <= pixel_neg_out_pixel_id;
 
   ---------------------------------------------------------------------
   -- Error latching

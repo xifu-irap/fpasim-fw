@@ -217,6 +217,9 @@ entity regdecode_top is
     o_reg_make_eof                    : out std_logic;  -- last sample
     o_reg_make_pulse_valid            : out std_logic;  -- register make_pulse valid
     o_reg_make_pulse                  : out std_logic_vector(31 downto 0);  -- register make_pulse value
+    -- fpasim_status
+    i_reg_fpasim_status_valid         : in  std_logic;
+    i_reg_fpasim_status               : in std_logic_vector(31 downto 0);
 
     -- recording
     ---------------------------------------------------------------------
@@ -273,6 +276,7 @@ architecture RTL of regdecode_top is
   signal usb_wireout_error_delay         : std_logic_vector(31 downto 0);
   signal usb_wireout_ra_delay            : std_logic_vector(31 downto 0);
   signal usb_wireout_tes_conf            : std_logic_vector(31 downto 0);
+  signal usb_wireout_fpasim_status       : std_logic_vector(31 downto 0);
   signal usb_wireout_debug_ctrl          : std_logic_vector(31 downto 0);
   signal usb_wireout_firmware_id         : std_logic_vector(31 downto 0);
   signal usb_wireout_firmware_version    : std_logic_vector(31 downto 0);
@@ -504,6 +508,15 @@ architecture RTL of regdecode_top is
   signal make_pulse_errors : std_logic_vector(15 downto 0);
   signal make_pulse_status : std_logic_vector(7 downto 0);
 
+  ---------------------------------------------------------------------
+  -- wire: fpasim_status
+  ---------------------------------------------------------------------
+
+  signal fpasim_status_valid  : std_logic;
+  signal fpasim_status        : std_logic_vector(i_reg_fpasim_status'range);
+  signal fpasim_status_errors : std_logic_vector(15 downto 0);
+  signal fpasim_status_status : std_logic_vector(7 downto 0);
+
 
   ---------------------------------------------------------------------
   -- wire/pipe: recording register
@@ -589,6 +602,7 @@ begin
       i_usb_wireout_error_delay     => usb_wireout_error_delay,
       i_usb_wireout_ra_delay        => usb_wireout_ra_delay,
       i_usb_wireout_tes_conf        => usb_wireout_tes_conf,
+      i_usb_wireout_fpasim_status   => usb_wireout_fpasim_status,
 
       i_usb_wireout_debug_ctrl          => usb_wireout_debug_ctrl,
       i_usb_wireout_firmware_id         => usb_wireout_firmware_id,
@@ -1094,6 +1108,42 @@ begin
   o_reg_make_pulse       <= make_pulse_data_tmp2;
 
   ---------------------------------------------------------------------
+  -- fpasim_status
+  ---------------------------------------------------------------------
+  inst_regdecode_wire_rd_fpasim_status : entity work.regdecode_wire_rd
+    generic map(
+      g_DATA_WIDTH_OUT => i_reg_fpasim_status'length  -- define the RAM address width
+      )
+    port map(
+      ---------------------------------------------------------------------
+      -- from the regdecode: input @i_clk
+      ---------------------------------------------------------------------
+      i_clk         => i_out_clk,       -- clock
+      i_rst         => i_out_rst,       -- rst
+      -- data
+      i_data_valid  => i_reg_fpasim_status_valid,  -- data valid
+      i_data        => i_reg_fpasim_status,        -- data value
+      ---------------------------------------------------------------------
+      -- from/to the user:  @i_out_clk
+      ---------------------------------------------------------------------
+      i_out_clk     => usb_clk,         -- output clock
+      i_rst_status  => usb_rst_status,  -- reset error flag(s)
+      i_debug_pulse => usb_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+      -- ram: wr
+      o_data_valid  => fpasim_status_valid,        -- data valid
+      o_data        => fpasim_status,   -- data
+      ---------------------------------------------------------------------
+      -- errors/status @ i_out_clk
+      ---------------------------------------------------------------------
+      o_errors      => fpasim_status_errors,       -- output errors
+      o_status      => fpasim_status_status        -- output status
+      );
+
+-- output: to USB
+  ---------------------------------------------------------------------
+  usb_wireout_fpasim_status <= fpasim_status;
+
+  ---------------------------------------------------------------------
   -- recording register
   ---------------------------------------------------------------------
   rec_valid_tmp0 <= trig_rec_valid;
@@ -1181,7 +1231,7 @@ begin
   -- regdecode errors/status
   ---------------------------------------------------------------------
   -- errors
-  regdecode_errors6(31 downto 16) <= (others => '0');
+  regdecode_errors6(31 downto 16) <= fpasim_status_errors;  -- fpasim_status register: output errors
   regdecode_errors6(15 downto 0)  <= i_spi_errors;  -- spi register: output errors
 
   regdecode_errors5(31 downto 16) <= rec_errors1;  -- rec_conf0 register: output errors
@@ -1204,9 +1254,9 @@ begin
 
   -- status
   regdecode_status6(31 downto 24) <= (others => '0');
-  regdecode_status6(23 downto 16) <= (others => '0');
+  regdecode_status6(23 downto 16) <= fpasim_status_status;  -- fpasim_status register: output errors
   regdecode_status6(15 downto 8)  <= (others => '0');
-  regdecode_status6(7 downto 0)   <= i_spi_status;  -- spi register: output status
+  regdecode_status6(7 downto 0)   <= i_spi_status;  -- spi register: output errors
 
   regdecode_status5(31 downto 24) <= (others => '0');
   regdecode_status5(23 downto 16) <= rec_status1;  -- rec_ctrl register: output status

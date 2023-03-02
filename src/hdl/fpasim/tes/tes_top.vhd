@@ -17,14 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   tes_top.vhd 
+--    @file                   tes_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 --
--- This module is the top_level of the tes funcion
+--    This module is the top_level of the tes funcion
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -113,6 +113,13 @@ entity tes_top is
     o_frame_id     : out std_logic_vector(g_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  -- output frame id
 
     ---------------------------------------------------------------------
+    -- output: detect negative output value
+    ---------------------------------------------------------------------
+    o_tes_pixel_neg_out_valid    : out std_logic;
+    o_tes_pixel_neg_out_error    : out std_logic;
+    o_tes_pixel_neg_out_pixel_id : out std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
+
+    ---------------------------------------------------------------------
     -- errors/status
     ---------------------------------------------------------------------
     o_errors                     : out std_logic_vector(15 downto 0);  -- output errors
@@ -153,6 +160,10 @@ architecture RTL of tes_top is
   signal pixel_id1     : std_logic_vector(o_pixel_id'range);
   signal pixel_valid1  : std_logic;
   signal pixel_result1 : std_logic_vector(o_pixel_result'range);
+
+  signal tes_pixel_neg_out_valid1    : std_logic;
+  signal tes_pixel_neg_out_error1    : std_logic;
+  signal tes_pixel_neg_out_pixel_id1 : std_logic_vector(o_tes_pixel_neg_out_pixel_id'range);
 
   signal status1 : std_logic_vector(o_status'range);
   signal errors1 : std_logic_vector(o_errors'range);
@@ -285,6 +296,12 @@ begin
       o_pixel_id                   => pixel_id1,   -- id of the pixel
       o_pixel_valid                => pixel_valid1,   -- valid pixel result
       o_pixel_result               => pixel_result1,  -- pixel result
+      ---------------------------------------------------------------------
+      -- output: detect negative output value
+      --------------------------------------------------------------------- 
+      o_tes_pixel_neg_out_valid    => tes_pixel_neg_out_valid1,
+      o_tes_pixel_neg_out_error    => tes_pixel_neg_out_error1,
+      o_tes_pixel_neg_out_pixel_id => tes_pixel_neg_out_pixel_id1,
       -----------------------------------------------------------------
       -- errors/status
       -----------------------------------------------------------------
@@ -315,6 +332,10 @@ begin
   frame_id1  <= data_pipe_tmp1(c_IDX0_H downto c_IDX0_L);
 
   ---------------------------------------------------------------------
+  -- negative output detection
+  ---------------------------------------------------------------------
+
+  ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
   -- rd pulse shape
@@ -335,6 +356,11 @@ begin
   o_frame_sof             <= frame_sof1;
   o_frame_eof             <= frame_eof1;
   o_frame_id              <= frame_id1;
+
+  -- output: detect negative output value
+  o_tes_pixel_neg_out_valid    <= tes_pixel_neg_out_valid1;
+  o_tes_pixel_neg_out_error    <= tes_pixel_neg_out_error1;
+  o_tes_pixel_neg_out_pixel_id <= tes_pixel_neg_out_pixel_id1;
 
   -- errors/status
   o_errors <= errors1;

@@ -216,7 +216,7 @@ package pkg_fpasim is
 
   -- result: steady state - (pulse heigth*pulse shape)
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_TES_MULT_SUB_Q_M_S     : positive := 16;
+  constant pkg_TES_MULT_SUB_Q_M_S     : positive := 17;
   -- user-defined: number of fraction bits
   constant pkg_TES_MULT_SUB_Q_N_S     : natural  := 0;
   -- auto-computed: bus width of the TES_Q_S

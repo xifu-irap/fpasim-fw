@@ -240,6 +240,9 @@ architecture RTL of fpasim_top is
   signal reg_make_pulse_valid    : std_logic;
   signal reg_make_pulse          : std_logic_vector(31 downto 0);
   signal reg_make_pulse_ready    : std_logic;
+  -- fpasim_status register
+  signal reg_fpasim_status_valid : std_logic;
+  signal reg_fpasim_status       : std_logic_vector(31 downto 0);
 
   -- recording register
   signal reg_rec_valid : std_logic;
@@ -287,6 +290,11 @@ architecture RTL of fpasim_top is
   signal frame_sof1    : std_logic;
   signal frame_eof1    : std_logic;
   signal frame_id1     : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);
+
+  signal tes_pixel_neg_out_valid1    : std_logic;
+  signal tes_pixel_neg_out_error1    : std_logic;
+  signal tes_pixel_neg_out_pixel_id1 : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
+
   signal tes_errors0 : std_logic_vector(15 downto 0);
   signal tes_status0 : std_logic_vector(7 downto 0);
 
@@ -500,6 +508,10 @@ begin
       o_reg_make_pulse                  => reg_make_pulse,
       i_reg_make_pulse_ready            => reg_make_pulse_ready,
 
+      -- fpasim_status
+      i_reg_fpasim_status_valid => reg_fpasim_status_valid,
+      i_reg_fpasim_status       => reg_fpasim_status,
+
       -- recording: register
       o_reg_rec_valid => reg_rec_valid,
       o_reg_rec_ctrl  => reg_rec_ctrl,
@@ -561,6 +573,12 @@ begin
   -- debug_ctrl register
   debug_pulse <= reg_debug_ctrl(pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H);
   rst_status  <= reg_debug_ctrl(pkg_DEBUG_CTRL_RST_STATUS_IDX_H);
+
+  -- fpasim_status register
+  reg_fpasim_status_valid        <= tes_pixel_neg_out_valid1;
+  reg_fpasim_status(31 downto 9) <= (others => '0');
+  reg_fpasim_status(8)           <= tes_pixel_neg_out_error1;
+  reg_fpasim_status(7 downto 0)  <= std_logic_vector(resize(unsigned(tes_pixel_neg_out_pixel_id1), 8));
 
   -- recording:
   rec_adc_cmd_valid             <= reg_rec_valid and reg_rec_ctrl(pkg_REC_CTRL_ADC_EN_IDX_H);
@@ -764,6 +782,12 @@ begin
       o_frame_sof                  => frame_sof1,
       o_frame_eof                  => frame_eof1,
       o_frame_id                   => frame_id1,
+      ---------------------------------------------------------------------
+      -- output: detect negative output value
+      ---------------------------------------------------------------------
+      o_tes_pixel_neg_out_valid    => tes_pixel_neg_out_valid1,
+      o_tes_pixel_neg_out_error    => tes_pixel_neg_out_error1,
+      o_tes_pixel_neg_out_pixel_id => tes_pixel_neg_out_pixel_id1,
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------
@@ -1130,6 +1154,7 @@ begin
         clk => i_clk,
 
         -- probe0
+        probe0(35)          => tes_pixel_neg_out_valid1,
         probe0(34)          => fifo_rec_adc_rd,
         probe0(33)          => fifo_rec_adc_sof,
         probe0(32)          => fifo_rec_adc_eof,
@@ -1181,6 +1206,8 @@ begin
         probe5(15 downto 0)  => debug_sample_frame_cnt_tmp,
 
         -- probe6
+        probe6(32)           => tes_pixel_neg_out_error1,
+        probe6(31 downto 26) => tes_pixel_neg_out_pixel_id1,
         probe6(25 downto 10) => cmd_pulse_height,
         probe6(9 downto 4)   => cmd_pixel_id,
         probe6(3 downto 0)   => cmd_time_shift,

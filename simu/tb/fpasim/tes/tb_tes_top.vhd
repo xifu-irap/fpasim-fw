@@ -1039,7 +1039,7 @@ begin
       --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
       --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
       --  data type = "STD_VEC" => no data convertion before writing in the output file
-      i_DATA0_TYP      => "UINT",
+      i_DATA0_TYP      => "INT",
       ---------------------------------------------------------------------
       -- Vunit Scoreboard objects
       ---------------------------------------------------------------------

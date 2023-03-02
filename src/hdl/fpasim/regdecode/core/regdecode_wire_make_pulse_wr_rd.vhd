@@ -86,7 +86,8 @@ entity regdecode_wire_make_pulse_wr_rd is
 end entity regdecode_wire_make_pulse_wr_rd;
 
 architecture RTL of regdecode_wire_make_pulse_wr_rd is
-  constant c_WR_TO_RD_DELAY : integer := 0;
+  constant c_WR_TO_RD_DELAY    : integer := 0;
+  constant c_FIFO_READ_LATENCY : integer := 2;
 
   ---------------------------------------------------------------------
   -- cross clock domain: redecode to user
@@ -181,8 +182,8 @@ begin
   inst_fifo_async_with_error_prog_full_wr_count_regdecode_to_user : entity work.fifo_async_with_error_prog_full_wr_count
     generic map(
       g_CDC_SYNC_STAGES     => 2,
-      g_FIFO_MEMORY_TYPE    => "distributed",
-      g_FIFO_READ_LATENCY   => 1,
+      g_FIFO_MEMORY_TYPE    => "auto",
+      g_FIFO_READ_LATENCY   => c_FIFO_READ_LATENCY,
       g_FIFO_WRITE_DEPTH    => c_FIFO_DEPTH0,
       g_PROG_FULL_THRESH    => c_FIFO_PROG_FULL0,
       g_READ_DATA_WIDTH     => data_tmp0'length,
@@ -276,8 +277,8 @@ begin
   inst_fifo_async_with_error_user_to_regdecode : entity work.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
-      g_FIFO_MEMORY_TYPE  => "distributed",
-      g_FIFO_READ_LATENCY => 1,
+      g_FIFO_MEMORY_TYPE  => "auto",
+      g_FIFO_READ_LATENCY => c_FIFO_READ_LATENCY,
       g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH2,
       g_READ_DATA_WIDTH   => data_tmp2'length,
       g_READ_MODE         => "std",

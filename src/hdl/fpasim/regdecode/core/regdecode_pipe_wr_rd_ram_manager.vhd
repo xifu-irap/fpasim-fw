@@ -113,6 +113,8 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   constant c_DELAY_OUT      : integer := 1;
   constant c_ADDR_DELAY_OUT : integer := c_DELAY_OUT + g_RAM_RD_LATENCY;
 
+  constant c_FIFO_READ_LATENCY : integer := 2;
+
   ---------------------------------------------------------------------
   -- fsm
   ---------------------------------------------------------------------
@@ -405,8 +407,8 @@ begin
   inst_fifo_async_with_error_regdecode_to_user : entity work.fifo_async_with_error
     generic map(
       g_CDC_SYNC_STAGES   => 2,
-      g_FIFO_MEMORY_TYPE  => "distributed",
-      g_FIFO_READ_LATENCY => 1,
+      g_FIFO_MEMORY_TYPE  => "auto",
+      g_FIFO_READ_LATENCY => c_FIFO_READ_LATENCY,
       g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH0,
       g_READ_DATA_WIDTH   => data_tmp0'length,
       g_READ_MODE         => "std",
@@ -550,8 +552,8 @@ begin
   inst_fifo_async_with_error_prog_full_user_to_regdecode : entity work.fifo_async_with_error_prog_full
     generic map(
       g_CDC_SYNC_STAGES   => 2,
-      g_FIFO_MEMORY_TYPE  => "distributed",
-      g_FIFO_READ_LATENCY => 1,
+      g_FIFO_MEMORY_TYPE  => "auto",
+      g_FIFO_READ_LATENCY => c_FIFO_READ_LATENCY,
       g_FIFO_WRITE_DEPTH  => c_FIFO_DEPTH2,
       g_PROG_FULL_THRESH  => c_FIFO_PROG_FULL2,
       g_READ_DATA_WIDTH   => data_tmp2'length,

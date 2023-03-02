@@ -104,6 +104,8 @@ end entity regdecode_wire_errors;
 
 architecture RTL of regdecode_wire_errors is
 
+  constant c_FIFO_READ_LATENCY : integer := 2;
+
   constant c_NB_ERRORS : integer := 4;
   type t_errors is array (integer range <>) of std_logic_vector(i_reg_wire_errors0'range);
   signal errors_tmp0   : t_errors(0 to c_NB_ERRORS - 1);
@@ -195,8 +197,8 @@ begin
     inst_fifo_async_flag : entity work.fifo_async
       generic map(
         g_CDC_SYNC_STAGES   => 2,
-        g_FIFO_MEMORY_TYPE  => "distributed",
-        g_FIFO_READ_LATENCY => 1,
+        g_FIFO_MEMORY_TYPE  => "auto",
+        g_FIFO_READ_LATENCY => c_FIFO_READ_LATENCY,
         g_FIFO_WRITE_DEPTH  => 16,
         g_READ_DATA_WIDTH   => wr_din_flag(i)'length,
         g_READ_MODE         => "std",
@@ -271,8 +273,8 @@ begin
     inst_fifo_async_flag : entity work.fifo_async
       generic map(
         g_CDC_SYNC_STAGES   => 2,
-        g_FIFO_MEMORY_TYPE  => "distributed",
-        g_FIFO_READ_LATENCY => 1,
+        g_FIFO_MEMORY_TYPE  => "auto",
+        g_FIFO_READ_LATENCY => c_FIFO_READ_LATENCY,
         g_FIFO_WRITE_DEPTH  => 16,
         g_READ_DATA_WIDTH   => wr_din_flag(i)'length,
         g_READ_MODE         => "std",
