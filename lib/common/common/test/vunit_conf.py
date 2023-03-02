@@ -538,6 +538,7 @@ class VunitConf:
 
         filepath_list.append(str(Path(base_path, 'system_fpasim_top_ila/sim/system_fpasim_top_ila.vhd')))
         filepath_list.append(str(Path(base_path, 'fpasim_top_ila_0/sim/fpasim_top_ila_0.vhd')))
+        filepath_list.append(str(Path(base_path, 'fpasim_top_vio_0/sim/fpasim_top_vio_0.vhd')))
         
         filepath_list.append(str(Path(base_path, 'fpasim_regdecode_top_ila_0/sim/fpasim_regdecode_top_ila_0.vhd')))
         filepath_list.append(str(Path(base_path, 'fpasim_regdecode_top_ila_1/sim/fpasim_regdecode_top_ila_1.vhd')))

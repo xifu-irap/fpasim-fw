@@ -18,76 +18,76 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   regdecode_top.vhd 
+--    @file                   regdecode_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
---!
---!   This module manages the writing/reading of the registers/RAMs.
---!   The module is composed of 4 main sections:
---!     . The RAM access are done by using the Opal Kelly pipe_in/pipe_out
---!        . de-multiplexes the input data flow (i_addr/i_data) in order to configure each RAM
---!        . multiplexe the reading of each RAM into the output data flow (o_fifo_addr/o_fifo_data)
---!        . for each ram, it automatically generates read address in order to retrieve the RAM contents by taking into account
---!          the different RAM depth.
---!     . The common register access are done by using the Opal Kelly wire_in/wire_out and trig_in
---!        . on the trig signal, common registers are synchronized from a source clock domain to a destination clock domain.
---!        . Then, the output synchronized registers are read back from the destination clock domain to the source clock domain.
---!     . The command register access are done by using the Opal Kelly wire_in/wire_out and trig_in
---!        . it analyses the field of the i_make_pulse register. 2 behaviour are managed by the FSM:
---!           1. if pixel_all_tmp = '0' then no change is done on the i_make_pulse register value.
---!           2. if pixel_out_tmp = '1', then the FSM will automatically generate (i_pixel_nb + 1) words from the i_make_pulse value.
---!           All field of the generated words will be identical except the pixel_id field. For each generated word, the pixel_id field
---!           will be incremented from 0 to i_pixel_nb.
---!     . The errors/status access are done by using the Opal Kelly wire_in/wire_out and trig_out
---!       . it synchronizes the input errors/status from the i_clk source clock domain to the i_out_clk destination clock domain.
---!       Then, it generates a common error pulse signal on the first error detection.
---!
---!
---!   The RAM configuration principle is as follows:
---!       @i_clk source clock domain                                         |    @ i_out_clk destination clock domain
---!                                                        |--- fsm ---- fifo_async -------------- RAM0
---!                                                        |--- fsm ---- fifo_async ----------- RAM1 |
---!          i_addr/i_data    ----> addr_decode----------> |--- fsm ---- fifo_async ------- RAM2  |  |
---!                                                        |--- fsm ---- fifo_async ---- RAM3 |   |  |
---!                                                        |--- fsm ---- fifo_async - RAM4 |  |   |  |
---!                                                                                    |   |  |   |  |
---!                                              |------------------------fifo_async----   |  |   |  |                        
---!                                              |------------------------fifo_async--------  |   |  |                          
---!         o_fifo_addr/o_fifo_data <--fsm <---- |------------------------fifo_async----------    |  |
---!                                              |------------------------fifo_async--------------   | 
---!                                              |------------------------fifo_async-----------------
---!  The common register architecture principle is as follows:
---!        @i_clk clock domain        |                   @ i_out_clk clock domain
---!        i_data ---------------> async_fifo -----------> o_data
---!                                                      |
---!        o_fifo_data <---------  async_fifo <---------- 
---!
---!
---! The command register architecture principle is as follows:
---!        @i_clk source clock domain              |                   @ i_out_clk destination clock domain
---!        i_make_pulse_valid-------FSM -----> async_fifo -----------> o_data
---!                                                                      |
---!        o_fifo_data <----------------------  async_fifo <------------- 
---!
---!
---! The error/status register architecture principle is as follows:
---!       @i_clk destination clock domain                                         |                                @ i_out_clk source clock domain
---!                                                   |<-------------  single_bit_array_synchronizer <------------- i_errors7/i_status7
---!                                                   |<-------------  single_bit_array_synchronizer <-------------         .
---!        o_errors/o_status <--------- select output |<-------------  single_bit_array_synchronizer <-------------         .
---!                                                   |<-------------  single_bit_array_synchronizer <-------------         .
---!                                                   |<-------------  single_bit_array_synchronizer <------------- i_errors0/i_status0
---!
---!                                                                        |<-------------  /=0 ?    <------------- errors7 synchronized
---!                                                                        |<-------------  /=0 ?    <-------------         .
---!        errors_valid <-- rising_edge detection <-- /= last value? ------|<-------------  /=0 ?    <-------------         .
---!                                                                        |<-------------  /=0 ?    <-------------         .
---!                                                                        |<-------------  /=0 ?    <------------- errors0 synchronized
---!   Note: 
---!      . The module manages the clock domain crossing
+--    @details                
+-- 
+--    This module manages the writing/reading of the registers/RAMs.
+--    The module is composed of 4 main sections:
+--      . The RAM access are done by using the Opal Kelly pipe_in/pipe_out
+--         . de-multiplexes the input data flow (i_addr/i_data) in order to configure each RAM
+--         . multiplexe the reading of each RAM into the output data flow (o_fifo_addr/o_fifo_data)
+--         . for each ram, it automatically generates read address in order to retrieve the RAM contents by taking into account
+--           the different RAM depth.
+--      . The common register access are done by using the Opal Kelly wire_in/wire_out and trig_in
+--         . on the trig signal, common registers are synchronized from a source clock domain to a destination clock domain.
+--         . Then, the output synchronized registers are read back from the destination clock domain to the source clock domain.
+--      . The command register access are done by using the Opal Kelly wire_in/wire_out and trig_in
+--         . it analyses the field of the i_make_pulse register. 2 behaviour are managed by the FSM:
+--            1. if pixel_all_tmp = '0' then no change is done on the i_make_pulse register value.
+--            2. if pixel_out_tmp = '1', then the FSM will automatically generate (i_pixel_nb + 1) words from the i_make_pulse value.
+--            All field of the generated words will be identical except the pixel_id field. For each generated word, the pixel_id field
+--            will be incremented from 0 to i_pixel_nb.
+--      . The errors/status access are done by using the Opal Kelly wire_in/wire_out and trig_out
+--        . it synchronizes the input errors/status from the i_clk source clock domain to the i_out_clk destination clock domain.
+--        Then, it generates a common error pulse signal on the first error detection.
+-- 
+-- 
+--    The RAM configuration principle is as follows:
+--        @i_clk source clock domain                                         |    @ i_out_clk destination clock domain
+--                                                         |--- fsm ---- fifo_async -------------- RAM0
+--                                                         |--- fsm ---- fifo_async ----------- RAM1 |
+--           i_addr/i_data    ----> addr_decode----------> |--- fsm ---- fifo_async ------- RAM2  |  |
+--                                                         |--- fsm ---- fifo_async ---- RAM3 |   |  |
+--                                                         |--- fsm ---- fifo_async - RAM4 |  |   |  |
+--                                                                                     |   |  |   |  |
+--                                               |------------------------fifo_async----   |  |   |  |                        
+--                                               |------------------------fifo_async--------  |   |  |                          
+--          o_fifo_addr/o_fifo_data <--fsm <---- |------------------------fifo_async----------    |  |
+--                                               |------------------------fifo_async--------------   | 
+--                                               |------------------------fifo_async-----------------
+--   The common register architecture principle is as follows:
+--         @i_clk clock domain        |                   @ i_out_clk clock domain
+--         i_data ---------------> async_fifo -----------> o_data
+--                                                       |
+--         o_fifo_data <---------  async_fifo <---------- 
+-- 
+-- 
+--  The command register architecture principle is as follows:
+--         @i_clk source clock domain              |                   @ i_out_clk destination clock domain
+--         i_make_pulse_valid-------FSM -----> async_fifo -----------> o_data
+--                                                                       |
+--         o_fifo_data <----------------------  async_fifo <------------- 
+-- 
+-- 
+--  The error/status register architecture principle is as follows:
+--        @i_clk destination clock domain                                         |                                @ i_out_clk source clock domain
+--                                                    |<-------------  single_bit_array_synchronizer <------------- i_errors7/i_status7
+--                                                    |<-------------  single_bit_array_synchronizer <-------------         .
+--         o_errors/o_status <--------- select output |<-------------  single_bit_array_synchronizer <-------------         .
+--                                                    |<-------------  single_bit_array_synchronizer <-------------         .
+--                                                    |<-------------  single_bit_array_synchronizer <------------- i_errors0/i_status0
+-- 
+--                                                                         |<-------------  /=0 ?    <------------- errors7 synchronized
+--                                                                         |<-------------  /=0 ?    <-------------         .
+--         errors_valid <-- rising_edge detection <-- /= last value? ------|<-------------  /=0 ?    <-------------         .
+--                                                                         |<-------------  /=0 ?    <-------------         .
+--                                                                         |<-------------  /=0 ?    <------------- errors0 synchronized
+--    Note: 
+--       . The module manages the clock domain crossing
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -114,37 +114,38 @@ entity regdecode_top is
     ---------------------------------------------------------------------
     -- from/to the user @usb_clk
     ---------------------------------------------------------------------
-    o_usb_clk             : out std_logic;  -- clock @usb_clk
-    o_usb_rst_status        : out std_logic; -- reset error flag(s)
-    o_usb_debug_pulse       : out std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    o_usb_clk         : out std_logic;  -- clock @usb_clk
+    o_usb_rst_status  : out std_logic;  -- reset error flag(s)
+    o_usb_debug_pulse : out std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     -- spi: tx
     o_reg_spi_valid   : out std_logic;  -- valid spi_wr_data and spi_ctrl register
     o_reg_spi_ctrl    : out std_logic_vector(31 downto 0);  -- spi_ctrl register value
-    o_reg_spi_conf    : out std_logic_vector(31 downto 0);  -- spi_ctrl register value
+    o_reg_spi_conf0   : out std_logic_vector(31 downto 0);  -- spi_conf0 register value
+    o_reg_spi_conf1   : out std_logic_vector(31 downto 0);  -- spi_conf1 register value
     o_reg_spi_wr_data : out std_logic_vector(31 downto 0);  -- spi_wr_data register value
 
     -- spi: rx
-    i_reg_spi_rd_data_valid : in std_logic;  -- to connect
+    i_reg_spi_rd_data_valid : in std_logic;                      -- to connect
     i_reg_spi_rd_data       : in std_logic_vector(31 downto 0);  -- spi_rd_data register value
     -- spi: status
     i_reg_spi_status        : in std_logic_vector(31 downto 0);  -- spi_status register value
 
-    i_spi_errors: in std_logic_vector(15 downto 0);
-    i_spi_status: in std_logic_vector(7 downto 0);
+    i_spi_errors : in  std_logic_vector(15 downto 0);
+    i_spi_status : in  std_logic_vector(7 downto 0);
     -- to/from reset_top
-    i_usb_rst : in std_logic;               -- reset
-    o_usb_rst : out std_logic;               -- reset
+    i_usb_rst    : in  std_logic;                     -- reset
+    o_usb_rst    : out std_logic;                     -- reset
     ---------------------------------------------------------------------
     -- from the board
     ---------------------------------------------------------------------
-    i_board_id : in std_logic_vector(7 downto 0);  -- board id
+    i_board_id   : in  std_logic_vector(7 downto 0);  -- board id
 
     ---------------------------------------------------------------------
     -- from/to the user: @i_out_clk
     ---------------------------------------------------------------------
-    i_out_rst     : in std_logic;       -- reset (user side)
-    i_out_clk     : in std_logic;       -- clock (user side)
+    i_out_rst : in std_logic;           -- reset (user side)
+    i_out_clk : in std_logic;           -- clock (user side)
 
     -- RAM configuration 
     ---------------------------------------------------------------------
@@ -248,33 +249,6 @@ entity regdecode_top is
 end entity regdecode_top;
 
 architecture RTL of regdecode_top is
-  -- spi_valid
-  constant c_TRIGIN_SPI_VALID_IDX_H        : integer := pkg_TRIGIN_SPI_VALID_IDX_H;
-  -- rec_valid
-  constant c_TRIGIN_REC_VALID_IDX_H        : integer := pkg_TRIGIN_REC_VALID_IDX_H;
-  -- debug_valid
-  constant c_TRIGIN_DEBUG_VALID_IDX_H      : integer := pkg_TRIGIN_DEBUG_VALID_IDX_H;
-  -- ctrl_valid
-  constant c_TRIGIN_CTRL_VALID_IDX_H       : integer := pkg_TRIGIN_CTRL_VALID_IDX_H;
-  -- read_all
-  constant c_TRIGIN_READ_ALL_VALID_IDX_H   : integer := pkg_TRIGIN_READ_ALL_VALID_IDX_H;
-  -- make_pulse valid
-  constant c_TRIGIN_MAKE_PULSE_VALID_IDX_H : integer := pkg_TRIGIN_MAKE_PULSE_VALID_IDX_H;
-  -- reg_valid
-  constant c_TRIGIN_REG_VALID_IDX_H        : integer := pkg_TRIGIN_REG_VALID_IDX_H;
-
-  -- firwmare id
-  constant c_FIRMWARE_ID      : std_logic_vector(31 downto 0) := pkg_FIRMWARE_ID;
-  -- firmware version
-  constant c_FIRMWARE_VERSION : std_logic_vector(31 downto 0) := pkg_FIRMWARE_VERSION;
-
-  constant c_TES_CONF_PIXEL_NB_IDX_H : integer := pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H;
-  constant c_TES_CONF_PIXEL_NB_IDX_L : integer := pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L;
-  constant c_TES_CONF_PIXEL_NB_WIDTH : integer := pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH;
-
-  constant c_ERROR_SEL_IDX_H : integer := pkg_ERROR_SEL_IDX_H;
-  constant c_ERROR_SEL_IDX_L : integer := pkg_ERROR_SEL_IDX_L;
-  constant c_ERROR_SEL_WIDTH : integer := pkg_ERROR_SEL_WIDTH;
 
   ---------------------------------------------------------------------
   -- usb
@@ -312,13 +286,14 @@ architecture RTL of regdecode_top is
   signal usb_wireout_rec_fifo_data_count : std_logic_vector(31 downto 0);
   -- spi: register
   signal usb_wireout_spi_ctrl            : std_logic_vector(31 downto 0);
-  signal usb_wireout_spi_conf            : std_logic_vector(31 downto 0);
+  signal usb_wireout_spi_conf0           : std_logic_vector(31 downto 0);
+  signal usb_wireout_spi_conf1           : std_logic_vector(31 downto 0);
   signal usb_wireout_spi_wr_data         : std_logic_vector(31 downto 0);
 
   -- errors/status
-  signal usb_wireout_sel_errors          : std_logic_vector(31 downto 0);
-  signal usb_wireout_errors              : std_logic_vector(31 downto 0);
-  signal usb_wireout_status              : std_logic_vector(31 downto 0);
+  signal usb_wireout_sel_errors : std_logic_vector(31 downto 0);
+  signal usb_wireout_errors     : std_logic_vector(31 downto 0);
+  signal usb_wireout_status     : std_logic_vector(31 downto 0);
 
   -- to the user
   ---------------------------------------------------------------------
@@ -345,7 +320,8 @@ architecture RTL of regdecode_top is
 
   -- spi:register
   signal usb_wirein_spi_ctrl    : std_logic_vector(31 downto 0);
-  signal usb_wirein_spi_conf    : std_logic_vector(31 downto 0);
+  signal usb_wirein_spi_conf0   : std_logic_vector(31 downto 0);
+  signal usb_wirein_spi_conf1   : std_logic_vector(31 downto 0);
   signal usb_wirein_spi_wr_data : std_logic_vector(31 downto 0);
 
   -- debug: register
@@ -506,7 +482,7 @@ architecture RTL of regdecode_top is
   ---------------------------------------------------------------------
   -- wire: make pulse register
   ---------------------------------------------------------------------
-  signal pixel_nb                      : std_logic_vector(c_TES_CONF_PIXEL_NB_WIDTH - 1 downto 0);
+  signal pixel_nb                      : std_logic_vector(pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH - 1 downto 0);
   signal make_pulse_data_valid_tmp0    : std_logic;
   signal make_pulse_data_tmp0          : std_logic_vector(usb_wirein_make_pulse'range);
   signal make_pulse_wr_data_count_tmp0 : std_logic_vector(15 downto 0);
@@ -544,7 +520,7 @@ architecture RTL of regdecode_top is
   signal reg_fifo_rec_adc_rd : std_logic;
 
   -- to usb: register
-  signal usb_rec_valid              : std_logic; -- @suppress "signal usb_rec_valid is never read"
+  signal usb_rec_valid              : std_logic;  -- @suppress "signal usb_rec_valid is never read"
   signal usb_rec_ctrl               : std_logic_vector(usb_wireout_rec_ctrl'range);
   signal usb_rec_conf0              : std_logic_vector(usb_wireout_rec_conf0'range);
   -- to usb: fifo
@@ -564,7 +540,7 @@ architecture RTL of regdecode_top is
   ---------------------------------------------------------------------
   -- wire: errors registers
   ---------------------------------------------------------------------
-  signal error_sel : std_logic_vector(c_ERROR_SEL_WIDTH - 1 downto 0);
+  signal error_sel : std_logic_vector(pkg_ERROR_SEL_WIDTH - 1 downto 0);
 
   signal wire_errors_valid : std_logic;
   signal wire_errors       : std_logic_vector(i_reg_wire_errors0'range);
@@ -591,28 +567,29 @@ begin
   inst_usb_opal_kelly : entity work.usb_opal_kelly
     port map(
       --  Opal Kelly inouts --
-      i_okUH                            => i_okUH,
-      o_okHU                            => o_okHU,
-      b_okUHU                           => b_okUHU,
-      b_okAA                            => b_okAA,
+      i_okUH                        => i_okUH,
+      o_okHU                        => o_okHU,
+      b_okUHU                       => b_okUHU,
+      b_okAA                        => b_okAA,
       ---------------------------------------------------------------------
       -- from the user @o_usb_clk
       ---------------------------------------------------------------------
       -- pipe
-      o_usb_pipeout_fifo_rd             => usb_pipeout_fifo_rd,
-      i_usb_pipeout_fifo_data           => usb_pipeout_fifo_data,
-      i_usb_wireout_fifo_data_count     => usb_wireout_fifo_data_count,
+      o_usb_pipeout_fifo_rd         => usb_pipeout_fifo_rd,
+      i_usb_pipeout_fifo_data       => usb_pipeout_fifo_data,
+      i_usb_wireout_fifo_data_count => usb_wireout_fifo_data_count,
       -- trig
-      i_usb_trigout_data                => usb_trigout_data,
+      i_usb_trigout_data            => usb_trigout_data,
       -- wire
-      i_usb_wireout_ctrl                => usb_wireout_ctrl,
-      i_usb_wireout_make_pulse          => usb_wireout_make_pulse,
-      i_usb_wireout_fpasim_gain         => usb_wireout_fpasim_gain,
-      i_usb_wireout_mux_sq_fb_delay     => usb_wireout_mux_sq_fb_delay,
-      i_usb_wireout_amp_sq_of_delay     => usb_wireout_amp_sq_of_delay,
-      i_usb_wireout_error_delay         => usb_wireout_error_delay,
-      i_usb_wireout_ra_delay            => usb_wireout_ra_delay,
-      i_usb_wireout_tes_conf            => usb_wireout_tes_conf,
+      i_usb_wireout_ctrl            => usb_wireout_ctrl,
+      i_usb_wireout_make_pulse      => usb_wireout_make_pulse,
+      i_usb_wireout_fpasim_gain     => usb_wireout_fpasim_gain,
+      i_usb_wireout_mux_sq_fb_delay => usb_wireout_mux_sq_fb_delay,
+      i_usb_wireout_amp_sq_of_delay => usb_wireout_amp_sq_of_delay,
+      i_usb_wireout_error_delay     => usb_wireout_error_delay,
+      i_usb_wireout_ra_delay        => usb_wireout_ra_delay,
+      i_usb_wireout_tes_conf        => usb_wireout_tes_conf,
+
       i_usb_wireout_debug_ctrl          => usb_wireout_debug_ctrl,
       i_usb_wireout_firmware_id         => usb_wireout_firmware_id,
       i_usb_wireout_firmware_version    => usb_wireout_firmware_version,
@@ -626,7 +603,8 @@ begin
       i_usb_wireout_rec_fifo_data_count => usb_wireout_rec_fifo_data_count,  -- to connect
       -- spi: register
       i_usb_wireout_spi_ctrl            => usb_wireout_spi_ctrl,
-      i_usb_wireout_spi_conf            => usb_wireout_spi_conf,
+      i_usb_wireout_spi_conf0           => usb_wireout_spi_conf0,
+      i_usb_wireout_spi_conf1           => usb_wireout_spi_conf1,
       i_usb_wireout_spi_wr_data         => usb_wireout_spi_wr_data,
       i_usb_wireout_spi_rd_data         => i_reg_spi_rd_data,
       i_usb_wireout_spi_status          => i_reg_spi_status,
@@ -658,7 +636,8 @@ begin
       o_usb_wirein_rec_conf0       => usb_wirein_rec_conf0,
       -- spi: register
       o_usb_wirein_spi_ctrl        => usb_wirein_spi_ctrl,
-      o_usb_wirein_spi_conf        => usb_wirein_spi_conf,
+      o_usb_wirein_spi_conf0       => usb_wirein_spi_conf0,
+      o_usb_wirein_spi_conf1       => usb_wirein_spi_conf1,
       o_usb_wirein_spi_wr_data     => usb_wirein_spi_wr_data,
 
       -- debug
@@ -672,32 +651,34 @@ begin
   o_usb_clk         <= usb_clk;
   o_reg_spi_valid   <= trig_spi_valid;
   o_reg_spi_ctrl    <= usb_wirein_spi_ctrl;
-  o_reg_spi_conf    <= usb_wirein_spi_conf;
+  o_reg_spi_conf0   <= usb_wirein_spi_conf0;
+  o_reg_spi_conf1   <= usb_wirein_spi_conf1;
   o_reg_spi_wr_data <= usb_wirein_spi_wr_data;
 
   o_usb_rst_status  <= usb_rst_status;
-  o_usb_debug_pulse  <= usb_debug_pulse;
+  o_usb_debug_pulse <= usb_debug_pulse;
 
   -- loop back register value
   usb_wireout_spi_ctrl    <= usb_wirein_spi_ctrl;
-  usb_wireout_spi_conf    <= usb_wirein_spi_conf;
+  usb_wireout_spi_conf0   <= usb_wirein_spi_conf0;
+  usb_wireout_spi_conf1   <= usb_wirein_spi_conf1;
   usb_wireout_spi_wr_data <= usb_wirein_spi_wr_data;
 
   ---------------------------------------------------------------------
   -- get the firmware id
   ---------------------------------------------------------------------
-  usb_wireout_firmware_id      <= c_FIRMWARE_ID;
-  usb_wireout_firmware_version <= c_FIRMWARE_VERSION;
+  usb_wireout_firmware_id      <= pkg_FIRMWARE_ID;
+  usb_wireout_firmware_version <= pkg_FIRMWARE_VERSION;
   usb_wireout_board_id         <= std_logic_vector(resize(unsigned(i_board_id), usb_wireout_board_id'length));
 
   -- from trigin: extract bits signal
-  trig_spi_valid        <= usb_trigin_data(c_TRIGIN_SPI_VALID_IDX_H);
-  trig_rec_valid        <= usb_trigin_data(c_TRIGIN_REC_VALID_IDX_H);
-  trig_debug_valid      <= usb_trigin_data(c_TRIGIN_DEBUG_VALID_IDX_H);
-  trig_ctrl_valid       <= usb_trigin_data(c_TRIGIN_CTRL_VALID_IDX_H);
-  trig_rd_all_valid     <= usb_trigin_data(c_TRIGIN_READ_ALL_VALID_IDX_H);
-  trig_make_pulse_valid <= usb_trigin_data(c_TRIGIN_MAKE_PULSE_VALID_IDX_H);
-  trig_reg_valid        <= usb_trigin_data(c_TRIGIN_REG_VALID_IDX_H);
+  trig_spi_valid        <= usb_trigin_data(pkg_TRIGIN_SPI_VALID_IDX_H);
+  trig_rec_valid        <= usb_trigin_data(pkg_TRIGIN_REC_VALID_IDX_H);
+  trig_debug_valid      <= usb_trigin_data(pkg_TRIGIN_DEBUG_VALID_IDX_H);
+  trig_ctrl_valid       <= usb_trigin_data(pkg_TRIGIN_CTRL_VALID_IDX_H);
+  trig_rd_all_valid     <= usb_trigin_data(pkg_TRIGIN_READ_ALL_VALID_IDX_H);
+  trig_make_pulse_valid <= usb_trigin_data(pkg_TRIGIN_MAKE_PULSE_VALID_IDX_H);
+  trig_reg_valid        <= usb_trigin_data(pkg_TRIGIN_REG_VALID_IDX_H);
 
   ---------------------------------------------------------------------
   -- pipe management
@@ -718,7 +699,7 @@ begin
       -- input @i_clk
       ---------------------------------------------------------------------
       i_clk           => usb_clk,       -- clock
-      i_rst           => i_usb_rst,         -- reset
+      i_rst           => i_usb_rst,     -- reset
       i_rst_status    => usb_rst_status,
       i_debug_pulse   => usb_debug_pulse,
       -- from the trig in
@@ -980,7 +961,7 @@ begin
 
   -- output: to the user
   ---------------------------------------------------------------------
-   o_usb_rst      <= usb_wirein_ctrl(pkg_CTRL_RST_IDX_H);-- get the reset field from the ctrl register
+  o_usb_rst <= usb_wirein_ctrl(pkg_CTRL_RST_IDX_H);  -- get the reset field from the ctrl register
 
   o_reg_ctrl_valid <= ctrl_data_valid_tmp2;
   o_reg_ctrl       <= ctrl_data_tmp2;
@@ -1047,7 +1028,7 @@ begin
   ---------------------------------------------------------------------
   make_pulse_data_valid_tmp0 <= trig_make_pulse_valid;
   make_pulse_data_tmp0       <= usb_wirein_make_pulse;
-  pixel_nb                   <= usb_wirein_tes_conf(c_TES_CONF_PIXEL_NB_IDX_H downto c_TES_CONF_PIXEL_NB_IDX_L);   -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>) but was (<6>)"
+  pixel_nb                   <= usb_wirein_tes_conf(pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>) but was (<6>)"
 
   inst_regdecode_wire_make_pulse : entity work.regdecode_wire_make_pulse
     generic map(
@@ -1119,8 +1100,6 @@ begin
   rec_ctrl_tmp0  <= usb_wirein_rec_ctrl;
   rec_conf0_tmp0 <= usb_wirein_rec_conf0;
 
- 
-
   regdecode_recording_INST : entity work.regdecode_recording
     generic map(
       g_DATA_WIDTH => i_reg_fifo_rec_adc_data'length
@@ -1130,7 +1109,7 @@ begin
       -- from the regdecode/usb: input @i_clk
       ---------------------------------------------------------------------
       i_clk                        => usb_clk,         -- clock
-      i_rst                        => i_usb_rst,           -- reset
+      i_rst                        => i_usb_rst,       -- reset
       i_rst_status                 => usb_rst_status,  -- not connected  
       i_debug_pulse                => usb_debug_pulse,     -- not connected  
       -- data
@@ -1202,9 +1181,9 @@ begin
   -- regdecode errors/status
   ---------------------------------------------------------------------
   -- errors
-  regdecode_errors6(31 downto 16) <= (others => '0');  
+  regdecode_errors6(31 downto 16) <= (others => '0');
   regdecode_errors6(15 downto 0)  <= i_spi_errors;  -- spi register: output errors
-  
+
   regdecode_errors5(31 downto 16) <= rec_errors1;  -- rec_conf0 register: output errors
   regdecode_errors5(15 downto 0)  <= rec_errors0;  -- rec_ctrl/rec_conf0 register: output errors
 
@@ -1225,7 +1204,7 @@ begin
 
   -- status
   regdecode_status6(31 downto 24) <= (others => '0');
-  regdecode_status6(23 downto 16) <= (others => '0');  
+  regdecode_status6(23 downto 16) <= (others => '0');
   regdecode_status6(15 downto 8)  <= (others => '0');
   regdecode_status6(7 downto 0)   <= i_spi_status;  -- spi register: output status
 
@@ -1263,7 +1242,7 @@ begin
   ---------------------------------------------------------------------
   -- errors register
   ---------------------------------------------------------------------
-  error_sel <= usb_wirein_sel_errors(c_ERROR_SEL_IDX_H downto c_ERROR_SEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_SEL_WIDTH>) but was (<4>)"
+  error_sel <= usb_wirein_sel_errors(pkg_ERROR_SEL_IDX_H downto pkg_ERROR_SEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_SEL_WIDTH>) but was (<4>)"
   inst_regdecode_wire_errors : entity work.regdecode_wire_errors
     generic map(
       g_ERROR_SEL_WIDTH => error_sel'length
@@ -1324,8 +1303,8 @@ begin
 
   usb_trigout_data(31 downto 29) <= (others => '0');
   usb_trigout_data(28)           <= wire_errors_valid;
-  usb_trigout_data(27 downto 1) <= (others => '0');
-  usb_trigout_data(0)           <= i_reg_spi_rd_data_valid;
+  usb_trigout_data(27 downto 1)  <= (others => '0');
+  usb_trigout_data(0)            <= i_reg_spi_rd_data_valid;
 
 
 
@@ -1337,64 +1316,65 @@ begin
   begin
 
 
-     inst_fpasim_regdecode_top_ila_0 : entity work.fpasim_regdecode_top_ila_0
-       port map(
-         clk                  => usb_clk,
-         -- probe0
-         probe0(8)            => i_usb_rst,
-         probe0(7)            => i_reg_spi_rd_data_valid,
-         probe0(6)            => trig_spi_valid,
-         probe0(5)            => trig_rec_valid,
-         probe0(4)            => trig_debug_valid,
-         probe0(3)            => trig_ctrl_valid,
-         probe0(2)            => trig_rd_all_valid,
-         probe0(1)            => trig_make_pulse_valid,
-         probe0(0)            => trig_reg_valid,
-         
-         -- probe1
-         probe1(127 downto 96) => usb_wirein_ctrl,
-         probe1(95 downto 64) => usb_wireout_ctrl,
-         probe1(63 downto 32) => usb_wirein_make_pulse,
-         probe1(31 downto 0) => usb_wireout_make_pulse,
+    inst_fpasim_regdecode_top_ila_0 : entity work.fpasim_regdecode_top_ila_0
+      port map(
+        clk       => usb_clk,
+        -- probe0
+        probe0(8) => i_usb_rst,
+        probe0(7) => i_reg_spi_rd_data_valid,
+        probe0(6) => trig_spi_valid,
+        probe0(5) => trig_rec_valid,
+        probe0(4) => trig_debug_valid,
+        probe0(3) => trig_ctrl_valid,
+        probe0(2) => trig_rd_all_valid,
+        probe0(1) => trig_make_pulse_valid,
+        probe0(0) => trig_reg_valid,
 
-         -- probe2
-         probe2(127 downto 96) => i_reg_spi_rd_data,
-         probe2(95 downto 64) => usb_wirein_spi_wr_data,
-         probe2(63 downto 32) => usb_wirein_spi_conf,
-         probe2(31 downto 0) => usb_wirein_spi_ctrl
-       );
+        -- probe1
+        probe1(127 downto 96) => usb_wirein_ctrl,
+        probe1(95 downto 64)  => usb_wireout_ctrl,
+        probe1(63 downto 32)  => usb_wirein_make_pulse,
+        probe1(31 downto 0)   => usb_wireout_make_pulse,
 
-       inst_fpasim_regdecode_top_ila_1 : entity work.fpasim_regdecode_top_ila_1
-       port map(
-         clk                  => usb_clk,
+        -- probe2
+        probe2(159 downto 128) => usb_wirein_spi_conf1,
+        probe2(127 downto 96)  => i_reg_spi_rd_data,
+        probe2(95 downto 64)   => usb_wirein_spi_wr_data,
+        probe2(63 downto 32)   => usb_wirein_spi_conf0,
+        probe2(31 downto 0)    => usb_wirein_spi_ctrl
+        );
 
-             -- probe0
-         probe0(5)            => pipeout_rd,
-         probe0(4)            => pipeout_sof,
-         probe0(3)            => pipeout_eof,
-         probe0(2)            => pipeout_valid,
-         probe0(1)            => pipeout_empty,
-         probe0(0)            => pipein_valid0,
+    inst_fpasim_regdecode_top_ila_1 : entity work.fpasim_regdecode_top_ila_1
+      port map(
+        clk => usb_clk,
 
-         -- probe1
-         probe1(31 downto 16) => pipein_addr0,
-         probe1(15 downto 0)  => pipein_data0,
-         -- probe2
-         probe2(47 downto 32) => pipeout_data_count,
-         probe2(31 downto 16) => pipeout_addr,
-         probe2(15 downto 0)  => pipeout_data,
+        -- probe0
+        probe0(5) => pipeout_rd,
+        probe0(4) => pipeout_sof,
+        probe0(3) => pipeout_eof,
+        probe0(2) => pipeout_valid,
+        probe0(1) => pipeout_empty,
+        probe0(0) => pipein_valid0,
 
-         -- probe3
-         probe3(4) => usb_fifo_adc_empty,
-         probe3(3) => usb_fifo_adc_rd,
-         probe3(2) => usb_fifo_adc_sof,
-         probe3(1) => usb_fifo_adc_eof,
-         probe3(0) => usb_fifo_adc_data_valid,
-         -- probe4
-         probe4(47 downto 32) => usb_fifo_adc_wr_data_count,
-         probe4(31 downto 0) => usb_fifo_adc_data
+        -- probe1
+        probe1(31 downto 16) => pipein_addr0,
+        probe1(15 downto 0)  => pipein_data0,
+        -- probe2
+        probe2(47 downto 32) => pipeout_data_count,
+        probe2(31 downto 16) => pipeout_addr,
+        probe2(15 downto 0)  => pipeout_data,
 
-       );
+        -- probe3
+        probe3(4)            => usb_fifo_adc_empty,
+        probe3(3)            => usb_fifo_adc_rd,
+        probe3(2)            => usb_fifo_adc_sof,
+        probe3(1)            => usb_fifo_adc_eof,
+        probe3(0)            => usb_fifo_adc_data_valid,
+        -- probe4
+        probe4(47 downto 32) => usb_fifo_adc_wr_data_count,
+        probe4(31 downto 0)  => usb_fifo_adc_data
+
+        );
 
   end generate gen_debug_ila;
 

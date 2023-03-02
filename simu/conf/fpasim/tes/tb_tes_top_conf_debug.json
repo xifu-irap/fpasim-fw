@@ -7,21 +7,25 @@
     {
         "description_list":
          [
-            "On the VHDL simulation computer, the user must set a system environment variable called VUNIT_PATH"
+            "This section defines the configuration parameters."
         ],
         "value":
         
             {
                 "description_list":
                 [
-                    "The 'nb_pixel_by_frame' : define the current number of pixels in a column (minus 1)",
-                    "     'value' (integer: [1, 64])): 0: 1 pixel, 1: 2 pixels and so on",
-                    "The 'nb_sample_by_pixel' : define the number of samples by pixels (minus 1)",
-                    "     'value' (integer: [1, 64])): 0: 1 sample duration, 1: 2 samples duration and so on",
-                    "The 'nb_frame_by_pulse' : define the number of frame to generate a pulse_shape",
-                    "     'value' (integer: [1, 2048])): 0: 1 frame, 1: 2 frame and so on",
-                    "The 'nb_pulse' : define the number of frame to generate a pulse_shape",
-                    "     'value' (integer: [0, integer max])): 0: 1 pulse shape, 1: 2 pulse shape and so on"
+                    "The configuration parameters are:",
+                    "  :param filename (string): filename expected by the vhdl testbench.",
+                    "         Note: This file is a *.csv file",
+                    "  :param en (integer:0,1): 1: enable the function, 0: disable the function.",
+                    "  :param nb_pixel_by_frame (integer) : define the current number of pixels in a column",
+                    "     The range is [1, 64]: 1: 1 pixel, 2: 2 pixels and so on",
+                    "  :param nb_sample_by_pixel (integer>1) : define the number of samples by pixels (minus 1)",
+                    "     The range is [1, 64]: 1: 1 sample duration, 2: 2 samples duration and so on",
+                    "  :param nb_frame_by_pulse (integer) : define the number of frame to generate a pulse_shape",
+                    "     The range is [1, 2048]: 1: 1 frame, 2: 2 frame and so on",
+                    "   :param nb_pulse (integer) : define the number of frame to generate a pulse_shape",
+                    "     The range is [1, integer max]: 1: 1 pulse shape, 2: 2 pulse shape and so on"
                 ],
                 "filename":"py_reg_in.csv",
                 "en":1,
@@ -35,7 +39,32 @@
         {
             "description_list":
             [
-                ""
+                 " Theses parameters control how the file will be read in the vhdl testbench",
+                "   .The parameters are",
+                "       :param filename (string): filename expected by the vhdl testbench.",
+                "              Note: This file is *.csv file",
+                "       :param ctrl (integer>=0): define the mode. Possibles values are:",
+                "               .0: continuous valid generation",
+                "                   . min_value1, max_value1, min_value2, max_value2 values are ignored",
+                "               .1. constant short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a constant width defined by the min_value2 value",
+                "               .2. constant pulse generation",
+                "                   . a positive pulse with a width defined by the v_min_value1 value followed by",
+                "                   . a negative pulse with a width defined by the v_min_value2 value",
+                "               .3: random short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a random width between min_value2 and max_value2",
+                "               .4. random pulse generation",
+                "                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by",
+                "                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_",
+                "               others values : continuous valid generation",
+                "               others values : continuous valid generation",
+                "       :param min_value1 (integer>=0): define a min value for the positive pulse",
+                "       :param max_value1 (integer>=0): define a max value for the positive pulse",
+                "       :param min_value2 (integer>=0): define a min value for the negative pulse",
+                "       :param max_value2 (integer>=0): define a min value for the negative pulse",
+                "       :param num_rising_edge_before_pulse (integer>=0): define a starting offset before generating pulses"
             ],
             "filename":"py_reg_valid_sequencer_in.csv",
             "ctrl":0,
@@ -50,14 +79,17 @@
     {
         "description_list":
          [
-            "On the VHDL simulation computer, the user must set a system environment variable called VUNIT_PATH"
+            "This section defines the properties associated to the testbench input data file."
         ],
         "value":
         
             {
                 "description_list":
                 [
-                    ""
+                    "This section is associated to the input data file.",
+                    "The paramter is:",
+                    "    :param filename (string): filename expected by the vhdl testbench.",
+                    "          Note: This file is a *.csv file"
                 ],
                 "filename":"py_data_in.csv"
             }
@@ -66,7 +98,32 @@
         {
             "description_list":
             [
-                ""
+                " Theses parameters control how the file will be read in the vhdl testbench",
+                "   .The parameters are",
+                "       :param filename (string): filename expected by the vhdl testbench.",
+                "              Note: This file is a *.csv file",
+                "       :param ctrl (integer>=0): define the mode. Possibles values are:",
+                "               .0: continuous valid generation",
+                "                   . min_value1, max_value1, min_value2, max_value2 values are ignored",
+                "               .1. constant short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a constant width defined by the min_value2 value",
+                "               .2. constant pulse generation",
+                "                   . a positive pulse with a width defined by the v_min_value1 value followed by",
+                "                   . a negative pulse with a width defined by the v_min_value2 value",
+                "               .3: random short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a random width between min_value2 and max_value2",
+                "               .4. random pulse generation",
+                "                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by",
+                "                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_",
+                "               others values : continuous valid generation",
+                "               others values : continuous valid generation",
+                "       :param min_value1 (integer>=0): define a min value for the positive pulse",
+                "       :param max_value1 (integer>=0): define a max value for the positive pulse",
+                "       :param min_value2 (integer>=0): define a min value for the negative pulse",
+                "       :param max_value2 (integer>=0): define a min value for the negative pulse",
+                "       :param num_rising_edge_before_pulse (integer>=0): define a starting offset before generating pulses"
             ],
             "filename":"py_data_valid_sequencer_in.csv",
             "ctrl":0,
@@ -82,19 +139,22 @@
 
         "description":
         [
-            ""
+            "This section defines the command list to run"
         ],
     "value":
     
         {
         "description_list":
             [
-      "The 'pulse_height': percentage applied on the pulse_shape values (multiplicator factor)",
-      "     'value' [0,65535]: 0 : 0% of pulse shape, 65535: 100% pulse shape (formula: percentage = pulse_height/65535)",
-      "The 'pixel_id': value of the pixel id",
-      "     'value' (integer: [0, nb_pixels - 1] (see TES_CONF_ register)): pixel_id value",
-      "The 'time_shift': time_shift value (address offset on the pulse_shape RAM).",
-      "     'value' (integer: [0, 15] ): time_shift value"
+                "The configuration parameters are:",
+                "    :param filename (string): filename expected by the vhdl testbench.",
+                "         Note: This file is a *.csv file",
+                "    :param pulse_height (integer >= 0): percentage applied on the pulse_shape values (multiplicator factor)",
+                "         The range is [0,65535]: 0 : 0% of pulse shape, 65535: 100% pulse shape (formula: percentage = pulse_height/65535)",
+                "    :param pixel_id (integer >= 0)': value of the pixel id",
+                "         The range is [0, nb_pixels - 1]",
+                "    :param: time_shift (integer >= 0): time_shift value (address offset on the pulse_shape RAM).",
+                "        The range is integer: [0, 15]."
             ],
         "filename":"py_cmd_in.csv",
         "pulse_height_list":[65535],
@@ -106,7 +166,32 @@
         {
             "description_list":
             [
-                ""
+                 " Theses parameters control how the file will be read in the vhdl testbench",
+                "   .The parameters are",
+                "       :param filename (string): filename expected by the vhdl testbench.",
+                "              Note: This file is a *.csv file",
+                "       :param ctrl (integer>=0): define the mode. Possibles values are:",
+                "               .0: continuous valid generation",
+                "                   . min_value1, max_value1, min_value2, max_value2 values are ignored",
+                "               .1. constant short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a constant width defined by the min_value2 value",
+                "               .2. constant pulse generation",
+                "                   . a positive pulse with a width defined by the v_min_value1 value followed by",
+                "                   . a negative pulse with a width defined by the v_min_value2 value",
+                "               .3: random short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a random width between min_value2 and max_value2",
+                "               .4. random pulse generation",
+                "                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by",
+                "                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_",
+                "               others values : continuous valid generation",
+                "               others values : continuous valid generation",
+                "       :param min_value1 (integer>=0): define a min value for the positive pulse",
+                "       :param max_value1 (integer>=0): define a max value for the positive pulse",
+                "       :param min_value2 (integer>=0): define a min value for the negative pulse",
+                "       :param max_value2 (integer>=0): define a min value for the negative pulse",
+                "       :param num_rising_edge_before_pulse (integer>=0): define a starting offset before generating pulses"
             ],
             "filename":"py_cmd_valid_sequencer_in.csv",
             "ctrl":"0",
@@ -123,7 +208,10 @@
         {
             "description_list":
             [
-                ""
+                "This section controls the testbench behaviour.",
+                "   .The parameters are",
+                "       :param check (integer:0,1): 1: the testbench performs the memory reading and checking, 0: no memory reading and checking",
+                "       :param verbosity (integer >= 0): 1: print all check (if enable), 0: do nothing"
             ],
             "name":"tes_shape_pulse",
             "check":0,
@@ -133,7 +221,11 @@
         {
             "description_list":
             [
-                ""
+                "This section defines the source filename to copy as well as the destination filename",
+                "   .The parameters are",
+                "       :param input_filename (string): source filename to copy",
+                "       :param output_filename (string): destination filename"
+
             ],
             "input_filename":"tes_response.csv",
             "output_filename":"py_ram_tes_shape.csv"
@@ -142,7 +234,32 @@
         {
             "description_list":
             [
-                ""
+                 " Theses parameters control how the file will be read in the vhdl testbench",
+                "   .The parameters are",
+                "       :param filename (string): filename expected by the vhdl testbench.",
+                "              Note: This file is a *.csv file",
+                "       :param ctrl (integer>=0): define the mode. Possibles values are:",
+                "               .0: continuous valid generation",
+                "                   . min_value1, max_value1, min_value2, max_value2 values are ignored",
+                "               .1. constant short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a constant width defined by the min_value2 value",
+                "               .2. constant pulse generation",
+                "                   . a positive pulse with a width defined by the v_min_value1 value followed by",
+                "                   . a negative pulse with a width defined by the v_min_value2 value",
+                "               .3: random short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a random width between min_value2 and max_value2",
+                "               .4. random pulse generation",
+                "                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by",
+                "                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_",
+                "               others values : continuous valid generation",
+                "               others values : continuous valid generation",
+                "       :param min_value1 (integer>=0): define a min value for the positive pulse",
+                "       :param max_value1 (integer>=0): define a max value for the positive pulse",
+                "       :param min_value2 (integer>=0): define a min value for the negative pulse",
+                "       :param max_value2 (integer>=0): define a min value for the negative pulse",
+                "       :param num_rising_edge_before_pulse (integer>=0): define a starting offset before generating pulses"
             ],
             "filename":"py_ram_tes_shape_valid_sequencer_in.csv",
             "ctrl":"0",
@@ -159,7 +276,10 @@
         {
             "description_list":
             [
-                ""
+                "This section controls the testbench behaviour.",
+                "   .The parameters are",
+                "       :param check (integer:0,1): 1: the testbench performs the memory reading and checking, 0: no memory reading and checking",
+                "       :param verbosity (integer >= 0): 1: print all check (if enable), 0: do nothing"
             ],
             "name":"tes_steady_state",
             "check":1,
@@ -169,7 +289,10 @@
         {
             "description_list":
             [
-                ""
+                "This section defines the source filename to copy as well as the destination filename",
+                "   .The parameters are",
+                "       :param input_filename (string): source filename to copy",
+                "       :param output_filename (string): destination filename"
             ],
             "input_filename":"tes_steady_state.csv",
             "output_filename":"py_ram_tes_steady_state.csv"
@@ -178,7 +301,32 @@
         {
             "description_list":
             [
-                ""
+                 " Theses parameters control how the file will be read in the vhdl testbench",
+                "   .The parameters are",
+                "       :param filename (string): filename expected by the vhdl testbench.",
+                "              Note: This file is a *.csv file",
+                "       :param ctrl (integer>=0): define the mode. Possibles values are:",
+                "               .0: continuous valid generation",
+                "                   . min_value1, max_value1, min_value2, max_value2 values are ignored",
+                "               .1. constant short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a constant width defined by the min_value2 value",
+                "               .2. constant pulse generation",
+                "                   . a positive pulse with a width defined by the v_min_value1 value followed by",
+                "                   . a negative pulse with a width defined by the v_min_value2 value",
+                "               .3: random short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a random width between min_value2 and max_value2",
+                "               .4. random pulse generation",
+                "                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by",
+                "                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_",
+                "               others values : continuous valid generation",
+                "               others values : continuous valid generation",
+                "       :param min_value1 (integer>=0): define a min value for the positive pulse",
+                "       :param max_value1 (integer>=0): define a max value for the positive pulse",
+                "       :param min_value2 (integer>=0): define a min value for the negative pulse",
+                "       :param max_value2 (integer>=0): define a min value for the negative pulse",
+                "       :param num_rising_edge_before_pulse (integer>=0): define a starting offset before generating pulses"
             ],
             "filename":"py_ram_tes_steady_state_valid_sequencer_in.csv",
             "ctrl":"0",
@@ -191,8 +339,16 @@
     },
     "model":
     {
+        
         "value":
         {
+            "description_list":
+            [
+                "This section defines the filename expected by the vhdl testbench.",
+                "This file will be used as reference file in order to compare it against the VHDL DUT output",
+                "   .The parameters are",
+                "       :param output_filename (string): reference filename"
+            ],
             "output_filename":"py_check_data_out.csv"
         }
     }

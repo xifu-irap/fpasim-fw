@@ -314,6 +314,7 @@ begin
     show(get_logger("log:summary"), display_handler, pass);
     show(get_logger("check:data_count"), display_handler, pass);
     show(get_logger("check:errors"), display_handler, pass);
+    --show(get_logger("check:reg:data"), display_handler, pass);
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 

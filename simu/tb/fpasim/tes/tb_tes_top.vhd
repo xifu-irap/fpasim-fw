@@ -42,23 +42,23 @@ context common_lib.common_context;
 
 entity tb_tes_top is
   generic(
-    runner_cfg                   : string   := runner_cfg_default; -- vunit generic: don't touch
-    output_path                  : string   := "C:/Project/fpasim-fw-hardware/"; -- vunit generic: don't touch
+    runner_cfg                   : string   := runner_cfg_default;  -- vunit generic: don't touch
+    output_path                  : string   := "C:/Project/fpasim-fw-hardware/";  -- vunit generic: don't touch
     ---------------------------------------------------------------------
     -- DUT generic
     ---------------------------------------------------------------------
     -- command 
-    g_CMD_PULSE_HEIGHT_WIDTH     : positive := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH; -- pulse_heigth bus width (expressed in bits). Possible values [1;max integer value[
-    g_CMD_TIME_SHIFT_WIDTH       : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH; --time_shift bus width (expressed in bits). Possible values [1;max integer value[
-    g_CMD_PIXEL_ID_WIDTH         : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_PULSE_HEIGHT_WIDTH     : positive := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH;  -- pulse_heigth bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_TIME_SHIFT_WIDTH       : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH;  --time_shift bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_PIXEL_ID_WIDTH         : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH;  -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
     -- pixel
     -- pixel
-    g_PIXEL_LENGTH_WIDTH         : positive := 6; -- bus width in order to define the number of samples by pixel
+    g_PIXEL_LENGTH_WIDTH         : positive := 6;  -- bus width in order to define the number of samples by pixel
     -- frame
-    g_FRAME_LENGTH_WIDTH         : positive := 11; -- bus width in order to define the number of samples by frame
-    g_FRAME_ID_WIDTH             : positive := pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH; -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+    g_FRAME_LENGTH_WIDTH         : positive := 11;  -- bus width in order to define the number of samples by frame
+    g_FRAME_ID_WIDTH             : positive := pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH;  -- frame id bus width (expressed in bits). Possible values [1;max integer value[
     -- addr
-    g_PULSE_SHAPE_RAM_ADDR_WIDTH : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
+    g_PULSE_SHAPE_RAM_ADDR_WIDTH : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- output
     g_PIXEL_RESULT_OUTPUT_WIDTH  : positive := pkg_TES_MULT_SUB_Q_WIDTH_S;
     ---------------------------------------------------------------------
@@ -78,7 +78,7 @@ entity tb_tes_top is
     g_RAM2_NAME                  : string   := "tes_steady_state";
     g_RAM2_CHECK                 : boolean  := true;
     g_RAM2_VERBOSITY             : integer  := 0
-  );
+    );
 end tb_tes_top;
 
 architecture simulate of tb_tes_top is
@@ -145,7 +145,7 @@ architecture simulate of tb_tes_top is
   -- errors/status
   ---------------------------------------------------------------------
   signal o_errors : std_logic_vector(15 downto 0);
-  signal o_status : std_logic_vector(7 downto 0); -- @suppress "signal o_status is never read"
+  signal o_status : std_logic_vector(7 downto 0);  -- @suppress "signal o_status is never read"
 
   ---------------------------------------------------------------------
   -- Clock definition
@@ -159,7 +159,7 @@ architecture simulate of tb_tes_top is
   signal reg_start      : std_logic := '0';
   signal reg_rd_valid   : std_logic := '0';
   signal reg_gen_finish : std_logic := '0';
-  signal reg_valid      : std_logic;    -- @suppress "signal reg_valid is never read"
+  signal reg_valid      : std_logic;  -- @suppress "signal reg_valid is never read"
 
   -- Cmd
   signal cmd_start      : std_logic := '0';
@@ -172,7 +172,7 @@ architecture simulate of tb_tes_top is
   signal data_gen_finish        : std_logic := '0';
   signal data_valid             : std_logic := '0';
   signal data_count_in          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_in : std_logic; -- @suppress "signal data_count_overflow_in is never read"
+  signal data_count_overflow_in : std_logic;  -- @suppress "signal data_count_overflow_in is never read"
 
   -- ram tes pulse shape
   signal ram1_wr_start      : std_logic                    := '0';
@@ -180,7 +180,7 @@ architecture simulate of tb_tes_top is
   signal ram1_rd_valid      : std_logic                    := '0';
   signal ram1_wr_gen_finish : std_logic                    := '0';
   signal ram1_rd_gen_finish : std_logic                    := '0';
-  signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0'); -- @suppress "signal ram1_error is never read"
+  signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0');  -- @suppress "signal ram1_error is never read"
 
   -- ram tes steady state
   signal ram2_wr_start      : std_logic                    := '0';
@@ -188,14 +188,14 @@ architecture simulate of tb_tes_top is
   signal ram2_rd_valid      : std_logic                    := '0';
   signal ram2_wr_gen_finish : std_logic                    := '0';
   signal ram2_rd_gen_finish : std_logic                    := '0';
-  signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0'); -- @suppress "signal ram2_error is never read"
+  signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0');  -- @suppress "signal ram2_error is never read"
 
   -- check
   signal data_count_out          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_out : std_logic; -- @suppress "signal data_count_overflow_out is never read"
+  signal data_count_overflow_out : std_logic;  -- @suppress "signal data_count_overflow_out is never read"
 
-  signal data_stop : std_logic := '0';
-  signal data_out_error : std_logic_vector(0 downto 0); -- @suppress "signal data_out_error is never read"
+  signal data_stop      : std_logic := '0';
+  signal data_out_error : std_logic_vector(0 downto 0);  -- @suppress "signal data_out_error is never read"
 
   ---------------------------------------------------------------------
   -- filepath definition
@@ -238,19 +238,19 @@ architecture simulate of tb_tes_top is
   constant c_FILEPATH_RAM2_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM2_IN;
 
   -- output check data
-  constant c_FILENAME_CHECK_DATA_OUT : string := "py_check_data_out.csv";
-  constant c_FILEPATH_CHECK_DATA_OUT : string := c_INPUT_BASEPATH & c_FILENAME_CHECK_DATA_OUT;
+  constant c_FILENAME_CHECK_DATA_OUT : string    := "py_check_data_out.csv";
+  constant c_FILEPATH_CHECK_DATA_OUT : string    := c_INPUT_BASEPATH & c_FILENAME_CHECK_DATA_OUT;
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers 
-  constant c_LOGGER_SUMMARY     : logger_t  := get_logger("log:summary"); -- @suppress "Expression does not result in a constant"
+  constant c_LOGGER_SUMMARY          : logger_t  := get_logger("log:summary");  -- @suppress "Expression does not result in a constant"
   -- checkers
-  constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_DATA_COUNT : checker_t := new_checker("check:data_count"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM1       : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM2       : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_DATA       : checker_t := new_checker("check:out:data_out"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_ERRORS          : checker_t := new_checker("check:errors");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_DATA_COUNT      : checker_t := new_checker("check:data_count");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM1            : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME);  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_RAM2            : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME);  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_DATA            : checker_t := new_checker("check:out:data_out");  -- @suppress "Expression does not result in a constant"
 
 begin
 
@@ -281,7 +281,7 @@ begin
     ---------------------------------------------------------------------
     -- VUNIT - Scoreboard object : Visibility definition
     ---------------------------------------------------------------------
-    if g_VUNIT_DEBUG = true then        -- @suppress "Redundant boolean equality check with true"
+    if g_VUNIT_DEBUG = true then  -- @suppress "Redundant boolean equality check with true"
       -- the simulator doesn't stop on errors => stop on failure
       set_stop_level(failure);
     end if;
@@ -403,7 +403,7 @@ begin
     ---------------------------------------------------------------------
     -- RAM Check: RAM1
     ---------------------------------------------------------------------
-    if g_RAM1_CHECK = true then -- @suppress "Redundant boolean equality check with true"
+    if g_RAM1_CHECK = true then  -- @suppress "Redundant boolean equality check with true"
       info("Start RAM reading: " & g_RAM1_NAME);
       ram1_rd_start <= '1';
       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
@@ -414,7 +414,7 @@ begin
     ---------------------------------------------------------------------
     -- RAM Check: RAM2
     ---------------------------------------------------------------------
-    if g_RAM2_CHECK = true then -- @suppress "Redundant boolean equality check with true"
+    if g_RAM2_CHECK = true then  -- @suppress "Redundant boolean equality check with true"
       info("Start RAM reading: " & g_RAM2_NAME);
       ram2_rd_start <= '1';
       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
@@ -428,16 +428,16 @@ begin
     info("wait end of data generation");
 
     while v_test = 0 loop
-     if data_gen_finish = '1' then
-       v_test := 1;
-     end if;
-     if o_pixel_valid = '1' and o_frame_sof = '1' then
-        info("Frame"&to_string(to_integer(unsigned(o_frame_id) ) ) );
-     end if;
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      if data_gen_finish = '1' then
+        v_test := 1;
+      end if;
+      if o_pixel_valid = '1' and o_frame_sof = '1' then
+        info("Frame"&to_string(to_integer(unsigned(o_frame_id))));
+      end if;
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-      --wait until rising_edge(i_clk) and data_gen_finish = '1';
+    --wait until rising_edge(i_clk) and data_gen_finish = '1';
 
     ---------------------------------------------------------------------
     -- End of simulation: wait few more clock cycles
@@ -460,11 +460,11 @@ begin
     -- summary
     info(c_LOGGER_SUMMARY, "===Summary===" & LF &
          "c_CHECKER_DATA: " & to_string(get_checker_stat(c_CHECKER_DATA)) & LF &
-        "c_CHECKER_RAM1: " & to_string(get_checker_stat(c_CHECKER_RAM1)) & LF & 
-        "c_CHECKER_RAM2: " & to_string(get_checker_stat(c_CHECKER_RAM2)) & LF &
-        "c_CHECKER_ERRORS: " & to_string(get_checker_stat(c_CHECKER_ERRORS)) & LF &
-        "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(c_CHECKER_DATA_COUNT))
-    );
+         "c_CHECKER_RAM1: " & to_string(get_checker_stat(c_CHECKER_RAM1)) & LF &
+         "c_CHECKER_RAM2: " & to_string(get_checker_stat(c_CHECKER_RAM2)) & LF &
+         "c_CHECKER_ERRORS: " & to_string(get_checker_stat(c_CHECKER_ERRORS)) & LF &
+         "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(c_CHECKER_DATA_COUNT))
+         );
 
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
@@ -500,7 +500,7 @@ begin
       -- command
       ---------------------------------------------------------------------
       o_valid         => reg_rd_valid
-    );
+      );
 
     -- data generation
     ---------------------------------------------------------------------
@@ -534,7 +534,7 @@ begin
       -- status
       ---------------------------------------------------------------------
       o_finish         => reg_gen_finish
-    );
+      );
     i_en <= sig_vect(0);
   end generate gen_reg;
 
@@ -559,7 +559,7 @@ begin
       -- command
       ---------------------------------------------------------------------
       o_valid         => cmd_rd_valid
-    );
+      );
     cmd_ready <= '1' when cmd_rd_valid = '1' and o_cmd_ready = '1' else '0';
     --  data generation
     ---------------------------------------------------------------------
@@ -591,7 +591,7 @@ begin
       -- status
       ---------------------------------------------------------------------
       o_finish         => cmd_gen_finish
-    );
+      );
 
   end generate gen_cmd;
 
@@ -616,7 +616,7 @@ begin
       -- command
       ---------------------------------------------------------------------
       o_valid         => ram1_rd_valid
-    );
+      );
 
     -- Data RAM Generation
     ---------------------------------------------------------------------
@@ -661,7 +661,7 @@ begin
       o_wr_finish       => ram1_wr_gen_finish,
       o_rd_finish       => ram1_rd_gen_finish,
       o_error           => ram1_error
-    );
+      );
 
   end generate gen_ram1;
 
@@ -686,7 +686,7 @@ begin
       -- command
       ---------------------------------------------------------------------
       o_valid         => ram2_rd_valid
-    );
+      );
 
     -- Data RAM generation
     ---------------------------------------------------------------------
@@ -731,7 +731,7 @@ begin
       o_wr_finish       => ram2_wr_gen_finish,
       o_rd_finish       => ram2_rd_gen_finish,
       o_error           => ram2_error
-    );
+      );
 
   end generate gen_ram2;
 
@@ -739,7 +739,7 @@ begin
   -- Input: data generation
   ---------------------------------------------------------------------
   gen_data : if true generate
-    signal vect_tmp : std_logic_vector(0 downto 0); -- @suppress "signal vect_tmp is never read"
+    signal vect_tmp : std_logic_vector(0 downto 0);  -- @suppress "signal vect_tmp is never read"
   begin
 
     -- valid sequence generation
@@ -756,7 +756,7 @@ begin
       -- command
       ---------------------------------------------------------------------
       o_valid         => data_rd_valid
-    );
+      );
 
     -- data generation
     ---------------------------------------------------------------------
@@ -784,8 +784,8 @@ begin
       ---------------------------------------------------------------------
       -- status
       ---------------------------------------------------------------------
-      o_finish         => data_gen_finish
-    );
+      o_finish => data_gen_finish
+      );
 
     i_data_valid <= data_valid;
 
@@ -799,7 +799,7 @@ begin
       -- output
       o_count      => data_count_in,
       o_overflow   => data_count_overflow_in
-    );
+      );
 
   end generate gen_data;
 
@@ -808,79 +808,79 @@ begin
   ---------------------------------------------------------------------
   inst_dut_tes_top : entity fpasim.tes_top
     generic map(
-      g_CMD_PULSE_HEIGHT_WIDTH     => i_cmd_pulse_height'length, -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
-      g_CMD_TIME_SHIFT_WIDTH       => i_cmd_time_shift'length, -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
-      g_CMD_PIXEL_ID_WIDTH         => i_cmd_pixel_id'length, -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+      g_CMD_PULSE_HEIGHT_WIDTH        => i_cmd_pulse_height'length,  -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+      g_CMD_TIME_SHIFT_WIDTH          => i_cmd_time_shift'length,  -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+      g_CMD_PIXEL_ID_WIDTH            => i_cmd_pixel_id'length,  -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
       -- pixel
-      g_NB_SAMPLE_BY_PIXEL_WIDTH         => g_PIXEL_LENGTH_WIDTH, -- bus width in order to define the number of samples by pixel
+      g_NB_SAMPLE_BY_PIXEL_WIDTH      => g_PIXEL_LENGTH_WIDTH,  -- bus width in order to define the number of samples by pixel
       -- frame
-      g_NB_SAMPLE_BY_FRAME_WIDTH         => g_FRAME_LENGTH_WIDTH, -- bus width in order to define the number of samples by frame
-      g_NB_FRAME_BY_PULSE_SHAPE_WIDTH    => o_frame_id'length, -- frame id bus width (expressed in bits). Possible values [1;max integer value[
-      g_NB_FRAME_BY_PULSE_SHAPE          => g_NB_FRAME_BY_PULSE, -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+      g_NB_SAMPLE_BY_FRAME_WIDTH      => g_FRAME_LENGTH_WIDTH,  -- bus width in order to define the number of samples by frame
+      g_NB_FRAME_BY_PULSE_SHAPE_WIDTH => o_frame_id'length,  -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+      g_NB_FRAME_BY_PULSE_SHAPE       => g_NB_FRAME_BY_PULSE,  -- frame id bus width (expressed in bits). Possible values [1;max integer value[
       -- addr
-      g_PULSE_SHAPE_RAM_ADDR_WIDTH => g_PULSE_SHAPE_RAM_ADDR_WIDTH, -- address bus width (expressed in bits)
+      g_PULSE_SHAPE_RAM_ADDR_WIDTH    => g_PULSE_SHAPE_RAM_ADDR_WIDTH,  -- address bus width (expressed in bits)
       -- output
-      g_PIXEL_RESULT_OUTPUT_WIDTH  => g_PIXEL_RESULT_OUTPUT_WIDTH -- pixel output result bus width (expressed in bit). Possible values [1;max integer value[
-    )
+      g_PIXEL_RESULT_OUTPUT_WIDTH     => g_PIXEL_RESULT_OUTPUT_WIDTH  -- pixel output result bus width (expressed in bit). Possible values [1;max integer value[
+      )
     port map(
-      i_clk                     => i_clk, -- clock signal
-      i_rst                     => i_rst, -- reset signal
-      i_rst_status              => i_rst_status, -- reset error flag(s)
-      i_debug_pulse             => i_debug_pulse, -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+      i_clk                     => i_clk,        -- clock signal
+      i_rst                     => i_rst,        -- reset signal
+      i_rst_status              => i_rst_status,   -- reset error flag(s)
+      i_debug_pulse             => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
-      i_en                      => i_en, -- enable
+      i_en                      => i_en,         -- enable
       i_nb_sample_by_pixel      => i_nb_sample_by_pixel,
       i_nb_pixel_by_frame       => i_nb_pixel_by_frame,
       i_nb_sample_by_frame      => i_nb_sample_by_frame,
       -- command
-      i_cmd_valid               => i_cmd_valid, -- valid command
-      i_cmd_pulse_height        => i_cmd_pulse_height, -- pulse height command
-      i_cmd_pixel_id            => i_cmd_pixel_id, -- pixel id command
-      i_cmd_time_shift          => i_cmd_time_shift, -- time shift command
+      i_cmd_valid               => i_cmd_valid,  -- valid command
+      i_cmd_pulse_height        => i_cmd_pulse_height,  -- pulse height command
+      i_cmd_pixel_id            => i_cmd_pixel_id,      -- pixel id command
+      i_cmd_time_shift          => i_cmd_time_shift,    -- time shift command
       o_cmd_ready               => o_cmd_ready,
       -- RAM: pulse shape
       -- wr
-      i_pulse_shape_wr_en       => i_pulse_shape_wr_en, -- write enable
-      i_pulse_shape_wr_rd_addr  => i_pulse_shape_wr_rd_addr, -- write address
-      i_pulse_shape_wr_data     => i_pulse_shape_wr_data, -- write data
+      i_pulse_shape_wr_en       => i_pulse_shape_wr_en,      -- write enable
+      i_pulse_shape_wr_rd_addr  => i_pulse_shape_wr_rd_addr,   -- write address
+      i_pulse_shape_wr_data     => i_pulse_shape_wr_data,    -- write data
       -- rd
-      i_pulse_shape_rd_en       => i_pulse_shape_rd_en, -- rd enable
-      o_pulse_shape_rd_valid    => o_pulse_shape_rd_valid, -- rd data valid
-      o_pulse_shape_rd_data     => o_pulse_shape_rd_data, -- rd data
+      i_pulse_shape_rd_en       => i_pulse_shape_rd_en,      -- rd enable
+      o_pulse_shape_rd_valid    => o_pulse_shape_rd_valid,   -- rd data valid
+      o_pulse_shape_rd_data     => o_pulse_shape_rd_data,    -- rd data
       -- RAM:
       -- wr
-      i_steady_state_wr_en      => i_steady_state_wr_en, -- write enable
-      i_steady_state_wr_rd_addr => i_steady_state_wr_rd_addr, -- write address
-      i_steady_state_wr_data    => i_steady_state_wr_data, -- write data
+      i_steady_state_wr_en      => i_steady_state_wr_en,     -- write enable
+      i_steady_state_wr_rd_addr => i_steady_state_wr_rd_addr,  -- write address
+      i_steady_state_wr_data    => i_steady_state_wr_data,   -- write data
       -- rd
-      i_steady_state_rd_en      => i_steady_state_rd_en, -- rd enable
-      o_steady_state_rd_valid   => o_steady_state_rd_valid, -- rd data valid
-      o_steady_state_rd_data    => o_steady_state_rd_data, -- read data
+      i_steady_state_rd_en      => i_steady_state_rd_en,     -- rd enable
+      o_steady_state_rd_valid   => o_steady_state_rd_valid,  -- rd data valid
+      o_steady_state_rd_data    => o_steady_state_rd_data,   -- read data
       ---------------------------------------------------------------------
       -- from the adc
       ---------------------------------------------------------------------
-      i_data_valid              => i_data_valid, --  input valid data
+      i_data_valid              => i_data_valid,   --  input valid data
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
       o_pulse_sof               => o_pulse_sof,  -- first processed sample of a new command
       o_pulse_eof               => o_pulse_eof,  -- first processed sample of a new command
-      o_pixel_sof               => o_pixel_sof, -- first pixel sample
-      o_pixel_eof               => o_pixel_eof, -- last pixel sample
-      o_pixel_valid             => o_pixel_valid, -- valid pixel sample
-      o_pixel_id                => o_pixel_id, --  pixel id
-      o_pixel_result            => o_pixel_result, --  pixel result
-      o_frame_sof               => o_frame_sof, -- first frame sample
-      o_frame_eof               => o_frame_eof, -- last frame sample
-      o_frame_id                => o_frame_id, --  frame id
+      o_pixel_sof               => o_pixel_sof,  -- first pixel sample
+      o_pixel_eof               => o_pixel_eof,  -- last pixel sample
+      o_pixel_valid             => o_pixel_valid,  -- valid pixel sample
+      o_pixel_id                => o_pixel_id,   --  pixel id
+      o_pixel_result            => o_pixel_result,      --  pixel result
+      o_frame_sof               => o_frame_sof,  -- first frame sample
+      o_frame_eof               => o_frame_eof,  -- last frame sample
+      o_frame_id                => o_frame_id,   --  frame id
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------
-      o_errors                  => o_errors, -- output errors
-      o_status                  => o_status -- output status
-    );
+      o_errors                  => o_errors,     -- output errors
+      o_status                  => o_status      -- output status
+      );
 
   -- count output data
   ---------------------------------------------------------------------
@@ -891,14 +891,14 @@ begin
     i_data_valid => o_pixel_valid,
     -- output
     o_count      => data_count_out,
-    o_overflow   => data_count_overflow_out -- not connected
-  );
+    o_overflow   => data_count_overflow_out  -- not connected
+    );
 
 
   ---------------------------------------------------------------------
   -- log: data out
   ---------------------------------------------------------------------
-  gen_log : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_log : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
     signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
     signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
     signal frame_sof_vect_tmp : std_logic_vector(0 downto 0);
@@ -939,7 +939,7 @@ begin
         i_DATA0_TYP      => "UINT",
         i_DATA1_TYP      => "UINT",
         i_DATA2_TYP      => "UINT",
-        i_DATA3_TYP      => "UINT",
+        i_DATA3_TYP      => "INT",
         i_DATA4_TYP      => "UINT",
         i_DATA5_TYP      => "UINT",
         i_DATA6_TYP      => "UINT",
@@ -954,16 +954,75 @@ begin
         i_data4_std_vect => frame_sof_vect_tmp,
         i_data5_std_vect => frame_eof_vect_tmp,
         i_data6_std_vect => o_frame_id
-      );
+        );
 
     end generate gen_log_by_id;
 
   end generate gen_log;
 
-   ---------------------------------------------------------------------
- -- check data
- ---------------------------------------------------------------------
-  gen_check_data : if g_ENABLE_CHECK = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_log_all : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
+    constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & "vhdl_data_out_all.csv";
+    signal pixel_sof_vect_tmp    : std_logic_vector(0 downto 0);
+    signal pixel_eof_vect_tmp    : std_logic_vector(0 downto 0);
+    signal frame_sof_vect_tmp    : std_logic_vector(0 downto 0);
+    signal frame_eof_vect_tmp    : std_logic_vector(0 downto 0);
+    signal data_valid            : std_logic;
+  begin
+    pixel_sof_vect_tmp(0) <= o_pixel_sof;
+    pixel_eof_vect_tmp(0) <= o_pixel_eof;
+    frame_sof_vect_tmp(0) <= o_frame_sof;
+    frame_eof_vect_tmp(0) <= o_frame_eof;
+    data_valid            <= o_pixel_valid;
+
+    inst_pkg_log_data_in_file : pkg_log_data_in_file_7(
+      i_clk            => i_clk,
+      i_start          => data_start,
+      i_stop           => data_stop,
+      ---------------------------------------------------------------------
+      -- output file
+      ---------------------------------------------------------------------
+      i_filepath       => c_FILEPATH_DATA_OUT,
+      i_csv_separator  => c_CSV_SEPARATOR,
+      i_NAME0          => "pixel_sof",
+      i_NAME1          => "pixel_eof",
+      i_NAME2          => "pixel_id",
+      i_NAME3          => "pixel_result",
+      i_NAME4          => "frame_sof",
+      i_NAME5          => "frame_eof",
+      i_NAME6          => "frame_id",
+      --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
+      --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
+      --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
+      --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
+      --  data type = "STD_VEC" => no data convertion before writing in the output file
+      i_DATA0_TYP      => "UINT",
+      i_DATA1_TYP      => "UINT",
+      i_DATA2_TYP      => "UINT",
+      i_DATA3_TYP      => "INT",
+      i_DATA4_TYP      => "UINT",
+      i_DATA5_TYP      => "UINT",
+      i_DATA6_TYP      => "UINT",
+      ---------------------------------------------------------------------
+      -- signals to log
+      ---------------------------------------------------------------------
+      i_data_valid     => data_valid,
+      i_data0_std_vect => pixel_sof_vect_tmp,
+      i_data1_std_vect => pixel_eof_vect_tmp,
+      i_data2_std_vect => o_pixel_id,
+      i_data3_std_vect => o_pixel_result,
+      i_data4_std_vect => frame_sof_vect_tmp,
+      i_data5_std_vect => frame_eof_vect_tmp,
+      i_data6_std_vect => o_frame_id
+      );
+
+
+  end generate gen_log_all;
+
+
+  ---------------------------------------------------------------------
+  -- check data
+  ---------------------------------------------------------------------
+  gen_check_data : if g_ENABLE_CHECK = true generate  -- @suppress "Redundant boolean equality check with true"
   begin
 
     inst_pkg_vunit_data_checker : pkg_vunit_data_checker_1(
@@ -994,7 +1053,7 @@ begin
       -- status
       ---------------------------------------------------------------------
       o_error_std_vect => data_out_error
-    );
+      );
 
   end generate gen_check_data;
 

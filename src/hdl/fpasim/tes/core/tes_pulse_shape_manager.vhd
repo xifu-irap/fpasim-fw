@@ -128,25 +128,10 @@ architecture RTL of tes_pulse_shape_manager is
 
   constant c_SHIFT_MAX : positive := 2 ** (i_cmd_time_shift'length);
 
-  constant c_TES_PULSE_SHAPE_RAM_A_RD_LATENCY : natural := pkg_TES_PULSE_SHAPE_RAM_A_RD_LATENCY;
-  constant c_TES_PULSE_SHAPE_RAM_B_RD_LATENCY : natural := pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY;
-
-  constant c_TES_STD_STATE_RAM_A_RD_LATENCY : natural := pkg_TES_STD_STATE_RAM_A_RD_LATENCY;
-  constant c_TES_STD_STATE_RAM_B_RD_LATENCY : natural := pkg_TES_STD_STATE_RAM_B_RD_LATENCY;
-
   constant c_MEMORY_SIZE_PULSE_SHAPE  : positive := (2 ** i_pulse_shape_wr_rd_addr'length) * i_pulse_shape_wr_data'length;  -- memory size in bits
   constant c_MEMORY_SIZE_STEADY_STATE : positive := (2 ** i_steady_state_wr_rd_addr'length) * i_steady_state_wr_data'length;  -- memory size in bits
 
-  constant c_COMPUTATION_LATENCY : natural := pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY;
-
-  constant c_TES_MULT_SUB_Q_WIDTH_A : positive := pkg_TES_MULT_SUB_Q_WIDTH_A;
-  constant c_TES_MULT_SUB_Q_WIDTH_B : positive := pkg_TES_MULT_SUB_Q_WIDTH_B;
-  constant c_TES_MULT_SUB_Q_WIDTH_C : positive := pkg_TES_MULT_SUB_Q_WIDTH_C;
-  constant c_TES_MULT_SUB_Q_WIDTH_S : positive := pkg_TES_MULT_SUB_Q_WIDTH_S;
-
-  constant c_MULT_ADD_UFIXED_LATENCY : natural := pkg_MULT_ADD_UFIXED_LATENCY;
-
-  -- add 1 bit to the i_cmd_time_shift length to be able to represente the c_SHIFT_MAX value
+  -- add 1 bit to the i_cmd_time_shift length to be able to represent the c_SHIFT_MAX value
   constant c_SHIFT_MAX_VECTOR : std_logic_vector(i_cmd_time_shift'length downto 0) := std_logic_vector(to_unsigned(c_SHIFT_MAX, i_cmd_time_shift'length + 1));
 
   ---------------------------------------------------------------------
@@ -162,7 +147,6 @@ architecture RTL of tes_pulse_shape_manager is
   constant c_CMD_IDX2_H : integer := c_CMD_IDX2_L + i_cmd_pulse_height'length - 1;
 
   -- find the power of 2 superior to the g_DELAY
-  --constant c_FIFO_DEPTH0  : integer := c_PIXEL_NB_MAX; 
   constant c_FIFO_DEPTH0    : integer := 16;                 --see IP
   constant c_FIFO_PROG_FULL : integer := c_FIFO_DEPTH0 - 5;  --see IP
   constant c_FIFO_WIDTH0    : integer := c_CMD_IDX2_H + 1;   --see IP
@@ -362,9 +346,9 @@ architecture RTL of tes_pulse_shape_manager is
   -- mult_sub_sfixed
   ------------------------------------------------------------------
   -- add sign bit
-  signal pulse_shape_tmp  : std_logic_vector(c_TES_MULT_SUB_Q_WIDTH_A - 1 downto 0);
-  signal pulse_heigth_tmp : std_logic_vector(c_TES_MULT_SUB_Q_WIDTH_B - 1 downto 0);
-  signal steady_state_tmp : std_logic_vector(c_TES_MULT_SUB_Q_WIDTH_C - 1 downto 0);
+  signal pulse_shape_tmp  : std_logic_vector(pkg_TES_MULT_SUB_Q_WIDTH_A - 1 downto 0);
+  signal pulse_heigth_tmp : std_logic_vector(pkg_TES_MULT_SUB_Q_WIDTH_B - 1 downto 0);
+  signal steady_state_tmp : std_logic_vector(pkg_TES_MULT_SUB_Q_WIDTH_C - 1 downto 0);
 
   signal result_ry : std_logic_vector(o_pixel_result'range);
 
@@ -388,6 +372,7 @@ architecture RTL of tes_pulse_shape_manager is
   constant NB_ERRORS_c : integer := 5;
   signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
   signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+
 
 begin
 
@@ -485,7 +470,7 @@ begin
 
       when E_WAIT =>
         pixel_valid_next <= i_pixel_valid;
-        
+
         if cnt_sample_pulse_shape_table_r1(to_integer(unsigned(i_pixel_id))) = to_unsigned(c_NB_FRAME_BY_PULSE_SHAPE - 1, cnt_sample_pulse_shape_r1'length) then
           last_sample_pulse_shape_next <= '1';
         else
@@ -539,7 +524,7 @@ begin
             end if;
           else
 
-           if en_r1 = '1' then
+            if en_r1 = '1' then
               -- update parameters only if the pixel is processed
               en_table_next(to_integer(unsigned(i_pixel_id)))                     <= en_r1;
               time_shift_table_next(to_integer(unsigned(i_pixel_id)))             <= time_shift_r1;
@@ -593,7 +578,7 @@ begin
   data_pipe_mult_tmp0(c_MULT_IDX0_H downto c_MULT_IDX0_L) <= std_logic_vector(pulse_heigth_r1);
   inst_pipeliner_sync_with_mult_add_ufixed_out0 : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_MULT_ADD_UFIXED_LATENCY,
+      g_NB_PIPES   => pkg_MULT_ADD_UFIXED_LATENCY,
       g_DATA_WIDTH => data_pipe_mult_tmp0'length
       )
     port map(
@@ -641,7 +626,7 @@ begin
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
   inst_pipeliner_sync_with_mult_add_ufixed_out1 : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_MULT_ADD_UFIXED_LATENCY + 1,
+      g_NB_PIPES   => pkg_MULT_ADD_UFIXED_LATENCY + 1,
       g_DATA_WIDTH => data_pipe_tmp0'length
       )
     port map(
@@ -672,14 +657,14 @@ begin
       g_WRITE_DATA_WIDTH_A => pulse_shape_dina'length,
       g_WRITE_MODE_A       => "no_change",
       g_READ_DATA_WIDTH_A  => pulse_shape_dina'length,
-      g_READ_LATENCY_A     => c_TES_PULSE_SHAPE_RAM_A_RD_LATENCY,
+      g_READ_LATENCY_A     => pkg_TES_PULSE_SHAPE_RAM_A_RD_LATENCY,
       -- port B
       g_ADDR_WIDTH_B       => pulse_shape_addra'length,
       g_BYTE_WRITE_WIDTH_B => pulse_shape_dina'length,
       g_WRITE_DATA_WIDTH_B => pulse_shape_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => pulse_shape_dina'length,
-      g_READ_LATENCY_B     => c_TES_PULSE_SHAPE_RAM_B_RD_LATENCY,
+      g_READ_LATENCY_B     => pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY,
       -- others
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
@@ -722,7 +707,7 @@ begin
   -------------------------------------------------------------------
   inst_pipeliner_sync_with_tdpram_tes_pulse_shape_outa : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_TES_PULSE_SHAPE_RAM_A_RD_LATENCY,
+      g_NB_PIPES   => pkg_TES_PULSE_SHAPE_RAM_A_RD_LATENCY,
       g_DATA_WIDTH => 1
       )
     port map(
@@ -776,14 +761,14 @@ begin
       g_WRITE_DATA_WIDTH_A => steady_state_dina'length,
       g_WRITE_MODE_A       => "no_change",
       g_READ_DATA_WIDTH_A  => steady_state_dina'length,
-      g_READ_LATENCY_A     => c_TES_STD_STATE_RAM_A_RD_LATENCY,
+      g_READ_LATENCY_A     => pkg_TES_STD_STATE_RAM_A_RD_LATENCY,
       -- port B
       g_ADDR_WIDTH_B       => steady_state_addra'length,
       g_BYTE_WRITE_WIDTH_B => steady_state_dina'length,
       g_WRITE_DATA_WIDTH_B => steady_state_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => steady_state_dina'length,
-      g_READ_LATENCY_B     => c_TES_STD_STATE_RAM_B_RD_LATENCY,
+      g_READ_LATENCY_B     => pkg_TES_STD_STATE_RAM_B_RD_LATENCY,
       -- others
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
@@ -826,7 +811,7 @@ begin
   -------------------------------------------------------------------
   inst_pipeliner_sync_with_tdpram_tes_steady_state_outa : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_TES_STD_STATE_RAM_A_RD_LATENCY,
+      g_NB_PIPES   => pkg_TES_STD_STATE_RAM_A_RD_LATENCY,
       g_DATA_WIDTH => 1
       )
     port map(
@@ -866,7 +851,7 @@ begin
   -------------------------------------------------------------------
   -- sync with RAM output
   --------------------------------------------------------------------
-  --assert not (c_TES_STD_STATE_RAM_B_RD_LATENCY = c_TES_PULSE_SHAPE_RAM_B_RD_LATENCY) report "[tes_pulse_shape_manager]: c_TES_STD_STATE_RD_RAM_LATENCY and c_TES_PULSE_SHAPE_RD_RAM_LATENCY must be equal. Otherwise, the user needs to update this design to equalize the output data path from each memory" severity error;
+  assert not (pkg_TES_STD_STATE_RAM_B_RD_LATENCY /= pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY) report "[tes_pulse_shape_manager]: c_TES_STD_STATE_RD_RAM_LATENCY and c_TES_PULSE_SHAPE_RD_RAM_LATENCY must be equal. Otherwise, the user needs to update this design to equalize the output data path from each memory" severity error;
 
   data_pipe_tmp2(c_IDX6_H downto c_IDX6_L) <= pulse_heigth_rc;
   data_pipe_tmp2(c_IDX5_H)                 <= pulse_sof_rc;
@@ -877,7 +862,7 @@ begin
   data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_rc;
   inst_pipeliner_sync_with_rams_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_TES_PULSE_SHAPE_RAM_B_RD_LATENCY,
+      g_NB_PIPES   => pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY,
       g_DATA_WIDTH => data_pipe_tmp2'length
       )
     port map(
@@ -897,9 +882,9 @@ begin
   ---------------------------------------------------------------------
   -- TES computation
   ---------------------------------------------------------------------
-  --assert not (pulse_shape_doutb'length /= pulse_shape_tmp'length - 1) report "[tes_pulse_shape_manager]: pulse shape => register/command width and sfixed package definition width doesn't match." severity error;
-  --assert not (pulse_heigth_rx'length /= pulse_heigth_tmp'length - 1) report "[tes_pulse_shape_manager]: pulse heigth => register/command width and sfixed package definition width doesn't match." severity error;
-  --assert not (steady_state_doutb'length /= steady_state_tmp'length - 1) report "[tes_pulse_shape_manager]: steady state => register/command width and sfixed package definition width doesn't match." severity error;
+  assert not ((pulse_shape_doutb'length) /= (pulse_shape_tmp'length - 1)) report "[tes_pulse_shape_manager]: pulse shape => register/command width and sfixed package definition width doesn't match." severity error;
+  assert not ((pulse_heigth_rx'length) /= (pulse_heigth_tmp'length - 1)) report "[tes_pulse_shape_manager]: pulse heigth => register/command width and sfixed package definition width doesn't match." severity error;
+  assert not ((steady_state_doutb'length) /= (steady_state_tmp'length - 1)) report "[tes_pulse_shape_manager]: steady state => register/command width and sfixed package definition width doesn't match." severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
   pulse_shape_tmp  <= std_logic_vector(resize(unsigned(pulse_shape_doutb), pulse_shape_tmp'length));
   pulse_heigth_tmp <= std_logic_vector(resize(unsigned(pulse_heigth_rx), pulse_heigth_tmp'length));
@@ -935,7 +920,7 @@ begin
       o_s   => result_ry  -- @suppress "Incorrect array size in assignment: expected (<16>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
       );
 
-  assert not (result_ry'length /= c_TES_MULT_SUB_Q_WIDTH_S) report "[tes_pulse_shape_manager]: result => output result width and sfixed package definition width doesn't match." severity error;
+  assert not ((result_ry'length) /= (pkg_TES_MULT_SUB_Q_WIDTH_S)) report "[tes_pulse_shape_manager]: result => output result width and sfixed package definition width doesn't match." severity error;
 
   -------------------------------------------------------------------
   -- sync with RAM output
@@ -948,7 +933,7 @@ begin
   data_pipe_tmp4(c_IDX0_H downto c_IDX0_L) <= pixel_id_rx;
   inst_pipeliner_sync_with_mult_sub_sfixed_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_COMPUTATION_LATENCY,
+      g_NB_PIPES   => pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY,
       g_DATA_WIDTH => data_pipe_tmp4'length
       )
     port map(

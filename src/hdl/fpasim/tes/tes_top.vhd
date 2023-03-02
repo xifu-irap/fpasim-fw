@@ -38,91 +38,90 @@ use work.pkg_regdecode.all;
 entity tes_top is
   generic(
     -- command
-    g_CMD_PULSE_HEIGHT_WIDTH        : positive := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH; -- pulse_heigth bus width (expressed in bits). Possible values [1;max integer value[
-    g_CMD_TIME_SHIFT_WIDTH          : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH; -- time_shift bus width (expressed in bits). Possible values [1;max integer value[
-    g_CMD_PIXEL_ID_WIDTH            : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH; -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_PULSE_HEIGHT_WIDTH        : positive := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH;  -- pulse_heigth bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_TIME_SHIFT_WIDTH          : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH;  -- time_shift bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_PIXEL_ID_WIDTH            : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH;  -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
     -- pixel
-    g_NB_SAMPLE_BY_PIXEL_WIDTH      : positive := 6; -- bus width in order to define the number of samples by pixel
+    g_NB_SAMPLE_BY_PIXEL_WIDTH      : positive := 6;  -- bus width in order to define the number of samples by pixel
     -- frame
-    g_NB_SAMPLE_BY_FRAME_WIDTH      : positive := 11; -- bus width in order to define the number of samples by frame
-    g_NB_FRAME_BY_PULSE_SHAPE_WIDTH : positive := pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH; -- frame id bus width (expressed in bits). Possible values [1;max integer value[
-    g_NB_FRAME_BY_PULSE_SHAPE       : positive := pkg_NB_FRAME_BY_PULSE_SHAPE; -- number of frame
+    g_NB_SAMPLE_BY_FRAME_WIDTH      : positive := 11;  -- bus width in order to define the number of samples by frame
+    g_NB_FRAME_BY_PULSE_SHAPE_WIDTH : positive := pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH;  -- frame id bus width (expressed in bits). Possible values [1;max integer value[
+    g_NB_FRAME_BY_PULSE_SHAPE       : positive := pkg_NB_FRAME_BY_PULSE_SHAPE;  -- number of frame
     -- addr
-    g_PULSE_SHAPE_RAM_ADDR_WIDTH    : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
+    g_PULSE_SHAPE_RAM_ADDR_WIDTH    : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- output
-    g_PIXEL_RESULT_OUTPUT_WIDTH     : positive := pkg_TES_MULT_SUB_Q_WIDTH_S -- pixel output result bus width (expressed in bit). Possible values [1;max integer value[
-  );
+    g_PIXEL_RESULT_OUTPUT_WIDTH     : positive := pkg_TES_MULT_SUB_Q_WIDTH_S  -- pixel output result bus width (expressed in bit). Possible values [1;max integer value[
+    );
 
   port(
-    i_clk                     : in  std_logic; -- clock signal
-    i_rst                     : in  std_logic; -- reset signal
+    i_clk : in std_logic;               -- clock signal
+    i_rst : in std_logic;               -- reset signal
 
-    i_rst_status              : in  std_logic; -- reset error flag(s)
-    i_debug_pulse             : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    i_rst_status  : in std_logic;       -- reset error flag(s)
+    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
-    i_en                      : in  std_logic; -- enable
-    i_nb_sample_by_pixel      : in  std_logic_vector(g_NB_SAMPLE_BY_PIXEL_WIDTH - 1 downto 0);
-    i_nb_pixel_by_frame       : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- number of pixel
-    i_nb_sample_by_frame      : in  std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+    i_en                     : in  std_logic;  -- enable
+    i_nb_sample_by_pixel     : in  std_logic_vector(g_NB_SAMPLE_BY_PIXEL_WIDTH - 1 downto 0);
+    i_nb_pixel_by_frame      : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- number of pixel
+    i_nb_sample_by_frame     : in  std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
     -- command
-    i_cmd_valid               : in  std_logic; -- valid command
-    i_cmd_pulse_height        : in  std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0); -- pulse height command
-    i_cmd_pixel_id            : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id command
-    i_cmd_time_shift          : in  std_logic_vector(g_CMD_TIME_SHIFT_WIDTH - 1 downto 0); -- time shift command
-    o_cmd_ready               : out std_logic;
+    i_cmd_valid              : in  std_logic;  -- valid command
+    i_cmd_pulse_height       : in  std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0);  -- pulse height command
+    i_cmd_pixel_id           : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id command
+    i_cmd_time_shift         : in  std_logic_vector(g_CMD_TIME_SHIFT_WIDTH - 1 downto 0);  -- time shift command
+    o_cmd_ready              : out std_logic;
     -- RAM: pulse shape
     -- wr
-    i_pulse_shape_wr_en       : in  std_logic; -- write enable
-    i_pulse_shape_wr_rd_addr  : in  std_logic_vector(g_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0); -- write address
-    i_pulse_shape_wr_data     : in  std_logic_vector(15 downto 0); -- write data
+    i_pulse_shape_wr_en      : in  std_logic;  -- write enable
+    i_pulse_shape_wr_rd_addr : in  std_logic_vector(g_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0);  -- write address
+    i_pulse_shape_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
     -- rd
-    i_pulse_shape_rd_en       : in  std_logic; -- rd enable
-    o_pulse_shape_rd_valid    : out std_logic; -- rd data valid
-    o_pulse_shape_rd_data     : out std_logic_vector(15 downto 0); -- rd data
+    i_pulse_shape_rd_en      : in  std_logic;  -- rd enable
+    o_pulse_shape_rd_valid   : out std_logic;  -- rd data valid
+    o_pulse_shape_rd_data    : out std_logic_vector(15 downto 0);  -- rd data
 
     -- RAM:
     -- wr
-    i_steady_state_wr_en      : in  std_logic; -- write enable
-    i_steady_state_wr_rd_addr : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- write address
-    i_steady_state_wr_data    : in  std_logic_vector(15 downto 0); -- write data
+    i_steady_state_wr_en      : in  std_logic;  -- write enable
+    i_steady_state_wr_rd_addr : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- write address
+    i_steady_state_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
     -- rd
-    i_steady_state_rd_en      : in  std_logic; -- rd enable
-    o_steady_state_rd_valid   : out std_logic; -- rd data valid
-    o_steady_state_rd_data    : out std_logic_vector(15 downto 0); -- read data
+    i_steady_state_rd_en      : in  std_logic;  -- rd enable
+    o_steady_state_rd_valid   : out std_logic;  -- rd data valid
+    o_steady_state_rd_data    : out std_logic_vector(15 downto 0);  -- read data
 
     ---------------------------------------------------------------------
     -- from the adc
     ---------------------------------------------------------------------
-    i_data_valid              : in  std_logic; --  input valid data
+    i_data_valid : in std_logic;        --  input valid data
 
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
-    o_pulse_sof               : out std_logic;     -- first processed sample of a pulse
-    o_pulse_eof               : out std_logic;     -- last processed sample of a pulse
-    o_pixel_sof               : out std_logic; -- first pixel sample
-    o_pixel_eof               : out std_logic; -- last pixel sample
-    o_pixel_valid             : out std_logic; -- valid pixel sample
-    o_pixel_id                : out std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- output pixel id
-    o_pixel_result            : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0); -- output pixel result
-    o_frame_sof               : out std_logic; -- first frame sample
-    o_frame_eof               : out std_logic; -- last frame sample
-    o_frame_id                : out std_logic_vector(g_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0); -- output frame id
+    o_pulse_sof    : out std_logic;     -- first processed sample of a pulse
+    o_pulse_eof    : out std_logic;     -- last processed sample of a pulse
+    o_pixel_sof    : out std_logic;     -- first pixel sample
+    o_pixel_eof    : out std_logic;     -- last pixel sample
+    o_pixel_valid  : out std_logic;     -- valid pixel sample
+    o_pixel_id     : out std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- output pixel id
+    o_pixel_result : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0);  -- output pixel result
+    o_frame_sof    : out std_logic;     -- first frame sample
+    o_frame_eof    : out std_logic;     -- last frame sample
+    o_frame_id     : out std_logic_vector(g_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  -- output frame id
+
     ---------------------------------------------------------------------
     -- errors/status
     ---------------------------------------------------------------------
-    o_errors                  : out std_logic_vector(15 downto 0); -- output errors
-    o_status                  : out std_logic_vector(7 downto 0) -- output status
-  );
+    o_errors                     : out std_logic_vector(15 downto 0);  -- output errors
+    o_status                     : out std_logic_vector(7 downto 0)  -- output status
+    );
 end entity tes_top;
 
 architecture RTL of tes_top is
 
-  constant c_NB_SAMPLE_BY_FRAME_WIDTH : positive                           := pkg_NB_SAMPLE_BY_FRAME_WIDTH;
-  constant c_NB_PIXEL_BY_FRAME_MAX    : positive                           := pkg_NB_PIXEL_BY_FRAME_MAX;
   constant c_NB_FRAME_BY_PULSE_SHAPE  : positive                           := g_NB_FRAME_BY_PULSE_SHAPE;
   constant c_FRAME_ID_SIZE            : std_logic_vector(o_frame_id'range) := std_logic_vector(to_unsigned(g_NB_FRAME_BY_PULSE_SHAPE - 1, o_frame_id'length));
   ---------------------------------------------------------------------
@@ -186,11 +185,11 @@ begin
     generic map(
       -- pixel
       g_NB_SAMPLE_BY_PIXEL_WIDTH      => i_nb_sample_by_pixel'length,
-      g_NB_PIXEL_BY_FRAME_WIDTH                => pixel_id0'length,
+      g_NB_PIXEL_BY_FRAME_WIDTH       => pixel_id0'length,
       -- frame
       g_NB_SAMPLE_BY_FRAME_WIDTH      => i_nb_sample_by_frame'length,
       g_NB_FRAME_BY_PULSE_SHAPE_WIDTH => frame_id0'length
-    )
+      )
     port map(
       i_clk                => i_clk,
       i_rst                => i_rst,
@@ -216,7 +215,7 @@ begin
       o_frame_sof          => frame_sof0,
       o_frame_eof          => frame_eof0,
       o_frame_id           => frame_id0
-    );
+      );
 
   -----------------------------------------------------------------
   -- tes computation
@@ -229,69 +228,69 @@ begin
       g_CMD_PIXEL_ID_WIDTH         => pixel_id0'length,
       -- frame
       g_NB_FRAME_BY_PULSE_SHAPE    => c_NB_FRAME_BY_PULSE_SHAPE,
-      g_NB_SAMPLE_BY_FRAME_WIDTH   => c_NB_SAMPLE_BY_FRAME_WIDTH,
+      g_NB_SAMPLE_BY_FRAME_WIDTH   => pkg_NB_SAMPLE_BY_FRAME_WIDTH,
       -- pixel
-      g_NB_PIXEL_BY_FRAME_MAX      => c_NB_PIXEL_BY_FRAME_MAX,
+      g_NB_PIXEL_BY_FRAME_MAX      => pkg_NB_PIXEL_BY_FRAME_MAX,
       -- addr
       g_PULSE_SHAPE_RAM_ADDR_WIDTH => i_pulse_shape_wr_rd_addr'length,
       -- output
       g_PIXEL_RESULT_OUTPUT_WIDTH  => pixel_result1'length
-    )
+      )
     port map(
-      i_clk                     => i_clk, -- clock signal
-      i_rst                     => i_rst, -- reset signal
-      i_rst_status              => i_rst_status, -- reset error flags
-      i_debug_pulse             => i_debug_pulse, -- '1': delay error, '0': latch error
+      i_clk                     => i_clk,        -- clock signal
+      i_rst                     => i_rst,        -- reset signal
+      i_rst_status              => i_rst_status,   -- reset error flags
+      i_debug_pulse             => i_debug_pulse,  -- '1': delay error, '0': latch error
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
-      i_cmd_valid               => i_cmd_valid, -- '1': command is valid, '0': otherwise
-      i_cmd_pulse_height        => i_cmd_pulse_height, -- pulse height value
-      i_cmd_pixel_id            => i_cmd_pixel_id, -- pixel id
-      i_cmd_time_shift          => i_cmd_time_shift, -- time shift value
+      i_cmd_valid               => i_cmd_valid,  -- '1': command is valid, '0': otherwise
+      i_cmd_pulse_height        => i_cmd_pulse_height,  -- pulse height value
+      i_cmd_pixel_id            => i_cmd_pixel_id,      -- pixel id
+      i_cmd_time_shift          => i_cmd_time_shift,    -- time shift value
       o_cmd_ready               => cmd_ready,
       -- RAM: pulse shape
       -- wr
-      i_pulse_shape_wr_en       => i_pulse_shape_wr_en, -- write enable
-      i_pulse_shape_wr_rd_addr  => i_pulse_shape_wr_rd_addr, -- write address
-      i_pulse_shape_wr_data     => i_pulse_shape_wr_data, -- write data
+      i_pulse_shape_wr_en       => i_pulse_shape_wr_en,     -- write enable
+      i_pulse_shape_wr_rd_addr  => i_pulse_shape_wr_rd_addr,   -- write address
+      i_pulse_shape_wr_data     => i_pulse_shape_wr_data,   -- write data
       -- rd
-      i_pulse_shape_rd_en       => i_pulse_shape_rd_en, -- read enable
-      o_pulse_shape_rd_valid    => pulse_shape_rd_valid1, -- read data valid
-      o_pulse_shape_rd_data     => pulse_shape_rd_data1, -- read data
+      i_pulse_shape_rd_en       => i_pulse_shape_rd_en,     -- read enable
+      o_pulse_shape_rd_valid    => pulse_shape_rd_valid1,   -- read data valid
+      o_pulse_shape_rd_data     => pulse_shape_rd_data1,    -- read data
       -- RAM:
       -- wr
-      i_steady_state_wr_en      => i_steady_state_wr_en, -- write enable
-      i_steady_state_wr_rd_addr => i_steady_state_wr_rd_addr, -- write address
-      i_steady_state_wr_data    => i_steady_state_wr_data, -- write data
+      i_steady_state_wr_en      => i_steady_state_wr_en,    -- write enable
+      i_steady_state_wr_rd_addr => i_steady_state_wr_rd_addr,  -- write address
+      i_steady_state_wr_data    => i_steady_state_wr_data,  -- write data
       -- rd
-      i_steady_state_rd_en      => i_steady_state_rd_en, -- read enable
-      o_steady_state_rd_valid   => steady_state_rd_valid1, -- read data valid
-      o_steady_state_rd_data    => steady_state_rd_data1, -- read data
+      i_steady_state_rd_en      => i_steady_state_rd_en,    -- read enable
+      o_steady_state_rd_valid   => steady_state_rd_valid1,  -- read data valid
+      o_steady_state_rd_data    => steady_state_rd_data1,   -- read data
 
       ---------------------------------------------------------------------
       -- input data
       ---------------------------------------------------------------------
-      i_pixel_sof               => pixel_sof0, -- tag the first sample of the pixel
-      i_pixel_eof               => pixel_eof0, -- tag the last sample of the pixel
-      i_pixel_id                => pixel_id0, -- id of the pixel
-      i_pixel_valid             => pixel_valid0, -- valid pixel sample
+      i_pixel_sof                  => pixel_sof0,  -- tag the first sample of the pixel
+      i_pixel_eof                  => pixel_eof0,  -- tag the last sample of the pixel
+      i_pixel_id                   => pixel_id0,   -- id of the pixel
+      i_pixel_valid                => pixel_valid0,   -- valid pixel sample
       ---------------------------------------------------------------------
       -- output data
       ---------------------------------------------------------------------
-      o_pulse_sof               => pulse_sof1,
-      o_pulse_eof               => pulse_eof1,
-      o_pixel_sof               => pixel_sof1, -- tag the first sample of the pixel
-      o_pixel_eof               => pixel_eof1, -- tag the last sample of the pixel
-      o_pixel_id                => pixel_id1, -- id of the pixel
-      o_pixel_valid             => pixel_valid1, -- valid pixel result
-      o_pixel_result            => pixel_result1, -- pixel result
+      o_pulse_sof                  => pulse_sof1,
+      o_pulse_eof                  => pulse_eof1,
+      o_pixel_sof                  => pixel_sof1,  -- tag the first sample of the pixel
+      o_pixel_eof                  => pixel_eof1,  -- tag the last sample of the pixel
+      o_pixel_id                   => pixel_id1,   -- id of the pixel
+      o_pixel_valid                => pixel_valid1,   -- valid pixel result
+      o_pixel_result               => pixel_result1,  -- pixel result
       -----------------------------------------------------------------
       -- errors/status
       -----------------------------------------------------------------
-      o_errors                  => errors1,
-      o_status                  => status1
-    );
+      o_errors                     => errors1,
+      o_status                     => status1
+      );
 
   o_cmd_ready                              <= cmd_ready;
   ---------------------------------------------------------------------
@@ -302,14 +301,14 @@ begin
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= frame_id0;
   inst_pipeliner_sync_with_tes_pulse_manager_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => pkg_TES_PULSE_MANAGER_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => data_pipe_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
-    )
+      g_NB_PIPES   => pkg_TES_PULSE_MANAGER_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => data_pipe_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
     port map(
       i_clk  => i_clk,                  -- clock signal
       i_data => data_pipe_tmp0,         -- input data
       o_data => data_pipe_tmp1          -- output data with/without delay
-    );
+      );
 
   frame_sof1 <= data_pipe_tmp1(c_IDX2_H);
   frame_eof1 <= data_pipe_tmp1(c_IDX1_H);
@@ -325,18 +324,19 @@ begin
   -- rd steady state
   o_steady_state_rd_valid <= steady_state_rd_valid1;
   o_steady_state_rd_data  <= steady_state_rd_data1;
+  -- output data
+  o_pulse_sof             <= pulse_sof1;
+  o_pulse_eof             <= pulse_eof1;
+  o_pixel_sof             <= pixel_sof1;
+  o_pixel_eof             <= pixel_eof1;
+  o_pixel_valid           <= pixel_valid1;
+  o_pixel_id              <= pixel_id1;
+  o_pixel_result          <= pixel_result1;
+  o_frame_sof             <= frame_sof1;
+  o_frame_eof             <= frame_eof1;
+  o_frame_id              <= frame_id1;
 
-  o_pulse_sof    <= pulse_sof1;
-  o_pulse_eof    <= pulse_eof1;
-  o_pixel_sof    <= pixel_sof1;
-  o_pixel_eof    <= pixel_eof1;
-  o_pixel_valid  <= pixel_valid1;
-  o_pixel_id     <= pixel_id1;
-  o_pixel_result <= pixel_result1;
-  o_frame_sof    <= frame_sof1;
-  o_frame_eof    <= frame_eof1;
-  o_frame_id     <= frame_id1;
-
+  -- errors/status
   o_errors <= errors1;
   o_status <= status1;
 

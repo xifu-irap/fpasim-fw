@@ -1,0 +1,87 @@
+// -------------------------------------------------------------------------------------------------------------
+//                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
+// -------------------------------------------------------------------------------------------------------------
+//                              This file is part of the ATHENA X-IFU DRE Focal Plane Assembly simulator.
+//
+//                              fpasim-fw is free software: you can redistribute it and/or modify
+//                              it under the terms of the GNU General Public License as published by
+//                              the Free Software Foundation, either version 3 of the License, or
+//                              (at your option) any later version.
+//
+//                              This program is distributed in the hope that it will be useful,
+//                              but WITHOUT ANY WARRANTY; without even the implied warranty of
+//                              MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//                              GNU General Public License for more details.
+//
+//                              You should have received a copy of the GNU General Public License
+//                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// -------------------------------------------------------------------------------------------------------------
+//    email                   kenji.delarosa@alten.com
+//    @file                   ADS62P49.py
+// -------------------------------------------------------------------------------------------------------------
+//    Automatic Generation    No
+//    Code Rules Reference
+// -------------------------------------------------------------------------------------------------------------
+//    @details
+//
+//   This javscript generates spi commands in order to initialize the ads62P49 (ADCs) registers.
+//
+//   Note:
+//      . Tested with javascript
+//
+// -------------------------------------------------------------------------------------------------------------
+
+// import javascript
+include("./fpasim/utils_tools.dscript");
+include("./fpasim/fpasim_address.dscript");
+include("./fpasim/fpasim_tools.dscript");
+
+
+function test_acq_adc() {
+    en = 1;
+    data = fpasim_build_rec_ctrl(en_p = en);
+    fpasim_set_debug_wirein_by_name(reg_name_p = "REC_CTRL", data_p = data, level_p = 0, mode_p = 0, verbosity_p = 2);
+
+    rec_adc_nb_word_32b = 2048-1;
+    data = fpasim_build_rec_conf(rec_adc_nb_word_32b_p = rec_adc_nb_word_32b);
+    fpasim_set_debug_wirein_by_name(reg_name_p = "REC_CONF0", data_p = data, level_p = 0, mode_p = 0, verbosity_p = 2);
+
+    waitMs(2000);
+    getLatestValue("FPA_adc_mux_squid_feedback,FPA_amp_squid_offset_correction");
+
+    print("FPA_adc_mux_squid_feedback");
+    print(FPA_adc_mux_squid_feedback);
+
+    print("FPA_amp_squid_offset_correction");
+    print(FPA_amp_squid_offset_correction);
+
+
+
+}
+
+/* 
+ ***************************************************************************
+ * reset the fpasim function
+ ***************************************************************************
+ */
+
+msg = "Reset the fpasim function";
+display_title(msg_p = msg, level_p = 0, mode_p = 0);
+//fpasim_reset(level_p = 0, mode_p = 0, verbosity_p = 0);
+
+waitMs(100);
+test_acq_adc();
+
+/*
+
+print("");
+print("Read All wire_out");
+//Operator_name = getText("Please, type the operator name:", "")
+waitMs(600);
+
+getLatestValue("FPA_WireOutValues");
+
+for (i = 0; i < 32; ++i) {
+    print((0x20 + i).toString(16) + ": ", FPA_WireOutValues[i].toString(16));
+}
+*/

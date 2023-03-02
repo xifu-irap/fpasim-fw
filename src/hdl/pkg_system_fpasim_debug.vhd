@@ -36,13 +36,13 @@ package pkg_system_fpasim_debug is
   -- system_fpasim
   ---------------------------------------------------------------------
   -- user-defined: true: to use Xilinx debugging modules (ILA, VIO,..), false: otherwise
-  constant pkg_SYSTEM_FPASIM_TOP_DEBUG : boolean := true;
+  constant pkg_SYSTEM_FPASIM_TOP_DEBUG : boolean := false;
 
   ---------------------------------------------------------------------
   -- IOs
   ---------------------------------------------------------------------
   -- user-defined: true: to use Xilinx debugging modules (ILA, VIO,..), false: otherwise
-  constant pkg_SPI_TOP_DEBUG : boolean := true;
+  constant pkg_SPI_TOP_DEBUG : boolean := false;
 
   ---------------------------------------------------------------------
   -- fpasim_top/regdecode_top
@@ -54,7 +54,7 @@ package pkg_system_fpasim_debug is
   -- fpasim_top/regdecode_top
   ---------------------------------------------------------------------
   -- user-defined: true: to use Xilinx debugging modules (ILA, VIO,..), false: otherwise
-  constant pkg_REGDECODE_TOP_DEBUG : boolean := true;
+  constant pkg_REGDECODE_TOP_DEBUG : boolean := false;
 
 
 

@@ -165,10 +165,35 @@ add wave -noupdate -group tes_pulse_manager -group out -radix unsigned /tb_tes_t
 add wave -noupdate -group tes_pulse_manager -group out -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/o_pixel_result
 add wave -noupdate -group tes_pulse_manager -group out -expand -group error_status -color Magenta /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/o_errors
 add wave -noupdate -group tes_pulse_manager -group out -expand -group error_status /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/o_status
+add wave -noupdate -expand -group mult_sub_fixed -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/g_Q_M_A
+add wave -noupdate -expand -group mult_sub_fixed -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/g_Q_N_A
+add wave -noupdate -expand -group mult_sub_fixed -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/g_Q_M_B
+add wave -noupdate -expand -group mult_sub_fixed -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/g_Q_N_B
+add wave -noupdate -expand -group mult_sub_fixed -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/g_Q_M_C
+add wave -noupdate -expand -group mult_sub_fixed -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/g_Q_N_C
+add wave -noupdate -expand -group mult_sub_fixed -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/g_Q_M_S
+add wave -noupdate -expand -group mult_sub_fixed -group generic -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/g_Q_N_S
+add wave -noupdate -expand -group mult_sub_fixed -group generic /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/g_SIM_EN
+add wave -noupdate -expand -group mult_sub_fixed -expand -group in /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/pixel_sof_rx
+add wave -noupdate -expand -group mult_sub_fixed -expand -group in /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/pixel_eof_rx
+add wave -noupdate -expand -group mult_sub_fixed -expand -group in -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/pixel_id_rx
+add wave -noupdate -expand -group mult_sub_fixed -expand -group in /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/pixel_valid_rx
+add wave -noupdate -expand -group mult_sub_fixed -expand -group in /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/i_clk
+add wave -noupdate -expand -group mult_sub_fixed -expand -group in -radix hexadecimal /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/i_a
+add wave -noupdate -expand -group mult_sub_fixed -expand -group in -radix hexadecimal /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/i_b
+add wave -noupdate -expand -group mult_sub_fixed -expand -group in -radix hexadecimal /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/i_c
+add wave -noupdate -expand -group mult_sub_fixed -expand -group step1 -radix sfixed /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/a_r1
+add wave -noupdate -expand -group mult_sub_fixed -expand -group step1 -radix sfixed /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/b_r1
+add wave -noupdate -expand -group mult_sub_fixed -expand -group step1 -radix sfixed /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/c_r1
+add wave -noupdate -expand -group mult_sub_fixed -expand -group step2 -radix sfixed /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/mult_r2
+add wave -noupdate -expand -group mult_sub_fixed -expand -group step2 -radix sfixed /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/c_r2
+add wave -noupdate -expand -group mult_sub_fixed -expand -group step3 -radix sfixed /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/res_r3
+add wave -noupdate -expand -group mult_sub_fixed -expand -group step3 -radix ufixed /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/res_tmp4
+add wave -noupdate -expand -group mult_sub_fixed -group out -radix unsigned /tb_tes_top/inst_dut_tes_top/inst_tes_pulse_shape_manager/inst_mult_sub_sfixed/o_s
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {200290000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {35262 ps} 0}
 quietly wave cursor active 1
-configure wave -namecolwidth 150
+configure wave -namecolwidth 220
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
 configure wave -signalnamewidth 1
@@ -182,4 +207,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {1317946812 ps} {1318202812 ps}
+WaveRestoreZoom {0 ps} {186417 ps}

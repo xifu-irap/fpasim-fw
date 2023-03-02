@@ -122,102 +122,6 @@ entity fpasim_top is
 end entity fpasim_top;
 
 architecture RTL of fpasim_top is
-  constant c_NB_PIXEL_BY_FRAME_MAX_WIDTH   : integer := pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH;
-  constant c_NB_FRAME_BY_PULSE_SHAPE_WIDTH : integer := pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH;
-  constant c_NB_FRAME_BY_PULSE_SHAPE       : integer := pkg_NB_FRAME_BY_PULSE_SHAPE;
-
-  constant c_TES_TOP_LATENCY                : integer  := pkg_TES_TOP_LATENCY;
-  constant c_MUX_SQUID_TOP_LATENCY          : integer  := pkg_MUX_SQUID_TOP_LATENCY;
-  constant c_SYNC_PULSE_DURATION            : integer  := pkg_SYNC_PULSE_DURATION;
-  constant c_MUX_SQUID_ADD_Q_WIDTH_S        : integer  := pkg_MUX_SQUID_ADD_Q_WIDTH_S;
-  constant c_TES_MULT_SUB_Q_WIDTH_S         : integer  := pkg_TES_MULT_SUB_Q_WIDTH_S;
-  constant c_TES_PULSE_SHAPE_RAM_ADDR_WIDTH : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;
-  constant c_AMP_SQUID_TF_RAM_ADDR_WIDTH    : positive := pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH;
-  constant c_MUX_SQUID_TF_RAM_ADDR_WIDTH    : positive := pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH;
-
-  -- ctrl 
-  ---------------------------------------------------------------------
-  constant c_CTRL_EN_IDX_H : integer := pkg_CTRL_EN_IDX_H;
-  --constant c_CTRL_RST_IDX_H : integer := pkg_CTRL_RST_IDX_H;
-
-  -- make pulse
-  ---------------------------------------------------------------------
-  -- pixel all
-  constant pkg_MAKE_PULSE_PIXEL_ALL_IDX_H : integer := 31;  -- @suppress "Unused declaration"
-
-  -- pixel id
-  constant c_MAKE_PULSE_PIXEL_ID_IDX_H : integer := pkg_MAKE_PULSE_PIXEL_ID_IDX_H;
-  constant c_MAKE_PULSE_PIXEL_ID_IDX_L : integer := pkg_MAKE_PULSE_PIXEL_ID_IDX_L;
-  constant c_MAKE_PULSE_PIXEL_ID_WIDTH : integer := pkg_MAKE_PULSE_PIXEL_ID_WIDTH;
-
-  -- time shift
-  constant c_MAKE_PULSE_TIME_SHIFT_IDX_H : integer := pkg_MAKE_PULSE_TIME_SHIFT_IDX_H;
-  constant c_MAKE_PULSE_TIME_SHIFT_IDX_L : integer := pkg_MAKE_PULSE_TIME_SHIFT_IDX_L;
-  constant c_MAKE_PULSE_TIME_SHIFT_WIDTH : integer := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH;
-
-  -- pulse height
-  constant c_MAKE_PULSE_PULSE_HEIGHT_IDX_H : integer := pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_H;
-  constant c_MAKE_PULSE_PULSE_HEIGHT_IDX_L : integer := pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_L;
-  constant c_MAKE_PULSE_PULSE_HEIGHT_WIDTH : integer := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH;
-
-  -- fpasim_gain
-  ---------------------------------------------------------------------
-  constant c_FPASIM_GAIN_IDX_H : integer := pkg_FPASIM_GAIN_IDX_H;
-  constant c_FPASIM_GAIN_IDX_L : integer := pkg_FPASIM_GAIN_IDX_L;
-  constant c_FPASIM_GAIN_WIDTH : integer := pkg_FPASIM_GAIN_WIDTH;
-
-  -- mux_sq_fb_delay
-  ---------------------------------------------------------------------
-  constant c_MUX_SQ_FB_DELAY_IDX_H : integer := pkg_MUX_SQ_FB_DELAY_IDX_H;
-  constant c_MUX_SQ_FB_DELAY_IDX_L : integer := pkg_MUX_SQ_FB_DELAY_IDX_L;
-  constant c_MUX_SQ_FB_DELAY_WIDTH : integer := pkg_MUX_SQ_FB_DELAY_WIDTH;
-
-  -- mux_sq_fb_delay
-  ---------------------------------------------------------------------
-  constant c_AMP_SQ_OF_DELAY_IDX_H : integer := pkg_AMP_SQ_OF_DELAY_IDX_H;
-  constant c_AMP_SQ_OF_DELAY_IDX_L : integer := pkg_AMP_SQ_OF_DELAY_IDX_L;
-  constant c_AMP_SQ_OF_DELAY_WIDTH : integer := pkg_AMP_SQ_OF_DELAY_WIDTH;
-
-  ---------------------------------------------------------------------
-  -- error_delay
-  ---------------------------------------------------------------------
-  constant c_ERROR_DELAY_IDX_H : integer := pkg_ERROR_DELAY_IDX_H;
-  constant c_ERROR_DELAY_IDX_L : integer := pkg_ERROR_DELAY_IDX_L;
-  constant c_ERROR_DELAY_WIDTH : integer := pkg_ERROR_DELAY_WIDTH;
-
-  ---------------------------------------------------------------------
-  -- ra_delay
-  ---------------------------------------------------------------------
-  constant c_RA_DELAY_IDX_H : integer := pkg_RA_DELAY_IDX_H;
-  constant c_RA_DELAY_IDX_L : integer := pkg_RA_DELAY_IDX_L;
-  constant c_RA_DELAY_WIDTH : integer := pkg_RA_DELAY_WIDTH;
-
-  -- tes_conf 
-  ---------------------------------------------------------------------
-  constant c_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H : integer := pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H;
-  constant c_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L : integer := pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L;
-  constant c_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH : integer := pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH;
-
-  constant c_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H : integer := pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H;
-  constant c_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L : integer := pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L;
-  constant c_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH : integer := pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH;
-
-  constant c_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H : integer := pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H;
-  constant c_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L : integer := pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L;
-  constant c_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH : integer := pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH;
-
-  -- rec_ctrl
-  ---------------------------------------------------------------------
-  constant c_REC_CTRL_ADC_EN_IDX_H : integer := pkg_REC_CTRL_ADC_EN_IDX_H;
-
-  -- rec_conf0
-  ---------------------------------------------------------------------
-  constant c_REC_CONF0_ADC_NB_WORD32b_IDX_H : integer := pkg_REC_CONF0_ADC_NB_WORD32b_IDX_H;
-  constant c_REC_CONF0_ADC_NB_WORD32b_IDX_L : integer := pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L;
-  -- debug_ctrl
-  ---------------------------------------------------------------------
-  constant c_DEBUG_CTRL_DEBUG_PULSE_IDX_H   : integer := pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H;
-  constant c_DEBUG_CTRL_RST_STATUS_IDX_H    : integer := pkg_DEBUG_CTRL_RST_STATUS_IDX_H;
 
   ---------------------------------------------------------------------
   -- regdecode
@@ -234,27 +138,27 @@ architecture RTL of fpasim_top is
 
   -- make_pulse register
   signal cmd_valid        : std_logic;
-  signal cmd_pixel_id     : std_logic_vector(c_MAKE_PULSE_PIXEL_ID_WIDTH - 1 downto 0);
-  signal cmd_time_shift   : std_logic_vector(c_MAKE_PULSE_TIME_SHIFT_WIDTH - 1 downto 0);
-  signal cmd_pulse_height : std_logic_vector(c_MAKE_PULSE_PULSE_HEIGHT_WIDTH - 1 downto 0);
+  signal cmd_pixel_id     : std_logic_vector(pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1 downto 0);
+  signal cmd_time_shift   : std_logic_vector(pkg_MAKE_PULSE_TIME_SHIFT_WIDTH - 1 downto 0);
+  signal cmd_pulse_height : std_logic_vector(pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH - 1 downto 0);
   signal cmd_ready        : std_logic;
-  signal fpasim_gain      : std_logic_vector(c_FPASIM_GAIN_WIDTH - 1 downto 0);
+  signal fpasim_gain      : std_logic_vector(pkg_FPASIM_GAIN_WIDTH - 1 downto 0);
 
   -- mux_sq_fb_delay register
-  signal adc1_delay : std_logic_vector(c_MUX_SQ_FB_DELAY_WIDTH - 1 downto 0);
+  signal adc1_delay : std_logic_vector(pkg_MUX_SQ_FB_DELAY_WIDTH - 1 downto 0);
   -- amp_sq_of_delay register
-  signal adc0_delay : std_logic_vector(c_AMP_SQ_OF_DELAY_WIDTH - 1 downto 0);
+  signal adc0_delay : std_logic_vector(pkg_AMP_SQ_OF_DELAY_WIDTH - 1 downto 0);
 
   -- error_delay register
-  signal dac_delay : std_logic_vector(c_ERROR_DELAY_WIDTH - 1 downto 0);
+  signal dac_delay : std_logic_vector(pkg_ERROR_DELAY_WIDTH - 1 downto 0);
 
   -- ra_delay register
-  signal sync_delay : std_logic_vector(c_RA_DELAY_WIDTH - 1 downto 0);
+  signal sync_delay : std_logic_vector(pkg_RA_DELAY_WIDTH - 1 downto 0);
 
   -- tes_conf register
-  signal nb_pixel_by_frame  : std_logic_vector(c_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH - 1 downto 0);
-  signal nb_sample_by_pixel : std_logic_vector(c_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH - 1 downto 0);
-  signal nb_sample_by_frame : std_logic_vector(c_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+  signal nb_pixel_by_frame  : std_logic_vector(pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH - 1 downto 0);
+  signal nb_sample_by_pixel : std_logic_vector(pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH - 1 downto 0);
+  signal nb_sample_by_frame : std_logic_vector(pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
 
   -- debug_ctrl register
   signal rst_status  : std_logic;
@@ -267,7 +171,7 @@ architecture RTL of fpasim_top is
   signal tes_pulse_shape_ram_wr_en          : std_logic;
   signal tes_pulse_shape_ram_wr_rd_addr     : std_logic_vector(15 downto 0);
   signal tes_pulse_shape_ram_wr_data        : std_logic_vector(15 downto 0);
-  signal tes_pulse_shape_ram_wr_rd_addr_tmp : std_logic_vector(c_TES_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0);
+  signal tes_pulse_shape_ram_wr_rd_addr_tmp : std_logic_vector(pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0);
   -- ram: rd
   signal tes_pulse_shape_ram_rd_en          : std_logic;
   signal tes_pulse_shape_ram_rd_valid       : std_logic;
@@ -278,7 +182,7 @@ architecture RTL of fpasim_top is
   signal amp_squid_tf_ram_wr_en              : std_logic;
   signal amp_squid_tf_ram_wr_rd_addr         : std_logic_vector(15 downto 0);
   signal amp_squid_tf_ram_wr_data            : std_logic_vector(15 downto 0);
-  signal amp_squid_tf_ram_wr_rd_addr_tmp     : std_logic_vector(c_AMP_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);
+  signal amp_squid_tf_ram_wr_rd_addr_tmp     : std_logic_vector(pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);
   -- ram: rd
   signal amp_squid_tf_ram_rd_en              : std_logic;
   signal amp_squid_tf_ram_rd_valid           : std_logic;
@@ -288,7 +192,7 @@ architecture RTL of fpasim_top is
   signal mux_squid_tf_ram_wr_en              : std_logic;
   signal mux_squid_tf_ram_wr_rd_addr         : std_logic_vector(15 downto 0);
   signal mux_squid_tf_ram_wr_data            : std_logic_vector(15 downto 0);
-  signal mux_squid_tf_ram_wr_rd_addr_tmp     : std_logic_vector(c_MUX_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);
+  signal mux_squid_tf_ram_wr_rd_addr_tmp     : std_logic_vector(pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);
   -- ram: rd
   signal mux_squid_tf_ram_rd_en              : std_logic;
   signal mux_squid_tf_ram_rd_valid           : std_logic;
@@ -298,7 +202,7 @@ architecture RTL of fpasim_top is
   signal tes_std_state_ram_wr_en             : std_logic;
   signal tes_std_state_ram_wr_rd_addr        : std_logic_vector(15 downto 0);
   signal tes_std_state_ram_wr_data           : std_logic_vector(15 downto 0);
-  signal tes_std_state_ram_wr_rd_addr_tmp    : std_logic_vector(c_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
+  signal tes_std_state_ram_wr_rd_addr_tmp    : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
   -- ram: rd
   signal tes_std_state_ram_rd_en             : std_logic;
   signal tes_std_state_ram_rd_valid          : std_logic;
@@ -308,7 +212,7 @@ architecture RTL of fpasim_top is
   signal mux_squid_offset_ram_wr_en          : std_logic;
   signal mux_squid_offset_ram_wr_rd_addr     : std_logic_vector(15 downto 0);
   signal mux_squid_offset_ram_wr_data        : std_logic_vector(15 downto 0);
-  signal mux_squid_offset_ram_wr_rd_addr_tmp : std_logic_vector(c_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
+  signal mux_squid_offset_ram_wr_rd_addr_tmp : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
   -- ram: rd
   signal mux_squid_offset_ram_rd_en          : std_logic;
   signal mux_squid_offset_ram_rd_valid       : std_logic;
@@ -317,25 +221,25 @@ architecture RTL of fpasim_top is
   -- Register configuration
   ---------------------------------------------------------------------
   -- common register
-  signal reg_valid            : std_logic;  -- register valid -- @suppress "signal reg_valid is never read"
-  signal reg_fpasim_gain      : std_logic_vector(31 downto 0);
-  signal reg_mux_sq_fb_delay  : std_logic_vector(31 downto 0);
-  signal reg_amp_sq_of_delay  : std_logic_vector(31 downto 0);
-  signal reg_error_delay      : std_logic_vector(31 downto 0);
-  signal reg_ra_delay         : std_logic_vector(31 downto 0);
-  signal reg_tes_conf         : std_logic_vector(31 downto 0);
+  signal reg_valid               : std_logic;  -- register valid -- @suppress "signal reg_valid is never read"
+  signal reg_fpasim_gain         : std_logic_vector(31 downto 0);
+  signal reg_mux_sq_fb_delay     : std_logic_vector(31 downto 0);
+  signal reg_amp_sq_of_delay     : std_logic_vector(31 downto 0);
+  signal reg_error_delay         : std_logic_vector(31 downto 0);
+  signal reg_ra_delay            : std_logic_vector(31 downto 0);
+  signal reg_tes_conf            : std_logic_vector(31 downto 0);
   -- ctrl register
-  signal reg_ctrl_valid       : std_logic;  -- register ctrl valid -- @suppress "signal reg_ctrl_valid is never read"
-  signal reg_ctrl             : std_logic_vector(31 downto 0);
+  signal reg_ctrl_valid          : std_logic;  -- register ctrl valid -- @suppress "signal reg_ctrl_valid is never read"
+  signal reg_ctrl                : std_logic_vector(31 downto 0);
   -- debug ctrl register
-  signal reg_debug_ctrl_valid : std_logic;  -- register debug_ctrl valid -- @suppress "signal reg_debug_ctrl_valid is never read"
-  signal reg_debug_ctrl       : std_logic_vector(31 downto 0);
+  signal reg_debug_ctrl_valid    : std_logic;  -- register debug_ctrl valid -- @suppress "signal reg_debug_ctrl_valid is never read"
+  signal reg_debug_ctrl          : std_logic_vector(31 downto 0);
   -- make pulse register
-  signal reg_make_sof         : std_logic;  -- first sample -- @suppress "signal reg_make_sof is never read"
-  signal reg_make_eof         : std_logic;  -- last sample -- @suppress "signal reg_make_eof is never read"
-  signal reg_make_pulse_valid : std_logic;
-  signal reg_make_pulse       : std_logic_vector(31 downto 0);
-  signal reg_make_pulse_ready : std_logic;
+  signal reg_make_sof            : std_logic;  -- first sample -- @suppress "signal reg_make_sof is never read"
+  signal reg_make_eof            : std_logic;  -- last sample -- @suppress "signal reg_make_eof is never read"
+  signal reg_make_pulse_valid    : std_logic;
+  signal reg_make_pulse          : std_logic_vector(31 downto 0);
+  signal reg_make_pulse_ready    : std_logic;
 
   -- recording register
   signal reg_rec_valid : std_logic;
@@ -345,7 +249,8 @@ architecture RTL of fpasim_top is
   -- to the user @usb_clk
   signal reg_spi_valid   : std_logic;
   signal reg_spi_ctrl    : std_logic_vector(31 downto 0);
-  signal reg_spi_conf    : std_logic_vector(31 downto 0);
+  signal reg_spi_conf0   : std_logic_vector(31 downto 0);
+  signal reg_spi_conf1   : std_logic_vector(31 downto 0);
   signal reg_spi_wr_data : std_logic_vector(31 downto 0);
 
   signal reg_wire_errors3 : std_logic_vector(31 downto 0);
@@ -361,6 +266,10 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- adc_top
   ---------------------------------------------------------------------
+  signal adc_valid_tmp0                       : std_logic;
+  signal adc_mux_squid_feedback_tmp0          : std_logic_vector(i_adc_mux_squid_feedback'range);
+  signal adc_amp_squid_offset_correction_tmp0 : std_logic_vector(i_adc_amp_squid_offset_correction'range);
+
   signal adc_valid0                       : std_logic;
   signal adc_mux_squid_feedback0          : std_logic_vector(i_adc_mux_squid_feedback'range);
   signal adc_amp_squid_offset_correction0 : std_logic_vector(i_adc_amp_squid_offset_correction'range);
@@ -373,13 +282,13 @@ architecture RTL of fpasim_top is
   signal pixel_sof1    : std_logic;
   signal pixel_eof1    : std_logic;
   signal pixel_valid1  : std_logic;
-  signal pixel_id1     : std_logic_vector(c_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
-  signal pixel_result1 : std_logic_vector(c_TES_MULT_SUB_Q_WIDTH_S - 1 downto 0);
+  signal pixel_id1     : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
+  signal pixel_result1 : std_logic_vector(pkg_TES_MULT_SUB_Q_WIDTH_S - 1 downto 0);
   signal frame_sof1    : std_logic;
   signal frame_eof1    : std_logic;
-  signal frame_id1     : std_logic_vector(c_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);
-  signal tes_errors0   : std_logic_vector(15 downto 0);
-  signal tes_status0   : std_logic_vector(7 downto 0);
+  signal frame_id1     : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);
+  signal tes_errors0 : std_logic_vector(15 downto 0);
+  signal tes_status0 : std_logic_vector(7 downto 0);
 
   -- signals synchronization with tes_top output
   ---------------------------------------------------------------------
@@ -401,11 +310,11 @@ architecture RTL of fpasim_top is
   signal pixel_sof2        : std_logic;
   signal pixel_eof2        : std_logic;
   signal pixel_valid2      : std_logic;
-  signal pixel_id2         : std_logic_vector(c_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
-  signal pixel_result2     : std_logic_vector(c_MUX_SQUID_ADD_Q_WIDTH_S - 1 downto 0);
+  signal pixel_id2         : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
+  signal pixel_result2     : std_logic_vector(pkg_MUX_SQUID_ADD_Q_WIDTH_S - 1 downto 0);
   signal frame_sof2        : std_logic;
   signal frame_eof2        : std_logic;
-  signal frame_id2         : std_logic_vector(c_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);
+  signal frame_id2         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);
   signal mux_squid_errors0 : std_logic_vector(15 downto 0);
   signal mux_squid_status0 : std_logic_vector(7 downto 0);
 
@@ -419,11 +328,11 @@ architecture RTL of fpasim_top is
   signal pixel_sof3        : std_logic;  -- @suppress "signal pixel_sof3 is never read"
   signal pixel_eof3        : std_logic;  -- @suppress "signal pixel_eof3 is never read"
   signal pixel_valid3      : std_logic;
-  signal pixel_id3         : std_logic_vector(c_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);  -- @suppress "signal pixel_id3 is never read"
+  signal pixel_id3         : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);  -- @suppress "signal pixel_id3 is never read"
   signal pixel_result3     : std_logic_vector(15 downto 0);
   signal frame_sof3        : std_logic;
   signal frame_eof3        : std_logic;  -- @suppress "signal frame_eof3 is never read"
-  signal frame_id3         : std_logic_vector(c_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  -- @suppress "signal frame_id3 is never read"
+  signal frame_id3         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  -- @suppress "signal frame_id3 is never read"
   signal amp_squid_errors0 : std_logic_vector(15 downto 0);
   signal amp_squid_status0 : std_logic_vector(7 downto 0);
 
@@ -460,6 +369,13 @@ architecture RTL of fpasim_top is
   signal rec_adc_errors0 : std_logic_vector(15 downto 0);
   signal rec_adc_status0 : std_logic_vector(7 downto 0);
 
+  ---------------------------------------------------------------------
+  -- debug
+  ---------------------------------------------------------------------
+  signal debug_adc_sel                         : std_logic;
+  signal debug_adc_mux_squid_feedback          : std_logic_vector(i_adc_mux_squid_feedback'range);
+  signal debug_adc_amp_squid_offset_correction : std_logic_vector(i_adc_amp_squid_offset_correction'range);
+
 begin
 
   ---------------------------------------------------------------------
@@ -488,7 +404,8 @@ begin
       -- tx
       o_reg_spi_valid         => reg_spi_valid,
       o_reg_spi_ctrl          => reg_spi_ctrl,
-      o_reg_spi_conf          => reg_spi_conf,
+      o_reg_spi_conf0         => reg_spi_conf0,
+      o_reg_spi_conf1         => reg_spi_conf1,
       o_reg_spi_wr_data       => reg_spi_wr_data,
       -- rx
       i_reg_spi_rd_data_valid => i_spi_rd_data_valid,
@@ -613,50 +530,50 @@ begin
 
   -- ctrl register: extract fields
   -- rst <= reg_ctrl(c_CTRL_RST_IDX_H); -- this reset is managed by the reset_top module
-  en <= reg_ctrl(c_CTRL_EN_IDX_H);
+  en <= reg_ctrl(pkg_CTRL_EN_IDX_H);
 
   -- make_pulse register: extract fields
   cmd_valid            <= reg_make_pulse_valid;
-  cmd_pixel_id         <= reg_make_pulse(c_MAKE_PULSE_PIXEL_ID_IDX_H downto c_MAKE_PULSE_PIXEL_ID_IDX_L);
-  cmd_time_shift       <= reg_make_pulse(c_MAKE_PULSE_TIME_SHIFT_IDX_H downto c_MAKE_PULSE_TIME_SHIFT_IDX_L);
-  cmd_pulse_height     <= reg_make_pulse(c_MAKE_PULSE_PULSE_HEIGHT_IDX_H downto c_MAKE_PULSE_PULSE_HEIGHT_IDX_L);
+  cmd_pixel_id         <= reg_make_pulse(pkg_MAKE_PULSE_PIXEL_ID_IDX_H downto pkg_MAKE_PULSE_PIXEL_ID_IDX_L);
+  cmd_time_shift       <= reg_make_pulse(pkg_MAKE_PULSE_TIME_SHIFT_IDX_H downto pkg_MAKE_PULSE_TIME_SHIFT_IDX_L);
+  cmd_pulse_height     <= reg_make_pulse(pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_H downto pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_L);
   reg_make_pulse_ready <= cmd_ready;
 
   -- reg_fpasim_gain register: extract fields
-  fpasim_gain <= reg_fpasim_gain(c_FPASIM_GAIN_IDX_H downto c_FPASIM_GAIN_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_FPASIM_GAIN_WIDTH>) but was (<3>)"
+  fpasim_gain <= reg_fpasim_gain(pkg_FPASIM_GAIN_IDX_H downto pkg_FPASIM_GAIN_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_FPASIM_GAIN_WIDTH>) but was (<3>)"
 
   -- reg_mux_sq_fb_delay register: extract fields
-  adc0_delay <= reg_mux_sq_fb_delay(c_MUX_SQ_FB_DELAY_IDX_H downto c_MUX_SQ_FB_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_AMP_SQ_OF_DELAY_WIDTH>) but was (<6>)"
+  adc0_delay <= reg_mux_sq_fb_delay(pkg_MUX_SQ_FB_DELAY_IDX_H downto pkg_MUX_SQ_FB_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_AMP_SQ_OF_DELAY_WIDTH>) but was (<6>)"
   -- reg_amp_sq_of_delay register: extract fields
-  adc1_delay <= reg_amp_sq_of_delay(c_AMP_SQ_OF_DELAY_IDX_H downto c_AMP_SQ_OF_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_MUX_SQ_FB_DELAY_WIDTH>) but was (<6>)"
+  adc1_delay <= reg_amp_sq_of_delay(pkg_AMP_SQ_OF_DELAY_IDX_H downto pkg_AMP_SQ_OF_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_MUX_SQ_FB_DELAY_WIDTH>) but was (<6>)"
 
   -- error_delay register: extract fields
-  dac_delay <= reg_error_delay(c_ERROR_DELAY_IDX_H downto c_ERROR_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_DELAY_WIDTH>) but was (<6>)"
+  dac_delay <= reg_error_delay(pkg_ERROR_DELAY_IDX_H downto pkg_ERROR_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_DELAY_WIDTH>) but was (<6>)"
 
   -- ra_delay register: extract fields
-  sync_delay <= reg_ra_delay(c_RA_DELAY_IDX_H downto c_RA_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_RA_DELAY_WIDTH>) but was (<6>)"
+  sync_delay <= reg_ra_delay(pkg_RA_DELAY_IDX_H downto pkg_RA_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_RA_DELAY_WIDTH>) but was (<6>)"
 
   -- tes_conf register: extract fields
-  nb_pixel_by_frame  <= reg_tes_conf(c_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H downto c_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>) but was (<6>)"
-  nb_sample_by_pixel <= reg_tes_conf(c_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H downto c_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH>) but was (<7>)"
-  nb_sample_by_frame <= reg_tes_conf(c_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H downto c_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH>) but was (<13>)"
+  nb_pixel_by_frame  <= reg_tes_conf(pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>) but was (<6>)"
+  nb_sample_by_pixel <= reg_tes_conf(pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H downto pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH>) but was (<7>)"
+  nb_sample_by_frame <= reg_tes_conf(pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH>) but was (<13>)"
 
   -- debug_ctrl register
-  debug_pulse <= reg_debug_ctrl(c_DEBUG_CTRL_DEBUG_PULSE_IDX_H);
-  rst_status  <= reg_debug_ctrl(c_DEBUG_CTRL_RST_STATUS_IDX_H);
+  debug_pulse <= reg_debug_ctrl(pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H);
+  rst_status  <= reg_debug_ctrl(pkg_DEBUG_CTRL_RST_STATUS_IDX_H);
 
   -- recording:
-  rec_adc_cmd_valid             <= reg_rec_valid and reg_rec_ctrl(c_REC_CTRL_ADC_EN_IDX_H);
-  rec_adc_cmd_nb_words_by_block <= reg_rec_conf0(c_REC_CONF0_ADC_NB_WORD32b_IDX_H downto c_REC_CONF0_ADC_NB_WORD32b_IDX_L);
+  rec_adc_cmd_valid             <= reg_rec_valid and reg_rec_ctrl(pkg_REC_CTRL_ADC_EN_IDX_H);
+  rec_adc_cmd_nb_words_by_block <= reg_rec_conf0(pkg_REC_CONF0_ADC_NB_WORD32b_IDX_H downto pkg_REC_CONF0_ADC_NB_WORD32b_IDX_L);
 
   -- spi:
   o_usb_clk            <= usb_clk;
   o_spi_rst            <= reg_spi_ctrl(pkg_SPI_CTRL_RST_IDX_H);
   o_spi_en             <= reg_spi_ctrl(pkg_SPI_CTRL_EN_IDX_H);
   o_spi_cmd_valid      <= reg_spi_valid;
-  o_spi_dac_tx_present <= reg_spi_conf(pkg_SPI_CONF_DAC_TX_ENABLE_IDX_H);
-  o_spi_mode           <= reg_spi_conf(pkg_SPI_CONF_MODE_IDX_H);
-  o_spi_id             <= reg_spi_conf(pkg_SPI_CONF_ID_IDX_H downto pkg_SPI_CONF_ID_IDX_L);
+  o_spi_dac_tx_present <= reg_spi_conf1(pkg_SPI_CONF1_DAC_TX_ENABLE_IDX_H);
+  o_spi_mode           <= reg_spi_conf0(pkg_SPI_CONF0_MODE_IDX_H);
+  o_spi_id             <= reg_spi_conf0(pkg_SPI_CONF0_ID_IDX_H downto pkg_SPI_CONF0_ID_IDX_L);
   o_spi_cmd_wr_data    <= reg_spi_wr_data;
 
   o_usb_rst_status  <= usb_rst_status;
@@ -674,6 +591,8 @@ begin
   sync_errors0(4)           <= sync_errors0_tmp(0);
   sync_errors0(3 downto 0)  <= i_sync_errors(3 downto 0);
   sync_status0              <= i_sync_status;
+
+
 
   -- errors
   reg_wire_errors3(31 downto 16) <= (others => '0');
@@ -709,13 +628,39 @@ begin
   reg_wire_status0(15 downto 8)  <= (others => '0');
   reg_wire_status0(7 downto 0)   <= i_adc_status;  -- adc
 
+  gen_not_adc_debug : if g_FPASIM_DEBUG = false generate
+  begin
+    adc_valid_tmp0                       <= i_adc_valid;
+    adc_mux_squid_feedback_tmp0          <= i_adc_mux_squid_feedback;
+    adc_amp_squid_offset_correction_tmp0 <= i_adc_amp_squid_offset_correction;
+  end generate gen_not_adc_debug;
+
+  gen_adc_debug : if g_FPASIM_DEBUG = true generate
+  begin
+    select_path : process (i_clk) is
+    begin
+      if rising_edge(i_clk) then
+        adc_valid_tmp0 <= i_adc_valid;
+        if debug_adc_sel = '1' then
+          adc_mux_squid_feedback_tmp0          <= debug_adc_mux_squid_feedback;
+          adc_amp_squid_offset_correction_tmp0 <= debug_adc_amp_squid_offset_correction;
+
+        else
+          adc_mux_squid_feedback_tmp0          <= i_adc_mux_squid_feedback;
+          adc_amp_squid_offset_correction_tmp0 <= i_adc_amp_squid_offset_correction;
+        end if;
+      end if;
+    end process select_path;
+  end generate gen_adc_debug;
+
+
   ---------------------------------------------------------------------
   -- adc
   ---------------------------------------------------------------------
   inst_adc_top : entity work.adc_top
     generic map(
-      g_ADC1_WIDTH       => i_adc_mux_squid_feedback'length,
-      g_ADC0_WIDTH       => i_adc_amp_squid_offset_correction'length,
+      g_ADC1_WIDTH       => adc_amp_squid_offset_correction_tmp0'length,
+      g_ADC0_WIDTH       => adc_mux_squid_feedback_tmp0'length,
       g_ADC1_DELAY_WIDTH => adc1_delay'length,
       g_ADC0_DELAY_WIDTH => adc0_delay'length
       )
@@ -724,9 +669,9 @@ begin
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_adc_valid  => i_adc_valid,
-      i_adc1       => i_adc_mux_squid_feedback,
-      i_adc0       => i_adc_amp_squid_offset_correction,
+      i_adc_valid  => adc_valid_tmp0,
+      i_adc1       => adc_amp_squid_offset_correction_tmp0,
+      i_adc0       => adc_mux_squid_feedback_tmp0,
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
@@ -738,8 +683,8 @@ begin
       -- output
       -----------------------------------------------------------------
       o_adc_valid  => adc_valid0,
-      o_adc1       => adc_mux_squid_feedback0,
-      o_adc0       => adc_amp_squid_offset_correction0
+      o_adc1       => adc_amp_squid_offset_correction0,
+      o_adc0       => adc_mux_squid_feedback0
       );
 
   ---------------------------------------------------------------------
@@ -760,70 +705,70 @@ begin
       -- frame
       g_NB_SAMPLE_BY_FRAME_WIDTH      => nb_sample_by_frame'length,
       g_NB_FRAME_BY_PULSE_SHAPE_WIDTH => frame_id1'length,
-      g_NB_FRAME_BY_PULSE_SHAPE       => c_NB_FRAME_BY_PULSE_SHAPE,
+      g_NB_FRAME_BY_PULSE_SHAPE       => pkg_NB_FRAME_BY_PULSE_SHAPE,
       -- addr
       g_PULSE_SHAPE_RAM_ADDR_WIDTH    => tes_pulse_shape_ram_wr_rd_addr_tmp'length,
       -- output
       g_PIXEL_RESULT_OUTPUT_WIDTH     => pixel_result1'length
       )
     port map(
-      i_clk                     => i_clk,
-      i_rst                     => i_rst,
-      i_rst_status              => rst_status,
-      i_debug_pulse             => debug_pulse,
+      i_clk                        => i_clk,
+      i_rst                        => i_rst,
+      i_rst_status                 => rst_status,
+      i_debug_pulse                => debug_pulse,
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
-      i_en                      => en,
-      i_nb_sample_by_pixel      => nb_sample_by_pixel,
-      i_nb_pixel_by_frame       => nb_pixel_by_frame,  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>)"
-      i_nb_sample_by_frame      => nb_sample_by_frame,
+      i_en                         => en,
+      i_nb_sample_by_pixel         => nb_sample_by_pixel,
+      i_nb_pixel_by_frame          => nb_pixel_by_frame,  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>)"
+      i_nb_sample_by_frame         => nb_sample_by_frame,
       -- command
-      i_cmd_valid               => cmd_valid,
-      i_cmd_pulse_height        => cmd_pulse_height,
-      i_cmd_pixel_id            => cmd_pixel_id,
-      i_cmd_time_shift          => cmd_time_shift,
-      o_cmd_ready               => cmd_ready,
+      i_cmd_valid                  => cmd_valid,
+      i_cmd_pulse_height           => cmd_pulse_height,
+      i_cmd_pixel_id               => cmd_pixel_id,
+      i_cmd_time_shift             => cmd_time_shift,
+      o_cmd_ready                  => cmd_ready,
       -- RAM: pulse shape
       -- wr
-      i_pulse_shape_wr_en       => tes_pulse_shape_ram_wr_en,
-      i_pulse_shape_wr_rd_addr  => tes_pulse_shape_ram_wr_rd_addr_tmp,
-      i_pulse_shape_wr_data     => tes_pulse_shape_ram_wr_data,
+      i_pulse_shape_wr_en          => tes_pulse_shape_ram_wr_en,
+      i_pulse_shape_wr_rd_addr     => tes_pulse_shape_ram_wr_rd_addr_tmp,
+      i_pulse_shape_wr_data        => tes_pulse_shape_ram_wr_data,
       -- rd
-      i_pulse_shape_rd_en       => tes_pulse_shape_ram_rd_en,
-      o_pulse_shape_rd_valid    => tes_pulse_shape_ram_rd_valid,
-      o_pulse_shape_rd_data     => tes_pulse_shape_ram_rd_data,
+      i_pulse_shape_rd_en          => tes_pulse_shape_ram_rd_en,
+      o_pulse_shape_rd_valid       => tes_pulse_shape_ram_rd_valid,
+      o_pulse_shape_rd_data        => tes_pulse_shape_ram_rd_data,
       -- RAM:
       -- wr
-      i_steady_state_wr_en      => tes_std_state_ram_wr_en,
-      i_steady_state_wr_rd_addr => tes_std_state_ram_wr_rd_addr_tmp,  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
-      i_steady_state_wr_data    => tes_std_state_ram_wr_data,
+      i_steady_state_wr_en         => tes_std_state_ram_wr_en,
+      i_steady_state_wr_rd_addr    => tes_std_state_ram_wr_rd_addr_tmp,  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+      i_steady_state_wr_data       => tes_std_state_ram_wr_data,
       -- rd
-      i_steady_state_rd_en      => tes_std_state_ram_rd_en,
-      o_steady_state_rd_valid   => tes_std_state_ram_rd_valid,
-      o_steady_state_rd_data    => tes_std_state_ram_rd_data,
+      i_steady_state_rd_en         => tes_std_state_ram_rd_en,
+      o_steady_state_rd_valid      => tes_std_state_ram_rd_valid,
+      o_steady_state_rd_data       => tes_std_state_ram_rd_data,
       ---------------------------------------------------------------------
       -- from the adc
       ---------------------------------------------------------------------
-      i_data_valid              => adc_valid0,
+      i_data_valid                 => adc_valid0,
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      o_pulse_sof               => pulse_sof1,         -- not connected
-      o_pulse_eof               => pulse_eof1,         -- not connected
-      o_pixel_sof               => pixel_sof1,
-      o_pixel_eof               => pixel_eof1,
-      o_pixel_valid             => pixel_valid1,
-      o_pixel_id                => pixel_id1,  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
-      o_pixel_result            => pixel_result1,
-      o_frame_sof               => frame_sof1,
-      o_frame_eof               => frame_eof1,
-      o_frame_id                => frame_id1,
+      o_pulse_sof                  => pulse_sof1,         -- not connected
+      o_pulse_eof                  => pulse_eof1,         -- not connected
+      o_pixel_sof                  => pixel_sof1,
+      o_pixel_eof                  => pixel_eof1,
+      o_pixel_valid                => pixel_valid1,
+      o_pixel_id                   => pixel_id1,  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+      o_pixel_result               => pixel_result1,
+      o_frame_sof                  => frame_sof1,
+      o_frame_eof                  => frame_eof1,
+      o_frame_id                   => frame_id1,
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------
-      o_errors                  => tes_errors0,
-      o_status                  => tes_status0
+      o_errors                     => tes_errors0,
+      o_status                     => tes_status0
       );
 
   -- sync with inst_tes_top out
@@ -832,7 +777,7 @@ begin
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= adc_amp_squid_offset_correction0;
   inst_pipeliner_sync_with_tes_top_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_TES_TOP_LATENCY,
+      g_NB_PIPES   => pkg_TES_TOP_LATENCY,
       g_DATA_WIDTH => data_pipe_tmp0'length
       )
     port map(
@@ -925,7 +870,7 @@ begin
   -----------------------------------------------------------------
   inst_pipeliner_sync_with_mux_squid_top_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_MUX_SQUID_TOP_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_MUX_SQUID_TOP_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => amp_squid_offset_correction1'length  -- width of the input/output data.  Possibles values: [1, integer max value[
       )
     port map(
@@ -1044,7 +989,7 @@ begin
   ---------------------------------------------------------------------
   inst_sync_top : entity work.sync_top
     generic map(
-      g_PULSE_DURATION   => c_SYNC_PULSE_DURATION,  -- duration of the output pulse. Possible values [1;integer max value[
+      g_PULSE_DURATION   => pkg_SYNC_PULSE_DURATION,  -- duration of the output pulse. Possible values [1;integer max value[
       g_SYNC_DELAY_WIDTH => sync_delay'length
       )
     port map(
@@ -1185,7 +1130,15 @@ begin
         clk => i_clk,
 
         -- probe0
-        probe0(26)          => i_adc_valid,
+        probe0(34)          => fifo_rec_adc_rd,
+        probe0(33)          => fifo_rec_adc_sof,
+        probe0(32)          => fifo_rec_adc_eof,
+        probe0(31)          => fifo_rec_adc_data_valid,
+        probe0(30)          => fifo_rec_adc_empty,
+        probe0(29)          => rec_adc_cmd_valid,
+        probe0(28)          => cmd_ready,
+        probe0(27)          => cmd_valid,
+        probe0(26)          => adc_valid0,
         probe0(25)          => i_rst,
         probe0(24)          => sync5,
         probe0(23)          => sync_valid5,
@@ -1204,8 +1157,8 @@ begin
         probe1(15 downto 0)  => pixel_result3,
 
         -- probe2
-        probe2(27 downto 14) => i_adc_amp_squid_offset_correction,
-        probe2(13 downto 0)  => i_adc_mux_squid_feedback,
+        probe2(27 downto 14) => adc_amp_squid_offset_correction0,
+        probe2(13 downto 0)  => adc_mux_squid_feedback0,
 
         -- probe3
         probe3(24)          => debug_en_r1,
@@ -1225,9 +1178,29 @@ begin
         probe4(10 downto 0)  => debug_frame_id_pulse_eof_r1,
         -- probe5
         probe5(31 downto 16) => debug_sample_pixel_cnt_tmp,
-        probe5(15 downto 0)  => debug_sample_frame_cnt_tmp
+        probe5(15 downto 0)  => debug_sample_frame_cnt_tmp,
+
+        -- probe6
+        probe6(25 downto 10) => cmd_pulse_height,
+        probe6(9 downto 4)   => cmd_pixel_id,
+        probe6(3 downto 0)   => cmd_time_shift,
+
+        -- probe7
+        probe7(47 downto 32) => rec_adc_cmd_nb_words_by_block,
+        probe7(31 downto 0)  => fifo_rec_adc_data
 
         );
+
+    inst_fpasim_top_vio_0 : entity work.fpasim_top_vio_0
+      port map (
+        clk           => i_clk,
+        probe_out0(0) => debug_adc_sel,
+        probe_out1    => debug_adc_mux_squid_feedback,
+        probe_out2    => debug_adc_amp_squid_offset_correction
+        );
+
   end generate gen_debug;
+
+
 
 end architecture RTL;

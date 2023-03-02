@@ -128,13 +128,12 @@ function dac_spi_enable(level_p, mode_p, verbosity_p) {
 function dac_write_command(addr_p, data_p) {
 
     //---------------------------------------------------------------------
-    // write in the SPI_CONF register
+    // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
     mode = 1; // 0: rd, 1: wr
     spi_id = 2; // 0: cdce,1: adc, 2: dac, 3: amc
-    spi_dac_tx_enable = 0;
-    data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+    data = (spi_id << 4) + mode;
+    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
     sendToFPA_debugSetWireIn(addr, data);
 
     //---------------------------------------------------------------------
@@ -176,13 +175,12 @@ function dac_write_command(addr_p, data_p) {
 function dac_read_command(addr_p) {
 
     //---------------------------------------------------------------------
-    // write in the SPI_CONF register
+    // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
     mode = 0; // 0: rd, 1: wr
     spi_id = 2; // 0: cdce,1: adc, 2: dac, 3: amc
-    spi_dac_tx_enable = 0;
-    data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+    data =  (spi_id << 4) + mode;
+    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
     sendToFPA_debugSetWireIn(addr, data);
 
     //---------------------------------------------------------------------
@@ -3447,16 +3445,13 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     dac_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 	
 	//---------------------------------------------------------------------
-    // write in the SPI_CONF register
+    // write in the SPI_CONF1 register
     //---------------------------------------------------------------------
-    const mode = 0; // 0: rd, 1: wr
-    const spi_id = 0; // 0: cdce,1: adc, 2: dac, 3: amc
-    const spi_dac_tx_enable = 0;
-    const data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
+    const data = (spi_dac_tx_enable << 0)
 
     msg = "Disable the DAC TX";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+    addr = FPASIM_ADDR_WIREIN['SPI_CONF1'];
     sendToFPA_debugSetWireIn(addr, data);
 
     //###############################################################
@@ -3685,7 +3680,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // The values of these bits tell which bit in the byte-wide LVDS bus
     // failed during the pattern checker test.
     // [7:0]: R/W: iotest_results[7:0]
-    iotest_results = int('00000000', 2);
+    iotest_results = parseInt('00000000', 2);
 
     dac_set_config8(
         iotest_results_p = iotest_results,
@@ -3698,7 +3693,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // This is dataword0 in the IO test pattern. It is used with the seven
     // other words to test the input data.
     // [7:0]: R/W: iotest_pattern0[7:0]
-    iotest_pattern0 = int('01010101', 2);
+    iotest_pattern0 = parseInt('01010101', 2);
 
     dac_set_config9(
         iotest_pattern0_p = iotest_pattern0,
@@ -3711,7 +3706,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // This is dataword1 in the IO test pattern. It is used with the seven
     // other words to test the input data.
     // [7:0]: R/W: iotest_pattern1[7:0]
-    iotest_pattern1 = int('10101010', 2);
+    iotest_pattern1 = parseInt('10101010', 2);
 
     dac_set_config10(
         iotest_pattern1_p = iotest_pattern1,
@@ -3724,7 +3719,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // This is dataword2 in the IO test pattern. It is used with the seven
     // other words to test the input data.
     // [7:0]: R/W: iotest_pattern2[7:0]
-    iotest_pattern2 = int('01010101', 2);
+    iotest_pattern2 = parseInt('01010101', 2);
 
     dac_set_config11(
         iotest_pattern2_p = iotest_pattern2,
@@ -3737,7 +3732,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // This is dataword3 in the IO test pattern. It is used with the seven
     // other words to test the input data.
     // [7:0]: R/W: iotest_pattern3[7:0]
-    iotest_pattern3 = int('10101010', 2);
+    iotest_pattern3 = parseInt('10101010', 2);
 
     dac_set_config12(
         iotest_pattern3_p = iotest_pattern3,
@@ -3750,7 +3745,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // This is dataword4 in the IO test pattern. It is used with the seven
     // other words to test the input data.
     // [7:0]: R/W: iotest_pattern4[7:0]
-    iotest_pattern4 = int('01010101', 2);
+    iotest_pattern4 = parseInt('01010101', 2);
 
     dac_set_config13(
         iotest_pattern4_p = iotest_pattern4,
@@ -3763,7 +3758,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // This is dataword5 in the IO test pattern. It is used with the seven
     // other words to test the input data.
     // [7:0]: R/W: iotest_pattern5[7:0]
-    iotest_pattern5 = int('10101010', 2);
+    iotest_pattern5 = parseInt('10101010', 2);
 
     dac_set_config14(
         iotest_pattern5_p = iotest_pattern5,
@@ -3776,7 +3771,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // This is dataword6 in the IO test pattern. It is used with the seven
     // other words to test the input data.
     // [7:0]: R/W: iotest_pattern6[7:0]
-    iotest_pattern6 = int('01010101', 2);
+    iotest_pattern6 = parseInt('01010101', 2);
 
     dac_set_config15(
         iotest_pattern6_p = iotest_pattern6,
@@ -3789,7 +3784,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // This is dataword7 in the IO test pattern. It is used with the seven
     // other words to test the input data.
     // [7:0]: R/W: iotest_pattern7[7:0]
-    iotest_pattern7 = int('10101010', 2);
+    iotest_pattern7 = parseInt('10101010', 2);
 
     dac_set_config16(
         iotest_pattern7_p = iotest_pattern7,
@@ -4013,9 +4008,9 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // QMC phase correction, this value is multiplied by the current 'Q'
     // sample, then summed into the ‘I’ sample.
     // [9:0]: R/W: qmc_phase
-    qmc_gaina = int('100_0000_0000', 2);
-    qmc_gainb = int('100_0000_0000', 2);
-    qmc_phase = int('0_0000_0000', 2);
+    qmc_gaina = parseInt('10000000000', 2);
+    qmc_gainb = parseInt('10000000000', 2);
+    qmc_phase = parseInt('000000000', 2);
 
 
     dac_set_config27(
@@ -4059,7 +4054,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // [5:0]: R: version[5:0]
     clk_alarm = 0;
     tx_off = 1;
-    version = int('10010', 2);
+    version = parseInt('10010', 2);
 
     dac_set_config31(
         clk_alarm_p = clk_alarm,
@@ -4069,16 +4064,14 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     );
 
     //---------------------------------------------------------------------
-    // write in the SPI_CONF register
+    // write in the SPI_CONF1 register
     //---------------------------------------------------------------------
-    const mode = 0; // 0: rd, 1: wr
-    const spi_id = 0; // 0: cdce,1: adc, 2: dac, 3: amc
     const spi_dac_tx_enable = 1;
-    const data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
+    const data = (spi_dac_tx_enable << 0)
 
     msg = "Enable the DAC TX";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+    addr = FPASIM_ADDR_WIREIN['SPI_CONF1'];
     sendToFPA_debugSetWireIn(addr, data);
 
 }

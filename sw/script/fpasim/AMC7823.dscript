@@ -158,13 +158,12 @@ function amc_spi_enable(level_p, mode_p, verbosity_p) {
 function amc_write_command(addr_p, data_p, page_p) {
 
     //---------------------------------------------------------------------
-    // write in the SPI_CONF register
+    // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
     mode = 1; // 0: rd, 1: wr
     spi_id = 3; // 0: cdce,1: adc, 2: dac, 3: amc
-    spi_dac_tx_enable = 0;
-    data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+    data = (spi_id << 4) + mode;
+    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
     sendToFPA_debugSetWireIn(addr, data);
 
     //---------------------------------------------------------------------
@@ -201,13 +200,12 @@ function amc_write_command(addr_p, data_p, page_p) {
 function amc_read_command(addr_p, page_p) {
 
     //---------------------------------------------------------------------
-    // write in the SPI_CONF register
+    // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
     mode = 0; // 0: rd, 1: wr
     spi_id = 3; // 0: cdce,1: adc, 2: dac, 3: amc
-    spi_dac_tx_enable = 0;
-    data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+    data = (spi_id << 4) + mode;
+    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
     sendToFPA_debugSetWireIn(addr, data);
 
     //---------------------------------------------------------------------

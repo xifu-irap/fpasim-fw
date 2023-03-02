@@ -56,17 +56,17 @@ function fpasim_reset(level_p, mode_p, verbosity_p) {
     // Reset: CTRL
     rst = 1;
     en = 0;
-    data = fpasim_build_ctrl(rst_p=rst, en_p=en);
+    data = fpasim_build_ctrl(rst_p = rst, en_p = en);
 
     msg = "CTRL: Reset On"
     display(msg_p = msg, level_p = level0, mode_p = mode_p);
-	sendToFPA_configureControl(data);
+    sendToFPA_configureControl(data);
     //fpasim_set_debug_wirein_by_name(reg_name_p = 'CTRL', data_p = data, level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
     // Reset SPI_CTRL
     rst = 1;
     en = 0;
-    data = fpasim_build_spi_ctrl(rst_p=rst, en_p=en);
+    data = fpasim_build_spi_ctrl(rst_p = rst, en_p = en);
 
     msg = "SPI_CTRL: Reset On"
     display(msg_p = msg, level_p = level0, mode_p = mode_p);
@@ -75,7 +75,7 @@ function fpasim_reset(level_p, mode_p, verbosity_p) {
     // Reset DEBUG_CTRL
     rst_status = 1;
     debug_pulse = 0;
-    data = fpasim_build_debug_ctrl(rst_status_p=rst_status, debug_pulse_p=debug_pulse);
+    data = fpasim_build_debug_ctrl(rst_status_p = rst_status, debug_pulse_p = debug_pulse);
 
     msg = "DEBUG_CTRL: Reset On"
     display(msg_p = msg, level_p = level0, mode_p = mode_p);
@@ -89,7 +89,7 @@ function fpasim_reset(level_p, mode_p, verbosity_p) {
     // Reset: CTRL
     rst = 0;
     en = 0;
-    data = fpasim_build_ctrl(rst_p=rst, en_p=en);
+    data = fpasim_build_ctrl(rst_p = rst, en_p = en);
 
     msg = "CTRL: Reset Off"
     display(msg_p = msg, level_p = level0, mode_p = mode_p);
@@ -98,7 +98,7 @@ function fpasim_reset(level_p, mode_p, verbosity_p) {
     // Reset SPI_CTRL
     rst = 0;
     en = 0;
-    data = fpasim_build_spi_ctrl(rst_p=rst, en_p=en);
+    data = fpasim_build_spi_ctrl(rst_p = rst, en_p = en);
 
     msg = "SPI_CTRL: Reset Off"
     display(msg_p = msg, level_p = level0, mode_p = mode_p);
@@ -107,7 +107,7 @@ function fpasim_reset(level_p, mode_p, verbosity_p) {
     // Reset DEBUG_CTRL
     rst_status = 0;
     debug_pulse = 0;
-    data = fpasim_build_debug_ctrl(rst_status_p=rst_status, debug_pulse_p=debug_pulse);
+    data = fpasim_build_debug_ctrl(rst_status_p = rst_status, debug_pulse_p = debug_pulse);
 
     msg = "DEBUG_CTRL: Reset Off"
     display(msg_p = msg, level_p = level0, mode_p = mode_p);
@@ -213,10 +213,16 @@ function fpasim_build_debug_ctrl(rst_status_p, debug_pulse_p) {
 
 // }
 
-function fpasim_build_spi_conf(spi_dac_tx_en_p, spi_id_p, spi_mode_p) {
-    data = (spi_dac_tx_en_p << 8) + (spi_id_p << 4) + spi_mode_p;
+function fpasim_build_spi_conf0(spi_id_p, spi_mode_p) {
+    data = (spi_id_p << 4) + spi_mode_p;
     return data;
 }
+
+function fpasim_build_spi_conf1(spi_dac_tx_en_p) {
+    data = (spi_dac_tx_en_p << 0);
+    return data;
+}
+
 
 function fpasim_build_spi_wr_data(data_p) {
     data = data_p;
@@ -889,7 +895,7 @@ function fpasim_get_wireout_spi_ctrl(level_p, mode_p, verbosity_p) {
     return data;
 }
 
-function fpasim_get_wireout_spi_conf(level_p, mode_p, verbosity_p) {
+function fpasim_get_wireout_spi_conf0(level_p, mode_p, verbosity_p) {
     // default function parameter values
     if (typeof(level_p) === 'undefined') level_p = 0;
     if (typeof(mode_p) === 'undefined') mode_p = 0;
@@ -899,14 +905,14 @@ function fpasim_get_wireout_spi_conf(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = FPASIM_ADDR_WIREOUT['SPI_CONF'];
+    addr = FPASIM_ADDR_WIREOUT['SPI_CONF0'];
     data = fpasim_wireout_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
     } else {
         if (verbosity_p >= c_FPASIM_REG_VERBOSITY_MIN) {
-            msg = "[fpasim_get_wireout_spi_conf]: Get the register value: ";
+            msg = "[fpasim_get_wireout_spi_conf0]: Get the register value: ";
             display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -915,9 +921,41 @@ function fpasim_get_wireout_spi_conf(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_FPASIM_BIT_VERBOSITY_MIN) {
-            display_bit_from_data(bit_name_p = "spi_dac_tx_enable_p", bit_pos_p = 8, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
             display_bit_from_data(bit_name_p = "spi_id_p", bit_pos_p = 4, bit_width_p = 2, data_p = data, level_p = level2, mode_p = mode_p);
             display_bit_from_data(bit_name_p = "spi_mode_p", bit_pos_p = 0, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+function fpasim_get_wireout_spi_conf1(level_p, mode_p, verbosity_p) {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    addr = FPASIM_ADDR_WIREOUT['SPI_CONF1'];
+    data = fpasim_wireout_read_command(addr_p = addr);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_FPASIM_REG_VERBOSITY_MIN) {
+            msg = "[fpasim_get_wireout_spi_conf1]: Get the register value: ";
+            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_FPASIM_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_FPASIM_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "spi_dac_tx_enable_p", bit_pos_p = 0, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
         }
     }
 
@@ -1352,8 +1390,11 @@ function fpasim_get_wireout_by_name(reg_name_p, level_p, mode_p, verbosity_p) {
             data = fpasim_get_wireout_spi_ctrl(level_p = level0, mode_p, verbosity_p);
             break;
 
-        case 'SPI_CONF':
-            data = fpasim_get_wireout_spi_conf(level_p = level0, mode_p, verbosity_p);
+        case 'SPI_CONF0':
+            data = fpasim_get_wireout_spi_conf0(level_p = level0, mode_p, verbosity_p);
+            break;
+        case 'SPI_CONF1':
+            data = fpasim_get_wireout_spi_conf1(level_p = level0, mode_p, verbosity_p);
             break;
         case 'SPI_WR_DATA':
             data = fpasim_get_wireout_spi_wr_data(level_p = level0, mode_p, verbosity_p);
@@ -1454,9 +1495,9 @@ function fpasim_check_error_by_id(error_id_p, error_p, level_p, mode_p, verbosit
     const data1 = error_p;
 
     data0 = fpasim_get_error_by_id(sel_error_p = error_id_p, level_p = level0, mode_p = mode_p, verbosity_p = -2);
-    str_data0 = convert_int_to_str_hex(value_p=data0, width_p=32);
-    str_data1 = convert_int_to_str_hex(value_p=data1, width_p=32);
-    const msg_error = "Errors" + error_id_p.toString(10)+": Read Errors:0x"+str_data0+" - expected value: 0x"+str_data1;
+    str_data0 = convert_int_to_str_hex(value_p = data0, width_p = 32);
+    str_data1 = convert_int_to_str_hex(value_p = data1, width_p = 32);
+    const msg_error = "Errors" + error_id_p.toString(10) + ": Read Errors:0x" + str_data0 + " - expected value: 0x" + str_data1;
     check_equal(value0_p = data0, value1_p = data1, msg_p = msg_error, level_p = level0, mode_p = mode_p);
 }
 
@@ -1474,17 +1515,17 @@ function fpasim_check_all_errors(level_p, mode_p, verbosity_p) {
 
     const level0 = level_p;
 
-    fpasim_check_error_by_id(error_id_p = 0,  error_p=0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
-    fpasim_check_error_by_id(error_id_p = 1,  error_p=0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
-    fpasim_check_error_by_id(error_id_p = 2,  error_p=0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
-    fpasim_check_error_by_id(error_id_p = 3,  error_p=0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
-    fpasim_check_error_by_id(error_id_p = 4,  error_p=0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
-    fpasim_check_error_by_id(error_id_p = 5,  error_p=0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
-    fpasim_check_error_by_id(error_id_p = 6,  error_p=0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
-    fpasim_check_error_by_id(error_id_p = 7,  error_p=0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
-    fpasim_check_error_by_id(error_id_p = 8,  error_p=0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
-    fpasim_check_error_by_id(error_id_p = 9,  error_p=0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
-    fpasim_check_error_by_id(error_id_p = 10, error_p=0,  level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    fpasim_check_error_by_id(error_id_p = 0, error_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    fpasim_check_error_by_id(error_id_p = 1, error_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    fpasim_check_error_by_id(error_id_p = 2, error_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    fpasim_check_error_by_id(error_id_p = 3, error_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    fpasim_check_error_by_id(error_id_p = 4, error_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    fpasim_check_error_by_id(error_id_p = 5, error_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    fpasim_check_error_by_id(error_id_p = 6, error_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    fpasim_check_error_by_id(error_id_p = 7, error_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    fpasim_check_error_by_id(error_id_p = 8, error_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    fpasim_check_error_by_id(error_id_p = 9, error_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    fpasim_check_error_by_id(error_id_p = 10, error_p = 0, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
 
 }
 
@@ -1500,8 +1541,8 @@ function configure_fmc150_spi_device(level_p, mode_p, verbosity_p) {
 
     CDCE72010_configure(level_p = level_p, mode_p = mode_p, verbosity_p = verbosity_p);
     ADS62P49_configure(level_p = level_p, mode_p = mode_p, verbosity_p = verbosity_p);
-    //DAC3283_configure(level_p = level_p, mode_p = mode_p, verbosity_p = verbosity_p);
-    //AMC7823_configure(level_p = level_p, mode_p = mode_p, verbosity_p = verbosity_p);
+    DAC3283_configure(level_p = level_p, mode_p = mode_p, verbosity_p = verbosity_p);
+    AMC7823_configure(level_p = level_p, mode_p = mode_p, verbosity_p = verbosity_p);
 
     return 0;
 
@@ -1526,21 +1567,19 @@ function check_equal(value0_p, value1_p, msg_p, level_p, mode_p) {
 
 
     if (value0_p !== value1_p) {
-		msg_tmp = "[KO]: " + msg_p;
-		display(msg_p = msg_tmp, level_p = level1, mode_p = mode_p);
-		
+        msg_tmp = "[KO]: " + msg_p;
+        display(msg_p = msg_tmp, level_p = level1, mode_p = mode_p);
+
         const msg = [
             "[Error]: value0_p != value1_p",
             "[check_equal]: value0_p: 0x" + convert_int_to_str_hex(value_p = value0_p, width_p = 32),
             "[check_equal]: value1_p: 0x" + convert_int_to_str_hex(value_p = value1_p, width_p = 32)
         ];
         display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    } else {
+        const msg = "[OK] " + msg_p;
+        display(msg_p = msg, level_p = level1, mode_p = mode_p);
     }
-	else
-	{
-		const msg = "[OK] "+ msg_p;
-		display(msg_p = msg, level_p = level1, mode_p = mode_p);
-	}
 }
 
 //---------------------------------------------------------------------------------------

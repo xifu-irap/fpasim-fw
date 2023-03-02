@@ -232,21 +232,22 @@ class TesTopDataGen:
 
         filename           = json_data["register"]["value"]["filename"]
         en                 = json_data["register"]["value"]["en"]
-        nb_sample_by_pixel_tmp = json_data["register"]["value"]["nb_sample_by_pixel"]
-        nb_pixel_by_frame_tmp  = json_data["register"]["value"]["nb_pixel_by_frame"]
-        nb_frame_by_pulse_tmp  = json_data["register"]["value"]["nb_frame_by_pulse"]
-        nb_pulse_tmp           = json_data["register"]["value"]["nb_pulse"]
+        nb_sample_by_pixel = json_data["register"]["value"]["nb_sample_by_pixel"]
+        nb_pixel_by_frame  = json_data["register"]["value"]["nb_pixel_by_frame"]
+        nb_frame_by_pulse  = json_data["register"]["value"]["nb_frame_by_pulse"]
+        nb_pulse           = json_data["register"]["value"]["nb_pulse"]
 
-        # compute values start from 1
-        nb_sample_by_pixel = nb_sample_by_pixel_tmp
-        nb_pixel_by_frame  = nb_pixel_by_frame_tmp
-        nb_frame_by_pulse  = nb_frame_by_pulse_tmp
-        nb_pulse           = nb_pulse_tmp
-
-        # auto-compute the VDHL expected nb_samples_by_frame value (start from 0)
-        nb_samples_by_frame_tmp = nb_sample_by_pixel * nb_pixel_by_frame - 1
         # compute the number total of data to generate
         nb_total_samples = nb_sample_by_pixel * nb_pixel_by_frame * nb_frame_by_pulse * nb_pulse
+
+        # compute fpga values start from 0
+        nb_sample_by_pixel_tmp = nb_sample_by_pixel - 1
+        nb_pixel_by_frame_tmp  = nb_pixel_by_frame - 1
+        nb_frame_by_pulse_tmp  = nb_frame_by_pulse - 1
+        # nb_pulse           = nb_pulse_tmp
+        # auto-compute the VDHL expected nb_samples_by_frame value (start from 0)
+        nb_samples_by_frame_tmp = nb_sample_by_pixel * nb_pixel_by_frame - 1
+
 
         filepath     = str(Path(tb_input_base_path,filename))
         fid = open(filepath,'w')

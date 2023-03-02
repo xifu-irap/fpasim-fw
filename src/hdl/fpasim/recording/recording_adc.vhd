@@ -112,7 +112,7 @@ architecture RTL of recording_adc is
   ---------------------------------------------------------------------
   -- state machine
   ---------------------------------------------------------------------
-  type t_state is (E_RST, E_WAIT, E_START, E_RUN);
+  type t_state is (E_RST, E_WAIT, E_RUN);
   signal sm_state_next : t_state;
   signal sm_state_r1   : t_state := E_RST;
 
@@ -126,10 +126,10 @@ architecture RTL of recording_adc is
   signal eof_r1   : std_logic := '0';
 
   signal cnt_sample_next : unsigned(i_adc_cmd_nb_words_by_block'range);
-  signal cnt_frame_r1    : unsigned(i_adc_cmd_nb_words_by_block'range) := (others => '0');
+  signal cnt_sample_r1    : unsigned(i_adc_cmd_nb_words_by_block'range) := (others => '0');
 
   signal cnt_sample_max_next : unsigned(i_adc_cmd_nb_words_by_block'range);
-  signal cnt_frame_max_r1    : unsigned(i_adc_cmd_nb_words_by_block'range) := (others => '0');
+  signal cnt_sample_max_r1    : unsigned(i_adc_cmd_nb_words_by_block'range) := (others => '0');
 
   signal data1_r1 : std_logic_vector(i_adc_data1'range);
   signal data0_r1 : std_logic_vector(i_adc_data0'range);
@@ -171,7 +171,7 @@ begin
 ---------------------------------------------------------------------
 -- state machine
 ---------------------------------------------------------------------
-  p_decode_state : process(cnt_frame_max_r1, cnt_frame_r1,
+  p_decode_state : process(cnt_sample_max_r1, cnt_sample_r1,
                            i_adc_cmd_nb_words_by_block, i_adc_cmd_start, i_adc_data_valid,
                            sm_state_r1) is
   begin
@@ -180,8 +180,8 @@ begin
     data_valid_next     <= '0';
     sof_next            <= '0';
     eof_next            <= '0';
-    cnt_sample_next     <= cnt_frame_r1;
-    cnt_sample_max_next <= cnt_frame_max_r1;
+    cnt_sample_next     <= cnt_sample_r1;
+    cnt_sample_max_next <= cnt_sample_max_r1;
 
     case sm_state_r1 is
       when E_RST =>
@@ -190,37 +190,30 @@ begin
 
       when E_WAIT =>
 
-        if i_adc_cmd_start = '1' then
-          sm_state_next <= E_START;
-        else
-          sm_state_next <= E_WAIT;
-        end if;
+        if i_adc_data_valid = '1' and i_adc_cmd_start = '1' then
+          data_valid_next     <= i_adc_data_valid;
 
-      when E_START =>
+          sof_next            <= '1';
+          cnt_sample_next     <= to_unsigned(0, i_adc_cmd_nb_words_by_block'length);
+          cnt_sample_max_next <= unsigned(i_adc_cmd_nb_words_by_block) - 1;  --susbract - 1 to anticipate
 
-        if i_adc_data_valid = '1' then
-          data_valid_next <= i_adc_data_valid;
-
-          sof_next        <= '1';
-          cnt_sample_next <= to_unsigned(0, i_adc_cmd_nb_words_by_block'length);
           -- special case: frame of one sample
           if unsigned(i_adc_cmd_nb_words_by_block) = to_unsigned(0, i_adc_cmd_nb_words_by_block'length) then
             eof_next      <= '1';
-            sm_state_next <= E_START;
+            sm_state_next <= E_WAIT;
           else
-            cnt_sample_max_next <= unsigned(i_adc_cmd_nb_words_by_block) - 1;  --susbract - 1 to anticipate
-            sm_state_next       <= E_RUN;
+            sm_state_next <= E_RUN;
           end if;
         else
-          sm_state_next <= E_START;
+          sm_state_next <= E_WAIT;
         end if;
 
       when E_RUN =>
 
         if i_adc_data_valid = '1' then
           data_valid_next <= '1';
-          cnt_sample_next <= cnt_frame_r1 + 1;
-          if cnt_frame_r1 = cnt_frame_max_r1 then
+          cnt_sample_next <= cnt_sample_r1 + 1;
+          if cnt_sample_r1 = cnt_sample_max_r1 then
             eof_next      <= '1';
             sm_state_next <= E_WAIT;
           else
@@ -242,8 +235,8 @@ begin
       else
         sm_state_r1 <= sm_state_next;
       end if;
-      cnt_frame_r1     <= cnt_sample_next;
-      cnt_frame_max_r1 <= cnt_sample_max_next;
+      cnt_sample_r1     <= cnt_sample_next;
+      cnt_sample_max_r1 <= cnt_sample_max_next;
 
       sof_r1        <= sof_next;
       eof_r1        <= eof_next;

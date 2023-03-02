@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   mux_squid.vhd 
+--    @file                   mux_squid.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 --
 -- This module performs the following mux_squid computation steps:
 --   . addr0 = i_pixel_result - i_mux_squid_feedback
@@ -105,31 +105,17 @@ entity mux_squid is
 end entity mux_squid;
 
 architecture RTL of mux_squid is
-  constant c_MUX_SQUID_SUB_LATENCY             : positive := pkg_MUX_SQUID_SUB_LATENCY;
-  -- RAM: mux squid offset
-  constant c_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY : positive := pkg_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY;
-  constant c_MUX_SQUID_OFFSET_RAM_B_RD_LATENCY : positive := pkg_MUX_SQUID_OFFSET_RAM_B_RD_LATENCY;
-  -- RAM: mux squid tf
-  constant c_MUX_SQUID_TF_RAM_A_RD_LATENCY     : positive := pkg_MUX_SQUID_TF_RAM_A_RD_LATENCY;
-  constant c_MUX_SQUID_TF_RAM_B_RD_LATENCY     : positive := pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY;
 
   constant c_MEMORY_SIZE_MUX_SQUID_OFFSET : positive := (2 ** (i_mux_squid_offset_wr_rd_addr'length)) * (i_mux_squid_offset_wr_data'length); -- memory size in bits
   constant c_MEMORY_SIZE_MUX_SQUID_TF     : positive := (2 ** (i_mux_squid_tf_wr_rd_addr'length)) * i_mux_squid_tf_wr_data'length; -- memory size in bits
-
-  constant c_MUX_SQUID_SUB_Q_WIDTH_A : positive := pkg_MUX_SQUID_SUB_Q_WIDTH_A;
-  constant c_MUX_SQUID_SUB_Q_WIDTH_B : positive := pkg_MUX_SQUID_SUB_Q_WIDTH_B;
-  constant c_MUX_SQUID_SUB_Q_WIDTH_S : positive := pkg_MUX_SQUID_SUB_Q_WIDTH_S;
-
-  constant c_MUX_SQUID_ADD_Q_WIDTH_A : positive := pkg_MUX_SQUID_ADD_Q_WIDTH_A;
-  constant c_MUX_SQUID_ADD_Q_WIDTH_B : positive := pkg_MUX_SQUID_ADD_Q_WIDTH_B;
 
   ---------------------------------------------------------------------
   -- compute
   --   S = i_pixel_result - i_mux_squid_feedback
   ---------------------------------------------------------------------
-  signal pixel_result_tmp       : std_logic_vector(c_MUX_SQUID_SUB_Q_WIDTH_A - 1 downto 0);
-  signal mux_squid_feedback_tmp : std_logic_vector(c_MUX_SQUID_SUB_Q_WIDTH_B - 1 downto 0);
-  signal result_sub_rx          : std_logic_vector(c_MUX_SQUID_SUB_Q_WIDTH_S - 1 downto 0);
+  signal pixel_result_tmp       : std_logic_vector(pkg_MUX_SQUID_SUB_Q_WIDTH_A - 1 downto 0);
+  signal mux_squid_feedback_tmp : std_logic_vector(pkg_MUX_SQUID_SUB_Q_WIDTH_B - 1 downto 0);
+  signal result_sub_rx          : std_logic_vector(pkg_MUX_SQUID_SUB_Q_WIDTH_S - 1 downto 0);
 
   ---------------------------------------------------------------------
   -- sync with sub_sfixed_mux_squid out
@@ -218,8 +204,8 @@ architecture RTL of mux_squid is
   -- add: mux_squid_offset + mux_squid_tf
   -------------------------------------------------------------------
   -- add a sign bit
-  signal mux_squid_tf_tmp     : std_logic_vector(c_MUX_SQUID_ADD_Q_WIDTH_A - 1 downto 0);
-  signal mux_squid_offset_tmp : std_logic_vector(c_MUX_SQUID_ADD_Q_WIDTH_B - 1 downto 0);
+  signal mux_squid_tf_tmp     : std_logic_vector(pkg_MUX_SQUID_ADD_Q_WIDTH_B - 1 downto 0);
+  signal mux_squid_offset_tmp : std_logic_vector(pkg_MUX_SQUID_ADD_Q_WIDTH_A - 1 downto 0);
   signal result_rz            : std_logic_vector(o_pixel_result'range);
 
   ---------------------------------------------------------------------
@@ -242,14 +228,15 @@ architecture RTL of mux_squid is
 
 begin
 
+  assert not ((i_pixel_result'length) /= ((pixel_result_tmp'length) - 1) )  report "[mux_squid]: pixel result => input port width and sfixed package definition width doesn't match." severity error;
+  assert not ((i_mux_squid_feedback'length) /= (mux_squid_feedback_tmp'length)) report "[mux_squid]: mux_squid_feedback => input port width and sfixed package definition width doesn't match." severity error;
+
   -------------------------------------------------------------------
   -- sub_sfixed_mux_squid_out
   -------------------------------------------------------------------
-  --assert not (pixel_result_tmp'length /= i_pixel_result'length - 1) report "[mux_squid]: pixel result => input port width and sfixed package definition width doesn't match." severity error;
-  --assert not (mux_squid_feedback_tmp'length /= i_mux_squid_feedback'length - 1) report "[mux_squid]: mux_squid_feedback => input port width and sfixed package definition width doesn't match." severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
   pixel_result_tmp       <= std_logic_vector(resize(unsigned(i_pixel_result), pixel_result_tmp'length));
-  mux_squid_feedback_tmp <= std_logic_vector(resize(unsigned(i_mux_squid_feedback), mux_squid_feedback_tmp'length));
+  mux_squid_feedback_tmp <= i_mux_squid_feedback;
 
   inst_sub_sfixed_mux_squid : entity work.sub_sfixed
     generic map(
@@ -275,7 +262,7 @@ begin
       --------------------------------------------------------------
       o_s   => result_sub_rx
     );
-  assert not (result_sub_rx'length /= mux_squid_tf_addrb'length) report "[mux_squid]: result_sub_rx => mux_squid_tf_addrb width and sfixed package definition width doesn't match." severity error;
+  assert not ((result_sub_rx'length) /= (mux_squid_tf_addrb'length)) report "[mux_squid]: result_sub_rx => mux_squid_tf_addrb width and sfixed package definition width doesn't match." severity error;
 
   -----------------------------------------------------------------
   -- sync with sub_sfixed_mux_squid out
@@ -286,7 +273,7 @@ begin
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
   inst_pipeliner_sync_with_sub_sfixed_mux_squid_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_MUX_SQUID_SUB_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_MUX_SQUID_SUB_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -318,14 +305,14 @@ begin
       g_WRITE_DATA_WIDTH_A => mux_squid_offset_dina'length,
       g_WRITE_MODE_A       => "no_change",
       g_READ_DATA_WIDTH_A  => mux_squid_offset_dina'length,
-      g_READ_LATENCY_A     => c_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY,
+      g_READ_LATENCY_A     => pkg_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY,
       -- port B
       g_ADDR_WIDTH_B       => mux_squid_offset_addra'length,
       g_BYTE_WRITE_WIDTH_B => mux_squid_offset_dina'length,
       g_WRITE_DATA_WIDTH_B => mux_squid_offset_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => mux_squid_offset_dina'length,
-      g_READ_LATENCY_B     => c_MUX_SQUID_OFFSET_RAM_B_RD_LATENCY,
+      g_READ_LATENCY_B     => pkg_MUX_SQUID_OFFSET_RAM_B_RD_LATENCY,
       -- other
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
@@ -368,7 +355,7 @@ begin
   -------------------------------------------------------------------
   inst_pipeliner_sync_with_tdpram_mux_squid_offset_outa : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -424,14 +411,14 @@ begin
       g_WRITE_DATA_WIDTH_A => mux_squid_tf_dina'length,
       g_WRITE_MODE_A       => "no_change",
       g_READ_DATA_WIDTH_A  => mux_squid_tf_dina'length,
-      g_READ_LATENCY_A     => c_MUX_SQUID_TF_RAM_A_RD_LATENCY,
+      g_READ_LATENCY_A     => pkg_MUX_SQUID_TF_RAM_A_RD_LATENCY,
       -- port B
       g_ADDR_WIDTH_B       => mux_squid_tf_addra'length,
       g_BYTE_WRITE_WIDTH_B => mux_squid_tf_dina'length,
       g_WRITE_DATA_WIDTH_B => mux_squid_tf_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => mux_squid_tf_dina'length,
-      g_READ_LATENCY_B     => c_MUX_SQUID_TF_RAM_B_RD_LATENCY,
+      g_READ_LATENCY_B     => pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY,
       -- other
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
@@ -474,7 +461,7 @@ begin
   -------------------------------------------------------------------
   inst_pipeliner_sync_with_tdpram_mux_squid_tf_outa : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_MUX_SQUID_TF_RAM_A_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_MUX_SQUID_TF_RAM_A_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -520,7 +507,7 @@ begin
   data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_rx;
   inst_pipeliner_sync_with_sdpram_mux_squid_tf_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_MUX_SQUID_TF_RAM_B_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp2'length -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -552,8 +539,8 @@ begin
   ---------------------------------------------------------------------
   -- add mux_squid_offset + mux_squid_tf
   ---------------------------------------------------------------------
-  --assert not (mux_squid_tf_tmp'length = mux_squid_tf_doutb'length - 1) report "[mux_squid]: mux_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
-  --assert not (mux_squid_offset_tmp'length /= mux_squid_offset_ry'length) report "[mux_squid]: mux_squid_offset_tmp => port width and sfixed package definition width doesn't match." severity error;
+  assert not ((mux_squid_tf_doutb'length) /= ((mux_squid_tf_tmp'length) - 1)) report "[mux_squid]: mux_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
+  assert not ((mux_squid_offset_tmp'length) /= (mux_squid_offset_ry'length)) report "[mux_squid]: mux_squid_offset_tmp => port width and sfixed package definition width doesn't match." severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
   mux_squid_tf_tmp     <= std_logic_vector(resize(unsigned(mux_squid_tf_doutb), mux_squid_tf_tmp'length));
   -- no conversion => width unchanged
@@ -576,8 +563,8 @@ begin
       --------------------------------------------------------------
       -- input
       --------------------------------------------------------------
-      i_a   => mux_squid_tf_tmp,
-      i_b   => mux_squid_offset_tmp,
+      i_a   => mux_squid_offset_tmp,
+      i_b   => mux_squid_tf_tmp,
       --------------------------------------------------------------
       -- output : S = a + B
       --------------------------------------------------------------

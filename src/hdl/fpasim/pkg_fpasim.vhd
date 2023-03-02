@@ -277,7 +277,7 @@ package pkg_fpasim is
 
   -- mux_squid_tf
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_MUX_SQUID_ADD_Q_M_B     : positive := 16;
+  constant pkg_MUX_SQUID_ADD_Q_M_B     : positive := 17;
   -- user-defined: number of fraction bits
   constant pkg_MUX_SQUID_ADD_Q_N_B     : natural  := 0;
   -- auto-computed: bus width
@@ -285,7 +285,8 @@ package pkg_fpasim is
 
   -- result
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_MUX_SQUID_ADD_Q_M_S     : positive := 34;
+  --constant pkg_MUX_SQUID_ADD_Q_M_S     : positive := 34;
+  constant pkg_MUX_SQUID_ADD_Q_M_S     : positive := 16;
   -- user-defined: number of fraction bits
   constant pkg_MUX_SQUID_ADD_Q_N_S     : natural  := 0;
   -- auto-computed: bus width

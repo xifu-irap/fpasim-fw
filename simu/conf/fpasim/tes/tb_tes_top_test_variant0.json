@@ -157,7 +157,7 @@
                 "        The range is integer: [0, 15]."
             ],
         "filename":"py_cmd_in.csv",
-        "pulse_height_list":[1],
+        "pulse_height_list":[16384],
         "pixel_id_list":    [0],
         "time_shift_list":  [2]
         }
@@ -227,7 +227,7 @@
                 "       :param output_filename (string): destination filename"
 
             ],
-            "input_filename":"tes_response.csv",
+            "input_filename":"tes_pulse_shape.csv",
             "output_filename":"py_ram_tes_shape.csv"
         },
         "sequence":
@@ -294,7 +294,7 @@
                 "       :param input_filename (string): source filename to copy",
                 "       :param output_filename (string): destination filename"
             ],
-            "input_filename":"tes_steady_state.csv",
+            "input_filename":"tes_std_state.csv",
             "output_filename":"py_ram_tes_steady_state.csv"
         },
         "sequence":

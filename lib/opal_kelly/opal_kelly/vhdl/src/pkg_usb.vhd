@@ -397,7 +397,7 @@ package body pkg_usb is
                   i_internal_rd_if => i_internal_rd_if
                   );
 
-              when 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 212 | 213 | 224 | 225 =>
+              when 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 212 | 213 | 218 | 219 | 220 | 221 | 224 | 225 =>
                 ---------------------------------------------------------------------
                 -- wire in
                 ---------------------------------------------------------------------
@@ -426,12 +426,27 @@ package body pkg_usb is
                   if v_file_reg_id = 207 then
                     info("[pkg_usb_wr] : Set TES_CONF Register: " & to_string(v_file_data));
                   end if;
+
                   if v_file_reg_id = 212 then
                     info("[pkg_usb_wr] : Set REC_CTRL Register: " & to_string(v_file_data));
                   end if;
                   if v_file_reg_id = 213 then
                     info("[pkg_usb_wr] : Set REC_CONF0 Register: " & to_string(v_file_data));
                   end if;
+
+                  if v_file_reg_id = 218 then
+                    info("[pkg_usb_wr] : Set SPI_CTRL Register: " & to_string(v_file_data));
+                  end if;
+                  if v_file_reg_id = 219 then
+                    info("[pkg_usb_wr] : Set SPI_CONF0 Register: " & to_string(v_file_data));
+                  end if;
+                  if v_file_reg_id = 220 then
+                    info("[pkg_usb_wr] : Set SPI_CONF1 Register: " & to_string(v_file_data));
+                  end if;
+                  if v_file_reg_id = 221 then
+                    info("[pkg_usb_wr] : Set SPI_WR_DATA Register: " & to_string(v_file_data));
+                  end if;
+
                   if v_file_reg_id = 224 then
                     info("[pkg_usb_wr] : Set DEBUG_CTRL Register: " & to_string(v_file_data));
                   end if;
@@ -534,6 +549,7 @@ package body pkg_usb is
                   if v_file_reg_id = 511 then
                     info("[pkg_usb_wr] : Get DATA_COUNT Register");
                   end if;
+
                   if v_file_reg_id = 512 then
                     info("[pkg_usb_wr] : Get REC_CTRL Register: ");
                   end if;
@@ -543,6 +559,26 @@ package body pkg_usb is
                   if v_file_reg_id = 517 then
                     info("[pkg_usb_wr] : Get REC_DATA_COUNT Register");
                   end if;
+
+                  if v_file_reg_id = 518 then
+                    info("[pkg_usb_wr] : Get SPI_CTRL Register");
+                  end if;
+                  if v_file_reg_id = 519 then
+                    info("[pkg_usb_wr] : Get SPI_CONF0 Register");
+                  end if;
+                  if v_file_reg_id = 520 then
+                    info("[pkg_usb_wr] : Get SPI_CONF1 Register");
+                  end if;
+                  if v_file_reg_id = 521 then
+                    info("[pkg_usb_wr] : Get SPI_WR_DATA Register");
+                  end if;
+                  if v_file_reg_id = 522 then
+                    info("[pkg_usb_wr] : Get SPI_RD_DATA Register");
+                  end if;
+                  if v_file_reg_id = 523 then
+                    info("[pkg_usb_wr] : Get SPI_STATUS Register");
+                  end if;
+
                   if v_file_reg_id = 524 then
                     info("[pkg_usb_wr] : Get DEBUG_CTRL Register");
                   end if;
@@ -555,6 +591,7 @@ package body pkg_usb is
                   if v_file_reg_id = 527 then
                     info("[pkg_usb_wr] : Get STATUS Register");
                   end if;
+
                   if v_file_reg_id = 529 then
                     info("[pkg_usb_wr] : Get BOARD_ID Register");
                   end if;
@@ -607,6 +644,7 @@ package body pkg_usb is
                 if v_file_reg_id = 511 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get DATA_COUNT Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
+
                 if v_file_reg_id = 512 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get REC_CTRL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
@@ -616,6 +654,26 @@ package body pkg_usb is
                 if v_file_reg_id = 517 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get REC_DATA_COUNT Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
+
+                if v_file_reg_id = 518 then
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get SPI_CTRL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                end if;
+                if v_file_reg_id = 519 then
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get SPI_CONF0 Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                end if;
+                if v_file_reg_id = 520 then
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get SPI_CONF1 Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                end if;
+                if v_file_reg_id = 521 then
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get SPI_WR_DATA Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                end if;
+                if v_file_reg_id = 522 then
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get SPI_RD_DATA Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                end if;
+                if v_file_reg_id = 523 then
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get SPI_STATUS Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                end if;
+
                 if v_file_reg_id = 524 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get DEBUG_CTRL Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;

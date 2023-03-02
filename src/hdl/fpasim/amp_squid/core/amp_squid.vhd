@@ -95,14 +95,8 @@ entity amp_squid is
 end entity amp_squid;
 
 architecture RTL of amp_squid is
-  constant c_AMP_SQUID_TF_RAM_A_RD_LATENCY : positive := pkg_AMP_SQUID_TF_RAM_A_RD_LATENCY;
-  constant c_AMP_SQUID_TF_RAM_B_RD_LATENCY : positive := pkg_AMP_SQUID_TF_RAM_B_RD_LATENCY;
 
   constant c_MEMORY_SIZE_AMP_SQUID_TF : positive := (2 ** (i_amp_squid_tf_wr_rd_addr'length)) * i_amp_squid_tf_wr_data'length; -- memory size in bits
-
-  constant c_pkg_AMP_SQUID_SUB_Q_WIDTH_S : positive := pkg_AMP_SQUID_SUB_Q_WIDTH_S;
-  constant c_AMP_SQUID_MULT_Q_WIDTH_A    : positive := pkg_AMP_SQUID_MULT_Q_WIDTH_A;
-  constant c_AMP_SQUID_MULT_Q_WIDTH_B    : positive := pkg_AMP_SQUID_MULT_Q_WIDTH_B;
 
   ---------------------------------------------------------------------
   -- compute
@@ -110,7 +104,7 @@ architecture RTL of amp_squid is
   ---------------------------------------------------------------------
   signal pixel_result_tmp                : std_logic_vector(i_pixel_result'range);
   signal amp_squid_offset_correction_tmp : std_logic_vector(i_amp_squid_offset_correction'range);
-  signal result_sub_rx                   : std_logic_vector(c_pkg_AMP_SQUID_SUB_Q_WIDTH_S - 1 downto 0);
+  signal result_sub_rx                   : std_logic_vector(pkg_AMP_SQUID_SUB_Q_WIDTH_S - 1 downto 0);
 
   ---------------------------------------------------------------------
   -- sync with sub_sfixed_mux_squid out
@@ -173,14 +167,14 @@ architecture RTL of amp_squid is
   ---------------------------------------------------------------------
   -- amp_squid_fpagain_table
   ---------------------------------------------------------------------
-  signal fpasim_gain : std_logic_vector(c_AMP_SQUID_MULT_Q_WIDTH_B - 1 downto 0);
+  signal fpasim_gain : std_logic_vector(pkg_AMP_SQUID_MULT_Q_WIDTH_B - 1 downto 0);
 
   -------------------------------------------------------------------
   -- mult: fpasim_gain * amp_squid_tf
   -------------------------------------------------------------------
   -- add a sign bit
-  signal amp_squid_tf_tmp : std_logic_vector(c_AMP_SQUID_MULT_Q_WIDTH_A - 1 downto 0);
-  signal fpasim_gain_tmp  : std_logic_vector(c_AMP_SQUID_MULT_Q_WIDTH_B - 1 downto 0);
+  signal amp_squid_tf_tmp : std_logic_vector(pkg_AMP_SQUID_MULT_Q_WIDTH_A - 1 downto 0);
+  signal fpasim_gain_tmp  : std_logic_vector(pkg_AMP_SQUID_MULT_Q_WIDTH_B - 1 downto 0);
   signal result_rz        : std_logic_vector(o_pixel_result'range);
 
   ---------------------------------------------------------------------
@@ -206,8 +200,8 @@ begin
   -------------------------------------------------------------------
   -- sub_sfixed_amp_squid_out : out = pixel_result_tmp - amp_squid_offset_correction_tmp
   -------------------------------------------------------------------
-  assert not (i_pixel_result'length /= pkg_AMP_SQUID_SUB_Q_WIDTH_A) report "[mux_squid]: i_pixel_result => port width and sfixed package definition width doesn't match." severity error;
-  assert not (i_amp_squid_offset_correction'length /= pkg_AMP_SQUID_SUB_Q_WIDTH_B) report "[mux_squid]: i_amp_squid_offset_correction => port width and sfixed package definition width doesn't match." severity error;
+  assert not ((i_pixel_result'length) /= pkg_AMP_SQUID_SUB_Q_WIDTH_A) report "[mux_squid]: i_pixel_result => port width and sfixed package definition width doesn't match." severity error;
+  assert not ((i_amp_squid_offset_correction'length) /= pkg_AMP_SQUID_SUB_Q_WIDTH_B) report "[mux_squid]: i_amp_squid_offset_correction => port width and sfixed package definition width doesn't match." severity error;
   -- no conversion: already sfixed
   pixel_result_tmp                <= i_pixel_result;
   amp_squid_offset_correction_tmp <= i_amp_squid_offset_correction;
@@ -278,14 +272,14 @@ begin
       g_WRITE_DATA_WIDTH_A => amp_squid_tf_dina'length,
       g_WRITE_MODE_A       => "no_change",
       g_READ_DATA_WIDTH_A  => amp_squid_tf_dina'length,
-      g_READ_LATENCY_A     => c_AMP_SQUID_TF_RAM_A_RD_LATENCY,
+      g_READ_LATENCY_A     => pkg_AMP_SQUID_TF_RAM_A_RD_LATENCY,
       -- port B
       g_ADDR_WIDTH_B       => amp_squid_tf_addra'length,
       g_BYTE_WRITE_WIDTH_B => amp_squid_tf_dina'length,
       g_WRITE_DATA_WIDTH_B => amp_squid_tf_dina'length,
       g_WRITE_MODE_B       => "no_change",
       g_READ_DATA_WIDTH_B  => amp_squid_tf_dina'length,
-      g_READ_LATENCY_B     => c_AMP_SQUID_TF_RAM_B_RD_LATENCY,
+      g_READ_LATENCY_B     => pkg_AMP_SQUID_TF_RAM_B_RD_LATENCY,
       -- others
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
@@ -328,7 +322,7 @@ begin
   -------------------------------------------------------------------
   inst_pipeliner_sync_with_tdpram_amp_squid_tf_outa : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_AMP_SQUID_TF_RAM_A_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_AMP_SQUID_TF_RAM_A_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -374,7 +368,7 @@ begin
   data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_rx;
   inst_pipeliner_sync_with_sdpram_amp_squid_tf_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => c_AMP_SQUID_TF_RAM_B_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_AMP_SQUID_TF_RAM_B_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp2'length -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(
@@ -418,7 +412,7 @@ begin
   ---------------------------------------------------------------------
   -- add mux_squid_offset + mux_squid_tf
   ---------------------------------------------------------------------
-  assert not (amp_squid_tf_tmp'length /= amp_squid_tf_doutb'length + 1) report "[amp_squid]: amp_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
+  assert not ((amp_squid_tf_doutb'length) /= (amp_squid_tf_tmp'length - 1)) report "[amp_squid]: amp_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
   amp_squid_tf_tmp <= std_logic_vector(resize(unsigned(amp_squid_tf_doutb), amp_squid_tf_tmp'length));
   -- no change: already sfixed

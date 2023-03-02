@@ -166,7 +166,7 @@ architecture RTL of regdecode_pipe_rd_all is
   constant c_FIFO_IDX3_H : integer := c_FIFO_IDX3_L + 1 - 1;
 
   -- find the power of 2 superior to the g_DELAY
-  constant c_FIFO_DEPTH0          : integer := 16;                 --see IP
+  constant c_FIFO_DEPTH0          : integer := 1024;                 --see IP
   constant c_PROG_FULL_THRESH0    : integer := c_FIFO_DEPTH0 - 6;  --see IP
   constant c_FIFO_WIDTH0          : integer := c_FIFO_IDX3_H + 1;  --see IP
   constant c_WR_DATA_COUNT_WIDTH0 : integer := work.pkg_utils.pkg_width_from_value(c_FIFO_DEPTH0) + 1;  --see IP

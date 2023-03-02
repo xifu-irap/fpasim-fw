@@ -64,20 +64,6 @@ entity regdecode_pipe_addr_decode is
 end entity regdecode_pipe_addr_decode;
 
 architecture RTL of regdecode_pipe_addr_decode is
-  constant c_TES_PULSE_SHAPE_ADDR_RANGE_MIN : std_logic_vector(pkg_TES_PULSE_SHAPE_ADDR_RANGE_MIN'range) := pkg_TES_PULSE_SHAPE_ADDR_RANGE_MIN;
-  constant c_TES_PULSE_SHAPE_ADDR_RANGE_MAX : std_logic_vector(pkg_TES_PULSE_SHAPE_ADDR_RANGE_MAX'range) := pkg_TES_PULSE_SHAPE_ADDR_RANGE_MAX;
-
-  constant c_AMP_SQUID_TF_ADDR_RANGE_MIN : std_logic_vector(pkg_AMP_SQUID_TF_ADDR_RANGE_MIN'range) := pkg_AMP_SQUID_TF_ADDR_RANGE_MIN;
-  constant c_AMP_SQUID_TF_ADDR_RANGE_MAX : std_logic_vector(pkg_AMP_SQUID_TF_ADDR_RANGE_MAX'range) := pkg_AMP_SQUID_TF_ADDR_RANGE_MAX;
-
-  constant c_MUX_SQUID_TF_ADDR_RANGE_MIN : std_logic_vector(pkg_MUX_SQUID_TF_ADDR_RANGE_MIN'range) := pkg_MUX_SQUID_TF_ADDR_RANGE_MIN;
-  constant c_MUX_SQUID_TF_ADDR_RANGE_MAX : std_logic_vector(pkg_MUX_SQUID_TF_ADDR_RANGE_MAX'range) := pkg_MUX_SQUID_TF_ADDR_RANGE_MAX;
-
-  constant c_TES_STD_STATE_ADDR_RANGE_MIN : std_logic_vector(pkg_TES_STD_STATE_ADDR_RANGE_MIN'range) := pkg_TES_STD_STATE_ADDR_RANGE_MIN;
-  constant c_TES_STD_STATE_ADDR_RANGE_MAX : std_logic_vector(pkg_TES_STD_STATE_ADDR_RANGE_MAX'range) := pkg_TES_STD_STATE_ADDR_RANGE_MAX;
-
-  constant c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN : std_logic_vector(pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN'range) := pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN;
-  constant c_MUX_SQUID_OFFSET_ADDR_RANGE_MAX : std_logic_vector(pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MAX'range) := pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MAX;
 
   constant c_PIPE_DELAY         : integer := pkg_REGDECODE_PIPE_ADDR_DECODE_CHECK_ADDR_RANGE_LATENCY;
   ---------------------------------------------------------------------
@@ -112,7 +98,7 @@ begin
   -- check address range of tes_pulse_shape
   inst_regdecode_pipe_addr_decode_check_addr_range_tes_pulse_shape : entity work.regdecode_pipe_addr_decode_check_addr_range
     generic map(
-      g_ADDR_RANGE_WIDTH => c_TES_PULSE_SHAPE_ADDR_RANGE_MIN'length,  -- input address bus range width
+      g_ADDR_RANGE_WIDTH => pkg_TES_PULSE_SHAPE_ADDR_RANGE_MIN'length,  -- input address bus range width
       g_ADDR_WIDTH       => i_addr'length  -- input address bus width
       )
     port map(
@@ -120,8 +106,8 @@ begin
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      i_addr_range_min => c_TES_PULSE_SHAPE_ADDR_RANGE_MIN,  -- define the lowest possible address
-      i_addr_range_max => c_TES_PULSE_SHAPE_ADDR_RANGE_MAX,  -- define the highest possible address
+      i_addr_range_min => pkg_TES_PULSE_SHAPE_ADDR_RANGE_MIN,  -- define the lowest possible address
+      i_addr_range_max => pkg_TES_PULSE_SHAPE_ADDR_RANGE_MAX,  -- define the highest possible address
       ---------------------------------------------------------------------
       -- input data
       ---------------------------------------------------------------------
@@ -136,7 +122,7 @@ begin
   -- check address range of amp_squid_tf
   inst_regdecode_pipe_addr_decode_check_addr_range_amp_squid_tf : entity work.regdecode_pipe_addr_decode_check_addr_range
     generic map(
-      g_ADDR_RANGE_WIDTH => c_AMP_SQUID_TF_ADDR_RANGE_MIN'length,  -- input address bus range width
+      g_ADDR_RANGE_WIDTH => pkg_AMP_SQUID_TF_ADDR_RANGE_MIN'length,  -- input address bus range width
       g_ADDR_WIDTH       => i_addr'length  -- input address bus width
       )
     port map(
@@ -144,8 +130,8 @@ begin
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      i_addr_range_min => c_AMP_SQUID_TF_ADDR_RANGE_MIN,  -- define the lowest possible address
-      i_addr_range_max => c_AMP_SQUID_TF_ADDR_RANGE_MAX,  -- define the highest possible address
+      i_addr_range_min => pkg_AMP_SQUID_TF_ADDR_RANGE_MIN,  -- define the lowest possible address
+      i_addr_range_max => pkg_AMP_SQUID_TF_ADDR_RANGE_MAX,  -- define the highest possible address
       ---------------------------------------------------------------------
       -- input data
       ---------------------------------------------------------------------
@@ -160,7 +146,7 @@ begin
   -- check address range of mux_squid_tf
   inst_regdecode_pipe_addr_decode_check_addr_range_mux_squid_tf : entity work.regdecode_pipe_addr_decode_check_addr_range
     generic map(
-      g_ADDR_RANGE_WIDTH => c_MUX_SQUID_TF_ADDR_RANGE_MIN'length,  -- input address bus range width
+      g_ADDR_RANGE_WIDTH => pkg_MUX_SQUID_TF_ADDR_RANGE_MIN'length,  -- input address bus range width
       g_ADDR_WIDTH       => i_addr'length  -- input address bus width
       )
     port map(
@@ -168,8 +154,8 @@ begin
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      i_addr_range_min => c_MUX_SQUID_TF_ADDR_RANGE_MIN,  -- define the lowest possible address
-      i_addr_range_max => c_MUX_SQUID_TF_ADDR_RANGE_MAX,  -- define the highest possible address
+      i_addr_range_min => pkg_MUX_SQUID_TF_ADDR_RANGE_MIN,  -- define the lowest possible address
+      i_addr_range_max => pkg_MUX_SQUID_TF_ADDR_RANGE_MAX,  -- define the highest possible address
       ---------------------------------------------------------------------
       -- input data
       ---------------------------------------------------------------------
@@ -184,7 +170,7 @@ begin
   -- check address range of tes_std_state
   inst_regdecode_pipe_addr_decode_check_addr_range_tes_std_state : entity work.regdecode_pipe_addr_decode_check_addr_range
     generic map(
-      g_ADDR_RANGE_WIDTH => c_TES_STD_STATE_ADDR_RANGE_MIN'length,  -- input address bus range width
+      g_ADDR_RANGE_WIDTH => pkg_TES_STD_STATE_ADDR_RANGE_MIN'length,  -- input address bus range width
       g_ADDR_WIDTH       => i_addr'length  -- input address bus width
       )
     port map(
@@ -192,8 +178,8 @@ begin
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      i_addr_range_min => c_TES_STD_STATE_ADDR_RANGE_MIN,  -- define the lowest possible address
-      i_addr_range_max => c_TES_STD_STATE_ADDR_RANGE_MAX,  -- define the highest possible address
+      i_addr_range_min => pkg_TES_STD_STATE_ADDR_RANGE_MIN,  -- define the lowest possible address
+      i_addr_range_max => pkg_TES_STD_STATE_ADDR_RANGE_MAX,  -- define the highest possible address
       ---------------------------------------------------------------------
       -- input data
       ---------------------------------------------------------------------
@@ -208,7 +194,7 @@ begin
   -- check address range of mux_squid_offset
   inst_regdecode_pipe_addr_decode_check_addr_range_mux_squid_offset : entity work.regdecode_pipe_addr_decode_check_addr_range
     generic map(
-      g_ADDR_RANGE_WIDTH => c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN'length,  -- input address bus range width
+      g_ADDR_RANGE_WIDTH => pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN'length,  -- input address bus range width
       g_ADDR_WIDTH       => i_addr'length  -- input address bus width
       )
     port map(
@@ -216,8 +202,8 @@ begin
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
-      i_addr_range_min => c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN,  -- define the lowest possible address
-      i_addr_range_max => c_MUX_SQUID_OFFSET_ADDR_RANGE_MAX,  -- define the highest possible address
+      i_addr_range_min => pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN,  -- define the lowest possible address
+      i_addr_range_max => pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MAX,  -- define the highest possible address
       ---------------------------------------------------------------------
       -- input data
       ---------------------------------------------------------------------

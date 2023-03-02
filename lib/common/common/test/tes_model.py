@@ -19,7 +19,7 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   mux_squid_model.py
+#    @file                   tes_model.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
@@ -114,17 +114,27 @@ class TesModel:
 
     def add_command(self, pixel_id_p, time_shift_p, pulse_heigth_p):
 
-        # 0 = 0%, 65535 = 100%
-        pulse_heigth_percentage = pulse_heigth_p /65535
-
         dic = {}
         dic['pixel_id']     = pixel_id_p
         dic['time_shift']   = time_shift_p
-        dic['pulse_heigth_percentage'] = pulse_heigth_percentage
+        dic['pulse_heigth'] = pulse_heigth_p
 
         self.cmd_dic_list.append(dic)
 
+    def _compute_tes(self,pulse_shape_p,pulse_heigth_p,i0_p):
 
+        # convert pulse_heigth to percentage
+        #    uint16_t -> [0;0.9999847412109375]
+        #    0x0000 -> 0%
+        #    0xFFFF -> ~100%
+        pulse_heigth_width = 16
+
+        pulse_heigth_percentage = pulse_heigth_p / 2**pulse_heigth_width
+
+        pulse_shape = pulse_shape_p * pulse_heigth_percentage
+        res = i0_p - pulse_shape
+        res = math.floor(res)
+        return res
 
     def run(self):
 
@@ -132,9 +142,7 @@ class TesModel:
         tes_pulse_shape_list = self.tes_pulse_shape_list
         tes_steady_state_list = self.tes_steady_state_list
         nb_sample_by_pixel = self.nb_sample_by_pixel
-        # nb_pixel_by_frame = self.nb_pixel_by_frame
-        # nb_frame_by_pulse = self.nb_frame_by_pulse
-        # nb_pulse = self.nb_pulse
+
         cmd_dic_list = self.cmd_dic_list
 
         pulse_shape_oversampling_factor = 16
@@ -143,29 +151,29 @@ class TesModel:
         result = []
 
         # compute data with only I0
-        data_list = []
+        io_list = []
         for pixel_id in pixel_id_list:
             data = tes_steady_state_list[pixel_id]
-            data_list.append(data)
+            io_list.append(data)
   
         index = 0
-        L = len(data_list)
+        L = len(io_list)
         for cmd_dic in cmd_dic_list:
             cmd_pixel_id = cmd_dic['pixel_id']
             cmd_time_shift = cmd_dic['time_shift']
-            cmd_pulse_heigth_percentage = cmd_dic['pulse_heigth_percentage']
+            cmd_pulse_heigth = cmd_dic['pulse_heigth']
+
             cnt = 0
             cnt_sample = 1
             for i in range(L):
                 pixel_id = pixel_id_list[i]
-                i0       = data_list[i]
-                # cnt      = table_cnt[pixel_id]
+                i0       = io_list[i]
                 if cmd_pixel_id == pixel_id:
                     if cnt <= (pulse_shape_nb_samples_by_frame - 1):
+                        # compute tes_pulse_shape address
                         index = cnt*pulse_shape_oversampling_factor  + cmd_time_shift
-                        pulse_shape = tes_pulse_shape_list[index] * cmd_pulse_heigth_percentage
-                        res = i0 - pulse_shape
-                        data_list[i] = math.floor(res)  
+                        pulse_shape = tes_pulse_shape_list[index]
+                        io_list[i] = self._compute_tes(pulse_shape_p=pulse_shape, pulse_heigth_p=cmd_pulse_heigth, i0_p=i0)
 
                         # add pulse shape
                     if cnt_sample == nb_sample_by_pixel:
@@ -176,7 +184,7 @@ class TesModel:
                        
                    
 
-        self.result = data_list
+        self.result = io_list
 
     def get_result(self):
 

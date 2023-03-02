@@ -35,6 +35,7 @@
 include("./fpasim/utils_tools.dscript");
 include("./fpasim/fpasim_address.dscript");
 include("./fpasim/fpasim_tools.dscript");
+include("./fpasim/ads62p49.dscript");
 
 function test_recording(level_p, mode_p, verbosity_p)
 {
@@ -46,7 +47,7 @@ function test_recording(level_p, mode_p, verbosity_p)
     const level0 = level_p;
 
     // configure the adc to automatically generate pattern.
-    adc_generate_pattern0(level_p=level0, mode_p=mode_p, verbosity_p=verbosity_p):
+    adc_generate_pattern0(level_p=level0, mode_p=mode_p, verbosity_p=verbosity_p);
 
     // Enable the recording.
     en = 1;
@@ -94,7 +95,8 @@ function test_wire_random(level_p, mode_p, verbosity_p) {
     wr_dic['REC_CTRL'] = 0x23456789 & mask_en;
     wr_dic['REC_CONF0'] = 0x3456789A;
     wr_dic['SPI_CTRL'] = 0x456789AB & mask_rst & mask_en;
-    wr_dic['SPI_CONF'] = 0x56789ABC;
+    wr_dic['SPI_CONF0'] = 0x56789ABC;
+    wr_dic['SPI_CONF1'] = 0x56789ABC;
     wr_dic['SPI_WR_DATA'] = 0x6789ABCD;
     wr_dic['DEBUG_CTRL'] = 0x789ABCDE;
     wr_dic['ERROR_SEL'] = 0x89ABCDEF;
@@ -376,26 +378,33 @@ function test_wire(level_p, mode_p, verbosity_p) {
 
     /* 
     ***************************************************************************
-    * check: SPI_CONF
+    * check: SPI_CONF0
     ***************************************************************************
     */ 
     spi_mode = 0;
-    spi_id = 0;
-    spi_dac_tx_en = 0;
-    data = (spi_dac_tx_en << 8) + (spi_id << 4) + spi_mode;
-
-    // msg = "Set register: SPI_CONF";
-    // display(msg_p = msg, level_p = level1, mode_p = mode_p);
-    // addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
-    // sendToFPA_debugSetWireIn(addr, data);
-    fpasim_set_debug_wirein_by_name(reg_name_p='SPI_CONF', data_p=data, level_p=level1, mode_p=mode_p, verbosity_p=verbosity_p);
-
-     // build the data to send
-    data0 = fpasim_build_spi_conf(spi_dac_tx_en_p=spi_dac_tx_en, spi_id_p=spi_id, spi_mode_p=spi_mode);
+    spi_id = 2;
+    data0 = fpasim_build_spi_conf0(spi_id_p=spi_id, spi_mode_p=spi_mode)
+    fpasim_set_debug_wirein_by_name(reg_name_p='SPI_CONF0', data_p=data0, level_p=level1, mode_p=mode_p, verbosity_p=verbosity_p);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="SPI_CTRL", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p="SPI_CONF0", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
     // check the read data Vs the written data
-    msg = "Check register: SPI_CTRL";
+    msg = "Check register: SPI_CONF0";
+    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+
+
+    /* 
+    ***************************************************************************
+    * check: SPI_CONF1
+    ***************************************************************************
+    */ 
+    spi_dac_tx_en = 0;
+    data0 = fpasim_build_spi_conf1(spi_dac_tx_en_p=spi_dac_tx_en)
+    fpasim_set_debug_wirein_by_name(reg_name_p='SPI_CONF1', data_p=data0, level_p=level1, mode_p=mode_p, verbosity_p=verbosity_p);
+
+    // read the register
+    data1 = fpasim_get_wireout_by_name(reg_name_p="SPI_CONF1", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    // check the read data Vs the written data
+    msg = "Check register: SPI_CONF1";
     check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
 
     /* 

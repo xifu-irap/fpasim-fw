@@ -118,13 +118,12 @@ function adc_spi_enable(level_p, mode_p, verbosity_p) {
 function adc_write_command(addr_p, data_p) {
 
     //---------------------------------------------------------------------
-    // write in the SPI_CONF register
+    // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
     const mode = 1; // 0: rd, 1: wr
     const spi_id = 1; // 0: cdce,1: adc, 2: dac, 3: amc
-    const spi_dac_tx_enable = 0;
-    const data = (spi_dac_tx_enable << 8) + (spi_id << 4) + mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+    const data = (spi_id << 4) + mode;
+    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
     sendToFPA_debugSetWireIn(addr, data);
 
     //---------------------------------------------------------------------
@@ -163,13 +162,12 @@ function adc_read_command(addr_p) {
     );
 
     //---------------------------------------------------------------------
-    // write in the SPI_CONF register
+    // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
     const spi_mode = 0; // 0: rd, 1: wr
     const spi_id = 1; // 0: cdce,1: adc, 2: dac, 3: amc
-    const spi_dac_tx_enable = 0;
-    data = (spi_dac_tx_enable << 8) + (spi_id << 4) + spi_mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF'];
+    data = (spi_id << 4) + spi_mode;
+    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
     sendToFPA_debugSetWireIn(addr, data);
 
     //---------------------------------------------------------------------
