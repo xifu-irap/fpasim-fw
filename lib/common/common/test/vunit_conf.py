@@ -426,6 +426,8 @@ class VunitConf:
             filepath = filepath.replace('\\','/')
             if suffix == '.vhd':
                 str0 = " ".join(['vcom','-work',library_name,'-'+version,filepath])
+            elif suffix == '.vhdl':
+                str0 = " ".join(['vcom','-work',library_name,'-'+version,filepath])
             elif suffix == '.v':
                 str0 = " ".join(['vlog','-work',library_name,filepath])
             elif suffix == '.sv':
@@ -518,23 +520,18 @@ class VunitConf:
 
         # list of files to compile
         filepath_list = []
-        filepath_list.append(str(Path(base_path, 'selectio_wiz_adc/selectio_wiz_adc_selectio_wiz.v')))
-        filepath_list.append(str(Path(base_path, 'selectio_wiz_adc/selectio_wiz_adc.v')))
-        
-        filepath_list.append(str(Path(base_path, 'selectio_wiz_sync/selectio_wiz_sync_selectio_wiz.v')))
-        filepath_list.append(str(Path(base_path, 'selectio_wiz_sync/selectio_wiz_sync.v')))
 
-        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac/selectio_wiz_dac_selectio_wiz.v')))
-        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac/selectio_wiz_dac.v')))
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_adc/selectio_wiz_adc_sim_netlist.vhdl')))
 
-        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_frame/selectio_wiz_dac_frame_selectio_wiz.v')))
-        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_frame/selectio_wiz_dac_frame.v')))
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_sync/selectio_wiz_sync_sim_netlist.vhdl')))
 
-        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_clk/selectio_wiz_dac_clk_selectio_wiz.v')))
-        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_clk/selectio_wiz_dac_clk.v')))
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac/selectio_wiz_dac_sim_netlist.vhdl')))
 
-        filepath_list.append(str(Path(base_path, 'fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v')))
-        filepath_list.append(str(Path(base_path, 'fpasim_clk_wiz_0/fpasim_clk_wiz_0.v')))
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_frame/selectio_wiz_dac_frame_sim_netlist.vhdl')))
+
+        filepath_list.append(str(Path(base_path, 'selectio_wiz_dac_clk/selectio_wiz_dac_clk_sim_netlist.vhdl')))
+
+        filepath_list.append(str(Path(base_path, 'fpasim_clk_wiz_0/fpasim_clk_wiz_0_sim_netlist.vhdl')))
 
         filepath_list.append(str(Path(base_path, 'system_fpasim_top_ila/sim/system_fpasim_top_ila.vhd')))
         filepath_list.append(str(Path(base_path, 'fpasim_top_ila_0/sim/fpasim_top_ila_0.vhd')))
@@ -1222,6 +1219,8 @@ class VunitConf:
             suffix = Path(filepath).suffix
             filepath = filepath.replace('\\','/')
             if suffix == '.vhd':
+                str0 = " ".join(['vcom','-work',library_name,'-'+version,filepath])
+            elif suffix == '.vhdl':
                 str0 = " ".join(['vcom','-work',library_name,'-'+version,filepath])
             elif suffix == '.v':
                 str0 = " ".join(['vlog','-work',library_name,filepath,str1,str2])

@@ -36,8 +36,21 @@
 /project/vivado00/fpasim.runs/**/*.wpc
 /project/vivado00/fpasim.runs/**/.Xil/*
 # Untracked no necessary Xilinx IP Files
-/ip/xilinx/coregen/*/*.*
-/ip/xilinx/coregen/*/**/*.*
+/ip/xilinx/coregen/*/*.dcp
+/ip/xilinx/coregen/*/*.vho
+/ip/xilinx/coregen/*/*.xml
+/ip/xilinx/coregen/*/doc
+/ip/xilinx/coregen/*/hdl
+/ip/xilinx/coregen/*/synth
+/ip/xilinx/coregen/*/ila*
+/ip/xilinx/coregen/*/*_stub.*
+/ip/xilinx/coregen/*/*.v
+/ip/xilinx/coregen/*/*.vh
+/ip/xilinx/coregen/*/*.veo
+/ip/xilinx/coregen/*/*ila*netlist.vhdl
+/ip/xilinx/coregen/*/*vio*netlist.vhdl
+
+
 
 # Track essential Xilinx IP files
 !/ip/xilinx/coregen/*/*.xdc

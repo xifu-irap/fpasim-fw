@@ -82,13 +82,13 @@ vcom -work fpasim  -93 \
 "${PR_DIR}/ip/xilinx/coregen/fpasim_regdecode_top_ila_1/sim/fpasim_regdecode_top_ila_1.vhd" \
 "${PR_DIR}/ip/xilinx/coregen/fpasim_top_ila_0/sim/fpasim_top_ila_0.vhd" \
 "${PR_DIR}/ip/xilinx/coregen/fpasim_top_vio_0/sim/fpasim_top_vio_0.vhd" \
+"${PR_DIR}/ip/xilinx/coregen/selectio_wiz_adc/selectio_wiz_adc_sim_netlist.vhdl" \
+"${PR_DIR}/ip/xilinx/coregen/selectio_wiz_sync/selectio_wiz_sync_sim_netlist.vhdl" \
+"${PR_DIR}/ip/xilinx/coregen/selectio_wiz_dac/selectio_wiz_dac_sim_netlist.vhdl" \
+"${PR_DIR}/ip/xilinx/coregen/selectio_wiz_dac_frame/selectio_wiz_dac_frame_sim_netlist.vhdl" \
+"${PR_DIR}/ip/xilinx/coregen/selectio_wiz_dac_clk/selectio_wiz_dac_clk_sim_netlist.vhdl" \
+"${PR_DIR}/ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0_sim_netlist.vhdl" \
 
-vlog -work fpasim  -incr -mfcu "+incdir+${PR_DIR}/ip/xilinx/coregen/fpasim_clk_wiz_0" \
-"${PR_DIR}/ip/xilinx/coregen/selectio_wiz_dac_frame/selectio_wiz_dac_frame_sim_netlist.v" \
-"${PR_DIR}/ip/xilinx/coregen/selectio_wiz_dac/selectio_wiz_dac_sim_netlist.v" \
-"${PR_DIR}/ip/xilinx/coregen/selectio_wiz_dac_clk/selectio_wiz_dac_clk_sim_netlist.v" \
-"${PR_DIR}/ip/xilinx/coregen/selectio_wiz_sync/selectio_wiz_sync_sim_netlist.v" \
-"${PR_DIR}/ip/xilinx/coregen/selectio_wiz_adc/selectio_wiz_adc_sim_netlist.v" \
 
 vlog -work fpasim ${VIVADO_DIR}/data/verilog/src/glbl.v  
 
