@@ -266,6 +266,8 @@ if __name__ == '__main__':
     ram_filename_list.append('mux_squid_offset.mem')
     ram_filename_list.append('mux_squid_tf.mem')
     ram_filename_list.append('amp_squid_tf.mem')
+    ram_filename_list.append('mux_squid_linear_tf.mem')
+    ram_filename_list.append('amp_squid_linear_tf.mem')
     ram_filepath_list = obj.get_ram_filepath(filename_list_p=ram_filename_list,level_p=level1)
 
     # obj.set_mif_files(filepath_list_p = ram_filepath_list)

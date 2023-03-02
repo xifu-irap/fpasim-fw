@@ -95,6 +95,8 @@ package pkg_fpasim is
   constant pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_TES_PULSE_SHAPE_RAM_NB_WORDS);
   -- user-defined: ram data bus width
   constant pkg_TES_PULSE_SHAPE_RAM_DATA_WIDTH   : positive := 16;
+  -- user-defined: ram configuration file
+  constant pkg_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE   : string := "tes_pulse_shape.mem";
 
   -- std state
   -- auto-computed: read latency of the RAM (port A). Possible values: [2; max integer value[. Indeed, by design, memory are in parallel. So, we fixe the same latency
@@ -107,6 +109,8 @@ package pkg_fpasim is
   constant pkg_TES_STD_STATE_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_TES_STD_STATE_RAM_NB_WORDS);
   -- user-defined: ram data bus width
   constant pkg_TES_STD_STATE_RAM_DATA_WIDTH   : positive := 16;
+  -- user-defined: ram configuration file
+  constant pkg_TES_STD_STATE_RAM_MEMORY_INIT_FILE   : string := "tes_std_state.mem";
 
   -- mux squid offset
   -- user-defined: read latency of the RAM (port A). Possible values: [2; max integer value[
@@ -119,6 +123,8 @@ package pkg_fpasim is
   constant pkg_MUX_SQUID_OFFSET_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_NB_PIXEL_BY_FRAME_MAX);
   -- user-defined: data bus width
   constant pkg_MUX_SQUID_OFFSET_RAM_DATA_WIDTH   : positive := 16;
+  -- user-defined: ram configuration file
+  constant pkg_MUX_SQUID_OFFSET_RAM_MEMORY_INIT_FILE   : string := "mux_squid_offset.mem";
 
   -- mux squid tf
   -- user-defined: read latency of the RAM (port A). Possible values: [2; max integer value[.
@@ -131,6 +137,9 @@ package pkg_fpasim is
   constant pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_MUX_SQUID_TF_RAM_NB_WORDS);
   -- user-defined: ram data bus width
   constant pkg_MUX_SQUID_TF_RAM_DATA_WIDTH   : positive := 16;
+  -- user-defined: ram configuration file
+  constant pkg_MUX_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "mux_squid_tf.mem";
+  --constant pkg_MUX_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "mux_squid_linear_tf.mem";
 
   -- amp squid tf
   -- user-defined: read latency of the RAM (port A). Possible values: [2; max integer value[
@@ -143,6 +152,9 @@ package pkg_fpasim is
   constant pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH   : natural := work.pkg_utils.pkg_width_from_value(pkg_AMP_SQUID_TF_RAM_NB_WORDS);
   -- user-defined: ram data bus width
   constant pkg_AMP_SQUID_TF_RAM_DATA_WIDTH   : natural := 16;
+  -- user-defined: ram configuration file
+  constant pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "amp_squid_tf.mem";
+  --constant pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "amp_squid_linear_tf.mem";
 
 
   ---------------------------------------------------------------------

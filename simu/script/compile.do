@@ -70,6 +70,8 @@ file copy -force "${PR_DIR}/src/hdl/fpasim/tes/core/tes_pulse_shape.mem" .
 file copy -force "${PR_DIR}/src/hdl/fpasim/mux_squid/core/mux_squid_offset.mem" .
 file copy -force "${PR_DIR}/src/hdl/fpasim/mux_squid/core/mux_squid_tf.mem" .
 file copy -force "${PR_DIR}/src/hdl/fpasim/amp_squid/core/amp_squid_tf.mem" .
+file copy -force "${PR_DIR}/src/hdl/fpasim/mux_squid/core/mux_squid_linear_tf.mem" .
+file copy -force "${PR_DIR}/src/hdl/fpasim/amp_squid/core/amp_squid_linear_tf.mem" .
 
 ###################### IP Source files ######################
 # don't edit except if you know what you do

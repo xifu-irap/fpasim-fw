@@ -48,18 +48,22 @@ use work.pkg_regdecode.all;
 entity tes_pulse_shape_manager is
   generic(
     -- command
-    g_CMD_PULSE_HEIGHT_WIDTH     : positive := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH;  -- pulse_heigth bus width (expressed in bits). Possible values [1;max integer value[
-    g_CMD_TIME_SHIFT_WIDTH       : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH;  -- time_shift bus width (expressed in bits). Possible values [1;max integer value[
-    g_CMD_PIXEL_ID_WIDTH         : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH;  -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[
+    g_CMD_PULSE_HEIGHT_WIDTH               : positive := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH;  -- pulse_heigth bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_TIME_SHIFT_WIDTH                 : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH;  -- time_shift bus width (expressed in bits). Possible values [1;max integer value[
+    g_CMD_PIXEL_ID_WIDTH                   : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH;  -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[
     -- frame
-    g_NB_FRAME_BY_PULSE_SHAPE    : positive := pkg_NB_FRAME_BY_PULSE_SHAPE;
-    g_NB_SAMPLE_BY_FRAME_WIDTH   : positive := pkg_NB_SAMPLE_BY_FRAME_WIDTH;  -- frame bus width (expressed in bits). Possible values : [1; max integer value[
+    g_NB_FRAME_BY_PULSE_SHAPE              : positive := pkg_NB_FRAME_BY_PULSE_SHAPE;
+    g_NB_SAMPLE_BY_FRAME_WIDTH             : positive := pkg_NB_SAMPLE_BY_FRAME_WIDTH;  -- frame bus width (expressed in bits). Possible values : [1; max integer value[
     -- pixel
-    g_NB_PIXEL_BY_FRAME_MAX      : positive := pkg_NB_PIXEL_BY_FRAME_MAX;  -- number max of pixel by frame authorised by the design
+    g_NB_PIXEL_BY_FRAME_MAX                : positive := pkg_NB_PIXEL_BY_FRAME_MAX;  -- number max of pixel by frame authorised by the design
     -- addr
-    g_PULSE_SHAPE_RAM_ADDR_WIDTH : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
+    g_PULSE_SHAPE_RAM_ADDR_WIDTH           : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- output 
-    g_PIXEL_RESULT_OUTPUT_WIDTH  : positive := pkg_TES_MULT_SUB_Q_WIDTH_S  -- pixel output result width (expressed in bits). Possible values : [1; max integer value[
+    g_PIXEL_RESULT_OUTPUT_WIDTH            : positive := pkg_TES_MULT_SUB_Q_WIDTH_S;  -- pixel output result width (expressed in bits). Possible values : [1; max integer value[
+    -- RAM configuration filename
+    g_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE : string   := pkg_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE;
+    g_TES_STD_STATE_RAM_MEMORY_INIT_FILE   : string   := pkg_TES_STD_STATE_RAM_MEMORY_INIT_FILE
+
     );
   port(
     i_clk         : in std_logic;       -- clock 
@@ -688,7 +692,7 @@ begin
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_PULSE_SHAPE,
-      g_MEMORY_INIT_FILE   => "tes_pulse_shape.mem",
+      g_MEMORY_INIT_FILE   => g_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE,
       g_MEMORY_INIT_PARAM  => ""
       )
     port map(
@@ -792,7 +796,7 @@ begin
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_STEADY_STATE,
-      g_MEMORY_INIT_FILE   => "tes_std_state.mem",
+      g_MEMORY_INIT_FILE   => g_TES_STD_STATE_RAM_MEMORY_INIT_FILE,
       g_MEMORY_INIT_PARAM  => ""
       )
     port map(

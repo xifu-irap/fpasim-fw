@@ -41,62 +41,64 @@ use work.pkg_fpasim.all;
 entity amp_squid is
   generic(
     -- pixel
-    g_PIXEL_ID_WIDTH              : positive := pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH; -- pixel id bus width (expressed in bits). Possible values [1; max integer value[
+    g_PIXEL_ID_WIDTH                    : positive := pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH;  -- pixel id bus width (expressed in bits). Possible values [1; max integer value[
     -- addr
-    g_AMP_SQUID_TF_RAM_ADDR_WIDTH : positive := pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
+    g_AMP_SQUID_TF_RAM_ADDR_WIDTH       : positive := pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- computation
-    g_PIXEL_RESULT_INPUT_WIDTH    : positive := pkg_AMP_SQUID_SUB_Q_WIDTH_A; -- pixel input result bus width (expressed in bits). Possible values [1; max integer value[
-    g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_AMP_SQUID_MULT_Q_WIDTH -- pixel output result bus width (expressed in bits). Possible values [1; max integer value[
-  );
+    g_PIXEL_RESULT_INPUT_WIDTH          : positive := pkg_AMP_SQUID_SUB_Q_WIDTH_A;  -- pixel input result bus width (expressed in bits). Possible values [1; max integer value[
+    g_PIXEL_RESULT_OUTPUT_WIDTH         : positive := pkg_AMP_SQUID_MULT_Q_WIDTH;  -- pixel output result bus width (expressed in bits). Possible values [1; max integer value[
+    -- RAM configuration filename
+    g_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE : string   := pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE
+    );
   port(
-    i_clk                         : in  std_logic; -- clock
-    i_rst_status                  : in  std_logic; -- reset error flag(s)
-    i_debug_pulse                 : in  std_logic; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    i_clk                     : in  std_logic;  -- clock
+    i_rst_status              : in  std_logic;  -- reset error flag(s)
+    i_debug_pulse             : in  std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
     -- RAM: amp_squid_tf
     -- wr
-    i_amp_squid_tf_wr_en          : in  std_logic; -- write enable
-    i_amp_squid_tf_wr_rd_addr     : in  std_logic_vector(g_AMP_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0); -- write address
-    i_amp_squid_tf_wr_data        : in  std_logic_vector(15 downto 0); -- write data
+    i_amp_squid_tf_wr_en      : in  std_logic;  -- write enable
+    i_amp_squid_tf_wr_rd_addr : in  std_logic_vector(g_AMP_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);  -- write address
+    i_amp_squid_tf_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
     -- rd
-    i_amp_squid_tf_rd_en          : in  std_logic; -- rd enable
-    o_amp_squid_tf_rd_valid       : out std_logic; -- rd data valid
-    o_amp_squid_tf_rd_data        : out std_logic_vector(15 downto 0); -- read data
+    i_amp_squid_tf_rd_en      : in  std_logic;  -- rd enable
+    o_amp_squid_tf_rd_valid   : out std_logic;  -- rd data valid
+    o_amp_squid_tf_rd_data    : out std_logic_vector(15 downto 0);  -- read data
 
-    i_fpasim_gain                 : in  std_logic_vector(2 downto 0); -- fpasim gain value
+    i_fpasim_gain                 : in  std_logic_vector(2 downto 0);  -- fpasim gain value
     ---------------------------------------------------------------------
     -- input1
     ---------------------------------------------------------------------
-    i_pixel_sof                   : in  std_logic; -- first pixel sample
-    i_pixel_eof                   : in  std_logic; -- last pixel sample
-    i_pixel_valid                 : in  std_logic; -- valid pixel sample
-    i_pixel_id                    : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id
-    i_pixel_result                : in  std_logic_vector(g_PIXEL_RESULT_INPUT_WIDTH - 1 downto 0); -- pixel result
+    i_pixel_sof                   : in  std_logic;  -- first pixel sample
+    i_pixel_eof                   : in  std_logic;  -- last pixel sample
+    i_pixel_valid                 : in  std_logic;  -- valid pixel sample
+    i_pixel_id                    : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id
+    i_pixel_result                : in  std_logic_vector(g_PIXEL_RESULT_INPUT_WIDTH - 1 downto 0);  -- pixel result
     ---------------------------------------------------------------------
     -- input2
     ---------------------------------------------------------------------
-    i_amp_squid_offset_correction : in  std_logic_vector(13 downto 0); -- amp squid offset correction value
+    i_amp_squid_offset_correction : in  std_logic_vector(13 downto 0);  -- amp squid offset correction value
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
-    o_pixel_sof                   : out std_logic; -- first pixel sample
-    o_pixel_eof                   : out std_logic; -- last pixel sample
-    o_pixel_valid                 : out std_logic; -- valid pixel sample
-    o_pixel_id                    : out std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id
-    o_pixel_result                : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0); -- pixel result
+    o_pixel_sof                   : out std_logic;  -- first pixel sample
+    o_pixel_eof                   : out std_logic;  -- last pixel sample
+    o_pixel_valid                 : out std_logic;  -- valid pixel sample
+    o_pixel_id                    : out std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id
+    o_pixel_result                : out std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0);  -- pixel result
     ---------------------------------------------------------------------
     -- errors/status
     ---------------------------------------------------------------------
-    o_errors                      : out std_logic_vector(15 downto 0); -- output errors
-    o_status                      : out std_logic_vector(7 downto 0) -- output status
-  );
+    o_errors                      : out std_logic_vector(15 downto 0);  -- output errors
+    o_status                      : out std_logic_vector(7 downto 0)  -- output status
+    );
 end entity amp_squid;
 
 architecture RTL of amp_squid is
 
-  constant c_MEMORY_SIZE_AMP_SQUID_TF : positive := (2 ** (i_amp_squid_tf_wr_rd_addr'length)) * i_amp_squid_tf_wr_data'length; -- memory size in bits
+  constant c_MEMORY_SIZE_AMP_SQUID_TF : positive := (2 ** (i_amp_squid_tf_wr_rd_addr'length)) * i_amp_squid_tf_wr_data'length;  -- memory size in bits
 
   ---------------------------------------------------------------------
   -- compute
@@ -217,19 +219,19 @@ begin
       -- port S: AMD Q notation (fixed point)
       g_Q_M_S => pkg_AMP_SQUID_SUB_Q_M_S,
       g_Q_N_S => pkg_AMP_SQUID_SUB_Q_N_S
-    )
+      )
     port map(
       i_clk => i_clk,
       --------------------------------------------------------------
       -- input
       --------------------------------------------------------------
-      i_a   => pixel_result_tmp, -- @suppress "Incorrect array size in assignment: expected (<34>) but was (<g_PIXEL_RESULT_INPUT_WIDTH>)"
+      i_a   => pixel_result_tmp,  -- @suppress "Incorrect array size in assignment: expected (<34>) but was (<g_PIXEL_RESULT_INPUT_WIDTH>)"
       i_b   => amp_squid_offset_correction_tmp,
       --------------------------------------------------------------
       -- output : S = A - B
       --------------------------------------------------------------
       o_s   => result_sub_rx
-    );
+      );
 
   -----------------------------------------------------------------
   -- sync with inst_sub_sfixed_amp_squid out
@@ -240,14 +242,14 @@ begin
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
   inst_pipeliner_sync_with_sub_sfixed_amp_squid_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => pkg_AMP_SQUID_SUB_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => data_pipe_tmp0'length -- width of the input/output data.  Possibles values: [1, integer max value[
-    )
+      g_NB_PIPES   => pkg_AMP_SQUID_SUB_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => data_pipe_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
     port map(
       i_clk  => i_clk,                  -- clock signal
       i_data => data_pipe_tmp0,         -- input data
       o_data => data_pipe_tmp1          -- output data with/without delay
-    );
+      );
 
   pixel_valid_rx <= data_pipe_tmp1(c_IDX3_H);
   pixel_sof_rx   <= data_pipe_tmp1(c_IDX2_H);
@@ -284,9 +286,9 @@ begin
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "block",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_AMP_SQUID_TF,
-      g_MEMORY_INIT_FILE   => "amp_squid_tf.mem",
+      g_MEMORY_INIT_FILE   => g_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE,
       g_MEMORY_INIT_PARAM  => ""
-    )
+      )
     port map(
       ---------------------------------------------------------------------
       -- port A
@@ -310,11 +312,11 @@ begin
       i_dinb   => amp_squid_tf_dinb,
       i_regceb => amp_squid_tf_regceb,
       o_doutb  => amp_squid_tf_doutb
-    );
+      );
   amp_squid_tf_web    <= '0';
   amp_squid_tf_dinb   <= (others => '0');
   amp_squid_tf_enb    <= pixel_valid_rx;
-  amp_squid_tf_addrb  <= result_sub_rx; -- @suppress "Incorrect array size in assignment: expected (<g_AMP_SQUID_TF_RAM_ADDR_WIDTH>) but was (<14>)"
+  amp_squid_tf_addrb  <= result_sub_rx;  -- @suppress "Incorrect array size in assignment: expected (<g_AMP_SQUID_TF_RAM_ADDR_WIDTH>) but was (<14>)"
   amp_squid_tf_regceb <= pixel_valid_rx;
 
   -------------------------------------------------------------------
@@ -322,14 +324,14 @@ begin
   -------------------------------------------------------------------
   inst_pipeliner_sync_with_tdpram_amp_squid_tf_outa : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => pkg_AMP_SQUID_TF_RAM_A_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
-    )
+      g_NB_PIPES   => pkg_AMP_SQUID_TF_RAM_A_RD_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => 1  -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
     port map(
       i_clk     => i_clk,               -- clock signal
-      i_data(0) => i_amp_squid_tf_rd_en, -- input data
-      o_data(0) => amp_squid_tf_rd_en_rw -- output data with/without delay
-    );
+      i_data(0) => i_amp_squid_tf_rd_en,  -- input data
+      o_data(0) => amp_squid_tf_rd_en_rw  -- output data with/without delay
+      );
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
@@ -343,7 +345,7 @@ begin
     generic map(
       g_WR_ADDR_WIDTH => amp_squid_tf_addra'length,
       g_RD_ADDR_WIDTH => amp_squid_tf_addrb'length
-    )
+      )
     port map(
       i_clk         => i_clk,
       ---------------------------------------------------------------------
@@ -357,7 +359,7 @@ begin
       -- Errors
       ---------------------------------------------------------------------
       o_error_pulse => amp_squid_tf_error
-    );
+      );
 
   -----------------------------------------------------------------
   -- sync with inst_sdpram_mux_squid_tf out
@@ -368,14 +370,14 @@ begin
   data_pipe_tmp2(c_IDX0_H downto c_IDX0_L) <= pixel_id_rx;
   inst_pipeliner_sync_with_sdpram_amp_squid_tf_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => pkg_AMP_SQUID_TF_RAM_B_RD_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => data_pipe_tmp2'length -- width of the input/output data.  Possibles values: [1, integer max value[
-    )
+      g_NB_PIPES   => pkg_AMP_SQUID_TF_RAM_B_RD_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => data_pipe_tmp2'length  -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
     port map(
       i_clk  => i_clk,                  -- clock signal
       i_data => data_pipe_tmp2,         -- input data
       o_data => data_pipe_tmp3          -- output data with/without delay
-    );
+      );
 
   pixel_valid_ry <= data_pipe_tmp3(c_IDX3_H);
   pixel_sof_ry   <= data_pipe_tmp3(c_IDX2_H);
@@ -388,10 +390,10 @@ begin
   inst_amp_squid_fpagain_table : entity work.amp_squid_fpagain_table
     generic map(
       -- port S: AMD Q notation (fixed point)
-      g_Q_M_S       => pkg_AMP_SQUID_MULT_Q_M_B, -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
-      g_Q_N_S       => pkg_AMP_SQUID_MULT_Q_N_B, -- number of fraction bits. Possible values [0;integer_max_value[
+      g_Q_M_S       => pkg_AMP_SQUID_MULT_Q_M_B,  -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
+      g_Q_N_S       => pkg_AMP_SQUID_MULT_Q_N_B,  -- number of fraction bits. Possible values [0;integer_max_value[
       g_LATENCY_OUT => pkg_AMP_SQUID_FPAGAIN_TABLE_OUT_LATENCY
-    )
+      )
     port map(
       i_clk         => i_clk,
       ---------------------------------------------------------------------
@@ -407,7 +409,7 @@ begin
       -- output
       ---------------------------------------------------------------------
       o_fpasim_gain => fpasim_gain
-    );
+      );
 
   ---------------------------------------------------------------------
   -- add mux_squid_offset + mux_squid_tf
@@ -429,7 +431,7 @@ begin
       -- port S: AMD Q notation (fixed point)
       g_Q_M_S => pkg_AMP_SQUID_MULT_Q_M_S,
       g_Q_N_S => pkg_AMP_SQUID_MULT_Q_N_S
-    )
+      )
     port map(
       i_clk => i_clk,
       --------------------------------------------------------------
@@ -440,8 +442,8 @@ begin
       --------------------------------------------------------------
       -- output : S = a * B
       --------------------------------------------------------------
-      o_s   => result_rz -- @suppress "Incorrect array size in assignment: expected (<16>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
-    );
+      o_s   => result_rz  -- @suppress "Incorrect array size in assignment: expected (<16>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
+      );
 
   -----------------------------------------------------------------
   -- sync with inst_add_sfixed_mux_squid_offset_and_tf out
@@ -452,14 +454,14 @@ begin
   data_pipe_tmp4(c_IDX0_H downto c_IDX0_L) <= pixel_id_ry;
   inst_pipeliner_sync_with_mult_sfixed_amp_squid_correction_and_tf_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => work.pkg_fpasim.pkg_AMP_SQUID_MULT_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => data_pipe_tmp4'length -- width of the input/output data.  Possibles values: [1, integer max value[
-    )
+      g_NB_PIPES   => work.pkg_fpasim.pkg_AMP_SQUID_MULT_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => data_pipe_tmp4'length  -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
     port map(
       i_clk  => i_clk,                  -- clock signal
       i_data => data_pipe_tmp4,         -- input data
       o_data => data_pipe_tmp5          -- output data with/without delay
-    );
+      );
 
   pixel_valid_rz <= data_pipe_tmp5(c_IDX3_H);
   pixel_sof_rz   <= data_pipe_tmp5(c_IDX2_H);
@@ -487,7 +489,7 @@ begin
         i_debug_pulse => i_debug_pulse,
         i_error       => error_tmp(i),
         o_error       => error_tmp_bis(i)
-      );
+        );
   end generate gen_errors_latch;
 
   o_errors(15 downto 1) <= (others => '0');
