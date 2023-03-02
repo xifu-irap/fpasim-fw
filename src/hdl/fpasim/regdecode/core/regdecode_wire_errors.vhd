@@ -54,51 +54,52 @@ use ieee.numeric_std.all;
 
 entity regdecode_wire_errors is
   generic(
-    g_ERROR_SEL_WIDTH : integer := 4
+    g_ERROR_SEL_WIDTH  : integer := 4;  -- define the width of the error selection
+    g_FIFO_WRITE_DEPTH : integer := 16  -- define the depth of the cross clock domaine FIFO
     );
   port(
     ---------------------------------------------------------------------
     -- input @i_out_clk
     ---------------------------------------------------------------------
-    i_out_clk          : in std_logic;
+    i_out_clk          : in std_logic;  -- clock
     -- errors
-    i_reg_wire_errors3 : in std_logic_vector(31 downto 0);
-    i_reg_wire_errors2 : in std_logic_vector(31 downto 0);
-    i_reg_wire_errors1 : in std_logic_vector(31 downto 0);
-    i_reg_wire_errors0 : in std_logic_vector(31 downto 0);
+    i_reg_wire_errors3 : in std_logic_vector(31 downto 0);  -- errors value
+    i_reg_wire_errors2 : in std_logic_vector(31 downto 0);  -- errors value
+    i_reg_wire_errors1 : in std_logic_vector(31 downto 0);  -- errors value
+    i_reg_wire_errors0 : in std_logic_vector(31 downto 0);  -- errors value
     -- status
-    i_reg_wire_status3 : in std_logic_vector(31 downto 0);
-    i_reg_wire_status2 : in std_logic_vector(31 downto 0);
-    i_reg_wire_status1 : in std_logic_vector(31 downto 0);
-    i_reg_wire_status0 : in std_logic_vector(31 downto 0);
+    i_reg_wire_status3 : in std_logic_vector(31 downto 0);  -- status value
+    i_reg_wire_status2 : in std_logic_vector(31 downto 0);  -- status value
+    i_reg_wire_status1 : in std_logic_vector(31 downto 0);  -- status value
+    i_reg_wire_status0 : in std_logic_vector(31 downto 0);  -- status value
 
     ---------------------------------------------------------------------
     -- input @i_clk
     ---------------------------------------------------------------------
-    i_clk               : in  std_logic;
-    i_error_sel         : in  std_logic_vector(g_ERROR_SEL_WIDTH - 1 downto 0);
+    i_clk               : in  std_logic;  -- clock
+    i_error_sel         : in  std_logic_vector(g_ERROR_SEL_WIDTH - 1 downto 0);  -- select the errors/status to output
     -- errors
-    i_usb_reg_errors6   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_errors5   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_errors4   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_errors3   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_errors2   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_errors1   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_errors0   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_errors6   : in  std_logic_vector(31 downto 0);  -- errors value
+    i_usb_reg_errors5   : in  std_logic_vector(31 downto 0);  -- errors value
+    i_usb_reg_errors4   : in  std_logic_vector(31 downto 0);  -- errors value
+    i_usb_reg_errors3   : in  std_logic_vector(31 downto 0);  -- errors value
+    i_usb_reg_errors2   : in  std_logic_vector(31 downto 0);  -- errors value
+    i_usb_reg_errors1   : in  std_logic_vector(31 downto 0);  -- errors value
+    i_usb_reg_errors0   : in  std_logic_vector(31 downto 0);  -- errors value
     -- status
-    i_usb_reg_status6   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_status5   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_status4   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_status3   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_status2   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_status1   : in  std_logic_vector(31 downto 0);
-    i_usb_reg_status0   : in  std_logic_vector(31 downto 0);
+    i_usb_reg_status6   : in  std_logic_vector(31 downto 0);  -- status value
+    i_usb_reg_status5   : in  std_logic_vector(31 downto 0);  -- status value
+    i_usb_reg_status4   : in  std_logic_vector(31 downto 0);  -- status value
+    i_usb_reg_status3   : in  std_logic_vector(31 downto 0);  -- status value
+    i_usb_reg_status2   : in  std_logic_vector(31 downto 0);  -- status value
+    i_usb_reg_status1   : in  std_logic_vector(31 downto 0);  -- status value
+    i_usb_reg_status0   : in  std_logic_vector(31 downto 0);  -- status value
     ---------------------------------------------------------------------
     -- output @ i_clk
     ---------------------------------------------------------------------
-    o_wire_errors_valid : out std_logic;
-    o_wire_errors       : out std_logic_vector(31 downto 0);
-    o_wire_status       : out std_logic_vector(31 downto 0)
+    o_wire_errors_valid : out std_logic;  -- valid output errors/status
+    o_wire_errors       : out std_logic_vector(31 downto 0);  -- output errors
+    o_wire_status       : out std_logic_vector(31 downto 0)   -- output status
     );
 end entity regdecode_wire_errors;
 
@@ -199,7 +200,7 @@ begin
         g_CDC_SYNC_STAGES   => 2,
         g_FIFO_MEMORY_TYPE  => "auto",
         g_FIFO_READ_LATENCY => c_FIFO_READ_LATENCY,
-        g_FIFO_WRITE_DEPTH  => 16,
+        g_FIFO_WRITE_DEPTH  => g_FIFO_WRITE_DEPTH,
         g_READ_DATA_WIDTH   => wr_din_flag(i)'length,
         g_READ_MODE         => "std",
         g_RELATED_CLOCKS    => 0,
@@ -275,7 +276,7 @@ begin
         g_CDC_SYNC_STAGES   => 2,
         g_FIFO_MEMORY_TYPE  => "auto",
         g_FIFO_READ_LATENCY => c_FIFO_READ_LATENCY,
-        g_FIFO_WRITE_DEPTH  => 16,
+        g_FIFO_WRITE_DEPTH  => g_FIFO_WRITE_DEPTH,
         g_READ_DATA_WIDTH   => wr_din_flag(i)'length,
         g_READ_MODE         => "std",
         g_RELATED_CLOCKS    => 0,
@@ -313,28 +314,28 @@ begin
   -- for each error word, generate an associated trig bit if the error value is different of 0
   -----------------------------------------------------------------
   errors_tmp(10) <= errors_tmp1(3);
-  errors_tmp(9) <= errors_tmp1(2);
-  errors_tmp(8) <= errors_tmp1(1);
-  errors_tmp(7) <= errors_tmp1(0);
-  errors_tmp(6) <= i_usb_reg_errors6;
-  errors_tmp(5) <= i_usb_reg_errors5;
-  errors_tmp(4) <= i_usb_reg_errors4;
-  errors_tmp(3) <= i_usb_reg_errors3;
-  errors_tmp(2) <= i_usb_reg_errors2;
-  errors_tmp(1) <= i_usb_reg_errors1;
-  errors_tmp(0) <= i_usb_reg_errors0;
+  errors_tmp(9)  <= errors_tmp1(2);
+  errors_tmp(8)  <= errors_tmp1(1);
+  errors_tmp(7)  <= errors_tmp1(0);
+  errors_tmp(6)  <= i_usb_reg_errors6;
+  errors_tmp(5)  <= i_usb_reg_errors5;
+  errors_tmp(4)  <= i_usb_reg_errors4;
+  errors_tmp(3)  <= i_usb_reg_errors3;
+  errors_tmp(2)  <= i_usb_reg_errors2;
+  errors_tmp(1)  <= i_usb_reg_errors1;
+  errors_tmp(0)  <= i_usb_reg_errors0;
 
   status_tmp(10) <= status_tmp1(3);
-  status_tmp(9) <= status_tmp1(2);
-  status_tmp(8) <= status_tmp1(1);
-  status_tmp(7) <= status_tmp1(0);
-  status_tmp(6) <= i_usb_reg_status6;
-  status_tmp(5) <= i_usb_reg_status5;
-  status_tmp(4) <= i_usb_reg_status4;
-  status_tmp(3) <= i_usb_reg_status3;
-  status_tmp(2) <= i_usb_reg_status2;
-  status_tmp(1) <= i_usb_reg_status1;
-  status_tmp(0) <= i_usb_reg_status0;
+  status_tmp(9)  <= status_tmp1(2);
+  status_tmp(8)  <= status_tmp1(1);
+  status_tmp(7)  <= status_tmp1(0);
+  status_tmp(6)  <= i_usb_reg_status6;
+  status_tmp(5)  <= i_usb_reg_status5;
+  status_tmp(4)  <= i_usb_reg_status4;
+  status_tmp(3)  <= i_usb_reg_status3;
+  status_tmp(2)  <= i_usb_reg_status2;
+  status_tmp(1)  <= i_usb_reg_status1;
+  status_tmp(0)  <= i_usb_reg_status0;
 
   p_select_error_status : process(i_clk) is
   begin

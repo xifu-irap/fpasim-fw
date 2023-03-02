@@ -50,10 +50,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.pkg_fpasim.all;
+
 
 entity recording_adc is
   generic (
-    g_ADC_FIFO_OUT_DEPTH : integer := 32768  -- depth of the FIFO (number of words). Must be a power of 2
+    g_ADC_FIFO_OUT_DEPTH : integer := pkg_REC_ADC_FIFO_OUT_DEPTH  -- depth of the FIFO (number of words). Must be a power of 2
     );
   port (
     i_rst         : in std_logic;       -- input reset

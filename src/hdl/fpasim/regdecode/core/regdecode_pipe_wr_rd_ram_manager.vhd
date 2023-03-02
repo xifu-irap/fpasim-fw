@@ -165,7 +165,7 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   constant c_FIFO_IDX4_L : integer := c_FIFO_IDX3_H + 1;
   constant c_FIFO_IDX4_H : integer := c_FIFO_IDX4_L + 1 - 1;
 
-  constant c_FIFO_DEPTH0 : integer := 16;                 --see IP
+  constant c_FIFO_DEPTH0 : integer := 512;                 --see IP
   constant c_FIFO_WIDTH0 : integer := c_FIFO_IDX4_H + 1;  --see IP
 
   signal wr_rst_tmp0 : std_logic;
@@ -249,7 +249,7 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   ---------------------------------------------------------------------
   -- cross clock domain: user to regdecode
   ---------------------------------------------------------------------
-  constant c_FIFO_DEPTH2     : integer := 32;                 --see IP
+  constant c_FIFO_DEPTH2     : integer := 512;                 --see IP
   constant c_FIFO_WIDTH2     : integer := c_FIFO_IDX4_H + 1;  --see IP
   constant c_FIFO_PROG_FULL2 : integer := c_FIFO_DEPTH2 - 16;
 

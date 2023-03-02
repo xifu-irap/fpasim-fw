@@ -88,7 +88,7 @@ architecture RTL of io_adc is
   ---------------------------------------------------------------------
   -- ouput FIFO
   ---------------------------------------------------------------------
-  constant c_WR_FIFO_DEPTH     : integer := 16;
+  constant c_WR_FIFO_DEPTH     : integer := 1024;
   -- adc_a
   constant c_ADC_A_WR_IDX0_L   : integer := 0;
   constant c_ADC_A_WR_IDX0_H   : integer := c_ADC_A_WR_IDX0_L + c_ADC_A_WIDTH - 1;

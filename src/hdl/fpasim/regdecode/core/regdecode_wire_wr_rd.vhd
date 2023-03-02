@@ -43,7 +43,8 @@ use ieee.numeric_std.all;
 
 entity regdecode_wire_wr_rd is
   generic(
-    g_DATA_WIDTH_OUT : positive := 15   -- define the RAM address width
+    g_DATA_WIDTH_OUT   : positive := 15;  -- define the RAM address width,
+    g_FIFO_WRITE_DEPTH : integer  := 16  -- define the cross clock domain FIFO depth
     );
   port(
     ---------------------------------------------------------------------
@@ -60,7 +61,7 @@ entity regdecode_wire_wr_rd is
     -- from/to the user:  @i_out_clk
     ---------------------------------------------------------------------
     i_out_clk         : in  std_logic;  -- output clock
-    i_out_rst         : in std_logic;   -- reset @i_out_clk
+    i_out_rst         : in  std_logic;  -- reset @i_out_clk
     -- ram: wr
     o_data_valid      : out std_logic;  -- data valid
     o_data            : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0);  -- data
@@ -89,8 +90,8 @@ architecture RTL of regdecode_wire_wr_rd is
   constant c_FIFO_IDX0_L : integer := 0;
   constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + i_data'length - 1;
 
-  constant c_FIFO_DEPTH0 : integer := 16;                 --see IP
-  constant c_FIFO_WIDTH0 : integer := c_FIFO_IDX0_H + 1;  --see IP
+  constant c_FIFO_DEPTH0 : integer := g_FIFO_WRITE_DEPTH;  --see IP
+  constant c_FIFO_WIDTH0 : integer := c_FIFO_IDX0_H + 1;   --see IP
 
   signal wr_rst_tmp0 : std_logic;
   signal wr_tmp0     : std_logic;
@@ -128,8 +129,8 @@ architecture RTL of regdecode_wire_wr_rd is
   ---------------------------------------------------------------------
   -- cross clock domain: user to regdecode
   ---------------------------------------------------------------------
-  constant c_FIFO_DEPTH2 : integer := 32;                 --see IP
-  constant c_FIFO_WIDTH2 : integer := c_FIFO_IDX0_H + 1;  --see IP
+  constant c_FIFO_DEPTH2 : integer := g_FIFO_WRITE_DEPTH;  --see IP
+  constant c_FIFO_WIDTH2 : integer := c_FIFO_IDX0_H + 1;   --see IP
 
   -- wr side
   signal wr_tmp2   : std_logic;

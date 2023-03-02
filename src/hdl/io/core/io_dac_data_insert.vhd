@@ -86,7 +86,7 @@ architecture RTL of io_dac_data_insert is
   constant c_WR_IDX1_H : integer := c_WR_IDX1_L + 1 - 1;
 
   -- find the power of 2 superior to the g_DELAY
-  constant c_FIFO_DEPTH    : integer := 128;  --see IP
+  constant c_FIFO_DEPTH    : integer := 1024;  --see IP
   constant c_WR_FIFO_WIDTH : integer := 17;
   constant c_RD_FIFO_WIDTH : integer := c_WR_FIFO_WIDTH*2;
 

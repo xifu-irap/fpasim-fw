@@ -219,7 +219,7 @@ entity regdecode_top is
     o_reg_make_pulse                  : out std_logic_vector(31 downto 0);  -- register make_pulse value
     -- fpasim_status
     i_reg_fpasim_status_valid         : in  std_logic;
-    i_reg_fpasim_status               : in std_logic_vector(31 downto 0);
+    i_reg_fpasim_status               : in  std_logic_vector(31 downto 0);
 
     -- recording
     ---------------------------------------------------------------------
@@ -869,7 +869,8 @@ begin
   reg_data_tmp0(c_REG_IDX0_H downto c_REG_IDX0_L) <= usb_wirein_fpasim_gain;
   inst_regdecode_wire_wr_rd_common_register : entity work.regdecode_wire_wr_rd
     generic map(
-      g_DATA_WIDTH_OUT => reg_data_tmp0'length  -- define the RAM address width
+      g_DATA_WIDTH_OUT   => reg_data_tmp0'length,  -- define the RAM address width
+      g_FIFO_WRITE_DEPTH => 16
       )
     port map(
       ---------------------------------------------------------------------
@@ -932,7 +933,8 @@ begin
   ctrl_data_tmp0       <= usb_wirein_ctrl;
   inst_regdecode_wire_wr_rd_ctrl_register : entity work.regdecode_wire_wr_rd
     generic map(
-      g_DATA_WIDTH_OUT => ctrl_data_tmp0'length  -- define the RAM address width
+      g_DATA_WIDTH_OUT   => ctrl_data_tmp0'length,  -- define the RAM address width
+      g_FIFO_WRITE_DEPTH => 256
       )
     port map(
       ---------------------------------------------------------------------
@@ -991,7 +993,8 @@ begin
   debug_ctrl_data_tmp0       <= usb_wirein_debug_ctrl;
   inst_regdecode_wire_wr_rd_debug_ctrl_register : entity work.regdecode_wire_wr_rd
     generic map(
-      g_DATA_WIDTH_OUT => debug_ctrl_data_tmp0'length  -- define the RAM address width
+      g_DATA_WIDTH_OUT   => debug_ctrl_data_tmp0'length,  -- define the RAM address width
+      g_FIFO_WRITE_DEPTH => 256
       )
     port map(
       ---------------------------------------------------------------------
@@ -1112,7 +1115,8 @@ begin
   ---------------------------------------------------------------------
   inst_regdecode_wire_rd_fpasim_status : entity work.regdecode_wire_rd
     generic map(
-      g_DATA_WIDTH_OUT => i_reg_fpasim_status'length  -- define the RAM address width
+      g_DATA_WIDTH_OUT   => i_reg_fpasim_status'length,  -- define the RAM address width
+      g_FIFO_WRITE_DEPTH => 16
       )
     port map(
       ---------------------------------------------------------------------
@@ -1121,8 +1125,8 @@ begin
       i_clk         => i_out_clk,       -- clock
       i_rst         => i_out_rst,       -- rst
       -- data
-      i_data_valid  => i_reg_fpasim_status_valid,  -- data valid
-      i_data        => i_reg_fpasim_status,        -- data value
+      i_data_valid  => i_reg_fpasim_status_valid,        -- data valid
+      i_data        => i_reg_fpasim_status,              -- data value
       ---------------------------------------------------------------------
       -- from/to the user:  @i_out_clk
       ---------------------------------------------------------------------
@@ -1130,13 +1134,13 @@ begin
       i_rst_status  => usb_rst_status,  -- reset error flag(s)
       i_debug_pulse => usb_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- ram: wr
-      o_data_valid  => fpasim_status_valid,        -- data valid
+      o_data_valid  => fpasim_status_valid,              -- data valid
       o_data        => fpasim_status,   -- data
       ---------------------------------------------------------------------
       -- errors/status @ i_out_clk
       ---------------------------------------------------------------------
-      o_errors      => fpasim_status_errors,       -- output errors
-      o_status      => fpasim_status_status        -- output status
+      o_errors      => fpasim_status_errors,             -- output errors
+      o_status      => fpasim_status_status              -- output status
       );
 
 -- output: to USB
@@ -1295,7 +1299,8 @@ begin
   error_sel <= usb_wirein_sel_errors(pkg_ERROR_SEL_IDX_H downto pkg_ERROR_SEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_SEL_WIDTH>) but was (<4>)"
   inst_regdecode_wire_errors : entity work.regdecode_wire_errors
     generic map(
-      g_ERROR_SEL_WIDTH => error_sel'length
+      g_ERROR_SEL_WIDTH  => error_sel'length,
+      g_FIFO_WRITE_DEPTH => 512
       )
     port map(
       ---------------------------------------------------------------------
