@@ -43,7 +43,7 @@ package pkg_io is
 
 
   -------------------------------------------------------------------
-  -- IOs
+  -- IOs: ADC
   -------------------------------------------------------------------
 
   -- user-defined: add latency after the input IOs. Possible values: [0;max integer value[
@@ -57,6 +57,10 @@ package pkg_io is
   -- auto-computed: latency of the io_adc module (rough estimation: because of different frequencies)
   constant pkg_IO_ADC_LATENCY           : natural := pkg_IO_ADC_IN_LATENCY + pkg_IO_ADC_FIFO;
 
+  -------------------------------------------------------------------
+  -- IOs: DAC
+  -- to align the o_dac_frame_p port with the o_sync port => pkg_IO_DAC_OUT_LATENCY = pkg_IO_SYNC_OUT_LATENCY + 6;
+  -------------------------------------------------------------------
   -- user-defined: Number of cdc stage of the cross clock domain FIFO. [2 - 8]. Must be <5 if FIFO_WRITE_DEPTH = 16
   constant pkg_IO_DAC_FIFO_CDC_STAGE      : natural := 2;
   -- user-defined: Read FIFO latency. Possible values : [1, max integer value[
@@ -66,10 +70,14 @@ package pkg_io is
   -- auto-computed: latency of the io_dac_data_insert module
   constant pkg_IO_DAC_DATA_INSERT_LATENCY : natural := pkg_IO_DAC_FIFO;
   -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
-  constant pkg_IO_DAC_OUT_LATENCY         : natural := 1;
+  constant pkg_IO_DAC_OUT_LATENCY         : natural := 1 + 6; -- 
   -- auto-computed: latency of the io_dac module
   constant pkg_IO_DAC_LATENCY             : natural := pkg_IO_DAC_DATA_INSERT_LATENCY + pkg_IO_DAC_OUT_LATENCY;  -- fifo CDC + fifo read latency
 
+  -------------------------------------------------------------------
+  -- IOs: SYNC
+  -- to align the o_dac_frame_p port with the o_sync port => pkg_IO_DAC_OUT_LATENCY = pkg_IO_SYNC_OUT_LATENCY + 6;
+  -------------------------------------------------------------------
   -- user-defined: Number of cdc stage of the cross clock domain FIFO. [2 - 8]. Must be <5 if FIFO_WRITE_DEPTH = 16
   constant pkg_IO_SYNC_FIFO_CDC_STAGE    : natural := 2;
   -- user-defined: Read FIFO latency. Possible values : [1, max integer value[
