@@ -255,6 +255,15 @@ if __name__ == '__main__':
     ######################################################
     conf_filepath_list = obj.get_conf_filepath(level_p=level1)
 
+    ######################################################
+    # get the list of ram configuration filepath
+    ######################################################
+    ram_filename_list = []
+    ram_filename_list.append('tes_pulse_shape.mem')
+    ram_filename_list.append('tes_std_state.mem')
+    ram_filepath_list = obj.get_ram_filepath(filename_list_p=ram_filename_list,level_p=level1)
+
+
     
     ######################################################
     # get the Vunit testbench object + testbench name
@@ -284,6 +293,7 @@ if __name__ == '__main__':
         data_gen_obj.set_indentation_level(level_p= level1)
         data_gen_obj.set_conf_filepath(conf_filepath_p= conf_filepath)
         data_gen_obj.set_vunit_conf_obj(obj_p= obj)
+        data_gen_obj.set_mif_files(filepath_list_p=ram_filepath_list)
 
         # get a dictionnary of generics parameter
         generic_dic = data_gen_obj.get_generic_dic()
