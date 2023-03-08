@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   tb_fpga_system_fpasim_top.vhd 
+--    @file                   tb_fpga_system_fpasim_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -44,8 +44,8 @@ use ieee.fixed_float_types.all;
 
 entity tb_fpga_system_fpasim_top is
   generic(
-    runner_cfg           : string   := runner_cfg_default;  -- vunit generic: don't touch
-    output_path          : string   := "C:/Project/fpasim-fw-hardware/";  -- vunit generic: don't touch
+    runner_cfg           : string  := runner_cfg_default;  -- vunit generic: don't touch
+    output_path          : string  := "C:/Project/fpasim-fw-hardware/";  -- vunit generic: don't touch
     ---------------------------------------------------------------------
     -- DUT generic
     ---------------------------------------------------------------------
@@ -82,15 +82,15 @@ architecture simulate of tb_fpga_system_fpasim_top is
   ---------------------------------------------------------------------
   -- command
   ---------------------------------------------------------------------
-  signal i_make_pulse_valid : std_logic:= '0';
-  signal i_make_pulse       : std_logic_vector(31 downto 0):= (others => '0');
+  signal i_make_pulse_valid : std_logic                     := '0';
+  signal i_make_pulse       : std_logic_vector(31 downto 0) := (others => '0');
   signal o_auto_conf_busy   : std_logic;
   signal o_ready            : std_logic;
   ---------------------------------------------------------------------
   -- ADC
   ---------------------------------------------------------------------
-  signal adc_clk          : std_logic;
-  signal adc_clk_phase          : std_logic;
+  signal adc_clk            : std_logic;
+  signal adc_clk_phase      : std_logic;
   signal i_adc0_real        : real;
   signal i_adc1_real        : real;
   ---------------------------------------------------------------------
@@ -139,9 +139,8 @@ architecture simulate of tb_fpga_system_fpasim_top is
 begin
 
   ---------------------------------------------------------------------
-  -- Clock generation
+  -- ADC data clock generation
   ---------------------------------------------------------------------
-
   p_adc_clk : process is
   begin
     adc_clk <= '0';
@@ -150,18 +149,25 @@ begin
     wait for c_CLK_PERIOD0 / 2;
   end process p_adc_clk;
 
-    p_adc_clk_phase : process is
+  ---------------------------------------------------------------------
+  -- ADC sampling clock generation
+  ---------------------------------------------------------------------
+  p_adc_clk_phase : process is
+    variable v_first : integer := 1;
   begin
+    -- add an initial: 90 degree phase
+    if v_first = 1 then
+      v_first := 0;
+      wait for 1*c_CLK_PERIOD0 / 4;
+    end if;
     adc_clk_phase <= '0';
     -- on the rising edge, keep only the even bit
-      wait until adc_clk'event;
-      -- add 90 degree dephasage
-      wait for c_CLK_PERIOD0 / 4;
+    wait for c_CLK_PERIOD0 / 2;
+
     adc_clk_phase <= '1';
     -- on the rising edge, keep only the even bit
-      wait until adc_clk'event;
-      -- add 90 degree dephasage
-      wait for c_CLK_PERIOD0 / 4;
+    wait for c_CLK_PERIOD0 / 2;
+
   end process p_adc_clk_phase;
 
   ---------------------------------------------------------------------
@@ -242,40 +248,42 @@ begin
     end if;
   end process;
 
----------------------------------------------------------------------
--- generate data adc
----------------------------------------------------------------------
----------------------------------------------------------------------
+  ---------------------------------------------------------------------
   -- Data Generation
-  --  the data computation is done on the rising edge.
-  --  the i_adc clock and the computation clock is dephased by 90 degree
+  --   .pattern generation on adc0 and adc1
   ---------------------------------------------------------------------
   data_gen : process is
+    variable v_first : integer := 0;
   begin
-      -- compute a new value on the rising_edge
-      data0 <= data0 + 1;
-      data1 <= data1 + 1;
-      -- on the rising edge, keep only the even bit
-      wait until rising_edge(adc_clk);
-      wait for 12 ps;
-      -- add 90 degree dephasage
-      --wait for c_CLK_PERIOD0 / 4;
+    -- alternate values:
+    --    "01010101010101"
+    --    "10101010101010"
+    if v_first = 0 then
+      data0   <= "01010101010101";
+      v_first := 1;
+    else
+      data0   <= "10101010101010";
+      v_first := 0;
+    end if;
+    -- counter
+    data1 <= data1 + 1;
+
+    wait until rising_edge(adc_clk);
+    wait for 12 ps;
   end process data_gen;
 
 -- convert std_logic_vector to sfixed [-1;0.99[
-s_data0 <= sfixed(data0);
-s_data1 <= sfixed(data1);
+  s_data0 <= sfixed(data0);
+  s_data1 <= sfixed(data1);
 
 -- convert to float with upscale
-gen_convert: if true generate
-constant c_FACTOR : real := real(g_ADC_VPP)/2.0;
+  gen_convert : if true generate
+    constant c_FACTOR : real := real(g_ADC_VPP)/2.0;
   begin
-i_adc0_real <= c_FACTOR * To_real(s_data0);
-i_adc1_real <= c_FACTOR * To_real(s_data1);
+    i_adc0_real <= c_FACTOR * To_real(s_data0);
+    i_adc1_real <= c_FACTOR * To_real(s_data1);
 
-end generate gen_convert;
-
-
+  end generate gen_convert;
 
 
   ---------------------------------------------------------------------

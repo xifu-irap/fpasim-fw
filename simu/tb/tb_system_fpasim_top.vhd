@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   tb_system_fpasim.vhd 
+--    @file                   tb_system_fpasim.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -79,12 +79,12 @@ architecture simulate of tb_system_fpasim_top is
   signal b_okAA  : std_logic                    := '0';
 
   -- FMC: from the card
-  signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0'); -- @suppress "signal i_board_id is never written"
+  signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');  -- @suppress "signal i_board_id is never written"
   ---------------------------------------------------------------------
   -- FMC: from the adc
   ---------------------------------------------------------------------
-  signal i_adc_clk_p : std_logic;       --  differential clock p @250MHz
-  signal i_adc_clk_n : std_logic;       --  differential clock n @250MHZ
+  signal i_adc_clk_p : std_logic                    := '0';  --  differential clock p @250MHz
+  signal i_adc_clk_n : std_logic                    := '1';  --  differential clock n @250MHZ
   -- adc_a
   -- bit P/N: 0-1
   signal i_da0_p     : std_logic;
@@ -149,34 +149,34 @@ architecture simulate of tb_system_fpasim_top is
   -- devices: spi links + specific signals
   ---------------------------------------------------------------------
   -- common: shared link between the spi
-  signal o_spi_sclk        : std_logic;   -- @suppress "signal o_spi_sclk is never read"
-  signal o_spi_sdata       : std_logic;   -- @suppress "signal o_spi_sdata is never read"
+  signal o_spi_sclk        : std_logic;  -- @suppress "signal o_spi_sclk is never read"
+  signal o_spi_sdata       : std_logic;  -- @suppress "signal o_spi_sdata is never read"
   -- CDCE: SPI
   signal i_cdce_sdo        : std_logic := '0';  -- @suppress "signal i_cdce_sdo is never written"
   signal o_cdce_n_en       : std_logic;  -- @suppress "signal o_cdce_n_en is never read"
   -- CDCE: specific signals
-  signal i_cdce_pll_status : std_logic := '1';   -- @suppress "signal i_cdce_pll_status is never written"
-  signal o_cdce_n_reset    : std_logic;   -- @suppress "signal o_cdce_n_reset is never read"
+  signal i_cdce_pll_status : std_logic := '1';  -- @suppress "signal i_cdce_pll_status is never written"
+  signal o_cdce_n_reset    : std_logic;  -- @suppress "signal o_cdce_n_reset is never read"
   signal o_cdce_n_pd       : std_logic;  -- @suppress "signal o_cdce_n_pd is never read"
-  signal o_ref_en          : std_logic;   -- @suppress "signal o_ref_en is never read"
+  signal o_ref_en          : std_logic;  -- @suppress "signal o_ref_en is never read"
   -- ADC: SPI
-  signal i_adc_sdo         : std_logic := '0'; -- @suppress "signal i_adc_sdo is never written"
+  signal i_adc_sdo         : std_logic := '0';  -- @suppress "signal i_adc_sdo is never written"
   signal o_adc_n_en        : std_logic;  -- @suppress "signal o_adc_n_en is never read"
   -- ADC: specific signals
-  signal o_adc_reset       : std_logic; -- @suppress "signal o_adc_reset is never read"
+  signal o_adc_reset       : std_logic;  -- @suppress "signal o_adc_reset is never read"
   -- DAC: SPI
-  signal i_dac_sdo         : std_logic := '0';   -- @suppress "signal i_dac_sdo is never written"
-  signal o_dac_n_en        : std_logic;   -- @suppress "signal o_dac_n_en is never read"
+  signal i_dac_sdo         : std_logic := '0';  -- @suppress "signal i_dac_sdo is never written"
+  signal o_dac_n_en        : std_logic;  -- @suppress "signal o_dac_n_en is never read"
   -- DAC: specific signal
-  signal o_dac_tx_present  : std_logic;   -- @suppress "signal o_dac_tx_present is never read"
+  signal o_dac_tx_present  : std_logic;  -- @suppress "signal o_dac_tx_present is never read"
   -- AMC: SPI (monitoring)
   signal i_mon_sdo         : std_logic := '0';  -- @suppress "signal i_mon_sdo is never written"
-  signal o_mon_n_en        : std_logic;   -- @suppress "signal o_mon_n_en is never read"
+  signal o_mon_n_en        : std_logic;  -- @suppress "signal o_mon_n_en is never read"
   -- AMC : specific signals
   signal i_mon_n_int       : std_logic := '0';  -- @suppress "signal i_mon_n_int is never written"
   signal o_mon_n_reset     : std_logic;  -- @suppress "signal o_mon_n_reset is never read"
 
-  signal o_leds : std_logic_vector(3 downto 2); -- @suppress "signal o_leds is never read"
+  signal o_leds : std_logic_vector(3 downto 2);  -- @suppress "signal o_leds is never read"
 
   ---------------------------------------------------------------------
   -- additional signals
@@ -271,7 +271,7 @@ architecture simulate of tb_system_fpasim_top is
 begin
 
   ---------------------------------------------------------------------
-  -- Clock generation
+  -- USB Clock generation
   ---------------------------------------------------------------------
   p_usb_clk_gen : process is
   begin
@@ -281,17 +281,39 @@ begin
     wait for c_CLK_PERIOD0 / 2;
   end process p_usb_clk_gen;
 
+  ---------------------------------------------------------------------
+  -- ADC data clock generation
+  ---------------------------------------------------------------------
   p_adc_clk : process is
   begin
     adc_clk <= '0';
-    i_adc_clk_p <= '0';
-    i_adc_clk_n <= '1';
     wait for c_CLK_PERIOD1 / 2;
     adc_clk <= '1';
-    i_adc_clk_p <= '1';
-    i_adc_clk_n <= '0';
     wait for c_CLK_PERIOD1 / 2;
   end process p_adc_clk;
+
+---------------------------------------------------------------------
+-- ADC sampling clock generation
+---------------------------------------------------------------------
+  p_adc_clk_phase : process is
+    variable v_first : integer := 1;
+  begin
+    -- add an initial: 90 degree phase
+    if v_first = 1 then
+      v_first := 0;
+      wait for 1*c_CLK_PERIOD1 / 4;
+    end if;
+    i_adc_clk_p <= '0';
+    i_adc_clk_n <= '1';
+    -- on the rising edge, keep only the even bit
+    wait for c_CLK_PERIOD1 / 2;
+
+    i_adc_clk_p <= '1';
+    i_adc_clk_n <= '0';
+    -- on the rising edge, keep only the even bit
+    wait for c_CLK_PERIOD1 / 2;
+
+  end process p_adc_clk_phase;
 
   ---------------------------------------------------------------------
   -- master fsm
@@ -451,87 +473,102 @@ begin
 
   ---------------------------------------------------------------------
   -- Data Generation
-  --  the data computation is done on the rising edge.
-  --  the i_adc clock and the computation clock is dephased by 90 degree
+  --   .pattern generation on adc0 and adc1
   ---------------------------------------------------------------------
   data_gen : process is
+    variable v_first : integer := 0;
   begin
-      -- compute a new value on the rising_edge
-      data0 <= data0 + 1;
-      data1 <= data1 + 2;
-      -- save the value
-      data0_r1 <= data0;
-      data1_r1 <= data1;
-      -- on the rising edge, keep only the even bit
-      i_da0_p  <= data0(0);
-      i_da0_n  <= not(data0(0));
-      i_da2_p  <= data0(2);
-      i_da2_n  <= not(data0(2));
-      i_da4_p  <= data0(4);
-      i_da4_n  <= not(data0(4));
-      i_da6_p  <= data0(6);
-      i_da6_n  <= not(data0(6));
-      i_da8_p  <= data0(8);
-      i_da8_n  <= not(data0(8));
-      i_da10_p <= data0(10);
-      i_da10_n <= not(data0(10));
-      i_da12_p <= data0(12);
-      i_da12_n <= not(data0(12));
+    -- counter
+    data0 <= data0 + 1;
 
-      i_db0_p  <= data1(0);
-      i_db0_n  <= not(data1(0));
-      i_db2_p  <= data1(2);
-      i_db2_n  <= not(data1(2));
-      i_db4_p  <= data1(4);
-      i_db4_n  <= not(data1(4));
-      i_db6_p  <= data1(6);
-      i_db6_n  <= not(data1(6));
-      i_db8_p  <= data1(8);
-      i_db8_n  <= not(data1(8));
-      i_db10_p <= data1(10);
-      i_db10_n <= not(data1(10));
-      i_db12_p <= data1(12);
-      i_db12_n <= not(data1(12));
+    -- alternate values:
+    --    "01010101010101"
+    --    "10101010101010"
+    if v_first = 0 then
+      data1   <= "01010101010101";
+      v_first := 1;
+    else
+      data1   <= "10101010101010";
+      v_first := 0;
+    end if;
 
-      wait until rising_edge(adc_clk);
-      -- add 90 degree dephasage
-      wait for c_CLK_PERIOD1 / 4;
-      -- on the falling edge, keep only the odd bit (previously computed)
-      i_da0_p  <= data0_r1(1);
-      i_da0_n  <= not(data0_r1(1));
-      i_da2_p  <= data0_r1(3);
-      i_da2_n  <= not(data0_r1(3));
-      i_da4_p  <= data0_r1(5);
-      i_da4_n  <= not(data0_r1(5));
-      i_da6_p  <= data0_r1(7);
-      i_da6_n  <= not(data0_r1(7));
-      i_da8_p  <= data0_r1(9);
-      i_da8_n  <= not(data0_r1(9));
-      i_da10_p <= data0_r1(11);
-      i_da10_n <= not(data0_r1(11));
-      i_da12_p <= data0_r1(13);
-      i_da12_n <= not(data0_r1(13));
-
-      i_db0_p  <= data1_r1(1);
-      i_db0_n  <= not(data1_r1(1));
-      i_db2_p  <= data1_r1(3);
-      i_db2_n  <= not(data1_r1(3));
-      i_db4_p  <= data1_r1(5);
-      i_db4_n  <= not(data1_r1(5));
-      i_db6_p  <= data1_r1(7);
-      i_db6_n  <= not(data1_r1(7));
-      i_db8_p  <= data1_r1(9);
-      i_db8_n  <= not(data1_r1(9));
-      i_db10_p <= data1_r1(11);
-      i_db10_n <= not(data1_r1(11));
-      i_db12_p <= data1_r1(13);
-      i_db12_n <= not(data1_r1(13));
-
-      wait until falling_edge(adc_clk);
-      -- add 90 degree dephasage
-      wait for c_CLK_PERIOD1 / 4;
-
+    wait until rising_edge(adc_clk);
+    wait for 12 ps;
   end process data_gen;
+
+---------------------------------------------------------------------
+-- Select bits according to the edge clock
+---------------------------------------------------------------------
+  data_select_bits_by_edge_clk : process is
+  begin
+    -- on rising_edge: set the even bits
+    i_da0_p  <= data0(0);
+    i_da0_n  <= not(data0(0));
+    i_da2_p  <= data0(2);
+    i_da2_n  <= not(data0(2));
+    i_da4_p  <= data0(4);
+    i_da4_n  <= not(data0(4));
+    i_da6_p  <= data0(6);
+    i_da6_n  <= not(data0(6));
+    i_da8_p  <= data0(8);
+    i_da8_n  <= not(data0(8));
+    i_da10_p <= data0(10);
+    i_da10_n <= not(data0(10));
+    i_da12_p <= data0(12);
+    i_da12_n <= not(data0(12));
+
+    i_db0_p  <= data1(0);
+    i_db0_n  <= not(data1(0));
+    i_db2_p  <= data1(2);
+    i_db2_n  <= not(data1(2));
+    i_db4_p  <= data1(4);
+    i_db4_n  <= not(data1(4));
+    i_db6_p  <= data1(6);
+    i_db6_n  <= not(data1(6));
+    i_db8_p  <= data1(8);
+    i_db8_n  <= not(data1(8));
+    i_db10_p <= data1(10);
+    i_db10_n <= not(data1(10));
+    i_db12_p <= data1(12);
+    i_db12_n <= not(data1(12));
+    wait until rising_edge(adc_clk);
+    -- on falling_edge: set the even bits
+    i_da0_p  <= data0(1);
+    i_da0_n  <= not(data0(1));
+    i_da2_p  <= data0(3);
+    i_da2_n  <= not(data0(3));
+    i_da4_p  <= data0(5);
+    i_da4_n  <= not(data0(5));
+    i_da6_p  <= data0(7);
+    i_da6_n  <= not(data0(7));
+    i_da8_p  <= data0(9);
+    i_da8_n  <= not(data0(9));
+    i_da10_p <= data0(11);
+    i_da10_n <= not(data0(11));
+    i_da12_p <= data0(13);
+    i_da12_n <= not(data0(13));
+
+    i_db0_p  <= data1(1);
+    i_db0_n  <= not(data1(1));
+    i_db2_p  <= data1(3);
+    i_db2_n  <= not(data1(3));
+    i_db4_p  <= data1(5);
+    i_db4_n  <= not(data1(5));
+    i_db6_p  <= data1(7);
+    i_db6_n  <= not(data1(7));
+    i_db8_p  <= data1(9);
+    i_db8_n  <= not(data1(9));
+    i_db10_p <= data1(11);
+    i_db10_n <= not(data1(11));
+    i_db12_p <= data1(13);
+    i_db12_n <= not(data1(13));
+
+    wait until falling_edge(adc_clk);
+
+
+  end process data_select_bits_by_edge_clk;
+
+
 
 
   ---------------------------------------------------------------------
@@ -540,10 +577,10 @@ begin
   dut_system_fpasim_top : entity fpasim.system_fpasim_top
     generic map (
       g_DEBUG => false
-    )
-    port map( -- @suppress "Port map uses default values. Missing optional actuals: o_leds"
-     -- i_clk_to_fpga_p => i_clk_to_fpga_p,
-     -- i_clk_to_fpga_n => i_clk_to_fpga_n,
+      )
+    port map(  -- @suppress "Port map uses default values. Missing optional actuals: o_leds"
+      -- i_clk_to_fpga_p => i_clk_to_fpga_p,
+      -- i_clk_to_fpga_n => i_clk_to_fpga_n,
       --  Opal Kelly inouts --
       i_okUH            => i_okUH,
       o_okHU            => o_okHU,
@@ -646,12 +683,12 @@ begin
       o_mon_n_en        => o_mon_n_en,  -- SPI chip select
       -- AMC : specific signals
       i_mon_n_int       => i_mon_n_int,  -- galr_n: Global analog input out-of-range alarm.
-      o_mon_n_reset     => o_mon_n_reset,       -- reset_n: hardware reset
+      o_mon_n_reset     => o_mon_n_reset,      -- reset_n: hardware reset
 
       ---------------------------------------------------------------------
-    -- leds
-    ---------------------------------------------------------------------
-    o_leds => o_leds
+      -- leds
+      ---------------------------------------------------------------------
+      o_leds => o_leds
       );
 
 

@@ -47,8 +47,7 @@ include("./fpasim/fpasim_tools.dscript");
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
  */
-function test_recording(level_p, mode_p, verbosity_p)
-{
+function test_recording(level_p, mode_p, verbosity_p) {
     // default function parameter values
     if (typeof(level_p) === 'undefined') level_p = 0;
     if (typeof(mode_p) === 'undefined') mode_p = 0;
@@ -58,61 +57,172 @@ function test_recording(level_p, mode_p, verbosity_p)
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-     /* 
-    ***************************************************************************
-    * check: adc recording
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * check: adc recording
+     ***************************************************************************
+     */
     msg = "FPASIM : Check adc recording";
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
 
-     /* 
-    ***************************************************************************
-    * Configure the ADC to generate a pre-defined pattern
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * Configure the ADC to generate a pre-defined pattern
+     ***************************************************************************
+     */
     msg = "Configure ADC to generate a pre-defined pattern";
     display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
     // configure the adc to automatically generate pattern.
-    adc_generate_pattern0(level_p=level0, mode_p=mode_p, verbosity_p=verbosity_p);
+    adc_generate_pattern0(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    /*
+     ***************************************************************************
+     Enable the fpasim function
+      ***************************************************************************
+      */
+    rst = 0;
+    en = 1;
+    data = fpasim_build_ctrl(rst_p = rst, en_p = en);
+    msg = "Enable the FPASIM function";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    sendToFPA_configureControl(data);
 
 
-     /* 
-    ***************************************************************************
-    * Enable the recording
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * Enable the recording
+     ***************************************************************************
+     */
     msg = "Set register: REC_CTRL";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     en = 1;
     data = fpasim_build_rec_ctrl(en_p = en);
     fpasim_set_debug_wirein_by_name(reg_name_p = "REC_CTRL", data_p = data, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
 
-     /* 
-    ***************************************************************************
-    * Set the number of words to record
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * Set the number of words to record
+     ***************************************************************************
+     */
     msg = "Set register: REC_CONF0";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     // Set the number of 32 bit-words to record.
-    rec_adc_nb_word_32b = 4092-1;
+    rec_adc_nb_word_32b = 4092 - 1;
     data = fpasim_build_rec_conf0(rec_adc_nb_word_32b_p = rec_adc_nb_word_32b);
     fpasim_set_debug_wirein_by_name(reg_name_p = "REC_CONF0", data_p = data, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
 
     waitMs(2000);
-    getLatestValue("FPA_adc_mux_squid_feedback,FPA_amp_squid_offset_correction,FPA_rec_adc_size")
+    getLatestValue("FPA_adc_mux_squid_feedback,FPA_adc_amp_squid_offset_correction,FPA_rec_adc_size")
+
 
     print("FPA_adc_mux_squid_feedback");
     print(FPA_adc_mux_squid_feedback);
 
-    print("FPA_amp_squid_offset_correction");
-    print(FPA_amp_squid_offset_correction);
-    
-    // print the number of data read at the pipeout access
-    print("Number of read data at the pipeout access: FPA_rec_adc_size");
-    print(FPA_rec_adc_size);
+    print("FPA_adc_amp_squid_offset_correction");
+    print(FPA_adc_amp_squid_offset_correction);
+
+    msg = "Number of read data at the pipeout access: FPA_rec_adc_size=" + FPA_rec_adc_size.toString(10);
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    /* 
+     ***************************************************************************
+     * Auto-check the recording adc data
+     *   if the adc device generates the pre-defined pattern0 then
+     *      . adc0 (=FPA_adc_mux_squid_feedback) generates the following alternates values
+     *          . "01010101010101" (14 bits) -> "0001010101010101" (16 bits) <-> 5461 at the software side
+     *          . "10101010101010" (14 bits) -> "1110101010101010" (16 bits) <-> at the software side
+     *      . adc1 (=FPA_amp_squid_offset_correction) generates the following incremental values
+     *          . 0 to 16383 (14 bits) -> -8192 to 8191
+     ***************************************************************************
+     */
+    msg = "Check: the recording adc data";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    // check the pattern on the adc0
+    v_cnt_err0 = 0;
+    v_first = 1;
+    v_state = 0;
+    // expected pattern
+    adc0_word0 = 5461;
+    adc0_word1 = -5462; // 
+    for (i = 0; i < FPA_rec_adc_size; i++) {
+        // data from the FPGA
+        adc0 = FPA_adc_mux_squid_feedback[i];
+        // initial pattern
+        if (v_first == 1) {
+            v_first = 0;
+            // define the initial state
+            if (adc0 == adc0_word0) {
+                v_state = 0;
+            } else if (adc0 == adc0_word1) {
+                v_state = 1;
+            } else {
+                v_cnt_err0 += 1;
+            }
+        }
+
+        // state machine
+        if (v_state == 0) {
+            v_state = 1;
+            if (adc0 != adc0_word0) {
+                v_cnt_err0 += 1;
+            }
+
+        } else if (v_state == 1) {
+            v_state = 0;
+            if (adc0 != adc0_word1) {
+                v_cnt_err0 += 1;
+            }
+        } else {
+            v_cnt_err0 += 1;
+        }
+
+
+    }
+
+    // check the read data Vs the written data
+    msg = "Check: Number of errors on the FPA_adc_mux_squid_feedback(adc0)";
+    check_equal(value0_p = v_cnt_err0, value1_p = 0, msg_p = msg, level_p = level2, mode_p = mode_p);
+
+    //check the pattern on the adc1
+    v_cnt_err1 = 0;
+    v_first = 1;
+    v_last_data = 0;
+    adc1_word_max = 8191; //16383 (considered as signed value) + 2 extension bits (signe)
+    adc1_word_min = -8192; //16383 (considered as signed value) + 2 extension bits (signe)
+    for (i = 0; i < FPA_rec_adc_size; i++) {
+        // data from the FPGA
+        adc1 = FPA_adc_amp_squid_offset_correction[i];
+        // initial value for v_last_data
+        if (v_first == 1) {
+            v_first = 0;
+            v_last_data = adc1;
+            continue;
+        }
+
+        if (v_last_data == adc1_word_max) {
+            if (adc1 != adc1_word_min) {
+                print(i.toString(10), ' ', v_last_data.toString(10), ' ', adc1_word_max.toString(10));
+                v_cnt_err1 += 1;
+            }
+        } else {
+            // adc1 should be equal to v_last_data + 1
+            new_data = v_last_data + 1;
+            if (new_data != adc1) {
+                print("test1: ", i.toString(10), ' ', new_data.toString(10), ' ', adc1.toString(10));
+                v_cnt_err1 += 1;
+            }
+            
+        }
+
+        v_last_data = adc1;
+
+
+    }
+    // check the read data Vs the written data
+    msg = "Check: Number of errors on the FPA_amp_squid_offset_correction(adc1)";
+    check_equal(value0_p = v_cnt_err1, value1_p = 0, msg_p = msg, level_p = level2, mode_p = mode_p);
 }
 
 /**
@@ -137,10 +247,10 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
     const level2 = level_p + 2;
 
     /* 
-    ***************************************************************************
-    * check: RAM configuration
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * check: RAM configuration
+     ***************************************************************************
+     */
     msg = "FPASIM : Check RAM configuration";
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
 
@@ -153,10 +263,10 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
     //sendToFPA_loadMuxSQUID_Offset(64);
 
     /* 
-    ***************************************************************************
-    * configure the tes_pulse_shape RAM
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * configure the tes_pulse_shape RAM
+     ***************************************************************************
+     */
     msg = "Configure the tes_pulse_shape RAM";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
 
@@ -174,10 +284,10 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
     sendToFPA_loadTES_PulseShape(tes_pulse_shape_tab);
 
     /* 
-    ***************************************************************************
-    * Configure the amp_squid_tf RAM
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * Configure the amp_squid_tf RAM
+     ***************************************************************************
+     */
     msg = "Configure the amp_squid_tf RAM";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
     tab_length = 16384;
@@ -194,10 +304,10 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
     sendToFPA_loadAmpSQUID_TF(amp_squid_tf_tab);
 
     /* 
-    ***************************************************************************
-    * Configure the mux_squid_tf RAM
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * Configure the mux_squid_tf RAM
+     ***************************************************************************
+     */
     msg = "Configure the mux_squid_tf RAM";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
 
@@ -215,10 +325,10 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
     sendToFPA_loadMuxSQUID_TF(mux_squid_tf_tab);
 
     /* 
-    ***************************************************************************
-    * Configure the tes_std_state RAM
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * Configure the tes_std_state RAM
+     ***************************************************************************
+     */
     msg = "Configure the tes_std_state RAM";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
 
@@ -236,10 +346,10 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
     sendToFPA_loadTES_SteadyState(tes_steady_state_tab);
 
     /* 
-    ***************************************************************************
-    * Configure the mux_squid_offset RAM
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * Configure the mux_squid_offset RAM
+     ***************************************************************************
+     */
     msg = "Configure the mux_squid_offset RAM";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
 
@@ -258,43 +368,43 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
     sendToFPA_loadMuxSQUID_Offset(mux_squid_offset_tab);
 
     /* 
-    ***************************************************************************
-    * Configure the mux_squid_offset RAM
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * Configure the mux_squid_offset RAM
+     ***************************************************************************
+     */
     msg = "FPASIM: auto-read the RAMs content";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
     sendToFPA_readAllRegisters();
 
     tempo = 2000
-    msg = "Set a tempo (ms): "+tempo.toString(10);
+    msg = "Set a tempo (ms): " + tempo.toString(10);
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
     waitMs(tempo);
 
     /* 
-    ***************************************************************************
-    * Read and check the tes_pulse_shape RAM
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * Read and check the tes_pulse_shape RAM
+     ***************************************************************************
+     */
 
     msg = "Read the tes_pulse_shape RAM (pipeout access)";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
     getLatestValue("FPA_TES_PULSE_SHAPE");
-    
-    print("FPA_TES_PULSE_SHAPE: length:",FPA_TES_PULSE_SHAPE.length);
+
+    print("FPA_TES_PULSE_SHAPE: length:", FPA_TES_PULSE_SHAPE.length);
     print(FPA_TES_PULSE_SHAPE);
 
     msg = "Check: the tes_pulse_shape";
-    check_equal_tab(tab0_p=FPA_TES_PULSE_SHAPE, tab1_p=tes_pulse_shape_tab ,msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal_tab(tab0_p = FPA_TES_PULSE_SHAPE, tab1_p = tes_pulse_shape_tab, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /* 
-    ***************************************************************************
-    * Read and check the amp_squid_tf RAM
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * Read and check the amp_squid_tf RAM
+     ***************************************************************************
+     */
 
     msg = "Read the amp_squid_tf RAM (pipeout access)";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
@@ -304,17 +414,17 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
     print(FPA_AMP_SQUID_TF);
 
     msg = "Check: the amp_squid_tf RAM";
-    check_equal_tab(tab0_p=FPA_AMP_SQUID_TF, tab1_p=amp_squid_tf_tab ,msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal_tab(tab0_p = FPA_AMP_SQUID_TF, tab1_p = amp_squid_tf_tab, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 
     /* 
-    ***************************************************************************
-    * Read and check the mux_squid_offset RAM
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * Read and check the mux_squid_offset RAM
+     ***************************************************************************
+     */
 
     msg = "Read the mux_squid_tf RAM (pipeout access)";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
@@ -324,17 +434,17 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
     print(FPA_MUX_SQUID_TF);
 
     msg = "Check: the mux_squid_tf RAM";
-    check_equal_tab(tab0_p=FPA_MUX_SQUID_TF, tab1_p=mux_squid_tf_tab ,msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal_tab(tab0_p = FPA_MUX_SQUID_TF, tab1_p = mux_squid_tf_tab, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 
     /* 
-    ***************************************************************************
-    * Read and check the tes_std_state RAM
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * Read and check the tes_std_state RAM
+     ***************************************************************************
+     */
 
     msg = "Read the tes_std_state RAM (pipeout access)";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
@@ -345,17 +455,17 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
     print(FPA_TES_STD_STATE);
 
     msg = "Check: the tes_std_state RAM";
-    check_equal_tab(tab0_p=FPA_TES_STD_STATE, tab1_p=tes_steady_state_tab ,msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal_tab(tab0_p = FPA_TES_STD_STATE, tab1_p = tes_steady_state_tab, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 
     /* 
-    ***************************************************************************
-    * Read and check the mux_squid_offset RAM
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * Read and check the mux_squid_offset RAM
+     ***************************************************************************
+     */
 
     msg = "Read the mux_squid_offset RAM (pipeout access)";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
@@ -365,7 +475,7 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
     print(FPA_MUX_SQUID_OFFSET);
 
     msg = "Check: the mux_squid_offset RAM";
-    check_equal_tab(tab0_p=FPA_MUX_SQUID_OFFSET, tab1_p=mux_squid_offset_tab ,msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal_tab(tab0_p = FPA_MUX_SQUID_OFFSET, tab1_p = mux_squid_offset_tab, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display_subtitle(msg_p = msg, level_p = level1, mode_p = mode_p);
@@ -394,172 +504,172 @@ function test_wire(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-     /* 
-    ***************************************************************************
-    * check: Check Wire registers
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * check: Check Wire registers
+     ***************************************************************************
+     */
     msg = "FPASIM : Check Wire registers";
     display_title(msg_p = msg, level_p = level0, mode_p = 0);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
-     /* 
-    ***************************************************************************
-    * check: CTRL
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * check: CTRL
+     ***************************************************************************
+     */
 
     msg = "Set register: CTRL";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
-    
+
     data0 = 0xFFFF0000;
     sendToFPA_configureControl(data0);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="CTRL", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "CTRL", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: Ctrl";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
-     /* 
-    ***************************************************************************
-    * check: MAKE_PULSE
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * check: MAKE_PULSE
+     ***************************************************************************
+     */
 
     msg = "Set register: MAKE_PULSE";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
-    pixel_all   = 0x0;
-    pixelId     = 0x1;
-    timeShift   = 0x2;
+    pixel_all = 0x0;
+    pixelId = 0x1;
+    timeShift = 0x2;
     pulseHeigth = 0x3;
     sendToFPA_makePulse(pixelId = pixelId, timeShift = timeShift, pulseHeigth = pulseHeigth);
     // build the data to send
-    data0 = fpasim_build_make_pulse(pixel_all_p=pixel_all, pixel_id_p=pixelId, time_shift_p=timeShift,pulse_height_p=pulseHeigth);
+    data0 = fpasim_build_make_pulse(pixel_all_p = pixel_all, pixel_id_p = pixelId, time_shift_p = timeShift, pulse_height_p = pulseHeigth);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="MAKE_PULSE", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "MAKE_PULSE", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: Make_Pulse";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
-     /* 
-    ***************************************************************************
-    * check: FPASIM_GAIN
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * check: FPASIM_GAIN
+     ***************************************************************************
+     */
     msg = "Set register: FPASIM_GAIN";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     fpasim_gain = 0x4;
     sendToFPA_configureGain(fpasim_gain);
     // build the data to send
-    data0 = fpasim_build_fpasim_gain(fpasim_gain_p=fpasim_gain);
+    data0 = fpasim_build_fpasim_gain(fpasim_gain_p = fpasim_gain);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="FPASIM_GAIN", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "FPASIM_GAIN", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: FPASIM_GAIN";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
-     /* 
-    ***************************************************************************
-    * check: MUX_SQ_FB_DELAY
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * check: MUX_SQ_FB_DELAY
+     ***************************************************************************
+     */
     msg = "Set register: MUX_SQ_FB_DELAY";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     mux_sq_fb_delay = 0x5;
     sendToFPA_configureMuxDelay(mux_sq_fb_delay);
     // build the data to send
-    data0 = fpasim_build_mux_sq_fb_delay(mux_sq_fb_delay_p=mux_sq_fb_delay);
+    data0 = fpasim_build_mux_sq_fb_delay(mux_sq_fb_delay_p = mux_sq_fb_delay);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="MUX_SQ_FB_DELAY", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "MUX_SQ_FB_DELAY", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: MUX_SQ_FB_DELAY";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
-     /* 
-    ***************************************************************************
-    * check: AMP_SQ_OF_DELAY
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * check: AMP_SQ_OF_DELAY
+     ***************************************************************************
+     */
     msg = "Set register: AMP_SQ_OF_DELAY";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     amp_sq_of_delay = 0x6;
     sendToFPA_configureAmpDelay(amp_sq_of_delay);
     // build the data to send
-    data0 = fpasim_build_amp_sq_of_delay(amp_sq_of_delay_p=amp_sq_of_delay);
+    data0 = fpasim_build_amp_sq_of_delay(amp_sq_of_delay_p = amp_sq_of_delay);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="AMP_SQ_OF_DELAY", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "AMP_SQ_OF_DELAY", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: AMP_SQ_OF_DELAY";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
-     /* 
-    ***************************************************************************
-    * check: ERROR_DELAY
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * check: ERROR_DELAY
+     ***************************************************************************
+     */
     msg = "Set register: ERROR_DELAY";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     error_delay = 0x7;
     sendToFPA_configureErrorDelay(error_delay);
     // build the data to send
-    data0 = fpasim_build_error_delay(error_delay_p=error_delay);
+    data0 = fpasim_build_error_delay(error_delay_p = error_delay);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="ERROR_DELAY", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "ERROR_DELAY", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: ERROR_DELAY";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
-     /* 
-    ***************************************************************************
-    * check: RA_DELAY
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * check: RA_DELAY
+     ***************************************************************************
+     */
     msg = "Set register: RA_DELAY";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     ra_delay = 0x8;
-    
-    // build the data to send
-    data0 = fpasim_build_ra_delay(ra_delay_p=ra_delay);
 
-	sendToFPA_configureRaDelay(data0);
+    // build the data to send
+    data0 = fpasim_build_ra_delay(ra_delay_p = ra_delay);
+
+    sendToFPA_configureRaDelay(data0);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="RA_DELAY", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "RA_DELAY", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: RA_DELAY";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
-     /* 
-    ***************************************************************************
-    * check: TES_CONF
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * check: TES_CONF
+     ***************************************************************************
+     */
     msg = "Set register: TES_CONF";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
@@ -567,22 +677,22 @@ function test_wire(level_p, mode_p, verbosity_p) {
     nbSamplesPerPixel = 40 - 1; // add -1 because we start from 0
     totalFrameSize = nbPixels * nbSamplesPerPixel - 1; // add -1 because we start from 0
     sendToFPA_configureTES_conf(nbPixels = nbPixels, nbSamplesPerPixel = nbSamplesPerPixel, totalFrameSize = totalFrameSize);
-     // build the data to send
-    data0 = fpasim_build_tes_conf(nb_pixel_by_frame_p=nbPixels, nb_sample_by_pixel_p=nbSamplesPerPixel, nb_samples_by_frame_p=totalFrameSize);
+    // build the data to send
+    data0 = fpasim_build_tes_conf(nb_pixel_by_frame_p = nbPixels, nb_sample_by_pixel_p = nbSamplesPerPixel, nb_samples_by_frame_p = totalFrameSize);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="TES_CONF", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "TES_CONF", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: TES_CONF";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /* 
-    ***************************************************************************
-    * check: REC_CTRL
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * check: REC_CTRL
+     ***************************************************************************
+     */
 
     // msg = "Set register: REC_CTRL";
     // display(msg_p = msg, level_p = level1, mode_p = mode_p);
@@ -603,54 +713,54 @@ function test_wire(level_p, mode_p, verbosity_p) {
 
 
     /* 
-    ***************************************************************************
-    * check: REC_CONF0
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * check: REC_CONF0
+     ***************************************************************************
+     */
     msg = "Set register: REC_CONF0";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     rec_adc_nb_word_32b = 0x0000ABCD;
-    data0 = fpasim_build_rec_conf0(rec_adc_nb_word_32b_p=rec_adc_nb_word_32b);
+    data0 = fpasim_build_rec_conf0(rec_adc_nb_word_32b_p = rec_adc_nb_word_32b);
     // build the data to send
-    fpasim_set_debug_wirein_by_name(reg_name_p='REC_CONF0', data_p=data0, level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    fpasim_set_debug_wirein_by_name(reg_name_p = 'REC_CONF0', data_p = data0, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="REC_CONF0", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "REC_CONF0", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: REC_CONF0";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 
-     /* 
-    ***************************************************************************
-    * check: SPI_CTRL
-    ***************************************************************************
-    */ 
+    /* 
+     ***************************************************************************
+     * check: SPI_CTRL
+     ***************************************************************************
+     */
     msg = "Set register: SPI_CTRL";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     en = 0;
     rst = 1;
-     // build the data to send
-    data0 = fpasim_build_spi_ctrl(rst_p=rst, en_p=en);
-    fpasim_set_debug_wirein_by_name(reg_name_p='SPI_CTRL', data_p=data0, level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    // build the data to send
+    data0 = fpasim_build_spi_ctrl(rst_p = rst, en_p = en);
+    fpasim_set_debug_wirein_by_name(reg_name_p = 'SPI_CTRL', data_p = data0, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="SPI_CTRL", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "SPI_CTRL", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: SPI_CTRL";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /* 
-    ***************************************************************************
-    * check: SPI_CONF0
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * check: SPI_CONF0
+     ***************************************************************************
+     */
 
     msg = "Set register: SPI_CONF0";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
@@ -658,105 +768,105 @@ function test_wire(level_p, mode_p, verbosity_p) {
     spi_mode = 0;
     spi_id = 2;
 
-    data0 = fpasim_build_spi_conf0(spi_id_p=spi_id, spi_mode_p=spi_mode)
-    fpasim_set_debug_wirein_by_name(reg_name_p='SPI_CONF0', data_p=data0, level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data0 = fpasim_build_spi_conf0(spi_id_p = spi_id, spi_mode_p = spi_mode)
+    fpasim_set_debug_wirein_by_name(reg_name_p = 'SPI_CONF0', data_p = data0, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="SPI_CONF0", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "SPI_CONF0", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: SPI_CONF0";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 
     /* 
-    ***************************************************************************
-    * check: SPI_CONF1
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * check: SPI_CONF1
+     ***************************************************************************
+     */
     msg = "Set register: SPI_CONF1";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     mask = 0xFFFFFFFE; // protect the spi_dac_tx_en
     data0 = 0xABCDEFA & mask;
     // data0 = fpasim_build_spi_conf1(spi_dac_tx_en_p=spi_dac_tx_en)
-    fpasim_set_debug_wirein_by_name(reg_name_p='SPI_CONF1', data_p=data0, level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    fpasim_set_debug_wirein_by_name(reg_name_p = 'SPI_CONF1', data_p = data0, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
 
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="SPI_CONF1", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "SPI_CONF1", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: SPI_CONF1";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /* 
-    ***************************************************************************
-    * check: SPI_WR_DATA
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * check: SPI_WR_DATA
+     ***************************************************************************
+     */
 
     msg = "Set register: SPI_WR_DATA";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     spi_data = 0x9ABDCEF1;
     // build the data to send
-    data0 = fpasim_build_spi_wr_data(data_p=spi_data);
-    fpasim_set_debug_wirein_by_name(reg_name_p='SPI_WR_DATA', data_p=data0, level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data0 = fpasim_build_spi_wr_data(data_p = spi_data);
+    fpasim_set_debug_wirein_by_name(reg_name_p = 'SPI_WR_DATA', data_p = data0, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="SPI_WR_DATA", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "SPI_WR_DATA", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: SPI_WR_DATA";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
- 
-    
+
+
 
     /* 
-    ***************************************************************************
-    * check: DEBUG_CTRL
-    ***************************************************************************
-    */ 
-    
+     ***************************************************************************
+     * check: DEBUG_CTRL
+     ***************************************************************************
+     */
+
     msg = "Set register: DEBUG_CTRL";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     rst_status = 0;
     debug_pulse = 1;
     // build the data to send
-    data0 = fpasim_build_debug_ctrl(rst_status_p=rst_status, debug_pulse_p=debug_pulse);
-    fpasim_set_debug_wirein_by_name(reg_name_p='DEBUG_CTRL', data_p=data0, level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data0 = fpasim_build_debug_ctrl(rst_status_p = rst_status, debug_pulse_p = debug_pulse);
+    fpasim_set_debug_wirein_by_name(reg_name_p = 'DEBUG_CTRL', data_p = data0, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="DEBUG_CTRL", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "DEBUG_CTRL", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: DEBUG_CTRL";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /* 
-    ***************************************************************************
-    * check: ERROR_SEL
-    ***************************************************************************
-    */ 
+     ***************************************************************************
+     * check: ERROR_SEL
+     ***************************************************************************
+     */
     msg = "Set register: ERROR_SEL";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     sel_error = 2;
     // build the data to send
-    data0 = fpasim_build_error_sel(sel_error_p=sel_error);
-    fpasim_set_debug_wirein_by_name(reg_name_p='ERROR_SEL', data_p=data0, level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data0 = fpasim_build_error_sel(sel_error_p = sel_error);
+    fpasim_set_debug_wirein_by_name(reg_name_p = 'ERROR_SEL', data_p = data0, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // read the register
-    data1 = fpasim_get_wireout_by_name(reg_name_p="ERROR_SEL", level_p=level2, mode_p=mode_p, verbosity_p=verbosity_p);
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "ERROR_SEL", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // check the read data Vs the written data
     msg = "Check register: ERROR_SEL";
-    check_equal(value0_p=data0, value1_p=data1, msg_p=msg, level_p=level2, mode_p=mode_p);
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
@@ -781,7 +891,7 @@ function main(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    const mode_p      = mode_p;
+    const mode_p = mode_p;
     const verbosity_p = verbosity_p;
 
     /* 
@@ -789,7 +899,7 @@ function main(level_p, mode_p, verbosity_p) {
      * display the test description
      ***************************************************************************
      */
-     msg = "FPAsim Test Description: check_tmtc_link";
+    msg = "FPAsim Test Description: check_tmtc_link";
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
 
     msg = "Contexte et objet du test";
@@ -820,13 +930,13 @@ function main(level_p, mode_p, verbosity_p) {
     display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
 
-    
+
     /* 
      ***************************************************************************
      * display the script info
      ***************************************************************************
      */
-    fpasim_script_info(level_p=level0,mode_p=mode_p,verbosity_p=2);
+    fpasim_script_info(level_p = level0, mode_p = mode_p, verbosity_p = 2);
 
     /* 
      ***************************************************************************
@@ -838,22 +948,25 @@ function main(level_p, mode_p, verbosity_p) {
 
     // 1st Test to execute
     str_en_wire = getText("Test: Check wire registers", "0 or 1");
-    en_wire     = parseInt(str_en_wire,10);
-    msg         = "Test: Check wire registers: " + str_en_wire;
+    en_wire = parseInt(str_en_wire, 10);
+    msg = "Test: Check wire registers: " + str_en_wire;
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     // 2nd Test to execute
-    str_en_rec  = getText("Test: Check ADC recording", "0 or 1");
-    en_rec      = parseInt(str_en_rec,10);
-    msg         = "Test: Check adc recording: " + str_en_rec;
+    str_en_rec = getText("Test: Check ADC recording", "0 or 1");
+    en_rec = parseInt(str_en_rec, 10);
+    msg = "Test: Check adc recording: " + str_en_rec;
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     // 3rd Test to execute
-    str_en_ram_conf  = getText("Test: Check RAM configuration", "0 or 1");
-    en_ram_conf      = parseInt(str_en_ram_conf,10);
-    msg         = "Test: Check RAM configuration: " + str_en_ram_conf;
+    str_en_ram_conf = getText("Test: Check RAM configuration", "0 or 1");
+    en_ram_conf = parseInt(str_en_ram_conf, 10);
+    msg = "Test: Check RAM configuration: " + str_en_ram_conf;
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
+    // en_wire = 0;
+    // en_rec = 1;
+    // en_ram_conf = 0;
 
     /* 
      ***************************************************************************
@@ -862,7 +975,7 @@ function main(level_p, mode_p, verbosity_p) {
      */
     msg = "Configure spi devices";
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
-    configure_fmc150_spi_device(level_p=level1,mode_p=mode_p,verbosity_p=verbosity_p);
+    configure_fmc150_spi_device(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
     /* 
      ***************************************************************************
@@ -871,7 +984,7 @@ function main(level_p, mode_p, verbosity_p) {
      */
     msg = "Reset the fpasim function";
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
-    fpasim_reset(level_p=level1, mode_p=mode_p, verbosity_p=verbosity_p);
+    fpasim_reset(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
 
     /* 
@@ -879,38 +992,35 @@ function main(level_p, mode_p, verbosity_p) {
      * Check: Wire registers
      ***************************************************************************
      */
-     if (en_wire == 1)
-     {
+    if (en_wire == 1) {
         msg = "Check: wire Registers";
         display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
-        test_wire(level_p=level1, mode_p=mode_p, verbosity_p=verbosity_p);
-        
-     }
+        test_wire(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
-     /* 
+    }
+
+    /* 
      ***************************************************************************
      * Check: ADC recording
      ***************************************************************************
      */
-     if (en_rec == 1)
-     {
+    if (en_rec == 1) {
         msg = "Check: ADC recording";
         display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
-        test_recording(level_p=level1, mode_p=mode_p, verbosity_p=verbosity_p);
-        
-     }
+        test_recording(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    }
 
     /* 
      ***************************************************************************
      * Check: RAM configuration
      ***************************************************************************
      */
-     if (en_ram_conf == 1)
-     {
+    if (en_ram_conf == 1) {
         msg = "Check: RAM configuration";
         display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
-        test_ram_conf(level_p=level1, mode_p=mode_p, verbosity_p=verbosity_p);
-     }
+        test_ram_conf(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+    }
 
     /* 
      ***************************************************************************
