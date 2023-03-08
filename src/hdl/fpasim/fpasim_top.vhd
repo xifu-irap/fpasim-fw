@@ -383,6 +383,8 @@ architecture RTL of fpasim_top is
   signal debug_adc_sel                         : std_logic;
   signal debug_adc_mux_squid_feedback          : std_logic_vector(i_adc_mux_squid_feedback'range);
   signal debug_adc_amp_squid_offset_correction : std_logic_vector(i_adc_amp_squid_offset_correction'range);
+  signal debug_dac_sel                         : std_logic;
+  signal debug_dac                             : std_logic_vector(15 downto 0);
 
 begin
 
@@ -1005,9 +1007,31 @@ begin
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
-  o_dac_valid <= dac_valid4;
-  o_dac_frame <= dac_frame4;
-  o_dac       <= dac4;
+ 
+
+  gen_not_dac_debug : if g_FPASIM_DEBUG = false generate
+  begin
+    o_dac_valid <= dac_valid4;
+    o_dac_frame <= dac_frame4;
+    o_dac       <= dac4;
+  end generate gen_not_dac_debug;
+
+  gen_dac_debug : if g_FPASIM_DEBUG = true generate
+  begin
+    select_path : process (i_clk) is
+    begin
+      if rising_edge(i_clk) then
+         o_dac_valid <= dac_valid4;
+         o_dac_frame <= dac_frame4;
+         
+        if debug_dac_sel = '1' then
+          o_dac          <= debug_dac;
+        else
+          o_dac          <= dac4;
+        end if;
+      end if;
+    end process select_path;
+  end generate gen_dac_debug;
   ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
@@ -1223,7 +1247,10 @@ begin
         clk           => i_clk,
         probe_out0(0) => debug_adc_sel,
         probe_out1    => debug_adc_mux_squid_feedback,
-        probe_out2    => debug_adc_amp_squid_offset_correction
+        probe_out2    => debug_adc_amp_squid_offset_correction,
+        probe_out3(0) => debug_dac_sel,
+        probe_out4    => debug_dac
+
         );
 
   end generate gen_debug;
