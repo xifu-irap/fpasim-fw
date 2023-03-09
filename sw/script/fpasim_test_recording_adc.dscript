@@ -42,19 +42,44 @@ function test_acq_adc() {
     data = fpasim_build_rec_ctrl(en_p = en);
     fpasim_set_debug_wirein_by_name(reg_name_p = "REC_CTRL", data_p = data, level_p = 0, mode_p = 0, verbosity_p = 2);
 
-    rec_adc_nb_word_32b = 2048-1;
+    rec_adc_nb_word_32b = 4092-1;
     data = fpasim_build_rec_conf(rec_adc_nb_word_32b_p = rec_adc_nb_word_32b);
     fpasim_set_debug_wirein_by_name(reg_name_p = "REC_CONF0", data_p = data, level_p = 0, mode_p = 0, verbosity_p = 2);
 
     waitMs(2000);
-    getLatestValue("FPA_adc_mux_squid_feedback,FPA_amp_squid_offset_correction");
+    getLatestValue("FPA_adc_mux_squid_feedback,FPA_amp_squid_offset_correction,FPA_rec_adc_size")
 
     print("FPA_adc_mux_squid_feedback");
     print(FPA_adc_mux_squid_feedback);
 
     print("FPA_amp_squid_offset_correction");
     print(FPA_amp_squid_offset_correction);
-
+	
+	print("FPA_rec_adc_size");
+    print(FPA_rec_adc_size);
+	
+	/*
+	cnt0 = 0;
+	cnt1 = 0;
+	for (index = 0;index<=FPA_amp_squid_offset_correction.length;index++)
+	{
+	value0 = FPA_adc_mux_squid_feedback[index];
+	value1 = FPA_amp_squid_offset_correction[index];
+		if (value0 != 0)
+		{
+			cnt0 = cnt0 + 1;
+		}
+		if ( value1 != 0)
+		{
+			cnt1 = cnt1 + 1;
+		}
+	}
+	
+	
+	print("FPA_adc_mux_squid_feedback cnt", cnt0.toString(10));
+	print("FPA_amp_squid_offset_correction cnt", cnt1.toString(10));
+	
+*/
 
 
 }
@@ -70,8 +95,8 @@ display_title(msg_p = msg, level_p = 0, mode_p = 0);
 //fpasim_reset(level_p = 0, mode_p = 0, verbosity_p = 0);
 
 waitMs(100);
-test_acq_adc();
-
+test_acq_adc();
+
 /*
 
 print("");

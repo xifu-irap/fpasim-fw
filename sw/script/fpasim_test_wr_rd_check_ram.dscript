@@ -166,7 +166,7 @@ function test_conf_ram() {
 
     getLatestValue("FPA_TES_PULSE_SHAPE");
     getLatestValue("FPA_AMP_SQUID_TF");
-    getLatestValue("FPA_MUX_SUID_OFFSET");
+    getLatestValue("FPA_MUX_SQUID_TF");
     getLatestValue("FPA_TES_STD_STATE");
     getLatestValue("FPA_MUX_SQUID_OFFSET");
 
@@ -214,12 +214,12 @@ function test_conf_ram() {
     print("");
 
 
-    print("FPA_MUX_SUID_OFFSET");
-    print(FPA_MUX_SUID_OFFSET);
+    print("FPA_MUX_SQUID_TF");
+    print(FPA_MUX_SQUID_TF);
 
 
 
-    error = check_equal_ram(tab0_p = FPA_MUX_SUID_OFFSET, tab1_p = mux_squid_tf_tab);
+    error = check_equal_ram(tab0_p = FPA_MUX_SQUID_TF, tab1_p = mux_squid_tf_tab);
 
     if (error == 0)
 

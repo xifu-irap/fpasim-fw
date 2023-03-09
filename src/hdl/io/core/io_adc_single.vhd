@@ -29,6 +29,23 @@
 --    The architecture is as follows:
 --      i_adc_p/n ->  FPGA IO DDR deserializing (1-> 8) -> optionnal latency -> o_adc
 --
+--    Remark:
+--         Ideally (case0): the even and odd data bits will be sampled as follows:
+--             bitslip        :  0x0000         ............................................       0x0000        
+--                                 __________            __________            __________            __________
+--             sampling clock : __|          |__________|          |__________|          |__________|          |__________
+--             data bits      :  even(n)  odd(n)  even(n+1)       odd(n+1)  even(n+2)   odd(n+2)   even(n+3)  odd(n+3)  
+--
+--         unfortunately (case1): the sampling clock can be dephased, as follows:
+--                                 __________            __________            __________            __________
+--             sampling clock : __|          |__________|          |__________|          |__________|          |__________
+--             data bits      :  odd(n-1)  even(n)  odd(n)       even(n+1)  odd(n+1)   even(n+2)   odd(n+2)  even(n+3)  
+--
+--         In this case, to pass from case1 to case0, we need to set to '1' the bitslip bit of each lane in order to drop one bit on each one (one time).
+--             bitslip        :   0x3FFF           ......     0x0000                0x0000                0x0000
+--                                 __________      ......      __________            __________            __________
+--             sampling clock : __|          |_____......_____|          |__________|          |__________|          |__________
+--             data bits      :  odd(n-x)  even(n-x+1)      even(n+1)   odd(n+1)  even(n+2)   odd(n+2)   even(n+3)  odd(n+3)  
 --    Note: 
 --      . An optional pipeliner (after the IO) can be added.
 --      . After the de-serializer, bits are rearranged. For each output word, the bit order must match the bit order defined in the ads62p49 adc datasheet.
@@ -46,13 +63,13 @@ entity io_adc_single is
   port(
 
     -- from reset_top: @i_clk
-    i_io_rst  : in std_logic;  -- Reset connected to all other elements in the circuit
+    i_io_rst    : in std_logic;  -- Reset connected to all other elements in the circuit
     ---------------------------------------------------------------------
     -- input @i_adc_clk_p
     ---------------------------------------------------------------------
-    i_adc_clk_p : in std_logic; -- adc clock
-    i_adc_clk_n : in std_logic; -- adc clock
-    
+    i_adc_clk_p : in std_logic;         -- adc clock
+    i_adc_clk_n : in std_logic;         -- adc clock
+
     i_adc_a_p : in std_logic_vector(6 downto 0);  -- Diff_p buffer input
     i_adc_a_n : in std_logic_vector(6 downto 0);  -- Diff_n buffer input
 
@@ -62,8 +79,8 @@ entity io_adc_single is
     ---------------------------------------------------------------------
     -- output @o_clk_div
     ---------------------------------------------------------------------
-    o_adc_clk_div : out std_logic; -- output clock after the IO deserializing
-    o_adc_a       : out std_logic_vector(55 downto 0); -- output adc_a data (4 words of 14 bits)
+    o_adc_clk_div : out std_logic;  -- output clock after the IO deserializing
+    o_adc_a       : out std_logic_vector(55 downto 0);  -- output adc_a data (4 words of 14 bits)
     o_adc_b       : out std_logic_vector(55 downto 0)  -- output adc_a data (4 words of 14 bits)
     );
 end entity io_adc_single;
@@ -71,34 +88,58 @@ end entity io_adc_single;
 architecture RTL of io_adc_single is
 
   ---------------------------------------------------------------------
+  -- management of bitslip_r1
+  ---------------------------------------------------------------------
+  signal io_rst_r1  : std_logic;
+  ---------------------------------------------------------------------
   -- selectio_wiz_adc
   ---------------------------------------------------------------------
-  signal adc_tmp_p : std_logic_vector(13 downto 0);
-  signal adc_tmp_n : std_logic_vector(13 downto 0);
-  signal bitslip   : std_logic_vector(13 downto 0);
-  signal adc_tmp0  : std_logic_vector(111 downto 0);
+  signal adc_tmp_p  : std_logic_vector(13 downto 0);
+  signal adc_tmp_n  : std_logic_vector(13 downto 0);
+  signal bitslip_r1 : std_logic_vector(13 downto 0) := (others => '0');
+  signal adc_tmp0   : std_logic_vector(111 downto 0);
 
   signal clk_div : std_logic;
 
   ---------------------------------------------------------------------
   -- bit remapping
   ---------------------------------------------------------------------
-  type t_word_by_bit is array (0 to 3) of std_logic_vector(13 downto 0);
-  signal adc_a_word_tmp1 : t_word_by_bit;
-  signal adc_a_word_tmp2 : t_word_by_bit;
-  signal adc_b_word_tmp1 : t_word_by_bit;
-  signal adc_b_word_tmp2 : t_word_by_bit;
+  type t_word_by_bit is array (natural range <>) of std_logic_vector(13 downto 0);
+  signal adc_a_word_tmp1 : t_word_by_bit(0 to 3);
+  signal adc_a_word_tmp2 : t_word_by_bit(0 to 3);
+  signal adc_b_word_tmp1 : t_word_by_bit(0 to 3);
+  signal adc_b_word_tmp2 : t_word_by_bit(0 to 3);
+
 
 begin
 
+---------------------------------------------------------------------
+-- bitslip_r1 pulse generation
+--  At the end of the reset (falling edge), set the bitslip_r1 bit to '1' for all
+-- lanes in order to only skip the first bit in the de-serializer (one time).
+---------------------------------------------------------------------
+  pulse_bitslip : process (clk_div) is
+  begin
+    if rising_edge(clk_div) then
+      io_rst_r1 <= i_io_rst;
+      -- detect falling edge
+      if i_io_rst = '0' and io_rst_r1 = '1' then
+        bitslip_r1(13 downto 0) <= (others => '1');
+      else
+        bitslip_r1(13 downto 0) <= (others => '0');
+      end if;
+    end if;
+  end process pulse_bitslip;
+
+  ---------------------------------------------------------------------
+  -- IOs
+  ---------------------------------------------------------------------
   -- adc_b
   adc_tmp_p(13 downto 7) <= i_adc_b_p;
   adc_tmp_n(13 downto 7) <= i_adc_b_n;
   -- adc_a
   adc_tmp_p(6 downto 0)  <= i_adc_a_p;
   adc_tmp_n(6 downto 0)  <= i_adc_a_n;
-
-  bitslip <= (others => '0');
 
   inst_selectio_wiz_adc : entity work.selectio_wiz_adc
     port map(
@@ -107,7 +148,7 @@ begin
       data_in_to_device   => adc_tmp0,
       clk_in_p            => i_adc_clk_p,
       clk_in_n            => i_adc_clk_n,
-      bitslip             => bitslip,
+      bitslip             => bitslip_r1,
       clk_div_out         => clk_div,
       clk_reset           => '0',
       io_reset            => i_io_rst

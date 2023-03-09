@@ -105,7 +105,7 @@ function adc_spi_enable(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
             msg = "[adc_spi_enable]: Enable the SPI";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
     }
 }
@@ -247,8 +247,8 @@ function adc_set_config0(rst_p, serial_out_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config0]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config0]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -292,8 +292,8 @@ function adc_set_config1(enable_low_speed_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config1]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config1]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -341,8 +341,8 @@ function adc_set_config2(ref_p, standby_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config2]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config2]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -396,8 +396,8 @@ function adc_set_config3(power_down_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config3]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config3]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -440,8 +440,8 @@ function adc_set_config4(lvds_cmos_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config4]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config4]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -506,8 +506,8 @@ function adc_set_config5(clkout_pos_rise_p, clkout_pos_fall_p, level_p, mode_p, 
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config5]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config5]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -556,8 +556,8 @@ function adc_set_config6(en_independant_chan_ctrl_p, data_format_p, level_p, mod
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config6]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config6]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -600,8 +600,8 @@ function adc_set_config7(custom_patter_low_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config7]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config7]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -644,8 +644,8 @@ function adc_set_config8(custom_patter_high_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config8]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config8]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -690,8 +690,8 @@ function adc_set_config9(en_offset_correction_cha_p, level_p, mode_p, verbosity_
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config9]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config9]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -759,8 +759,8 @@ function adc_set_config10(gain_common_or_cha_p, offset_corr_time_common_or_cha_p
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config10]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config10]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -807,8 +807,8 @@ function adc_set_config11(fine_gain_adjust_common_or_cha_p, level_p, mode_p, ver
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config11]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config11]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -860,8 +860,8 @@ function adc_set_config12(test_pattern_common_or_cha_p, level_p, mode_p, verbosi
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config12]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config12]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -918,8 +918,8 @@ function adc_set_config13(offset_pedestal_common_or_cha_p, level_p, mode_p, verb
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config13]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config13]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -964,8 +964,8 @@ function adc_set_config14(offset_corr_chb_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config14]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config14]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1034,8 +1034,8 @@ function adc_set_config15(gain_chb_p, offset_corr_time_chb_p, level_p, mode_p, v
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config15]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config15]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1082,8 +1082,8 @@ function adc_set_config16(fine_gain_adjust_chb_p, level_p, mode_p, verbosity_p) 
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config16]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config16]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1135,8 +1135,8 @@ function adc_set_config17(test_pattern_chb_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config17]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config17]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1190,8 +1190,8 @@ function adc_set_config18(offset_pedestal_common_or_chb_p, level_p, mode_p, verb
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_set_config18]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_set_config18]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1234,8 +1234,8 @@ function adc_get_config0(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config0]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config0]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1278,8 +1278,8 @@ function adc_get_config1(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config1]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config1]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1328,8 +1328,8 @@ function adc_get_config2(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config2]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config2]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1381,8 +1381,8 @@ function adc_get_config3(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config3]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config3]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1423,8 +1423,8 @@ function adc_get_config4(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config4]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config4]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1488,8 +1488,8 @@ function adc_get_config5(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config5]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config5]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1537,8 +1537,8 @@ function adc_get_config6(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config6]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config6]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1581,8 +1581,8 @@ function adc_get_config7(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config7]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config7]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1625,8 +1625,8 @@ function adc_get_config8(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config8]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config8]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1670,8 +1670,8 @@ function adc_get_config9(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config9]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config9]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1740,8 +1740,8 @@ function adc_get_config10(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config10]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config10]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1788,8 +1788,8 @@ function adc_get_config11(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config11]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config11]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1842,8 +1842,8 @@ function adc_get_config12(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config12]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config12]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1899,8 +1899,8 @@ function adc_get_config13(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config13]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config13]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -1943,8 +1943,8 @@ function adc_get_config14(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config14]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config14]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -2011,8 +2011,8 @@ function adc_get_config15(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config15]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config15]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -2059,8 +2059,8 @@ function adc_get_config16(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config16]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config16]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -2113,8 +2113,8 @@ function adc_get_config17(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config17]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config17]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -2169,8 +2169,8 @@ function adc_get_config18(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            msg = "[adc_get_config18]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[adc_get_config18]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
@@ -2203,6 +2203,145 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
 
     const level0 = level_p;
+    const level1 = level_p + 1;
+
+    msg = "adc_generate_pattern0";
+    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+    // Enable the SPI on the FPGA board
+    adc_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    /*
+    //###############################################################
+    // register0
+    //###############################################################
+    // [7]: rst
+    //    1: Software reset applied – resets all internal registers and self-clears to 0.
+    //    0: do nothing
+    // [0] : serial_out
+    //    0: Serial readout disabled. SDOUT is forced low by the device (and not put in high impedance state).
+    //    1: Serial readout enabled, Pin SDOUT functions as serial data readout.
+    */
+    rst = 0; //  Software reset applied – resets all internal registers and self-clears to 0.
+    serial_out = 0; //0: Serial readout disabled. SDOUT is forced low by the device (and not put in high impedance state).1:Serial readout enabled, Pin SDOUT functions as serial data readout.
+    adc_set_config0(
+        rst_p = rst, serial_out_p = serial_out,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
+    /*
+    //###############################################################
+    // register1
+    //###############################################################
+    // [2]: enable_low_speed
+    //      0: LOW SPEED mode disabled. Use for sampling frequency > 80 MSPS
+    //      1: Enable LOW SPEED mode for sampling frequencies ≤ 80 MSPS.
+    */
+    enable_low_speed = 0;
+    adc_set_config1(
+        enable_low_speed_p = enable_low_speed,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
+
+
+    /*
+    //###############################################################
+    // register2
+    //###############################################################
+    // [6] ref: Internal or external reference selection
+    //      00 : Internal reference enabled
+    //      01:
+    //      10:
+    //      11: External reference enabled
+    // [1]: standby <STANDBY>
+    //      0 Normal operation
+    //      1 Both ADC channels are put in standby. Internal references, output buffers are active. This results in
+    //   quick wake-up time from standby.
+    */
+    ref = parseInt('00', 2);
+    standby = 0;
+    adc_set_config2(
+        ref_p = ref, standby_p = standby,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
+
+    /*
+    //###############################################################
+    // register3
+    //###############################################################
+    // [3:0]: power_down
+    //   0000 Pins CTRL1, CTRL2, and CTRL3 determine power down modes.
+    //   1000 Normal operation
+    //   1001 Output buffer disabled for channel B
+    //   1010 Output buffer disabled for channel A
+    //   1011 Output buffer disabled for channel A and B
+    //   1100 Global power down
+    //   1101 Channel B standby
+    //   1110 Channel A standby
+    //   1111 Multiplexed mode, MUX- (only with CMOS interface)
+    //      Channel A and B data is multiplexed and output on DA13 to DA0 pins. Refer to the Multiplexed
+    //      Output Mode section in the APPLICATION INFORMATION for additional information.
+    */
+    power_down = parseInt('1000', 2);
+    adc_set_config3(
+        power_down_p = power_down,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
+
+    /*
+    //###############################################################
+    // register4
+    //###############################################################
+    // [7]: lvds_cmos
+    //   0 Parallel CMOS interface
+    //   1 DDR LVDS interface
+    */
+    lvds_cmos = 1;
+    adc_set_config4(
+        lvds_cmos_p = lvds_cmos,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
+
+    /*
+    //###############################################################
+    // register5
+    //###############################################################
+    // LVDS interface
+    //    [7:5] clkout_pos_rise Output clock rising edge position (2)
+    //       000, 100 Default output clock position (refer to timing specification table)
+    //       101 Falling edge shifted (delayed) by + (4/26)×Ts(1)
+    //       110 Falling edge shifted (advanced) by – (7/26)×Ts
+    //       111 Falling edge shifted (advanced) by – (4/26)×Ts
+    //    [4:2] clkout_pos_fall Output clock falling edge position (2)
+    //       000, 100 Default output clock position (refer to timing specification table)
+    //       101 Rising edge shifted (delayed) by + (4/26)×Ts
+    //       110 Rising edge shifted (advanced) by – (7/26)×Ts
+    //       111 Rising edge shifted (advanced) by – (4/26)×Ts
+    // CMOS interface
+    //    [7:5]: clkout_pos_rise Output clock rising edge position (2)
+    //       000, 100 Default output clock position (refer to timing specification table)
+    //       101 Rising edge shifted (delayed) by + (4/26)×Ts
+    //       110 Rising edge shifted (advanced) by – (7/26)×Ts
+    //       111 Rising edge shifted (advanced) by – (4/26)×Ts
+    //    [4:2] clkout_pos_fall Output clock falling edge position (2)
+    //       000, 100 Default output clock position (refer to timing specification table)
+    //       101 Falling edge shifted (delayed) by + (4/26)×Ts
+    //       110 Falling edge shifted (advanced) by – (7/26)×Ts
+    //       111 Falling edge shifted (advanced) by – (4/26)×Ts
+    // Note: 
+    //       (1) Ts = 1 / sampling frequency
+    //       (2) Keep the same duty cycle, move both edges by the same amount (i.e., write both D<4:2> and D<7:5> to be
+    //       the same value).
+    */
+    clkout_pos_rise = parseInt('000', 2);
+    clkout_pos_fall = parseInt('000', 2);
+
+    adc_set_config5(
+        clkout_pos_rise_p = clkout_pos_rise, clkout_pos_fall_p = clkout_pos_fall,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
+
+
+
 
     /*
     //###############################################################
@@ -2222,7 +2361,7 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
 
     adc_set_config6(
         en_independant_chan_ctrl_p = en_independant_chan_ctrl, data_format_p = data_format,
-        level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
     //###############################################################
@@ -2245,7 +2384,7 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     test_pattern_common_or_cha = parseInt('011', 2);
     adc_set_config12(
         test_pattern_common_or_cha_p = test_pattern_common_or_cha,
-        level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
     //###############################################################
@@ -2269,7 +2408,7 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
 
     adc_set_config17(
         test_pattern_chb_p = test_pattern_chb,
-        level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
 

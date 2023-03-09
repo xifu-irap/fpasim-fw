@@ -115,7 +115,7 @@ function dac_spi_enable(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
             msg = "[dac_spi_enable]: Enable the SPI";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
     }
 }
@@ -287,8 +287,8 @@ function dac_set_config0(fifo_ena_p, fifo_reset_ena_p, multi_sync_ena_p, alarm_o
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config0]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config0]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -360,8 +360,8 @@ function dac_set_config1(qmc_offset_ena_p, qmc_correct_ena_p, fir0_ena_p, fir1_e
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config1]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config1]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -417,8 +417,8 @@ function dac_set_config2(sif_sync_p, sif_sync_ena_p, output_delay_p, level_p, mo
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config2]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config2]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -487,8 +487,8 @@ function dac_set_config3(cnt64_ena_p, fifo_offset_p, alarm_2away_ena_p, alarm_1a
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config3]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config3]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -544,8 +544,8 @@ function dac_set_config4(coarse_daca_p, coarse_dacb_p, level_p, mode_p, verbosit
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config4]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config4]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -591,8 +591,8 @@ function dac_set_config5(tempdata_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config5]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config5]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -647,8 +647,8 @@ function dac_set_config6(alarm_mask_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config6]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config6]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -716,8 +716,8 @@ function dac_set_config7(alarm_from_zerochk_p, alarm_fifo_collision_p, alarm_fro
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config7]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config7]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -766,8 +766,8 @@ function dac_set_config8(iotest_results_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config8]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config8]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -812,8 +812,8 @@ function dac_set_config9(iotest_pattern0_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config9]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config9]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -858,8 +858,8 @@ function dac_set_config10(iotest_pattern1_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config10]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config10]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -904,8 +904,8 @@ function dac_set_config11(iotest_pattern2_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config11]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config11]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -950,8 +950,8 @@ function dac_set_config12(iotest_pattern3_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config12]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config12]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -995,8 +995,8 @@ function dac_set_config13(iotest_pattern4_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config13]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config13]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1041,8 +1041,8 @@ function dac_set_config14(iotest_pattern5_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config14]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config14]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1088,8 +1088,8 @@ function dac_set_config15(iotest_pattern6_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config15]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config15]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1133,8 +1133,8 @@ function dac_set_config16(iotest_pattern7_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config16]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config16]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1197,8 +1197,8 @@ function dac_set_config17(clk_alarm_mask_p, tx_off_mask_p, clk_alarm_ena_p, tx_o
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config17]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config17]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1261,8 +1261,8 @@ function dac_set_config18(daca_complement_p, dacb_complement_p, clkdiv_sync_ena_
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config18]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config18]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1324,8 +1324,8 @@ function dac_set_config19(bequalsa_p, aequalsb_p, multi_sync_sel_p, rev_p, level
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config19]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config19]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1394,8 +1394,8 @@ function dac_set_config20(qmc_offseta_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config20]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config20]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1429,8 +1429,8 @@ function dac_set_config21(qmc_offsetb_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config21]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config21]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1466,8 +1466,8 @@ function dac_set_config22(qmc_offseta_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config22]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config22]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1507,8 +1507,8 @@ function dac_set_config23(qmc_offsetb_p, sif4_ena_p, clkpath_sleep_a_p, clkpath_
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config23]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config23]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1571,8 +1571,8 @@ function dac_set_config24(tsense_ena_p, clkrecv_sleep_p, sleepb_p, sleepa_p, lev
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config24]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config24]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1621,8 +1621,8 @@ function dac_set_config25(extref_ena_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config25]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config25]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1663,8 +1663,8 @@ function dac_set_config25(extref_ena_p, level_p, mode_p, verbosity_p) {
 
 //     if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN)
 //     {
-//       msg = "[dac_set_config26]: Set the register value: ";
-//       display_subtitle(msg_p=msg, level_p=level0, mode_p=mode_p);
+//       msg = "[dac_set_config26]: Set the register value ";
+//       display(msg_p=msg, level_p=level0, mode_p=mode_p);
 //     }
 
 //    if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN)
@@ -1736,8 +1736,8 @@ function dac_set_config27(qmc_gaina_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config27]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config27]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1773,8 +1773,8 @@ function dac_set_config28(qmc_gainb_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config28]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config28]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1811,8 +1811,8 @@ function dac_set_config29(qmc_phase_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config29]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config29]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1855,8 +1855,8 @@ function dac_set_config30(qmc_phase_p, qmc_gaina_p, qmc_gainb_p, level_p, mode_p
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config30]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config30]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1915,8 +1915,8 @@ function dac_set_config31(clk_alarm_p, tx_off_p, version_p, level_p, mode_p, ver
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_set_config31]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_set_config31]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -1981,8 +1981,8 @@ function dac_get_config0(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config0]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config0]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2044,8 +2044,8 @@ function dac_get_config1(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config1]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config1]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2097,8 +2097,8 @@ function dac_get_config2(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config2]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config2]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2159,8 +2159,8 @@ function dac_get_config3(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config3]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config3]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2210,8 +2210,8 @@ function dac_get_config4(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config4]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config4]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2258,8 +2258,8 @@ function dac_get_config5(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config5]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config5]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2311,8 +2311,8 @@ function dac_get_config6(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config6]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config6]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2373,8 +2373,8 @@ function dac_get_config7(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config7]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config7]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2420,8 +2420,8 @@ function dac_get_config8(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config8]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config8]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2463,8 +2463,8 @@ function dac_get_config9(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config9]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config9]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2506,8 +2506,8 @@ function dac_get_config10(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config10]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config10]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2550,8 +2550,8 @@ function dac_get_config11(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config11]: get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config11]: get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2596,8 +2596,8 @@ function dac_get_config12(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config12]: get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config12]: get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2641,8 +2641,8 @@ function dac_get_config13(level_p, mode_p, verbosity_p) {
     } else {
 
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config13]: get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config13]: get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2686,8 +2686,8 @@ function dac_get_config14(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config14]: get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config14]: get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2731,8 +2731,8 @@ function dac_get_config15(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config15]: get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config15]: get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2776,8 +2776,8 @@ function dac_get_config16(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config16]: get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config16]: get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2832,8 +2832,8 @@ function dac_get_config17(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config17]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config17]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2890,8 +2890,8 @@ function dac_get_config18(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config18]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config18]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -2951,8 +2951,8 @@ function dac_get_config19(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config19]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config19]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -3046,8 +3046,8 @@ function dac_get_config24(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config24]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config24]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -3092,8 +3092,8 @@ function dac_get_config25(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config25]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config25]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -3155,8 +3155,8 @@ function dac_get_config27(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config27]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config27]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -3201,8 +3201,8 @@ function dac_get_config28(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config28]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config28]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -3251,8 +3251,8 @@ function dac_get_config29(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config29]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config29]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -3303,8 +3303,8 @@ function dac_get_config30(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config30]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config30]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -3360,8 +3360,8 @@ function dac_get_config31(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            msg = "[dac_get_config31]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[dac_get_config31]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
@@ -3449,7 +3449,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     //---------------------------------------------------------------------
     const data = (spi_dac_tx_enable << 0)
 
-    msg = "Disable the DAC TX";
+    msg = "Set SPI_CONF1: Disable the DAC TX";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     addr = FPASIM_ADDR_WIREIN['SPI_CONF1'];
     sendToFPA_debugSetWireIn(addr, data);
@@ -4069,7 +4069,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     const spi_dac_tx_enable = 1;
     const data = (spi_dac_tx_enable << 0)
 
-    msg = "Enable the DAC TX";
+    msg = "Set SPI_CONF1: Enable the DAC TX";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     addr = FPASIM_ADDR_WIREIN['SPI_CONF1'];
     sendToFPA_debugSetWireIn(addr, data);

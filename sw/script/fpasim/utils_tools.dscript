@@ -189,7 +189,7 @@ function display_register(addr_p, addr_width_p, data_p, data_width_p, level_p, m
     // default function parameter values
     if (typeof(level_p) === 'undefined') level_p = 0;
     if (typeof(mode_p) === 'undefined') mode_p = 0;
-    
+
     const level0 = level_p;
 
     msg = 'addr: 0x' + convert_int_to_str_hex(value_p = addr_p, width_p = addr_width_p);
@@ -227,6 +227,7 @@ function display_bit(bit_name_p, bit_value_p, bit_width_p, level_p, mode_p) {
     msg = bit_name_p + ': 0x' + convert_int_to_str_hex(value_p = bit_value_p, width_p = bit_width_p);
     display(msg_p = msg, level_p = level_p, mode_p = mode_p);
 }
+
 
 /**
  * Convert the input string into an string array
@@ -283,6 +284,24 @@ function convert_hex_to_ascii(value_p, width_p) {
     }
     return str0;
 
+}
+
+function convert_uint_to_int(data_p, width_p) {
+    if (data_p >= Math.pow(2, width_p - 1)) {
+        const val = data_p - Math.pow(2, width_p);
+    } else {
+        const val = data_p;
+    }
+    return val
+}
+
+function convert_int_to_uint(data_p, width_p) {
+    if (data_p < 0) {
+        const val = Math.pow(2, width_p) + data_p;
+    } else {
+        const val = data_p;
+    }
+    return val;
 }
 
 //---------------------------------------------------------------------------------------

@@ -125,7 +125,7 @@ function cdce_spi_enable(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
             msg = "[cdce_spi_enable]: Enable the SPI";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
     }
 }
@@ -316,8 +316,8 @@ function cdce_set_config0(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config0]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_set_config0]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -400,8 +400,8 @@ function cdce_set_config1(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config1]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_set_config1]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -473,8 +473,8 @@ function cdce_set_config2(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config2]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_set_config2]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -550,7 +550,7 @@ function cdce_set_config3(
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
             msg = "[cdce_set_config3]: Set the register data: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -622,7 +622,7 @@ function cdce_set_config4(
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
             msg = "[cdce_set_config4]: Set the register data: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -692,8 +692,8 @@ function cdce_set_config5(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config5]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_set_config5]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -768,8 +768,8 @@ function cdce_set_config6(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config6]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_set_config6]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -843,8 +843,8 @@ function cdce_set_config7(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config7]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_set_config7]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -920,8 +920,8 @@ function cdce_set_config8(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config8]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_set_config8]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -933,7 +933,7 @@ function cdce_set_config8(
             display_bit(bit_name_p = "cmosmode8nyx_p", bit_value_p = cmosmode8nyx_p, bit_width_p = 2, level_p = level2, mode_p = mode_p);
             display_bit(bit_name_p = "cmosmode8pyx_p", bit_value_p = cmosmode8pyx_p, bit_width_p = 2, level_p = level2, mode_p = mode_p);
             display_bit(bit_name_p = "pecl8hiswing_p", bit_value_p = pecl8hiswing_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
-            display_bit(bit_name_p = "en8div_p", bit_value_p = en8div_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "en89div_p", bit_value_p = en89div_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
             display_bit(bit_name_p = "out8divrsel_p", bit_value_p = out8divrsel_p, bit_width_p = 7, level_p = level2, mode_p = mode_p);
             display_bit(bit_name_p = "ph8adjc_p", bit_value_p = ph8adjc_p, bit_width_p = 7, level_p = level2, mode_p = mode_p);
             display_bit(bit_name_p = "vcxoinvbb_p", bit_value_p = vcxoinvbb_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
@@ -1014,7 +1014,7 @@ function cdce_set_config9(
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
             msg = "[cdce_set_config9]: Set the register data: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1083,8 +1083,8 @@ function cdce_set_config10(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config10]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_set_config10]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1154,8 +1154,8 @@ function cdce_set_config11(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config11]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_set_config11]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1240,8 +1240,8 @@ function cdce_set_config12(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config12]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_set_config12]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -1310,8 +1310,8 @@ function cdce_get_config0(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config0]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config0]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1379,8 +1379,8 @@ function cdce_get_config1(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config1]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config1]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -1441,8 +1441,8 @@ function cdce_get_config2(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config2]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config2]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -1502,8 +1502,8 @@ function cdce_get_config3(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config3]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config3]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -1562,8 +1562,8 @@ function cdce_get_config4(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config4]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config4]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -1618,8 +1618,8 @@ function cdce_get_config5(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config5]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config5]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -1680,8 +1680,8 @@ function cdce_get_config6(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config6]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config6]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -1742,8 +1742,8 @@ function cdce_get_config7(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config7]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config7]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -1805,8 +1805,8 @@ function cdce_get_config8(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config8]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config8]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -1877,8 +1877,8 @@ function cdce_get_config9(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config9]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config9]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -1942,8 +1942,8 @@ function cdce_get_config10(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config10]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config10]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -1999,8 +1999,8 @@ function cdce_get_config11(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config11]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config11]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
@@ -2068,8 +2068,8 @@ function cdce_get_config12(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config12]: Get the register value:";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[cdce_get_config12]: Get the register value";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
             display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);

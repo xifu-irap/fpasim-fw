@@ -40,50 +40,7 @@ include("./fpasim/fpasim_address.dscript");
 include("./fpasim/fpasim_tools.dscript");
 
 
-function script_info(level_p, mode_p, verbosity_p) {
-    // default function parameter values
-    if (typeof(level_p) === 'undefined') level_p = 0;
-    if (typeof(mode_p) === 'undefined') mode_p = 0;
-    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
 
-    const level0 = level_p;
-    const level1 = level_p + 1;
-    /*
-     Print the test info
-    */
-    msg = "Script info:";
-    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
-
-    // get the operator name
-    operator_name = get_operator_name();
-    msg = "Operator Name: " + operator_name;
-    display(msg_p = msg, level_p = level0, mode_p = mode_p);
-    // get the session
-    session_name = get_session_name();
-    msg = "Session: " + session_name;
-    display(msg_p = msg, level_p = level0, mode_p = mode_p);
-    // Print the current date
-    date = maDate()
-    msg = "Date: " + date;
-    display(msg_p = msg, level_p = level0, mode_p = mode_p);
-
-    // get board id
-    reg_name = 'BOARD_ID';
-    msg = reg_name + ": ";
-    display(msg_p = msg, level_p = level0, mode_p = mode_p);
-    data = fpasim_get_wireout_by_name(reg_name_p = reg_name, level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
-    // get firmware id
-    reg_name = 'FIRMWARE_ID';
-    msg = reg_name + ": ";
-    display(msg_p = msg, level_p = level0, mode_p = mode_p);
-    data = fpasim_get_wireout_by_name(reg_name_p = reg_name, level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
-    // get firmware version
-    reg_name = 'FIRMWARE_VERSION';
-    msg = reg_name + ": ";
-    display(msg_p = msg, level_p = level0, mode_p = mode_p);
-    data = fpasim_get_wireout_by_name(reg_name_p = reg_name, level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
-
-}
 
 function convert_percentage_to_pulse_heigth(percentage_p) {
 
@@ -221,7 +178,7 @@ function main() {
      * display the script info
      ***************************************************************************
      */
-    script_info(level_p = level0, mode_p = mode_p, verbosity_p = 2);
+    fpasim_script_info(level_p = level0, mode_p = mode_p, verbosity_p = 2);
 
     /* 
      ***************************************************************************
@@ -392,11 +349,11 @@ function main() {
     	
     	*/
 
-    pulse_height_tab[4] = convert_percentage_to_pulse_heigth(percentage_p = 10);
+    pulse_height_tab[4] = convert_percentage_to_pulse_heigth(percentage_p = 14);
     pulse_height_tab[3] = convert_percentage_to_pulse_heigth(percentage_p = 12);
     pulse_height_tab[2] = convert_percentage_to_pulse_heigth(percentage_p = 10);
-    pulse_height_tab[1] = convert_percentage_to_pulse_heigth(percentage_p = 12);
-    pulse_height_tab[0] = convert_percentage_to_pulse_heigth(percentage_p = 10);
+    pulse_height_tab[1] = convert_percentage_to_pulse_heigth(percentage_p = 8);
+    pulse_height_tab[0] = convert_percentage_to_pulse_heigth(percentage_p = 6);
 
 
     session_name = getText("Start loop");
@@ -441,12 +398,20 @@ function main() {
         pulse_height_tab[1] = convert_percentage_to_pulse_heigth(percentage_p = 40);
         pulse_height_tab[0] = convert_percentage_to_pulse_heigth(percentage_p = 100);
     	*/
-
+/*
     pulse_height_tab[4] = convert_percentage_to_pulse_heigth(percentage_p = 10);
     pulse_height_tab[3] = convert_percentage_to_pulse_heigth(percentage_p = 12);
     pulse_height_tab[2] = convert_percentage_to_pulse_heigth(percentage_p = 10);
     pulse_height_tab[1] = convert_percentage_to_pulse_heigth(percentage_p = 12);
-    pulse_height_tab[0] = convert_percentage_to_pulse_heigth(percentage_p = 10);
+    pulse_height_tab[0] = convert_percentage_to_pulse_heigth(percentage_p = 100);
+	*/
+	
+	 pulse_height_tab[4] = convert_percentage_to_pulse_heigth(percentage_p = 14);
+    pulse_height_tab[3] = convert_percentage_to_pulse_heigth(percentage_p = 12);
+    pulse_height_tab[2] = convert_percentage_to_pulse_heigth(percentage_p = 10);
+    pulse_height_tab[1] = convert_percentage_to_pulse_heigth(percentage_p = 8);
+    pulse_height_tab[0] = convert_percentage_to_pulse_heigth(percentage_p = 6);
+	
 
     // user-defined: edit indivual tab values.
 
@@ -474,7 +439,9 @@ function main() {
      * check all errors
      ***************************************************************************
      */
-    fpasim_check_all_errors(level_p = 0, mode_p = 0, verbosity_p = 0);
+    msg = "Check Debug Errors";
+    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+    fpasim_check_all_errors(level_p = level1, mode_p = 0, verbosity_p = 0);
 
     /* 
      ***************************************************************************

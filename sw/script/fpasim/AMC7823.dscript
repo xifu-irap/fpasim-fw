@@ -145,7 +145,7 @@ function amc_spi_enable(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
             msg = "[dac_init_device]: Enable the SPI";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
     }
 }
@@ -302,8 +302,8 @@ function amc_set_gpio(iomod_p, iost_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_gpio]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_set_gpio]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -379,8 +379,8 @@ function amc_set_dac(dac_p, dac_id_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_dac" + dac_id_p.toString(16) + "]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_set_dac" + dac_id_p.toString(16) + "]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -432,8 +432,8 @@ function amc_set_dac_load(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_dac_load]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_set_dac_load]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -489,8 +489,8 @@ function amc_set_dac_conf(slda_p, gdac_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_dac_conf]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_set_dac_conf]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -591,8 +591,8 @@ function amc_set_amc_status_conf(rstc_p, davf_p, sref_p, gref_p, ecnvt_p, level_
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_dac_conf]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_set_dac_conf]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -655,8 +655,8 @@ function amc_set_adc_ctrl(cmode_p, sa_p, ea_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_adc_ctrl]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_set_adc_ctrl]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -704,8 +704,8 @@ function amc_set_reset(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_reset]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_set_reset]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -778,8 +778,8 @@ function amc_set_power_down(padc_p, pdac_p, pts_p, prefb_p, level_p, mode_p, ver
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_power_down]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_set_power_down]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -842,8 +842,8 @@ function amc_set_threshold_hi(threshold_p, threshold_id_p, level_p, mode_p, verb
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_threshold_hi" + threshold_id_p.toString(16) + "]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_set_threshold_hi" + threshold_id_p.toString(16) + "]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -903,8 +903,8 @@ function amc_set_threshold_lo(threshold_p, threshold_id_p, level_p, mode_p, verb
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_threshold_lo" + threshold_id_p.toString(16) + "]: Set the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_set_threshold_lo" + threshold_id_p.toString(16) + "]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -955,7 +955,7 @@ function amc_get_adc0(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
             msg = "[amc_get_adc0]: Get the register value " + text;
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1006,7 +1006,7 @@ function amc_get_adc1(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
             msg = "[amc_get_adc1]: Get the register value " + text;
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1057,7 +1057,7 @@ function amc_get_adc2(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
             msg = "[amc_get_adc2]: Get the register value " + text;
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1108,7 +1108,7 @@ function amc_get_adc3(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
             msg = "[amc_get_adc3]: Get the register value " + text;
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1159,7 +1159,7 @@ function amc_get_adc4(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
             msg = "[amc_get_adc4]: Get the register value " + text;
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1210,7 +1210,7 @@ function amc_get_adc5(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
             msg = "[amc_get_adc5]: Get the register value " + text;
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1261,7 +1261,7 @@ function amc_get_adc6(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
             msg = "[amc_get_adc6]: Get the register value " + text;
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1312,7 +1312,7 @@ function amc_get_adc7(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
             msg = "[amc_get_adc7]: Get the register value " + text;
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1363,7 +1363,7 @@ function amc_get_adc8(level_p, mode_p, verbosity_p) {
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
             msg = "[amc_get_adc8]: Get the register value " + text;
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1466,8 +1466,8 @@ function amc_get_alr(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_alr]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_alr]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1535,8 +1535,8 @@ function amc_get_gpio(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_gpio]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_gpio]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1613,8 +1613,8 @@ function amc_get_dac(dac_id_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_dac" + adc_id_p.toString(16) + "]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_dac" + adc_id_p.toString(16) + "]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1661,8 +1661,8 @@ function amc_get_load_dac(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_load_dac]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_load_dac]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1717,8 +1717,8 @@ function amc_get_dac_conf(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_dac_conf]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_dac_conf]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1817,8 +1817,8 @@ function amc_get_amc_status_conf(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_amc_status_conf]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_amc_status_conf]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1880,8 +1880,8 @@ function amc_get_adc_ctrl(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_adc_ctrl]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_adc_ctrl]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1927,8 +1927,8 @@ function amc_get_reset(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_reset]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_reset]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -1997,8 +1997,8 @@ function amc_get_power_down(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_power_down]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_power_down]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -2060,8 +2060,8 @@ function amc_get_threshold_hi(threshold_id_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_threshold_hi" + threshold_id_p.toString(16) + "]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_threshold_hi" + threshold_id_p.toString(16) + "]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -2118,8 +2118,8 @@ function amc_get_threshold_lo(threshold_id_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_threshold_lo" + threshold_id_p.toString(16) + "]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_threshold_lo" + threshold_id_p.toString(16) + "]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
@@ -2161,8 +2161,8 @@ function amc_get_part_rev_number(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_part_rev_number]: Get the register value: ";
-            display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
+            msg = "[amc_get_part_rev_number]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
