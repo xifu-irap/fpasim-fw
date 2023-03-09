@@ -1,5 +1,12 @@
 {
   "description_list": [
+    "This test checks the FPGA RAMS configuration",
+    "  1. write the FPGA RAM contents from files",
+    "  2. read the FPGA RAMs contents",
+    "  3. check if the read value is equal to the corresponding written value"
+  ],
+  "note_list":
+  [
     "This file was manually generated",
     "This file is constitued by 2 parts",
     "The first part defines the list of commands to simulate (see the sequence key).",
@@ -9,6 +16,7 @@
     "Note: the second part is built from the 0136-FPAsim_commands_dictionnary_vx.y.xlsx (api register document)",
     "Note: the INTERRUPT register is not easily manageable in simulation. So, it's not defined here."
   ],
+
   "sequence": {
     "description_list": [
       "This section defines the list of commands to simulate",
@@ -46,77 +54,11 @@
       "usb_ctrl;wr;rst=1",
       "usb_ctrl;wr;rst=0",
       "nop;wr;delay=32",
-      "usb_trig;wr;ctrl_valid=1",
-      "usb_fpgasim_gain;wr;gain=1",
-      "usb_mux_sq_fb_delay;wr;delay=2",
-      "usb_amp_sq_of_delay;wr;delay=3",
-      "usb_error_delay;wr;delay=4",
-      "usb_ra_delay;wr;delay=5",
-      "usb_tes_conf;wr",
-      "usb_trig;wr;reg_valid=1",
-      "nop;wr;delay=16",
-      "usb_fpgasim_gain;rd;gain=1",
-      "usb_mux_sq_fb_delay;rd;delay=2",
-      "usb_amp_sq_of_delay;rd;delay=3",
-      "usb_error_delay;rd;delay=4",
-      "usb_ra_delay;rd;delay=5",
-
-
-      "usb_rec_conf0;wr;rec_adc_nb_word_32=4",
-      "usb_rec_ctrl;wr;rec_adc_en=1",
-      "usb_trig;wr;rec_valid=1",
-      "nop;wr;delay=16",
-      "usb_rec_conf0;rd;rec_adc_nb_word_32=4",
-      "usb_rec_ctrl;rd;rec_adc_en=1",
 
       "usb_ram;wr;tes_shape_pulse;amp_squid_tf;mux_squid_tf;tes_steady_state;mux_squid_offset",
       "usb_trig;wr;rd_all=1",
       "nop;wr;delay=16",
-      "usb_ram;rd;tes_shape_pulse;amp_squid_tf;mux_squid_tf;tes_steady_state;mux_squid_offset",
- 
-      "usb_ctrl;wr;en=1",
-      "usb_trig;wr;ctrl_valid=1",
-
-      "usb_error_sel;wr;sel=0",
-      "nop;wr;delay=16",
-      "usb_error_sel;rd;sel=0",
-      "usb_errors;rd;error=0",
-
-      "usb_error_sel;wr;sel=1",
-      "nop;wr;delay=16",
-      "usb_error_sel;rd;sel=1",
-      "usb_errors;rd;error=0",
-
-      "usb_error_sel;wr;sel=2",
-      "nop;wr;delay=16",
-      "usb_error_sel;rd;sel=2",
-      "usb_errors;rd;error=0",
-
-      "usb_error_sel;wr;sel=3",
-      "nop;wr;delay=16",
-      "usb_error_sel;rd;sel=3",
-      "usb_errors;rd;error=0",
-
-      "usb_error_sel;wr;sel=4",
-      "nop;wr;delay=16",
-      "usb_error_sel;rd;sel=4",
-      "usb_errors;rd;error=0",
-
-      "usb_error_sel;wr;sel=5",
-      "nop;wr;delay=16",
-      "usb_error_sel;rd;sel=5",
-      "usb_errors;rd;error=0",
-
-      "usb_error_sel;wr;sel=6",
-      "nop;wr;delay=16",
-      "usb_error_sel;rd;sel=6",
-      "usb_errors;rd;error=0",
-
-      "usb_error_sel;wr;sel=7",
-      "nop;wr;delay=16",
-      "usb_error_sel;rd;sel=7",
-      "usb_errors;rd;error=0"
-
+      "usb_ram;rd;tes_shape_pulse;amp_squid_tf;mux_squid_tf;tes_steady_state;mux_squid_offset"
     ]
   },
   "def": {
@@ -223,6 +165,11 @@
         "rec_valid": {
           "value": 0,
           "bit_pos_min": 20,
+          "width": 1
+        },
+        "spi_valid": {
+          "value": 0,
+          "bit_pos_min": 24,
           "width": 1
         }
       }
@@ -837,8 +784,8 @@
         },
         "spi_id": {
           "value": 0,
-          "bit_pos_min": 1,
-          "width": 1
+          "bit_pos_min": 4,
+          "width": 3
         }
       }
     },
@@ -1049,7 +996,7 @@
         "sel": {
           "value": 0,
           "bit_pos_min": 0,
-          "width": 3
+          "width": 4
         }
       }
     },

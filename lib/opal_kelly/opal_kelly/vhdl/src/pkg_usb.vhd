@@ -517,7 +517,7 @@ package body pkg_usb is
                   v_pipe_rd_cnt_word := v_pipe_rd_cnt_word + 1;
                 end if;
 
-              when 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 510 | 511 | 512 | 513 | 517 | 524 | 525 | 526 | 527 | 529 | 530 | 531 =>
+              when 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 510 | 511 | 512 | 513 | 517 | 518 | 519 | 520 | 521 | 522 | 523 | 524 | 525 | 526 | 527 | 529 | 530 | 531 =>
                 ---------------------------------------------------------------------
                 -- wire out
                 ---------------------------------------------------------------------
@@ -721,7 +721,7 @@ package body pkg_usb is
             end case;
 
             if v_error(0) = '1' then
-              info("[pkg_usb_wr]: error: v_file_reg_id is out of range");
+              info("[pkg_usb_wr]: error: v_file_reg_id(" & to_string(v_file_reg_id) & ") is out of range");
             end if;
             if v_csv_file.end_of_file(void) = true then  -- @suppress "Redundant boolean equality check with true"
               v_wr_finish := '1';

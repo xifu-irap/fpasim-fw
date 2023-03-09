@@ -691,6 +691,32 @@ begin
       o_leds => o_leds
       );
 
+---------------------------------------------------------------------
+-- spi management
+---------------------------------------------------------------------
+  gen_SPI_READBACK : if true generate
+    signal data_tmp0 : std_logic;
+  begin
+
+    inst_pipeliner : entity fpasim.pipeliner
+      generic map(
+        g_NB_PIPES   => 1,
+        g_DATA_WIDTH => 1
+        )
+      port map(
+        i_clk     => i_adc_clk_p,
+        i_data(0) => o_spi_sdata,
+        o_data(0) => data_tmp0
+        );
+
+    i_cdce_sdo <= data_tmp0;
+    i_adc_sdo  <= data_tmp0;
+    i_dac_sdo  <= data_tmp0;
+    i_mon_sdo  <= data_tmp0;
+
+
+  end generate gen_SPI_READBACK;
+
 
   ---------------------------------------------------------------------
   -- log: data out
