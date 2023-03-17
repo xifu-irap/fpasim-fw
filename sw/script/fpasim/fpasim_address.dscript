@@ -24,8 +24,8 @@
 // -------------------------------------------------------------------------------------------------------------
 //    @details                
 //    
-//    This script lists:
-//      . The available addresses in the {name, address value} dictionnary format for the:
+//    By access type, this script defines the addresses of the FPASIM function.
+//      . The available addresses in the {name, address value} dictionnary format for the following access type:
 //			. wire in
 //          . wire out
 //          . trig in
@@ -103,7 +103,7 @@ FPASIM_ADDR_WIREOUT['RA_DELAY'] = 0x26; // 6
 FPASIM_ADDR_WIREOUT['TES_CONF'] = 0x27; // 7
 // FPASIM_ADDR_WIREOUT['RFU'] = 0x28; // 8
 // FPASIM_ADDR_WIREOUT['RFU'] = 0x29; // 9
-// FPASIM_ADDR_WIREOUT['RFU'] = 0x2A; // 10
+FPASIM_ADDR_WIREOUT['FPASIM_STATUS'] = 0x2A; // 10
 FPASIM_ADDR_WIREOUT['DATA_COUNT'] = 0x2B; // 11
 FPASIM_ADDR_WIREOUT['REC_CTRL'] = 0x2C; // 12
 FPASIM_ADDR_WIREOUT['REC_CONF0'] = 0x2D; // 13

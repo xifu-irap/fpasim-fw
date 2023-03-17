@@ -24,7 +24,8 @@
 // -------------------------------------------------------------------------------------------------------------
 //    @details
 //
-//   This javscript generates spi commands in order to initialize the dac3283 registers.
+//   This script defines functions in order to configure (read/write) the registers of the dac3283 spi device (FMC150 board) knowing the FPASIM function
+//   has a role of bridge between the software and the spi device.
 //
 //   Note:
 //      . Tested with javascript
@@ -77,10 +78,13 @@ const c_DAC_ADDR_VERBOSITY_MIN = 1;
 // verbosity min to display register bit
 const c_DAC_BIT_VERBOSITY_MIN = c_DAC_ADDR_VERBOSITY_MIN + 1;
 
-/*
-FPGA specifics:
- Enable the FPGA SPI
-*/
+/**
+ * Enable the FPASIM SPI MODULE (bridge)
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ */
 function dac_spi_enable(level_p, mode_p, verbosity_p) {
     // default function parameter values
     if (typeof(level_p) === 'undefined') level_p = 0;
@@ -121,10 +125,11 @@ function dac_spi_enable(level_p, mode_p, verbosity_p) {
 }
 
 /**
-* FPGA specifics: 
-    Build the expected spi command
-    Build the expected fpga register accesses
-*/
+ * Write a spi device register through the FPASIM SPI MODULE (bridge).
+ *
+ * @param {number} addr_p - register address of the SPI device to write.
+ * @param {number} data_p - value to write in the spi device register.
+ */
 function dac_write_command(addr_p, data_p) {
 
     //---------------------------------------------------------------------
@@ -172,6 +177,13 @@ function dac_write_command(addr_p, data_p) {
 
 }
 
+/**
+ * Read a spi device register value.
+ *
+ * @param {number} addr_p - register address of the SPI device to read.
+ * @return {number} read value from the spi device register.
+ *
+ */
 function dac_read_command(addr_p) {
 
     //---------------------------------------------------------------------
@@ -179,7 +191,7 @@ function dac_read_command(addr_p) {
     //---------------------------------------------------------------------
     mode = 0; // 0: rd, 1: wr
     spi_id = 2; // 0: cdce,1: adc, 2: dac, 3: amc
-    data =  (spi_id << 4) + mode;
+    data = (spi_id << 4) + mode;
     addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
     sendToFPA_debugSetWireIn(addr, data);
 
@@ -222,15 +234,16 @@ function dac_read_command(addr_p) {
     //---------------------------------------------------------------------
     getLatestValue("FPA_WireOutValues");
 
-    return FPA_WireOutValues[21];
+    return FPA_WireOutValues[22];
 
 }
 
 /**
- *  Set the register0
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register0 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * When asserted the FIFO is enabled. When the FIFO is bypassed
  *   DACCCLKP/N and DATACLKP/N must be aligned to within t_align.
@@ -307,10 +320,11 @@ function dac_set_config0(fifo_ena_p, fifo_reset_ena_p, multi_sync_ena_p, alarm_o
 }
 
 /**
- *  Set the register1
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ *  Set the register1 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * When asserted the QMC offset correction circuitry is enabled.
  * [7]: R/W: qmc_offset_ena[0]
@@ -380,10 +394,11 @@ function dac_set_config1(qmc_offset_ena_p, qmc_correct_ena_p, fir0_ena_p, fir1_e
 }
 
 /**
- *  Set the register2
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ *  Set the register2 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * Serial interface created sync signal. Set to '1' to cause a sync and then clear to '0' to remove it.
  * [5]: R/W: sif_sync[0]
@@ -434,10 +449,11 @@ function dac_set_config2(sif_sync_p, sif_sync_ena_p, output_delay_p, level_p, mo
 }
 
 /**
- *  Set the register3
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ *  Set the register3 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This enables resetting the alarms after 64 good samples with the
  * goal of removing unnecessary errors. For instance, when checking
@@ -505,10 +521,11 @@ function dac_set_config3(cnt64_ena_p, fifo_offset_p, alarm_2away_ena_p, alarm_1a
 }
 
 /**
- *  Set the register4
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ *  Set the register4 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * Scales the DACA output current in 16 equal steps.
  * (VEXTIO/Rbias)*(coarse_daca/b + 1)
@@ -560,10 +577,11 @@ function dac_set_config4(coarse_daca_p, coarse_dacb_p, level_p, mode_p, verbosit
 }
 
 /**
- *  Set the register5
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ *  Set the register5 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This is the output from the chip temperature sensor. The value
  * of this register in two’s complement format represents the
@@ -607,10 +625,11 @@ function dac_set_config5(tempdata_p, level_p, mode_p, verbosity_p) {
 
 
 /**
- *  Set the register6
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register6 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * These bits control the masking of the alarm outputs. This
  * means that the ALARM_SDO pin will not be asserted if the
@@ -662,10 +681,11 @@ function dac_set_config6(alarm_mask_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register7
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register7 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This alarm indicates the 8-bit FIFO write pointer address has an all
  * zeros patterns. Due to pointer address being a shift register, this is
@@ -735,10 +755,11 @@ function dac_set_config7(alarm_from_zerochk_p, alarm_fifo_collision_p, alarm_fro
 }
 
 /**
- *  Set the register8
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register8 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * The values of these bits tell which bit in the byte-wide LVDS bus
  * failed during the pattern checker test.
@@ -781,10 +802,11 @@ function dac_set_config8(iotest_results_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register9
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register9 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This is dataword0 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -827,10 +849,11 @@ function dac_set_config9(iotest_pattern0_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register10
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register10 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This is dataword1 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -873,10 +896,11 @@ function dac_set_config10(iotest_pattern1_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register11
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register11 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This is dataword2 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -919,10 +943,11 @@ function dac_set_config11(iotest_pattern2_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register12
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register12 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This is dataword3 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -965,10 +990,11 @@ function dac_set_config12(iotest_pattern3_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register13
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register13 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This is dataword4 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -1010,10 +1036,11 @@ function dac_set_config13(iotest_pattern4_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register14
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register14 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This is dataword5 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -1056,10 +1083,11 @@ function dac_set_config14(iotest_pattern5_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register15
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register15 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This is dataword6 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -1103,10 +1131,11 @@ function dac_set_config15(iotest_pattern6_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register16
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register16 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This is dataword7 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -1148,10 +1177,11 @@ function dac_set_config16(iotest_pattern7_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register17
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register17 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This bit controls the masking of the clock monitor alarm. This
  * means that the ALARM_SDO pin will not be asserted. The alarm
@@ -1215,10 +1245,11 @@ function dac_set_config17(clk_alarm_mask_p, tx_off_mask_p, clk_alarm_ena_p, tx_o
 }
 
 /**
- *  Set the register18
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register18 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * When asserted the output to the DACA is complemented. This
  * allows to effectively change the + and – designations of the LVDS data lines.
@@ -1278,10 +1309,11 @@ function dac_set_config18(daca_complement_p, dacb_complement_p, clkdiv_sync_ena_
 }
 
 /**
- *  Set the register19
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register19 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * When asserted the DACA data is driven onto DACB.
  * [7]: R/W: bequalsa[0]
@@ -1342,10 +1374,11 @@ function dac_set_config19(bequalsa_p, aequalsb_p, multi_sync_sel_p, rev_p, level
 }
 
 /**
- *  Set the register20-23
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register20-23 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * Lower 8 bits of the DAC A offset correction. The offset is
  * measured in DAC LSBs. Writing this register causes an
@@ -1525,10 +1558,11 @@ function dac_set_config23(qmc_offsetb_p, sif4_ena_p, clkpath_sleep_a_p, clkpath_
 }
 
 /**
- *  Set the register24
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register24 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * Turns on the temperature sensor when asserted.
  * [7]: R/W: tsense_ena[0]
@@ -1589,10 +1623,11 @@ function dac_set_config24(tsense_ena_p, clkrecv_sleep_p, sleepb_p, sleepa_p, lev
 }
 
 /**
- *  Set the register25
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register25 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * Allows the device to use an external reference or the internal reference.
  *  (0=internal, 1=external)
@@ -1636,10 +1671,11 @@ function dac_set_config25(extref_ena_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register26
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register26 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * [0]: R/W
  *
@@ -1679,10 +1715,11 @@ function dac_set_config25(extref_ena_p, level_p, mode_p, verbosity_p) {
 // }
 
 /**
- *  Set the register27-30
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register27-30 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * Lower 8 bits of the 11-bit DAC A QMC gain word. The upper 3
  * bits are located in the dac_CONFIG30 register. The full 11-bit
@@ -1872,10 +1909,11 @@ function dac_set_config30(qmc_phase_p, qmc_gaina_p, qmc_gainb_p, level_p, mode_p
 }
 
 /**
- *  Set the register31
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register31 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * This bit is set to '1' when DATACLK is stopped for 4 clock
  * cycles. Once set, the bit needs to be cleared by writing a '0'.
@@ -1932,10 +1970,12 @@ function dac_set_config31(clk_alarm_p, tx_off_p, version_p, level_p, mode_p, ver
 }
 
 /**
- *  Get the register0
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ *  Get the register0 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * When asserted the FIFO is enabled. When the FIFO is bypassed
  *   DACCCLKP/N and DATACLKP/N must be aligned to within t_align.
@@ -2002,10 +2042,12 @@ function dac_get_config0(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register1
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register1 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * When asserted the QMC offset correction circuitry is enabled.
  * [7]: R/W: qmc_offset_ena[0]
@@ -2065,10 +2107,12 @@ function dac_get_config1(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register2
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register2 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * Serial interface created sync signal. Set to '1' to cause a sync and then clear to '0' to remove it.
  * [5]: R/W: sif_sync[0]
@@ -2115,10 +2159,12 @@ function dac_get_config2(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register3
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register3 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This enables resetting the alarms after 64 good samples with the
  * goal of removing unnecessary errors. For instance, when checking
@@ -2178,10 +2224,12 @@ function dac_get_config3(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register4
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register4 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * Scales the DACA output current in 16 equal steps.
  * (VEXTIO/Rbias)*(coarse_daca/b + 1)
@@ -2227,10 +2275,12 @@ function dac_get_config4(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register5
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register5 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This is the output from the chip temperature sensor. The value
  * of this register in two’s complement format represents the
@@ -2274,10 +2324,12 @@ function dac_get_config5(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register6
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register6 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * These bits control the masking of the alarm outputs. This
  * means that the ALARM_SDO pin will not be asserted if the
@@ -2327,10 +2379,12 @@ function dac_get_config6(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register7
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register7 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This alarm indicates the 8-bit FIFO write pointer address has an all
  * zeros patterns. Due to pointer address being a shift register, this is
@@ -2393,10 +2447,12 @@ function dac_get_config7(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register8
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register8 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * The values of these bits tell which bit in the byte-wide LVDS bus
  * failed during the pattern checker test.
@@ -2436,10 +2492,12 @@ function dac_get_config8(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register9
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register9 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This is dataword0 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -2479,10 +2537,12 @@ function dac_get_config9(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register10
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register10 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This is dataword1 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -2522,10 +2582,12 @@ function dac_get_config10(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  get the register11
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * get the register11 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This is dataword2 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -2567,10 +2629,12 @@ function dac_get_config11(level_p, mode_p, verbosity_p) {
 
 
 /**
- *  Get the register12
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register12 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This is dataword3 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -2612,10 +2676,12 @@ function dac_get_config12(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register13
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register13 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This is dataword4 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -2657,10 +2723,12 @@ function dac_get_config13(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register14
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register14 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This is dataword5 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -2702,10 +2770,12 @@ function dac_get_config14(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register15
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register15 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This is dataword6 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -2747,10 +2817,12 @@ function dac_get_config15(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register16
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register16 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This is dataword7 in the IO test pattern. It is used with the seven
  * other words to test the input data.
@@ -2792,10 +2864,12 @@ function dac_get_config16(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register17
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register17 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This bit controls the masking of the clock monitor alarm. This
  * means that the ALARM_SDO pin will not be asserted. The alarm
@@ -2851,10 +2925,12 @@ function dac_get_config17(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register18
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register18 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * When asserted the output to the DACA is complemented. This
  * allows to effectively change the + and – designations of the LVDS data lines.
@@ -2909,10 +2985,12 @@ function dac_get_config18(level_p, mode_p, verbosity_p) {
 
 
 /**
- *  Get the register19
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register19 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * When asserted the DACA data is driven onto DACB.
  * [7]: R/W: bequalsa[0]
@@ -2940,10 +3018,6 @@ function dac_get_config19(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data1 = (bequalsa_p << 7) + (aequalsb_p << 6);
-    data0 = (multi_sync_sel_p << 1) + rev_p;
-    data = data1 + data0;
-
     addr = DAC_ADDR['reg19'];
     data = dac_read_command(addr_p = addr);
 
@@ -2970,49 +3044,197 @@ function dac_get_config19(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register20
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register20 value from the spi device.
  *
- * TODO
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
+ *
+ * [7:0]: qmc_offseta[7:0]
+ *
  */
+ function dac_get_config20(level_p, mode_p, verbosity_p) {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    addr = DAC_ADDR['reg20'];
+    data = dac_read_command(addr_p = addr);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
+            msg = "[dac_get_config20]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_DAC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "qmc_offseta[7:0]", bit_pos_p = 0, bit_width_p = 8, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+    return data;
+}
+
 
 /**
- *  Get the register21
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register21 value from the spi device.
  *
- * TODO
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
+ *
+ * [7:0]: qmc_offsetb[7:0]
+ *
  */
+  function dac_get_config21(level_p, mode_p, verbosity_p) {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    data1 = (bequalsa_p << 7) + (aequalsb_p << 6);
+    data0 = (multi_sync_sel_p << 1) + rev_p;
+    data = data1 + data0;
+
+    addr = DAC_ADDR['reg21'];
+    data = dac_read_command(addr_p = addr);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
+            msg = "[dac_get_config21]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_DAC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "qmc_offsetb[7:0]", bit_pos_p = 0, bit_width_p = 8, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+    return data;
+}
 
 /**
- *  Get the register22
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register22 value from the spi device.
  *
- * TODO
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
+ *
+ * [7:3]: qmc_offseta[12:8]
  */
+   function dac_get_config22(level_p, mode_p, verbosity_p) {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    addr = DAC_ADDR['reg22'];
+    data = dac_read_command(addr_p = addr);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
+            msg = "[dac_get_config22]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_DAC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "qmc_offseta[12:8]", bit_pos_p = 3, bit_width_p = 5, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+    return data;
+}
 
 /**
- *  Get the register23
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register23 value from the spi device.
  *
- * TODO
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
+ *
+ *
+ * [7:3]: qmc_offsetb[12:8]
+ * [2]: sif4_ena[0]
+ * [1]: clkpath_sleep_a[0]
+ * [0]: clkpath_sleep_b[0]
  */
+    function dac_get_config23(level_p, mode_p, verbosity_p) {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    addr = DAC_ADDR['reg23'];
+    data = dac_read_command(addr_p = addr);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
+            msg = "[dac_get_config23]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_DAC_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_DAC_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "qmc_offsetb[12:8]", bit_pos_p = 3, bit_width_p = 5, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "sif4_ena", bit_pos_p = 2, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "clkpath_sleep_a", bit_pos_p = 1, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+            display_bit_from_data(bit_name_p = "clkpath_sleep_b", bit_pos_p = 0, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+    return data;
+}
 
 
 
 
 /**
- *  Get the register24
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register24 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * Turns on the temperature sensor when asserted.
  * [7]: R/W: tsense_ena[0]
@@ -3065,10 +3287,12 @@ function dac_get_config24(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register25
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register25 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * Allows the device to use an external reference or the internal reference.
  *  (0=internal, 1=external)
@@ -3108,19 +3332,23 @@ function dac_get_config25(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register26
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register26 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * reserved funcion
  */
 
 /**
- *  Get the register27
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register27 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * Lower 8 bits of the 11-bit DAC A QMC gain word. The upper 3
  * bits are located in the dac_CONFIG30 register. The full 11-bit
@@ -3171,10 +3399,12 @@ function dac_get_config27(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register28
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register28 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * Lower 8 bits of the 11-bit DAC B QMC gain word. The upper 3
  * bits are located in the dac_CONFIG30 register. Refer to dac_CONFIG27
@@ -3217,10 +3447,12 @@ function dac_get_config28(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register29
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register29 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * Lower 8-bits of the 10-bit QMC phase word. The upper 2 bits are
  * in the dac_CONFIG30 register. The full 10-bit qmc_phase(9:0) word
@@ -3267,10 +3499,12 @@ function dac_get_config29(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register30
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register30 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * 3 upper bits of qmc_gaina.Refer to dac_CONFIG27
  * for formatting.
@@ -3321,13 +3555,13 @@ function dac_get_config30(level_p, mode_p, verbosity_p) {
 }
 
 
-
-
 /**
- *  Get the register31
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register31 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * This bit is set to '1' when DATACLK is stopped for 4 clock
  * cycles. Once set, the bit needs to be cleared by writing a '0'.
@@ -3377,7 +3611,14 @@ function dac_get_config31(level_p, mode_p, verbosity_p) {
     return data;
 }
 
-
+/**
+ * Read and Display the configuration of all spi device registers.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ *
+ */
 function dac_display_all_config(level_p, mode_p, verbosity_p) {
     // default function parameter values
     if (typeof(level_p) === 'undefined') level_p = 0;
@@ -3411,7 +3652,7 @@ function dac_display_all_config(level_p, mode_p, verbosity_p) {
     dac_get_config23(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
     dac_get_config24(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
     dac_get_config25(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
-    dac_get_config26(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
+    // dac_get_config26(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
     dac_get_config27(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
     dac_get_config28(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
     dac_get_config29(level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
@@ -3421,10 +3662,10 @@ function dac_display_all_config(level_p, mode_p, verbosity_p) {
 
 
 /**
- *  Configure the dac3283 (dac) Device
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Default Configuration of the dac3283 (dac) spi device (FMC150 board).
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  */
 function DAC3283_configure(level_p, mode_p, verbosity_p) {
@@ -3443,8 +3684,8 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
 
     // Enable the SPI on the FPGA board
     dac_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
-	
-	//---------------------------------------------------------------------
+
+    //---------------------------------------------------------------------
     // write in the SPI_CONF1 register
     //---------------------------------------------------------------------
     const data = (spi_dac_tx_enable << 0)
