@@ -728,7 +728,7 @@ begin
   begin
     addr       <= o_data(31 downto 16);
     data       <= o_data(15 downto 0);
-    data_valid <= o_data_valid when o_reg_id = 32 else '0';
+    data_valid <= o_data_valid when o_reg_id = 0 else '0';
 
     inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
       i_clk            => usb_clk,
@@ -765,7 +765,7 @@ begin
   begin
     addr       <= o_data(31 downto 16);
     data       <= o_data(15 downto 0);
-    data_valid <= o_data_valid when o_reg_id = 33 else '0';
+    data_valid <= o_data_valid when o_reg_id = 1 else '0';
 
     inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
       i_clk            => usb_clk,
@@ -802,7 +802,7 @@ begin
   begin
     addr       <= o_data(31 downto 16);
     data       <= o_data(15 downto 0);
-    data_valid <= o_data_valid when o_reg_id = 34 else '0';
+    data_valid <= o_data_valid when o_reg_id = 2 else '0';
 
     inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
       i_clk            => usb_clk,
@@ -839,7 +839,7 @@ begin
   begin
     addr       <= o_data(31 downto 16);
     data       <= o_data(15 downto 0);
-    data_valid <= o_data_valid when o_reg_id = 35 else '0';
+    data_valid <= o_data_valid when o_reg_id = 3 else '0';
 
     inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
       i_clk            => usb_clk,
@@ -876,7 +876,7 @@ begin
   begin
     addr       <= o_data(31 downto 16);
     data       <= o_data(15 downto 0);
-    data_valid <= o_data_valid when o_reg_id = 35 else '0';
+    data_valid <= o_data_valid when o_reg_id = 4 else '0';
 
     inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
       i_clk            => usb_clk,

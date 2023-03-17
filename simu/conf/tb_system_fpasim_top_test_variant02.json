@@ -1,9 +1,8 @@
 {
   "description_list": [
-    "This test checks the wire Registers. For the specified registers:",
-    "  1. write a value in the wire_in access",
-    "  2. read the value in the wire_out access",
-    "  3. check if the read value is equal to the corresponding written value"
+    "This test configure the fpasim function and generate one pulse on a given pixel",
+    "  1. configure the fpasim function",
+    "  2. generate a pulse"
   ],
   "note_list":
   [
@@ -54,48 +53,22 @@
       "usb_ctrl;wr;rst=1",
       "usb_ctrl;wr;rst=0",
       "nop;wr;delay=32",
-      "usb_fpgasim_gain;wr;gain=1",
-      "usb_mux_sq_fb_delay;wr;delay=2",
-      "usb_amp_sq_of_delay;wr;delay=3",
-      "usb_error_delay;wr;delay=4",
-      "usb_ra_delay;wr;delay=5",
+      "usb_fpgasim_gain;wr;gain=3",
+      "usb_mux_sq_fb_delay;wr;delay=0",
+      "usb_amp_sq_of_delay;wr;delay=0",
+      "usb_error_delay;wr;delay=0",
+      "usb_ra_delay;wr;delay=0",
       "usb_tes_conf;wr",
       "usb_trig;wr;reg_valid=1",
       "nop;wr;delay=16",
-      "usb_fpgasim_gain;rd;gain=1",
-      "usb_mux_sq_fb_delay;rd;delay=2",
-      "usb_amp_sq_of_delay;rd;delay=3",
-      "usb_error_delay;rd;delay=4",
-      "usb_ra_delay;rd;delay=5",
-
-
-      "usb_rec_conf0;wr;rec_adc_nb_word_32=32",
-      "usb_rec_ctrl;wr;rec_adc_en=1",
-      "usb_trig;wr;rec_valid=1",
-      "nop;wr;delay=16",
-      "usb_rec_conf0;rd;rec_adc_nb_word_32=32",
-      "usb_rec_ctrl;rd;rec_adc_en=1",
-
-      "usb_spi_ctrl;wr;rst=1",
-      "usb_spi_ctrl;wr;rst=0",
-      "usb_spi_ctrl;wr;en=1",
-      "usb_spi_conf0;wr;spi_mode=0;spi_id=2",
-      "usb_spi_conf1;wr;spi_dac_tx_enable=1",
-      "usb_spi_wr_data;wr;data=16",
-      "usb_trig;wr;spi_valid=1",
-      "nop;wr;delay=1024",
-      "usb_spi_ctrl;rd;en=1",
-      "usb_spi_conf0;rd;spi_mode=0;spi_id=2",
-      "usb_spi_conf1;rd;spi_dac_tx_enable=1",
-      "usb_spi_wr_data;rd;data=16",
-      "usb_spi_rd_data;rd;data=16",
-
-
  
       "usb_ctrl;wr;en=1",
       "usb_trig;wr;ctrl_valid=1",
       "nop;wr;delay=16",
-      "usb_ctrl;rd;en=1",
+
+      "usb_make_pulse;wr;pixel_all=0;pixel_id=0;time_shift=0;pulse_heigth=16383",
+      "usb_trig;wr;make_pulse=1",
+
 
       "usb_error_sel;wr;sel=0",
       "nop;wr;delay=16",
@@ -150,14 +123,7 @@
       "usb_error_sel;wr;sel=10",
       "nop;wr;delay=16",
       "usb_error_sel;rd;sel=10",
-      "usb_errors;rd;error=0",
-
-      "usb_debug_ctrl;wr;rst_status=1",
-      "usb_trig;wr;debug_valid=1",
-      "nop;wr;delay=16",
-      "usb_debug_ctrl;rd;rst_status=1",
-      "usb_trig;wr;debug_valid=1",
-      "usb_debug_ctrl;wr;rst_status=0"
+      "usb_errors;rd;error=0"
 
     ]
   },

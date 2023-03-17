@@ -686,6 +686,28 @@ if __name__ == '__main__':
     # save the individual test for further use (sequence building)
     solo_test_dic[test_name] = test_dic0
 
+    # individual test
+    ############################################################################
+    # search run python script file
+    tb_name = 'tb_system_fpasim_top'
+    test_name = 'tb_system_fpasim_top_test_variant02'
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
+    # generate individual test
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
+    test0 = DUT()
+    test0.add_description(text_p="")
+    test0.set_name(name_p=tb_name)
+    test0.add_conf_filename(filename_p="tb_system_fpasim_top_test_variant02.json")
+    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    test0.set_script_filename(filename_p="")
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
+    test0.set_vunit_outpath(path_p=vunit_outpath)
+    test0.set_sim_wave_filepath(filename_p="wave_tb_system_fpasim_top_test_variant01.do")
+    test_dic0 = test0.get_dic(level_p=level2)
+    # save the individual test for further use (sequence building)
+    solo_test_dic[test_name] = test_dic0
+
 
     # individual test
     ############################################################################
@@ -831,7 +853,7 @@ if __name__ == '__main__':
     test0 = DUT()
     test0.add_description(text_p="")
     test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_mux_squid_top_conf_test_variant00.json")
+    test0.add_conf_filename(filename_p="tb_mux_squid_top_test_variant00.json")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
@@ -921,6 +943,7 @@ if __name__ == '__main__':
     json_data["tb_system_fpasim_test0"] = [solo_test_dic['tb_system_fpasim_top']]
     json_data["tb_system_fpasim_top_test_variant00"] = [solo_test_dic['tb_system_fpasim_top_test_variant00']]
     json_data["tb_system_fpasim_top_test_variant01"] = [solo_test_dic['tb_system_fpasim_top_test_variant01']]
+    json_data["tb_system_fpasim_top_test_variant02"] = [solo_test_dic['tb_system_fpasim_top_test_variant02']]
 
     # tes_top
     json_data["tb_tes_top_debug_test0"] = [solo_test_dic['tb_tes_top_debug']]
@@ -930,11 +953,11 @@ if __name__ == '__main__':
 
     # mux_squid_top
     json_data["tb_mux_squid_top_test0"] = [solo_test_dic['tb_mux_squid_top']]
-    json_data["tb_mux_squid_top_debug_test_variant00"] = [solo_test_dic['tb_mux_squid_top_test_variant00']]
+    json_data["tb_mux_squid_top_test_variant00"] = [solo_test_dic['tb_mux_squid_top_test_variant00']]
 
     # amp_squid_top
     json_data["tb_amp_squid_top_test2"] = [solo_test_dic['tb_amp_squid_top']]
-    json_data["tb_amp_squid_top_debug_test_variant00"] = [solo_test_dic['tb_amp_squid_top_test_variant00']]
+    json_data["tb_amp_squid_top_test_variant00"] = [solo_test_dic['tb_amp_squid_top_test_variant00']]
 
     # spi_top
     json_data["tb_spi_top_debug_test0"] = [solo_test_dic['tb_spi_top_conf_debug']]
