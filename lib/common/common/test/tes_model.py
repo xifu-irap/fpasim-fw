@@ -133,6 +133,9 @@ class TesModel:
 
         pulse_shape = pulse_shape_p * pulse_heigth_percentage
         res = i0_p - pulse_shape
+        if res < 0:
+            # force output value to 0 when negative
+            res = 0
         res = math.floor(res)
         return res
 

@@ -377,8 +377,28 @@ architecture RTL of tes_pulse_shape_manager is
   signal pixel_valid_ry : std_logic;
   signal pixel_id_ry    : std_logic_vector(i_pixel_id'range);
 
+  -------------------------------------------------------------------
+  -- force output value when negative
+  -------------------------------------------------------------------
+  signal sign_value_tmp6 : std_logic;
+  signal result_rz : std_logic_vector(o_pixel_result'range);
+
+  -------------------------------------------------------------------
+  -- sync with p_force_output_value_when_negative output
+  -------------------------------------------------------------------
+  signal data_pipe_tmp6 : std_logic_vector(c_IDX5_H downto 0);
+  signal data_pipe_tmp7 : std_logic_vector(c_IDX5_H downto 0);
+
+  signal pulse_sof_rz : std_logic;
+  signal pulse_eof_rz : std_logic;
+
+  signal pixel_sof_rz   : std_logic;
+  signal pixel_eof_rz   : std_logic;
+  signal pixel_valid_rz : std_logic;
+  signal pixel_id_rz    : std_logic_vector(i_pixel_id'range);
+
   ---------------------------------------------------------------------
-  -- detecte output negative value
+  -- detect output negative value
   ---------------------------------------------------------------------
   signal sign_value       : std_logic;
   signal error_sign_value : std_logic;
@@ -972,21 +992,65 @@ begin
   pixel_eof_ry   <= data_pipe_tmp5(c_IDX1_H);
   pixel_id_ry    <= data_pipe_tmp5(c_IDX0_H downto c_IDX0_L);
 
+
+  -------------------------------------------------------------------
+  -- force output value when negative.
+  --------------------------------------------------------------------
+  sign_value_tmp6 <= result_ry(result_ry'high);
+  p_force_output_value_when_negative: process (i_clk) is
+  begin
+    if rising_edge(i_clk) then
+      if sign_value_tmp6 = '1' then
+        -- input value negative => force output to 0
+        result_rz <= (others => '0');
+      else
+        result_rz <= result_ry;
+      end if;
+    end if;
+  end process p_force_output_value_when_negative;
+
+  ---------------------------------------------------------------------
+  -- sync with
+  ---------------------------------------------------------------------
+  data_pipe_tmp6(c_IDX5_H)                 <= pulse_sof_ry;
+  data_pipe_tmp6(c_IDX4_H)                 <= pulse_eof_ry;
+  data_pipe_tmp6(c_IDX3_H)                 <= pixel_valid_ry;
+  data_pipe_tmp6(c_IDX2_H)                 <= pixel_sof_ry;
+  data_pipe_tmp6(c_IDX1_H)                 <= pixel_eof_ry;
+  data_pipe_tmp6(c_IDX0_H downto c_IDX0_L) <= pixel_id_ry;
+  inst_pipeliner_sync_with_select_output : entity work.pipeliner
+    generic map(
+      g_NB_PIPES   => pkg_TES_FORCE_OUTPUT_LATENCY,
+      g_DATA_WIDTH => data_pipe_tmp6'length
+      )
+    port map(
+      i_clk  => i_clk,
+      i_data => data_pipe_tmp6,
+      o_data => data_pipe_tmp7
+      );
+
+  pulse_sof_rz   <= data_pipe_tmp7(c_IDX5_H);
+  pulse_eof_rz   <= data_pipe_tmp7(c_IDX4_H);
+  pixel_valid_rz <= data_pipe_tmp7(c_IDX3_H);
+  pixel_sof_rz   <= data_pipe_tmp7(c_IDX2_H);
+  pixel_eof_rz   <= data_pipe_tmp7(c_IDX1_H);
+  pixel_id_rz    <= data_pipe_tmp7(c_IDX0_H downto c_IDX0_L);
+
   -------------------------------------------------------------------
   -- output
   -------------------------------------------------------------------
-  o_pulse_sof    <= pulse_sof_ry;
-  o_pulse_eof    <= pulse_eof_ry;
-  o_pixel_sof    <= pixel_sof_ry;
-  o_pixel_eof    <= pixel_eof_ry;
-  o_pixel_valid  <= pixel_valid_ry;
-  o_pixel_id     <= pixel_id_ry;
-  o_pixel_result <= result_ry;
+  o_pulse_sof    <= pulse_sof_rz;
+  o_pulse_eof    <= pulse_eof_rz;
+  o_pixel_sof    <= pixel_sof_rz;
+  o_pixel_eof    <= pixel_eof_rz;
+  o_pixel_valid  <= pixel_valid_rz;
+  o_pixel_id     <= pixel_id_rz;
+  o_pixel_result <= result_rz;
 
   ---------------------------------------------------------------------
   -- detect output negative value
   ---------------------------------------------------------------------
-  sign_value <= result_ry(result_ry'high);
+  sign_value <= sign_value_tmp6;
   tes_negative_output_detection_INST : entity work.tes_negative_output_detection
     generic map(
       -- command
@@ -1000,7 +1064,7 @@ begin
       -- input
       ---------------------------------------------------------------------
       i_pixel_valid            => pixel_valid_ry,       -- pixel valid
-      i_pixel_result_sign      => sign_value,  -- sign of the pixel result
+      i_pixel_result_sign      => sign_value_tmp6,  -- sign of the pixel result
       i_pixel_id               => pixel_id_ry,          -- pixel id
       ---------------------------------------------------------------------
       -- output

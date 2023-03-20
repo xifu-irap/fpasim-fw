@@ -234,14 +234,17 @@ package pkg_fpasim is
   -- auto-computed: bus width of the TES_Q_S
   constant pkg_TES_MULT_SUB_Q_WIDTH_S : positive := pkg_TES_MULT_SUB_Q_M_S + pkg_TES_MULT_SUB_Q_N_S;
 
-  -- hardcode: latency of the "mult_sub_sfixed" module
+  -- hardcoded: latency of the "mult_sub_sfixed" module
   constant pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY : natural := pkg_MULT_SUB_SFIXED_LATENCY;  -- number of pipes to compute the result
 
   -- user-defined: enable the overflow checking
   constant pkg_TES_PULSE_MANAGER_COMPUTATION_SIM_EN : boolean := true;
 
+  -- hardcoded: latency to force the output value when negative.
+  constant pkg_TES_FORCE_OUTPUT_LATENCY : positive := 1;
+
   -- auto-computed: latency of the "tes_pulse_manager" module
-  constant pkg_TES_PULSE_MANAGER_LATENCY : natural := pkg_TES_PULSE_MANAGER_FSM_LATENCY + pkg_TES_PULSE_MANAGER_ADDR_COMPUTE_LATENCY + pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY + pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY;
+  constant pkg_TES_PULSE_MANAGER_LATENCY : natural := pkg_TES_PULSE_MANAGER_FSM_LATENCY + pkg_TES_PULSE_MANAGER_ADDR_COMPUTE_LATENCY + pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY + pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY + pkg_TES_FORCE_OUTPUT_LATENCY;
 
   -- auto-commputed: latency of the "tes_top" module
   constant pkg_TES_TOP_LATENCY : natural := pkg_TES_SIGNALLING_LATENCY + pkg_TES_PULSE_MANAGER_LATENCY;
