@@ -24,8 +24,8 @@
 // -------------------------------------------------------------------------------------------------------------
 //    @details
 //
-//   This javscript generates spi commands in order to initialize the ads62p49 (ADCs) registers.
-//
+//   This script defines functions in order to configure (read/write) the registers of the ads62p49 spi device (FMC150 board) knowing the FPASIM function
+//   has a role of bridge between the software and the spi device.
 //   Note:
 //      . Tested with javascript
 //
@@ -65,10 +65,13 @@ const c_ADC_ADDR_VERBOSITY_MIN = 1;
 // verbosity min to display register bit
 const c_ADC_BIT_VERBOSITY_MIN = c_ADC_ADDR_VERBOSITY_MIN + 1;
 
-/*
-FPGA specifics:
- Enable the FPGA SPI
-*/
+/**
+ * Enable the FPASIM SPI MODULE (bridge)
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ */
 function adc_spi_enable(level_p, mode_p, verbosity_p) {
     // default function parameter values
     if (typeof(level_p) === 'undefined') level_p = 0;
@@ -111,10 +114,11 @@ function adc_spi_enable(level_p, mode_p, verbosity_p) {
 }
 
 /**
-* FPGA specifics: 
-    Build the expected spi command
-    Build the expected fpga register accesses
-*/
+ * Write a spi device register through the FPASIM SPI MODULE (bridge).
+ *
+ * @param {number} addr_p - register address of the SPI device to write.
+ * @param {number} data_p - value to write in the spi device register.
+ */
 function adc_write_command(addr_p, data_p) {
 
     //---------------------------------------------------------------------
@@ -149,6 +153,13 @@ function adc_write_command(addr_p, data_p) {
 
 }
 
+/**
+ * Read spi device register value.
+ *
+ * @param {number} addr_p - register address of the SPI device to read.
+ * @return {number} read value from the spi device register.
+ *
+ */
 function adc_read_command(addr_p) {
 
     //---------------------------------------------------------------------
@@ -212,15 +223,16 @@ function adc_read_command(addr_p) {
     );
 
 
-    return FPA_WireOutValues[21];
+    return FPA_WireOutValues[22];
 
 }
 
 /**
- *  Set the register0
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register0 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [7]: rst
  *     1: Software reset applied – resets all internal registers and self-clears to 0.
@@ -264,10 +276,11 @@ function adc_set_config0(rst_p, serial_out_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register1
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register1 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [2]: enable_low_speed
  *  0: LOW SPEED mode disabled. Use for sampling frequency > 80 MSPS
@@ -308,10 +321,11 @@ function adc_set_config1(enable_low_speed_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register2
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register2 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [6:5] ref: Internal or external reference selection
  *       00 : Internal reference enabled
@@ -359,10 +373,11 @@ function adc_set_config2(ref_p, standby_p, level_p, mode_p, verbosity_p) {
 
 
 /**
- *  Set the register3
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register3 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [3:0]: power_down
  *    0000 Pins CTRL1, CTRL2, and CTRL3 determine power down modes.
@@ -413,10 +428,11 @@ function adc_set_config3(power_down_p, level_p, mode_p, verbosity_p) {
 
 
 /**
- *  Set the register4
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register4 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [7]: lvds_cmos
  *    0 Parallel CMOS interface
@@ -455,10 +471,11 @@ function adc_set_config4(lvds_cmos_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register5
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register5 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  LVDS interface
  *     [7:5] clkout_pos_rise Output clock rising edge position (2)
@@ -523,10 +540,11 @@ function adc_set_config5(clkout_pos_rise_p, clkout_pos_fall_p, level_p, mode_p, 
 }
 
 /**
- *  Set the register6
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register6 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [6]: en_independant_chan_ctrl
  *     0 Common control – both channels use common control settings for test patterns, offset correction,
@@ -572,10 +590,11 @@ function adc_set_config6(en_independant_chan_ctrl_p, data_format_p, level_p, mod
 }
 
 /**
- *  Set the register7
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register7 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [7:0] custom_pattern_low
  *    8 lower bits of custom pattern available at the output instead of ADC data.
@@ -616,10 +635,11 @@ function adc_set_config7(custom_patter_low_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register8
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register8 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [5:0] custom_pattern_high
  *    6 upper bits of custom pattern available at the output instead of ADC data
@@ -660,10 +680,11 @@ function adc_set_config8(custom_patter_high_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register9
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register9 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [6]:  en_offset_correction – Common/Ch A>
  *       Offset correction enable control for both channels (with common control) or for channel A only (with
@@ -704,10 +725,11 @@ function adc_set_config9(en_offset_correction_cha_p, level_p, mode_p, verbosity_
     }
 }
 /**
- *  Set the register10
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register10 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [7:4] gain_common_or_cha <GAIN – Common/Ch A>
  *   Gain control for both channels (with common control) or for channel A only (with independent control).
@@ -775,10 +797,11 @@ function adc_set_config10(gain_common_or_cha_p, offset_corr_time_common_or_cha_p
 
 }
 /**
- *  Set the register11
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register11 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * [6:0] fine_gain_adjust_common_or_cha
  * Using the FINE GAIN ADJUST register bits, the channel gain can be trimmed in fine steps. The trim is only
@@ -822,10 +845,11 @@ function adc_set_config11(fine_gain_adjust_common_or_cha_p, level_p, mode_p, ver
 
 }
 /**
- *  Set the register12
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register12 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * [2:0] test_pattern_common_or_cha Test Patterns to verify data capture.
  *   Applies to both channels (with common control) or for channel A only (with independent control).
@@ -876,10 +900,11 @@ function adc_set_config12(test_pattern_common_or_cha_p, level_p, mode_p, verbosi
 }
 
 /**
- *  Set the register13
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register13 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [5:0]: offset_pedestal_common_or_cha <OFFSET PEDESTAL – Common/Ch A>
  *        When the offset correction is enabled, the final converged value (after the offset is corrected) will
@@ -935,10 +960,11 @@ function adc_set_config13(offset_pedestal_common_or_cha_p, level_p, mode_p, verb
 }
 
 /**
- *  Set the register14
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register14 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [6] offset_corr_chb
  *      Offset correction enable control for channel B (only with independent control).
@@ -980,10 +1006,11 @@ function adc_set_config14(offset_corr_chb_p, level_p, mode_p, verbosity_p) {
 
 }
 /**
- *  Set the register15
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register15 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [7:4] gain_chb Gain programmability to 0.5 dB steps.
  *        Applies to channel B (only with independent control).
@@ -1050,10 +1077,11 @@ function adc_set_config15(gain_chb_p, offset_corr_time_chb_p, level_p, mode_p, v
 }
 
 /**
- *  Set the register16
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register16 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  * [7:0] fine_gain_adjust_chb
  *     Using the FINE GAIN ADJUST register bits, the channel gain can be trimmed in fine steps. The trim is only
@@ -1096,10 +1124,11 @@ function adc_set_config16(fine_gain_adjust_chb_p, level_p, mode_p, verbosity_p) 
     }
 }
 /**
- *  Set the register17
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register17 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [2:0]: test_pattern_chb Test Patterns to verify data capture.
  *        Applies to channel B (only with independent control)
@@ -1150,10 +1179,11 @@ function adc_set_config17(test_pattern_chb_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Set the register18
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Set the register18 of the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  *  [5:0]: offset_pedestal_common_or_chb
  *        When the offset correction is enabled, the final converged value (after the offset is corrected) will
@@ -1205,10 +1235,12 @@ function adc_set_config18(offset_pedestal_common_or_chb_p, level_p, mode_p, verb
 }
 
 /**
- *  Get the register0
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register0 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [7]: rst
  *     1: Software reset applied – resets all internal registers and self-clears to 0.
@@ -1251,10 +1283,12 @@ function adc_get_config0(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register1
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register1 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [2]: enable_low_speed
  *  0: LOW SPEED mode disabled. Use for sampling frequency > 80 MSPS
@@ -1295,10 +1329,12 @@ function adc_get_config1(level_p, mode_p, verbosity_p) {
 
 
 /**
- *  Get the register2
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register2 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [6:5] ref: Internal or external reference selection
  *       00 : Internal reference enabled
@@ -1345,10 +1381,12 @@ function adc_get_config2(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register3
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register3 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [3:0]: power_down
  *    0000 Pins CTRL1, CTRL2, and CTRL3 determine power down modes.
@@ -1397,10 +1435,12 @@ function adc_get_config3(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register4
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register4 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [7]: lvds_cmos
  *    0 Parallel CMOS interface
@@ -1439,10 +1479,12 @@ function adc_get_config4(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register5
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register5 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  LVDS interface
  *     [7:5] clkout_pos_rise Output clock rising edge position (2)
@@ -1506,10 +1548,12 @@ function adc_get_config5(level_p, mode_p, verbosity_p) {
 
 
 /**
- *  Get the register6
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register6 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [6]: en_independant_chan_ctrl
  *     0 Common control – both channels use common control settings for test patterns, offset correction,
@@ -1554,10 +1598,12 @@ function adc_get_config6(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register7
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register7 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [7:0] custom_pattern_low
  *    8 lower bits of custom pattern available at the output instead of ADC data.
@@ -1597,10 +1643,12 @@ function adc_get_config7(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register8
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register8 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [5:0] custom_pattern_high
  *    6 upper bits of custom pattern available at the output instead of ADC data
@@ -1641,10 +1689,12 @@ function adc_get_config8(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register9
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register9 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [6]:  en_offset_correction – Common/Ch A>
  *       Offset correction enable control for both channels (with common control) or for channel A only (with
@@ -1686,10 +1736,12 @@ function adc_get_config9(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register10
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register10 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [7:4] gain_common_or_cha <GAIN – Common/Ch A>
  *   Gain control for both channels (with common control) or for channel A only (with independent control).
@@ -1757,10 +1809,12 @@ function adc_get_config10(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register11
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register11 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [6:0] fine_gain_adjust_common_or_cha
  * Using the FINE GAIN ADJUST register bits, the channel gain can be trimmed in fine steps. The trim is only
@@ -1804,10 +1858,12 @@ function adc_get_config11(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register12
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register12 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [2:0] test_pattern_common_or_cha Test Patterns to verify data capture.
  *   Applies to both channels (with common control) or for channel A only (with independent control).
@@ -1858,10 +1914,12 @@ function adc_get_config12(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register13
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register13 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [5:0]: offset_pedestal_common_or_cha <OFFSET PEDESTAL – Common/Ch A>
  *        When the offset correction is enabled, the final converged value (after the offset is corrected) will
@@ -1915,10 +1973,12 @@ function adc_get_config13(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register14
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register14 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [6] offset_corr_chb
  *      Offset correction enable control for channel B (only with independent control).
@@ -1959,10 +2019,12 @@ function adc_get_config14(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register15
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register15 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [7:4] gain_chb Gain programmability to 0.5 dB steps.
  *        Applies to channel B (only with independent control).
@@ -2028,10 +2090,12 @@ function adc_get_config15(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register16
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register16 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [7:0] fine_gain_adjust_chb
  *     Using the FINE GAIN ADJUST register bits, the channel gain can be trimmed in fine steps. The trim is only
@@ -2075,10 +2139,12 @@ function adc_get_config16(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register17
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register17 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [2:0]: test_pattern_chb Test Patterns to verify data capture.
  *        Applies to channel B (only with independent control)
@@ -2129,10 +2195,12 @@ function adc_get_config17(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register18
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register18 value from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  *  [5:0]: offset_pedestal_common_or_chb
  *        When the offset correction is enabled, the final converged value (after the offset is corrected) will
@@ -2196,6 +2264,18 @@ function adc_get_config(reg_id) {
 
 }
 
+/**
+ * Configure the device to generate the following pre-defined pattern
+ *  . cha: generates the following alternates values
+ *    . "01010101010101" (14 bits). 
+ *    . "10101010101010" (14 bits). 
+ *  . chb: generates the following incremental values
+ *    . 0 to 16383 (14 bits) -> -8192 to 8191
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ *
+ */
 function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     // default function parameter values
     if (typeof(level_p) === 'undefined') level_p = 0;
@@ -2414,6 +2494,14 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
 
 }
 
+/**
+ * Read and Display the configuration of all spi device registers.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ *
+ */
 function adc_display_all_config(level_p, mode_p, verbosity_p) {
     // default function parameter values
     if (typeof(level_p) === 'undefined') level_p = 0;
@@ -2446,13 +2534,11 @@ function adc_display_all_config(level_p, mode_p, verbosity_p) {
 }
 
 
-
-
-/**
- *  Configure the ads62p49 (adc) Device
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ /**
+ * Default Configuration of the ads62p49 (adc) spi device (FMC150 board).
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  */
 function ADS62P49_configure(level_p, mode_p, verbosity_p) {
@@ -2897,9 +2983,5 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         offset_pedestal_common_or_chb_p = offset_pedestal_common_or_chb,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
-
-
-
-
 
 }

@@ -244,13 +244,23 @@ if __name__ == '__main__':
     #####################################################
     # simulator configuration
     #####################################################
-    # Set the simulator options
+    # Set the simulator wave
     obj.set_waveform(level_p=level1)
+    # Get the simulator wave
+    wave_filepath = obj.get_waveform(level_p=level1)
+
+    if wave_filepath is None:
+        sim_title = __file__.replace('\\','/')
+    else:
+        str0 = "run_filepath:"+__file__.replace('\\','/')
+        str1 = "waveform_filepath:"+wave_filepath.replace('\\','/')
+        sim_title = str0 + '__' + str1
+
 
     #####################################################
     # Set the simulation options
     #####################################################
-    VU.set_sim_option("modelsim.vsim_flags", ["-stats=-cmd,-time",'-c','-t','ps','fpasim.glbl','-voptargs=+acc','-title',__file__.replace('\\','/')])
+    VU.set_sim_option("modelsim.vsim_flags", ["-stats=-cmd,-time",'-c','-t','ps','fpasim.glbl','-voptargs=+acc','-title',sim_title])
 
     ######################################################
     # get the list of conf_filepath (if any)

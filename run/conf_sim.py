@@ -314,6 +314,7 @@ class DUT:
         :param filepath_p: (string) filepath of the run script python (can be relative or absolute)
         :return: None
         """
+
         if filepath_p is None:
             str0 = "ERROR: DUT.run_filepath (name=" + self.name + "): filepath_p = None"
             self.obj_display.display(str0, level_p=level_p, color_p='red')
@@ -326,6 +327,23 @@ class DUT:
         path_tmp = str(path_tmp)
         self.run_filepath = path_tmp
         return None
+
+    def set_vunit_run_filename(self, basepath_p, filename_p, level_p=0):
+        """
+        This method set the filepath to the run script python
+        Example: c:/blabla/run_tb_XXX.py with basepath_p= c:/ and filename_p = "run_tb_XXX.py"
+        :param level_p: (integer >=0) define the message level indentation
+        :param basepath_p: (string) basepath where to find the filename (can be relative or absolute)
+        :param filename_p: (string) filename
+        :return: None
+        """
+        extension_list = [Path(filename_p).suffix]
+        obj = FilepathListBuilder()
+        obj.set_file_extension(file_extension_list_p=extension_list)
+        run_filepath = obj.get_filepath_by_filename(basepath_p=basepath_p, filename_p=filename_p)
+
+        result = self.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level_p)
+        return result
 
     def set_vunit_outpath(self, path_p):
         """
@@ -605,11 +623,10 @@ if __name__ == '__main__':
     ############################################################################
     # search run python script file
     tb_name = 'tb_system_fpasim_top'
-    test_name = tb_name
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    test_name = 'tb_system_fpasim_top'
+
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
     # generate individual test
     vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
@@ -618,7 +635,97 @@ if __name__ == '__main__':
     # test0.add_conf_filename(filename_p="")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
     test0.set_script_filename(filename_p="")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
+    test0.set_vunit_outpath(path_p=vunit_outpath)
+    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test_dic0 = test0.get_dic(level_p=level2)
+    # save the individual test for further use (sequence building)
+    solo_test_dic[test_name] = test_dic0
+
+    # individual test
+    ############################################################################
+    # search run python script file
+    tb_name = 'tb_system_fpasim_top'
+    test_name = 'tb_system_fpasim_top_test_variant00'
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
+    # generate individual test
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
+    test0 = DUT()
+    test0.add_description(text_p="")
+    test0.set_name(name_p=tb_name)
+    test0.add_conf_filename(filename_p="tb_system_fpasim_top_test_variant00.json")
+    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    test0.set_script_filename(filename_p="")
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
+    test0.set_vunit_outpath(path_p=vunit_outpath)
+    test0.set_sim_wave_filepath(filename_p="wave_tb_system_fpasim_top_test_variant00.do")
+    test_dic0 = test0.get_dic(level_p=level2)
+    # save the individual test for further use (sequence building)
+    solo_test_dic[test_name] = test_dic0
+
+    # individual test
+    ############################################################################
+    # search run python script file
+    tb_name = 'tb_system_fpasim_top'
+    test_name = 'tb_system_fpasim_top_test_variant01'
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
+    # generate individual test
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
+    test0 = DUT()
+    test0.add_description(text_p="")
+    test0.set_name(name_p=tb_name)
+    test0.add_conf_filename(filename_p="tb_system_fpasim_top_test_variant01.json")
+    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    test0.set_script_filename(filename_p="")
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
+    test0.set_vunit_outpath(path_p=vunit_outpath)
+    test0.set_sim_wave_filepath(filename_p="wave_tb_system_fpasim_top_test_variant01.do")
+    test_dic0 = test0.get_dic(level_p=level2)
+    # save the individual test for further use (sequence building)
+    solo_test_dic[test_name] = test_dic0
+
+    # individual test
+    ############################################################################
+    # search run python script file
+    tb_name = 'tb_system_fpasim_top'
+    test_name = 'tb_system_fpasim_top_test_variant02'
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
+    # generate individual test
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
+    test0 = DUT()
+    test0.add_description(text_p="")
+    test0.set_name(name_p=tb_name)
+    test0.add_conf_filename(filename_p="tb_system_fpasim_top_test_variant02.json")
+    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    test0.set_script_filename(filename_p="")
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
+    test0.set_vunit_outpath(path_p=vunit_outpath)
+    test0.set_sim_wave_filepath(filename_p="wave_tb_system_fpasim_top_test_variant01.do")
+    test_dic0 = test0.get_dic(level_p=level2)
+    # save the individual test for further use (sequence building)
+    solo_test_dic[test_name] = test_dic0
+
+
+    # individual test
+    ############################################################################
+    # search run python script file
+    tb_name = 'tb_tes_top'
+    test_name = 'tb_tes_top_test_variant00'
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
+
+    # generate individual test
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
+    test0 = DUT()
+    test0.add_description(text_p="")
+    test0.set_name(name_p=tb_name)
+    test0.add_conf_filename(filename_p="tb_tes_top_test_variant00.json")
+    test0.set_script_filename(filename_p="tb_tes_top.py")
+    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
@@ -629,44 +736,19 @@ if __name__ == '__main__':
     ############################################################################
     # search run python script file
     tb_name = 'tb_tes_top'
-    test_name = 'tb_tes_top_test0'
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
-    # generate individual test
-    vunit_outpath = str(Path(root_path, 'vunit_out'))
-    test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_tes_top_test_variant0.json")
-    test0.set_script_filename(filename_p="tb_tes_top.py")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
-    test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
-    test_dic0 = test0.get_dic(level_p=level2)
-    # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    test_name = 'tb_tes_top_test_variant01'
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
 
-    # individual test
-    ############################################################################
-    # search run python script file
-    tb_name = 'tb_tes_top'
-    test_name = 'tb_tes_top_test1'
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
     # generate individual test
     vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
     test0.add_description(text_p="")
     test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_tes_top_test_variant1.json")
+    test0.add_conf_filename(filename_p="tb_tes_top_test_variant01.json")
     test0.set_script_filename(filename_p="tb_tes_top.py")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
@@ -674,20 +756,19 @@ if __name__ == '__main__':
     solo_test_dic[test_name] = test_dic0
 
     tb_name = 'tb_tes_top'
-    test_name = 'tb_tes_top_test2'
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    test_name = 'tb_tes_top_test_variant02'
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
+
     # generate individual test
     vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
     test0.add_description(text_p="")
     test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_tes_top_test_variant2.json")
+    test0.add_conf_filename(filename_p="tb_tes_top_test_variant02.json")
     test0.set_script_filename(filename_p="tb_tes_top.py")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
@@ -700,10 +781,9 @@ if __name__ == '__main__':
     # search run python script file
     tb_name = 'tb_amp_squid_top'
     test_name = tb_name
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
+
     # generate individual test
     vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
@@ -711,7 +791,7 @@ if __name__ == '__main__':
     test0.set_name(name_p=tb_name)
     #test0.add_conf_filename(filename_p="")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
@@ -723,10 +803,8 @@ if __name__ == '__main__':
     # search run python script file
     tb_name = 'tb_mux_squid_top'
     test_name = tb_name
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
     # generate individual test
     vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
@@ -734,7 +812,7 @@ if __name__ == '__main__':
     test0.set_name(name_p=tb_name)
     #test0.add_conf_filename(filename_p="")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
@@ -746,10 +824,8 @@ if __name__ == '__main__':
     # search run python script file
     tb_name = 'tb_tes_top'
     test_name = 'tb_tes_top_debug'
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
     # generate individual test
     vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
@@ -758,7 +834,7 @@ if __name__ == '__main__':
     test0.add_conf_filename(filename_p="tb_tes_top_conf_debug.json")
     test0.set_script_filename(filename_p="tb_tes_top.py")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
@@ -769,19 +845,17 @@ if __name__ == '__main__':
     ############################################################################
     # search run python script file
     tb_name = 'tb_mux_squid_top'
-    test_name = 'tb_mux_squid_top_debug'
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    test_name = 'tb_mux_squid_top_test_variant00'
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
     # generate individual test
     vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
     test0.add_description(text_p="")
     test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_mux_squid_top_conf_debug.json")
+    test0.add_conf_filename(filename_p="tb_mux_squid_top_test_variant00.json")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
@@ -792,115 +866,42 @@ if __name__ == '__main__':
     ############################################################################
     # search run python script file
     tb_name = 'tb_amp_squid_top'
-    test_name = 'tb_amp_squid_top_debug'
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    test_name = 'tb_amp_squid_top_test_variant00'
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
     # generate individual test
     vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
     test0.add_description(text_p="")
     test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_amp_squid_top_conf_debug.json")
+    test0.add_conf_filename(filename_p="tb_amp_squid_top_test_variant00.json")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
     solo_test_dic[test_name] = test_dic0
 
-    # individual test
-    ############################################################################
-    # search run python script file
-    tb_name = 'tb_system_fpasim_top'
-    test_name = 'tb_system_fpasim_top_conf_debug'
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
-    # generate individual test
-    vunit_outpath = str(Path(root_path, 'vunit_out'))
-    test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_system_fpasim_top_conf_debug.json")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_script_filename(filename_p="")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
-    test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
-    test_dic0 = test0.get_dic(level_p=level2)
-    # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    
 
-    # individual test
-    ############################################################################
-    # search run python script file
-    # tb_name = 'tb_fmc150_controler'
-    # test_name = 'tb_fmc150_controler_conf_debug'
-    # obj = FilepathListBuilder()
-    # obj.set_file_extension(file_extension_list_p=['.py'])
-    # vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    # run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
-    # # generate individual test
-    # vunit_outpath = str(Path(root_path, 'vunit_out'))
-    # test0 = DUT()
-    # test0.add_description(text_p="")
-    # test0.set_name(name_p=tb_name)
-    # # test0.add_conf_filename(filename_p="tb_system_fpasim_top_conf_debug.json")
-    # test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    # test0.set_script_filename(filename_p="")
-    # test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
-    # test0.set_vunit_outpath(path_p=vunit_outpath)
-    # test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
-    # test_dic0 = test0.get_dic(level_p=level2)
-    # # save the individual test for further use (sequence building)
-    # solo_test_dic[test_name] = test_dic0
-
-    # individual test
-    ############################################################################
-    # search run python script file
-    # tb_name = 'tb_spi_master'
-    # test_name = 'tb_spi_master_conf_debug'
-    # obj = FilepathListBuilder()
-    # obj.set_file_extension(file_extension_list_p=['.py'])
-    # vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    # run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
-    # # generate individual test
-    # vunit_outpath = str(Path(root_path, 'vunit_out'))
-    # test0 = DUT()
-    # test0.add_description(text_p="")
-    # test0.set_name(name_p=tb_name)
-    # # test0.add_conf_filename(filename_p="tb_system_fpasim_top_conf_debug.json")
-    # test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    # test0.set_script_filename(filename_p="")
-    # test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
-    # test0.set_vunit_outpath(path_p=vunit_outpath)
-    # test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
-    # test_dic0 = test0.get_dic(level_p=level2)
-    # # save the individual test for further use (sequence building)
-    # solo_test_dic[test_name] = test_dic0
 
     # individual test
     ############################################################################
     # search run python script file
     tb_name = 'tb_spi_top'
     test_name = 'tb_spi_top_conf_debug'
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
     # generate individual test
     vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
     test0.add_description(text_p="")
     test0.set_name(name_p=tb_name)
-    # test0.add_conf_filename(filename_p="tb_system_fpasim_top_conf_debug.json")
+    # test0.add_conf_filename(filename_p=".json")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
     test0.set_script_filename(filename_p="")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
@@ -912,19 +913,17 @@ if __name__ == '__main__':
     # search run python script file
     tb_name = 'tb_fpga_system_fpasim_top'
     test_name = 'tb_fpga_system_fpasim_top_debug'
-    obj = FilepathListBuilder()
-    obj.set_file_extension(file_extension_list_p=['.py'])
-    vunit_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filepath = obj.get_filepath_by_filename(basepath_p=vunit_basepath, filename_p='run_' + tb_name + '.py')
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    run_filename = 'run_' + tb_name + '.py'
     # generate individual test
     vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
     test0.add_description(text_p="")
     test0.set_name(name_p=tb_name)
-    # test0.add_conf_filename(filename_p="tb_system_fpasim_top_conf_debug.json")
+    # test0.add_conf_filename(filename_p=".json")
     test0.set_tb_filename(filename_p=tb_name + ".vhd")
     test0.set_script_filename(filename_p="")
-    test0.set_vunit_run_filepath(filepath_p=run_filepath, level_p=level2)
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
     test_dic0 = test0.get_dic(level_p=level2)
@@ -937,20 +936,31 @@ if __name__ == '__main__':
     # Section6 : Define 1 or several list of individual tests
     ############################################################################
     # 0: first sequence of individual tests
-    json_data["test0_tb_system_fpasim"] = [solo_test_dic['tb_system_fpasim_top']]
-    json_data["test0_tb_tes_top"] = [solo_test_dic['tb_tes_top_test0']]
-    json_data["test1_tb_tes_top"] = [solo_test_dic['tb_tes_top_test1']]
-    json_data["test2_tb_tes_top"] = [solo_test_dic['tb_tes_top_test2']]
-    json_data["test0_tb_amp_squid_top"] = [solo_test_dic['tb_amp_squid_top']]
-    json_data["test0_tb_mux_squid_top"] = [solo_test_dic['tb_mux_squid_top']]
-    json_data["test0_tb_tes_top_debug"] = [solo_test_dic['tb_tes_top_debug']]
-    json_data["test0_tb_mux_squid_top_debug"] = [solo_test_dic['tb_mux_squid_top_debug']]
-    json_data["test0_tb_amp_squid_top_debug"] = [solo_test_dic['tb_amp_squid_top_debug']]
-    json_data["test0_tb_system_fpasim_top_debug"] = [solo_test_dic['tb_system_fpasim_top_conf_debug']]
-    # json_data["test0_tb_fmc150_controler_conf_debug"] = [solo_test_dic['tb_fmc150_controler_conf_debug']]
-    # json_data["test0_tb_spi_master_conf_debug"] = [solo_test_dic['tb_spi_master_conf_debug']]
-    json_data["test0_tb_spi_top_debug"] = [solo_test_dic['tb_spi_top_conf_debug']]
-    json_data["test0_tb_fpga_system_fpasim_top_debug"] = [solo_test_dic['tb_fpga_system_fpasim_top_debug']]
+    # fpga_system_fpasim
+    json_data["tb_fpga_system_fpasim_top_debug_test0"] = [solo_test_dic['tb_fpga_system_fpasim_top_debug']]
+
+    # system_fpasim
+    json_data["tb_system_fpasim_test0"] = [solo_test_dic['tb_system_fpasim_top']]
+    json_data["tb_system_fpasim_top_test_variant00"] = [solo_test_dic['tb_system_fpasim_top_test_variant00']]
+    json_data["tb_system_fpasim_top_test_variant01"] = [solo_test_dic['tb_system_fpasim_top_test_variant01']]
+    json_data["tb_system_fpasim_top_test_variant02"] = [solo_test_dic['tb_system_fpasim_top_test_variant02']]
+
+    # tes_top
+    json_data["tb_tes_top_debug_test0"] = [solo_test_dic['tb_tes_top_debug']]
+    json_data["tb_tes_top_test_variant00"] = [solo_test_dic['tb_tes_top_test_variant00']]
+    json_data["tb_tes_top_test_variant01"] = [solo_test_dic['tb_tes_top_test_variant01']]
+    json_data["tb_tes_top_test_variant02"] = [solo_test_dic['tb_tes_top_test_variant02']]
+
+    # mux_squid_top
+    json_data["tb_mux_squid_top_test0"] = [solo_test_dic['tb_mux_squid_top']]
+    json_data["tb_mux_squid_top_test_variant00"] = [solo_test_dic['tb_mux_squid_top_test_variant00']]
+
+    # amp_squid_top
+    json_data["tb_amp_squid_top_test2"] = [solo_test_dic['tb_amp_squid_top']]
+    json_data["tb_amp_squid_top_test_variant00"] = [solo_test_dic['tb_amp_squid_top_test_variant00']]
+
+    # spi_top
+    json_data["tb_spi_top_debug_test0"] = [solo_test_dic['tb_spi_top_conf_debug']]
 
     ############################################################################
     # Section7: Output the result in an output json file

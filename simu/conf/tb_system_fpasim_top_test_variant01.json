@@ -1,0 +1,1455 @@
+{
+  "description_list": [
+    "This test checks the wire Registers. For the specified registers:",
+    "  1. write a value in the wire_in access",
+    "  2. read the value in the wire_out access",
+    "  3. check if the read value is equal to the corresponding written value"
+  ],
+  "note_list":
+  [
+    "This file was manually generated",
+    "This file is constitued by 2 parts",
+    "The first part defines the list of commands to simulate (see the sequence key).",
+    "    It can be edited by the user",
+    "The second part defines the authorized register/commands (see the 'def/@command_name'",
+    "    To edit, only if the vhdl code is changed on registers (add,modify,delete)",
+    "Note: the second part is built from the 0136-FPAsim_commands_dictionnary_vx.y.xlsx (api register document)",
+    "Note: the INTERRUPT register is not easily manageable in simulation. So, it's not defined here."
+  ],
+
+  "sequence": {
+    "description_list": [
+      "This section defines the list of commands to simulate",
+      "The configuration parameters are:",
+      "   :param: output_tb_filename (string): filename expected by the vhdl testbench.",
+      "         Note: This file is a *.csv file",
+      "   :param: cmd_list (list of strings): define a list of command in order to configure the FPGA RAM(s) or register(s).",
+      "      . Each command is divided in 3 parts:",
+      "         . Part1: The command_name (without @). The possible command_name are defined in def key (ex: 'def/@command_name').",
+      "                . The command_name are existing register name. But few more commands are added for the simulation needs (ex: nop)",
+      "         . Part2: The mode. The mode has 2 possibles values: wr and/or rd.",
+      "                . To know the available mode for a command, see the corresponding command at the json path 'def/@command_name'",
+      "         . Part3: a list of string such as bit_field_name0=value0[;bit_field_name1=value1]",
+      "                . for a given command/register name, if a bit field is not overwritten by the command then the bit_field value is the one defined in the 'def/@command_name'",
+      "         . ex0: 'usb_ctrl;wr;rst=1'",
+      "         . ex1: 'usb_ctrl;wr;rst=1;en=1'",
+      "         Remark:",
+      "           . If a field/bit_name is not overwritten by a command the corresponding bit_name value by default is the one defined in 'def/@command/field/bit_name/value'",
+      "             ex0: 'usb_ctrl;wr;rst=1;en=1' -> output: rst=1,en=1",
+      "             ex0: 'usb_ctrl;wr;rst=1'      -> output: rst=1,en=0. Indeed, the value of the en is 0 in 'def/usb_ctrl/field/en/value'",
+      "       Special case: command associated to the RAM configuration(s) is processed slightly differently",
+      "                 .In this case, the part3 of the command is slightly different since the list of string specify only a list of bit_field_name.",
+      "                     .ex0; 'usb_ram;wr;tes_pulse_shape",
+      "                     .ex1; 'usb_ram;wr;tes_pulse_shape;mux_squid_tf",
+      "                 Remark: by vhdl design",
+      "                      . in writting, the user can configure the rams as he wants (no order restriction)",
+      "                          ex: '@usb_ram;wr;tes_pulse_shape;amp_squid_tf' <=> '@usb_ram;wr;amp_squid_tf;tes_pulse_shape'",
+      "                      . in reading, the user must respect the following order",
+      "                           ex: 'usb_ram;rd;tes_shape_pulse;amp_squid_tf;mux_squid_tf;tes_steady_state;mux_squid_offset'",
+      "       Remark: ",
+      "           . The user mustn't finish the command by ';' because it's not managed by the python script"
+    ],
+    "output_tb_filename": "py_usb_data.csv",
+    "cmd_list": [
+      "usb_ctrl;wr;rst=1",
+      "usb_ctrl;wr;rst=0",
+      "nop;wr;delay=32",
+      "usb_fpgasim_gain;wr;gain=1",
+      "usb_mux_sq_fb_delay;wr;delay=2",
+      "usb_amp_sq_of_delay;wr;delay=3",
+      "usb_error_delay;wr;delay=4",
+      "usb_ra_delay;wr;delay=5",
+      "usb_tes_conf;wr",
+      "usb_trig;wr;reg_valid=1",
+      "nop;wr;delay=16",
+      "usb_fpgasim_gain;rd;gain=1",
+      "usb_mux_sq_fb_delay;rd;delay=2",
+      "usb_amp_sq_of_delay;rd;delay=3",
+      "usb_error_delay;rd;delay=4",
+      "usb_ra_delay;rd;delay=5",
+
+
+      "usb_rec_conf0;wr;rec_adc_nb_word_32=32",
+      "usb_rec_ctrl;wr;rec_adc_en=1",
+      "usb_trig;wr;rec_valid=1",
+      "nop;wr;delay=16",
+      "usb_rec_conf0;rd;rec_adc_nb_word_32=32",
+      "usb_rec_ctrl;rd;rec_adc_en=1",
+
+      "usb_spi_ctrl;wr;rst=1",
+      "usb_spi_ctrl;wr;rst=0",
+      "usb_spi_ctrl;wr;en=1",
+      "usb_spi_conf0;wr;spi_mode=0;spi_id=2",
+      "usb_spi_conf1;wr;spi_dac_tx_enable=1",
+      "usb_spi_wr_data;wr;data=16",
+      "usb_trig;wr;spi_valid=1",
+      "nop;wr;delay=1024",
+      "usb_spi_ctrl;rd;en=1",
+      "usb_spi_conf0;rd;spi_mode=0;spi_id=2",
+      "usb_spi_conf1;rd;spi_dac_tx_enable=1",
+      "usb_spi_wr_data;rd;data=16",
+      "usb_spi_rd_data;rd;data=16",
+
+
+ 
+      "usb_ctrl;wr;en=1",
+      "usb_trig;wr;ctrl_valid=1",
+      "nop;wr;delay=16",
+      "usb_ctrl;rd;en=1",
+
+      "usb_error_sel;wr;sel=0",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=0",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=1",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=1",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=2",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=2",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=3",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=3",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=4",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=4",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=5",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=5",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=6",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=6",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=7",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=7",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=8",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=8",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=9",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=9",
+      "usb_errors;rd;error=0",
+
+      "usb_error_sel;wr;sel=10",
+      "nop;wr;delay=16",
+      "usb_error_sel;rd;sel=10",
+      "usb_errors;rd;error=0",
+
+      "usb_debug_ctrl;wr;rst_status=1",
+      "usb_trig;wr;debug_valid=1",
+      "nop;wr;delay=16",
+      "usb_debug_ctrl;rd;rst_status=1",
+      "usb_trig;wr;debug_valid=1",
+      "usb_debug_ctrl;wr;rst_status=0"
+
+    ]
+  },
+  "def": {
+    "@nop": {
+      "description_list": [
+      "This command is a command created specifically for the simulation.",
+      "It adds delays between 2 consecutives commands (expressed in clock cycles)",
+      "The parameters are:",
+      "   :param wr/reg_id (integer): -1: select the nop function in the vhdl procedure.",
+
+      "   :param rd/reg_id (integer): -1: select the nop function in the vhdl procedure.",
+
+      "   :param field/delay/value (integer > 0): define the number of idle clock cycles to add",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr":
+      {
+        "reg_id":-1
+      },
+      "rd":
+      {
+        "reg_id":-1
+      },
+      "field": {
+        "delay": {
+          "value": 1
+        }
+      }
+    },
+    "@usb_trig": {
+      "description_list": [
+      "This command is used to access to the trig register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "     :param field/reg_valid: write the FPASIM_GAIN, MUX_SQ_FB_DELAY, AMP_SQ_OF_DELAY, ERROR_DELAY, RA_DELAY and TES_CONF registers in the associated cross clock domain FIFO",
+      "         :param value (integer: 0 or 1): 0: do nothing, 1: write in the FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "     :param field/make_pulse: write the MAKE_PULSE register in the associated cross clock domain FIFO",
+      "         :param value (integer: 0 or 1): 0: do nothing, 1: write in the FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "     :param field/rd_all: enable the auto-read of all design RAMs. By design, the order is: tes_shape_pulse;amp_squid_tf;mux_squid_tf;tes_steady_state;mux_squid_offset",
+      "         :param value (integer: 0 or 1): 0: do nothing, 1: enable the auto-read of all design RAMs.",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "     :param field/ctrl_valid: write the CTRL register in the associated cross clock domain FIFO",
+      "         :param value (integer: 0 or 1): 0: do nothing, 1: write in the FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "     :param field/debug_valid: write the DEBUG_CTRL register in the associated the cross clock domain FIFO",
+      "         :param value (integer: 0 or 1): 0: do nothing, 1: write in the FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "     :param field/rec_valid: write the REC_CTRL and REC_CONF0 registers in the associated the cross clock domain FIFO",
+      "         :param value (integer: 0 or 1): 0: do nothing, 1: write in the FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "     :param wr/usb_addr (hexadecimal string): define the Opal kelly address value of the trig_in",
+      "     :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands(see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x40",
+        "reg_id": 100
+      },
+      "field": {
+        "reg_valid": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        },
+        "make_pulse": {
+          "value": 0,
+          "bit_pos_min": 4,
+          "width": 1
+        },
+        "rd_all": {
+          "value": 0,
+          "bit_pos_min": 8,
+          "width": 1
+        },
+        "ctrl_valid": {
+          "value": 0,
+          "bit_pos_min": 12,
+          "width": 1
+        },
+        "debug_valid": {
+          "value": 0,
+          "bit_pos_min": 16,
+          "width": 1
+        },
+        "rec_valid": {
+          "value": 0,
+          "bit_pos_min": 20,
+          "width": 1
+        },
+        "spi_valid": {
+          "value": 0,
+          "bit_pos_min": 24,
+          "width": 1
+        }
+      }
+    },
+    "@usb_ctrl": {
+      "description_list": [
+      "This command is used to access to the Ctrl register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/en: enable the fpasim function",
+      "         :param value (integer: 0 or 1): 0: do nothing, 1: enable the fpasim function",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param field/rst: reset the fpasim function (global reset)",
+      "         :param value (integer: 0 or 1): 0: do nothing, 1: reset the vhdl functionalities",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x00",
+        "reg_id": 200
+      },
+      "rd": {
+        "usb_addr": "0x20",
+        "reg_id": 500
+      },
+      "field": {
+        "en": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        },
+        "rst": {
+          "value": 0,
+          "bit_pos_min": 1,
+          "width": 1
+        }
+      }
+    },
+    "@usb_make_pulse": {
+      "description_list": [
+      "This command is used to access to the MAKE_PULSE register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/pixel_all: auto-generate a sequence of pixel_id with the same value of time_shift and pulse_heigth (see TES_CONF register)",
+      "        :param value (integer: 0 or 1): 0: single make_pulse , 1: auto-generate a sequence a pixels id from 0 to nb_pixel_by_frame - 1 (defined in the TES_CONF register) by overwritting the pixel_id register value",
+      "        :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "        :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param field/pixel_id: value of the pixel_id (see TES_CONF register)",
+      "        :param value (integer: [0, nb_pixel_by_frame - 1] ): pixel_id value",
+      "        :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "        :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param field/time_shift: time_shift value (address offset on the pulse_shape RAM).",
+      "        :param value (integer: [0, 15] ): time_shift value",
+      "        :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "        :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param field/pulse_heigth: pulse_heigth value. In the VHDL, the value represent a multiplicator factor (percentage) of the pulse_shape heigth stored in the associated FPGA RAMs",
+      "        :param value (UQ16,0): pulse_heigth value (0x0000: 0% of pulse_shape height, 0xFFFF: ~100% pulse_shape heigth)",
+      "        :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "        :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x01",
+        "reg_id": 201
+      },
+      "rd": {
+        "usb_addr": "0x21",
+        "reg_id": 501
+      },
+      "field": {
+        "pixel_all": {
+          "value": 0,
+          "bit_pos_min": 31,
+          "width": 1
+        },
+        "pixel_id": {
+          "value": 0,
+          "bit_pos_min": 24,
+          "width": 6
+        },
+        "time_shift": {
+          "value": 0,
+          "bit_pos_min": 16,
+          "width": 4
+        },
+        "pulse_heigth": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
+    "@usb_fpgasim_gain": {
+      "description_list": [
+      "This command is used to access to the FPASIM_GAIN register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/gain: index table of fpasim gain value (multiplicatif factor)",
+      "        :param value (integer: [0,7]): 0: 0.25, 1:0.5, 2:0.75, 3:1, 4:1.5, 5:2, 6:3, 7:4",
+      "        :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "        :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x02",
+        "reg_id": 202
+      },
+      "rd": {
+        "usb_addr": "0x22",
+        "reg_id": 502
+      },
+      "field": {
+        "gain": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 3
+        }
+      }
+    },
+    "@usb_mux_sq_fb_delay": {
+      "description_list": [
+      "This command is used to access to the MUX_SQ_FB_DELAY register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/delay : delay to applied on the mux_squid_feedback path (from the input ADC0)",
+      "        :param value (integer: [0, 2**6-1)): 0: no delay, 1: one clock cycle delay and so on",
+      "        :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "        :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x03",
+        "reg_id": 203
+      },
+      "rd": {
+        "usb_addr": "0x23",
+        "reg_id": 503
+      },
+      "field": {
+        "delay": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_amp_sq_of_delay": {
+      "description_list": [
+      "This command is used to access to the AMP_SQ_OF_DELAY register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/delay: delay to applied on the amp_offset_correction path (from the input ADC1)",
+      "         :param value (integer: [0, 2**6-1)): 0: no delay, 1: one clock cycle delay and so on",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x04",
+        "reg_id": 204
+      },
+      "rd": {
+        "usb_addr": "0x24",
+        "reg_id": 504
+      },
+      "field": {
+        "delay": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_error_delay": {
+      "description_list": [
+      "This command is used to access to the ERROR_DELAY register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/delay: delay to applied on the data path towards the DAC",
+      "         :param value (integer: [0, 2**6-1)): 0: no delay, 1: one clock cycle delay and so on",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x05",
+        "reg_id": 205
+      },
+      "rd": {
+        "usb_addr": "0x25",
+        "reg_id": 505
+      },
+      "field": {
+        "delay": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_ra_delay": {
+      "description_list": [
+      "This command is used to access to the RA_DELAY register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/delay: delay to applied on the sync path",
+      "         :param value (integer: [0, 2**6-1)): 0: no delay, 1: one clock cycle delay and so on",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x06",
+        "reg_id": 206
+      },
+      "rd": {
+        "usb_addr": "0x26",
+        "reg_id": 506
+      },
+      "field": {
+        "delay": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        }
+      }
+    },
+    "@usb_tes_conf": {
+      "description_list": [
+      "This command is used to access to the TES_CONF register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/nb_pixel_by_frame: define the number of pixels in a column (minus 1)",
+      "         :param value (integer: [0, 63])): 0: 1 pixel, 1: 2 pixels and so on",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param field/nb_sample_by_pixel : define the number of samples by pixel (minus 1)",
+      "         :param value (integer: [0, 63])): 0: 1 sample duration, 1: 2 samples duration and so on",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param field/nb_sample_by_frame : define the number of samples by frame. The value should be equal to (nb_pixel_by_frame+1)*(nb_sample_by_pixel+1) - 1",
+      "         :param value (integer: [0, 8191])): 0: 1 sample duration, 1: 2 samples duration and so on",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Example 0: ",
+      "   nb_pixel_by_frame = 33 (the user wants 34 pixel by column)",
+      "   nb_sample_by_pixel = 39 (the user has defined a pixel size of 40 samples by pixel)",
+      "   nb_sample_by_frame = 34*40 - 1 (from the nb_pixel_by_frame and nb_sample_by_frame values we compute the value)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x07",
+        "reg_id": 207
+      },
+      "rd": {
+        "usb_addr": "0x27",
+        "reg_id": 507
+      },
+      "field": {
+        "nb_pixel_by_frame": {
+          "value": 33,
+          "bit_pos_min": 24,
+          "width": 6
+        },
+        "nb_sample_by_pixel": {
+          "value": 39,
+          "bit_pos_min": 16,
+          "width": 7
+        },
+        "nb_sample_by_frame": {
+          "value": 1359,
+          "bit_pos_min": 0,
+          "width": 13
+        }
+      }
+    },
+    "@usb_fpasim_status": {
+      "description_list": [
+      "This command is used to access to the DATA_COUNT register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/pipe_out_data_count : number of 32 bit-words currently in the pipe_out FIFO. This FIFO is used to store the read FPASIM RAM content",
+      "         :param value (integer >=0): number of 32 bit-words in the pipe_out FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param field/make_pulse_data_count : number of 32 bit-words currently in the make_pulse FIFO. This",
+      "         :param value (integer >=0): number of 32 bit-words in the make_pulse FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "rd": {
+        "usb_addr": "0x2A",
+        "reg_id": 510
+      },
+      "field": {
+        "tes_neg_out_pixel_id ": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 6
+        },
+        "tes_neg_out_erro": {
+          "value": 0,
+          "bit_pos_min": 8,
+          "width": 1
+        }
+      }
+    },
+    "@usb_data_count": {
+      "description_list": [
+      "This command is used to access to the DATA_COUNT register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/pipe_out_data_count : number of 32 bit-words currently in the pipe_out FIFO. This FIFO is used to store the read FPASIM RAM content",
+      "         :param value (integer >=0): number of 32 bit-words in the pipe_out FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param field/make_pulse_data_count : number of 32 bit-words currently in the make_pulse FIFO. This",
+      "         :param value (integer >=0): number of 32 bit-words in the make_pulse FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "rd": {
+        "usb_addr": "0x2B",
+        "reg_id": 511
+      },
+      "field": {
+        "pipe_out_data_count": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        },
+        "make_pulse_data_count": {
+          "value": 0,
+          "bit_pos_min": 16,
+          "width": 16
+        }
+      }
+    },
+    "@usb_rec_ctrl": {
+      "description_list": [
+      "This command is used to access to the REC_CTRL register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/rec_adc_en: Enable the recording of the ADCs samples",
+      "        :param value (integer: 0 or 1): 0: do nothing, 1: enable the adc recording",
+      "        :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "        :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x0C",
+        "reg_id": 212
+      },
+      "rd": {
+        "usb_addr": "0x2C",
+        "reg_id": 512
+      },
+      "field": {
+        "rec_adc_en": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        }
+      }
+    },
+    "@usb_rec_conf0": {
+      "description_list": [
+      "This command is used to access to the REC_CONF0 register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/rec_adc_nb_word_32: Define the number of 32 bit-word to record ",
+      "         :param value (integer >=0 ):value",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x0D",
+        "reg_id": 213
+      },
+      "rd": {
+        "usb_addr": "0x2D",
+        "reg_id": 513
+      },
+      "field": {
+        "rec_adc_nb_word_32": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
+
+    "@usb_rec_data_count": {
+      "description_list": [
+      "This command is used to access to the REC_DATA_COUNT register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param /field/rec_adc_data_count: number of 32 bit-words currently in the rec_pipe_out FIFO. This FIFO is used to stored recorded data",
+      "         :param value (integer >=0): number of words in the rec_pipe_out FIFO",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "rd": {
+        "usb_addr": "0x31",
+        "reg_id": 517
+      },
+      "field": {
+        "rec_adc_data_count": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
+
+    "@usb_spi_ctrl": {
+      "description_list": [
+      "This command is used to access to the SPI_CTRL register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/en: enable the FPGA SPI module",
+      "         :param value (integer: 0 or 1): 0: do nothing, 1: enable",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param field/rst reset the FPGA SPI module",
+      "         :param value (integer: 0 or 1): 0: do nothing, 1: reset",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x12",
+        "reg_id": 218
+      },
+      "rd": {
+        "usb_addr": "0x32",
+        "reg_id": 518
+      },
+      "field": {
+        "en": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        },
+        "rst": {
+          "value": 0,
+          "bit_pos_min": 1,
+          "width": 1
+        }
+      }
+    },
+
+    "@usb_spi_conf0": {
+      "description_list": [
+            "This command is used to access to the SPI_CONF0 register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+            "The parameters are:",
+            "    :param field/spi_mode: define the access mode on the selected spi device",
+            "         :param value (integer: 0 or 1): 0: read in a SPI register, 1: write in a SPI register",
+            "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+            "         :param width (integer >=1): define the field width (expressed in bit)",
+
+            "    :param field/spi_id: Select the SPI device",
+            "         :param value (integer: 0 or 1): 0: the cdce spi device, 1: the adc spi device, 2: the dac spi device, 3: the amc spi device",
+            "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+            "         :param width (integer >=1): define the field width (expressed in bit)",
+
+            "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+            "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+            "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "Note: ",
+            "    This section defines the parameter default values.",
+            "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+        ],
+      "wr": {
+        "usb_addr": "0x13",
+        "reg_id": 219
+      },
+      "rd": {
+        "usb_addr": "0x33",
+        "reg_id": 519
+      },
+      "field": {
+        "spi_mode": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        },
+        "spi_id": {
+          "value": 0,
+          "bit_pos_min": 4,
+          "width": 3
+        }
+      }
+    },
+
+    "@usb_spi_conf1": {
+      "description_list": [
+      "This command is used to access to the SPI_CONF1 register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/spi_dac_tx_enable: enable the TX_ENABLE pin of the DAC device ",
+      "         :param value (integer: 0 or 1): 0: the DAC TX_ENABLE pin is disabled, 1:  the DAC TX_ENABLE pin is enabled",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x14",
+        "reg_id": 220
+      },
+      "rd": {
+        "usb_addr": "0x34",
+        "reg_id": 520
+      },
+      "field": {
+        "spi_dac_tx_enable": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        }
+      }
+    },
+    "@usb_spi_wr_data": {
+      "description_list": [
+      "This command is used to access to the SPI_WR_DATA register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/data: spi command to write in the specified spi device (see @usb_spi_conf0)",
+      "     'value' (integer: 0 or 1): value to write",
+      "     'bit_pos_min' (integer >=0): define the position of the LSB bit",
+      "     'width' (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x15",
+        "reg_id": 221
+      },
+      "rd": {
+        "usb_addr": "0x35",
+        "reg_id": 521
+      },
+      "field": {
+        "data": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 32
+        }
+      }
+    },
+    "@usb_spi_rd_data": {
+      "description_list": [
+      "This command is used to access to the SPI_RD_DATA register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/data: read spi command from the selected spi device.",
+      "         :param value (integer): value",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+
+      "rd": {
+        "usb_addr": "0x36",
+        "reg_id": 522
+      },
+      "field": {
+        "data": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 32
+        }
+      }
+    },
+    "@usb_spi_status": {
+      "description_list": [
+      "This command is used to access to the SPI_STATUS register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/data : spi status",
+      "            :param value (integer): value",
+      "            :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "            :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+
+      "rd": {
+        "usb_addr": "0x37",
+        "reg_id": 523
+      },
+      "field": {
+        "data": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 32
+        }
+      }
+    },
+    "@usb_debug_ctrl": {
+      "description_list": [
+      "This command is used to access to the DEBUG_CTRL register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/debug_pulse: define if the errors are latched",
+      "             :param value (integer: 0 or 1): 0: do nothing, 1: errors are latched",
+      "             :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "             :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param field/rst_status: define if an errors is resetted",
+      "             :param value (integer: 0 or 1): 0: do nothing, 1: reset the errors",
+      "             :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "             :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x18",
+        "reg_id": 224
+      },
+      "rd": {
+        "usb_addr": "0x38",
+        "reg_id": 524
+      },
+      "field": {
+        "debug_pulse": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 1
+        },
+        "rst_status": {
+          "value": 0,
+          "bit_pos_min": 1,
+          "width": 1
+        }
+      }
+    },
+      
+    "@usb_error_sel": {
+      "description_list": [
+      "This command is used to access to the ERROR_SEL register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/sel: select one of the error/status registers",
+      "         :param value (integer: [0,7]): 0: select the first error and status register, 1: select the second error and status register and so on",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x19",
+        "reg_id": 225
+      },
+      "rd": {
+        "usb_addr": "0x39",
+        "reg_id": 525
+      },
+      "field": {
+        "sel": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 4
+        }
+      }
+    },
+    "@usb_errors": {
+      "description_list": [
+      "This command is used to access to the ERRORS register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/error: get the selected error register value",
+      "         :param value (integer >=0): error value",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "rd": {
+        "usb_addr": "0x3A",
+        "reg_id": 526
+      },
+      "field": {
+        "error": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 32
+        }
+      }
+    },
+
+    "@usb_status": {
+      "description_list": [
+      "This command is used to access to the STATUS register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/status: get the selected status value",
+      "         :param value (integer >=0): status value",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "rd": {
+        "usb_addr": "0x3B",
+        "reg_id": 527
+      },
+      "field": {
+        "status": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 32
+        }
+      }
+    },
+
+    "@usb_board_id": {
+      "description_list": [
+      "This command is used to access to the BOARD_ID register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/board_id: board_id value",
+      "     :param value (integer): board_id value",
+      "     :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "     :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "rd": {
+        "usb_addr": "0x3D",
+        "reg_id": 529
+      },
+      "field": {
+        "baord_id": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
+    
+    "@usb_firmware_id": {
+      "description_list": [
+      "This command is used to access to the FPGA_ID register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/fpga_id: fpga_id value (hexadecimal ASCII value)",
+      "         :param value (integer): fpga_id value ",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "rd": {
+        "usb_addr": "0x3E",
+        "reg_id": 530
+      },
+      "field": {
+        "firmware_id": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
+
+    "@usb_firware_version": {
+      "description_list": [
+      "This command is used to access to the FPGA_VERSION register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/fpga_version: fpga_version value",
+      "         :param value (integer): fpga_version value",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "rd": {
+        "usb_addr": "0x3F",
+        "reg_id": 531
+      },
+      "field": {
+        "firware_version": {
+          "value": 0,
+          "bit_pos_min": 0,
+          "width": 16
+        }
+      }
+    },
+
+    "@usb_rec_adc": {
+      "description_list": [
+      "This command is used to access to the pipeout REC_ADC (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (pipe_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "rd": {
+        "usb_addr": "0xA1",
+        "reg_id": 305
+      }
+    },
+
+    "@usb_ram": {
+      "field": {
+        "tes_shape_pulse": {
+          "description_list": [
+            "This command is used to access to the pipe_in in order to set or get the pulse_shape RAM content (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+            "The parameters are:",
+
+            "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (pipe_in)",
+            "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (pipe_out)",
+            "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "    :param name (string): name of the ram to configure",
+
+            "    :param offset_addr (hexadecimal string): Starting address to generate. This address is used to build the pipe_in words and to select the associated memory in the FPGA",
+            "    :param input_filename (string): filename to rename and copy for the VHDL simulation",
+            "          Note: ",
+            "             This file is a *.csv file",
+            "    :param output_tb_filename (string): expected VHDL testbench filename",
+            "          Note: This file is a *.csv file",
+
+            "Note: ",
+            "    This section defines the parameter default values.",
+            "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+          ],
+          "wr": {
+            "usb_addr": "0x80",
+            "reg_id": 0
+          },
+          "rd": {
+            "usb_addr": "0xA0",
+            "reg_id": 300
+          },
+          "name": "tes_shape_pulse",
+          "offset_addr": "0x0000",
+          "input_filename": "tes_response.csv",
+          "output_tb_filename": "py_tes_pulse_shape_ref.csv"
+        },
+        "amp_squid_tf": {
+          "description_list": [
+            "This command is used to access to the pipe_in in order to set or get the amp_squid_tf RAM content (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+            "The parameters are:",
+
+            "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (pipe_in)",
+            "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (pipe_out)",
+            "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "    :param name (string): name of the ram to configure",
+
+            "    :param offset_addr (hexadecimal string): Starting address to generate. This address is used to build the pipe_in words and to select the associated memory in the FPGA",
+            "    :param input_filename (string): filename to rename and copy for the VHDL simulation",
+            "          Note: ",
+            "             This file is a *.csv file",
+            "    :param output_tb_filename (string): expected VHDL testbench filename",
+            "          Note: This file is a *.csv file",
+
+            "Note: ",
+            "    This section defines the parameter default values.",
+            "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+          ],
+          "wr": {
+            "usb_addr": "0x80",
+            "reg_id": 1
+          },
+          "rd": {
+            "usb_addr": "0xA0",
+            "reg_id": 301
+          },
+          "name": "amp_squid_tf",
+          "offset_addr": "0x8000",
+          "input_filename": "amp_squid_tf.csv",
+          "output_tb_filename": "py_amp_squid_tf_ref.csv"
+        },
+        "mux_squid_tf": {
+          "description_list": [
+            "This command is used to access to the pipe_in in order to set or get the mux_squid_tf RAM content (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+            "The parameters are:",
+
+            "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (pipe_in)",
+            "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (pipe_out)",
+            "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "    :param name (string): name of the ram to configure",
+
+            "    :param offset_addr (hexadecimal string): Starting address to generate. This address is used to build the pipe_in words and to select the associated memory in the FPGA",
+            "    :param input_filename (string): filename to rename and copy for the VHDL simulation",
+            "          Note: ",
+            "             This file is a *.csv file",
+            "    :param output_tb_filename (string): expected VHDL testbench filename",
+            "          Note: This file is a *.csv file",
+
+            "Note: ",
+            "    This section defines the parameter default values.",
+            "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+          ],
+          "wr": {
+            "usb_addr": "0x80",
+            "reg_id": 2
+          },
+          "rd": {
+            "usb_addr": "0xA0",
+            "reg_id": 302
+          },
+          "name": "mux_squid_tf",
+          "offset_addr": "0xC000",
+          "input_filename": "mux_squid_tf.csv",
+          "output_tb_filename": "py_mux_squid_tf_ref.csv"
+        },
+        "tes_steady_state": {
+          "description_list": [
+            "This command is used to access to the pipe_in in order to set or get the tes_steady_state RAM content (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+            "The parameters are:",
+
+            "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (pipe_in)",
+            "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (pipe_out)",
+            "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "    :param name (string): name of the ram to configure",
+
+            "    :param offset_addr (hexadecimal string): Starting address to generate. This address is used to build the pipe_in words and to select the associated memory in the FPGA",
+            "    :param input_filename (string): filename to rename and copy for the VHDL simulation",
+            "          Note: ",
+            "             This file is a *.csv file",
+            "    :param output_tb_filename (string): expected VHDL testbench filename",
+            "          Note: This file is a *.csv file",
+
+            "Note: ",
+            "    This section defines the parameter default values.",
+            "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+          ],
+          "wr": {
+            "usb_addr": "0x80",
+            "reg_id": 3
+          },
+          "rd": {
+            "usb_addr": "0xA0",
+            "reg_id": 303
+          },
+          "name": "tes_steady_state",
+          "offset_addr": "0xE000",
+          "input_filename": "tes_steady_state.csv",
+          "output_tb_filename": "py_tes_steady_state_ref.csv"
+        },
+        "mux_squid_offset": {
+          "description_list": [
+            "This command is used to access to the pipe_in in order to set or get the mux_squid_offset RAM content (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+            "The parameters are:",
+
+            "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (pipe_in)",
+            "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (pipe_out)",
+            "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+            "    :param name (string): name of the ram to configure",
+
+            "    :param offset_addr (hexadecimal string): Starting address to generate. This address is used to build the pipe_in words and to select the associated memory in the FPGA",
+            "    :param input_filename (string): filename to rename and copy for the VHDL simulation",
+            "          Note: ",
+            "             This file is a *.csv file",
+            "    :param output_tb_filename (string): expected VHDL testbench filename",
+            "          Note: This file is a *.csv file",
+
+            "Note: ",
+            "    This section defines the parameter default values.",
+            "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+          ],
+          "wr": {
+            "usb_addr": "0x80",
+            "reg_id": 4
+          },
+          "rd": {
+            "usb_addr": "0xA0",
+            "reg_id": 304
+          },
+          "name": "mux_squid_offset",
+          "offset_addr": "0xE040",
+          "input_filename": "mux_squid_offset.csv",
+          "output_tb_filename": "py_mux_squid_offset_ref.csv"
+        }
+      }
+    }
+  }
+}

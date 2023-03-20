@@ -104,6 +104,9 @@ class VunitConf:
         # wave_filename
         self.wave_filename = None
 
+        # wave_filepath
+        self.wave_filepath = None
+
         # conf_filename_list
         self.conf_filename_list = None
 
@@ -786,6 +789,7 @@ class VunitConf:
         filename = self.wave_filename
         base_path = base_path_dic['wave_path']
 
+
         extension = str(Path(filename).suffix)
         display_obj.display_title(msg_p='Set the Simulator Waveform', level_p=level0)
         if extension in ['.do']:
@@ -808,11 +812,24 @@ class VunitConf:
                 else:
                     msg0 = "ERROR: VunitConf.set_waveform: isn't defined for simulator other than modelsim, questa"
                     display_obj.display(msg_p=msg0, level_p=level1)
+            self.wave_filepath = filepath
 
         else:
+            self.wave_filepath = None
             msg0 = 'No Waveform'
             display_obj.display(msg_p=msg0, level_p=level1)
         return None
+
+    def get_waveform(self, level_p=None):
+        """
+        This method get the waveform for Modelsim and Questa simulator
+        :param level_p: (integer >= 0) define the level of indentation of the message to print
+        :return: filepath
+        """
+        display_obj = self.display_obj
+        level0 = self._get_indentation_level(level_p=level_p)
+        display_obj.display_title(msg_p='Set the Simulator Waveform', level_p=level0)
+        return self.wave_filepath
 
     def get_testbench_name(self):
         """

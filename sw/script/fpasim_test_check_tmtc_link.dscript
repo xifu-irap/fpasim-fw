@@ -42,7 +42,7 @@ include("./fpasim/fpasim_tools.dscript");
  *   The steps are:
  *     . configure the ADC devices in order to generate a pre-defined pattern
  *     . configure the FPASIM in order to records few samples
- *     . display the recorded samples
+ *     . print the recorded samples
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity

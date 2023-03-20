@@ -35,6 +35,9 @@ const NB_CHAR_INDENT = 4;
 
 /**
  * Repeat a String
+ *    ex0: str_p = "a", nb_times_p = 0 => return = ""
+ *    ex1: str_p = "a", nb_times_p = 1 => return = "a"
+ *    ex2: str_p = "a", nb_times_p = 2 => return = "aa"
  * @param {string} str_p - string to repeat
  * @param {number} nb_times_p - number of times for the repeating
  * @return {string} The repeating string
@@ -219,6 +222,14 @@ function display_bit_from_data(bit_name_p, bit_pos_p, bit_width_p, data_p, level
 
 }
 
+/**
+ * print a bit field in the hexadecimal format
+ * @param {string} bit_name_p - bit name
+ * @param {number} bit_value_p - bit value
+ * @param {number} bit_width_p - bit width
+ * @param {number} level_p - level of indentation at the beginning
+ * @param {number} mode_p - define the output print
+ */
 function display_bit(bit_name_p, bit_value_p, bit_width_p, level_p, mode_p) {
     // default function parameter values
     if (typeof(level_p) === 'undefined') level_p = 0;
@@ -286,6 +297,12 @@ function convert_hex_to_ascii(value_p, width_p) {
 
 }
 
+/**
+ * Convert an unsigned int value into an int value (2's complement)
+ * @param {number} value_p - unsigned integer value to convert
+ * @param {number} width_p - value bus width (expressed in bits)
+ * @return {number} converted value
+ */
 function convert_uint_to_int(data_p, width_p) {
     if (data_p >= Math.pow(2, width_p - 1)) {
         const val = data_p - Math.pow(2, width_p);
@@ -295,6 +312,12 @@ function convert_uint_to_int(data_p, width_p) {
     return val
 }
 
+/**
+ * Convert an int value (2's complement) into an unsigned int value.
+ * @param {number} value_p - int value to convert
+ * @param {number} width_p - value bus width (expressed in bits)
+ * @return {number} converted value
+ */
 function convert_int_to_uint(data_p, width_p) {
     if (data_p < 0) {
         const val = Math.pow(2, width_p) + data_p;

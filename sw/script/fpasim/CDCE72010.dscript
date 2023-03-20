@@ -24,7 +24,8 @@
 // -------------------------------------------------------------------------------------------------------------
 //    @details
 //
-//    This javscript generates spi commands in order to initialize thecdcd72010 registers.
+//   This script defines functions in order to configure (read/write) the registers of the cdcd72010 spi device (FMC150 board) knowing the FPASIM function
+//   has a role of bridge between the software and the spi device.
 //
 //    Note:
 //       . Tested with javascript
@@ -62,14 +63,14 @@ const c_CDCE_BIT_VERBOSITY_MIN = c_CDCE_ADDR_VERBOSITY_MIN + 1;
 /**
   This function reverse the bit orders.
   Example:
-      width_p  | value_p            | function return value      |
+      width_p  | value_p            | return value               |
       ---------|--------------------|----------------------------|
       4        | 1 ("0001")         | 8 ("1000")                 |
       4        | 3 ("0011")         | 12 ("1100")                |
       4        | 3 ("0111")         | 14 ("1110")                |
       5        | 1 ("00001")        | 16 ("10000")               |
 
-  * @param {number} value_p - value where to reverse bit
+  * @param {number} value_p - value.
   * @param {number} width_p - width of the input value (expressed in bits)
   * @return {number} value with the reversed bit
 
@@ -87,11 +88,13 @@ function reverse_bit_order(value_p, width_p) {
 
 }
 
-
-/*
-FPGA specifics:
- Enable the FPGA SPI
-*/
+/**
+ * Enable the FPASIM SPI MODULE (bridge)
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ */
 function cdce_spi_enable(level_p, mode_p, verbosity_p) {
     // default function parameter values
     if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
@@ -131,10 +134,11 @@ function cdce_spi_enable(level_p, mode_p, verbosity_p) {
 }
 
 /**
-* FPGA specifics: 
-    Build the expected spi command
-    Build the expected fpga register accesses
-*/
+ * Write a spi device register through the FPASIM SPI MODULE (bridge).
+ *
+ * @param {number} addr_p - register address of the SPI device to write.
+ * @param {number} data_p - value to write in the spi device register.
+ */
 function cdce_write_command(addr_p, data_p) {
 
     //---------------------------------------------------------------------
@@ -173,6 +177,13 @@ function cdce_write_command(addr_p, data_p) {
 
 }
 
+/**
+ * Read spi device register value.
+ *
+ * @param {number} addr_p - register address of the SPI device to read.
+ * @return {number} read value from the spi device register.
+ *
+ */
 function cdce_read_command(addr_p) {
 
     //---------------------------------------------------------------------
@@ -250,7 +261,7 @@ function cdce_read_command(addr_p) {
     //---------------------------------------------------------------------
     //waitMs(100);
     //getLatestValue("FPA_WireOutValues");
-    data = FPA_WireOutValues[21]
+    data = FPA_WireOutValues[22]
         // reverse the bit order
     data = reverse_bit_order(value_p = data, width_p = 32);
     return data;
@@ -258,7 +269,8 @@ function cdce_read_command(addr_p) {
 }
 
 /**
- *  Set the register0
+ * Set the register0 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -347,7 +359,8 @@ function cdce_set_config0(
 
 }
 /**
- *  Set the register1
+ * Set the register1 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -427,7 +440,8 @@ function cdce_set_config1(
 }
 
 /**
- *  Set the register2
+ * Set the register2 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -498,7 +512,8 @@ function cdce_set_config2(
 }
 
 /**
- *  Set the register3
+ * Set the register3 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -576,7 +591,8 @@ function cdce_set_config3(
 }
 
 /**
- *  Set the register4
+ * Set the register4 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -645,7 +661,8 @@ function cdce_set_config4(
 }
 
 /**
- *  Set the register5
+ * Set the register5 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -716,7 +733,8 @@ function cdce_set_config5(
 }
 
 /**
- *  Set the register6
+ * Set the register6 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -796,7 +814,8 @@ function cdce_set_config6(
 }
 
 /**
- *  Set the register7
+ * Set the register7 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -867,7 +886,8 @@ function cdce_set_config7(
 }
 
 /**
- *  Set the register8
+ * Set the register8 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -948,7 +968,8 @@ function cdce_set_config8(
 }
 
 /**
- *  Set the register9
+ * Set the register9 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -1050,7 +1071,8 @@ function cdce_set_config9(
 }
 
 /**
- *  Set the register10
+ * Set the register10 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -1100,7 +1122,8 @@ function cdce_set_config10(
 }
 
 /**
- *  Set the register11
+ * Set the register11 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -1185,7 +1208,8 @@ function cdce_set_config11(
 }
 
 /**
- *  Set the register12
+ * Set the register12 of the spi device.
+ *
  * @param {number} level_p - level of indentation at the beginning
  * @param {number} mode_p - define the print output
  * @param {number} verbosity_p - level of verbosity
@@ -1270,10 +1294,12 @@ function cdce_set_config12(
 }
 
 /**
- *  Get the register0
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register0 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [27:26]: R/W: outbufsel0yx[1:0]
  * [25:24]: R/W: cmosmode0nyx[1:0]
@@ -1343,10 +1369,12 @@ function cdce_get_config0(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register1
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register1 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [27:26]: R/W: outbufsel1yx_p[1:0]
  * [25:24]: R/W: cmosmode1nyx_p[1:0]
@@ -1408,10 +1436,12 @@ function cdce_get_config1(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register2
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register2 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [27:26]: R/W: outbufsel2yx[1:0]
  * [25:24]: R/W: cmosmode2nyx[1:0]
@@ -1467,10 +1497,12 @@ function cdce_get_config2(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register3
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register3 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [27:26]: R/W: outbufsel3yx[1:0]
  * [25:24]: R/W: cmosmode3nyx[1:0]
@@ -1530,10 +1562,12 @@ function cdce_get_config3(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register4
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register4 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [27:26]: R/W: outbufsel4yx[1:0]
  * [25:24]: R/W: cmosmode4nyx[1:0]
@@ -1586,10 +1620,12 @@ function cdce_get_config4(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register5
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register5 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [27:26]: R/W: outbufsel5yx[1:0]
  * [25:24]: R/W: cmosmode5nyx[1:0]
@@ -1644,10 +1680,12 @@ function cdce_get_config5(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register6
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register6 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [27:26]: R/W: outbufsel6yx[1:0]
  * [25:24]: R/W: cmosmode6nyx[1:0]
@@ -1708,10 +1746,12 @@ function cdce_get_config6(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register7
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register7 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [27:26]: R/W: outbufsel7yx[1:0]
  * [25:24]: R/W: cmosmode7nyx[1:0]
@@ -1769,10 +1809,12 @@ function cdce_get_config7(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register8
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register8 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [27:26]: R/W: outbufsel8yx[1:0]
  * [25:24]: R/W: cmosmode8nyx[1:0]
@@ -1834,10 +1876,12 @@ function cdce_get_config8(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register9
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register9 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [27:26]: R/W: outbufsel9yx[1:0]
  * [25:24]: R/W: cmosmode9nyx[1:0]
@@ -1916,10 +1960,12 @@ function cdce_get_config9(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register10
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register10 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [27:14]: R/W: div_m[13:0]
  * [13:0]: R/W: div_n[13:0]
@@ -1961,10 +2007,12 @@ function cdce_get_config10(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register11
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register11 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [26]: R/W: eplock[0]
  * [25]: R/W: reset_hold_mode[0]
@@ -2031,10 +2079,12 @@ function cdce_get_config11(level_p, mode_p, verbosity_p) {
 }
 
 /**
- *  Get the register12
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Get the register12 from the spi device.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} register value.
  *
  * [26]: R/W: secactivity[0]
  * [25]: R/W: priactivity[0]
@@ -2102,11 +2152,12 @@ function cdce_get_config12(level_p, mode_p, verbosity_p) {
 
 
 /**
- *  Get register value by name
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
- * @param {string} reg_name_p - register name
+ * Get register value by name.
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @param {string} reg_name_p - register name.
+ * @return {number} selected register value.
  *
  */
 function CDCE72010_get_config_by_name(reg_name_p, level_p, mode_p, verbosity_p) {
@@ -2173,6 +2224,14 @@ function CDCE72010_get_config_by_name(reg_name_p, level_p, mode_p, verbosity_p) 
 
 }
 
+/**
+ * Read and Display the configuration of all spi device registers.
+ *
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ *
+ */
 function cdce_display_all_config(level_p, mode_p, verbosity_p) {
     // default function parameter values
     if (typeof(level_p) === 'undefined') level_p = 0;
@@ -2200,10 +2259,10 @@ function cdce_display_all_config(level_p, mode_p, verbosity_p) {
 
 
 /**
- *  Configure thecdcd72010 Device
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Default Configuration of the cdcd72010 spi device (FMC150 board).
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  */
 function CDCE72010_configure(level_p, mode_p, verbosity_p) {
@@ -2696,13 +2755,12 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
 
 
 /**
- *  Configure thecdcd72010 Device. The necessary output clocks are fixed at 100 MHz.
- * @param {number} level_p - level of indentation at the beginning
- * @param {number} mode_p - define the print output
- * @param {number} verbosity_p - level of verbosity
+ * Configuration of the cdcd72010 spi device (FMC150 board).
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
  *
  */
-
 function CDCE72010_configure_100M(level_p, mode_p, verbosity_p) {
 
     // default function parameter values

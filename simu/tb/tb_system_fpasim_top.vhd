@@ -691,6 +691,32 @@ begin
       o_leds => o_leds
       );
 
+---------------------------------------------------------------------
+-- spi management
+---------------------------------------------------------------------
+  gen_SPI_READBACK : if true generate
+    signal data_tmp0 : std_logic;
+  begin
+
+    inst_pipeliner : entity fpasim.pipeliner
+      generic map(
+        g_NB_PIPES   => 1,
+        g_DATA_WIDTH => 1
+        )
+      port map(
+        i_clk     => i_adc_clk_p,
+        i_data(0) => o_spi_sdata,
+        o_data(0) => data_tmp0
+        );
+
+    i_cdce_sdo <= data_tmp0;
+    i_adc_sdo  <= data_tmp0;
+    i_dac_sdo  <= data_tmp0;
+    i_mon_sdo  <= data_tmp0;
+
+
+  end generate gen_SPI_READBACK;
+
 
   ---------------------------------------------------------------------
   -- log: data out
@@ -702,7 +728,7 @@ begin
   begin
     addr       <= o_data(31 downto 16);
     data       <= o_data(15 downto 0);
-    data_valid <= o_data_valid when o_reg_id = 32 else '0';
+    data_valid <= o_data_valid when o_reg_id = 0 else '0';
 
     inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
       i_clk            => usb_clk,
@@ -739,7 +765,7 @@ begin
   begin
     addr       <= o_data(31 downto 16);
     data       <= o_data(15 downto 0);
-    data_valid <= o_data_valid when o_reg_id = 33 else '0';
+    data_valid <= o_data_valid when o_reg_id = 1 else '0';
 
     inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
       i_clk            => usb_clk,
@@ -776,7 +802,7 @@ begin
   begin
     addr       <= o_data(31 downto 16);
     data       <= o_data(15 downto 0);
-    data_valid <= o_data_valid when o_reg_id = 34 else '0';
+    data_valid <= o_data_valid when o_reg_id = 2 else '0';
 
     inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
       i_clk            => usb_clk,
@@ -813,7 +839,7 @@ begin
   begin
     addr       <= o_data(31 downto 16);
     data       <= o_data(15 downto 0);
-    data_valid <= o_data_valid when o_reg_id = 35 else '0';
+    data_valid <= o_data_valid when o_reg_id = 3 else '0';
 
     inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
       i_clk            => usb_clk,
@@ -850,7 +876,7 @@ begin
   begin
     addr       <= o_data(31 downto 16);
     data       <= o_data(15 downto 0);
-    data_valid <= o_data_valid when o_reg_id = 35 else '0';
+    data_valid <= o_data_valid when o_reg_id = 4 else '0';
 
     inst_pkg_log_data_in_file : pkg_log_data_in_file_2(
       i_clk            => usb_clk,
