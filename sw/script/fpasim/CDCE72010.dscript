@@ -34,7 +34,7 @@
 
 // import libraries
 include("./fpasim/utils_tools.dscript");
-include("./fpasim/fpasim_address.dscript");
+include("./fpasim/fpasim.dscript");
 
 // define the SPI device registers
 const CDCE_ADDR = {};
@@ -58,6 +58,11 @@ const c_CDCE_REG_VERBOSITY_MIN = 0;
 const c_CDCE_ADDR_VERBOSITY_MIN = 1;
 // verbosity min to display register bit
 const c_CDCE_BIT_VERBOSITY_MIN = c_CDCE_ADDR_VERBOSITY_MIN + 1;
+
+// address width of the spi device register
+const c_CDCE_SPI_ADDR_WIDTH = 4;
+// data width of the spi device register
+const c_CDCE_SPI_DATA_WIDTH = 28;
 
 
 /**
@@ -102,15 +107,6 @@ function cdce_spi_enable(level_p, mode_p, verbosity_p) {
     if (typeof(mode_p) === 'undefined') mode_p = 0;
 
     const level0 = level_p;
-    //---------------------------------------------------------------------
-    //-- write in the SPI_CTRL register 
-    //---------------------------------------------------------------------
-
-    // reset the spi links
-    // rst = 1;
-    // en = 0;
-    // data = (rst << 1) + en;
-    // sendToFPA_debugSetWireIn(0x12,data);
 
     //---------------------------------------------------------------------
     //-- write in the SPI_CTRL register 
@@ -119,9 +115,7 @@ function cdce_spi_enable(level_p, mode_p, verbosity_p) {
     // en the spi links
     rst = 0;
     en = 1;
-    data = (rst << 1) + en;
-    addr = FPASIM_ADDR_WIREIN['SPI_CTRL'];
-    sendToFPA_debugSetWireIn(addr, data);
+    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -144,14 +138,12 @@ function cdce_write_command(addr_p, data_p) {
     //---------------------------------------------------------------------
     // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
-    mode = 1; // 0: rd, 1: wr
+    spi_mode = 1; // 0: rd, 1: wr
     spi_id = 0; // 0: cdce,1: adc, 2: dac, 3: amc
-    data = (spi_id << 4) + mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
-    sendToFPA_debugSetWireIn(addr, data);
+    fpasim_set_spi_conf0(spi_id_p = spi_id, spi_mode_p = spi_mode, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     //---------------------------------------------------------------------
-    // build the SPI commands
+    // build and write the SPI commands
     //    (seecdcd72010 datasheet) 
     //---------------------------------------------------------------------
     // bit27 bit26 ... bit0 addr3 .. addr0 
@@ -160,20 +152,8 @@ function cdce_write_command(addr_p, data_p) {
     // reverse bit order:
     // addr0 addr1 .... bit0 ... bit26 bit27
     spi_cmd = reverse_bit_order(value_p = spi_cmd, width_p = 32);
-    addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
-    //---------------------------------------------------------------------
-    // write in the SPI_WR_DATA register
-    //---------------------------------------------------------------------
-    sendToFPA_debugSetWireIn(addr, spi_cmd);
+    fpasim_set_spi_wr_data(data_p = spi_cmd, level_p = 0, mode_p = 0, verbosity_p = -1);
 
-    //---------------------------------------------------------------------
-    // write in the TRIG register
-    //  => activate the spi_valid bit
-    //---------------------------------------------------------------------
-    addr = FPASIM_ADDR_TRIGIN['TRIG'];
-    pos = FPASIM_POS_TRIGIN['spi_valid'];
-    sendToFPA_debugSetTriggerIn(addr, pos);
-    waitMs(100);
 
 }
 
@@ -189,11 +169,9 @@ function cdce_read_command(addr_p) {
     //---------------------------------------------------------------------
     // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
-    mode = 0; // 0: rd, 1: wr
+    spi_mode = 0; // 0: rd, 1: wr
     spi_id = 0; // 0: cdce,1: adc, 2: dac, 3: amc
-    data = (spi_id << 4) + mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
-    sendToFPA_debugSetWireIn(addr, data);
+    fpasim_set_spi_conf0(spi_id_p = spi_id, spi_mode_p = spi_mode, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     //---------------------------------------------------------------------
     // First access
@@ -207,26 +185,14 @@ function cdce_read_command(addr_p) {
     spi_cmd = (data << 4) + addr;
 
     // reverse bit order:
-    // addr0 addr1 .... bit0 ... bit26 bit27
+    // from: bit27 bit26 ... bit1 bit0 addr3 .. addr0
+    // to:   addr0 addr1 .... bit0 ... bit26 bit27
     spi_cmd = reverse_bit_order(value_p = spi_cmd, width_p = 32);
+    fpasim_set_spi_wr_data(data_p = spi_cmd, level_p = 0, mode_p = 0, verbosity_p = -1);
 
-    //tmp = getText("Send the READ command", "");
-
-    // write in the SPI_WR_DATA register
-    //---------------------------------------------------------------------
-    addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
-    sendToFPA_debugSetWireIn(addr, spi_cmd);
-
-    // write in the TRIG register
-    //  => activate the spi_valid bit
-    //---------------------------------------------------------------------
-    addr = FPASIM_ADDR_TRIGIN['TRIG'];
-    pos = FPASIM_POS_TRIGIN['spi_valid'];
-    sendToFPA_debugSetTriggerIn(addr, pos);
-    waitMs(100);
+    waitMs(10);
 
 
-    getLatestValue("FPA_WireOutValues");
     //---------------------------------------------------------------------
     // Second access
     //  get the read data
@@ -238,32 +204,26 @@ function cdce_read_command(addr_p) {
     spi_cmd = (data << 4) + addr;
 
     // reverse bit order:
-    // addr0 addr1 .... bit0 ... bit26 bit27
+    // from: bit27 bit26 ... bit1 bit0 addr3 .. addr0
+    // to:   addr0 addr1 .... bit0 ... bit26 bit27
     spi_cmd = reverse_bit_order(value_p = spi_cmd, width_p = 32);
-    //tmp = getText("Send the READ dummy word", "");
+    fpasim_set_spi_wr_data(data_p = spi_cmd, level_p = 0, mode_p = 0, verbosity_p = -1);
+
+    waitMs(10);
 
     //---------------------------------------------------------------------
-    // write in the SPI_WR_DATA register
+    // Read the register value from the spi device
     //---------------------------------------------------------------------
-    addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
-    sendToFPA_debugSetWireIn(addr, spi_cmd);
-
-    //---------------------------------------------------------------------
-    // write in the TRIG register
-    //  => activate the spi_valid bit
-    //---------------------------------------------------------------------
-    addr = FPASIM_ADDR_TRIGIN['TRIG'];
-    pos = FPASIM_POS_TRIGIN['spi_valid'];
-    sendToFPA_debugSetTriggerIn(addr, pos);
-
-    //---------------------------------------------------------------------
-    // Read wire out registers
-    //---------------------------------------------------------------------
-    //waitMs(100);
-    //getLatestValue("FPA_WireOutValues");
-    data = FPA_WireOutValues[22]
-        // reverse the bit order
+    data = fpasim_get_wireout_spi_rd_data(level_p = 0, mode_p = 0, verbosity_p = -1);
+    // reverse bit order:
+    // from:   addr0 addr1 .... bit0 ... bit26 bit27
+    // to: bit27 bit26 ... bit1 bit0 addr3 .. addr0
     data = reverse_bit_order(value_p = data, width_p = 32);
+
+    // keep only the data part
+    // from: bit27 bit26 ... bit1 bit0 addr3 .. addr0
+    // to: bit27 bit26 ... bit1 bit0
+    data = (data >> 4);
     return data;
 
 }
@@ -312,17 +272,17 @@ function cdce_set_config0(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data5 = (outbufsel0yx_p << 26) + (cmosmode0nyx_p << 24);
-    data4 = (cmosmode0pyx_p << 22) + (pecl0hiswing_p << 21) + (irefres_p << 20);
-    data3 = (icp_p << 14) + (cp_pre_p << 13) + (cp_opa_p << 12);
-    data2 = (cp_snk_p << 11) + (cp_src_p << 10) + (cp_dir_p << 9);
-    data1 = (delay_pfd_p << 6) + (refselcntrl_p << 5) + (vcxosel_p << 4);
-    data0 = (secsel_p << 3) + (prisel_p << 2) + (inbufselyx_p << 0);
+    const reserved = 0;
+    const data5 = (outbufsel0yx_p << 26) + (cmosmode0nyx_p << 24);
+    const data4 = (cmosmode0pyx_p << 22) + (pecl0hiswing_p << 21) + (irefres_p << 20);
+    const data3 = (icp_p << 14) + (cp_pre_p << 13) + (cp_opa_p << 12);
+    const data2 = (cp_snk_p << 11) + (cp_src_p << 10) + (cp_dir_p << 9);
+    const data1 = (delay_pfd_p << 6) + (refselcntrl_p << 5) + (vcxosel_p << 4);
+    const data0 = (secsel_p << 3) + (prisel_p << 2) + (inbufselyx_p << 0);
 
-    data = data5 + data4 + data3 + data2 + data1 + data0;
+    const data = data5 + data4 + data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg0'];
+    const addr = CDCE_ADDR['reg0'];
     cdce_write_command(addr_p = addr, data_p = data);
     if (verbosity_p < 0) {
         // do nothing
@@ -333,7 +293,7 @@ function cdce_set_config0(
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -397,16 +357,16 @@ function cdce_set_config1(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data4 = (outbufsel1yx_p << 26) + (cmosmode1nyx_p << 24);
-    data3 = (cmosmode1pyx_p << 22) + (pecl1hiswing_p << 21) + (en01div_p << 20);
-    data2 = (out1divrsel_p << 13) + (ph1adjc_p << 6);
-    data1 = (failsafe_p << 5) + (secinvbb_p << 4);
-    data0 = (priinvbb_p << 3) + (termsel_p << 2) + (hysten_p << 1) + (acdcsel_p << 0);
+    const reserved = 0;
+    const data4 = (outbufsel1yx_p << 26) + (cmosmode1nyx_p << 24);
+    const data3 = (cmosmode1pyx_p << 22) + (pecl1hiswing_p << 21) + (en01div_p << 20);
+    const data2 = (out1divrsel_p << 13) + (ph1adjc_p << 6);
+    const data1 = (failsafe_p << 5) + (secinvbb_p << 4);
+    const data0 = (priinvbb_p << 3) + (termsel_p << 2) + (hysten_p << 1) + (acdcsel_p << 0);
 
-    data = data4 + data3 + data2 + data1 + data0;
+    const data = data4 + data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg1'];
+    const addr = CDCE_ADDR['reg1'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -418,7 +378,7 @@ function cdce_set_config1(
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -472,15 +432,15 @@ function cdce_set_config2(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data3 = (outbufsel2yx_p << 26) + (cmosmode2nyx_p << 24);
-    data2 = (cmosmode2pyx_p << 22) + (pecl2hiswing_p << 21) + (en2div_p << 20);
-    data1 = (out2divrsel_p << 13) + (ph2adjc_p << 6);
-    data0 = (dlyn_p << 3) + (dlym_p << 0);
+    const reserved = 0;
+    const data3 = (outbufsel2yx_p << 26) + (cmosmode2nyx_p << 24);
+    const data2 = (cmosmode2pyx_p << 22) + (pecl2hiswing_p << 21) + (en2div_p << 20);
+    const data1 = (out2divrsel_p << 13) + (ph2adjc_p << 6);
+    const data0 = (dlyn_p << 3) + (dlym_p << 0);
 
-    data = data3 + data2 + data1 + data0;
+    const data = data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg2'];
+    const addr = CDCE_ADDR['reg2'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -492,7 +452,7 @@ function cdce_set_config2(
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -548,16 +508,16 @@ function cdce_set_config3(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data4 = (outbufsel3yx_p << 26) + (cmosmode3nyx_p << 24);
-    data3 = (cmosmode3pyx_p << 22) + (pecl3hiswing_p << 21) + (en3div_p << 20);
-    data2 = (out3divrsel_p << 13) + (ph3adjc_p << 6);
-    data1 = (bias_div23_p << 4);
-    data0 = (bias_div01_p << 2) + (dis_fdet_fb_p << 1) + (dis_fdet_ref_p << 0);
+    const reserved = 0;
+    const data4 = (outbufsel3yx_p << 26) + (cmosmode3nyx_p << 24);
+    const data3 = (cmosmode3pyx_p << 22) + (pecl3hiswing_p << 21) + (en3div_p << 20);
+    const data2 = (out3divrsel_p << 13) + (ph3adjc_p << 6);
+    const data1 = (bias_div23_p << 4);
+    const data0 = (bias_div01_p << 2) + (dis_fdet_fb_p << 1) + (dis_fdet_ref_p << 0);
 
-    data = data4 + data3 + data2 + data1 + data0;
+    const data = data4 + data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg3'];
+    const addr = CDCE_ADDR['reg3'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -569,7 +529,7 @@ function cdce_set_config3(
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -622,15 +582,15 @@ function cdce_set_config4(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data3 = (outbufsel4yx_p << 26) + (cmosmode4nyx_p << 24);
-    data2 = (cmosmode4pyx_p << 22) + (pecl4hiswing_p << 21) + (en4div_p << 20);
-    data1 = (out4divrsel_p << 13) + (ph4adjc_p << 6);
-    data0 = (holdonlor_p << 4);
+    const reserved = 0;
+    const data3 = (outbufsel4yx_p << 26) + (cmosmode4nyx_p << 24);
+    const data2 = (cmosmode4pyx_p << 22) + (pecl4hiswing_p << 21) + (en4div_p << 20);
+    const data1 = (out4divrsel_p << 13) + (ph4adjc_p << 6);
+    const data0 = (holdonlor_p << 4);
 
-    data = data3 + data2 + data1 + data0;
+    const data = data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg4'];
+    const addr = CDCE_ADDR['reg4'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -642,7 +602,7 @@ function cdce_set_config4(
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -694,15 +654,15 @@ function cdce_set_config5(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data3 = (outbufsel5yx_p << 26) + (cmosmode5nyx_p << 24);
-    data2 = (cmosmode5pyx_p << 22) + (pecl5hiswing_p << 21) + (en5div_p << 20);
-    data1 = (out5divrsel_p << 13) + (ph5adjc_p << 6);
-    data0 = (bias_div67_p << 2) + (bias_div45_p << 0);
+    const reserved = 0;
+    const data3 = (outbufsel5yx_p << 26) + (cmosmode5nyx_p << 24);
+    const data2 = (cmosmode5pyx_p << 22) + (pecl5hiswing_p << 21) + (en5div_p << 20);
+    const data1 = (out5divrsel_p << 13) + (ph5adjc_p << 6);
+    const data0 = (bias_div67_p << 2) + (bias_div45_p << 0);
 
-    data = data3 + data2 + data1 + data0;
+    const data = data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg5'];
+    const addr = CDCE_ADDR['reg5'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -714,7 +674,7 @@ function cdce_set_config5(
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -770,16 +730,16 @@ function cdce_set_config6(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data4 = (outbufsel6yx_p << 26) + (cmosmode6nyx_p << 24);
-    data3 = (cmosmode6pyx_p << 22) + (pecl6hiswing_p << 21) + (en6div_p << 20);
-    data2 = (out6divrsel_p << 13) + (ph6adjc_p << 6);
-    data1 = (det_start_bypass_p << 5) + (fb_start_bypass_p << 4);
-    data0 = (fbdeterm_div2_dis_p << 3) + (fbdeterm_div_sel_p << 2) + (fb_fd_desel_p << 0);
+    const reserved = 0;
+    const data4 = (outbufsel6yx_p << 26) + (cmosmode6nyx_p << 24);
+    const data3 = (cmosmode6pyx_p << 22) + (pecl6hiswing_p << 21) + (en6div_p << 20);
+    const data2 = (out6divrsel_p << 13) + (ph6adjc_p << 6);
+    const data1 = (det_start_bypass_p << 5) + (fb_start_bypass_p << 4);
+    const data0 = (fbdeterm_div2_dis_p << 3) + (fbdeterm_div_sel_p << 2) + (fb_fd_desel_p << 0);
 
-    data = data4 + data3 + data2 + data1 + data0;
+    const data = data4 + data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg6'];
+    const addr = CDCE_ADDR['reg6'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -791,7 +751,7 @@ function cdce_set_config6(
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -847,15 +807,15 @@ function cdce_set_config7(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data3 = (outbufsel7yx_p << 26) + (cmosmode7nyx_p << 24);
-    data2 = (cmosmode7pyx_p << 22) + (pecl7hiswing_p << 21) + (en7div_p << 20);
-    data1 = (out7divrsel_p << 13) + (ph7adjc_p << 6);
-    data0 = (adlock_p << 5) + (lockc_p << 3) + lockw_p;
+    const reserved = 0;
+    const data3 = (outbufsel7yx_p << 26) + (cmosmode7nyx_p << 24);
+    const data2 = (cmosmode7pyx_p << 22) + (pecl7hiswing_p << 21) + (en7div_p << 20);
+    const data1 = (out7divrsel_p << 13) + (ph7adjc_p << 6);
+    const data0 = (adlock_p << 5) + (lockc_p << 3) + lockw_p;
 
-    data = data3 + data2 + data1 + data0;
+    const data = data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg7'];
+    const addr = CDCE_ADDR['reg7'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -866,7 +826,7 @@ function cdce_set_config7(
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -924,16 +884,16 @@ function cdce_set_config8(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data4 = (outbufsel8yx_p << 26) + (cmosmode8nyx_p << 24);
-    data3 = (cmosmode8pyx_p << 22) + (pecl8hiswing_p << 21) + (en89div_p << 20);
-    data2 = (out8divrsel_p << 13) + (ph8adjc_p << 6);
-    data1 = (vcxoinvbb_p << 5) + (vcxotermsel_p << 4);
-    data0 = (vcxohysten_p << 3) + (vcxoacdcsel_p << 2) + (vcxobufselyx_p << 0);
+    const reserved = 0;
+    const data4 = (outbufsel8yx_p << 26) + (cmosmode8nyx_p << 24);
+    const data3 = (cmosmode8pyx_p << 22) + (pecl8hiswing_p << 21) + (en89div_p << 20);
+    const data2 = (out8divrsel_p << 13) + (ph8adjc_p << 6);
+    const data1 = (vcxoinvbb_p << 5) + (vcxotermsel_p << 4);
+    const data0 = (vcxohysten_p << 3) + (vcxoacdcsel_p << 2) + (vcxobufselyx_p << 0);
 
-    data = data4 + data3 + data2 + data1 + data0;
+    const data = data4 + data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg8'];
+    const addr = CDCE_ADDR['reg8'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -945,7 +905,7 @@ function cdce_set_config8(
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1017,17 +977,17 @@ function cdce_set_config9(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data6 = (outbufsel9yx_p << 26) + (cmosmode9nyx_p << 24);
-    data5 = (cmosmode9pyx_p << 22) + (pecl9hiswing_p << 21) + (dis_aux_y9_p << 20);
-    data4 = (auxinvbb_p << 19) + (bias_div89_p << 17) + (bias_div_fb_p << 15);
-    data3 = (npreset_mdiv_p << 14) + (low_fd_fb_en_p << 13) + (pll_lock_bp_p << 12);
-    data2 = (indet_bp_p << 11) + (start_bypass_p << 10) + (divsync_dis_p << 9) + (noinv_reshol_int_p << 8);
-    data1 = (lockw32_p << 6) + (hold_cnt_p << 4);
-    data0 = (holdtr_p << 3) + (hold_n_p << 2) + holdf_p;
-    data = data6 + data5 + data4 + data3 + data2 + data1 + data0;
+    const reserved = 0;
+    const data6 = (outbufsel9yx_p << 26) + (cmosmode9nyx_p << 24);
+    const data5 = (cmosmode9pyx_p << 22) + (pecl9hiswing_p << 21) + (dis_aux_y9_p << 20);
+    const data4 = (auxinvbb_p << 19) + (bias_div89_p << 17) + (bias_div_fb_p << 15);
+    const data3 = (npreset_mdiv_p << 14) + (low_fd_fb_en_p << 13) + (pll_lock_bp_p << 12);
+    const data2 = (indet_bp_p << 11) + (start_bypass_p << 10) + (divsync_dis_p << 9) + (noinv_reshol_int_p << 8);
+    const data1 = (lockw32_p << 6) + (hold_cnt_p << 4);
+    const data0 = (holdtr_p << 3) + (hold_n_p << 2) + holdf_p;
+    const data = data6 + data5 + data4 + data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg9'];
+    const addr = CDCE_ADDR['reg9'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -1039,7 +999,7 @@ function cdce_set_config9(
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1094,11 +1054,11 @@ function cdce_set_config10(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data1 = (div_n_p << 14);
-    data0 = (div_m_p << 0);
-    data = data1 + data0;
+    const data1 = (div_n_p << 14);
+    const data0 = (div_m_p << 0);
+    const data = data1 + data0;
 
-    addr = CDCE_ADDR['reg10'];
+    const addr = CDCE_ADDR['reg10'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -1110,7 +1070,7 @@ function cdce_set_config10(
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1163,14 +1123,14 @@ function cdce_set_config11(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data3 = (eplock_p << 26) + (reset_hold_mode_p << 25) + (sel_del1_p << 24);
-    data2 = (nreshape1_p << 23) + (fb_sel_p << 22) + (out_mux_sel_p << 21) + (fb_mux_sel_p << 20);
-    data1 = (pd_pll_p << 19) + (fb_phase_p << 12) + (fb_count32_p << 5) + (fb_inclk_inv_p << 4);
-    data0 = (fb_cml_sel_p << 3) + (fb_dis_p << 2) + (sec_div2_p << 1) + (pri_div2_p << 0);
-    data = data3 + data2 + data1 + data0;
+    const reserved = 0;
+    const data3 = (eplock_p << 26) + (reset_hold_mode_p << 25) + (sel_del1_p << 24);
+    const data2 = (nreshape1_p << 23) + (fb_sel_p << 22) + (out_mux_sel_p << 21) + (fb_mux_sel_p << 20);
+    const data1 = (pd_pll_p << 19) + (fb_phase_p << 12) + (fb_count32_p << 5) + (fb_inclk_inv_p << 4);
+    const data0 = (fb_cml_sel_p << 3) + (fb_dis_p << 2) + (sec_div2_p << 1) + (pri_div2_p << 0);
+    const data = data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg11'];
+    const addr = CDCE_ADDR['reg11'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -1182,7 +1142,7 @@ function cdce_set_config11(
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1249,15 +1209,15 @@ function cdce_set_config12(
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    reserved = 0;
-    data4 = (secactivity_p << 26) + (priactivity_p << 25) + (titstcfg_p << 21);
-    data3 = (status_p << 17);
-    data2 = (shold_p << 15) + (sxoiref_p << 14) + (pd_io_p << 13);
-    data1 = (revision_p << 10) + (gtme_p << 9) + (reset_hold_n_p << 8);
-    data0 = (sleep_n_p << 7) + (pll_lock_p << 6) + (indet_vcxo_p << 5) + (indet_aux_p << 4);
-    data = data4 + data3 + data2 + data1 + data0;
+    const reserved = 0;
+    const data4 = (secactivity_p << 26) + (priactivity_p << 25) + (titstcfg_p << 21);
+    const data3 = (status_p << 17);
+    const data2 = (shold_p << 15) + (sxoiref_p << 14) + (pd_io_p << 13);
+    const data1 = (revision_p << 10) + (gtme_p << 9) + (reset_hold_n_p << 8);
+    const data0 = (sleep_n_p << 7) + (pll_lock_p << 6) + (indet_vcxo_p << 5) + (indet_aux_p << 4);
+    const data = data4 + data3 + data2 + data1 + data0;
 
-    addr = CDCE_ADDR['reg12'];
+    const addr = CDCE_ADDR['reg12'];
     cdce_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -1268,7 +1228,7 @@ function cdce_set_config12(
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1329,8 +1289,8 @@ function cdce_get_config0(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = CDCE_ADDR['reg0'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg0'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1341,7 +1301,7 @@ function cdce_get_config0(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1400,8 +1360,8 @@ function cdce_get_config1(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = CDCE_ADDR['reg1'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg1'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1411,7 +1371,7 @@ function cdce_get_config1(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1464,8 +1424,8 @@ function cdce_get_config2(level_p, mode_p, verbosity_p) {
     const level2 = level_p + 2;
 
 
-    addr = CDCE_ADDR['reg2'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg2'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1475,7 +1435,7 @@ function cdce_get_config2(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1527,8 +1487,8 @@ function cdce_get_config3(level_p, mode_p, verbosity_p) {
     const level2 = level_p + 2;
 
 
-    addr = CDCE_ADDR['reg3'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg3'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1538,7 +1498,7 @@ function cdce_get_config3(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1589,8 +1549,8 @@ function cdce_get_config4(level_p, mode_p, verbosity_p) {
     const level2 = level_p + 2;
 
 
-    addr = CDCE_ADDR['reg4'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg4'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1600,7 +1560,7 @@ function cdce_get_config4(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1647,8 +1607,8 @@ function cdce_get_config5(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = CDCE_ADDR['reg5'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg5'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1658,7 +1618,7 @@ function cdce_get_config5(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1711,8 +1671,8 @@ function cdce_get_config6(level_p, mode_p, verbosity_p) {
     const level2 = level_p + 2;
 
 
-    addr = CDCE_ADDR['reg6'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg6'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1722,7 +1682,7 @@ function cdce_get_config6(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1775,8 +1735,8 @@ function cdce_get_config7(level_p, mode_p, verbosity_p) {
     const level2 = level_p + 2;
 
 
-    addr = CDCE_ADDR['reg7'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg7'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1786,7 +1746,7 @@ function cdce_get_config7(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1840,8 +1800,8 @@ function cdce_get_config8(level_p, mode_p, verbosity_p) {
     const level2 = level_p + 2;
 
 
-    addr = CDCE_ADDR['reg8'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg8'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1851,7 +1811,7 @@ function cdce_get_config8(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1914,8 +1874,8 @@ function cdce_get_config9(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = CDCE_ADDR['reg9'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg9'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1925,7 +1885,7 @@ function cdce_get_config9(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -1981,8 +1941,8 @@ function cdce_get_config10(level_p, mode_p, verbosity_p) {
     const level2 = level_p + 2;
 
 
-    addr = CDCE_ADDR['reg10'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg10'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1992,7 +1952,7 @@ function cdce_get_config10(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -2040,8 +2000,8 @@ function cdce_get_config11(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = CDCE_ADDR['reg11'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg11'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -2051,7 +2011,7 @@ function cdce_get_config11(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -2111,8 +2071,8 @@ function cdce_get_config12(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = CDCE_ADDR['reg12'];
-    data = cdce_read_command(addr_p = addr);
+    const addr = CDCE_ADDR['reg12'];
+    const data = cdce_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -2122,7 +2082,7 @@ function cdce_get_config12(level_p, mode_p, verbosity_p) {
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_CDCE_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_CDCE_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
@@ -2280,6 +2240,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // Enable the SPI on the FPGA board
     cdce_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     //###############################################################
     // config0
     //###############################################################
@@ -2329,6 +2292,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     //###############################################################
     // config1
     //###############################################################
@@ -2369,6 +2335,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     //###############################################################
     // config2
     //###############################################################
@@ -2398,6 +2367,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         dlyn_p = dlyn, dlym_p = dlym,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // config3
@@ -2435,6 +2407,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     //###############################################################
     // config4
     //###############################################################
@@ -2463,6 +2438,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         holdonlor_p = holdonlor,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // config5
@@ -2493,6 +2471,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         bias_div67_p = bias_div67, bias_div45_p = bias_div45,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // config6
@@ -2531,6 +2512,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     //###############################################################
     // config7
     //###############################################################
@@ -2562,6 +2546,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         adlock_p = adlock, lockc_p = lockc, lockw_p = lockw,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // config8
@@ -2599,6 +2586,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         vcxohysten_p = vcxohysten, vcxoacdcsel_p = vcxoacdcsel, vcxobufselyx_p = vcxobufselyx,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // config9
@@ -2654,6 +2644,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     //###############################################################
     // config10
     //###############################################################
@@ -2667,6 +2660,9 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         div_m_p = div_m,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // config11
@@ -2710,503 +2706,8 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    //###############################################################
-    // config12
-    //###############################################################
-    // [26]: R/W: secactivity[0]
-    // [25]: R/W: priactivity[0]
-    // [24:21]: R/W: titstcfg[3:0]
-    // [20:17]: R/W: status[3:0]
-    // [15]: R/W: shold[0]
-    // [14]: R/W: sxoiref[0]
-    // [13]: R/W: pd_io[0]
-    // [12:10]: R/W: revision[2:0]
-    // [9]: R/W: gtme[0]
-    // [8]: R/W: reset_hold_n[0]
-    // [7]: R/W: sleep_n[0]
-    // [6]: R: pll_lock[0]
-    // [5]: R: indet_vcxo[0]
-    // [4]: R: indet_aux[0]
-    secactivity = 0;
-    priactivity = 0;
-    titstcfg = parseInt('0000', 2);
-    v_status = parseInt('0000', 2);
-    shold = 0;
-    sxoiref = 0;
-    pd_io = 0;
-    revision = parseInt('000', 2);
-    gtme = 0;
-    reset_hold_n = 1;
-    sleep_n = 1;
-    pll_lock = 0;
-    indet_vcxo = 0;
-    indet_aux = 0;
-
-    cdce_set_config12(
-        secactivity_p = secactivity, priactivity_p = priactivity, titstcfg_p = titstcfg,
-        status_p = v_status,
-        shold_p = shold, sxoiref_p = sxoiref, pd_io_p = pd_io,
-        revision_p = revision, gtme_p = gtme, reset_hold_n_p = reset_hold_n,
-        sleep_n_p = sleep_n, pll_lock_p = pll_lock, indet_vcxo_p = indet_vcxo, indet_aux_p = indet_aux,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-}
-
-
-/**
- * Configuration of the cdcd72010 spi device (FMC150 board).
- * @param {number} level_p - level of indentation at the beginning.
- * @param {number} mode_p - define the print output.
- * @param {number} verbosity_p - level of verbosity.
- *
- */
-function CDCE72010_configure_100M(level_p, mode_p, verbosity_p) {
-
-    // default function parameter values
-    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
-    if (typeof(level_p) === 'undefined') level_p = 0;
-    if (typeof(mode_p) === 'undefined') mode_p = 0;
-
-    const level0 = level_p;
-    const level1 = level_p + 1;
-
-    msg = "CDCE72010_configure_100M";
-    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
-
-    // Enable the SPI on the FPGA board
-    cdce_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
-
-    //###############################################################
-    // config0
-    //###############################################################
-    // [27:26]: R/W: outbufsel0yx[1:0]
-    // [25:24]: R/W: cmosmode0nyx[1:0]
-    // [23:22]: R/W: cmosmode0pyx[1:0]
-    // [21]: R/W: pecl0hiswing[0]
-    // [20]: R/W: irefres[0]
-    // [17:14]: R/W: icp[3:0]
-    // [13]: R/W: cp_pre[0]
-    // [12]: R/W: cp_opa[0]
-    // [11]: R/W: cp_snk[0]
-    // [10]: R/W: cp_src[0]
-    // [9]: R/W: cp_dir[0]
-    // [7:6]: R/W: delay_pfd[1:0]
-    // [5]: R/W: refselcntrl[0]
-    // [4]: R/W: vcxosel[0]
-    // [3]: R/W: secsel[0]
-    // [2]: R/W: prisel[0]
-    // [1:0]: R/W: inbufselyx[1:0]
-
-    outbufsel0yx = parseInt('01', 2); // disable output0
-    cmosmode0nyx = parseInt('10', 2); // disable output0
-    cmosmode0pyx = parseInt('10', 2); // disable output0
-    pecl0hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    irefres = 0;
-    icp = parseInt('1111', 2);
-    cp_pre = 0; // Preset charge pump output voltage to VCC_CP/2, on [1], off [0] 
-    cp_opa = 0;
-    cp_snk = 0;
-    cp_src = 0;
-    cp_dir = 0;
-    delay_pfd = parseInt('00', 2); // delay on the reset path: 1.5 ns (default)
-    refselcntrl = 1; // 1: use register0 to select ref_clk
-    vcxosel = 1; // 0; use register0 to select ref_clk, 1: use VCXO/AUX-clock
-    secsel = 0; // use prim_ref
-    prisel = 1;
-    inbufselyx = parseInt('11', 2); //LVDS PRI_Ref/SEC_Ref
-
-    cdce_set_config0(
-        outbufsel0yx_p = outbufsel0yx, cmosmode0nyx_p = cmosmode0nyx,
-        cmosmode0pyx_p = cmosmode0pyx, pecl0hiswing_p = pecl0hiswing, irefres_p = irefres,
-        icp_p = icp, cp_pre_p = cp_pre, cp_opa_p = cp_opa,
-        cp_snk_p = cp_snk, cp_src_p = cp_src, cp_dir_p = cp_dir,
-        delay_pfd_p = delay_pfd, refselcntrl_p = refselcntrl, vcxosel_p = vcxosel,
-        secsel_p = secsel, prisel_p = prisel, inbufselyx_p = inbufselyx,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    //###############################################################
-    // config1
-    //###############################################################
-    // [27:26]: R/W: outbufsel1yx[1:0]
-    // [25:24]: R/W: cmosmode1nyx[1:0]
-    // [23:22]: R/W: cmosmode1pyx[1:0]
-    // [21]: R/W: pecl1hiswing[0]
-    // [20]: R/W: en01div[0]
-    // [19:13]: R/W: out1divrsel[6:0]
-    // [12:6]: R/W: ph1adjc[6:0]
-    // [5]: R/W: failsafe[0]
-    // [4]: R/W: secinvbb[0]
-    // [3]: R/W: priinvbb[0]
-    // [2]: R/W: termsel[0]
-    // [1]: R/W: hysten[0]
-    // [0]: R/W: acdcsel[0]
-
-    outbufsel1yx = parseInt('01', 2); // disable output1
-    cmosmode1nyx = parseInt('10', 2); // disable output1
-    cmosmode1pyx = parseInt('10', 2); // disable output1
-    pecl1hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en01div = 0; //0: divider is disabled on output0/output1
-    out1divrsel = parseInt('000_0000', 2);
-    ph1adjc = parseInt('000_0000', 2);
-    failsafe = 0;
-    secinvbb = 0;
-    priinvbb = 0;
-    termsel = 0;
-    hysten = 1;
-    acdcsel = 0;
-
-    cdce_set_config1(
-        outbufsel1yx_p = outbufsel1yx, cmosmode1nyx_p = cmosmode1nyx,
-        cmosmode1pyx_p = cmosmode1pyx, pecl1hiswing_p = pecl1hiswing, en01div_p = en01div,
-        out1divrsel_p = out1divrsel, ph1adjc_p = ph1adjc,
-        failsafe_p = failsafe, secinvbb_p = secinvbb,
-        priinvbb_p = priinvbb, termsel_p = termsel, hysten_p = hysten, acdcsel_p = acdcsel,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    //###############################################################
-    // config2
-    //###############################################################
-    // [27:26]: R/W: outbufsel2yx[1:0]
-    // [25:24]: R/W: cmosmode2nyx[1:0]
-    // [23:22]: R/W: cmosmode2pyx[1:0]
-    // [21]: R/W: pecl2hiswing[0]
-    // [20]: R/W: en2div[0]
-    // [19:13]: R/W: out2divrsel[6:0]
-    // [12:6]: R/W: ph2adjc[6:0]
-    // [5:3]: R/W: dlyn[2:0]
-    // [2:0]: R/W: dlym[2:0]
-    outbufsel2yx = parseInt('10', 2); // LVPECL output2
-    cmosmode2nyx = parseInt('00', 2); // LVPECL output2
-    cmosmode2pyx = parseInt('00', 2); // LVPECL output2
-    pecl2hiswing = 1; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en2div = 1; //0: divider is disabled on output2, 1: otherwise
-    out2divrsel = parseInt('1000000', 2); // Output Divider 2 ratio select: divided by 2
-    ph2adjc = parseInt('0000000', 2);
-    dlyn = parseInt('00', 2); // Feedback phase delay. (default:'00' <=> 0ps (page 55)).If Progr Delay N is set, all Yx outputs are leading to the Reference Clock according to the value set
-    dlym = parseInt('00', 2); // Reference phase delay. (default:'00' <=> 0ps (page 55)). If Progr Delay M is set, all Yx outputs are lagging to the Reference Clock according to the value set
-
-    cdce_set_config2(
-        outbufsel2yx_p = outbufsel2yx, cmosmode2nyx_p = cmosmode2nyx,
-        cmosmode2pyx_p = cmosmode2pyx, pecl2hiswing_p = pecl2hiswing, en2div_p = en2div,
-        out2divrsel_p = out2divrsel, ph2adjc_p = ph2adjc,
-        dlyn_p = dlyn, dlym_p = dlym,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    //###############################################################
-    // config3
-    //###############################################################
-    // [27:26]: R/W: outbufsel3yx[1:0]
-    // [25:24]: R/W: cmosmode3nyx[1:0]
-    // [23:22]: R/W: cmosmode3pyx[1:0]
-    // [21]: R/W: pecl3hiswing[0]
-    // [20]: R/W: en3div[0]
-    // [19:13]: R/W: out3divrsel[6:0]
-    // [12:6]: R/W: ph3adjc[6:0]
-    // [5:4]: R/W: bias_div23[1:0]
-    // [3:2]: R/W: bias_div01[1:0]
-    // [1]: R/W: dis_fdet_fb[0]
-    // [0]: R/W: dis_fdet_ref[0]
-
-    outbufsel3yx = parseInt('01', 2); // disable output3
-    cmosmode3nyx = parseInt('10', 2); // disable output3
-    cmosmode3pyx = parseInt('10', 2); // disable output3
-    pecl3hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en3div = 0; //0: divider is disabled on output3, 1: otherwise
-    out3divrsel = parseInt('0000000', 2);
-    ph3adjc = parseInt('0000000', 2);
-    bias_div23 = parseInt('00', 2);
-    bias_div01 = parseInt('00', 2);
-    dis_fdet_fb = 0;
-    dis_fdet_ref = 0; // 0: ref clock frequency detector is ON, 1: otherwise
-
-    cdce_set_config3(
-        outbufsel3yx_p = outbufsel3yx, cmosmode3nyx_p = cmosmode3nyx,
-        cmosmode3pyx_p = cmosmode3pyx, pecl3hiswing_p = pecl3hiswing, en3div_p = en3div,
-        out3divrsel_p = out3divrsel, ph3adjc_p = ph3adjc,
-        bias_div23_p = bias_div23,
-        bias_div01_p = bias_div01, dis_fdet_fb_p = dis_fdet_fb, dis_fdet_ref_p = dis_fdet_ref,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    //###############################################################
-    // config4
-    //###############################################################
-    // [27:26]: R/W: outbufsel4yx[1:0]
-    // [25:24]: R/W: cmosmode4nyx[1:0]
-    // [23:22]: R/W: cmosmode4pyx[1:0]
-    // [21]: R/W: pecl4hiswing[0]
-    // [20]: R/W: en4div[0]
-    // [19:13]: R/W: out4divrsel[6:0]
-    // [12:6]: R/W: ph4adjc[6:0]
-    // [4]: R/W: holdonlor[0]
-
-    outbufsel4yx = parseInt('11', 2); // LVDS output4
-    cmosmode4nyx = parseInt('10', 2); // LVDS output4
-    cmosmode4pyx = parseInt('10', 2); // LVDS output4
-    pecl4hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en4div = 1; //0: divider is disabled on output4, 1: otherwise
-    out4divrsel = parseInt('1000000', 2); // Output Divider 4 ratio select: divided by 2
-    ph4adjc = parseInt('000_0000', 2);
-    holdonlor = 0; //If set to 0, CP remains active and will discharge loop filter if input reference clock is lost
-
-    cdce_set_config4(
-        outbufsel4yx_p = outbufsel4yx, cmosmode4nyx_p = cmosmode4nyx,
-        cmosmode4pyx_p = cmosmode4pyx, pecl4hiswing_p = pecl4hiswing, en4div_p = en4div,
-        out4divrsel_p = out4divrsel, ph4adjc_p = ph4adjc,
-        holdonlor_p = holdonlor,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    //###############################################################
-    // config5
-    //###############################################################
-    // [27:26]: R/W: outbufsel5yx[1:0]
-    // [25:24]: R/W: cmosmode5nyx[1:0]
-    // [23:22]: R/W: cmosmode5pyx[1:0]
-    // [21]: R/W: pecl5hiswing[0]
-    // [20]: R/W: en5div[0]
-    // [19:13]: R/W: out5divrsel[6:0]
-    // [12:6]: R/W: ph5adjc[6:0]
-    // [3:2]: R/W: bias_div67[1:0]
-    // [1:0]: R/W: bias_div45[1:0]
-    outbufsel5yx = parseInt('01', 2); // disable output5
-    cmosmode5nyx = parseInt('10', 2); // disable output5
-    cmosmode5pyx = parseInt('10', 2); // disable output5
-    pecl5hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en5div = 0; //0: divider is disabled on output5, 1: otherwise
-    out5divrsel = parseInt('0000000', 2);
-    ph5adjc = parseInt('0000000', 2);
-    bias_div67 = parseInt('00', 2); //00, No current reduction for all output-divider
-    bias_div45 = parseInt('00', 2); //00, No current reduction for all output-divider
-
-    cdce_set_config5(
-        outbufsel5yx_p = outbufsel5yx, cmosmode5nyx_p = cmosmode5nyx,
-        cmosmode5pyx_p = cmosmode5pyx, pecl5hiswing_p = pecl5hiswing, en5div_p = en5div,
-        out5divrsel_p = out5divrsel, ph5adjc_p = ph5adjc,
-        bias_div67_p = bias_div67, bias_div45_p = bias_div45,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    //###############################################################
-    // config6
-    //###############################################################
-    // [27:26]: R/W: outbufsel6yx[1:0]
-    // [25:24]: R/W: cmosmode6nyx[1:0]
-    // [23:22]: R/W: cmosmode6pyx[1:0]
-    // [21]: R/W: pecl6hiswing[0]
-    // [20]: R/W: en6div[0]
-    // [19:13]: R/W: out6divrsel[6:0]
-    // [12:6]: R/W: ph6adjc[6:0]
-    // [5]: R/W: det_start_bypass[0]
-    // [4]: R/W: fb_start_bypass[0]
-    // [3]: R/W: fbdeterm_div2_dis[0]
-    // [2]: R/W: fbdeterm_div_sel[0]
-    // [0]: R/W: fb_fd_desel[0]
-    outbufsel6yx = parseInt('01', 2); // disable output6
-    cmosmode6nyx = parseInt('10', 2); // disable output6
-    cmosmode6pyx = parseInt('10', 2); // disable output6
-    pecl6hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en6div = 0; //0: divider is disabled on output6, 1: otherwise
-    out6divrsel = parseInt('0000000', 2);
-    ph6adjc = parseInt('0000000', 2);
-    det_start_bypass = 0; // 0: Output-Dividers started with delay block (RC), normal operation, 1:Output-Dividers can be started with external NRESET-signal (pin)
-    fb_start_bypass = 0;
-    fbdeterm_div2_dis = 0;
-    fbdeterm_div_sel = 0;
-    fb_fd_desel = 0;
-
-    cdce_set_config6(
-        outbufsel6yx_p = outbufsel6yx, cmosmode6nyx_p = cmosmode6nyx,
-        cmosmode6pyx_p = cmosmode6pyx, pecl6hiswing_p = pecl6hiswing, en6div_p = en6div,
-        out6divrsel_p = out6divrsel, ph6adjc_p = ph6adjc,
-        det_start_bypass_p = det_start_bypass, fb_start_bypass_p = fb_start_bypass,
-        fbdeterm_div2_dis_p = fbdeterm_div2_dis, fbdeterm_div_sel_p = fbdeterm_div_sel, fb_fd_desel_p = fb_fd_desel,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    //###############################################################
-    // config7
-    //###############################################################
-    // [27:26]: R/W: outbufsel7yx[1:0]
-    // [25:24]: R/W: cmosmode7nyx[1:0]
-    // [23:22]: R/W: cmosmode7pyx[1:0]
-    // [21]: R/W: pecl7hiswing[0]
-    // [20]: R/W: en7div[0]
-    // [19:13]: R/W: out7divrsel[6:0]
-    // [12:6]: R/W: ph7adjc[6:0]
-    // [5]: R/W: adlock[0]
-    // [4:3]: R/W: lockc[1:0]
-    // [1:0]: R/W: lockw[1:0]
-    outbufsel7yx = parseInt('10', 2); // LVPECL output7
-    cmosmode7nyx = parseInt('00', 2); // LVPECL output7
-    cmosmode7pyx = parseInt('00', 2); // LVPECL output7
-    pecl7hiswing = 1; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en7div = 1; //0: divider is disabled on output7, 1: otherwise
-    out7divrsel = parseInt('1000000', 2); // Output Divider 7 ratio select: divided by 2
-    ph7adjc = parseInt('0000000', 2);
-    adlock = 0;
-    lockc = parseInt('00', 2); // Number of coherent lock events (page 59) ("00": default : 1 successive lock event)
-    lockw = parseInt('01', 2); // Lock-detect window (default : 01)
-
-    cdce_set_config7(
-        outbufsel7yx_p = outbufsel7yx, cmosmode7nyx_p = cmosmode7nyx,
-        cmosmode7pyx_p = cmosmode7pyx, pecl7hiswing_p = pecl7hiswing, en7div_p = en7div,
-        out7divrsel_p = out7divrsel, ph7adjc_p = ph7adjc,
-        adlock_p = adlock, lockc_p = lockc, lockw_p = lockw,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    //###############################################################
-    // config8
-    //###############################################################
-    // [27:26]: R/W: outbufsel8yx[1:0]
-    // [25:24]: R/W: cmosmode8nyx[1:0]
-    // [23:22]: R/W: cmosmode8pyx[1:0]
-    // [21]: R/W: pecl8hiswing[0]
-    // [20]: R/W: en8div[0]
-    // [19:13]: R/W: out8divrsel[6:0]
-    // [12:6]: R/W: ph8adjc[6:0]
-    // [5]: R/W: vcxoinvbb[0]
-    // [4]: R/W: vcxotermsel[0]
-    // [3]: R/W: vcxohysten[0]
-    // [2]: R/W: vcxoacdcsel[0]
-    // [1:0]: R/W: vcxobufselyx[1:0]
-    outbufsel8yx = parseInt('01', 2); // disable output8
-    cmosmode8nyx = parseInt('10', 2); // disable output8
-    cmosmode8pyx = parseInt('10', 2); // disable output8
-    pecl8hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en89div = 0; //0: divider is disabled on output8/9, 1: otherwise
-    out8divrsel = parseInt('0000000', 2);
-    ph8adjc = parseInt('0000000', 2);
-    vcxoinvbb = 0;
-    vcxotermsel = 0;
-    vcxohysten = 1;
-    vcxoacdcsel = 0;
-    vcxobufselyx = parseInt('01', 2); // VCXO and AUX Input Buffer Type Select (LVPECL,LVDS or LVCMOS): 01: LVPECL, 11: LVDS, 00: CMOS
-
-    cdce_set_config8(
-        outbufsel8yx_p = outbufsel8yx, cmosmode8nyx_p = cmosmode8nyx,
-        cmosmode8pyx_p = cmosmode8pyx, pecl8hiswing_p = pecl8hiswing, en89div_p = en89div,
-        out8divrsel_p = out8divrsel, ph8adjc_p = ph8adjc,
-        vcxoinvbb_p = vcxoinvbb, vcxotermsel_p = vcxotermsel,
-        vcxohysten_p = vcxohysten, vcxoacdcsel_p = vcxoacdcsel, vcxobufselyx_p = vcxobufselyx,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    //###############################################################
-    // config9
-    //###############################################################
-    // [27:26]: R/W: outbufsel9yx[1:0]
-    // [25:24]: R/W: cmosmode9nyx[1:0]
-    // [23:22]: R/W: cmosmode9pyx[1:0]
-    // [21]: R/W: pecl9hiswing[0]
-    // [20]: R/W: dis_aux_y9[0]
-    // [19]: R/W: auxinvbb[0]
-    // [18:17]: R/W: bias_div89[1:0]
-    // [16:15]: R/W: bias_div_fb[1:0]
-    // [14]: R/W: npreset_mdiv[0]
-    // [13]: R/W: low_fd_fb_en[0]
-    // [12]: R/W: pll_lock_bp[0]
-    // [11]: R/W: indet_bp[0]
-    // [10]: R/W: start_bypass[0]
-    // [9]: R/W: divsync_dis[0]
-    // [8]: R/W: noinv_reshol_int[0]
-    // [7:6]: R/W: lockw32[1:0] 
-    // [5:4]: R/W: hold_cnt[1:0]
-    // [3]: R/W: holdtr[0]
-    // [2]: R/W: hold_n[0]
-    // [0]: R/W: holdf[0]
-    outbufsel9yx = parseInt('11', 2); // LVDS output9
-    cmosmode9nyx = parseInt('10', 2); // LVDS output9
-    cmosmode9pyx = parseInt('10', 2); // LVDS output9
-    pecl9hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    dis_aux_y9 = 0;
-    auxinvbb = 0;
-    bias_div89 = parseInt('00', 2);
-    bias_div_fb = parseInt('00', 2);
-    npreset_mdiv = 1; // 1: M-Divider NOT preseted by NHOLD, 0:M-Divider uses NHOLD as NPRESET
-    low_fd_fb_en = 0;
-    pll_lock_bp = 1;
-    indet_bp = 0;
-    start_bypass = 0; // When set to 0, START-Signal is synchronized to VCXO-Clock,  When set to 1, START-Sync Block is bypassed
-    divsync_dis = 0;
-    noinv_reshol_int = 0;
-    lockw32 = parseInt('11', 2); // Extended Lock-detect window => 19.3 ns
-    hold_cnt = parseInt('00', 2);
-    holdtr = 1;
-    hold_n = 1;
-    holdf = 0;
-
-    cdce_set_config9(
-        outbufsel9yx_p = outbufsel9yx, cmosmode9nyx_p = cmosmode9nyx,
-        cmosmode9pyx_p = cmosmode9pyx, pecl9hiswing_p = pecl9hiswing, dis_aux_y9_p = dis_aux_y9,
-        auxinvbb_p = auxinvbb, bias_div89_p = bias_div89, bias_div_fb_p = bias_div_fb,
-        npreset_mdiv_p = npreset_mdiv, low_fd_fb_en_p = low_fd_fb_en, pll_lock_bp_p = pll_lock_bp,
-        indet_bp_p = indet_bp, start_bypass_p = start_bypass, divsync_dis_p = divsync_dis, noinv_reshol_int_p = noinv_reshol_int,
-        lockw32_p = lockw32, hold_cnt_p = hold_cnt,
-        holdtr_p = holdtr, hold_n_p = hold_n, holdf_p = holdf,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    //###############################################################
-    // config10
-    //###############################################################
-    // [27:14]: R/W: div_m[13:0]
-    // [13:0]: R/W: div_n[13:0]
-    div_n = 0x0; // VCXO Divider N (382)
-    div_m = 0x0; // Reference Divider M (624)
-
-    cdce_set_config10(
-        div_n_p = div_n,
-        div_m_p = div_m,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    //###############################################################
-    // config11
-    //###############################################################
-    // [26]: R/W: eplock[0]
-    // [25]: R/W: reset_hold_mode[0]
-    // [24]: R/W: sel_del1[0]
-    // [23]: R/W: nreshape1[0]
-    // [22]: R/W: fb_sel[0]
-    // [21]: R/W: out_mux_sel[0]
-    // [20]: R/W: fb_mux_sel[0]
-    // [19]: R/W: pd_pll[0]
-    // [18:12]: R/W: fb_phase[6:0]
-    // [11:5]: R/W: fb_count32[6:0]
-    // [4]: R/W: fb_inclk_inv[0]
-    // [3]: R/W: fb_cml_sel[0]
-    // [2]: R/W: fb_dis[0]
-    // [1]: R/W: sec_div2[0]
-    // [0]: R/W: pri_div2[0]
-    eplock = 0;
-    reset_hold_mode = 0; // f set to 1 the RESET or HOLD pin acts as HOLD, set to 0 it acts as RESET
-    sel_del1 = 0; // If set to 0 it enables short delay for fast operation, If Set to 1 Long Delay recommended for Input References below 150Mhz
-    nreshape1 = 0;
-    fb_sel = 0; // Feed Back Path Selects FB/VCXO-Path when set to 0 (TI Test-GTME), The econdary Reference clock input is selected when set to 1 (TI Test-GTME)
-    out_mux_sel = 0; // if Set to 0 it selects the VCXO Clock and if Set to 1 it selects the AUX Clock
-    fb_mux_sel = 0; //0: VCXO clock is selected from (clock tree, FB-DIV and Det), 1: AUX clock is selected
-    pd_pll = 0; //0: PLL in normal mode, 1: PLL is powered down
-    fb_phase = parseInt('0000000', 2); // Feedback Phase Adjust Bit0
-    fb_count32 = parseInt('000000', 2); // Feedback Counter: divided by 1
-    fb_inclk_inv = 0;
-    fb_cml_sel = 0;
-    fb_dis = 0;
-    sec_div2 = 0; // of set to 1 enables Secondary Reference Divide by 2, 0: otherwise divided by 1 => PRI_REF: 100 MHz -> 100 MHz.
-    pri_div2 = 0; // if set to 1 enables Primary Reference Divide by 2,  0: otherwise divided by 1
-
-    cdce_set_config11(
-        eplock_p = eplock, reset_hold_mode_p = reset_hold_mode, sel_del1_p = sel_del1,
-        nreshape1_p = nreshape1, fb_sel_p = fb_sel, out_mux_sel_p = out_mux_sel, fb_mux_sel_p = fb_mux_sel,
-        pd_pll_p = pd_pll, fb_phase_p = fb_phase, fb_count32_p = fb_count32, fb_inclk_inv_p = fb_inclk_inv,
-        fb_cml_sel_p = fb_cml_sel, fb_dis_p = fb_dis, sec_div2_p = sec_div2, pri_div2_p = pri_div2,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // config12
@@ -3248,5 +2749,7 @@ function CDCE72010_configure_100M(level_p, mode_p, verbosity_p) {
         sleep_n_p = sleep_n, pll_lock_p = pll_lock, indet_vcxo_p = indet_vcxo, indet_aux_p = indet_aux,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 }

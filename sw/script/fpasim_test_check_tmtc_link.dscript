@@ -33,8 +33,6 @@
 
 // import javascript
 include("./fpasim/utils_tools.dscript");
-include("./fpasim/fpasim_address.dscript");
-include("./fpasim/ads62p49.dscript");
 include("./fpasim/fpasim_tools.dscript");
 
 /**
@@ -87,6 +85,9 @@ function test_recording(level_p, mode_p, verbosity_p) {
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     sendToFPA_configureControl(data);
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
 
     /* 
      ***************************************************************************
@@ -98,6 +99,9 @@ function test_recording(level_p, mode_p, verbosity_p) {
     en = 1;
     data = fpasim_build_rec_ctrl(en_p = en);
     fpasim_set_debug_wirein_by_name(reg_name_p = "REC_CTRL", data_p = data, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /* 
      ***************************************************************************
@@ -112,17 +116,31 @@ function test_recording(level_p, mode_p, verbosity_p) {
     data = fpasim_build_rec_conf0(rec_adc_nb_word_32b_p = rec_adc_nb_word_32b);
     fpasim_set_debug_wirein_by_name(reg_name_p = "REC_CONF0", data_p = data, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     waitMs(2000);
     getLatestValue("FPA_adc_mux_squid_feedback,FPA_adc_amp_squid_offset_correction,FPA_rec_adc_size")
 
 
-    print("FPA_adc_mux_squid_feedback");
+    msg = "FPA_adc_mux_squid_feedback";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
     print(FPA_adc_mux_squid_feedback);
 
-    print("FPA_adc_amp_squid_offset_correction");
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    msg = "FPA_adc_amp_squid_offset_correction";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
     print(FPA_adc_amp_squid_offset_correction);
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     msg = "Number of read data at the pipeout access: FPA_rec_adc_size=" + FPA_rec_adc_size.toString(10);
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /* 
@@ -213,7 +231,7 @@ function test_recording(level_p, mode_p, verbosity_p) {
                 print("test1: ", i.toString(10), ' ', new_data.toString(10), ' ', adc1.toString(10));
                 v_cnt_err1 += 1;
             }
-            
+
         }
 
         v_last_data = adc1;
@@ -1041,5 +1059,10 @@ function main(level_p, mode_p, verbosity_p) {
 
 }
 
-
-main();
+/**
+ * Execute the main function
+ * @param {number} level_p - level of indentation at the beginning
+ * @param {number} mode_p - define the print output
+ * @param {number} verbosity_p - level of verbosity
+ */
+main(level_p = 0, mode_p = 0, verbosity_p = 2);

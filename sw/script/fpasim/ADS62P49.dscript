@@ -33,8 +33,8 @@
 
 // import libraries
 include("./fpasim/utils_tools.dscript");
-include("./fpasim/fpasim_address.dscript");
-//include("./fpasim/fpasim_tools.dscript");
+include("./fpasim/fpasim.dscript");
+
 
 // define the SPI device registers
 const ADC_ADDR = {};
@@ -65,6 +65,11 @@ const c_ADC_ADDR_VERBOSITY_MIN = 1;
 // verbosity min to display register bit
 const c_ADC_BIT_VERBOSITY_MIN = c_ADC_ADDR_VERBOSITY_MIN + 1;
 
+// address width of the spi device register
+const c_ADC_SPI_ADDR_WIDTH = 8;
+// data width of the spi device register
+const c_ADC_SPI_DATA_WIDTH = 8;
+
 /**
  * Enable the FPASIM SPI MODULE (bridge)
  *
@@ -84,24 +89,10 @@ function adc_spi_enable(level_p, mode_p, verbosity_p) {
     //-- write in the SPI_CTRL register 
     //---------------------------------------------------------------------
 
-    // reset the spi links
-    // rst = 1;
-    // en = 0;
-    // data = (rst << 1) + en;
-    // sendToFPA_debugSetWireIn(0x12,data);
-
-    //---------------------------------------------------------------------
-    //-- write in the SPI_CTRL register 
-    //---------------------------------------------------------------------
-
     // en the spi links
-    rst = 0;
-    en = 1;
-    data = (rst << 1) + en;
-    addr = FPASIM_ADDR_WIREIN['SPI_CTRL'];
-    sendToFPA_debugSetWireIn(addr, data);
-
-    // fpasim_set_spi_ctrl(rst_p=rst, en_p=en, level_p=0, mode_p=0, verbosity_p=-1);
+    const rst = 0;
+    const en = 1;
+    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -124,32 +115,16 @@ function adc_write_command(addr_p, data_p) {
     //---------------------------------------------------------------------
     // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
-    const mode = 1; // 0: rd, 1: wr
+    const spi_mode = 1; // 0: rd, 1: wr
     const spi_id = 1; // 0: cdce,1: adc, 2: dac, 3: amc
-    const data = (spi_id << 4) + mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
-    sendToFPA_debugSetWireIn(addr, data);
+    fpasim_set_spi_conf0(spi_id_p = spi_id, spi_mode_p = spi_mode, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     //---------------------------------------------------------------------
-    // build the SPI commands
+    // build and write the SPI commands
     //   (see the ads62p49 datasheet)
     //---------------------------------------------------------------------
-
     const spi_cmd = (addr_p << 8) + data_p;
-    addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
-    //---------------------------------------------------------------------
-    // write in the SPI_WR_DATA register
-    //---------------------------------------------------------------------
-    sendToFPA_debugSetWireIn(addr, spi_cmd);
-
-    //---------------------------------------------------------------------
-    // write in the TRIG register
-    //  => activate the spi_valid bit
-    //---------------------------------------------------------------------
-    addr = FPASIM_ADDR_TRIGIN['TRIG'];
-    pos = FPASIM_POS_TRIGIN['spi_valid'];
-    sendToFPA_debugSetTriggerIn(addr, pos);
-    waitMs(100);
+    fpasim_set_spi_wr_data(data_p = spi_cmd, level_p = 0, mode_p = 0, verbosity_p = -1);
 
 }
 
@@ -177,44 +152,27 @@ function adc_read_command(addr_p) {
     //---------------------------------------------------------------------
     const spi_mode = 0; // 0: rd, 1: wr
     const spi_id = 1; // 0: cdce,1: adc, 2: dac, 3: amc
-    data = (spi_id << 4) + spi_mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
-    sendToFPA_debugSetWireIn(addr, data);
+    fpasim_set_spi_conf0(spi_id_p = spi_id, spi_mode_p = spi_mode, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     //---------------------------------------------------------------------
-    // build the SPI commands
+    // build and write the SPI commands
     //   (see the ads62p49 datasheet)
     //---------------------------------------------------------------------
     data = 0x0;
-    spi_cmd = (addr_p << 8) + data;
-    //---------------------------------------------------------------------
-    // write in the SPI_WR_DATA register
-    //---------------------------------------------------------------------
-    addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
-    sendToFPA_debugSetWireIn(addr, spi_cmd);
-
-    //---------------------------------------------------------------------
-    // write in the TRIG register
-    //  => activate the spi_valid bit
-    //---------------------------------------------------------------------
-    addr = FPASIM_ADDR_TRIGIN['TRIG'];
-    pos = FPASIM_POS_TRIGIN['spi_valid'];
-    sendToFPA_debugSetTriggerIn(addr, pos);
+    const spi_cmd = (addr_p << 8) + data;
+    fpasim_set_spi_wr_data(data_p = spi_cmd, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     // tempo
-    waitMs(100);
+    waitMs(10);
 
     //---------------------------------------------------------------------
-    // Read wire out registers
+    // Read the register value from the spi device
     //---------------------------------------------------------------------
-    getLatestValue("FPA_WireOutValues");
+    data = fpasim_get_wireout_spi_rd_data(level_p = 0, mode_p = 0, verbosity_p = -1);
 
-    waitMs(600);
     //---------------------------------------------------------------------
     // Disable the read on the spi device
     //---------------------------------------------------------------------
-    // tempo
-    waitMs(500);
     const rst1 = 0; //  Software reset applied – resets all internal registers and self-clears to 0.
     const serial_out1 = 0; //0: Serial readout disabled. SDOUT is forced low by the device (and not put in high impedance state).1:Serial readout enabled, Pin SDOUT functions as serial data readout.
     adc_set_config0(
@@ -223,7 +181,12 @@ function adc_read_command(addr_p) {
     );
 
 
-    return FPA_WireOutValues[22];
+    // keep only the data part
+    // from: addr7 .. addr0 data7 .. data0
+    // to: data7.. data0
+    data = (data & 0xFF);
+
+    return data;
 
 }
 
@@ -264,7 +227,7 @@ function adc_set_config0(rst_p, serial_out_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -297,8 +260,8 @@ function adc_set_config1(enable_low_speed_p, level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (enable_low_speed_p << 2);
-    addr = ADC_ADDR['reg1'];
+    const data = (enable_low_speed_p << 2);
+    const addr = ADC_ADDR['reg1'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -310,7 +273,7 @@ function adc_set_config1(enable_low_speed_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -347,8 +310,8 @@ function adc_set_config2(ref_p, standby_p, level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (ref_p << 5) + (standby_p << 1);
-    addr = ADC_ADDR['reg2'];
+    const data = (ref_p << 5) + (standby_p << 1);
+    const addr = ADC_ADDR['reg2'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -360,7 +323,7 @@ function adc_set_config2(ref_p, standby_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -403,8 +366,8 @@ function adc_set_config3(power_down_p, level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = power_down_p;
-    addr = ADC_ADDR['reg3'];
+    const data = power_down_p;
+    const addr = ADC_ADDR['reg3'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -416,7 +379,7 @@ function adc_set_config3(power_down_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -448,8 +411,8 @@ function adc_set_config4(lvds_cmos_p, level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (lvds_cmos_p << 7);
-    addr = ADC_ADDR['reg4'];
+    const data = (lvds_cmos_p << 7);
+    const addr = ADC_ADDR['reg4'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -461,7 +424,7 @@ function adc_set_config4(lvds_cmos_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -515,8 +478,8 @@ function adc_set_config5(clkout_pos_rise_p, clkout_pos_fall_p, level_p, mode_p, 
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (clkout_pos_rise_p << 5) + clkout_pos_fall_p;
-    addr = ADC_ADDR['reg5'];
+    const data = (clkout_pos_rise_p << 5) + clkout_pos_fall_p;
+    const addr = ADC_ADDR['reg5'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -528,7 +491,7 @@ function adc_set_config5(clkout_pos_rise_p, clkout_pos_fall_p, level_p, mode_p, 
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -566,8 +529,8 @@ function adc_set_config6(en_independant_chan_ctrl_p, data_format_p, level_p, mod
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (en_independant_chan_ctrl_p << 6) + (data_format_p << 1);
-    addr = ADC_ADDR['reg6'];
+    const data = (en_independant_chan_ctrl_p << 6) + (data_format_p << 1);
+    const addr = ADC_ADDR['reg6'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -579,7 +542,7 @@ function adc_set_config6(en_independant_chan_ctrl_p, data_format_p, level_p, mod
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -611,8 +574,8 @@ function adc_set_config7(custom_patter_low_p, level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = custom_patter_low_p;
-    addr = ADC_ADDR['reg7'];
+    const data = custom_patter_low_p;
+    const addr = ADC_ADDR['reg7'];
     adc_write_command(addr_p = 0x51, data_p = data);
 
     if (verbosity_p < 0) {
@@ -624,7 +587,7 @@ function adc_set_config7(custom_patter_low_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -656,8 +619,8 @@ function adc_set_config8(custom_patter_high_p, level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = custom_patter_high_p;
-    addr = ADC_ADDR['reg8'];
+    const data = custom_patter_high_p;
+    const addr = ADC_ADDR['reg8'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -669,7 +632,7 @@ function adc_set_config8(custom_patter_high_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -703,8 +666,8 @@ function adc_set_config9(en_offset_correction_cha_p, level_p, mode_p, verbosity_
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (en_offset_correction_cha_p << 6);
-    addr = ADC_ADDR['reg9'];
+    const data = (en_offset_correction_cha_p << 6);
+    const addr = ADC_ADDR['reg9'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -716,7 +679,7 @@ function adc_set_config9(en_offset_correction_cha_p, level_p, mode_p, verbosity_
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -773,8 +736,8 @@ function adc_set_config10(gain_common_or_cha_p, offset_corr_time_common_or_cha_p
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (gain_common_or_cha_p << 4) + offset_corr_time_common_or_cha_p;
-    addr = ADC_ADDR['reg10'];
+    const data = (gain_common_or_cha_p << 4) + offset_corr_time_common_or_cha_p;
+    const addr = ADC_ADDR['reg10'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -786,7 +749,7 @@ function adc_set_config10(gain_common_or_cha_p, offset_corr_time_common_or_cha_p
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -822,8 +785,8 @@ function adc_set_config11(fine_gain_adjust_common_or_cha_p, level_p, mode_p, ver
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (fine_gain_adjust_common_or_cha_p);
-    addr = ADC_ADDR['reg11'];
+    const data = (fine_gain_adjust_common_or_cha_p);
+    const addr = ADC_ADDR['reg11'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -835,7 +798,7 @@ function adc_set_config11(fine_gain_adjust_common_or_cha_p, level_p, mode_p, ver
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -876,8 +839,8 @@ function adc_set_config12(test_pattern_common_or_cha_p, level_p, mode_p, verbosi
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (test_pattern_common_or_cha_p);
-    addr = ADC_ADDR['reg12'];
+    const data = (test_pattern_common_or_cha_p);
+    const addr = ADC_ADDR['reg12'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -889,7 +852,7 @@ function adc_set_config12(test_pattern_common_or_cha_p, level_p, mode_p, verbosi
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -935,8 +898,8 @@ function adc_set_config13(offset_pedestal_common_or_cha_p, level_p, mode_p, verb
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (offset_pedestal_common_or_cha_p);
-    addr = ADC_ADDR['reg13'];
+    const data = (offset_pedestal_common_or_cha_p);
+    const addr = ADC_ADDR['reg13'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -948,7 +911,7 @@ function adc_set_config13(offset_pedestal_common_or_cha_p, level_p, mode_p, verb
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -982,8 +945,8 @@ function adc_set_config14(offset_corr_chb_p, level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (offset_corr_chb_p << 6);
-    addr = ADC_ADDR['reg14'];
+    const data = (offset_corr_chb_p << 6);
+    const addr = ADC_ADDR['reg14'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -995,7 +958,7 @@ function adc_set_config14(offset_corr_chb_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1053,8 +1016,8 @@ function adc_set_config15(gain_chb_p, offset_corr_time_chb_p, level_p, mode_p, v
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = (gain_chb_p << 4) + offset_corr_time_chb_p;
-    addr = ADC_ADDR['reg15'];
+    const data = (gain_chb_p << 4) + offset_corr_time_chb_p;
+    const addr = ADC_ADDR['reg15'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -1066,7 +1029,7 @@ function adc_set_config15(gain_chb_p, offset_corr_time_chb_p, level_p, mode_p, v
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1102,8 +1065,8 @@ function adc_set_config16(fine_gain_adjust_chb_p, level_p, mode_p, verbosity_p) 
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = fine_gain_adjust_chb_p;
-    addr = ADC_ADDR['reg16'];
+    const data = fine_gain_adjust_chb_p;
+    const addr = ADC_ADDR['reg16'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -1115,7 +1078,7 @@ function adc_set_config16(fine_gain_adjust_chb_p, level_p, mode_p, verbosity_p) 
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1156,8 +1119,8 @@ function adc_set_config17(test_pattern_chb_p, level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = test_pattern_chb_p;
-    addr = ADC_ADDR['reg17'];
+    const data = test_pattern_chb_p;
+    const addr = ADC_ADDR['reg17'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -1169,7 +1132,7 @@ function adc_set_config17(test_pattern_chb_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1212,8 +1175,8 @@ function adc_set_config18(offset_pedestal_common_or_chb_p, level_p, mode_p, verb
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    data = offset_pedestal_common_or_chb_p;
-    addr = ADC_ADDR['reg18'];
+    const data = offset_pedestal_common_or_chb_p;
+    const addr = ADC_ADDR['reg18'];
     adc_write_command(addr_p = addr, data_p = data);
 
     if (verbosity_p < 0) {
@@ -1225,7 +1188,7 @@ function adc_set_config18(offset_pedestal_common_or_chb_p, level_p, mode_p, verb
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1259,8 +1222,8 @@ function adc_get_config0(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg0'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg0'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1271,7 +1234,7 @@ function adc_get_config0(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1305,8 +1268,8 @@ function adc_get_config1(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg1'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg1'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1317,7 +1280,7 @@ function adc_get_config1(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1357,8 +1320,8 @@ function adc_get_config2(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg2'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg2'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1369,7 +1332,7 @@ function adc_get_config2(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1412,8 +1375,8 @@ function adc_get_config3(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg3'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg3'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1424,7 +1387,7 @@ function adc_get_config3(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1456,8 +1419,8 @@ function adc_get_config4(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg4'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg4'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1468,7 +1431,7 @@ function adc_get_config4(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1523,8 +1486,8 @@ function adc_get_config5(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg5'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg5'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1535,7 +1498,7 @@ function adc_get_config5(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1574,8 +1537,8 @@ function adc_get_config6(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg6'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg6'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1586,7 +1549,7 @@ function adc_get_config6(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1620,8 +1583,8 @@ function adc_get_config7(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg7'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg7'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1632,7 +1595,7 @@ function adc_get_config7(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1666,8 +1629,8 @@ function adc_get_config8(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg8'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg8'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1678,7 +1641,7 @@ function adc_get_config8(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1713,8 +1676,8 @@ function adc_get_config9(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg9'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg9'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1725,7 +1688,7 @@ function adc_get_config9(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1785,8 +1748,8 @@ function adc_get_config10(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg10'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg10'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1797,7 +1760,7 @@ function adc_get_config10(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1835,8 +1798,8 @@ function adc_get_config11(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg11'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg11'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1847,7 +1810,7 @@ function adc_get_config11(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1891,8 +1854,8 @@ function adc_get_config12(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg12'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg12'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1903,7 +1866,7 @@ function adc_get_config12(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1950,8 +1913,8 @@ function adc_get_config13(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg13'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg13'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -1962,7 +1925,7 @@ function adc_get_config13(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -1996,8 +1959,8 @@ function adc_get_config14(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg14'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg14'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -2008,7 +1971,7 @@ function adc_get_config14(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -2066,8 +2029,8 @@ function adc_get_config15(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg15'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg15'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -2078,7 +2041,7 @@ function adc_get_config15(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -2116,8 +2079,8 @@ function adc_get_config16(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg16'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg16'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -2128,7 +2091,7 @@ function adc_get_config16(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -2172,8 +2135,8 @@ function adc_get_config17(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg17'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg17'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -2184,7 +2147,7 @@ function adc_get_config17(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -2230,8 +2193,8 @@ function adc_get_config18(level_p, mode_p, verbosity_p) {
     const level1 = level_p + 1;
     const level2 = level_p + 2;
 
-    addr = ADC_ADDR['reg18'];
-    data = adc_read_command(addr_p = addr);
+    const addr = ADC_ADDR['reg18'];
+    const data = adc_read_command(addr_p = addr);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -2242,7 +2205,7 @@ function adc_get_config18(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_ADC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_ADC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_ADC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_ADC_BIT_VERBOSITY_MIN) {
@@ -2254,15 +2217,15 @@ function adc_get_config18(level_p, mode_p, verbosity_p) {
 }
 
 
-function adc_get_config(reg_id) {
+// function adc_get_config(reg_id) {
 
-    if (reg_id == 7) {
-        addr = 0x51
-        value = adc_read_command(addr_p = addr);
-        print('custom_patter_low_p: 0x', value.toString(16))
-    }
+//     if (reg_id == 7) {
+//         addr = 0x51
+//         value = adc_read_command(addr_p = addr);
+//         print('custom_patter_low_p: 0x', value.toString(16))
+//     }
 
-}
+// }
 
 /**
  * Configure the device to generate the following pre-defined pattern
@@ -2291,6 +2254,9 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     // Enable the SPI on the FPGA board
     adc_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
     //###############################################################
     // register0
@@ -2308,6 +2274,9 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
         rst_p = rst, serial_out_p = serial_out,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
     //###############################################################
     // register1
@@ -2322,6 +2291,8 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2343,6 +2314,9 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
         ref_p = ref, standby_p = standby,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2367,6 +2341,9 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
     //###############################################################
     // register4
@@ -2380,6 +2357,9 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
         lvds_cmos_p = lvds_cmos,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2420,6 +2400,8 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 
 
@@ -2444,6 +2426,9 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     //###############################################################
     // register12
     //###############################################################
@@ -2466,6 +2451,9 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
         test_pattern_common_or_cha_p = test_pattern_common_or_cha,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // register17
@@ -2490,6 +2478,9 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
         test_pattern_chb_p = test_pattern_chb,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 
 }
@@ -2534,7 +2525,7 @@ function adc_display_all_config(level_p, mode_p, verbosity_p) {
 }
 
 
- /**
+/**
  * Default Configuration of the ads62p49 (adc) spi device (FMC150 board).
  * @param {number} level_p - level of indentation at the beginning.
  * @param {number} mode_p - define the print output.
@@ -2555,6 +2546,10 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
 
     // Enable the SPI on the FPGA board
     adc_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
     //###############################################################
     // register0
@@ -2573,6 +2568,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
     //###############################################################
     // register1
@@ -2587,6 +2585,8 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2608,6 +2608,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         ref_p = ref, standby_p = standby,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2632,6 +2635,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
     //###############################################################
     // register4
@@ -2645,6 +2651,8 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         lvds_cmos_p = lvds_cmos,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2685,6 +2693,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
     //###############################################################
     // register6
@@ -2706,6 +2717,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
     //###############################################################
     // register7
@@ -2721,6 +2735,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
     //###############################################################
     // register8
@@ -2735,6 +2752,8 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         custom_patter_high_p = custom_patter_high,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2752,6 +2771,8 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         en_offset_correction_cha_p = en_offset_correction_cha,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2795,6 +2816,8 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         gain_common_or_cha_p = gain_cha, offset_corr_time_common_or_cha_p = offset_corr_time_cha,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // register11
@@ -2812,6 +2835,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         fine_gain_adjust_common_or_cha_p = fine_gain_adjust_common_or_cha,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // register12
@@ -2835,6 +2861,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         test_pattern_common_or_cha_p = test_pattern_common_or_cha,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // register13
@@ -2863,6 +2892,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     //###############################################################
     // register14
     //###############################################################
@@ -2876,6 +2908,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         offset_corr_chb_p = offset_corr_chb,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // register15
@@ -2917,6 +2952,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     //###############################################################
     // register16
     //###############################################################
@@ -2933,6 +2971,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         fine_gain_adjust_chb_p = fine_gain_adjust_chb,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // register17
@@ -2957,6 +2998,9 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         test_pattern_chb_p = test_pattern_chb,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
     // register18
@@ -2983,5 +3027,8 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
         offset_pedestal_common_or_chb_p = offset_pedestal_common_or_chb,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 }
