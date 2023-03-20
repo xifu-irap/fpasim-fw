@@ -276,7 +276,7 @@ begin
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
   inst_pipeliner_sync_with_sub_sfixed_mux_squid_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => pkg_MUX_SQUID_SUB_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_SUB_SFIXED_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
       )
     port map(
@@ -530,7 +530,7 @@ begin
 
   inst_pipeliner_sync_with_sdpram_mux_squid_tf2_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_SUB_SFIXED_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => mux_squid_offset_doutb'length  -- width of the input/output data.  Possibles values: [1, integer max value[
       )
     port map(
@@ -583,7 +583,7 @@ begin
   data_pipe_tmp4(c_IDX0_H downto c_IDX0_L) <= pixel_id_ry;
   inst_pipeliner_sync_with_add_sfixed_mux_squid_offset_and_tf_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => pkg_MUX_SQUID_ADD_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_ADD_SFIXED_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp4'length  -- width of the input/output data.  Possibles values: [1, integer max value[
       )
     port map(

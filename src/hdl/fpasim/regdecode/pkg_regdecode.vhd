@@ -42,7 +42,7 @@ PACKAGE pkg_regdecode IS
     -- 
     ---------------------------------------------------------------------
     -- user-defined: Firmware version
-    constant pkg_FIRMWARE_VERSION_VALUE : integer := 2;
+    constant pkg_FIRMWARE_VERSION_VALUE : integer := 3;
 
     -- user-defined: FIRMWARE ID (name)
     constant pkg_FIRMWARE_ID_CHAR3 : character := 'f'; -- ascii character

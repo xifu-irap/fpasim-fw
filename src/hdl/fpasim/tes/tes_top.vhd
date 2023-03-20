@@ -57,16 +57,16 @@ entity tes_top is
     i_clk : in std_logic;               -- clock signal
     i_rst : in std_logic;               -- reset signal
 
-    i_rst_status  : in std_logic;       -- reset error flag(s)
+    i_rst_status  : in std_logic;  -- reset error flag(s)
     i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
     i_en                     : in  std_logic;  -- enable
-    i_nb_sample_by_pixel     : in  std_logic_vector(g_NB_SAMPLE_BY_PIXEL_WIDTH - 1 downto 0);
-    i_nb_pixel_by_frame      : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- number of pixel
-    i_nb_sample_by_frame     : in  std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+    i_nb_sample_by_pixel     : in  std_logic_vector(g_NB_SAMPLE_BY_PIXEL_WIDTH - 1 downto 0); -- number of samples by pixel
+    i_nb_pixel_by_frame      : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- number of pixel by frame (column)
+    i_nb_sample_by_frame     : in  std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0); -- number of samples by frame (column)
     -- command
     i_cmd_valid              : in  std_logic;  -- valid command
     i_cmd_pulse_height       : in  std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0);  -- pulse height command

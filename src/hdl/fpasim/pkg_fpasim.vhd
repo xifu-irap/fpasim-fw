@@ -276,7 +276,7 @@ package pkg_fpasim is
   constant pkg_MUX_SQUID_SUB_Q_WIDTH_S : positive := pkg_MUX_SQUID_SUB_Q_M_S + pkg_MUX_SQUID_SUB_Q_N_S;
 
   -- auto-computed: rename the "sub_sfixed" module latency
-  constant pkg_MUX_SQUID_SUB_LATENCY : natural := pkg_SUB_SFIXED_LATENCY;
+  --constant pkg_MUX_SQUID_SUB_LATENCY : natural := pkg_SUB_SFIXED_LATENCY;
 
   -- add
   -- mux_squid_offset
@@ -298,17 +298,17 @@ package pkg_fpasim is
   -- result
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
   --constant pkg_MUX_SQUID_ADD_Q_M_S     : positive := 34;
-  constant pkg_MUX_SQUID_ADD_Q_M_S     : positive := 16;
+  constant pkg_MUX_SQUID_ADD_Q_M_S     : positive := 18;
   -- user-defined: number of fraction bits
   constant pkg_MUX_SQUID_ADD_Q_N_S     : natural  := 0;
   -- auto-computed: bus width
   constant pkg_MUX_SQUID_ADD_Q_WIDTH_S : positive := pkg_MUX_SQUID_ADD_Q_M_S + pkg_MUX_SQUID_ADD_Q_N_S;
 
   -- auto-computed: rename the "add_sfixed" module latency
-  constant pkg_MUX_SQUID_ADD_LATENCY : natural := pkg_ADD_SFIXED_LATENCY;
+  --constant pkg_MUX_SQUID_ADD_LATENCY : natural := pkg_ADD_SFIXED_LATENCY;
 
   -- auto-computed: latency of the "mux_squid" module
-  constant pkg_MUX_SQUID_LATENCY     : natural := pkg_MUX_SQUID_SUB_LATENCY + pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY + pkg_MUX_SQUID_ADD_LATENCY;
+  constant pkg_MUX_SQUID_LATENCY     : natural := pkg_SUB_SFIXED_LATENCY + pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY + pkg_ADD_SFIXED_LATENCY;
   -- auto-computed: latency of the "mux_squid_top" module
   constant pkg_MUX_SQUID_TOP_LATENCY : natural := pkg_MUX_SQUID_LATENCY;
 
