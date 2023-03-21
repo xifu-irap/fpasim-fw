@@ -34,7 +34,7 @@
 
 // import libraries
 include("./fpasim/utils_tools.dscript");
-include("./fpasim/fpasim_address.dscript");
+include("./fpasim/fpasim.dscript");
 
 // define the SPI device registers
 const AMC_ADDR = {};
@@ -78,6 +78,11 @@ const c_AMC_ADDR_VERBOSITY_MIN = 1;
 // verbosity min to display register bit
 const c_AMC_BIT_VERBOSITY_MIN = c_AMC_ADDR_VERBOSITY_MIN + 1;
 
+// address width of the spi device register
+const c_AMC_SPI_ADDR_WIDTH = 16;
+// data width of the spi device register
+const c_AMC_SPI_DATA_WIDTH = 16;
+
 
 /**
  * Enable the FPASIM SPI MODULE (bridge)
@@ -100,22 +105,10 @@ function amc_spi_enable(level_p, mode_p, verbosity_p) {
     //-- write in the SPI_CTRL register 
     //---------------------------------------------------------------------
 
-    // reset the spi links
-    // rst = 1;
-    // en = 0;
-    // data = (rst << 1) + en;
-    // sendToFPA_debugSetWireIn(0x12,data);
-
-    //---------------------------------------------------------------------
-    //-- write in the SPI_CTRL register 
-    //---------------------------------------------------------------------
-
     // en the spi links
     const rst = 0;
     const en = 1;
-    const data = (rst << 1) + en;
-    const addr = FPASIM_ADDR_WIREIN['SPI_CTRL'];
-    sendToFPA_debugSetWireIn(addr, data);
+    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     if (verbosity_p < 0) {
         // do nothing
@@ -139,40 +132,26 @@ function amc_write_command(addr_p, data_p, page_p) {
     //---------------------------------------------------------------------
     // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
-    mode = 1; // 0: rd, 1: wr
-    spi_id = 3; // 0: cdce,1: adc, 2: dac, 3: amc
-    data = (spi_id << 4) + mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
-    sendToFPA_debugSetWireIn(addr, data);
+    const spi_mode = 1; // 0: rd, 1: wr
+    const spi_id = 3; // 0: cdce,1: adc, 2: dac, 3: amc
+    fpasim_set_spi_conf0(spi_id_p = spi_id, spi_mode_p = spi_mode, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     //---------------------------------------------------------------------
     // build the SPI commands
     //    (see amc7823 datasheet) 
     //---------------------------------------------------------------------
-    mode = 0; // 0:wr, 1:rd
-    page = page_p // 0: page0, 1: page1
-    start_addr = addr_p // start address: 5 bits
-    end_addr = 0x00
+    const mode = 0; // 0:wr, 1:rd
+    const page = page_p // 0: page0, 1: page1
+    const start_addr = addr_p // start address: 5 bits
+    const end_addr = 0x00
 
-    spi_cmd = (mode << 15) + (page << 12) + (start_addr << 6) + (end_addr);
+    const spi_cmd = (mode << 15) + (page << 12) + (start_addr << 6) + (end_addr);
     // MSB send first
     //  spi_cmd[15:0]
     //  spi_data[15:0]
-    spi_data = (spi_cmd << 16) + data_p;
-    addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
-    //---------------------------------------------------------------------
-    // write in the SPI_WR_DATA register
-    //---------------------------------------------------------------------
-    sendToFPA_debugSetWireIn(addr, spi_data);
+    const spi_data = (spi_cmd << 16) + data_p;
 
-    //---------------------------------------------------------------------
-    // write in the TRIG register
-    //  => activate the spi_valid bit
-    //---------------------------------------------------------------------
-    addr = FPASIM_ADDR_TRIGIN['TRIG'];
-    pos = FPASIM_POS_TRIGIN['spi_valid'];
-    sendToFPA_debugSetTriggerIn(addr, pos);
-    waitMs(100);
+    fpasim_set_spi_wr_data(data_p = spi_data, level_p = 0, mode_p = 0, verbosity_p = -1);
 
 }
 
@@ -189,46 +168,37 @@ function amc_read_command(addr_p, page_p) {
     //---------------------------------------------------------------------
     // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
-    mode = 0; // 0: rd, 1: wr
-    spi_id = 3; // 0: cdce,1: adc, 2: dac, 3: amc
-    data = (spi_id << 4) + mode;
-    addr = FPASIM_ADDR_WIREIN['SPI_CONF0'];
-    sendToFPA_debugSetWireIn(addr, data);
+    const spi_mode = 0; // 0: rd, 1: wr
+    const spi_id = 3; // 0: cdce,1: adc, 2: dac, 3: amc
+    fpasim_set_spi_conf0(spi_id_p = spi_id, spi_mode_p = spi_mode, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     //---------------------------------------------------------------------
-    // build the SPI commands
+    // build and write the SPI commands
     //    (see amc7823 datasheet) 
     //---------------------------------------------------------------------
-    mode = 1; // 0:wr, 1:rd
-    page = page_p // 0: page0, 1: page1
-    start_addr = addr_p // start address: 5 bits
-    end_addr = 0x00
+    const mode = 1; // 0:wr, 1:rd
+    const page = page_p // 0: page0, 1: page1
+    const start_addr = addr_p // start address: 5 bits
+    const end_addr = 0x00
 
-    spi_cmd = (mode << 15) + (page << 12) + (start_addr << 6) + (end_addr);
+    const spi_cmd = (mode << 15) + (page << 12) + (start_addr << 6) + (end_addr);
     // MSB send first
     //  spi_cmd[15:0]
     //  spi_data[15:0]
-    spi_data = (spi_cmd << 16) + 0x0000;
-    addr = FPASIM_ADDR_WIREIN['SPI_WR_DATA'];
-    //---------------------------------------------------------------------
-    // write in the SPI_WR_DATA register
-    //---------------------------------------------------------------------
-    sendToFPA_debugSetWireIn(addr, spi_data);
+    const spi_data = (spi_cmd << 16) + 0x0000;
+    fpasim_set_spi_wr_data(data_p = spi_data, level_p = 0, mode_p = 0, verbosity_p = -1);
+    waitMs(10);
 
     //---------------------------------------------------------------------
-    // write in the TRIG register
-    //  => activate the spi_valid bit
+    // Read the register value from the spi device
     //---------------------------------------------------------------------
-    addr = FPASIM_ADDR_TRIGIN['TRIG'];
-    pos = FPASIM_POS_TRIGIN['spi_valid'];
-    sendToFPA_debugSetTriggerIn(addr, pos);
-    waitMs(100);
-    //---------------------------------------------------------------------
-    // Read wire out registers
-    //---------------------------------------------------------------------
-    getLatestValue("FPA_WireOutValues");
+    const data = fpasim_get_wireout_spi_rd_data(level_p = 0, mode_p = 0, verbosity_p = -1);
 
-    return FPA_WireOutValues[22];
+    // keep only the data part
+    // from: cmd15 .. cmd0 data15 .. data0
+    // to: data15.. data0
+    data = (data & 0xFFFF);
+    return data;
 
 }
 
@@ -297,7 +267,7 @@ function amc_set_gpio(iomod_p, iost_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -377,7 +347,7 @@ function amc_set_dac(dac_p, dac_id_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -433,7 +403,7 @@ function amc_set_dac_load(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -493,7 +463,7 @@ function amc_set_dac_conf(slda_p, gdac_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -598,7 +568,7 @@ function amc_set_amc_status_conf(rstc_p, davf_p, sref_p, gref_p, ecnvt_p, level_
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -665,7 +635,7 @@ function amc_set_adc_ctrl(cmode_p, sa_p, ea_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -717,7 +687,7 @@ function amc_set_reset(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -794,7 +764,7 @@ function amc_set_power_down(padc_p, pdac_p, pts_p, prefb_p, level_p, mode_p, ver
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -861,7 +831,7 @@ function amc_set_threshold_hi(threshold_p, threshold_id_p, level_p, mode_p, verb
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -925,7 +895,7 @@ function amc_set_threshold_lo(threshold_p, threshold_id_p, level_p, mode_p, verb
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -980,7 +950,7 @@ function amc_get_adc0(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1035,7 +1005,7 @@ function amc_get_adc1(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1090,7 +1060,7 @@ function amc_get_adc2(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1145,7 +1115,7 @@ function amc_get_adc3(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1200,7 +1170,7 @@ function amc_get_adc4(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1255,7 +1225,7 @@ function amc_get_adc5(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1310,7 +1280,7 @@ function amc_get_adc6(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1365,7 +1335,7 @@ function amc_get_adc7(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1420,7 +1390,7 @@ function amc_get_adc8(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1532,7 +1502,7 @@ function amc_get_alr(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1605,7 +1575,7 @@ function amc_get_gpio(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1687,7 +1657,7 @@ function amc_get_dac(dac_id_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1739,7 +1709,7 @@ function amc_get_load_dac(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1799,7 +1769,7 @@ function amc_get_dac_conf(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1903,7 +1873,7 @@ function amc_get_amc_status_conf(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -1970,7 +1940,7 @@ function amc_get_adc_ctrl(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -2021,7 +1991,7 @@ function amc_get_reset(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -2095,7 +2065,7 @@ function amc_get_power_down(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -2162,11 +2132,11 @@ function amc_get_threshold_hi(threshold_id_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
-            display_bit(bit_name_p = "threshold_hi_p", bit_value_p = threshold_p, bit_width_p = 12, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "threshold_hi_p", bit_value_p = data, bit_width_p = 12, level_p = level2, mode_p = mode_p);
         }
     }
 }
@@ -2197,6 +2167,7 @@ function amc_get_threshold_lo(threshold_id_p, level_p, mode_p, verbosity_p) {
     const level2 = level_p + 2;
 
     const page = 1;
+
     switch (threshold_id_p) {
 
         case 0:
@@ -2224,11 +2195,11 @@ function amc_get_threshold_lo(threshold_id_p, level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
-            display_bit(bit_name_p = "threshold_lo_p", bit_value_p = threshold_p, bit_width_p = 12, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "threshold_lo_p", bit_value_p = data, bit_width_p = 12, level_p = level2, mode_p = mode_p);
         }
     }
 
@@ -2271,7 +2242,7 @@ function amc_get_part_rev_number(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_AMC_ADDR_VERBOSITY_MIN) {
-            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+            display_register(addr_p = addr, addr_width_p = c_AMC_SPI_ADDR_WIDTH, data_p = data, data_width_p = c_AMC_SPI_DATA_WIDTH, level_p = level1, mode_p = mode_p);
         }
 
         if (verbosity_p >= c_AMC_BIT_VERBOSITY_MIN) {
@@ -2362,7 +2333,7 @@ function adc_display_all_config(level_p, mode_p, verbosity_p) {
 
 
 
- /**
+/**
  * Default Configuration of the ads62p49 (adc) spi device (FMC150 board).
  * @param {number} level_p - level of indentation at the beginning.
  * @param {number} mode_p - define the print output.
@@ -2384,6 +2355,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
 
     // Enable the SPI on the FPGA board
     amc_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
      * #############################################################
@@ -2423,6 +2397,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         iomod_p = iomod, iost_p = iost,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
      * ##############################################################
@@ -2496,6 +2473,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /**
      * ##############################################################
      *  set the amc_set_adc_ctrl register
@@ -2525,6 +2505,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         cmode_p = cmode, sa_p = sa, ea_p = ea,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
      * ##############################################################
@@ -2568,6 +2551,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
      * ##############################################################
      *  set the amc_set_threshold_hi register
@@ -2583,6 +2569,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
      * ##############################################################
@@ -2600,6 +2589,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
      * ##############################################################
      *  set the amc_set_threshold_hi register
@@ -2615,6 +2607,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
      * ##############################################################
@@ -2632,6 +2627,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
      * ##############################################################
      *  set the amc_set_threshold_hi register
@@ -2647,6 +2645,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
      * ##############################################################
@@ -2664,6 +2665,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
      * ##############################################################
      *  set the amc_set_threshold_hi register
@@ -2680,6 +2684,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /**
      * ##############################################################
      *  set the amc_set_threshold_lo register
@@ -2695,6 +2702,9 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 
 }
