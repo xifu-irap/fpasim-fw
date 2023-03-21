@@ -35,6 +35,10 @@
 --     . steady_state =  TES_STD_STATE(addr1): use the addr value to read a pre-loaded RAM
 --     . o_pixel_result = steady_state - (pulse_shape * i_cmd_pulse_height)
 --
+--   Note:
+--     . If the state machine is processing a pulse for the pixel 0 and if a new command is received for the pixel 0, then
+--     the state machine stop the previous processing and start a new processing with the new set of paramters.
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -381,7 +385,7 @@ architecture RTL of tes_pulse_shape_manager is
   -- force output value when negative
   -------------------------------------------------------------------
   signal sign_value_tmp6 : std_logic;
-  signal result_rz : std_logic_vector(o_pixel_result'range);
+  signal result_rz       : std_logic_vector(o_pixel_result'range);
 
   -------------------------------------------------------------------
   -- sync with p_force_output_value_when_negative output
@@ -520,8 +524,6 @@ begin
           last_sample_pulse_shape_next <= '0';
         end if;
 
-        cnt_sample_pulse_shape_next <= cnt_sample_pulse_shape_table_r1(to_integer(unsigned(i_pixel_id)));
-
         if i_pixel_sof = '1' and i_pixel_valid = '1' then
           if (empty1 = '0') and (unsigned(cmd_pixel_id1) = unsigned(i_pixel_id)) then
             cmd_rd_next    <= '1';
@@ -529,14 +531,16 @@ begin
             pulse_sof_next <= '1';
 
             -- addr_pulse_shape to update
-            en_next           <= '1';
-            pulse_heigth_next <= unsigned(cmd_pulse_height1);
-            time_shift_next   <= unsigned(cmd_time_shift1);
+            en_next                     <= '1';
+            pulse_heigth_next           <= unsigned(cmd_pulse_height1);
+            time_shift_next             <= unsigned(cmd_time_shift1);
+            cnt_sample_pulse_shape_next <= (others => '0');
           else
-            cmd_rd_next       <= '0';
-            en_next           <= en_table_r1(to_integer(unsigned(i_pixel_id)));
-            pulse_heigth_next <= pulse_heigth_table_r1(to_integer(unsigned(i_pixel_id)));
-            time_shift_next   <= time_shift_table_r1(to_integer(unsigned(i_pixel_id)));
+            cmd_rd_next                 <= '0';
+            en_next                     <= en_table_r1(to_integer(unsigned(i_pixel_id)));
+            pulse_heigth_next           <= pulse_heigth_table_r1(to_integer(unsigned(i_pixel_id)));
+            time_shift_next             <= time_shift_table_r1(to_integer(unsigned(i_pixel_id)));
+            cnt_sample_pulse_shape_next <= cnt_sample_pulse_shape_table_r1(to_integer(unsigned(i_pixel_id)));
           end if;
 
           sm_state_next <= E_RUN;
@@ -997,7 +1001,7 @@ begin
   -- force output value when negative.
   --------------------------------------------------------------------
   sign_value_tmp6 <= result_ry(result_ry'high);
-  p_force_output_value_when_negative: process (i_clk) is
+  p_force_output_value_when_negative : process (i_clk) is
   begin
     if rising_edge(i_clk) then
       if sign_value_tmp6 = '1' then
@@ -1059,13 +1063,13 @@ begin
     port map(
       i_clk                    => i_clk,      -- clock 
       i_rst                    => i_rst,      -- reset 
-      i_rst_status             => i_rst_status,         -- reset error flag(s) 
+      i_rst_status             => i_rst_status,     -- reset error flag(s) 
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_pixel_valid            => pixel_valid_ry,       -- pixel valid
+      i_pixel_valid            => pixel_valid_ry,   -- pixel valid
       i_pixel_result_sign      => sign_value_tmp6,  -- sign of the pixel result
-      i_pixel_id               => pixel_id_ry,          -- pixel id
+      i_pixel_id               => pixel_id_ry,      -- pixel id
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
