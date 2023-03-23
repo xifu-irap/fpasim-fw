@@ -205,6 +205,7 @@ entity regdecode_top is
     o_reg_error_delay                 : out std_logic_vector(31 downto 0);  -- register error_delay value
     o_reg_ra_delay                    : out std_logic_vector(31 downto 0);  -- register ra_delay value
     o_reg_tes_conf                    : out std_logic_vector(31 downto 0);  -- register tes_conf value
+    o_reg_conf0                       : out std_logic_vector(31 downto 0);  -- register conf0 value
     -- ctrl register
     o_reg_ctrl_valid                  : out std_logic;  -- register ctrl valid
     o_reg_ctrl                        : out std_logic_vector(31 downto 0);  -- register ctrl value
@@ -276,6 +277,7 @@ architecture RTL of regdecode_top is
   signal usb_wireout_error_delay         : std_logic_vector(31 downto 0);
   signal usb_wireout_ra_delay            : std_logic_vector(31 downto 0);
   signal usb_wireout_tes_conf            : std_logic_vector(31 downto 0);
+  signal usb_wireout_conf0               : std_logic_vector(31 downto 0);
   signal usb_wireout_fpasim_status       : std_logic_vector(31 downto 0);
   signal usb_wireout_debug_ctrl          : std_logic_vector(31 downto 0);
   signal usb_wireout_firmware_id         : std_logic_vector(31 downto 0);
@@ -318,6 +320,7 @@ architecture RTL of regdecode_top is
   signal usb_wirein_error_delay     : std_logic_vector(31 downto 0);
   signal usb_wirein_ra_delay        : std_logic_vector(31 downto 0);
   signal usb_wirein_tes_conf        : std_logic_vector(31 downto 0);
+  signal usb_wirein_conf0           : std_logic_vector(31 downto 0);
   -- recording: register
   signal usb_wirein_rec_ctrl        : std_logic_vector(31 downto 0);
   signal usb_wirein_rec_conf0       : std_logic_vector(31 downto 0);
@@ -432,16 +435,19 @@ architecture RTL of regdecode_top is
   constant c_REG_IDX5_L : integer := c_REG_IDX4_H + 1;
   constant c_REG_IDX5_H : integer := c_REG_IDX5_L + usb_wirein_tes_conf'length - 1;
 
+  constant c_REG_IDX6_L : integer := c_REG_IDX5_H + 1;
+  constant c_REG_IDX6_H : integer := c_REG_IDX6_L + usb_wirein_conf0'length - 1;
+
   signal reg_data_valid_tmp0 : std_logic;
-  signal reg_data_tmp0       : std_logic_vector(c_REG_IDX5_H downto 0);
+  signal reg_data_tmp0       : std_logic_vector(c_REG_IDX6_H downto 0);
 
   signal reg_rd_tmp1    : std_logic;
   -- signal reg_data_valid_tmp1 : std_logic;
-  signal reg_data_tmp1  : std_logic_vector(c_REG_IDX5_H downto 0);
+  signal reg_data_tmp1  : std_logic_vector(c_REG_IDX6_H downto 0);
   signal reg_empty_tmp1 : std_logic;
 
   signal reg_data_valid_tmp2 : std_logic;
-  signal reg_data_tmp2       : std_logic_vector(c_REG_IDX5_H downto 0);
+  signal reg_data_tmp2       : std_logic_vector(c_REG_IDX6_H downto 0);
 
   signal reg_errors : std_logic_vector(15 downto 0);
   signal reg_status : std_logic_vector(7 downto 0);
@@ -602,6 +608,7 @@ begin
       i_usb_wireout_error_delay     => usb_wireout_error_delay,
       i_usb_wireout_ra_delay        => usb_wireout_ra_delay,
       i_usb_wireout_tes_conf        => usb_wireout_tes_conf,
+      i_usb_wireout_conf0           => usb_wireout_conf0,
       i_usb_wireout_fpasim_status   => usb_wireout_fpasim_status,
 
       i_usb_wireout_debug_ctrl          => usb_wireout_debug_ctrl,
@@ -645,6 +652,7 @@ begin
       o_usb_wirein_error_delay     => usb_wirein_error_delay,
       o_usb_wirein_ra_delay        => usb_wirein_ra_delay,
       o_usb_wirein_tes_conf        => usb_wirein_tes_conf,
+      o_usb_wirein_conf0           => usb_wirein_conf0,
       -- recording
       o_usb_wirein_rec_ctrl        => usb_wirein_rec_ctrl,
       o_usb_wirein_rec_conf0       => usb_wirein_rec_conf0,
@@ -861,6 +869,7 @@ begin
   -- common register
   ---------------------------------------------------------------------
   reg_data_valid_tmp0                             <= trig_reg_valid;
+  reg_data_tmp0(c_REG_IDX6_H downto c_REG_IDX6_L) <= usb_wirein_conf0;
   reg_data_tmp0(c_REG_IDX5_H downto c_REG_IDX5_L) <= usb_wirein_tes_conf;
   reg_data_tmp0(c_REG_IDX4_H downto c_REG_IDX4_L) <= usb_wirein_ra_delay;
   reg_data_tmp0(c_REG_IDX3_H downto c_REG_IDX3_L) <= usb_wirein_error_delay;
@@ -909,6 +918,7 @@ begin
 
   -- output: to USB
   ---------------------------------------------------------------------
+  usb_wireout_conf0           <= reg_data_tmp1(c_REG_IDX6_H downto c_REG_IDX6_L);
   usb_wireout_tes_conf        <= reg_data_tmp1(c_REG_IDX5_H downto c_REG_IDX5_L);
   usb_wireout_ra_delay        <= reg_data_tmp1(c_REG_IDX4_H downto c_REG_IDX4_L);
   usb_wireout_error_delay     <= reg_data_tmp1(c_REG_IDX3_H downto c_REG_IDX3_L);
@@ -919,6 +929,7 @@ begin
   -- output: to the user
   ---------------------------------------------------------------------
   o_reg_valid           <= reg_data_valid_tmp2;
+  o_reg_conf0           <= reg_data_tmp2(c_REG_IDX6_H downto c_REG_IDX6_L);
   o_reg_tes_conf        <= reg_data_tmp2(c_REG_IDX5_H downto c_REG_IDX5_L);
   o_reg_ra_delay        <= reg_data_tmp2(c_REG_IDX4_H downto c_REG_IDX4_L);
   o_reg_error_delay     <= reg_data_tmp2(c_REG_IDX3_H downto c_REG_IDX3_L);

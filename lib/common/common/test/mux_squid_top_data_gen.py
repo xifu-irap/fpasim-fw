@@ -155,7 +155,10 @@ class MuxSquidTopDataGen:
         ram2_check = json_data['ram2']['generic']['check']
         ram2_verbosity = json_data['ram2']['generic']['verbosity']
 
+        inter_squid_gain  = json_data["register"]["value"]["inter_squid_gain"]
+
         dic = {}
+        dic['g_INTER_SQUID_GAIN'] = int(inter_squid_gain)
         dic['g_NB_PIXEL_BY_FRAME'] = int(nb_pixel_by_frame)
         dic['g_RAM1_CHECK'] = bool(ram1_check)
         dic['g_RAM1_VERBOSITY'] = ram1_verbosity
@@ -402,12 +405,14 @@ class MuxSquidTopDataGen:
         #########################################################
         mux_squid_offset_name = json_data["ram1"]["generic"]["name"]
         mux_squid_tf_name = json_data["ram2"]["generic"]["name"]
+        inter_squid_gain  = int(json_data["register"]["value"]["inter_squid_gain"])
         obj = MuxSquidModel()
         obj.set_ram_mux_squid_offset(data_list_p=dic_ram_content_tmp[mux_squid_offset_name])
         obj.set_ram_mux_squid_tf(data_list_p=dic_ram_content_tmp[mux_squid_tf_name])
         obj.set_pixel_id(data_list_p=pixel_id_list)
         obj.set_data(data_list_p=pixel_result_oversample_list)
         obj.set_mux_squid_feedback(data_list_p=mux_squid_oversample_list)
+        obj.set_register(inter_squid_gain_p=inter_squid_gain)
         obj.run()
 
         result_list = obj.get_result()

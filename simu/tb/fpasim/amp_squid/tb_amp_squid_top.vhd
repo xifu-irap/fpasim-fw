@@ -53,7 +53,7 @@ entity tb_amp_squid_top is
     -- address        
     g_AMP_SQUID_TF_RAM_ADDR_WIDTH : positive := pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
     -- computation 
-    g_PIXEL_RESULT_INPUT_WIDTH    : positive := pkg_MUX_SQUID_ADD_Q_WIDTH_S; -- pixel input result bus width (expressed in bits). Possible values [1; max integer value[
+    g_PIXEL_RESULT_INPUT_WIDTH    : positive := pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S; -- pixel input result bus width (expressed in bits). Possible values [1; max integer value[
     g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_AMP_SQUID_MULT_Q_WIDTH;
     ---------------------------------------------------------------------
     -- simulation parameters

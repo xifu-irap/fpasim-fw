@@ -31,6 +31,9 @@
 --      . offset =  MUX_SQUID_OFFSET(addr1): use the addr value to read a pre-loaded RAM
 --      . o_pixel_result = S0 + offset
 --
+--    Note:
+--       . i_inter_squid_gain is not aligned with the data flow.
+--     
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -38,27 +41,31 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.pkg_fpasim.all;
+use work.pkg_regdecode.all;
 
 entity mux_squid is
   generic(
+    -- command
+    g_INTER_SQUID_GAIN_WIDTH                : positive := pkg_CONF0_INTER_SQUID_GAIN_WIDTH;  -- inter_squid_gain bus width (expressed in bits). Possible values: [1; max integer value[
     -- pixel
     g_PIXEL_ID_WIDTH                        : positive := pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH;  -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
     -- address
     g_MUX_SQUID_TF_RAM_ADDR_WIDTH           : positive := pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- computation
     g_PIXEL_RESULT_INPUT_WIDTH              : positive := pkg_TES_MULT_SUB_Q_WIDTH_S;  -- pixel input result bus width  (expressed in bits). Possible values: [1; max integer value[
-    g_PIXEL_RESULT_OUTPUT_WIDTH             : positive := pkg_MUX_SQUID_ADD_Q_WIDTH_S;  -- pixel output result bus width (expressed in bits). Possible values: [1; max integer value[
+    g_PIXEL_RESULT_OUTPUT_WIDTH             : positive := pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S;  -- pixel output result bus width (expressed in bits). Possible values: [1; max integer value[
     -- RAM configuration filename
     g_MUX_SQUID_OFFSET_RAM_MEMORY_INIT_FILE : string   := pkg_MUX_SQUID_OFFSET_RAM_MEMORY_INIT_FILE;
     g_MUX_SQUID_TF_RAM_MEMORY_INIT_FILE     : string   := pkg_MUX_SQUID_TF_RAM_MEMORY_INIT_FILE
     );
   port(
-    i_clk         : in std_logic;       -- clock
-    i_rst_status  : in std_logic;       -- reset error flag(s)
-    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    i_clk              : in std_logic;  -- clock
+    i_rst_status       : in std_logic;  -- reset error flag(s)
+    i_debug_pulse      : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
+    i_inter_squid_gain : in std_logic_vector(g_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
     -- RAM: mux_squid_offset
     -- wr
@@ -207,8 +214,9 @@ architecture RTL of mux_squid is
   -- add: mux_squid_offset + mux_squid_tf
   -------------------------------------------------------------------
   -- add a sign bit
-  signal mux_squid_tf_tmp     : std_logic_vector(pkg_MUX_SQUID_ADD_Q_WIDTH_B - 1 downto 0);
-  signal mux_squid_offset_tmp : std_logic_vector(pkg_MUX_SQUID_ADD_Q_WIDTH_A - 1 downto 0);
+  signal inter_squid_gain_tmp : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_A - 1 downto 0);
+  signal mux_squid_tf_tmp     : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_B - 1 downto 0);
+  signal mux_squid_offset_tmp : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_C - 1 downto 0);
   signal result_rz            : std_logic_vector(o_pixel_result'range);
 
   ---------------------------------------------------------------------
@@ -535,41 +543,47 @@ begin
       )
     port map(
       i_clk  => i_clk,                  -- clock signal
-      i_data => mux_squid_offset_doutb,              -- input data
+      i_data => mux_squid_offset_doutb,        -- input data
       o_data => mux_squid_offset_ry     -- output data with/without delay
       );
 
   ---------------------------------------------------------------------
   -- add mux_squid_offset + mux_squid_tf
   ---------------------------------------------------------------------
+  assert not ((i_inter_squid_gain'length) /= ((inter_squid_gain_tmp'length) - 1)) report "[mux_squid]: inter_squid_gain_tmp => port width and sfixed package definition width doesn't match." severity error;
   assert not ((mux_squid_tf_doutb'length) /= ((mux_squid_tf_tmp'length) - 1)) report "[mux_squid]: mux_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
   assert not ((mux_squid_offset_tmp'length) /= (mux_squid_offset_ry'length)) report "[mux_squid]: mux_squid_offset_tmp => port width and sfixed package definition width doesn't match." severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
+  inter_squid_gain_tmp <= std_logic_vector(resize(unsigned(i_inter_squid_gain), inter_squid_gain_tmp'length));
   mux_squid_tf_tmp     <= std_logic_vector(resize(unsigned(mux_squid_tf_doutb), mux_squid_tf_tmp'length));
   -- no conversion => width unchanged
   mux_squid_offset_tmp <= mux_squid_offset_ry;
 
-  inst_add_sfixed_mux_squid_offset_and_tf : entity work.add_sfixed
+  inst_mult_add_sfixed_mux_squid_offset_and_tf : entity work.mult_add_sfixed
     generic map(
       -- port A: AMD Q notation (fixed point)
-      g_Q_M_A => pkg_MUX_SQUID_ADD_Q_M_A,
-      g_Q_N_A => pkg_MUX_SQUID_ADD_Q_N_A,
+      g_Q_M_A => pkg_MUX_SQUID_MULT_ADD_Q_M_A,
+      g_Q_N_A => pkg_MUX_SQUID_MULT_ADD_Q_N_A,
       -- port B: AMD Q notation (fixed point)
-      g_Q_M_B => pkg_MUX_SQUID_ADD_Q_M_B,
-      g_Q_N_B => pkg_MUX_SQUID_ADD_Q_N_B,
+      g_Q_M_B => pkg_MUX_SQUID_MULT_ADD_Q_M_B,
+      g_Q_N_B => pkg_MUX_SQUID_MULT_ADD_Q_N_B,
+      -- port C: AMC Q notation (fixed point)
+      g_Q_M_C => pkg_MUX_SQUID_MULT_ADD_Q_M_C,
+      g_Q_N_C => pkg_MUX_SQUID_MULT_ADD_Q_N_C,
       -- port S: AMD Q notation (fixed point)
-      g_Q_M_S => pkg_MUX_SQUID_ADD_Q_M_S,
-      g_Q_N_S => pkg_MUX_SQUID_ADD_Q_N_S
+      g_Q_M_S => pkg_MUX_SQUID_MULT_ADD_Q_M_S,
+      g_Q_N_S => pkg_MUX_SQUID_MULT_ADD_Q_N_S
       )
     port map(
       i_clk => i_clk,
       --------------------------------------------------------------
       -- input
       --------------------------------------------------------------
-      i_a   => mux_squid_offset_tmp,
+      i_a   => inter_squid_gain_tmp,
       i_b   => mux_squid_tf_tmp,
+      i_c   => mux_squid_offset_tmp,
       --------------------------------------------------------------
-      -- output : S = a + B
+      -- output : S = C + A*B
       --------------------------------------------------------------
       o_s   => result_rz  -- @suppress "Incorrect array size in assignment: expected (<34>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
       );
@@ -581,9 +595,9 @@ begin
   data_pipe_tmp4(c_IDX2_H)                 <= pixel_sof_ry;
   data_pipe_tmp4(c_IDX1_H)                 <= pixel_eof_ry;
   data_pipe_tmp4(c_IDX0_H downto c_IDX0_L) <= pixel_id_ry;
-  inst_pipeliner_sync_with_add_sfixed_mux_squid_offset_and_tf_out : entity work.pipeliner
+  inst_pipeliner_sync_with_mult_add_sfixed_mux_squid_offset_and_tf_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => pkg_ADD_SFIXED_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_MULT_ADD_SFIXED_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp4'length  -- width of the input/output data.  Possibles values: [1, integer max value[
       )
     port map(

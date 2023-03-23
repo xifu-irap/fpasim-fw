@@ -32,6 +32,7 @@ use ieee.numeric_std.all;
 
 library fpasim;
 use fpasim.pkg_fpasim.all;
+use fpasim.pkg_regdecode.all;
 
 library vunit_lib;
 context vunit_lib.vunit_context;
@@ -46,6 +47,7 @@ entity tb_mux_squid_top is
     ---------------------------------------------------------------------
     -- DUT generic
     ---------------------------------------------------------------------
+     g_INTER_SQUID_GAIN_WIDTH  : positive := pkg_CONF0_INTER_SQUID_GAIN_WIDTH;  -- inter_squid_gain bus width (expressed in bits). Possible values: [1; max integer value[
     -- pixel
     g_PIXEL_ID_WIDTH              : positive := pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH; -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
     -- frame
@@ -54,11 +56,12 @@ entity tb_mux_squid_top is
     g_MUX_SQUID_TF_RAM_ADDR_WIDTH : positive := pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
     -- computation
     g_PIXEL_RESULT_INPUT_WIDTH    : positive := pkg_TES_MULT_SUB_Q_WIDTH_S; -- pixel input result bus width (expressed in bits). Possible values: [1; max integer value[
-    g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_MUX_SQUID_ADD_Q_WIDTH_S;
+    g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S;
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
     g_NB_PIXEL_BY_FRAME           : positive := 1;
+    g_INTER_SQUID_GAIN            : natural := 255;
     g_VUNIT_DEBUG                 : boolean  := true;
     g_TEST_NAME                   : string   := "";
     g_ENABLE_CHECK                : boolean  := true;
@@ -88,6 +91,7 @@ architecture simulate of tb_mux_squid_top is
 
   -- input command: from the regdecode
   ---------------------------------------------------------------------
+  signal  i_inter_squid_gain : std_logic_vector(g_INTER_SQUID_GAIN_WIDTH - 1 downto 0):= std_logic_vector(to_unsigned(g_INTER_SQUID_GAIN,g_INTER_SQUID_GAIN_WIDTH));
   -- RAM: mux_squid_offset
   -- wr
   signal i_mux_squid_offset_wr_en      : std_logic;
@@ -269,6 +273,7 @@ begin
     ---------------------------------------------------------------------
     -- DUT GENERIC
     ---------------------------------------------------------------------
+    info("    g_INTER_SQUID_GAIN_WIDTH = " & to_string(g_INTER_SQUID_GAIN_WIDTH));
     info("    g_PIXEL_ID_WIDTH = " & to_string(g_PIXEL_ID_WIDTH));
     info("    g_FRAME_ID_WIDTH = " & to_string(g_FRAME_ID_WIDTH));
     info("    g_MUX_SQUID_TF_RAM_ADDR_WIDTH = " & to_string(g_MUX_SQUID_TF_RAM_ADDR_WIDTH));
@@ -276,6 +281,8 @@ begin
     info("    g_PIXEL_RESULT_OUTPUT_WIDTH = " & to_string(g_PIXEL_RESULT_OUTPUT_WIDTH));
 
     -- simulator paramters
+    info("    g_NB_PIXEL_BY_FRAME = " & to_string(g_NB_PIXEL_BY_FRAME));
+    info("    g_INTER_SQUID_GAIN = " & to_string(g_INTER_SQUID_GAIN));
     info("    g_VUNIT_DEBUG = " & to_string(g_VUNIT_DEBUG));
     info("    g_TEST_NAME = " & g_TEST_NAME);
     info("    g_ENABLE_CHECK = " & to_string(g_ENABLE_CHECK));
@@ -652,6 +659,7 @@ begin
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
+       i_inter_squid_gain          => i_inter_squid_gain, 
       -- RAM: mux_squid_offset
       -- wr
       i_mux_squid_offset_wr_en      => i_mux_squid_offset_wr_en, -- write enable

@@ -70,6 +70,7 @@ class MuxSquidModel:
         self.pixel_id_list = None
         self.data_list = None
         self.mux_squid_feadback_list = None
+        self.inter_squid_gain = None
         self.result = None
 
 
@@ -121,6 +122,8 @@ class MuxSquidModel:
         """
         self.mux_squid_feadback_list = [int(i) for i in data_list_p]
 
+    def set_register(self,inter_squid_gain_p):
+        self.inter_squid_gain = inter_squid_gain_p
 
     def run(self):
 
@@ -129,6 +132,9 @@ class MuxSquidModel:
         mux_squid_feadback_list = self.mux_squid_feadback_list
         mux_squid_tf_list = self.mux_squid_tf_list
         mux_squid_offset_list = self.mux_squid_offset_list
+        inter_squid_gain = self.inter_squid_gain
+
+        inter_squid_gain = inter_squid_gain / 2**8
         result = []
         L = len(pixel_id_list)
         for i in range(L):
@@ -137,17 +143,25 @@ class MuxSquidModel:
             mux_squid_feedback = mux_squid_feadback_list[i]
 
             sub = data - mux_squid_feedback
-            # check if 0 <= sub<= 2**14-1
-            mux_squid_tf = 0
-            if (0 <= sub) and (sub <= 2**14-1):
-                mux_squid_tf = mux_squid_tf_list[sub]
-            else:
-                msg0 = '[MuxSquidModel]: ERROR  0 <= (result - mux_squid_feadback) <= (2**14-1) is not verified'
-                print(msg0)
 
+            # convert sub into unsigned int
+            if sub < 0:
+                addr = 2**16 - sub
+            else:
+                addr = sub
+
+            # compute the modulo on the addr_width
+            addr = addr % (2**14)
+            # get the mux_squid_tf value
+            mux_squid_tf = mux_squid_tf_list[addr]
+
+            # apply the gain
+            mux_squid_tf_with_gain = inter_squid_gain * mux_squid_tf
+
+            # get the mux_squid_offset
             mux_squid_offset = mux_squid_offset_list[pixel_id]
 
-            add = mux_squid_offset + mux_squid_tf
+            add = mux_squid_offset + mux_squid_tf_with_gain
 
             result.append(add)
 

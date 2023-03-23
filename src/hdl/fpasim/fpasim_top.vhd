@@ -29,6 +29,7 @@
 --    Note: the application reset is managed in the reset_top module in the upper level. 
 --       o_usb_rst -> reset_top -> i_rst
 --       o_usb_rst -> reset_top -> i_usb_rst
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -160,6 +161,9 @@ architecture RTL of fpasim_top is
   signal nb_sample_by_pixel : std_logic_vector(pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH - 1 downto 0);
   signal nb_sample_by_frame : std_logic_vector(pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
 
+  -- conf0 register
+  signal inter_squid_gain : std_logic_vector(pkg_CONF0_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
+
   -- debug_ctrl register
   signal rst_status  : std_logic;
   signal debug_pulse : std_logic;
@@ -228,7 +232,8 @@ architecture RTL of fpasim_top is
   signal reg_error_delay         : std_logic_vector(31 downto 0);
   signal reg_ra_delay            : std_logic_vector(31 downto 0);
   signal reg_tes_conf            : std_logic_vector(31 downto 0);
-  -- ctrl register
+  signal reg_conf0               : std_logic_vector(31 downto 0);
+  -- ctrl register  
   signal reg_ctrl_valid          : std_logic;  -- register ctrl valid -- @suppress "signal reg_ctrl_valid is never read"
   signal reg_ctrl                : std_logic_vector(31 downto 0);
   -- debug ctrl register
@@ -319,7 +324,7 @@ architecture RTL of fpasim_top is
   signal pixel_eof2        : std_logic;
   signal pixel_valid2      : std_logic;
   signal pixel_id2         : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
-  signal pixel_result2     : std_logic_vector(pkg_MUX_SQUID_ADD_Q_WIDTH_S - 1 downto 0);
+  signal pixel_result2     : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S - 1 downto 0);
   signal frame_sof2        : std_logic;
   signal frame_eof2        : std_logic;
   signal frame_id2         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);
@@ -497,6 +502,7 @@ begin
       o_reg_error_delay                 => reg_error_delay,
       o_reg_ra_delay                    => reg_ra_delay,
       o_reg_tes_conf                    => reg_tes_conf,
+      o_reg_conf0                       => reg_conf0,
       -- ctrl register
       o_reg_ctrl_valid                  => reg_ctrl_valid,
       o_reg_ctrl                        => reg_ctrl,
@@ -571,6 +577,9 @@ begin
   nb_pixel_by_frame  <= reg_tes_conf(pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>) but was (<6>)"
   nb_sample_by_pixel <= reg_tes_conf(pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H downto pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH>) but was (<7>)"
   nb_sample_by_frame <= reg_tes_conf(pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH>) but was (<13>)"
+
+  -- conf0 register
+  inter_squid_gain <= reg_conf0(pkg_CONF0_INTER_SQUID_GAIN_IDX_H downto pkg_CONF0_INTER_SQUID_GAIN_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH>) but was (<13>)"
 
   -- debug_ctrl register
   debug_pulse <= reg_debug_ctrl(pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H);
@@ -824,6 +833,8 @@ begin
 
   inst_mux_squid_top : entity work.mux_squid_top
     generic map(
+      -- command
+      g_INTER_SQUID_GAIN_WIDTH      => inter_squid_gain'length,
       -- pixel
       g_PIXEL_ID_WIDTH              => pixel_id1'length,
       -- frame
@@ -841,6 +852,7 @@ begin
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
+      i_inter_squid_gain            => inter_squid_gain,
       -- RAM: mux_squid_offset
       -- wr
       i_mux_squid_offset_wr_en      => mux_squid_offset_ram_wr_en,
@@ -901,7 +913,7 @@ begin
       )
     port map(
       i_clk  => i_clk,                  -- clock signal
-      i_data => amp_squid_offset_correction1,   -- input data
+      i_data => amp_squid_offset_correction1,     -- input data
       o_data => amp_squid_offset_correction2  -- output data with/without delay
       );
 
@@ -1007,7 +1019,7 @@ begin
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
- 
+
 
   gen_not_dac_debug : if g_FPASIM_DEBUG = false generate
   begin
@@ -1021,13 +1033,13 @@ begin
     select_path : process (i_clk) is
     begin
       if rising_edge(i_clk) then
-         o_dac_valid <= dac_valid4;
-         o_dac_frame <= dac_frame4;
-         
+        o_dac_valid <= dac_valid4;
+        o_dac_frame <= dac_frame4;
+
         if debug_dac_sel = '1' then
-          o_dac          <= debug_dac;
+          o_dac <= debug_dac;
         else
-          o_dac          <= dac4;
+          o_dac <= dac4;
         end if;
       end if;
     end process select_path;

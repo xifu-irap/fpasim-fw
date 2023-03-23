@@ -397,7 +397,7 @@ package body pkg_usb is
                   i_internal_rd_if => i_internal_rd_if
                   );
 
-              when 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 212 | 213 | 218 | 219 | 220 | 221 | 224 | 225 =>
+              when 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 208 | 212 | 213 | 218 | 219 | 220 | 221 | 224 | 225 =>
                 ---------------------------------------------------------------------
                 -- wire in
                 ---------------------------------------------------------------------
@@ -425,6 +425,9 @@ package body pkg_usb is
                   end if;
                   if v_file_reg_id = 207 then
                     info("[pkg_usb_wr] : Set TES_CONF Register: " & to_string(v_file_data));
+                  end if;
+                  if v_file_reg_id = 208 then
+                    info("[pkg_usb_wr] : Set CONF0 Register: " & to_string(v_file_data));
                   end if;
 
                   if v_file_reg_id = 212 then
@@ -517,7 +520,7 @@ package body pkg_usb is
                   v_pipe_rd_cnt_word := v_pipe_rd_cnt_word + 1;
                 end if;
 
-              when 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 510 | 511 | 512 | 513 | 517 | 518 | 519 | 520 | 521 | 522 | 523 | 524 | 525 | 526 | 527 | 529 | 530 | 531 =>
+              when 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 508 | 510 | 511 | 512 | 513 | 517 | 518 | 519 | 520 | 521 | 522 | 523 | 524 | 525 | 526 | 527 | 529 | 530 | 531 =>
                 ---------------------------------------------------------------------
                 -- wire out
                 ---------------------------------------------------------------------
@@ -545,6 +548,9 @@ package body pkg_usb is
                   end if;
                   if v_file_reg_id = 507 then
                     info("[pkg_usb_wr] : Get TES_CONF Register");
+                  end if;
+                  if v_file_reg_id = 508 then
+                    info("[pkg_usb_wr] : Get CONF0 Register");
                   end if;
                   if v_file_reg_id = 510 then
                     info("[pkg_usb_wr] : Get FPASIM_STATUS Register");
@@ -644,6 +650,9 @@ package body pkg_usb is
                 end if;
                 if v_file_reg_id = 507 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get TES_CONF Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                end if;
+                if v_file_reg_id = 508 then
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get CONF0 Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 510 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FPASIM_STATUS Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));

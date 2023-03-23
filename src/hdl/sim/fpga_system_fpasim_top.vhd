@@ -67,6 +67,7 @@ entity fpga_system_fpasim_top is
     g_AMP_SQ_OF_DELAY    : natural := 3;  -- delay on the adc1 input path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
     g_ERROR_DELAY        : natural := 3;  -- delay on the dac output path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
     g_RA_DELAY           : natural := 4;  -- delay on the sync output path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
+    g_INTER_SQUID_GAIN   : natural := 255;  -- inter squid gain. The range is: [0;(2**8) - 1]
     g_NB_PIXEL_BY_FRAME  : natural := 34;  -- number of pixels by column
     g_NB_SAMPLE_BY_PIXEL : natural := 40  -- number of pixels by pixels
     );
@@ -349,6 +350,27 @@ begin
       i_internal_rd_if   => usb_rd_if0);
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    ---------------------------------------------------------------------
+    -- set CONF0
+    ---------------------------------------------------------------------
+    v_opal_kelly_addr := x"08";
+    v_data            := g_INTER_SQUID_GAIN;
+    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
+    SetWireInValue(
+      i_ep               => v_opal_kelly_addr,
+      i_val              => v_data_vect,
+      i_mask             => c_WIRE_NO_MASK,
+      b_front_panel_conf => v_front_panel_conf
+      );
+
+    UpdateWireIns(
+      b_front_panel_conf => v_front_panel_conf,
+      o_internal_wr_if   => usb_wr_if0,
+      i_internal_rd_if   => usb_rd_if0);
+
+    pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
 
     ---------------------------------------------------------------------
     -- trig reg_valid bit

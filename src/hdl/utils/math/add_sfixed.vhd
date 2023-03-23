@@ -17,18 +17,20 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   add_sfixed.vhd 
+--    @file                   add_sfixed.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 --
--- This module computes the following formula: s = a + b (sfixed point representation)
--- It performs the following steps:
---   . According the generic parameters, convert its 2 input operands (a, b) into sfixed type
---   . s = a + b
---   . According the generic parameter values, extract the corresponding bits from s and convert it into an output std_logic_vector vector
+--    This module computes the following formula: s = a + b (sfixed point representation).
+--    It performs the following steps:
+--      . convert its 2 input operands (a, b) into sfixed type (see generic parameters).
+--      . s = a + b
+--      . extract sfixed range bits from s (see generic parameters).
+--      . convert the extracted bits into a std_logic_vector vector.
+--
 -------------------------------------------------------------------------------
 
 library ieee;
@@ -40,13 +42,13 @@ use ieee.fixed_float_types.all;
 
 entity add_sfixed is
   generic(
-    -- port A: AMD Q notation (fixed point)
+    -- port A: ARM Q notation (fixed point)
     g_Q_M_A : in positive := 15; -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
     g_Q_N_A : in natural := 0; -- number of fraction bits. Possible values [0;integer_max_value[
-    -- port B: AMD Q notation (fixed point)
+    -- port B: ARM Q notation (fixed point)
     g_Q_M_B : in positive := 15; -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
     g_Q_N_B : in natural := 0; -- number of fraction bits. Possible values [0;integer_max_value[
-    -- port S: AMD Q notation (fixed point)
+    -- port S: ARM Q notation (fixed point)
     g_Q_M_S  : in positive := 16; -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
     g_Q_N_S  : in natural := 0 -- number of fraction bits. Possible values [0;integer_max_value[
   );
@@ -69,17 +71,20 @@ end entity add_sfixed;
 
 architecture RTL of add_sfixed is
 
+    -----------------------------------------------------------------
+    -- step0: 
+    -----------------------------------------------------------------
     signal a_tmp : sfixed(g_Q_M_A - 1 downto -g_Q_N_A);
     signal b_tmp : sfixed(g_Q_M_B - 1 downto -g_Q_N_B);
 
     -----------------------------------------------------------------
-    -- step1: add 1 sign bit
+    -- step1: pipe 
     -----------------------------------------------------------------
     signal a_r1    : sfixed(a_tmp'high downto a_tmp'low):= (others => '0');
     signal b_r1    : sfixed(b_tmp'high downto b_tmp'low):= (others => '0');
 
     ---------------------------------------------------------------------
-    -- step3:
+    -- step4:
     --   res_r2 = a_r1 + b_r1
     ---------------------------------------------------------------------
     signal res_r2 : sfixed(sfixed_high(a_r1, '+', b_r1) downto sfixed_low(a_r1, '+', b_r1)):= (others => '0');
@@ -87,7 +92,7 @@ architecture RTL of add_sfixed is
     -----------------------------------------------------------------
     -- truncate: 
     --   extract sfixed range
-    --   sfixed -> ufixed conversion
+    --   sfixed -> std_logic_vector conversion
     -----------------------------------------------------------------
     signal res_tmp3 : sfixed(g_Q_M_S - 1 downto -g_Q_N_S);
 
@@ -102,7 +107,7 @@ begin
   begin
       if rising_edge(i_clk) then
           -------------------------------------------------------------
-          -- step1 : ufixed to sfixed conversion (because of the latter negate operation)
+          -- step1 
           -------------------------------------------------------------
           a_r1    <= sfixed(a_tmp);
           b_r1    <= sfixed(b_tmp);

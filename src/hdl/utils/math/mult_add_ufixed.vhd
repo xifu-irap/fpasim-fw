@@ -17,18 +17,20 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   mult_add_ufixed.vhd 
+--    @file                   mult_add_ufixed.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 --
--- This module computes the following formula: s = c + (a * b) (ufixed point representation)
--- It performs the following steps:
---   . According the generic parameters, convert its 3 input operands (a, b, c) into ufixed type
---   . s = c + (a * b)
---   . According the generic parameter values, extract the corresponding bits from s and convert it into an output std_logic_vector vector
+--    This module computes the following formula: s = c + (a * b) (ufixed point representation).
+--    It performs the following steps:
+--      . convert its 3 input operands (a, b, c) into ufixed type (see generic parameters).
+--      . s = c + (a * b)
+--      . extract ufixed range bits from s (see generic parameters).
+--      . convert the extracted bits into a std_logic_vector vector.
+--
 -------------------------------------------------------------------------------
 
 library ieee;
@@ -40,16 +42,16 @@ use ieee.fixed_float_types.all;
 
 entity mult_add_ufixed is
     generic(
-        -- port A: AMD Q notation (fixed point)
+        -- port A: ARM Q notation (fixed point)
         g_UQ_M_A : in positive := 15;
         g_UQ_N_A : in natural := 0;
-        -- port B: AMD Q notation (fixed point)
+        -- port B: ARM Q notation (fixed point)
         g_UQ_M_B : in positive := 15;
         g_UQ_N_B : in natural := 0;
         -- port C: AMC Q notation (fixed point)
         g_UQ_M_C : in positive := 15;
         g_UQ_N_C : in natural := 0;
-        -- port S: AMD Q notation (fixed point)
+        -- port S: ARM Q notation (fixed point)
         g_UQ_M_S  : in positive := 15;
         g_UQ_N_S  : in natural := 0
     );
@@ -77,7 +79,7 @@ architecture RTL of mult_add_ufixed is
     signal c_tmp : ufixed(g_UQ_M_C - 1 downto -g_UQ_N_C);
 
     -----------------------------------------------------------------
-    -- step1: 
+    -- step1: pipe
     -----------------------------------------------------------------
     signal a_r1    : ufixed(a_tmp'range):= (others => '0');
     signal b_r1    : ufixed(b_tmp'range):= (others => '0');
@@ -99,7 +101,7 @@ architecture RTL of mult_add_ufixed is
     -----------------------------------------------------------------
     -- truncate: 
     --   extract sfixed range
-    --   sfixed -> ufixed conversion
+    --   sfixed -> std_logic_vector conversion
     -----------------------------------------------------------------
     signal res_tmp4 : ufixed(g_UQ_M_S - 1 downto -g_UQ_N_S);
 
@@ -114,7 +116,7 @@ begin
     begin
         if rising_edge(i_clk) then
             -------------------------------------------------------------
-            -- step1 : 
+            -- step1
             -------------------------------------------------------------
             a_r1    <= a_tmp;
             b_r1    <= b_tmp;

@@ -59,6 +59,7 @@
       "usb_error_delay;wr;delay=0",
       "usb_ra_delay;wr;delay=0",
       "usb_tes_conf;wr",
+      "usb_conf0;wr;inter_squid_gain=255",
       "usb_trig;wr;reg_valid=1",
       "nop;wr;delay=16",
  
@@ -582,6 +583,41 @@
           "value": 1359,
           "bit_pos_min": 0,
           "width": 13
+        }
+      }
+    },
+    "@usb_conf0": {
+      "description_list": [
+      "This command is used to access to the CONF0 register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+      "The parameters are:",
+      "    :param field/inter_squid_gain: ",
+      "         :param value (integer: [0, 2**8-1)): gain to apply at the mux_squid_tf ram output",
+      "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
+      "         :param width (integer >=1): define the field width (expressed in bit)",
+
+      "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
+      "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
+      "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+
+      "Note: ",
+      "    This section defines the parameter default values.",
+      "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
+    ],
+      "wr": {
+        "usb_addr": "0x08",
+        "reg_id": 208
+      },
+      "rd": {
+        "usb_addr": "0x28",
+        "reg_id": 508
+      },
+      "field": {
+        "inter_squid_gain": {
+          "value": 255,
+          "bit_pos_min": 0,
+          "width": 8
         }
       }
     },

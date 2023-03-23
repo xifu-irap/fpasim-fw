@@ -51,6 +51,8 @@ package pkg_fpasim is
   constant pkg_MULT_SUB_SFIXED_LATENCY                    : natural := 3;
   -- hardcoded : latency of the "mult_add_ufixed" module
   constant pkg_MULT_ADD_UFIXED_LATENCY                    : natural := 3;
+  -- hardcoded : latency of the "mult_add_sfixed" module
+  constant pkg_MULT_ADD_SFIXED_LATENCY                    : natural := 3;
   -- hardcoded : latency of the dynamic shif register when its input delay is set to 0
   constant pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY : natural := 1;
 
@@ -86,74 +88,74 @@ package pkg_fpasim is
   ---------------------------------------------------------------------
   -- pulse shape
   -- user-defined: read latency of the RAM (port A). Possible values: [2; max integer value[
-  constant pkg_TES_PULSE_SHAPE_RAM_A_RD_LATENCY : natural  := 3;
+  constant pkg_TES_PULSE_SHAPE_RAM_A_RD_LATENCY     : natural  := 3;
   -- user-defined: read latency of the RAM (port B). Possible values: [2; max integer value[
-  constant pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY : natural  := 2;
+  constant pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY     : natural  := 2;
   -- auto-computed: number of words
-  constant pkg_TES_PULSE_SHAPE_RAM_NB_WORDS     : positive := pkg_PULSE_SHAPE_OVERSAMPLE * pkg_NB_FRAME_BY_PULSE_SHAPE;
+  constant pkg_TES_PULSE_SHAPE_RAM_NB_WORDS         : positive := pkg_PULSE_SHAPE_OVERSAMPLE * pkg_NB_FRAME_BY_PULSE_SHAPE;
   -- auto-computed: ram address bus width
-  constant pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_TES_PULSE_SHAPE_RAM_NB_WORDS);
+  constant pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH       : positive := work.pkg_utils.pkg_width_from_value(pkg_TES_PULSE_SHAPE_RAM_NB_WORDS);
   -- user-defined: ram data bus width
-  constant pkg_TES_PULSE_SHAPE_RAM_DATA_WIDTH   : positive := 16;
+  constant pkg_TES_PULSE_SHAPE_RAM_DATA_WIDTH       : positive := 16;
   -- user-defined: ram configuration file
-  constant pkg_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE   : string := "tes_pulse_shape.mem";
+  constant pkg_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE : string   := "tes_pulse_shape.mem";
 
   -- std state
   -- auto-computed: read latency of the RAM (port A). Possible values: [2; max integer value[. Indeed, by design, memory are in parallel. So, we fixe the same latency
-  constant pkg_TES_STD_STATE_RAM_A_RD_LATENCY : natural  := 3;
+  constant pkg_TES_STD_STATE_RAM_A_RD_LATENCY     : natural  := 3;
   -- auto-computed: read latency of the RAM (port B). Possible values: [2; max integer value[. Indeed, by design, memory are in parallel. So, we fixe the same latency
-  constant pkg_TES_STD_STATE_RAM_B_RD_LATENCY : natural  := pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY;
+  constant pkg_TES_STD_STATE_RAM_B_RD_LATENCY     : natural  := pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY;
   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
-  constant pkg_TES_STD_STATE_RAM_NB_WORDS     : positive := pkg_NB_PIXEL_BY_FRAME_MAX;
+  constant pkg_TES_STD_STATE_RAM_NB_WORDS         : positive := pkg_NB_PIXEL_BY_FRAME_MAX;
   -- auto-computed: ram address bus width
-  constant pkg_TES_STD_STATE_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_TES_STD_STATE_RAM_NB_WORDS);
+  constant pkg_TES_STD_STATE_RAM_ADDR_WIDTH       : positive := work.pkg_utils.pkg_width_from_value(pkg_TES_STD_STATE_RAM_NB_WORDS);
   -- user-defined: ram data bus width
-  constant pkg_TES_STD_STATE_RAM_DATA_WIDTH   : positive := 16;
+  constant pkg_TES_STD_STATE_RAM_DATA_WIDTH       : positive := 16;
   -- user-defined: ram configuration file
-  constant pkg_TES_STD_STATE_RAM_MEMORY_INIT_FILE   : string := "tes_std_state.mem";
+  constant pkg_TES_STD_STATE_RAM_MEMORY_INIT_FILE : string   := "tes_std_state.mem";
 
   -- mux squid offset
   -- user-defined: read latency of the RAM (port A). Possible values: [2; max integer value[
-  constant pkg_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY : natural  := 3;
+  constant pkg_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY     : natural  := 3;
   -- user-defined: read latency of the RAM (port B). Possible values: [2; max integer value[
-  constant pkg_MUX_SQUID_OFFSET_RAM_B_RD_LATENCY : natural  := 2;
+  constant pkg_MUX_SQUID_OFFSET_RAM_B_RD_LATENCY     : natural  := 2;
   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
-  constant pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS     : positive := pkg_NB_PIXEL_BY_FRAME_MAX;
+  constant pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS         : positive := pkg_NB_PIXEL_BY_FRAME_MAX;
   -- auto-computed: ram address bus width
-  constant pkg_MUX_SQUID_OFFSET_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_NB_PIXEL_BY_FRAME_MAX);
+  constant pkg_MUX_SQUID_OFFSET_RAM_ADDR_WIDTH       : positive := work.pkg_utils.pkg_width_from_value(pkg_NB_PIXEL_BY_FRAME_MAX);
   -- user-defined: data bus width
-  constant pkg_MUX_SQUID_OFFSET_RAM_DATA_WIDTH   : positive := 16;
+  constant pkg_MUX_SQUID_OFFSET_RAM_DATA_WIDTH       : positive := 16;
   -- user-defined: ram configuration file
-  constant pkg_MUX_SQUID_OFFSET_RAM_MEMORY_INIT_FILE   : string := "mux_squid_offset.mem";
+  constant pkg_MUX_SQUID_OFFSET_RAM_MEMORY_INIT_FILE : string   := "mux_squid_offset.mem";
 
   -- mux squid tf
   -- user-defined: read latency of the RAM (port A). Possible values: [2; max integer value[.
-  constant pkg_MUX_SQUID_TF_RAM_A_RD_LATENCY : natural  := 3;
+  constant pkg_MUX_SQUID_TF_RAM_A_RD_LATENCY     : natural  := 3;
   -- user-defined: read latency of the RAM (port B). Possible values: [2; max integer value[.
-  constant pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY : natural  := 2;
+  constant pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY     : natural  := 2;
   -- user-defined: number of words.
-  constant pkg_MUX_SQUID_TF_RAM_NB_WORDS     : positive := 2 ** 13;
+  constant pkg_MUX_SQUID_TF_RAM_NB_WORDS         : positive := 2 ** 13;
   -- auto-computed: ram address bus width
-  constant pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH   : positive := work.pkg_utils.pkg_width_from_value(pkg_MUX_SQUID_TF_RAM_NB_WORDS);
+  constant pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH       : positive := work.pkg_utils.pkg_width_from_value(pkg_MUX_SQUID_TF_RAM_NB_WORDS);
   -- user-defined: ram data bus width
-  constant pkg_MUX_SQUID_TF_RAM_DATA_WIDTH   : positive := 16;
+  constant pkg_MUX_SQUID_TF_RAM_DATA_WIDTH       : positive := 16;
   -- user-defined: ram configuration file
-  constant pkg_MUX_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "mux_squid_tf.mem";
+  constant pkg_MUX_SQUID_TF_RAM_MEMORY_INIT_FILE : string   := "mux_squid_tf.mem";
   --constant pkg_MUX_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "mux_squid_linear_tf.mem";
 
   -- amp squid tf
   -- user-defined: read latency of the RAM (port A). Possible values: [2; max integer value[
-  constant pkg_AMP_SQUID_TF_RAM_A_RD_LATENCY : natural := 3;
+  constant pkg_AMP_SQUID_TF_RAM_A_RD_LATENCY     : natural := 3;
   -- user-defined: read latency of the RAM (port B). Possible values: [2; max integer value[
-  constant pkg_AMP_SQUID_TF_RAM_B_RD_LATENCY : natural := 2;
+  constant pkg_AMP_SQUID_TF_RAM_B_RD_LATENCY     : natural := 2;
   -- user-defined: number of words.
-  constant pkg_AMP_SQUID_TF_RAM_NB_WORDS     : natural := 2 ** 14;
+  constant pkg_AMP_SQUID_TF_RAM_NB_WORDS         : natural := 2 ** 14;
   -- auto-computed: ram address bus width
-  constant pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH   : natural := work.pkg_utils.pkg_width_from_value(pkg_AMP_SQUID_TF_RAM_NB_WORDS);
+  constant pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH       : natural := work.pkg_utils.pkg_width_from_value(pkg_AMP_SQUID_TF_RAM_NB_WORDS);
   -- user-defined: ram data bus width
-  constant pkg_AMP_SQUID_TF_RAM_DATA_WIDTH   : natural := 16;
+  constant pkg_AMP_SQUID_TF_RAM_DATA_WIDTH       : natural := 16;
   -- user-defined: ram configuration file
-  constant pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "amp_squid_tf.mem";
+  constant pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE : string  := "amp_squid_tf.mem";
   --constant pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "amp_squid_linear_tf.mem";
 
 
@@ -281,31 +283,38 @@ package pkg_fpasim is
   -- auto-computed: rename the "sub_sfixed" module latency
   --constant pkg_MUX_SQUID_SUB_LATENCY : natural := pkg_SUB_SFIXED_LATENCY;
 
-  -- add
-  -- mux_squid_offset
+  -- mult_add
+  -- inter_squid_gain
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_MUX_SQUID_ADD_Q_M_A     : positive := 16;
+  constant pkg_MUX_SQUID_MULT_ADD_Q_M_A     : positive := 1;
   -- user-defined: number of fraction bits
-  constant pkg_MUX_SQUID_ADD_Q_N_A     : natural  := 0;
+  constant pkg_MUX_SQUID_MULT_ADD_Q_N_A     : natural  := 8;
   -- auto-computed: bus width
-  constant pkg_MUX_SQUID_ADD_Q_WIDTH_A : positive := pkg_MUX_SQUID_ADD_Q_M_A + pkg_MUX_SQUID_ADD_Q_N_A;
+  constant pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_A : positive := pkg_MUX_SQUID_MULT_ADD_Q_M_A + pkg_MUX_SQUID_MULT_ADD_Q_N_A;
 
   -- mux_squid_tf
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_MUX_SQUID_ADD_Q_M_B     : positive := 17;
+  constant pkg_MUX_SQUID_MULT_ADD_Q_M_B     : positive := 17;
   -- user-defined: number of fraction bits
-  constant pkg_MUX_SQUID_ADD_Q_N_B     : natural  := 0;
+  constant pkg_MUX_SQUID_MULT_ADD_Q_N_B     : natural  := 0;
   -- auto-computed: bus width
-  constant pkg_MUX_SQUID_ADD_Q_WIDTH_B : positive := pkg_MUX_SQUID_ADD_Q_M_B + pkg_MUX_SQUID_ADD_Q_N_B;
+  constant pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_B : positive := pkg_MUX_SQUID_MULT_ADD_Q_M_B + pkg_MUX_SQUID_MULT_ADD_Q_N_B;
+
+  -- mux_squid_offset
+  -- user-defined: number of bits used for the integer part of the value ( sign bit included)
+  constant pkg_MUX_SQUID_MULT_ADD_Q_M_C     : positive := 16;
+  -- user-defined: number of fraction bits
+  constant pkg_MUX_SQUID_MULT_ADD_Q_N_C     : natural  := 0;
+  -- auto-computed: bus width
+  constant pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_C : positive := pkg_MUX_SQUID_MULT_ADD_Q_M_C + pkg_MUX_SQUID_MULT_ADD_Q_N_C;
 
   -- result
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  --constant pkg_MUX_SQUID_ADD_Q_M_S     : positive := 34;
-  constant pkg_MUX_SQUID_ADD_Q_M_S     : positive := 18;
+  constant pkg_MUX_SQUID_MULT_ADD_Q_M_S     : positive := 18;
   -- user-defined: number of fraction bits
-  constant pkg_MUX_SQUID_ADD_Q_N_S     : natural  := 0;
+  constant pkg_MUX_SQUID_MULT_ADD_Q_N_S     : natural  := 0;
   -- auto-computed: bus width
-  constant pkg_MUX_SQUID_ADD_Q_WIDTH_S : positive := pkg_MUX_SQUID_ADD_Q_M_S + pkg_MUX_SQUID_ADD_Q_N_S;
+  constant pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S : positive := pkg_MUX_SQUID_MULT_ADD_Q_M_S + pkg_MUX_SQUID_MULT_ADD_Q_N_S;
 
   -- auto-computed: rename the "add_sfixed" module latency
   --constant pkg_MUX_SQUID_ADD_LATENCY : natural := pkg_ADD_SFIXED_LATENCY;
@@ -322,9 +331,9 @@ package pkg_fpasim is
   -- sub
   -- pixel_result
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_AMP_SQUID_SUB_Q_M_A     : positive := pkg_MUX_SQUID_ADD_Q_M_S;
+  constant pkg_AMP_SQUID_SUB_Q_M_A     : positive := pkg_MUX_SQUID_MULT_ADD_Q_M_S;
   -- user-defined: number of fraction bits
-  constant pkg_AMP_SQUID_SUB_Q_N_A     : natural  := pkg_MUX_SQUID_ADD_Q_N_S;
+  constant pkg_AMP_SQUID_SUB_Q_N_A     : natural  := pkg_MUX_SQUID_MULT_ADD_Q_N_S;
   -- auto-computed: bus width
   constant pkg_AMP_SQUID_SUB_Q_WIDTH_A : natural  := pkg_AMP_SQUID_SUB_Q_M_A + pkg_AMP_SQUID_SUB_Q_N_A;
 

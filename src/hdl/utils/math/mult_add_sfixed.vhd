@@ -17,17 +17,17 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   mult_sub_sfixed.vhd 
+--    @file                   mult_add_sfixed.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
 --    @details                
 --
---    This module computes the following formula: s = c - (a * b) (sfixed point representation)
+--    This module computes the following formula: s = c + (a * b) (sfixed point representation).
 --    It performs the following steps:
 --      . convert its 3 input operands (a, b, c) into sfixed type (see generic parameters).
---      . s = c - (a * b)
+--      . s = c + (a * b)
 --      . extract sfixed range bits from s (see generic parameters).
 --      . convert the extracted bits into a std_logic_vector vector.
 --
@@ -40,21 +40,20 @@ use ieee.fixed_pkg.all;
 use ieee.fixed_float_types.all;
 
 
-entity mult_sub_sfixed is
+entity mult_add_sfixed is
     generic(
-        -- port A: ARM Q notation (fixed point)
+        -- port A: AMD Q notation (fixed point)
         g_Q_M_A : in positive := 15;
         g_Q_N_A : in natural := 0;
-        -- port B: ARM Q notation (fixed point)
+        -- port B: AMD Q notation (fixed point)
         g_Q_M_B : in positive := 15;
         g_Q_N_B : in natural := 0;
         -- port C: AMC Q notation (fixed point)
         g_Q_M_C : in positive := 15;
         g_Q_N_C : in natural := 0;
-        -- port S: ARM Q notation (fixed point)
+        -- port S: AMD Q notation (fixed point)
         g_Q_M_S  : in positive := 15;
-        g_Q_N_S  : in natural := 0;
-        g_SIM_EN : in boolean := FALSE
+        g_Q_N_S  : in natural := 0
     );
     port(
         i_clk : in  std_logic;
@@ -65,27 +64,26 @@ entity mult_sub_sfixed is
         i_b   : in  std_logic_vector(g_Q_M_B + g_Q_N_B - 1 downto 0);
         i_c   : in  std_logic_vector(g_Q_M_C + g_Q_N_C - 1 downto 0);
         --------------------------------------------------------------
-        -- output : S = C - A*B
+        -- output : S = C + A*B
         --------------------------------------------------------------
         o_s   : out std_logic_vector(g_Q_M_S + g_Q_N_S - 1 downto 0)
     );
-end entity mult_sub_sfixed;
+end entity mult_add_sfixed;
 
-architecture RTL of mult_sub_sfixed is
+architecture RTL of mult_add_sfixed is
     -----------------------------------------------------------------
-    -- step0: 
+    -- step0
     -----------------------------------------------------------------
     signal a_tmp : sfixed(g_Q_M_A - 1 downto -g_Q_N_A);
     signal b_tmp : sfixed(g_Q_M_B - 1 downto -g_Q_N_B);
     signal c_tmp : sfixed(g_Q_M_C - 1 downto -g_Q_N_C);
 
     -----------------------------------------------------------------
-    -- step1: 
+    -- step1 
     -----------------------------------------------------------------
     signal a_r1    : sfixed(a_tmp'range):= (others => '0');
     signal b_r1    : sfixed(b_tmp'range):= (others => '0');
     signal c_r1    : sfixed(c_tmp'range):= (others => '0');
-
     ---------------------------------------------------------------------
     -- step2: 
     --    mult_r2 = a*b
@@ -96,9 +94,9 @@ architecture RTL of mult_sub_sfixed is
 
     ---------------------------------------------------------------------
     -- step3:
-    --   res_r3 = c_r2 - mult_r2
+    --   res_r3 = c_r2 + mult_r2
     ---------------------------------------------------------------------
-    signal res_r3 : sfixed(sfixed_high(c_r2, '-', mult_r2) downto sfixed_low(c_r2, '-', mult_r2)):= (others => '0');
+    signal res_r3 : sfixed(sfixed_high(c_r2, '+', mult_r2) downto sfixed_low(c_r2, '+', mult_r2)):= (others => '0');
 
     -----------------------------------------------------------------
     -- truncate: 
@@ -118,7 +116,7 @@ begin
     begin
         if rising_edge(i_clk) then
             -------------------------------------------------------------
-            -- step1
+            -- step1 : 
             -------------------------------------------------------------
             a_r1    <= a_tmp;
             b_r1    <= b_tmp;
@@ -129,9 +127,9 @@ begin
             mult_r2 <= a_r1 * b_r1;
             c_r2    <= c_r1;
             -------------------------------------------------------------
-            -- step3: C - (A * B)
+            -- step3: C + (A * B)
             -------------------------------------------------------------
-            res_r3  <= c_r2 - mult_r2;
+            res_r3  <= c_r2 + mult_r2;
         end if;
     end process p_computation;
     -----------------------------------------------------------------
@@ -144,6 +142,7 @@ begin
     -- output
     -----------------------------------------------------------------
     o_s <= to_slv(res_tmp4);
+
 
 
 end architecture RTL;

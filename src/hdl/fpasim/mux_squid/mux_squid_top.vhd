@@ -17,14 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   mux_squid_top.vhd 
+--    @file                   mux_squid_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 --
--- This module is the top level of the mux_squid function
+--    This module is the top level of the mux_squid function
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -32,9 +32,12 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 use work.pkg_fpasim.all;
+use work.pkg_regdecode.all;
 
 entity mux_squid_top is
   generic(
+    -- command
+    g_INTER_SQUID_GAIN_WIDTH      : positive := pkg_CONF0_INTER_SQUID_GAIN_WIDTH;  -- inter_squid_gain bus width (expressed in bits). Possible values: [1; max integer value[
     -- pixel
     g_PIXEL_ID_WIDTH              : positive := pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH;  -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
     -- frame
@@ -43,15 +46,17 @@ entity mux_squid_top is
     g_MUX_SQUID_TF_RAM_ADDR_WIDTH : positive := pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- computation
     g_PIXEL_RESULT_INPUT_WIDTH    : positive := pkg_TES_MULT_SUB_Q_WIDTH_S;  -- pixel input result bus width (expressed in bits). Possible values: [1; max integer value[
-    g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_MUX_SQUID_ADD_Q_WIDTH_S  -- pixel output result bus width (expressed in bits). Possible values: [1; max integer value[
+    g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S  -- pixel output result bus width (expressed in bits). Possible values: [1; max integer value[
     );
   port(
-    i_clk         : in std_logic;       -- clock signal
-    i_rst_status  : in std_logic;       -- reset error flag(s)
-    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    i_clk              : in std_logic;  -- clock signal
+    i_rst_status       : in std_logic;  -- reset error flag(s)
+    i_debug_pulse      : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
+    -- 
+    i_inter_squid_gain : in std_logic_vector(g_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
     -- RAM: mux_squid_offset
     -- wr
@@ -150,6 +155,8 @@ begin
 
   inst_mux_squid : entity work.mux_squid
     generic map(
+      -- command
+      g_INTER_SQUID_GAIN_WIDTH      => i_inter_squid_gain'length,
       -- pixel
       g_PIXEL_ID_WIDTH              => i_pixel_id'length,
       -- address
@@ -165,6 +172,8 @@ begin
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
+      -- command
+      i_inter_squid_gain            => i_inter_squid_gain,
       -- RAM: mux_squid_offset
       -- wr
       i_mux_squid_offset_wr_en      => i_mux_squid_offset_wr_en,
