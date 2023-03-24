@@ -17,20 +17,21 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   fifo_sync_with_error_prog_full.vhd 
+--    @file                   fifo_sync_with_error_prog_full.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                  
---!
---!   This module intanciates a synchronuous FIFO with the empty, full and prog full flags.
---!   This module generates 4 types of errors in the following cases:
---!     . a writting when the FIFO is full.
---!     . a writting when the FIFO is in a reset state.
---!     . a reading when the FIFO is empty.
---!     . a reading when the FIFO is in a reset state.
---!   Note: the following header documentation is an extract of the associated XPM Xilinx header.      
+--    @details                  
+-- 
+--    This module intanciates a synchronuous FIFO with the empty, full and prog full flags.
+--    This module generates 4 types of errors in the following cases:
+--      . a writting when the FIFO is full.
+--      . a writting when the FIFO is in a reset state.
+--      . a reading when the FIFO is empty.
+--      . a reading when the FIFO is in a reset state.
+--    Note: the following header documentation is an extract of the associated XPM Xilinx header.    
+--      
 -- -------------------------------------------------------------------------------------------------------------   
 
 -- -------------------------------------------------------------------------------------------------------------

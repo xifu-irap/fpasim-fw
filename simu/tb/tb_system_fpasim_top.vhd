@@ -66,9 +66,6 @@ architecture simulate of tb_system_fpasim_top is
   constant c_INPUT_BASEPATH  : string := output_path & "inputs/";
   constant c_OUTPUT_BASEPATH : string := output_path & "outputs/";
 
-  signal i_clk_to_fpga_p : std_logic;
-  signal i_clk_to_fpga_n : std_logic;
-
   ---------------------------------------------------------------------
   -- module input signals
   ---------------------------------------------------------------------
@@ -79,7 +76,7 @@ architecture simulate of tb_system_fpasim_top is
   signal b_okAA  : std_logic                    := '0';
 
   -- FMC: from the card
-  signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');  -- @suppress "signal i_board_id is never written"
+  signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');   -- @suppress "Unused declaration"
   ---------------------------------------------------------------------
   -- FMC: from the adc
   ---------------------------------------------------------------------
@@ -188,8 +185,6 @@ architecture simulate of tb_system_fpasim_top is
   signal data0 : unsigned(13 downto 0) := (others => '0');
   signal data1 : unsigned(13 downto 0) := (others => '0');
 
-  signal data0_r1 : unsigned(13 downto 0) := (others => '0');
-  signal data1_r1 : unsigned(13 downto 0) := (others => '0');
 
   ---------------------------------------------------------------------
   -- Clock definition
@@ -579,8 +574,6 @@ begin
       g_DEBUG => false
       )
     port map(  -- @suppress "Port map uses default values. Missing optional actuals: o_leds"
-      -- i_clk_to_fpga_p => i_clk_to_fpga_p,
-      -- i_clk_to_fpga_n => i_clk_to_fpga_n,
       --  Opal Kelly inouts --
       i_okUH            => i_okUH,
       o_okHU            => o_okHU,

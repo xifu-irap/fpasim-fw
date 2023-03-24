@@ -518,7 +518,7 @@ architecture RTL of regdecode_top is
   -- wire: fpasim_status
   ---------------------------------------------------------------------
 
-  signal fpasim_status_valid  : std_logic;
+  signal fpasim_status_valid  : std_logic;  -- @suppress "signal fpasim_status_valid is never read"
   signal fpasim_status        : std_logic_vector(i_reg_fpasim_status'range);
   signal fpasim_status_errors : std_logic_vector(15 downto 0);
   signal fpasim_status_status : std_logic_vector(7 downto 0);
@@ -1145,7 +1145,7 @@ begin
       i_rst_status  => usb_rst_status,  -- reset error flag(s)
       i_debug_pulse => usb_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- ram: wr
-      o_data_valid  => fpasim_status_valid,              -- data valid
+      o_data_valid  => fpasim_status_valid,              -- not used
       o_data        => fpasim_status,   -- data
       ---------------------------------------------------------------------
       -- errors/status @ i_out_clk

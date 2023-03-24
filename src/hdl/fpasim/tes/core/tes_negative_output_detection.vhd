@@ -132,7 +132,7 @@ begin
         sm_state_next <= E_END;
       end if;
 
-      when others =>
+      when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;

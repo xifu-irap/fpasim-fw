@@ -174,7 +174,7 @@ begin
     gen_io : for i in data_in_even'range generate
 
       inst_ODDR : ODDR
-        generic map(
+        generic map( -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
           DDR_CLK_EDGE => "OPPOSITE_EDGE",  -- "OPPOSITE_EDGE" or "SAME_EDGE" 
           INIT         => '0',  -- Initial value for Q port ('1' or '0')
           SRTYPE       => "SYNC")       -- Reset Type ("ASYNC" or "SYNC")
@@ -256,7 +256,7 @@ begin
     gen_io : for i in data_in_even'range generate
 
       inst_ODDR : ODDR
-        generic map(
+        generic map( -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
           DDR_CLK_EDGE => "OPPOSITE_EDGE",  -- "OPPOSITE_EDGE" or "SAME_EDGE" 
           INIT         => '0',  -- Initial value for Q port ('1' or '0')
           SRTYPE       => "SYNC")       -- Reset Type ("ASYNC" or "SYNC")

@@ -692,7 +692,7 @@ begin
     signal count_r1 : unsigned(31 downto 0) := (others => '0');
     signal pulse_r1 : std_logic             := '0';
 
-    signal clk_tmp : std_logic;
+
   begin
 
 

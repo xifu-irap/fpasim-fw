@@ -31,13 +31,11 @@
 --
 -- -------------------------------------------------------------------------------------------------------------
 
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.math_real.all;
 use ieee.fixed_pkg.all;
 use ieee.fixed_float_types.all;
-
 
 entity ads62p49_convert is
   generic (
@@ -55,7 +53,7 @@ entity ads62p49_convert is
     ---------------------------------------------------------------------
     -- ddr outputs @i_clk
     ---------------------------------------------------------------------
-    o_ddr_adc : out std_logic_vector(13 downto 0) -- ADC value
+    o_ddr_adc : out std_logic_vector(g_ADC_RES - 1 downto 0) -- ADC value
     );
 end entity ads62p49_convert;
 

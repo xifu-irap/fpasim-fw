@@ -246,7 +246,7 @@ begin
   -- sub_sfixed_mux_squid_out
   -------------------------------------------------------------------
   -- we assume i_pixel_result is always >=0 => set the sign bit (MSB bits) to '0' 
-  pixel_result_tmp       <= '0' & i_pixel_result(i_pixel_result'high - 1 downto 0);
+  pixel_result_tmp       <= '0' & i_pixel_result(i_pixel_result'high - 1 downto 0); -- @suppress "Incorrect array size in assignment: expected (<17>) but was (<g_PIXEL_RESULT_INPUT_WIDTH>)"
   mux_squid_feedback_tmp <= i_mux_squid_feedback;
 
   inst_sub_sfixed_mux_squid : entity work.sub_sfixed
@@ -585,7 +585,7 @@ begin
       --------------------------------------------------------------
       -- output : S = C + A*B
       --------------------------------------------------------------
-      o_s   => result_rz  -- @suppress "Incorrect array size in assignment: expected (<34>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
+      o_s   => result_rz   -- @suppress "Incorrect array size in assignment: expected (<18>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
       );
 
   -----------------------------------------------------------------

@@ -17,18 +17,18 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   amp_squid.vhd 
+--    @file                   amp_squid.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details       
+--    @details       
 --         
--- This module performs the following amp_squid computation steps:
---   . addr = i_pixel_result - i_amp_squid_offset_correction
---   . S0 = AMP_SQUID_TF(addr): use the addr value to read a pre-loaded RAM the corresponding value.
---   . fpagain = gain_table(i_fpasim_gain): use the i_fpasim_gain to read a pre-defined gain value
---   . o_pixel_result = S0 * fpagain
+--    This module performs the following amp_squid computation steps:
+--      . addr = i_pixel_result - i_amp_squid_offset_correction
+--      . S0 = AMP_SQUID_TF(addr): use the addr value to read a pre-loaded RAM the corresponding value.
+--      . fpagain = gain_table(i_fpasim_gain): use the i_fpasim_gain to read a pre-defined gain value
+--      . o_pixel_result = S0 * fpagain
 -- 
 -------------------------------------------------------------------------------
 
@@ -225,7 +225,7 @@ begin
       --------------------------------------------------------------
       -- input
       --------------------------------------------------------------
-      i_a   => pixel_result_tmp,  -- @suppress "Incorrect array size in assignment: expected (<34>) but was (<g_PIXEL_RESULT_INPUT_WIDTH>)"
+      i_a   => pixel_result_tmp,  -- @suppress "Incorrect array size in assignment: expected (<18>) but was (<g_PIXEL_RESULT_INPUT_WIDTH>)"
       i_b   => amp_squid_offset_correction_tmp,
       --------------------------------------------------------------
       -- output : S = A - B

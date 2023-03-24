@@ -17,15 +17,16 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   sdpram.vhd 
+--    @file                   sdpram.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                 
---! 
---!   The module is a wrapper of the Xilinx XPM Single Dual Port RAM   
---!   Note: the following header documentation is an extract of the associated XPM Xilinx header         
+--    @details                 
+--  
+--    The module is a wrapper of the Xilinx XPM Single Dual Port RAM   
+--    Note: the following header documentation is an extract of the associated XPM Xilinx header  
+--           
 -- -------------------------------------------------------------------------------------------------------------
 
 -- -------------------------------------------------------------------------------------------------------------
