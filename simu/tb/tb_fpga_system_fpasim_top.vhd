@@ -22,7 +22,9 @@
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details         
+--
+--    this testbench is only used to verify the adc interface       
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -61,6 +63,7 @@ entity tb_fpga_system_fpasim_top is
     g_AMP_SQ_OF_DELAY    : natural := 1;  -- [0;(2**6) - 1]
     g_ERROR_DELAY        : natural := 4;  -- [0;(2**6) - 1]
     g_RA_DELAY           : natural := 4;  -- [0;(2**6) - 1]
+    g_INTER_SQUID_GAIN   : natural := 255;  -- inter squid gain. The range is: [0;(2**8) - 1]
     g_NB_PIXEL_BY_FRAME  : natural := 34;
     g_NB_SAMPLE_BY_PIXEL : natural := 40;
 
@@ -76,16 +79,14 @@ end tb_fpga_system_fpasim_top;
 
 architecture simulate of tb_fpga_system_fpasim_top is
 
-  constant c_INPUT_BASEPATH  : string := output_path & "inputs/";
-  constant c_OUTPUT_BASEPATH : string := output_path & "outputs/";
 
   ---------------------------------------------------------------------
   -- command
   ---------------------------------------------------------------------
-  signal i_make_pulse_valid : std_logic                     := '0';
-  signal i_make_pulse       : std_logic_vector(31 downto 0) := (others => '0');
-  signal o_auto_conf_busy   : std_logic;
-  signal o_ready            : std_logic;
+  signal i_make_pulse_valid : std_logic                     := '0';  -- @suppress "signal i_make_pulse_valid is never written"
+  signal i_make_pulse       : std_logic_vector(31 downto 0) := (others => '0');  -- @suppress "signal i_make_pulse is never written"
+  signal o_auto_conf_busy   : std_logic;  -- @suppress "signal o_auto_conf_busy is never read"
+  signal o_ready            : std_logic;  -- @suppress "signal o_ready is never read"
   ---------------------------------------------------------------------
   -- ADC
   ---------------------------------------------------------------------
@@ -96,13 +97,13 @@ architecture simulate of tb_fpga_system_fpasim_top is
   ---------------------------------------------------------------------
   -- to sync
   ---------------------------------------------------------------------
-  signal o_ref_clk          : std_logic;
-  signal o_sync             : std_logic;
+  signal o_ref_clk          : std_logic;  -- @suppress "signal o_ref_clk is never read"
+  signal o_sync             : std_logic;  -- @suppress "signal o_sync is never read"
   ---------------------------------------------------------------------
   -- to DAC
   ---------------------------------------------------------------------
-  signal o_dac_real_valid   : std_logic;
-  signal o_dac_real         : real;
+  signal o_dac_real_valid   : std_logic;  -- @suppress "signal o_dac_real_valid is never read"
+  signal o_dac_real         : real;  -- @suppress "signal o_dac_real is never read"
 
   ---------------------------------------------------------------------
   -- additional signals
@@ -303,6 +304,7 @@ begin
       g_AMP_SQ_OF_DELAY    => g_AMP_SQ_OF_DELAY,  -- [0;(2**6) - 1]
       g_ERROR_DELAY        => g_ERROR_DELAY,  -- [0;(2**6) - 1]
       g_RA_DELAY           => g_RA_DELAY,     -- [0;(2**6) - 1]
+      g_INTER_SQUID_GAIN   => g_INTER_SQUID_GAIN,
       g_NB_PIXEL_BY_FRAME  => g_NB_PIXEL_BY_FRAME,
       g_NB_SAMPLE_BY_PIXEL => g_NB_SAMPLE_BY_PIXEL
       )
