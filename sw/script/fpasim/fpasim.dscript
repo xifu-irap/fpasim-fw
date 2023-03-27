@@ -64,9 +64,9 @@ FPASIM_ADDR_WIREIN['AMP_SQ_OF_DELAY'] = 0x04; // 4
 FPASIM_ADDR_WIREIN['ERROR_DELAY'] = 0x05; // 5
 FPASIM_ADDR_WIREIN['RA_DELAY'] = 0x06; // 6
 FPASIM_ADDR_WIREIN['TES_CONF'] = 0x07; // 7
-// FPASIM_ADDR_WIREIN['RFU'] = 0x08; // 8
+FPASIM_ADDR_WIREIN['CONF0'] = 0x08; // 8
 // FPASIM_ADDR_WIREIN['RFU'] = 0x09; // 9
-// FPASIM_ADDR_WIREIN['RFU'] = 0x0A; // 10
+// FPASIM_ADDR_WIREIN['FPASIM_STATUS'] = 0x0A; // 10
 // FPASIM_ADDR_WIREIN['DATA_COUNT'] = 0x0B; // 11
 FPASIM_ADDR_WIREIN['REC_CTRL'] = 0x0C; // 12
 FPASIM_ADDR_WIREIN['REC_CONF0'] = 0x0D; // 13
@@ -102,7 +102,7 @@ FPASIM_ADDR_WIREOUT['AMP_SQ_OF_DELAY'] = 0x24; // 4
 FPASIM_ADDR_WIREOUT['ERROR_DELAY'] = 0x25; // 5
 FPASIM_ADDR_WIREOUT['RA_DELAY'] = 0x26; // 6
 FPASIM_ADDR_WIREOUT['TES_CONF'] = 0x27; // 7
-// FPASIM_ADDR_WIREOUT['RFU'] = 0x28; // 8
+FPASIM_ADDR_WIREOUT['CONF0'] = 0x28; // 8
 // FPASIM_ADDR_WIREOUT['RFU'] = 0x29; // 9
 FPASIM_ADDR_WIREOUT['FPASIM_STATUS'] = 0x2A; // 10
 FPASIM_ADDR_WIREOUT['DATA_COUNT'] = 0x2B; // 11
@@ -215,6 +215,17 @@ function fpasim_build_tes_conf(nb_pixel_by_frame_p, nb_sample_by_pixel_p, nb_sam
     const data = (nb_pixel_by_frame_p << 24) + (nb_sample_by_pixel_p << 16) + nb_samples_by_frame_p;
     return data;
 }
+
+/**
+ * Build the word to write in the "CONF0" register.
+ * @param {number} inter_squid_gain_p - 
+ * @return {number} built word.
+ */
+function fpasim_build_conf0(inter_squid_gain_p) {
+    const data = inter_squid_gain_p;
+    return data;
+}
+
 
 /**
  * Build the word to write in the "SPI_CTRL" register.
@@ -563,8 +574,11 @@ function fpasim_set_debug_wirein_by_name(reg_name_p, data_p, level_p, mode_p, ve
             trig_pos = FPASIM_POS_TRIGIN['reg_valid'];
             break;
 
-            // case 'RFU':
-            //   break;
+        case 'CONF0':
+            addr = FPASIM_ADDR_WIREIN[reg_name_p];
+            trig_pos = FPASIM_POS_TRIGIN['reg_valid'];
+            break;
+
 
             // case 'RFU':
             //   break;
@@ -1031,6 +1045,46 @@ function fpasim_get_wireout_tes_conf(level_p, mode_p, verbosity_p) {
             display_bit_from_data(bit_name_p = "nb_sample_by_frame", bit_pos_p = 0, bit_width_p = 16, data_p = data, level_p = level2, mode_p = mode_p);
             display_bit_from_data(bit_name_p = "nb_sample_by_pixel", bit_pos_p = 0, bit_width_p = 7, data_p = data, level_p = level2, mode_p = mode_p);
             display_bit_from_data(bit_name_p = "nb_pixel_by_frame", bit_pos_p = 0, bit_width_p = 6, data_p = data, level_p = level2, mode_p = mode_p);
+        }
+    }
+
+    return data;
+}
+
+/**
+ * Get the "CONF0" register value.
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ * @return {number} read register value.
+ */
+function fpasim_get_wireout_conf0(level_p, mode_p, verbosity_p) {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    addr = FPASIM_ADDR_WIREOUT['CONF0'];
+    data = fpasim_wireout_read_command(addr_p = addr);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_FPASIM_REG_VERBOSITY_MIN) {
+            msg = "[fpasim_get_wireout_conf0]: Get the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_FPASIM_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_FPASIM_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "inter_squid_gain_p", bit_pos_p = 0, bit_width_p = 8, data_p = data, level_p = level2, mode_p = mode_p);
         }
     }
 
@@ -1818,6 +1872,10 @@ function fpasim_get_wireout_by_name(reg_name_p, level_p, mode_p, verbosity_p) {
             break;
         case 'TES_CONF':
             data = fpasim_get_wireout_tes_conf(level_p = level0, mode_p, verbosity_p);
+            break;
+
+        case 'CONF0':
+            data = fpasim_get_wireout_conf0(level_p = level0, mode_p, verbosity_p);
             break;
 
             // case 'RFU':

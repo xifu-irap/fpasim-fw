@@ -259,6 +259,16 @@ function main(level_p, mode_p, verbosity_p) {
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
+    // set the register: CONF0
+    inter_squid_gain = 0xFF;
+    msg = "Set register: CONF0";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    data = fpasim_build_conf0(inter_squid_gain_p = inter_squid_gain);
+    fpasim_set_debug_wirein_by_name(reg_name_p = 'CONF0', data_p = data, level_p = level1, mode_p = mode_p)
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     /*
      ***************************************************************************
      configure the mux_squid_tf RAM: ramp

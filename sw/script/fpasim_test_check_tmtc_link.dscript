@@ -708,6 +708,29 @@ function test_wire(level_p, mode_p, verbosity_p) {
 
     /* 
      ***************************************************************************
+     * check: CONF0
+     ***************************************************************************
+     */
+    msg = "Set register: CONF0";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    inter_squid_gain = 0xFF;
+
+    // build the data to send
+    data0 = fpasim_build_conf0(inter_squid_gain_p = inter_squid_gain);
+    fpasim_set_debug_wirein_by_name(reg_name_p = 'CONF0', data_p = data0, level_p = level2, mode_p = mode_p);
+
+    // read the register
+    data1 = fpasim_get_wireout_by_name(reg_name_p = "CONF0", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
+    // check the read data Vs the written data
+    msg = "Check register: CONF0";
+    check_equal(value0_p = data0, value1_p = data1, msg_p = msg, level_p = level2, mode_p = mode_p);
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    /* 
+     ***************************************************************************
      * check: REC_CTRL
      ***************************************************************************
      */
