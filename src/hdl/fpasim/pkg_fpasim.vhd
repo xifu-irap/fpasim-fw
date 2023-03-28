@@ -33,6 +33,7 @@
 
 library ieee;
 use ieee.math_real.all;
+use ieee.std_logic_1164.all;
 
 use work.pkg_utils;
 
@@ -86,7 +87,13 @@ package pkg_fpasim is
   ---------------------------------------------------------------------
   -- RAM
   ---------------------------------------------------------------------
-  -- pulse shape
+  -- tes: en_table, pulse_heigth_table, time_shift_table, cnt_sample_pulse_shape_table
+  -- user-defined: read latency of the RAM. Possible values: [1; max integer value[
+  constant pkg_TES_TABLE_RAM_RD_LATENCY : natural := 1;
+  -- Note:
+  --  . The other RAM parameters are auto-computed.
+
+  -- tes: pulse shape
   -- user-defined: read latency of the RAM (port A). Possible values: [2; max integer value[
   constant pkg_TES_PULSE_SHAPE_RAM_A_RD_LATENCY     : natural  := 3;
   -- user-defined: read latency of the RAM (port B). Possible values: [2; max integer value[
@@ -100,7 +107,7 @@ package pkg_fpasim is
   -- user-defined: ram configuration file
   constant pkg_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE : string   := "tes_pulse_shape.mem";
 
-  -- std state
+  -- tes: std state
   -- auto-computed: read latency of the RAM (port A). Possible values: [2; max integer value[. Indeed, by design, memory are in parallel. So, we fixe the same latency
   constant pkg_TES_STD_STATE_RAM_A_RD_LATENCY     : natural  := 3;
   -- auto-computed: read latency of the RAM (port B). Possible values: [2; max integer value[. Indeed, by design, memory are in parallel. So, we fixe the same latency
@@ -158,7 +165,6 @@ package pkg_fpasim is
   constant pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE : string  := "amp_squid_tf.mem";
   --constant pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "amp_squid_linear_tf.mem";
 
-
   ---------------------------------------------------------------------
   -- regdecode
   ---------------------------------------------------------------------
@@ -182,12 +188,10 @@ package pkg_fpasim is
   -- tes_signalling_generator parameters
   ----------------------------------------------------------------------
 
-
-
   -- hardcoded: latency of the fsm of the "tes_signalling_generator" module
-  constant pkg_TES_SIGNALLING_GENERATOR_FSM_LATENCY : natural := 1;
+  constant pkg_TES_SIGNALLING_GENERATOR_FSM_LATENCY : natural := 2;
   -- user-defined : add an additionnal output latency
-  constant pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY : natural := 1;
+  constant pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY : natural := 0;
   -- auto-computed: latency of the "tes_signalling_generator" module
   constant pkg_TES_SIGNALLING_GENERATOR_LATENCY     : natural := pkg_TES_SIGNALLING_GENERATOR_FSM_LATENCY + pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY;  -- number of pipes of the "tes_signalling_generator"
 
@@ -246,8 +250,10 @@ package pkg_fpasim is
   constant pkg_TES_FORCE_OUTPUT_LATENCY : positive := 1;
 
   -- auto-computed: latency of the "tes_pulse_manager" module
-  constant pkg_TES_PULSE_MANAGER_LATENCY : natural := pkg_TES_PULSE_MANAGER_FSM_LATENCY + pkg_TES_PULSE_MANAGER_ADDR_COMPUTE_LATENCY + pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY + pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY + pkg_TES_FORCE_OUTPUT_LATENCY;
+  constant pkg_TES_PULSE_MANAGER_LATENCY : natural := pkg_TES_TABLE_RAM_RD_LATENCY + pkg_TES_PULSE_MANAGER_FSM_LATENCY + pkg_TES_PULSE_MANAGER_ADDR_COMPUTE_LATENCY + pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY + pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY + pkg_TES_FORCE_OUTPUT_LATENCY;
 
+  -- auto-computed: max number of samples between pixel_sof, pixel_eof
+  constant pkg_TES_PULSE_MANAGER_SOF_EOF_NB_SAMPLES_MIN : natural := pkg_TES_TABLE_RAM_RD_LATENCY + pkg_TES_PULSE_MANAGER_FSM_LATENCY + 1 + 1 + 1; -- 1 (E_WAIT -> E_RUN), 1 (E_RUN), 1 (write memory latency)
   -- auto-commputed: latency of the "tes_top" module
   constant pkg_TES_TOP_LATENCY : natural := pkg_TES_SIGNALLING_LATENCY + pkg_TES_PULSE_MANAGER_LATENCY;
 
@@ -402,6 +408,30 @@ package pkg_fpasim is
   constant pkg_DAC_DYNAMIC_SHIFT_REGISTER_LATENCY : natural := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
   -- auto-computed: latency of the "dac_top" from the input port to the input of the last pipeliner.
   constant pkg_DAC_LATENCY_TMP                    : natural := pkg_DAC_FRAME_GENERATOR_LATENCY + pkg_DAC_DYNAMIC_SHIFT_REGISTER_LATENCY;
+
+  -- user-defined: dac_pattern0 (see dac3283 datasheet figure 34)
+  constant pkg_DAC_PATTERN0 : std_logic_vector(7 downto 0):= x"55";
+
+  -- user-defined: dac_pattern1 (see dac3283 datasheet figure 34)
+  constant pkg_DAC_PATTERN1 : std_logic_vector(7 downto 0):= x"55";
+
+  -- user-defined: dac_pattern2 (see dac3283 datasheet figure 34)
+  constant pkg_DAC_PATTERN2 : std_logic_vector(7 downto 0):= x"01";
+
+  -- user-defined: dac_pattern3 (see dac3283 datasheet figure 34)
+  constant pkg_DAC_PATTERN3 : std_logic_vector(7 downto 0):= x"02";
+
+  -- user-defined: dac_pattern4 (see dac3283 datasheet figure 34)
+  constant pkg_DAC_PATTERN4 : std_logic_vector(7 downto 0):= x"AA";
+
+  -- user-defined: dac_pattern5 (see dac3283 datasheet figure 34)
+  constant pkg_DAC_PATTERN5 : std_logic_vector(7 downto 0):= x"AA";
+
+  -- user-defined: dac_pattern6 (see dac3283 datasheet figure 34)
+  constant pkg_DAC_PATTERN6 : std_logic_vector(7 downto 0):= x"03";
+
+  -- user-defined: dac_pattern7 (see dac3283 datasheet figure 34)
+  constant pkg_DAC_PATTERN7 : std_logic_vector(7 downto 0):= x"04";
 
 
   ---------------------------------------------------------------------
