@@ -114,7 +114,7 @@ function amc_spi_enable(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[dac_init_device]: Enable the SPI";
+            const msg = "[dac_init_device]: Enable the SPI";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
     }
@@ -262,7 +262,7 @@ function amc_set_gpio(iomod_p, iost_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_gpio]: Set the register value ";
+            const msg = "[amc_set_gpio]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -342,7 +342,7 @@ function amc_set_dac(dac_p, dac_id_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_dac" + dac_id_p.toString(16) + "]: Set the register value ";
+            const msg = "[amc_set_dac" + dac_id_p.toString(16) + "]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -398,7 +398,7 @@ function amc_set_dac_load(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_dac_load]: Set the register value ";
+            const msg = "[amc_set_dac_load]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -458,7 +458,7 @@ function amc_set_dac_conf(slda_p, gdac_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_dac_conf]: Set the register value ";
+            const msg = "[amc_set_dac_conf]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -563,7 +563,7 @@ function amc_set_amc_status_conf(rstc_p, davf_p, sref_p, gref_p, ecnvt_p, level_
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_dac_conf]: Set the register value ";
+            const msg = "[amc_set_dac_conf]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -630,7 +630,7 @@ function amc_set_adc_ctrl(cmode_p, sa_p, ea_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_adc_ctrl]: Set the register value ";
+            const msg = "[amc_set_adc_ctrl]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -682,7 +682,7 @@ function amc_set_reset(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_reset]: Set the register value ";
+            const msg = "[amc_set_reset]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -759,7 +759,7 @@ function amc_set_power_down(padc_p, pdac_p, pts_p, prefb_p, level_p, mode_p, ver
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_power_down]: Set the register value ";
+            const msg = "[amc_set_power_down]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -826,7 +826,7 @@ function amc_set_threshold_hi(threshold_p, threshold_id_p, level_p, mode_p, verb
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_threshold_hi" + threshold_id_p.toString(16) + "]: Set the register value ";
+            const msg = "[amc_set_threshold_hi" + threshold_id_p.toString(16) + "]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -890,7 +890,7 @@ function amc_set_threshold_lo(threshold_p, threshold_id_p, level_p, mode_p, verb
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_set_threshold_lo" + threshold_id_p.toString(16) + "]: Set the register value ";
+            const msg = "[amc_set_threshold_lo" + threshold_id_p.toString(16) + "]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -945,7 +945,7 @@ function amc_get_adc0(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_adc0]: Get the register value " + text;
+            const msg = "[amc_get_adc0]: Get the register value " + text;
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1000,7 +1000,7 @@ function amc_get_adc1(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_adc1]: Get the register value " + text;
+            const msg = "[amc_get_adc1]: Get the register value " + text;
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1055,7 +1055,7 @@ function amc_get_adc2(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_adc2]: Get the register value " + text;
+            const msg = "[amc_get_adc2]: Get the register value " + text;
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1110,7 +1110,7 @@ function amc_get_adc3(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_adc3]: Get the register value " + text;
+            const msg = "[amc_get_adc3]: Get the register value " + text;
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1165,7 +1165,7 @@ function amc_get_adc4(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_adc4]: Get the register value " + text;
+            const msg = "[amc_get_adc4]: Get the register value " + text;
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1220,7 +1220,7 @@ function amc_get_adc5(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_adc5]: Get the register value " + text;
+            const msg = "[amc_get_adc5]: Get the register value " + text;
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1275,7 +1275,7 @@ function amc_get_adc6(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_adc6]: Get the register value " + text;
+            const msg = "[amc_get_adc6]: Get the register value " + text;
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1330,7 +1330,7 @@ function amc_get_adc7(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_adc7]: Get the register value " + text;
+            const msg = "[amc_get_adc7]: Get the register value " + text;
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1385,7 +1385,7 @@ function amc_get_adc8(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_adc8]: Get the register value " + text;
+            const msg = "[amc_get_adc8]: Get the register value " + text;
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1497,7 +1497,7 @@ function amc_get_alr(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_alr]: Get the register value ";
+            const msg = "[amc_get_alr]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1570,7 +1570,7 @@ function amc_get_gpio(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_gpio]: Get the register value ";
+            const msg = "[amc_get_gpio]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1652,7 +1652,7 @@ function amc_get_dac(dac_id_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_dac" + adc_id_p.toString(16) + "]: Get the register value ";
+            const msg = "[amc_get_dac" + adc_id_p.toString(16) + "]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1704,7 +1704,7 @@ function amc_get_load_dac(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_load_dac]: Get the register value ";
+            const msg = "[amc_get_load_dac]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1764,7 +1764,7 @@ function amc_get_dac_conf(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_dac_conf]: Get the register value ";
+            const msg = "[amc_get_dac_conf]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1868,7 +1868,7 @@ function amc_get_amc_status_conf(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_amc_status_conf]: Get the register value ";
+            const msg = "[amc_get_amc_status_conf]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1935,7 +1935,7 @@ function amc_get_adc_ctrl(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_adc_ctrl]: Get the register value ";
+            const msg = "[amc_get_adc_ctrl]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1986,7 +1986,7 @@ function amc_get_reset(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_reset]: Get the register value ";
+            const msg = "[amc_get_reset]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -2060,7 +2060,7 @@ function amc_get_power_down(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_power_down]: Get the register value ";
+            const msg = "[amc_get_power_down]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -2127,7 +2127,7 @@ function amc_get_threshold_hi(threshold_id_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_threshold_hi" + threshold_id_p.toString(16) + "]: Get the register value ";
+            const msg = "[amc_get_threshold_hi" + threshold_id_p.toString(16) + "]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -2190,7 +2190,7 @@ function amc_get_threshold_lo(threshold_id_p, level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_threshold_lo" + threshold_id_p.toString(16) + "]: Get the register value ";
+            const msg = "[amc_get_threshold_lo" + threshold_id_p.toString(16) + "]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -2237,7 +2237,7 @@ function amc_get_part_rev_number(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            msg = "[amc_get_part_rev_number]: Get the register value ";
+            const msg = "[amc_get_part_rev_number]: Get the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -2350,13 +2350,13 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
     const level0 = level_p;
     const level1 = level_p + 1;
 
-    msg = "AMC7823_configure";
+    const msg = "AMC7823_configure";
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
 
     // Enable the SPI on the FPGA board
     amc_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
@@ -2391,14 +2391,14 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *      mode (see ADC Control Register) before power-down and do not issue a convert command while the ADC is
      *      powered down.
      */
-    iomod = parseInt('1111', 2);
-    iost = parseInt('111111', 2);
+    const iomod = parseInt('1111', 2);
+    const iost = parseInt('111111', 2);
     amc_set_gpio(
         iomod_p = iomod, iost_p = iost,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
@@ -2463,17 +2463,17 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *    configuration.
      *    After power-on or reset, DAVF, SREF, GREF, and ECNVT are cleared to '0'; RSTC is set to '1'.
      */
-    rstc = 0;
-    davf = 0;
-    sref = 0;
-    gref = 0;
-    ecnvt = 0;
+    const rstc = 0;
+    const davf = 0;
+    const sref = 0;
+    const gref = 0;
+    const ecnvt = 0;
     amc_set_amc_status_conf(
         rstc_p = rstc, davf_p = davf, sref_p = sref, gref_p = gref, ecnvt_p = ecnvt,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
@@ -2498,15 +2498,15 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *  [7:4]: R/W: ea_p[3:0]
      *    The channel address of the last analog input to be converted (see Table 12).
      */
-    cmode = 1; // 0: direct mode, 1: auto-mode
-    sa = parseInt('0000', 2); // adc0
-    ea = parseInt('1000', 2); // adc8
+    const cmode = 1; // 0: direct mode, 1: auto-mode
+    const sa = parseInt('0000', 2); // adc0
+    const ea = parseInt('1000', 2); // adc8
     amc_set_adc_ctrl(
         cmode_p = cmode, sa_p = sa, ea_p = ea,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
@@ -2542,16 +2542,16 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *    any DAC-n operation. The precision current source may be used with either value of
      *    GREF.
      */
-    padc = 1; // 0: adc is power down, 1: adc is in normal mode
-    pdac = parseInt('0000_0000', 2); //0: DACi is power down,1 + (prefb = 1) = DAC is normal mode
-    pts = 0; //0: Precision current source is in power-down mode and the current output is zero, 1:Precision current source is in normal operating mode
-    prefb = 0; //0: Reference buffer amplifier is in power-down mode, 1:Reference buffer amplifier is powered on
+    const padc = 1; // 0: adc is power down, 1: adc is in normal mode
+    const pdac = parseInt('0000_0000', 2); //0: DACi is power down,1 + (prefb = 1) = DAC is normal mode
+    const pts = 0; //0: Precision current source is in power-down mode and the current output is zero, 1:Precision current source is in normal operating mode
+    const prefb = 0; //0: Reference buffer amplifier is in power-down mode, 1:Reference buffer amplifier is powered on
     amc_set_power_down(
         padc_p = padc, pdac_p = pdac, pts_p = pts, prefb_p = prefb,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
@@ -2563,14 +2563,14 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *    after power-on or reset.
      *  threshold_id_p (0 to 3)
      */
-    threshold = 0x0B16;
-    threshold_id = 0;
+    const threshold = 0x0B16;
+    const threshold_id = 0;
     amc_set_threshold_hi(
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
@@ -2582,14 +2582,14 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *    cleared to '0' after power-on or reset.
      *  threshold_id_p (0 to 3)
      */
-    threshold = 0x0A08;
-    threshold_id = 0;
+    const threshold = 0x0A08;
+    const threshold_id = 0;
     amc_set_threshold_lo(
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
@@ -2601,14 +2601,14 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *    after power-on or reset.
      *  threshold_id_p (0 to 3)
      */
-    threshold = 0x0B16;
-    threshold_id = 1;
+    const threshold = 0x0B16;
+    const threshold_id = 1;
     amc_set_threshold_hi(
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
@@ -2620,14 +2620,14 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *    cleared to '0' after power-on or reset.
      *  threshold_id_p (0 to 3)
      */
-    threshold = 0x0A08;
-    threshold_id = 1;
+    const threshold = 0x0A08;
+    const threshold_id = 1;
     amc_set_threshold_lo(
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
@@ -2639,14 +2639,14 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *    after power-on or reset.
      *  threshold_id_p (0 to 3)
      */
-    threshold = 0x0C18;
-    threshold_id = 2;
+    const threshold = 0x0C18;
+    const threshold_id = 2;
     amc_set_threshold_hi(
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
@@ -2658,14 +2658,14 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *    cleared to '0' after power-on or reset.
      *  threshold_id_p (0 to 3)
      */
-    threshold = 0x0AF1;
-    threshold_id = 2;
+    const threshold = 0x0AF1;
+    const threshold_id = 2;
     amc_set_threshold_lo(
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /*
@@ -2677,14 +2677,14 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *    after power-on or reset.
      *  threshold_id_p (0 to 3)
      */
-    threshold = 0x0C18;
-    threshold_id = 3;
+    const threshold = 0x0C18;
+    const threshold_id = 3;
     amc_set_threshold_hi(
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /**
@@ -2696,14 +2696,14 @@ function AMC7823_configure(level_p, mode_p, verbosity_p) {
      *    cleared to '0' after power-on or reset.
      *  threshold_id_p (0 to 3)
      */
-    threshold = 0x0AF1;
-    threshold_id = 3;
+    const threshold = 0x0AF1;
+    const threshold_id = 3;
     amc_set_threshold_lo(
         threshold_p = threshold, threshold_id_p = threshold_id,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 
