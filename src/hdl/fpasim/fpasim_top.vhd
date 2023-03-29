@@ -579,7 +579,7 @@ begin
   nb_sample_by_frame <= reg_tes_conf(pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH>) but was (<13>)"
 
   -- conf0 register
-  inter_squid_gain <= reg_conf0(pkg_CONF0_INTER_SQUID_GAIN_IDX_H downto pkg_CONF0_INTER_SQUID_GAIN_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH>) but was (<13>)"
+  inter_squid_gain <= reg_conf0(pkg_CONF0_INTER_SQUID_GAIN_IDX_H downto pkg_CONF0_INTER_SQUID_GAIN_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_CONF0_INTER_SQUID_GAIN_WIDTH>) but was (<8>)"
 
   -- debug_ctrl register
   debug_pulse <= reg_debug_ctrl(pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H);
@@ -664,7 +664,7 @@ begin
     adc_amp_squid_offset_correction_tmp0 <= i_adc_amp_squid_offset_correction;
   end generate gen_not_adc_debug;
 
-  gen_adc_debug : if g_FPASIM_DEBUG = true generate
+  gen_adc_debug : if g_FPASIM_DEBUG = true generate -- @suppress "Redundant boolean equality check with true"
   begin
     select_path : process (i_clk) is
     begin
@@ -798,7 +798,7 @@ begin
       ---------------------------------------------------------------------
       o_tes_pixel_neg_out_valid    => tes_pixel_neg_out_valid1,
       o_tes_pixel_neg_out_error    => tes_pixel_neg_out_error1,
-      o_tes_pixel_neg_out_pixel_id => tes_pixel_neg_out_pixel_id1,
+      o_tes_pixel_neg_out_pixel_id => tes_pixel_neg_out_pixel_id1, -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------
@@ -1028,7 +1028,7 @@ begin
     o_dac       <= dac4;
   end generate gen_not_dac_debug;
 
-  gen_dac_debug : if g_FPASIM_DEBUG = true generate
+  gen_dac_debug : if g_FPASIM_DEBUG = true generate -- @suppress "Redundant boolean equality check with true"
   begin
     select_path : process (i_clk) is
     begin
@@ -1209,8 +1209,8 @@ begin
         probe0(19)          => pixel_valid3,
         probe0(18)          => frame_sof3,
         probe0(17)          => frame_eof3,
-        probe0(16 downto 6) => frame_id3,
-        probe0(5 downto 0)  => pixel_id3,
+        probe0(16 downto 6) => frame_id3, -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
+        probe0(5 downto 0)  => pixel_id3, -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
 
         -- probe1
         probe1(32)           => dac_frame4,
@@ -1230,23 +1230,23 @@ begin
         probe3(19)          => pixel_valid1,
         probe3(18)          => frame_sof1,
         probe3(17)          => frame_eof1,
-        probe3(16 downto 6) => frame_id1,
-        probe3(5 downto 0)  => pixel_id1,
+        probe3(16 downto 6) => frame_id1, -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
+        probe3(5 downto 0)  => pixel_id1, -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
 
         -- probe4
         probe4(45 downto 22) => debug_pulse_cnt_r1_tmp,
-        probe4(21 downto 11) => debug_frame_id_pulse_sof_r1,
-        probe4(10 downto 0)  => debug_frame_id_pulse_eof_r1,
+        probe4(21 downto 11) => debug_frame_id_pulse_sof_r1, -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
+        probe4(10 downto 0)  => debug_frame_id_pulse_eof_r1, -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
         -- probe5
         probe5(31 downto 16) => debug_sample_pixel_cnt_tmp,
         probe5(15 downto 0)  => debug_sample_frame_cnt_tmp,
 
         -- probe6
         probe6(32)           => tes_pixel_neg_out_error1,
-        probe6(31 downto 26) => tes_pixel_neg_out_pixel_id1,
+        probe6(31 downto 26) => tes_pixel_neg_out_pixel_id1, -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
         probe6(25 downto 10) => cmd_pulse_height,
-        probe6(9 downto 4)   => cmd_pixel_id,
-        probe6(3 downto 0)   => cmd_time_shift,
+        probe6(9 downto 4)   => cmd_pixel_id, -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>)"
+        probe6(3 downto 0)   => cmd_time_shift, -- @suppress "Incorrect array size in assignment: expected (<4>) but was (<pkg_MAKE_PULSE_TIME_SHIFT_WIDTH>)"
 
         -- probe7
         probe7(47 downto 32) => rec_adc_cmd_nb_words_by_block,
@@ -1256,7 +1256,7 @@ begin
 
     inst_fpasim_top_vio_0 : entity work.fpasim_top_vio_0
       port map (
-        clk           => i_clk,
+        clk           => i_clk, -- @suppress "All references must have the same capitalization as their declaration: Expected 'CLK' but was 'clk'"
         probe_out0(0) => debug_adc_sel,
         probe_out1    => debug_adc_mux_squid_feedback,
         probe_out2    => debug_adc_amp_squid_offset_correction,

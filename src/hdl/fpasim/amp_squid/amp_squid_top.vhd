@@ -147,7 +147,9 @@ begin
       g_AMP_SQUID_TF_RAM_ADDR_WIDTH => i_amp_squid_tf_wr_rd_addr'length,
       -- computation
       g_PIXEL_RESULT_INPUT_WIDTH    => i_pixel_result'length,
-      g_PIXEL_RESULT_OUTPUT_WIDTH   => pixel_result'length
+      g_PIXEL_RESULT_OUTPUT_WIDTH   => pixel_result'length,
+      -- RAM configuration filename
+      g_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE => pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE
       )
     port map(
       i_clk                         => i_clk,

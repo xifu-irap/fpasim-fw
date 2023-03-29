@@ -144,7 +144,8 @@ begin
 
   inst_regdecode_wire_wr_rd : entity work.regdecode_wire_wr_rd
     generic map(
-      g_DATA_WIDTH_OUT => data_tmp0'length  -- define the RAM address width
+      g_DATA_WIDTH_OUT   => data_tmp0'length,  -- define the RAM address width
+      g_FIFO_WRITE_DEPTH => 16  -- define the cross clock domain FIFO depth
       )
     port map(
       ---------------------------------------------------------------------
@@ -175,8 +176,8 @@ begin
       ---------------------------------------------------------------------
       -- usb_errors/usb_status @ i_clk
       ---------------------------------------------------------------------
-      o_errors          => errors_tmp1,     -- output usb_errors
-      o_status          => status_tmp1      -- output usb_status
+      o_errors          => errors_tmp1,        -- output usb_errors
+      o_status          => status_tmp1  -- output usb_status
       );
 
   -- fifo auto-reading

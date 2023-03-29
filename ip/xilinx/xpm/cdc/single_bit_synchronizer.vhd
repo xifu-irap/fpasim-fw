@@ -17,19 +17,20 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   single_bit_synchronizer.vhd 
+--    @file                   single_bit_synchronizer.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
---!     
---!   This modules synchronizes a data bit from a source clock domain to a destination clock domain
---!   The architecture is as follows:
---!        @i_src_clk clock domain             |                    @ i_dest_clk clock domain
---!        i_src ---------------------> xpm_cdc_single -----------> o_dest
---!               
---!   Note: the following header documentation is an extract of the associated XPM Xilinx header      
+--    @details                
+--      
+--    This modules synchronizes a data bit from a source clock domain to a destination clock domain
+--    The architecture is as follows:
+--         @i_src_clk clock domain             |                    @ i_dest_clk clock domain
+--         i_src ---------------------> xpm_cdc_single -----------> o_dest
+--                
+--    Note: the following header documentation is an extract of the associated XPM Xilinx header      
+--    
 -- ------------------------------------------------------------------------------------------------------------- 
 
 -- -------------------------------------------------------------------------------------------------------------

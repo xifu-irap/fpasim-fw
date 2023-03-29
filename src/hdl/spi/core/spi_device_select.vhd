@@ -29,6 +29,7 @@
 --    
 --    Note: 
 --     . For the different devices, the user must build the corresponding full SPI words (typically: addr + data).
+--     
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -520,7 +521,7 @@ begin
     o_ref_en       <= cdce_ref_en1;
   end generate not_gen_vio_debug;
 
-  gen_vio_debug : if g_DEBUG = true generate
+  gen_vio_debug : if g_DEBUG = true generate -- @suppress "Redundant boolean equality check with true"
     o_cdce_n_reset <= debug_cdce_n_reset1;
     o_cdce_n_pd    <= debug_cdce_n_pd1;
     o_ref_en       <= debug_cdce_ref_en1;

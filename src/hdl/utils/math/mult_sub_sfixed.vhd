@@ -54,7 +54,7 @@ entity mult_sub_sfixed is
         -- port S: ARM Q notation (fixed point)
         g_Q_M_S  : in positive := 15;
         g_Q_N_S  : in natural := 0;
-        g_SIM_EN : in boolean := FALSE
+        g_SIM_EN : in boolean := FALSE -- @suppress "Unused generic: g_SIM_EN is not used in fpasim.mult_sub_sfixed(RTL)"
     );
     port(
         i_clk : in  std_logic;

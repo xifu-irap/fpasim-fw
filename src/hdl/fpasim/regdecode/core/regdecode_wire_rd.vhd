@@ -69,7 +69,7 @@ entity regdecode_wire_rd is
 end entity regdecode_wire_rd;
 
 architecture RTL of regdecode_wire_rd is
-  constant c_WR_TO_RD_DELAY    : integer := 0;
+
   constant c_FIFO_READ_LATENCY : integer := 2;
 
   ---------------------------------------------------------------------

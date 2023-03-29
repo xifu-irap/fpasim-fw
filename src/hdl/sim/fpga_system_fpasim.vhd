@@ -120,9 +120,6 @@ architecture RTL of fpga_system_fpasim is
 ---------------------------------------------------------------------
 -- system_fpasim_top
 ---------------------------------------------------------------------
-  signal i_clk_to_fpga_p : std_logic;  -- @suppress "signal i_clk_to_fpga_p is never written"
-  signal i_clk_to_fpga_n : std_logic;  -- @suppress "signal i_clk_to_fpga_n is never written"
-
   signal dac_clk_p   : std_logic;
   signal dac_clk_n   : std_logic;
   signal dac_frame_p : std_logic;

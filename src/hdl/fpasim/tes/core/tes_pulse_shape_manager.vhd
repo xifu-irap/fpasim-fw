@@ -38,13 +38,14 @@
 --   Note:
 --     . If the state machine is processing a pulse for the pixel 0 and if a new command is received for the pixel 0, then
 --     the state machine stop the previous processing and start a new processing with the new set of paramters.
---
+--   Remark:
+--     . The minimum number of samples between the i_pixel_sof and i_pixel_eof is given by the following formula:
+--        => min_sample = 
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 
 use work.pkg_fpasim.all;
 use work.pkg_regdecode.all;
@@ -58,8 +59,6 @@ entity tes_pulse_shape_manager is
     -- frame
     g_NB_FRAME_BY_PULSE_SHAPE              : positive := pkg_NB_FRAME_BY_PULSE_SHAPE;
     g_NB_SAMPLE_BY_FRAME_WIDTH             : positive := pkg_NB_SAMPLE_BY_FRAME_WIDTH;  -- frame bus width (expressed in bits). Possible values : [1; max integer value[
-    -- pixel
-    g_NB_PIXEL_BY_FRAME_MAX                : positive := pkg_NB_PIXEL_BY_FRAME_MAX;  -- number max of pixel by frame authorised by the design
     -- addr
     g_PULSE_SHAPE_RAM_ADDR_WIDTH           : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- output 
@@ -139,15 +138,20 @@ end entity tes_pulse_shape_manager;
 
 architecture RTL of tes_pulse_shape_manager is
   constant c_NB_FRAME_BY_PULSE_SHAPE : positive := g_NB_FRAME_BY_PULSE_SHAPE;
-  constant c_NB_PIXEL_BY_FRAME_MAX   : positive := g_NB_PIXEL_BY_FRAME_MAX;
 
   constant c_SHIFT_MAX : positive := 2 ** (i_cmd_time_shift'length);
 
-  constant c_MEMORY_SIZE_PULSE_SHAPE  : positive := (2 ** i_pulse_shape_wr_rd_addr'length) * i_pulse_shape_wr_data'length;  -- memory size in bits
-  constant c_MEMORY_SIZE_STEADY_STATE : positive := (2 ** i_steady_state_wr_rd_addr'length) * i_steady_state_wr_data'length;  -- memory size in bits
+  constant c_MEMORY_SIZE_PULSE_SHAPE                  : positive := (2 ** i_pulse_shape_wr_rd_addr'length) * i_pulse_shape_wr_data'length;  -- memory size in bits
+  constant c_MEMORY_SIZE_STEADY_STATE                 : positive := (2 ** i_steady_state_wr_rd_addr'length) * i_steady_state_wr_data'length;  -- memory size in bits
+  constant c_MEMORY_SIZE_EN_TABLE                     : positive := (2 ** i_pixel_id'length) * 1;  -- memory size in bits
+  constant c_MEMORY_SIZE_PULSE_HEIGTH_TABLE           : positive := (2 ** i_pixel_id'length) * (i_cmd_pulse_height'length);  -- memory size in bits
+  constant c_MEMORY_SIZE_TIME_SHIFT_TABLE             : positive := (2 ** i_pixel_id'length) * (i_cmd_time_shift'length);  -- memory size in bits
+  constant c_MEMORY_SIZE_CNT_SAMPLE_PULSE_SHAPE_TABLE : positive := (2 ** i_pixel_id'length) * (g_NB_SAMPLE_BY_FRAME_WIDTH);  -- memory size in bits
 
   -- add 1 bit to the i_cmd_time_shift length to be able to represent the c_SHIFT_MAX value
   constant c_SHIFT_MAX_VECTOR : std_logic_vector(i_cmd_time_shift'length downto 0) := std_logic_vector(to_unsigned(c_SHIFT_MAX, i_cmd_time_shift'length + 1));
+
+  constant c_CNT_MAX : unsigned(i_pixel_id'range) := (others => '1');
 
   ---------------------------------------------------------------------
   -- FIFO cmd
@@ -186,56 +190,6 @@ architecture RTL of tes_pulse_shape_manager is
 
   signal cmd_ready_r1 : std_logic := '0';
 
-  ---------------------------------------------------------------------
-  -- State machine
-  ---------------------------------------------------------------------
-  type t_addr_pulse_shape_array is array (0 to c_NB_PIXEL_BY_FRAME_MAX - 1) of unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
-  type t_pulse_height_array is array (0 to c_NB_PIXEL_BY_FRAME_MAX - 1) of unsigned(i_cmd_pulse_height'range);
-  type t_time_shift_array is array (0 to c_NB_PIXEL_BY_FRAME_MAX - 1) of unsigned(i_cmd_time_shift'range);
-
-  type t_state is (E_RST, E_WAIT, E_RUN);
-  signal sm_state_next : t_state;
-  signal sm_state_r1   : t_state := E_RST;
-
-  signal cmd_rd_next : std_logic;
-  signal cmd_rd_r1   : std_logic := '0';
-
-  signal cnt_sample_pulse_shape_next : unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
-  signal cnt_sample_pulse_shape_r1   : unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0) := (others => '0');
-
-  signal cnt_sample_pulse_shape_table_next : t_addr_pulse_shape_array;
-  signal cnt_sample_pulse_shape_table_r1   : t_addr_pulse_shape_array := (others => (others => '0'));
-
-  signal en_table_next : std_logic_vector(c_NB_PIXEL_BY_FRAME_MAX - 1 downto 0);
-  signal en_table_r1   : std_logic_vector(c_NB_PIXEL_BY_FRAME_MAX - 1 downto 0) := (others => '0');
-
-  signal pulse_heigth_next : unsigned(i_cmd_pulse_height'range);
-  signal pulse_heigth_r1   : unsigned(i_cmd_pulse_height'range) := (others => '0');
-
-  signal pulse_heigth_table_next : t_pulse_height_array;
-  signal pulse_heigth_table_r1   : t_pulse_height_array := (others => (others => '0'));
-
-  signal time_shift_next : unsigned(i_cmd_time_shift'range);
-  signal time_shift_r1   : unsigned(i_cmd_time_shift'range) := (others => '0');
-
-  signal time_shift_table_next : t_time_shift_array;
-  signal time_shift_table_r1   : t_time_shift_array := (others => (others => '0'));
-
-  signal en_next : std_logic;
-  signal en_r1   : std_logic := '0';
-
-  signal pixel_valid_next : std_logic;
-  signal pixel_valid_r1   : std_logic := '0';
-
-  signal pulse_sof_next : std_logic;
-  signal pulse_sof_r1   : std_logic := '0';
-
-  signal pulse_eof_next : std_logic;
-  signal pulse_eof_r1   : std_logic := '0';
-
-  signal last_sample_pulse_shape_next : std_logic;
-  signal last_sample_pulse_shape_r1   : std_logic := '0';
-
   -------------------------------------------------------------------
   -- compute pipe indexes
   --   Note: shared by more than 1 pipeliner
@@ -261,6 +215,153 @@ architecture RTL of tes_pulse_shape_manager is
   constant c_IDX6_L : integer := c_IDX5_H + 1;
   constant c_IDX6_H : integer := c_IDX6_L + i_cmd_pulse_height'length - 1;
 
+  ---------------------------------------------------------------------
+  -- table
+  ---------------------------------------------------------------------
+  -- RAM: en_table
+  signal en_table_wea   : std_logic;
+  signal en_table_ena   : std_logic;
+  signal en_table_addra : std_logic_vector(i_pixel_id'range);
+  signal en_table_dina  : std_logic_vector(0 downto 0);
+  --signal en_table_regcea : std_logic;
+  --signal en_table_douta  : std_logic_vector(0 downto 0);
+
+  signal en_table_enb    : std_logic;
+  --signal en_table_web    : std_logic;
+  signal en_table_addrb  : std_logic_vector(i_pixel_id'range);
+  --signal en_table_dinb   : std_logic_vector(0 downto 0);
+  signal en_table_regceb : std_logic;
+  signal en_table_doutb  : std_logic_vector(0 downto 0);
+
+  signal en_table_tmp : std_logic;
+
+  -- RAM: pulse_heigth_table
+  signal pulse_heigth_table_wea   : std_logic;
+  signal pulse_heigth_table_ena   : std_logic;
+  signal pulse_heigth_table_addra : std_logic_vector(i_pixel_id'range);
+  signal pulse_heigth_table_dina  : std_logic_vector(i_cmd_pulse_height'range);
+  --signal pulse_heigth_table_regcea : std_logic;
+  --signal pulse_heigth_table_douta  : std_logic_vector(0 downto 0);
+
+  signal pulse_heigth_table_enb    : std_logic;
+  --signal pulse_heigth_table_web    : std_logic;
+  signal pulse_heigth_table_addrb  : std_logic_vector(i_pixel_id'range);
+  --signal pulse_heigth_table_dinb   : std_logic_vector(0 downto 0);
+  signal pulse_heigth_table_regceb : std_logic;
+  signal pulse_heigth_table_doutb  : std_logic_vector(i_cmd_pulse_height'range);
+
+  signal pulse_heigth_table_tmp : std_logic_vector(i_cmd_pulse_height'range);
+
+  -- RAM: time_shift_table
+  signal time_shift_table_wea   : std_logic;
+  signal time_shift_table_ena   : std_logic;
+  signal time_shift_table_addra : std_logic_vector(i_pixel_id'range);
+  signal time_shift_table_dina  : std_logic_vector(i_cmd_time_shift'range);
+  --signal time_shift_table_regcea : std_logic;
+  --signal time_shift_table_douta  : std_logic_vector(0 downto 0);
+
+  signal time_shift_table_enb    : std_logic;
+  --signal pulse_heigth_table_web    : std_logic;
+  signal time_shift_table_addrb  : std_logic_vector(i_pixel_id'range);
+  --signal time_shift_table_dinb   : std_logic_vector(0 downto 0);
+  signal time_shift_table_regceb : std_logic;
+  signal time_shift_table_doutb  : std_logic_vector(i_cmd_time_shift'range);
+
+  signal time_shift_table_tmp : std_logic_vector(i_cmd_time_shift'range);
+
+  -- RAM: cnt_sample_pulse_shape_table
+  signal cnt_sample_pulse_shape_table_wea   : std_logic;
+  signal cnt_sample_pulse_shape_table_ena   : std_logic;
+  signal cnt_sample_pulse_shape_table_addra : std_logic_vector(i_pixel_id'range);
+  signal cnt_sample_pulse_shape_table_dina  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+  --signal cnt_sample_pulse_shape_table_regcea : std_logic;
+  --signal cnt_sample_pulse_shape_table_douta  : std_logic_vector(0 downto 0);
+
+  signal cnt_sample_pulse_shape_table_enb    : std_logic;
+  --signal cnt_sample_pulse_shapeth_table_web    : std_logic;
+  signal cnt_sample_pulse_shape_table_addrb  : std_logic_vector(i_pixel_id'range);
+  --signal cnt_sample_pulse_shape_table_dinb   : std_logic_vector(0 downto 0);
+  signal cnt_sample_pulse_shape_table_regceb : std_logic;
+  signal cnt_sample_pulse_shape_table_doutb  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+
+  signal cnt_sample_pulse_shape_table_tmp : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+
+  ---------------------------------------------------------------------
+  -- sync with the table out
+  ---------------------------------------------------------------------
+  signal data_pipe_table_tmp0 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_table_tmp1 : std_logic_vector(c_IDX3_H downto 0);
+
+  signal pixel_valid_ra : std_logic;
+  signal pixel_sof_ra   : std_logic;
+  signal pixel_eof_ra   : std_logic;
+  signal pixel_id_ra    : std_logic_vector(i_pixel_id'range);
+
+  ---------------------------------------------------------------------
+  -- State machine
+  ---------------------------------------------------------------------
+  type t_state is (E_RST0, E_RST1, E_WAIT, E_RUN);
+  signal sm_state_next : t_state;
+  signal sm_state_r1   : t_state := E_RST0;
+
+  signal cmd_rd_next : std_logic;
+  signal cmd_rd_r1   : std_logic := '0';
+
+  signal first_next : std_logic;
+  signal first_r1   : std_logic := '0';
+
+  signal last_sample_pulse_shape_next : std_logic;
+  signal last_sample_pulse_shape_r1   : std_logic := '0';
+
+  signal pixel_valid_next : std_logic;
+  signal pixel_valid_r1   : std_logic := '0';
+
+  signal pulse_sof_next : std_logic;
+  signal pulse_sof_r1   : std_logic := '0';
+
+  signal pulse_eof_next : std_logic;
+  signal pulse_eof_r1   : std_logic := '0';
+
+  signal en_next : std_logic;
+  signal en_r1   : std_logic := '0';
+
+  -- parameters for the computation
+  signal pulse_heigth_next : unsigned(i_cmd_pulse_height'range);
+  signal pulse_heigth_r1   : unsigned(i_cmd_pulse_height'range) := (others => '0');
+
+  signal time_shift_next : unsigned(i_cmd_time_shift'range);
+  signal time_shift_r1   : unsigned(i_cmd_time_shift'range) := (others => '0');
+
+  signal cnt_sample_pulse_shape_next : unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+  signal cnt_sample_pulse_shape_r1   : unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0) := (others => '0');
+
+  -- parameters to store in the tables
+  signal ram_wr_en_next : std_logic;
+  signal ram_wr_en_r1   : std_logic := '0';
+
+  signal ram_wr_pulse_heigth_next : std_logic;
+  signal ram_wr_pulse_heigth_r1   : std_logic := '0';
+
+  signal ram_wr_time_shift_next : std_logic;
+  signal ram_wr_time_shift_r1   : std_logic := '0';
+
+  signal ram_wr_cnt_sample_pulse_shape_next : std_logic;
+  signal ram_wr_cnt_sample_pulse_shape_r1   : std_logic := '0';
+
+  signal ram_addr_next : unsigned(i_pixel_id'range);
+  signal ram_addr_r1   : unsigned(i_pixel_id'range);
+
+  signal ram_en_next : std_logic;
+  signal ram_en_r1   : std_logic := '0';
+
+  signal ram_pulse_heigth_next : unsigned(i_cmd_pulse_height'range);
+  signal ram_pulse_heigth_r1   : unsigned(i_cmd_pulse_height'range) := (others => '0');
+
+  signal ram_time_shift_next : unsigned(i_cmd_time_shift'range);
+  signal ram_time_shift_r1   : unsigned(i_cmd_time_shift'range) := (others => '0');
+
+  signal ram_cnt_sample_pulse_shape_next : unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+  signal ram_cnt_sample_pulse_shape_r1   : unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0) := (others => '0');
 
   ---------------------------------------------------------------------
   -- sync with the address computation output
@@ -405,7 +506,6 @@ architecture RTL of tes_pulse_shape_manager is
   -- detect output negative value
   ---------------------------------------------------------------------
   signal sign_value       : std_logic;
-  signal error_sign_value : std_logic;
 
   signal pixel_neg_out_valid    : std_logic;
   signal pixel_neg_out_error    : std_logic;
@@ -481,66 +581,333 @@ begin
   cmd_time_shift1   <= data_tmp1(c_CMD_IDX0_H downto c_CMD_IDX0_L);
 
   ---------------------------------------------------------------------
+  -- memory
+  ---------------------------------------------------------------------
+  -- en_table
+  en_table_wea     <= ram_wr_en_r1;
+  en_table_ena     <= ram_wr_en_r1;
+  en_table_addra   <= std_logic_vector(ram_addr_r1);
+  en_table_dina(0) <= ram_en_r1;
+  inst_sdpram_en_table : entity work.sdpram
+    generic map(
+      g_ADDR_WIDTH_A       => en_table_addra'length,
+      g_BYTE_WRITE_WIDTH_A => en_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A. 
+      g_WRITE_DATA_WIDTH_A => en_table_dina'length,
+      g_ADDR_WIDTH_B       => en_table_addrb'length,
+      g_WRITE_MODE_B       => "no_change",  -- no_change, read_first, write_first
+      g_READ_DATA_WIDTH_B  => en_table_doutb'length,
+      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives. 
+      g_CLOCKING_MODE      => "common_clock",
+      g_MEMORY_PRIMITIVE   => "auto",
+      g_MEMORY_SIZE        => c_MEMORY_SIZE_EN_TABLE,
+      g_MEMORY_INIT_FILE   => "none",
+      g_MEMORY_INIT_PARAM  => ""
+      )
+    port map(
+      ---------------------------------------------------------------------
+      -- port A
+      ---------------------------------------------------------------------
+      i_clka   => i_clk,                -- clock
+      i_ena    => en_table_ena,         -- memory enable
+      i_wea(0) => en_table_wea,         -- write enable
+      i_addra  => en_table_addra,       -- write address
+      i_dina   => en_table_dina,        -- write data input
+      ---------------------------------------------------------------------
+      -- port B
+      ---------------------------------------------------------------------
+      i_rstb   => i_rst,                -- reset the ouput register
+      i_clkb   => i_clk,                -- clock
+      i_enb    => en_table_enb,         -- memory enable
+      i_addrb  => en_table_addrb,       -- read address
+      i_regceb => en_table_regceb,  -- clock enable for the last register stage on the output data path
+      o_doutb  => en_table_doutb        -- read data output
+      );
+  en_table_enb    <= i_pixel_valid;
+  en_table_addrb  <= i_pixel_id;
+  en_table_regceb <= '1';
+
+  en_table_tmp <= en_table_doutb(0);
+
+  -- pulse_heigth_table
+  pulse_heigth_table_wea   <= ram_wr_pulse_heigth_r1;
+  pulse_heigth_table_ena   <= ram_wr_pulse_heigth_r1;
+  pulse_heigth_table_addra <= std_logic_vector(ram_addr_r1);
+  pulse_heigth_table_dina  <= std_logic_vector(ram_pulse_heigth_r1);
+  inst_sdpram_pulse_heigth_table : entity work.sdpram
+    generic map(
+      g_ADDR_WIDTH_A       => pulse_heigth_table_addra'length,
+      g_BYTE_WRITE_WIDTH_A => pulse_heigth_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A. 
+      g_WRITE_DATA_WIDTH_A => pulse_heigth_table_dina'length,
+      g_ADDR_WIDTH_B       => pulse_heigth_table_addrb'length,
+      g_WRITE_MODE_B       => "no_change",  -- no_change, read_first, write_first
+      g_READ_DATA_WIDTH_B  => pulse_heigth_table_doutb'length,
+      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives. 
+      g_CLOCKING_MODE      => "common_clock",
+      g_MEMORY_PRIMITIVE   => "auto",
+      g_MEMORY_SIZE        => c_MEMORY_SIZE_PULSE_HEIGTH_TABLE,
+      g_MEMORY_INIT_FILE   => "none",
+      g_MEMORY_INIT_PARAM  => ""
+      )
+    port map(
+      ---------------------------------------------------------------------
+      -- port A
+      ---------------------------------------------------------------------
+      i_clka   => i_clk,                -- clock
+      i_ena    => pulse_heigth_table_ena,   -- memory enable
+      i_wea(0) => pulse_heigth_table_wea,   -- write enable
+      i_addra  => pulse_heigth_table_addra,   -- write address
+      i_dina   => pulse_heigth_table_dina,  -- write data input
+      ---------------------------------------------------------------------
+      -- port B
+      ---------------------------------------------------------------------
+      i_rstb   => i_rst,                -- reset the ouput register
+      i_clkb   => i_clk,                -- clock
+      i_enb    => pulse_heigth_table_enb,   -- memory enable
+      i_addrb  => pulse_heigth_table_addrb,   -- read address
+      i_regceb => pulse_heigth_table_regceb,  -- clock enable for the last register stage on the output data path
+      o_doutb  => pulse_heigth_table_doutb  -- read data output
+      );
+  pulse_heigth_table_enb    <= i_pixel_valid;
+  pulse_heigth_table_addrb  <= i_pixel_id;
+  pulse_heigth_table_regceb <= '1';
+
+  pulse_heigth_table_tmp <= pulse_heigth_table_doutb;
+
+  -- time_shift_table
+  time_shift_table_wea   <= ram_wr_time_shift_r1;
+  time_shift_table_ena   <= ram_wr_time_shift_r1;
+  time_shift_table_addra <= std_logic_vector(ram_addr_r1);
+  time_shift_table_dina  <= std_logic_vector(ram_time_shift_r1);
+  inst_sdpram_time_shift_table : entity work.sdpram
+    generic map(
+      g_ADDR_WIDTH_A       => time_shift_table_addra'length,
+      g_BYTE_WRITE_WIDTH_A => time_shift_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A. 
+      g_WRITE_DATA_WIDTH_A => time_shift_table_dina'length,
+      g_ADDR_WIDTH_B       => time_shift_table_addrb'length,
+      g_WRITE_MODE_B       => "no_change",  -- no_change, read_first, write_first
+      g_READ_DATA_WIDTH_B  => time_shift_table_doutb'length,
+      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives. 
+      g_CLOCKING_MODE      => "common_clock",
+      g_MEMORY_PRIMITIVE   => "auto",
+      g_MEMORY_SIZE        => c_MEMORY_SIZE_TIME_SHIFT_TABLE,
+      g_MEMORY_INIT_FILE   => "none",
+      g_MEMORY_INIT_PARAM  => ""
+      )
+    port map(
+      ---------------------------------------------------------------------
+      -- port A
+      ---------------------------------------------------------------------
+      i_clka   => i_clk,                -- clock
+      i_ena    => time_shift_table_ena,     -- memory enable
+      i_wea(0) => time_shift_table_wea,     -- write enable
+      i_addra  => time_shift_table_addra,   -- write address
+      i_dina   => time_shift_table_dina,    -- write data input
+      ---------------------------------------------------------------------
+      -- port B
+      ---------------------------------------------------------------------
+      i_rstb   => i_rst,                -- reset the ouput register
+      i_clkb   => i_clk,                -- clock
+      i_enb    => time_shift_table_enb,     -- memory enable
+      i_addrb  => time_shift_table_addrb,   -- read address
+      i_regceb => time_shift_table_regceb,  -- clock enable for the last register stage on the output data path
+      o_doutb  => time_shift_table_doutb    -- read data output
+      );
+  time_shift_table_enb    <= i_pixel_valid;
+  time_shift_table_addrb  <= i_pixel_id;
+  time_shift_table_regceb <= '1';
+
+  time_shift_table_tmp <= time_shift_table_doutb;
+
+  -- cnt_sample_pulse_shape_table
+  cnt_sample_pulse_shape_table_wea   <= ram_wr_cnt_sample_pulse_shape_r1;
+  cnt_sample_pulse_shape_table_ena   <= ram_wr_cnt_sample_pulse_shape_r1;
+  cnt_sample_pulse_shape_table_addra <= std_logic_vector(ram_addr_r1);
+  cnt_sample_pulse_shape_table_dina  <= std_logic_vector(ram_cnt_sample_pulse_shape_r1);
+  inst_sdpram_cnt_sample_pulse_shape_table : entity work.sdpram
+    generic map(
+      g_ADDR_WIDTH_A       => cnt_sample_pulse_shape_table_addra'length,
+      g_BYTE_WRITE_WIDTH_A => cnt_sample_pulse_shape_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A. 
+      g_WRITE_DATA_WIDTH_A => cnt_sample_pulse_shape_table_dina'length,
+      g_ADDR_WIDTH_B       => cnt_sample_pulse_shape_table_addrb'length,
+      g_WRITE_MODE_B       => "no_change",  -- no_change, read_first, write_first
+      g_READ_DATA_WIDTH_B  => cnt_sample_pulse_shape_table_doutb'length,
+      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives. 
+      g_CLOCKING_MODE      => "common_clock",
+      g_MEMORY_PRIMITIVE   => "auto",
+      g_MEMORY_SIZE        => c_MEMORY_SIZE_CNT_SAMPLE_PULSE_SHAPE_TABLE,
+      g_MEMORY_INIT_FILE   => "none",
+      g_MEMORY_INIT_PARAM  => ""
+      )
+    port map(
+      ---------------------------------------------------------------------
+      -- port A
+      ---------------------------------------------------------------------
+      i_clka   => i_clk,                -- clock
+      i_ena    => cnt_sample_pulse_shape_table_ena,     -- memory enable
+      i_wea(0) => cnt_sample_pulse_shape_table_wea,     -- write enable
+      i_addra  => cnt_sample_pulse_shape_table_addra,   -- write address
+      i_dina   => cnt_sample_pulse_shape_table_dina,    -- write data input
+      ---------------------------------------------------------------------
+      -- port B
+      ---------------------------------------------------------------------
+      i_rstb   => i_rst,                -- reset the ouput register
+      i_clkb   => i_clk,                -- clock
+      i_enb    => cnt_sample_pulse_shape_table_enb,     -- memory enable
+      i_addrb  => cnt_sample_pulse_shape_table_addrb,   -- read address
+      i_regceb => cnt_sample_pulse_shape_table_regceb,  -- clock enable for the last register stage on the output data path
+      o_doutb  => cnt_sample_pulse_shape_table_doutb    -- read data output
+      );
+  cnt_sample_pulse_shape_table_enb    <= i_pixel_valid;
+  cnt_sample_pulse_shape_table_addrb  <= i_pixel_id;
+  cnt_sample_pulse_shape_table_regceb <= '1';
+
+  cnt_sample_pulse_shape_table_tmp <= cnt_sample_pulse_shape_table_doutb;
+
+
+  ---------------------------------------------------------------------
+  -- sync with output table
+  ---------------------------------------------------------------------
+  data_pipe_table_tmp0(c_IDX3_H)                 <= i_pixel_valid;
+  data_pipe_table_tmp0(c_IDX2_H)                 <= i_pixel_sof;
+  data_pipe_table_tmp0(c_IDX1_H)                 <= i_pixel_eof;
+  data_pipe_table_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
+
+  inst_pipeliner_sync_with_table_output : entity work.pipeliner
+    generic map(
+      g_NB_PIPES   => pkg_TES_TABLE_RAM_RD_LATENCY,
+      g_DATA_WIDTH => data_pipe_table_tmp0'length
+      )
+    port map(
+      i_clk  => i_clk,
+      i_data => data_pipe_table_tmp0,
+      o_data => data_pipe_table_tmp1
+      );
+
+  pixel_valid_ra <= data_pipe_table_tmp1(c_IDX3_H);
+  pixel_sof_ra   <= data_pipe_table_tmp1(c_IDX2_H);
+  pixel_eof_ra   <= data_pipe_table_tmp1(c_IDX1_H);
+  pixel_id_ra    <= data_pipe_table_tmp1(c_IDX0_H downto c_IDX0_L);
+
+  ---------------------------------------------------------------------
   -- state machine
   ---------------------------------------------------------------------
   p_decode_state : process(cmd_pixel_id1, cmd_pulse_height1, cmd_time_shift1,
                            cnt_sample_pulse_shape_r1,
-                           cnt_sample_pulse_shape_table_r1, empty1, en_r1,
-                           en_table_r1, i_pixel_eof, i_pixel_id, i_pixel_sof,
-                           i_pixel_valid, last_sample_pulse_shape_r1,
-                           pulse_heigth_r1, pulse_heigth_table_r1, sm_state_r1,
-                           time_shift_r1, time_shift_table_r1) is
+                           cnt_sample_pulse_shape_table_tmp, empty1, en_r1,
+                           en_table_tmp, first_r1, last_sample_pulse_shape_r1,
+                           pixel_eof_ra, pixel_id_ra, pixel_sof_ra,
+                           pixel_valid_ra, pulse_heigth_r1,
+                           pulse_heigth_table_tmp, ram_addr_r1,
+                           ram_cnt_sample_pulse_shape_r1, ram_en_r1,
+                           ram_pulse_heigth_r1, ram_time_shift_r1, sm_state_r1,
+                           time_shift_r1, time_shift_table_tmp) is
   begin
-    cmd_rd_next                       <= '0';
-    cnt_sample_pulse_shape_table_next <= cnt_sample_pulse_shape_table_r1;
-    cnt_sample_pulse_shape_next       <= cnt_sample_pulse_shape_r1;
-    en_table_next                     <= en_table_r1;
-    en_next                           <= en_r1;
+    -- default value
+    cmd_rd_next <= '0';
 
-    pulse_heigth_next       <= pulse_heigth_r1;
-    pulse_heigth_table_next <= pulse_heigth_table_r1;
-    time_shift_next         <= time_shift_r1;
-    time_shift_table_next   <= time_shift_table_r1;
-    pixel_valid_next        <= '0';
-
+    first_next                   <= first_r1;
+    last_sample_pulse_shape_next <= last_sample_pulse_shape_r1;
+    pixel_valid_next             <= '0';
     pulse_sof_next               <= '0';
     pulse_eof_next               <= '0';
-    last_sample_pulse_shape_next <= last_sample_pulse_shape_r1;
+
+    en_next                     <= en_r1;
+    pulse_heigth_next           <= pulse_heigth_r1;
+    time_shift_next             <= time_shift_r1;
+    cnt_sample_pulse_shape_next <= cnt_sample_pulse_shape_r1;
+
+    ram_wr_en_next                     <= '0';
+    ram_wr_pulse_heigth_next           <= '0';
+    ram_wr_time_shift_next             <= '0';
+    ram_wr_cnt_sample_pulse_shape_next <= '0';
+
+    ram_addr_next                   <= ram_addr_r1;
+    ram_en_next                     <= ram_en_r1;
+    ram_pulse_heigth_next           <= ram_pulse_heigth_r1;
+    ram_time_shift_next             <= ram_time_shift_r1;
+    ram_cnt_sample_pulse_shape_next <= ram_cnt_sample_pulse_shape_r1;
 
     case sm_state_r1 is
-      when E_RST =>
-        en_table_next                     <= (others => '0');
-        cnt_sample_pulse_shape_table_next <= (others => (others => '0'));
-        pulse_heigth_table_next           <= (others => (others => '0'));
-        time_shift_table_next             <= (others => (others => '0'));
-        sm_state_next                     <= E_WAIT;
+      when E_RST0 =>
+        ram_addr_next <= (others => '0');
+        -- init values for table initialization in the next step
+        sm_state_next <= E_RST1;
+
+      when E_RST1 =>
+
+        ram_wr_en_next                     <= '1';
+        ram_wr_pulse_heigth_next           <= '1';
+        ram_wr_time_shift_next             <= '1';
+        ram_wr_cnt_sample_pulse_shape_next <= '1';
+
+        ram_en_next                     <= '0';
+        ram_pulse_heigth_next           <= (others => '0');
+        ram_time_shift_next             <= (others => '0');
+        ram_cnt_sample_pulse_shape_next <= (others => '0');
+
+        ram_addr_next <= ram_addr_r1 + 1;
+
+        if ram_addr_r1 = c_CNT_MAX then
+          sm_state_next <= E_WAIT;
+        else
+          sm_state_next <= E_RST1;
+        end if;
 
       when E_WAIT =>
-        pixel_valid_next <= i_pixel_valid;
+        pixel_valid_next <= pixel_valid_ra;
 
-        if cnt_sample_pulse_shape_table_r1(to_integer(unsigned(i_pixel_id))) = to_unsigned(c_NB_FRAME_BY_PULSE_SHAPE - 1, cnt_sample_pulse_shape_r1'length) then
+        -- for the current pixel, detect if this is the last sample of the pulse shape.
+        if unsigned(cnt_sample_pulse_shape_table_tmp) = to_unsigned(c_NB_FRAME_BY_PULSE_SHAPE - 1, cnt_sample_pulse_shape_table_tmp'length) then
           last_sample_pulse_shape_next <= '1';
         else
           last_sample_pulse_shape_next <= '0';
         end if;
 
-        if i_pixel_sof = '1' and i_pixel_valid = '1' then
-          if (empty1 = '0') and (unsigned(cmd_pixel_id1) = unsigned(i_pixel_id)) then
+        ram_addr_next <= unsigned(pixel_id_ra);
+
+        if pixel_sof_ra = '1' and pixel_valid_ra = '1' then
+          first_next <= '1';
+          if (empty1 = '0') and (unsigned(cmd_pixel_id1) = unsigned(pixel_id_ra)) then
+            -- read the command FIFO
             cmd_rd_next    <= '1';
             -- start processing pixel
             pulse_sof_next <= '1';
 
-            -- addr_pulse_shape to update
+            -- latch data for the computation
             en_next                     <= '1';
             pulse_heigth_next           <= unsigned(cmd_pulse_height1);
             time_shift_next             <= unsigned(cmd_time_shift1);
             cnt_sample_pulse_shape_next <= (others => '0');
+
+            -- save data in the tables
+            ram_wr_en_next                     <= '1';
+            ram_wr_pulse_heigth_next           <= '1';
+            ram_wr_time_shift_next             <= '1';
+            ram_wr_cnt_sample_pulse_shape_next <= '1';
+
+            ram_en_next                     <= '1';
+            ram_pulse_heigth_next           <= unsigned(cmd_pulse_height1);
+            ram_time_shift_next             <= unsigned(cmd_time_shift1);
+            ram_cnt_sample_pulse_shape_next <= (others => '0');
           else
-            cmd_rd_next                 <= '0';
-            en_next                     <= en_table_r1(to_integer(unsigned(i_pixel_id)));
-            pulse_heigth_next           <= pulse_heigth_table_r1(to_integer(unsigned(i_pixel_id)));
-            time_shift_next             <= time_shift_table_r1(to_integer(unsigned(i_pixel_id)));
-            cnt_sample_pulse_shape_next <= cnt_sample_pulse_shape_table_r1(to_integer(unsigned(i_pixel_id)));
+            cmd_rd_next <= '0';
+
+            -- latch data for the computation
+            en_next                     <= en_table_tmp;
+            pulse_heigth_next           <= unsigned(pulse_heigth_table_tmp);
+            time_shift_next             <= unsigned(time_shift_table_tmp);
+            cnt_sample_pulse_shape_next <= unsigned(cnt_sample_pulse_shape_table_tmp);
+
+            -- save data in the tables
+            ram_wr_en_next                     <= '1';
+            ram_wr_pulse_heigth_next           <= '1';
+            ram_wr_time_shift_next             <= '1';
+            ram_wr_cnt_sample_pulse_shape_next <= '1';
+
+            ram_en_next                     <= en_table_tmp;
+            ram_pulse_heigth_next           <= unsigned(pulse_heigth_table_tmp);
+            ram_time_shift_next             <= unsigned(time_shift_table_tmp);
+            ram_cnt_sample_pulse_shape_next <= unsigned(cnt_sample_pulse_shape_table_tmp);
           end if;
 
           sm_state_next <= E_RUN;
@@ -549,34 +916,59 @@ begin
         end if;
 
       when E_RUN =>
-        pixel_valid_next <= i_pixel_valid;
-        if i_pixel_eof = '1' and i_pixel_valid = '1' then
-          -- reset the enable signal. If the pixel must be processing again, this bit will be enabled via the corresponding table in the wait state.
+        pixel_valid_next <= pixel_valid_ra;
+        ---------------------------------------------------------------------
+        -- check the first_r1 bit to be able to update the table contens for the next processing as soon as possible.
+        -- By anticipating, that's allows to absorb the latency on the table paths.
+        -- If update is needed, it will be done only one time in this state.
+        ---------------------------------------------------------------------
+        if first_r1 = '1' then
+          first_next <= '0';
+          -- For the current pixel, the last sample of the pulse is reached (ex: frame 2047)
+          if last_sample_pulse_shape_r1 = '1' then
+
+            -- loop back on the first pulse sample (<=> frame 0) for the next processing.
+            ram_wr_cnt_sample_pulse_shape_next <= '1';
+            ram_cnt_sample_pulse_shape_next    <= (others => '0');
+
+            if en_r1 = '1' then
+              -- for the given pixel, the last sample of the pulse is reached => disable the pixel in the table.
+              ram_wr_en_next           <= '1';
+              ram_en_next              <= '0';
+              -- for the given pixel, the last sample of the pulse is reached => zeroed the pulse_height in order to output IO (steady value) if a new command isn't received.
+              ram_wr_pulse_heigth_next <= '1';
+              ram_pulse_heigth_next    <= (others => '0');
+            end if;
+
+          else
+
+            if en_r1 = '1' then
+              -- for the current pixel, update table parameters because this isn't the last pulse shape sample.
+              ram_wr_en_next                     <= '1';
+              ram_wr_pulse_heigth_next           <= '1';
+              ram_wr_time_shift_next             <= '1';
+              ram_wr_cnt_sample_pulse_shape_next <= '1';
+
+              ram_en_next                     <= '1';
+              ram_time_shift_next             <= time_shift_r1;
+              ram_pulse_heigth_next           <= pulse_heigth_r1;
+              ram_cnt_sample_pulse_shape_next <= cnt_sample_pulse_shape_r1 + 1;
+
+            end if;
+          end if;
+
+        end if;
+
+        if pixel_eof_ra = '1' and pixel_valid_ra = '1' then
+          -- reset the enable signal. 
           en_next <= '0';
 
           if last_sample_pulse_shape_r1 = '1' then
-            -- The pulse is totally read for the given pixel (frame 2047 (start from 0))
-            --  => the en is disabled in the table for the given pixel
-            --  => init the pulse shape sample counter
-            cnt_sample_pulse_shape_table_next(to_integer(unsigned(i_pixel_id))) <= (others => '0');
+            -- For the current pixel, the last sample of the pulse is reached.
 
             if en_r1 = '1' then
               -- end processing pixel
               pulse_eof_next <= '1';
-
-              -- The end of the pulse is reached for this given pixel, disable the pixel in the table.
-              en_table_next(to_integer(unsigned(i_pixel_id)))           <= '0';
-              -- The end of the pulse is reached, zeroed the pulse_height in order to output only the IO (steady value)
-              pulse_heigth_table_next(to_integer(unsigned(i_pixel_id))) <= (others => '0');
-            end if;
-          else
-
-            if en_r1 = '1' then
-              -- update parameters only if the pixel is processed
-              en_table_next(to_integer(unsigned(i_pixel_id)))                     <= en_r1;
-              time_shift_table_next(to_integer(unsigned(i_pixel_id)))             <= time_shift_r1;
-              pulse_heigth_table_next(to_integer(unsigned(i_pixel_id)))           <= pulse_heigth_r1;
-              cnt_sample_pulse_shape_table_next(to_integer(unsigned(i_pixel_id))) <= cnt_sample_pulse_shape_r1 + 1;  -- increment the "frame" counter
             end if;
           end if;
           sm_state_next <= E_WAIT;
@@ -585,7 +977,7 @@ begin
         end if;
 
       when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
-        sm_state_next <= E_RST;
+        sm_state_next <= E_RST0;
     end case;
   end process p_decode_state;
 
@@ -593,23 +985,34 @@ begin
   begin
     if rising_edge(i_clk) then
       if i_rst = '1' then
-        sm_state_r1 <= E_RST;
+        sm_state_r1 <= E_RST0;
       else
         sm_state_r1 <= sm_state_next;
       end if;
-      cmd_rd_r1                       <= cmd_rd_next;
-      cnt_sample_pulse_shape_table_r1 <= cnt_sample_pulse_shape_table_next;
-      cnt_sample_pulse_shape_r1       <= cnt_sample_pulse_shape_next;
-      en_table_r1                     <= en_table_next;
-      en_r1                           <= en_next;
-      pulse_heigth_r1                 <= pulse_heigth_next;
-      pulse_heigth_table_r1           <= pulse_heigth_table_next;
-      time_shift_r1                   <= time_shift_next;
-      time_shift_table_r1             <= time_shift_table_next;
-      pixel_valid_r1                  <= pixel_valid_next;
-      pulse_sof_r1                    <= pulse_sof_next;
-      pulse_eof_r1                    <= pulse_eof_next;
-      last_sample_pulse_shape_r1      <= last_sample_pulse_shape_next;
+      cmd_rd_r1                  <= cmd_rd_next;
+      first_r1                   <= first_next;
+      last_sample_pulse_shape_r1 <= last_sample_pulse_shape_next;
+      pixel_valid_r1             <= pixel_valid_next;
+      pulse_sof_r1               <= pulse_sof_next;
+      pulse_eof_r1               <= pulse_eof_next;
+
+      -- parameters for the computation
+      en_r1                     <= en_next;
+      pulse_heigth_r1           <= pulse_heigth_next;
+      time_shift_r1             <= time_shift_next;
+      cnt_sample_pulse_shape_r1 <= cnt_sample_pulse_shape_next;
+
+      -- parameters to store in the tables
+      ram_wr_en_r1                     <= ram_wr_en_next;
+      ram_wr_pulse_heigth_r1           <= ram_wr_pulse_heigth_next;
+      ram_wr_time_shift_r1             <= ram_wr_time_shift_next;
+      ram_wr_cnt_sample_pulse_shape_r1 <= ram_wr_cnt_sample_pulse_shape_next;
+
+      ram_addr_r1                   <= ram_addr_next;
+      ram_en_r1                     <= ram_en_next;
+      ram_pulse_heigth_r1           <= ram_pulse_heigth_next;
+      ram_time_shift_r1             <= ram_time_shift_next;
+      ram_cnt_sample_pulse_shape_r1 <= ram_cnt_sample_pulse_shape_next;
     end if;
   end process p_state;
 
@@ -618,7 +1021,6 @@ begin
   -- if the frame_size = 2048 and the step = max_shift = 16
   --  => addr_pulse_shape_rc = i*step + pixel_shift with i=[0,2047]
   ---------------------------------------------------------------------
-
   data_pipe_mult_tmp0(c_MULT_IDX3_H)                      <= pulse_sof_r1;
   data_pipe_mult_tmp0(c_MULT_IDX2_H)                      <= pulse_eof_r1;
   data_pipe_mult_tmp0(c_MULT_IDX1_H)                      <= pixel_valid_r1;
@@ -668,9 +1070,9 @@ begin
       o_s   => addr_pulse_shape_rc
       );
 
-  data_pipe_tmp0(c_IDX2_H)                 <= i_pixel_sof;
-  data_pipe_tmp0(c_IDX1_H)                 <= i_pixel_eof;
-  data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_pixel_id;
+  data_pipe_tmp0(c_IDX2_H)                 <= pixel_sof_ra;
+  data_pipe_tmp0(c_IDX1_H)                 <= pixel_eof_ra;
+  data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= pixel_id_ra;
   inst_pipeliner_sync_with_mult_add_ufixed_out1 : entity work.pipeliner
     generic map(
       g_NB_PIPES   => pkg_MULT_ADD_UFIXED_LATENCY + 1,
@@ -689,7 +1091,6 @@ begin
   ---------------------------------------------------------------------
   -- RAM: tes_pulse_shape
   ---------------------------------------------------------------------
-
   pulse_shape_ena    <= i_pulse_shape_wr_en or i_pulse_shape_rd_en;
   pulse_shape_wea    <= i_pulse_shape_wr_en;
   pulse_shape_addra  <= i_pulse_shape_wr_rd_addr;
@@ -964,7 +1365,7 @@ begin
       --------------------------------------------------------------
       -- output : S = C - A*B
       --------------------------------------------------------------
-      o_s   => result_ry  -- @suppress "Incorrect array size in assignment: expected (<16>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
+      o_s   => result_ry   -- @suppress "Incorrect array size in assignment: expected (<17>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
       );
 
   assert not ((result_ry'length) /= (pkg_TES_MULT_SUB_Q_WIDTH_S)) report "[tes_pulse_shape_manager]: result => output result width and sfixed package definition width doesn't match." severity error;
@@ -1068,7 +1469,7 @@ begin
       -- input
       ---------------------------------------------------------------------
       i_pixel_valid            => pixel_valid_ry,   -- pixel valid
-      i_pixel_result_sign      => sign_value_tmp6,  -- sign of the pixel result
+      i_pixel_result_sign      => sign_value,  -- sign of the pixel result
       i_pixel_id               => pixel_id_ry,      -- pixel id
       ---------------------------------------------------------------------
       -- output

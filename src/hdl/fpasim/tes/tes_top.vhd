@@ -57,16 +57,16 @@ entity tes_top is
     i_clk : in std_logic;               -- clock signal
     i_rst : in std_logic;               -- reset signal
 
-    i_rst_status  : in std_logic;  -- reset error flag(s)
+    i_rst_status  : in std_logic;       -- reset error flag(s)
     i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
     i_en                     : in  std_logic;  -- enable
-    i_nb_sample_by_pixel     : in  std_logic_vector(g_NB_SAMPLE_BY_PIXEL_WIDTH - 1 downto 0); -- number of samples by pixel
+    i_nb_sample_by_pixel     : in  std_logic_vector(g_NB_SAMPLE_BY_PIXEL_WIDTH - 1 downto 0);  -- number of samples by pixel
     i_nb_pixel_by_frame      : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- number of pixel by frame (column)
-    i_nb_sample_by_frame     : in  std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0); -- number of samples by frame (column)
+    i_nb_sample_by_frame     : in  std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);  -- number of samples by frame (column)
     -- command
     i_cmd_valid              : in  std_logic;  -- valid command
     i_cmd_pulse_height       : in  std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0);  -- pulse height command
@@ -122,22 +122,22 @@ entity tes_top is
     ---------------------------------------------------------------------
     -- errors/status
     ---------------------------------------------------------------------
-    o_errors                     : out std_logic_vector(15 downto 0);  -- output errors
-    o_status                     : out std_logic_vector(7 downto 0)  -- output status
+    o_errors : out std_logic_vector(15 downto 0);  -- output errors
+    o_status : out std_logic_vector(7 downto 0)    -- output status
     );
 end entity tes_top;
 
 architecture RTL of tes_top is
 
-  constant c_NB_FRAME_BY_PULSE_SHAPE  : positive                           := g_NB_FRAME_BY_PULSE_SHAPE;
-  constant c_FRAME_ID_SIZE            : std_logic_vector(o_frame_id'range) := std_logic_vector(to_unsigned(g_NB_FRAME_BY_PULSE_SHAPE - 1, o_frame_id'length));
+  constant c_NB_FRAME_BY_PULSE_SHAPE : positive                           := g_NB_FRAME_BY_PULSE_SHAPE;
+  constant c_FRAME_ID_SIZE           : std_logic_vector(o_frame_id'range) := std_logic_vector(to_unsigned(g_NB_FRAME_BY_PULSE_SHAPE - 1, o_frame_id'length));
   ---------------------------------------------------------------------
   -- tes_signalling
   ---------------------------------------------------------------------
-  signal pixel_sof0                   : std_logic;
-  signal pixel_eof0                   : std_logic;
-  signal pixel_id0                    : std_logic_vector(o_pixel_id'range);
-  signal pixel_valid0                 : std_logic;
+  signal pixel_sof0                  : std_logic;
+  signal pixel_eof0                  : std_logic;
+  signal pixel_id0                   : std_logic_vector(o_pixel_id'range);
+  signal pixel_valid0                : std_logic;
 
   signal frame_sof0 : std_logic;
   signal frame_eof0 : std_logic;
@@ -234,18 +234,19 @@ begin
   inst_tes_pulse_shape_manager : entity work.tes_pulse_shape_manager
     generic map(
       -- command
-      g_CMD_PULSE_HEIGHT_WIDTH     => i_cmd_pulse_height'length,
-      g_CMD_TIME_SHIFT_WIDTH       => i_cmd_time_shift'length,
-      g_CMD_PIXEL_ID_WIDTH         => pixel_id0'length,
+      g_CMD_PULSE_HEIGHT_WIDTH               => i_cmd_pulse_height'length,
+      g_CMD_TIME_SHIFT_WIDTH                 => i_cmd_time_shift'length,
+      g_CMD_PIXEL_ID_WIDTH                   => pixel_id0'length,
       -- frame
-      g_NB_FRAME_BY_PULSE_SHAPE    => c_NB_FRAME_BY_PULSE_SHAPE,
-      g_NB_SAMPLE_BY_FRAME_WIDTH   => pkg_NB_SAMPLE_BY_FRAME_WIDTH,
-      -- pixel
-      g_NB_PIXEL_BY_FRAME_MAX      => pkg_NB_PIXEL_BY_FRAME_MAX,
+      g_NB_FRAME_BY_PULSE_SHAPE              => c_NB_FRAME_BY_PULSE_SHAPE,
+      g_NB_SAMPLE_BY_FRAME_WIDTH             => pkg_NB_SAMPLE_BY_FRAME_WIDTH,
       -- addr
-      g_PULSE_SHAPE_RAM_ADDR_WIDTH => i_pulse_shape_wr_rd_addr'length,
+      g_PULSE_SHAPE_RAM_ADDR_WIDTH           => i_pulse_shape_wr_rd_addr'length,
       -- output
-      g_PIXEL_RESULT_OUTPUT_WIDTH  => pixel_result1'length
+      g_PIXEL_RESULT_OUTPUT_WIDTH            => pixel_result1'length,
+      -- RAM configuration filename
+      g_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE => pkg_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE,
+      g_TES_STD_STATE_RAM_MEMORY_INIT_FILE   => pkg_TES_STD_STATE_RAM_MEMORY_INIT_FILE
       )
     port map(
       i_clk                     => i_clk,        -- clock signal

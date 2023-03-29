@@ -17,23 +17,24 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   fifo_async_with_error.vhd 
+--    @file                   fifo_async_with_error.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
---!
---!   This module intanciates an asynchronuous FIFO with the empty and full flags.
---!   This module generates 4 types of errors in the following cases:
---!     . a writting when the FIFO is full.
---!     . a writting when the FIFO is in a reset state.
---!     . a reading when the FIFO is empty.
---!     . a reading when the FIFO is in a reset state.
---!   Via generics parameters, the user can select in which clock domain the error/empty flags are resynchronized. I.e,
---!       1. the write clock domain.
---!       2. or the read clock domain.
---!   Note: the following header documentation is an extract of the associated XPM Xilinx header.
+--    @details                
+-- 
+--    This module intanciates an asynchronuous FIFO with the empty and full flags.
+--    This module generates 4 types of errors in the following cases:
+--      . a writting when the FIFO is full.
+--      . a writting when the FIFO is in a reset state.
+--      . a reading when the FIFO is empty.
+--      . a reading when the FIFO is in a reset state.
+--    Via generics parameters, the user can select in which clock domain the error/empty flags are resynchronized. I.e,
+--        1. the write clock domain.
+--        2. or the read clock domain.
+--    Note: the following header documentation is an extract of the associated XPM Xilinx header.
+--    
 -- -------------------------------------------------------------------------------------------------------------   
 
 -- -------------------------------------------------------------------------------------------------------------
