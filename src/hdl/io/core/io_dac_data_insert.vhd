@@ -26,15 +26,15 @@
 --
 --    This module does the following steps:
 --       . pass data words from @sys_clk to the @i_dac_clk (async FIFO)
---    At the output of the async fifo, the dac data part is duplicated in order to send the same data on dac0 and dac1 (see dac3283 datasheet).
---    Likewise, the dac frame part is duplicated in order to match the expected behaviour by the dac3283.
+--    At the output of the internal async fifo, 
+--       .for each channel and word, the corresponding dac data bytes are splitted in order to send the MSB bytes first (see dac3283 datasheet).
+--       .for each word, the dac_frame bit is duplicated.
 --
 --    The architecture is as follows:
---      @i_clk                          --------->     @i_dac_clk
---      i_dac (16 bits)       --------> ASYNC_FIFO ----> 32 bit-word    ---- > duplicate data --> 64 bit-word 
---      i_dac_frame (1 bits)  -------->            ----> 2 bit-word     -----> duplicate data --> 8 bit-word
+--      @i_clk                              -------->     @i_dac_clk                  ---->  output 
+--      i_dac1 (16 bits) & i_dac0(16 bits)  -------->     ASYNC_FIFO                  ---->  64 bit-word  
+--      i_dac_frame (1 bits)                -------->                (duplicate bits) ---->  8 bit-word
 --
---   Note: bits are rearranged. For each output word, the bit order must match the bit order defined in the dac3283 datasheet 
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -54,7 +54,8 @@ entity io_dac_data_insert is
     i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     i_dac_valid   : in std_logic;       -- input dac valid  value 
     i_dac_frame   : in std_logic;       -- first sample of the frame
-    i_dac         : in std_logic_vector(15 downto 0);  -- dac value
+    i_dac1        : in std_logic_vector(15 downto 0);  -- dac0 value
+    i_dac0        : in std_logic_vector(15 downto 0);  -- dac0 value
 
     ---------------------------------------------------------------------
     -- output @i_dac_clk
@@ -80,14 +81,17 @@ architecture RTL of io_dac_data_insert is
   -- FIFO
   ---------------------------------------------------------------------
   constant c_WR_IDX0_L : integer := 0;
-  constant c_WR_IDX0_H : integer := c_WR_IDX0_L + 16 - 1;
+  constant c_WR_IDX0_H : integer := c_WR_IDX0_L + i_dac0'length - 1;
 
   constant c_WR_IDX1_L : integer := c_WR_IDX0_H + 1;
-  constant c_WR_IDX1_H : integer := c_WR_IDX1_L + 1 - 1;
+  constant c_WR_IDX1_H : integer := c_WR_IDX1_L + i_dac1'length - 1;
+
+  constant c_WR_IDX2_L : integer := c_WR_IDX1_H + 1;
+  constant c_WR_IDX2_H : integer := c_WR_IDX2_L + 1 - 1;
 
   -- find the power of 2 superior to the g_DELAY
-  constant c_FIFO_DEPTH    : integer := 1024;  --see IP
-  constant c_WR_FIFO_WIDTH : integer := 17;
+  constant c_FIFO_DEPTH    : integer := 512;  --see IP
+  constant c_WR_FIFO_WIDTH : integer := c_WR_IDX2_H + 1;
   constant c_RD_FIFO_WIDTH : integer := c_WR_FIFO_WIDTH*2;
 
   signal wr_rst_tmp0 : std_logic;
@@ -102,12 +106,20 @@ architecture RTL of io_dac_data_insert is
   signal empty1          : std_logic;
   signal rd_rst_busy1    : std_logic;
 
-  -- signal data_valid1 : std_logic;
-  signal dac_frame1 : std_logic;
-  signal dac1       : std_logic_vector(i_dac'range);
+  signal word0 : std_logic_vector(32 downto 0);
+  signal word1 : std_logic_vector(32 downto 0);
 
-  signal dac_frame0 : std_logic;
-  signal dac0       : std_logic_vector(i_dac'range);
+  -- signal data_valid1 : std_logic;
+
+  -- word0
+  signal dac_frame_word0 : std_logic;
+  signal dac1_word0      : std_logic_vector(i_dac0'range);
+  signal dac0_word0      : std_logic_vector(i_dac0'range);
+
+  -- word1
+  signal dac_frame_word1 : std_logic;
+  signal dac1_word1      : std_logic_vector(i_dac1'range);
+  signal dac0_word1      : std_logic_vector(i_dac1'range);
 
   -- resynchronized errors/status
   signal errors_sync0 : std_logic_vector(3 downto 0);
@@ -132,8 +144,9 @@ begin
   -- clock domain crossing
   ---------------------------------------------------------------------
   wr_tmp0                                   <= i_dac_valid;
-  data_tmp0(c_WR_IDX1_H)                    <= i_dac_frame;
-  data_tmp0(c_WR_IDX0_H downto c_WR_IDX0_L) <= i_dac;
+  data_tmp0(c_WR_IDX2_H)                    <= i_dac_frame;
+  data_tmp0(c_WR_IDX1_H downto c_WR_IDX1_L) <= i_dac1;
+  data_tmp0(c_WR_IDX0_H downto c_WR_IDX0_L) <= i_dac0;
   wr_rst_tmp0                               <= i_rst;
   inst_fifo_async_with_error : entity work.fifo_async_with_error
     generic map(
@@ -176,13 +189,19 @@ begin
       o_empty_sync    => empty_sync0
       );
 
-  rd1        <= '1' when empty1 = '0' and rd_rst_busy1 = '0' else '0';
+  rd1 <= '1' when empty1 = '0' and rd_rst_busy1 = '0' else '0';
+
+  word1 <= data_tmp1(65 downto 33);
+  word0 <= data_tmp1(32 downto 0);
+
   -- word1
-  dac_frame1 <= data_tmp1(33);            -- word1
-  dac1       <= data_tmp1(32 downto 17);  -- word1
+  dac_frame_word1 <= word1(32);
+  dac1_word1      <= word1(31 downto 16);
+  dac0_word1      <= word1(15 downto 0);
   -- word0
-  dac_frame0 <= data_tmp1(16);            -- word0
-  dac0       <= data_tmp1(15 downto 0);   -- word0
+  dac_frame_word0 <= word0(32);
+  dac1_word0      <= word0(31 downto 16);
+  dac0_word0      <= word0(15 downto 0);
 
   ---------------------------------------------------------------------
   -- bit mapping of the dac data
@@ -191,49 +210,65 @@ begin
   --     j: the index must follows the dac datasheet (dac3283)
   --  example: 
   --   .serial link0, data: bit8 -> bit0
-  --       dac_tmp(56) <= dac1(0);-- LSB bits word1 dac channel1: fake data (channel0 value duplication)
-  --       dac_tmp(48) <= dac1(8);-- LSB bits word1 dac channel1: fake data (channel0 value duplication)
-  --       dac_tmp(40) <= dac1(0);-- LSB bits word1 dac channel0
-  --       dac_tmp(32) <= dac1(8);-- MSB bits word1 dac channel0
-  --       dac_tmp(24) <= dac0(0);-- LSB bits word0 dac channel1: fake data (channel0 value duplication)
-  --       dac_tmp(16) <= dac0(8);-- LSB bits word0 dac channel1: fake data (channel0 value duplication)
-  --       dac_tmp(8)  <= dac0(0);-- LSB bits word0 dac channel0
-  --       dac_tmp(0)  <= dac0(8);-- MSB bits word0 dac channel0
+  --       dac_tmp(56) <= dac1_word1(0);-- bit0 dac channel1 word1
+  --       dac_tmp(48) <= dac1_word1(8);-- bit8 dac channel1 word1
+  --       dac_tmp(40) <= dac0_word1(0);-- bit0 dac channel0 word1
+  --       dac_tmp(32) <= dac0_word1(8);-- bit8 dac channel0 word1
+  --       dac_tmp(24) <= dac1_word0(0);-- bit0 dac channel1 word0
+  --       dac_tmp(16) <= dac1_word0(8);-- bit8 dac channel1 word0
+  --       dac_tmp(8)  <= dac0_word0(0);-- bit0 dac channel0 word0
+  --       dac_tmp(0)  <= dac0_word0(8);-- bit8 dac channel0 word0
   --   .serial link1, data: bit9 -> bit1
-  --       dac_tmp(57) <= dac1(1);-- LSB bits word1 dac channel1: fake data (channel0 value duplication)
-  --       dac_tmp(49) <= dac1(9);-- LSB bits word1 dac channel1: fake data (channel0 value duplication)
-  --       dac_tmp(41) <= dac1(1);-- LSB bits word1 dac channel0
-  --       dac_tmp(33) <= dac1(9);-- MSB bits word1 dac channel0
-  --       dac_tmp(25) <= dac0(1);-- LSB bits word0 dac channel1: fake data (channel0 value duplication)
-  --       dac_tmp(17) <= dac0(9);-- LSB bits word0 dac channel1: fake data (channel0 value duplication)
-  --       dac_tmp(9)  <= dac0(1);-- LSB bits word0 dac channel0
-  --       dac_tmp(1)  <= dac0(9);-- MSB bits word0 dac channel0
+  --       dac_tmp(57) <= dac1_word1(1);-- bit1 dac channel1 word1
+  --       dac_tmp(49) <= dac1_word1(9);-- bit9 dac channel1 word1
+  --       dac_tmp(41) <= dac0_word1(1);-- bit1 dac channel0 word1
+  --       dac_tmp(33) <= dac0_word1(9);-- bit9 dac channel0 word1
+  --       dac_tmp(25) <= dac1_word0(1);-- bit1 dac channel1 word0
+  --       dac_tmp(17) <= dac1_word0(9);-- bit9 dac channel1 word0
+  --       dac_tmp(9)  <= dac0_word0(1);-- bit1 dac channel0 word0
+  --       dac_tmp(1)  <= dac0_word0(9);-- bit9 dac channel0 word0
   ---------------------------------------------------------------------
   -- j = number of serial links
   gen_serial_index : for i in 0 to 7 generate
-    dac_tmp(i+56) <= dac1(i+0);  -- LSB bits word1 dac channel1: fake data (channel0 value duplication)
-    dac_tmp(i+48) <= dac1(i+8);  -- LSB bits word1 dac channel1: fake data (channel0 value duplication)
-    dac_tmp(i+40) <= dac1(i+0);         -- LSB bits word1 dac channel0
-    dac_tmp(i+32) <= dac1(i+8);         -- MSB bits word1 dac channel0
-    dac_tmp(i+24) <= dac0(i+0);  -- LSB bits word0 dac channel1: fake data (channel0 value duplication)
-    dac_tmp(i+16) <= dac0(i+8);  -- LSB bits word0 dac channel1: fake data (channel0 value duplication)
-    dac_tmp(i+8)  <= dac0(i+0);         -- LSB bits word0 dac channel0
-    dac_tmp(i+0)  <= dac0(i+8);         -- MSB bits word0 dac channel0
+    -- the bytes will be sent in the following order (see the dac3283 datasheet):
+    --   1.dac0_word0_byte1
+    --   2.dac0_word0_byte0
+    --   3.dac1_word0_byte1
+    --   4.dac1_word0_byte0
+    --   5.dac0_word1_byte1
+    --   6.dac0_word1_byte0
+    --   7.dac1_word1_byte1
+    --   8.dac1_word1_byte0
+    dac_tmp(i+56) <= dac1_word1(i+0);   -- byte0 dac channel1 word1
+    dac_tmp(i+48) <= dac1_word1(i+8);   -- byte1 dac channel1 word1
+    dac_tmp(i+40) <= dac0_word1(i+0);   -- byte0 dac channel0 word1
+    dac_tmp(i+32) <= dac0_word1(i+8);   -- byte1 dac channel0 word1
+    dac_tmp(i+24) <= dac1_word0(i+0);   -- byte0 dac channel1 word0
+    dac_tmp(i+16) <= dac1_word0(i+8);   -- byte1 dac channel1 word0
+    dac_tmp(i+8)  <= dac0_word0(i+0);   -- byte0 dac channel0 word0
+    dac_tmp(i+0)  <= dac0_word0(i+8);   -- byte1 dac channel0 word0
   end generate gen_serial_index;
 
   ---------------------------------------------------------------------
   -- bit mapping of the dac_frame
-  --  the left index value  => see ip/xilinx/coregen/selectio_wiz_dac/selectio_wiz_dac_sim_netlist
-  --  the right index value => see dac3283 datasheet
+  -- the bits will be sent in the following order:
+  --   1.dac_frame_word0
+  --   2.dac_frame_word0
+  --   3.dac_frame_word0
+  --   4.dac_frame_word0
+  --   5.dac_frame_word1
+  --   6.dac_frame_word1
+  --   7.dac_frame_word1
+  --   8.dac_frame_word1
   ---------------------------------------------------------------------
-  dac_frame_tmp(7) <= dac_frame1;  -- 4th bit on the dac channel1: fake data (channel0 value duplication)
-  dac_frame_tmp(6) <= dac_frame1;  -- 3th bit on the dac channel1: fake data (channel0 value duplication)
-  dac_frame_tmp(5) <= dac_frame1;  -- 4th bit on the dac channel0: bit duplication
-  dac_frame_tmp(4) <= dac_frame1;       -- 3th bit on the dac channel0
-  dac_frame_tmp(3) <= dac_frame0;  -- 2nd bit on the dac channel1: fake data (channel0 value duplication)
-  dac_frame_tmp(2) <= dac_frame0;  -- 1st bit on the dac channel1: fake data (channel0 value duplication)
-  dac_frame_tmp(1) <= dac_frame0;  -- 2nd bit on the dac channel0: bit duplication
-  dac_frame_tmp(0) <= dac_frame0;       -- 1st bit on the dac channel0
+  dac_frame_tmp(7) <= dac_frame_word1;  -- 4th bit from the dac_frame word1 (duplicated)
+  dac_frame_tmp(6) <= dac_frame_word1;  -- 3th bit from the dac_frame word1 (duplicated)
+  dac_frame_tmp(5) <= dac_frame_word1;  -- 4th bit from the dac_frame word1 (duplicated)
+  dac_frame_tmp(4) <= dac_frame_word1;  -- 3th bit from the dac_frame word1
+  dac_frame_tmp(3) <= dac_frame_word0;  -- 2nd bit from the dac_frame word0 (duplicated)
+  dac_frame_tmp(2) <= dac_frame_word0;  -- 1st bit from the dac_frame word0 (duplicated)
+  dac_frame_tmp(1) <= dac_frame_word0;  -- 2nd bit from the dac_frame word0 (duplicated)
+  dac_frame_tmp(0) <= dac_frame_word0;  -- 1st bit from the dac_frame word0
 
   ---------------------------------------------------------------------
   -- output

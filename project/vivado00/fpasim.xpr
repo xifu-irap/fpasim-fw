@@ -64,13 +64,13 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="111"/>
-    <Option Name="WTModelSimExportSim" Val="113"/>
-    <Option Name="WTQuestaExportSim" Val="117"/>
+    <Option Name="WTXSimExportSim" Val="116"/>
+    <Option Name="WTModelSimExportSim" Val="118"/>
+    <Option Name="WTQuestaExportSim" Val="122"/>
     <Option Name="WTIesExportSim" Val="0"/>
-    <Option Name="WTVcsExportSim" Val="111"/>
-    <Option Name="WTRivieraExportSim" Val="111"/>
-    <Option Name="WTActivehdlExportSim" Val="111"/>
+    <Option Name="WTVcsExportSim" Val="116"/>
+    <Option Name="WTRivieraExportSim" Val="116"/>
+    <Option Name="WTActivehdlExportSim" Val="116"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -140,14 +140,6 @@
       </File>
       <File Path="$PPRDIR/../../ip/xilinx/coregen/selectio_wiz_adc/selectio_wiz_adc.xci">
         <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../ip/xilinx/coregen/fpasim_top_ila_0/fpasim_top_ila_0.xci">
-        <FileInfo>
-          <Attr Name="Library" Val="fpasim"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -1030,6 +1022,20 @@
         <Option Name="UseBlackboxStub" Val="1"/>
       </Config>
     </FileSet>
+    <FileSet Name="fpasim_top_ila_0" Type="BlockSrcs" RelSrcDir="$PSRCDIR/fpasim_top_ila_0" RelGenDir="$PGENDIR/fpasim_top_ila_0">
+      <File Path="$PPRDIR/../../ip/xilinx/coregen/fpasim_top_ila_0/fpasim_top_ila_0.xci">
+        <FileInfo>
+          <Attr Name="Library" Val="fpasim"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <Config>
+        <Option Name="TopModule" Val="fpasim_top_ila_0"/>
+        <Option Name="UseBlackboxStub" Val="1"/>
+      </Config>
+    </FileSet>
   </FileSets>
   <Simulators>
     <Simulator Name="XSim">
@@ -1055,9 +1061,9 @@
         <StratHandle Name="Flow_PerfOptimized_high" Flow="Vivado Synthesis 2022"/>
         <Step Id="synth_design">
           <Option Id="ShregMinSize">5</Option>
+          <Option Id="IncrementalMode">2</Option>
           <Option Id="ReTiming">1</Option>
           <Option Id="KeepEquivalentRegisters">1</Option>
-          <Option Id="IncrementalMode">2</Option>
         </Step>
       </Strategy>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2022"/>
@@ -1065,6 +1071,16 @@
       <RQSFiles/>
     </Run>
     <Run Id="fpasim_top_vio_0_synth_1" Type="Ft3:Synth" SrcSet="fpasim_top_vio_0" Part="xc7k160tffg676-1" ConstrsSet="fpasim_top_vio_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/fpasim_top_vio_0_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/fpasim_top_vio_0_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/fpasim_top_vio_0_synth_1">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2022"/>
+        <Step Id="synth_design"/>
+      </Strategy>
+      <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
+      <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2022"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+      <RQSFiles/>
+    </Run>
+    <Run Id="fpasim_top_ila_0_synth_1" Type="Ft3:Synth" SrcSet="fpasim_top_ila_0" Part="xc7k160tffg676-1" ConstrsSet="fpasim_top_ila_0" Description="Vivado Synthesis Defaults" AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" Dir="$PRUNDIR/fpasim_top_ila_0_synth_1" IncludeInArchive="true" IsChild="false" AutoIncrementalDir="$PSRCDIR/utils_1/imports/fpasim_top_ila_0_synth_1" AutoRQSDir="$PSRCDIR/utils_1/imports/fpasim_top_ila_0_synth_1">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2022"/>
         <Step Id="synth_design"/>
@@ -1092,6 +1108,23 @@
       <RQSFiles/>
     </Run>
     <Run Id="fpasim_top_vio_0_impl_1" Type="Ft2:EntireDesign" Part="xc7k160tffg676-1" ConstrsSet="fpasim_top_vio_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="fpasim_top_vio_0_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/fpasim_top_vio_0_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/fpasim_top_vio_0_impl_1">
+      <Strategy Version="1" Minor="2">
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2022"/>
+        <Step Id="init_design"/>
+        <Step Id="opt_design"/>
+        <Step Id="power_opt_design"/>
+        <Step Id="place_design"/>
+        <Step Id="post_place_power_opt_design"/>
+        <Step Id="phys_opt_design"/>
+        <Step Id="route_design"/>
+        <Step Id="post_route_phys_opt_design"/>
+        <Step Id="write_bitstream"/>
+      </Strategy>
+      <ReportStrategy Name="Vivado Implementation Default Reports" Flow="Vivado Implementation 2022"/>
+      <Report Name="ROUTE_DESIGN.REPORT_METHODOLOGY" Enabled="1"/>
+      <RQSFiles/>
+    </Run>
+    <Run Id="fpasim_top_ila_0_impl_1" Type="Ft2:EntireDesign" Part="xc7k160tffg676-1" ConstrsSet="fpasim_top_ila_0" Description="Default settings for Implementation." AutoIncrementalCheckpoint="false" WriteIncrSynthDcp="false" SynthRun="fpasim_top_ila_0_synth_1" IncludeInArchive="false" IsChild="false" GenFullBitstream="true" AutoIncrementalDir="$PSRCDIR/utils_1/imports/fpasim_top_ila_0_impl_1" AutoRQSDir="$PSRCDIR/utils_1/imports/fpasim_top_ila_0_impl_1">
       <Strategy Version="1" Minor="2">
         <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2022"/>
         <Step Id="init_design"/>

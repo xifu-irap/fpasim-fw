@@ -177,7 +177,8 @@ begin
 
       inst_IDDR : IDDR
         generic map (  -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D_INVERTED"
-          DDR_CLK_EDGE => "SAME_EDGE",  -- "OPPOSITE_EDGE", "SAME_EDGE" 
+          --DDR_CLK_EDGE => "SAME_EDGE",  -- "OPPOSITE_EDGE", "SAME_EDGE" 
+          DDR_CLK_EDGE => "SAME_EDGE_PIPELINED",  -- "OPPOSITE_EDGE", "SAME_EDGE" 
           -- or "SAME_EDGE_PIPELINED" 
           INIT_Q1      => '0',          -- Initial value of Q1: '0' or '1'
           INIT_Q2      => '0',          -- Initial value of Q2: '0' or '1'

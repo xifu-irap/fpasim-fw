@@ -55,89 +55,89 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     -- FMC: from the adc @i_adc_clk_p
     ---------------------------------------------------------------------
-    i_adc_clk_p   : in  std_logic;      -- differential_p clock adc @250MHz
-    i_adc_clk_n   : in  std_logic;      -- differential_n clock adc @250MHZ
+    i_adc_clk_p : in std_logic;         -- differential_p clock adc @250MHz
+    i_adc_clk_n : in std_logic;         -- differential_n clock adc @250MHZ
     -- adc_a
     -- bit P/N: 0-1
-    i_da0_p       : in  std_logic; --  differential_p adc_a (lane0)
-    i_da0_n       : in  std_logic; --  differential_n adc_a (lane0)
+    i_da0_p     : in std_logic;         --  differential_p adc_a (lane0)
+    i_da0_n     : in std_logic;         --  differential_n adc_a (lane0)
 
-    i_da2_p       : in  std_logic; --  differential_p adc_a (lane1)
-    i_da2_n       : in  std_logic; --  differential_n adc_a (lane1)
+    i_da2_p : in std_logic;             --  differential_p adc_a (lane1)
+    i_da2_n : in std_logic;             --  differential_n adc_a (lane1)
 
-    i_da4_p       : in  std_logic; --  differential_p adc_a (lane2)
-    i_da4_n       : in  std_logic; --  differential_n adc_a (lane2)
+    i_da4_p : in std_logic;             --  differential_p adc_a (lane2)
+    i_da4_n : in std_logic;             --  differential_n adc_a (lane2)
 
-    i_da6_p       : in  std_logic; --  differential_p adc_a (lane3)
-    i_da6_n       : in  std_logic; --  differential_n adc_a (lane3)
+    i_da6_p : in std_logic;             --  differential_p adc_a (lane3)
+    i_da6_n : in std_logic;             --  differential_n adc_a (lane3)
 
-    i_da8_p       : in  std_logic; --  differential_p adc_a (lane4)
-    i_da8_n       : in  std_logic; --  differential_n adc_a (lane4)
+    i_da8_p : in std_logic;             --  differential_p adc_a (lane4)
+    i_da8_n : in std_logic;             --  differential_n adc_a (lane4)
 
-    i_da10_p      : in  std_logic; --  differential_p adc_a (lane5)
-    i_da10_n      : in  std_logic; --  differential_n adc_a (lane5)
+    i_da10_p : in std_logic;            --  differential_p adc_a (lane5)
+    i_da10_n : in std_logic;            --  differential_n adc_a (lane5)
 
-    i_da12_p      : in  std_logic; --  differential_p adc_a (lane6)
-    i_da12_n      : in  std_logic; --  differential_n adc_a (lane6)
+    i_da12_p : in std_logic;            --  differential_p adc_a (lane6)
+    i_da12_n : in std_logic;            --  differential_n adc_a (lane6)
     -- adc_b
-    i_db0_p       : in  std_logic; --  differential_p adc_b (lane0)
-    i_db0_n       : in  std_logic; --  differential_n adc_b (lane0)
+    i_db0_p  : in std_logic;            --  differential_p adc_b (lane0)
+    i_db0_n  : in std_logic;            --  differential_n adc_b (lane0)
 
-    i_db2_p       : in  std_logic; --  differential_p adc_b (lane1)
-    i_db2_n       : in  std_logic; --  differential_n adc_b (lane1)
+    i_db2_p : in std_logic;             --  differential_p adc_b (lane1)
+    i_db2_n : in std_logic;             --  differential_n adc_b (lane1)
 
-    i_db4_p       : in  std_logic; --  differential_p adc_b (lane2)
-    i_db4_n       : in  std_logic; --  differential_n adc_b (lane2)
+    i_db4_p : in std_logic;             --  differential_p adc_b (lane2)
+    i_db4_n : in std_logic;             --  differential_n adc_b (lane2)
 
-    i_db6_p       : in  std_logic; --  differential_p adc_b (lane3)
-    i_db6_n       : in  std_logic; --  differential_n adc_b (lane3)
+    i_db6_p : in std_logic;             --  differential_p adc_b (lane3)
+    i_db6_n : in std_logic;             --  differential_n adc_b (lane3)
 
-    i_db8_p       : in  std_logic; --  differential_p adc_b (lane4)
-    i_db8_n       : in  std_logic; --  differential_n adc_b (lane4)
+    i_db8_p : in std_logic;             --  differential_p adc_b (lane4)
+    i_db8_n : in std_logic;             --  differential_n adc_b (lane4)
 
-    i_db10_p      : in  std_logic; --  differential_p adc_b (lane5)
-    i_db10_n      : in  std_logic; --  differential_n adc_b (lane5)
+    i_db10_p : in std_logic;            --  differential_p adc_b (lane5)
+    i_db10_n : in std_logic;            --  differential_n adc_b (lane5)
 
-    i_db12_p      : in  std_logic; --  differential_p adc_b (lane6)
-    i_db12_n      : in  std_logic; --  differential_n adc_b (lane6)
+    i_db12_p : in std_logic;            --  differential_p adc_b (lane6)
+    i_db12_n : in std_logic;            --  differential_n adc_b (lane6)
 
     ---------------------------------------------------------------------
     -- FMC: to sync
     ---------------------------------------------------------------------
-    o_ref_clk     : out std_logic; -- reference clock
-    o_sync        : out std_logic; -- pulse at the beginning of the first pixel of a column (@o_ref_clk)
+    o_ref_clk   : out std_logic;        -- reference clock
+    o_sync      : out std_logic;  -- pulse at the beginning of the first pixel of a column (@o_ref_clk)
     ---------------------------------------------------------------------
     -- FMC: to dac
     ---------------------------------------------------------------------
-    o_dac_clk_p   : out std_logic; -- differential_p dac clock
-    o_dac_clk_n   : out std_logic; -- differential_n dac clock 
+    o_dac_clk_p : out std_logic;        -- differential_p dac clock
+    o_dac_clk_n : out std_logic;        -- differential_n dac clock 
 
-    o_dac_frame_p : out std_logic; -- differential_p dac frame
-    o_dac_frame_n : out std_logic; -- differential_n dac frame
+    o_dac_frame_p : out std_logic;      -- differential_p dac frame
+    o_dac_frame_n : out std_logic;      -- differential_n dac frame
 
-    o_dac0_p      : out std_logic; -- differential_p dac data (lane0)
-    o_dac0_n      : out std_logic; -- differential_n dac data (lane0)
+    o_dac0_p : out std_logic;           -- differential_p dac data (lane0)
+    o_dac0_n : out std_logic;           -- differential_n dac data (lane0)
 
-    o_dac1_p      : out std_logic; -- differential_p dac data (lane1)
-    o_dac1_n      : out std_logic; -- differential_n dac data (lane1)
+    o_dac1_p : out std_logic;           -- differential_p dac data (lane1)
+    o_dac1_n : out std_logic;           -- differential_n dac data (lane1)
 
-    o_dac2_p      : out std_logic; -- differential_p dac data (lane2)
-    o_dac2_n      : out std_logic; -- differential_n dac data (lane2)
+    o_dac2_p : out std_logic;           -- differential_p dac data (lane2)
+    o_dac2_n : out std_logic;           -- differential_n dac data (lane2)
 
-    o_dac3_p      : out std_logic; -- differential_p dac data (lane3)
-    o_dac3_n      : out std_logic; -- differential_n dac data (lane3)
+    o_dac3_p : out std_logic;           -- differential_p dac data (lane3)
+    o_dac3_n : out std_logic;           -- differential_n dac data (lane3)
 
-    o_dac4_p      : out std_logic; -- differential_p dac data (lane4)
-    o_dac4_n      : out std_logic; -- differential_n dac data (lane4)
+    o_dac4_p : out std_logic;           -- differential_p dac data (lane4)
+    o_dac4_n : out std_logic;           -- differential_n dac data (lane4)
 
-    o_dac5_p      : out std_logic; -- differential_p dac data (lane5)
-    o_dac5_n      : out std_logic; -- differential_n dac data (lane5)
+    o_dac5_p : out std_logic;           -- differential_p dac data (lane5)
+    o_dac5_n : out std_logic;           -- differential_n dac data (lane5)
 
-    o_dac6_p      : out std_logic; -- differential_p dac data (lane6)
-    o_dac6_n      : out std_logic; -- differential_n dac data (lane6)
+    o_dac6_p : out std_logic;           -- differential_p dac data (lane6)
+    o_dac6_n : out std_logic;           -- differential_n dac data (lane6)
 
-    o_dac7_p      : out std_logic; -- differential_p dac data (lane7)
-    o_dac7_n      : out std_logic; -- differential_n dac data (lane7)
+    o_dac7_p : out std_logic;           -- differential_p dac data (lane7)
+    o_dac7_n : out std_logic;           -- differential_n dac data (lane7)
 
     ---------------------------------------------------------------------
     -- devices: spi links + specific signals
@@ -178,7 +178,7 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     -- leds
     ---------------------------------------------------------------------
-    o_leds : out std_logic_vector(3 downto 2) -- status leds
+    o_leds : out std_logic_vector(3 downto 2)  -- status leds
     );
 end entity system_fpasim_top;
 
@@ -205,7 +205,7 @@ architecture RTL of system_fpasim_top is
   signal sys_rst            : std_logic;
   signal adc_io_clk_rst     : std_logic;
   signal adc_io_rst         : std_logic;
-  signal dac_io_clk_rst     : std_logic; -- @suppress "signal dac_io_clk_rst is never read"
+  signal dac_io_clk_rst     : std_logic;  -- @suppress "signal dac_io_clk_rst is never read"
   signal dac_io_rst         : std_logic;
   signal dac_io_rst_phase90 : std_logic;
   signal sync_io_clk_rst    : std_logic;
@@ -256,7 +256,8 @@ architecture RTL of system_fpasim_top is
   -- dac
   signal dac_valid  : std_logic;
   signal dac_frame  : std_logic;
-  signal dac        : std_logic_vector(15 downto 0);
+  signal dac1       : std_logic_vector(15 downto 0);
+  signal dac0       : std_logic_vector(15 downto 0);
   signal dac_errors : std_logic_vector(15 downto 0);
   signal dac_status : std_logic_vector(7 downto 0);
 
@@ -357,7 +358,7 @@ begin
       ---------------------------------------------------------------------
       -- to the io_dac @i_dac_clk_div
       ---------------------------------------------------------------------
-      o_dac_io_clk_rst      => dac_io_clk_rst,-- not connected
+      o_dac_io_clk_rst      => dac_io_clk_rst,  -- not connected
       o_dac_io_rst          => dac_io_rst,
       ---------------------------------------------------------------------
       -- to the io_dac @i_dac_clk_div_phase90
@@ -381,7 +382,7 @@ begin
       g_FPASIM_DEBUG        => pkg_FPASIM_TOP_DEBUG,
       g_REGDECODE_TOP_DEBUG => pkg_REGDECODE_TOP_DEBUG
       )
-    port map( -- @suppress "The order of the associations is different from the declaration order"
+    port map(  -- @suppress "The order of the associations is different from the declaration order"
       i_clk         => sys_clk,         -- system clock
       i_rst         => sys_rst,         -- reset sync @sync_clk
       ---------------------------------------------------------------------
@@ -449,7 +450,8 @@ begin
       ---------------------------------------------------------------------
       o_dac_valid                       => dac_valid,
       o_dac_frame                       => dac_frame,
-      o_dac                             => dac,
+      o_dac1                            => dac1,
+      o_dac0                            => dac0,
       i_dac_errors                      => dac_errors,
       i_dac_status                      => dac_status
       );
@@ -483,8 +485,8 @@ begin
       i_adc_io_clk_rst => adc_io_clk_rst,
       i_adc_io_rst     => adc_io_rst,
       -- from the fpga pads
-      i_adc_clk_p           => i_adc_clk_p,
-      i_adc_clk_n           => i_adc_clk_n,
+      i_adc_clk_p      => i_adc_clk_p,
+      i_adc_clk_n      => i_adc_clk_n,
       -- from fpga pads: adc_a  @i_adc_clk_p/n
       i_da0_p          => i_da0_p,
       i_da0_n          => i_da0_n,
@@ -546,7 +548,8 @@ begin
       i_dac_rst    => sys_rst,
       i_dac_valid  => dac_valid,
       i_dac_frame  => dac_frame,
-      i_dac        => dac,
+      i_dac1       => dac1,
+      i_dac0       => dac0,
       o_dac_errors => dac_errors,
       o_dac_status => dac_status,
 

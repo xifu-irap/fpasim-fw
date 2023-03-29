@@ -19,12 +19,12 @@
         <spirit:configurableElementValue spirit:referenceId="BUSIFPARAM_VALUE.SIGNAL_CLOCK.PHASE">0.0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_EN_PROBE_IN_ACTIVITY">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_NUM_PROBE_IN">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_NUM_PROBE_OUT">5</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_NUM_PROBE_OUT">15</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="MODELPARAM_VALUE.C_XDEVICEFAMILY">kintex7</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_EN_PROBE_IN_ACTIVITY">0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_EN_SYNCHRONIZATION">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_NUM_PROBE_IN">0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_NUM_PROBE_OUT">5</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_NUM_PROBE_OUT">15</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_IN0_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_IN100_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_IN101_WIDTH">1</spirit:configurableElementValue>
@@ -303,8 +303,8 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT108_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT109_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT109_WIDTH">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT10_INIT_VAL">0x0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT10_WIDTH">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT10_INIT_VAL">0x02</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT10_WIDTH">8</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT110_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT110_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT111_INIT_VAL">0x0</spirit:configurableElementValue>
@@ -325,8 +325,8 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT118_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT119_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT119_WIDTH">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT11_INIT_VAL">0x0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT11_WIDTH">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT11_INIT_VAL">0xAA</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT11_WIDTH">8</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT120_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT120_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT121_INIT_VAL">0x0</spirit:configurableElementValue>
@@ -347,8 +347,8 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT128_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT129_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT129_WIDTH">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT12_INIT_VAL">0x0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT12_WIDTH">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT12_INIT_VAL">0xAA</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT12_WIDTH">8</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT130_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT130_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT131_INIT_VAL">0x0</spirit:configurableElementValue>
@@ -369,8 +369,8 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT138_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT139_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT139_WIDTH">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT13_INIT_VAL">0x0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT13_WIDTH">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT13_INIT_VAL">0x03</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT13_WIDTH">8</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT140_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT140_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT141_INIT_VAL">0x0</spirit:configurableElementValue>
@@ -391,8 +391,8 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT148_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT149_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT149_WIDTH">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT14_INIT_VAL">0x0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT14_WIDTH">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT14_INIT_VAL">0x04</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT14_WIDTH">8</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT150_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT150_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT151_INIT_VAL">0x0</spirit:configurableElementValue>
@@ -704,7 +704,7 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT59_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT59_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT5_INIT_VAL">0x0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT5_WIDTH">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT5_WIDTH">16</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT60_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT60_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT61_INIT_VAL">0x0</spirit:configurableElementValue>
@@ -747,8 +747,8 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT78_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT79_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT79_WIDTH">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT7_INIT_VAL">0x0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT7_WIDTH">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT7_INIT_VAL">0x55</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT7_WIDTH">8</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT80_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT80_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT81_INIT_VAL">0x0</spirit:configurableElementValue>
@@ -769,8 +769,8 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT88_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT89_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT89_WIDTH">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT8_INIT_VAL">0x0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT8_WIDTH">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT8_INIT_VAL">0x55</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT8_WIDTH">8</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT90_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT90_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT91_INIT_VAL">0x0</spirit:configurableElementValue>
@@ -791,8 +791,8 @@
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT98_WIDTH">1</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT99_INIT_VAL">0x0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT99_WIDTH">1</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT9_INIT_VAL">0x0</spirit:configurableElementValue>
-        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT9_WIDTH">1</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT9_INIT_VAL">0x01</spirit:configurableElementValue>
+        <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.C_PROBE_OUT9_WIDTH">8</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PARAM_VALUE.Component_Name">fpasim_top_vio_0</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.ARCHITECTURE">kintex7</spirit:configurableElementValue>
         <spirit:configurableElementValue spirit:referenceId="PROJECT_PARAM.BASE_BOARD_PART"/>
@@ -822,9 +822,28 @@
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_EN_PROBE_IN_ACTIVITY" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_NUM_PROBE_IN" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_NUM_PROBE_OUT" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT10_INIT_VAL" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT10_WIDTH" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT11_INIT_VAL" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT11_WIDTH" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT12_INIT_VAL" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT12_WIDTH" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT13_INIT_VAL" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT13_WIDTH" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT14_INIT_VAL" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT14_WIDTH" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT1_WIDTH" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT2_WIDTH" xilinx:valueSource="user"/>
             <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT4_WIDTH" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT5_WIDTH" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT6_INIT_VAL" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT6_WIDTH" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT7_INIT_VAL" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT7_WIDTH" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT8_INIT_VAL" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT8_WIDTH" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT9_INIT_VAL" xilinx:valueSource="user"/>
+            <xilinx:configElementInfo xilinx:referenceId="PARAM_VALUE.C_PROBE_OUT9_WIDTH" xilinx:valueSource="user"/>
           </xilinx:configElementInfos>
           <xilinx:boundaryDescriptionInfo>
             <xilinx:boundaryDescription xilinx:boundaryDescriptionJSON="{
@@ -836,7 +855,17 @@
                   &quot;probe_out1&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;13&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
                   &quot;probe_out2&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;13&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
                   &quot;probe_out3&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;0&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
-                  &quot;probe_out4&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;15&quot;, &quot;size_right&quot;: &quot;0&quot; } ]
+                  &quot;probe_out4&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;15&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;probe_out5&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;15&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;probe_out6&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;0&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;probe_out7&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;7&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;probe_out8&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;7&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;probe_out9&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;7&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;probe_out10&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;7&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;probe_out11&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;7&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;probe_out12&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;7&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;probe_out13&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;7&quot;, &quot;size_right&quot;: &quot;0&quot; } ],
+                  &quot;probe_out14&quot;: [ { &quot;direction&quot;: &quot;out&quot;, &quot;size_left&quot;: &quot;7&quot;, &quot;size_right&quot;: &quot;0&quot; } ]
                 },
                 &quot;interfaces&quot;: {
                   &quot;signal_clock&quot;: {

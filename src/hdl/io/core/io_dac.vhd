@@ -25,7 +25,7 @@
 --    @details                
 --    
 --    This module does the following steps:
---       . pass data words from @sys_clk to the @dac_clk_div (async FIFO)
+--       . pass data words from @sys_clk to the @dac_clk_div (async FIFO) and reorder bytes.
 --       . serializes data words from @dac_clk_div to the IOs (@dac_clk)
 --       . generate "clock word" @dac_clk_div_phase90
 --       . serializes "clock word" from @dac_clk_div_phase90 to the IOs (@dac_clk_phase90)
@@ -48,7 +48,8 @@ entity io_dac is
     i_debug_pulse         : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     i_dac_valid           : in std_logic;  -- dac data valid
     i_dac_frame           : in std_logic;  -- data frame flag
-    i_dac                 : in std_logic_vector(15 downto 0);  -- dac data value
+    i_dac1                : in std_logic_vector(15 downto 0);  -- dac1 data value
+    i_dac0                : in std_logic_vector(15 downto 0);  -- dac0 data value
     ---------------------------------------------------------------------
     -- output @i_out_clk
     ---------------------------------------------------------------------
@@ -160,7 +161,8 @@ begin
       i_debug_pulse => i_debug_pulse,
       i_dac_valid   => i_dac_valid,
       i_dac_frame   => i_dac_frame,
-      i_dac         => i_dac,
+      i_dac1        => i_dac1,
+      i_dac0        => i_dac0,
       ---------------------------------------------------------------------
       -- output @i_dac_clk
       ---------------------------------------------------------------------
