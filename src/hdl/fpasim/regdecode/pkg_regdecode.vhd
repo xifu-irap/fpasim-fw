@@ -277,6 +277,8 @@ package pkg_regdecode is
   constant pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H : integer := 0;
   -- user-defined: rst_status (bit index)
   constant pkg_DEBUG_CTRL_RST_STATUS_IDX_H  : integer := 1;
+  -- user-defined: dac_en_pattern (bit index)
+  constant pkg_DEBUG_CTRL_DAC_EN_PATTERN_IDX_H  : integer := 4;
 
   -- user-defined: error_sel
   ---------------------------------------------------------------------

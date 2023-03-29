@@ -296,8 +296,8 @@ function fpasim_build_rec_conf0(rec_adc_nb_word_32b_p) {
  * @param {number} debug_pulse_p - 
  * @return {number} built word.
  */
-function fpasim_build_debug_ctrl(rst_status_p, debug_pulse_p) {
-    const data = (rst_status_p << 1) + debug_pulse_p;
+function fpasim_build_debug_ctrl(dac_en_pattern_p, rst_status_p, debug_pulse_p) {
+    const data = (dac_en_pattern_p << 4) + (rst_status_p << 1) + debug_pulse_p;
     return data;
 }
 

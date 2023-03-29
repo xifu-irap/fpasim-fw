@@ -101,8 +101,11 @@ entity fpasim_top is
     i_adc_valid                       : in  std_logic;  -- adc valid
     i_adc_amp_squid_offset_correction : in  std_logic_vector(13 downto 0);  -- adc_amp_squid_offset_correction value
     i_adc_mux_squid_feedback          : in  std_logic_vector(13 downto 0);  -- adc_mux_squid_feedback value
-    i_adc_errors                      : in  std_logic_vector(15 downto 0);
-    i_adc_status                      : in  std_logic_vector(7 downto 0);
+    ---------------------------------------------------------------------
+    -- from the ios
+    ---------------------------------------------------------------------
+    i_adc_errors                      : in  std_logic_vector(15 downto 0);  -- errors
+    i_adc_status                      : in  std_logic_vector(7 downto 0);  -- status
     ---------------------------------------------------------------------
     -- output sync @i_clk
     ---------------------------------------------------------------------
@@ -116,9 +119,13 @@ entity fpasim_top is
     ---------------------------------------------------------------------
     o_dac_valid   : out std_logic;                      -- dac valid
     o_dac_frame   : out std_logic;                      -- dac frame
-    o_dac         : out std_logic_vector(15 downto 0);  -- dac data
-    i_dac_errors  : in  std_logic_vector(15 downto 0);
-    i_dac_status  : in  std_logic_vector(7 downto 0)
+    o_dac1        : out std_logic_vector(15 downto 0);  -- output dac1
+    o_dac0        : out std_logic_vector(15 downto 0);  -- output dac0
+    ---------------------------------------------------------------------
+    -- from the ios @i_clk
+    ---------------------------------------------------------------------
+    i_dac_errors  : in  std_logic_vector(15 downto 0);  -- errors
+    i_dac_status  : in  std_logic_vector(7 downto 0)    -- status
     );
 end entity fpasim_top;
 
@@ -165,8 +172,9 @@ architecture RTL of fpasim_top is
   signal inter_squid_gain : std_logic_vector(pkg_CONF0_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
   -- debug_ctrl register
-  signal rst_status  : std_logic;
-  signal debug_pulse : std_logic;
+  signal rst_status           : std_logic;
+  signal debug_pulse          : std_logic;
+  signal dac_en_pattern : std_logic;
 
   -- RAM configuration 
   ---------------------------------------------------------------------
@@ -352,9 +360,19 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- dac_top
   ---------------------------------------------------------------------
+  signal dac_pattern0 : std_logic_vector(7 downto 0);
+  signal dac_pattern1 : std_logic_vector(7 downto 0);
+  signal dac_pattern2 : std_logic_vector(7 downto 0);
+  signal dac_pattern3 : std_logic_vector(7 downto 0);
+  signal dac_pattern4 : std_logic_vector(7 downto 0);
+  signal dac_pattern5 : std_logic_vector(7 downto 0);
+  signal dac_pattern6 : std_logic_vector(7 downto 0);
+  signal dac_pattern7 : std_logic_vector(7 downto 0);
+
   signal dac_valid4 : std_logic;
   signal dac_frame4 : std_logic;
-  signal dac4       : std_logic_vector(o_dac'range);
+  signal dac1_4     : std_logic_vector(o_dac1'range);
+  signal dac0_4     : std_logic_vector(o_dac0'range);
 
   ---------------------------------------------------------------------
   -- sync_top
@@ -385,11 +403,22 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- debug
   ---------------------------------------------------------------------
-  signal debug_adc_sel                         : std_logic;
+  signal debug_dac_pattern_sel : std_logic:= '0';
+  signal debug_dac_pattern0    : std_logic_vector(7 downto 0);
+  signal debug_dac_pattern1    : std_logic_vector(7 downto 0);
+  signal debug_dac_pattern2    : std_logic_vector(7 downto 0);
+  signal debug_dac_pattern3    : std_logic_vector(7 downto 0);
+  signal debug_dac_pattern4    : std_logic_vector(7 downto 0);
+  signal debug_dac_pattern5    : std_logic_vector(7 downto 0);
+  signal debug_dac_pattern6    : std_logic_vector(7 downto 0);
+  signal debug_dac_pattern7    : std_logic_vector(7 downto 0);
+
+  signal debug_adc_sel                         : std_logic := '0';
   signal debug_adc_mux_squid_feedback          : std_logic_vector(i_adc_mux_squid_feedback'range);
   signal debug_adc_amp_squid_offset_correction : std_logic_vector(i_adc_amp_squid_offset_correction'range);
   signal debug_dac_sel                         : std_logic;
-  signal debug_dac                             : std_logic_vector(15 downto 0);
+  signal debug_dac1                            : std_logic_vector(15 downto 0);
+  signal debug_dac0                            : std_logic_vector(15 downto 0);
 
 begin
 
@@ -582,8 +611,9 @@ begin
   inter_squid_gain <= reg_conf0(pkg_CONF0_INTER_SQUID_GAIN_IDX_H downto pkg_CONF0_INTER_SQUID_GAIN_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_CONF0_INTER_SQUID_GAIN_WIDTH>) but was (<8>)"
 
   -- debug_ctrl register
-  debug_pulse <= reg_debug_ctrl(pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H);
-  rst_status  <= reg_debug_ctrl(pkg_DEBUG_CTRL_RST_STATUS_IDX_H);
+  dac_en_pattern       <= reg_debug_ctrl(pkg_DEBUG_CTRL_DAC_EN_PATTERN_IDX_H);
+  debug_pulse          <= reg_debug_ctrl(pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H);
+  rst_status           <= reg_debug_ctrl(pkg_DEBUG_CTRL_RST_STATUS_IDX_H);
 
   -- fpasim_status register
   reg_fpasim_status_valid        <= tes_pixel_neg_out_valid1;
@@ -664,7 +694,7 @@ begin
     adc_amp_squid_offset_correction_tmp0 <= i_adc_amp_squid_offset_correction;
   end generate gen_not_adc_debug;
 
-  gen_adc_debug : if g_FPASIM_DEBUG = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_adc_debug : if g_FPASIM_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
   begin
     select_path : process (i_clk) is
     begin
@@ -798,7 +828,7 @@ begin
       ---------------------------------------------------------------------
       o_tes_pixel_neg_out_valid    => tes_pixel_neg_out_valid1,
       o_tes_pixel_neg_out_error    => tes_pixel_neg_out_error1,
-      o_tes_pixel_neg_out_pixel_id => tes_pixel_neg_out_pixel_id1, -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+      o_tes_pixel_neg_out_pixel_id => tes_pixel_neg_out_pixel_id1,  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------
@@ -991,6 +1021,45 @@ begin
   ---------------------------------------------------------------------
   -- dac_top
   ---------------------------------------------------------------------
+  not_gen_debug_pattern : if g_FPASIM_DEBUG = false generate
+    dac_pattern0 <= pkg_DAC_PATTERN0;
+    dac_pattern1 <= pkg_DAC_PATTERN1;
+    dac_pattern2 <= pkg_DAC_PATTERN2;
+    dac_pattern3 <= pkg_DAC_PATTERN3;
+    dac_pattern4 <= pkg_DAC_PATTERN4;
+    dac_pattern5 <= pkg_DAC_PATTERN5;
+    dac_pattern6 <= pkg_DAC_PATTERN6;
+    dac_pattern7 <= pkg_DAC_PATTERN7;
+  end generate not_gen_debug_pattern;
+
+  gen_debug_pattern : if g_FPASIM_DEBUG = true generate
+    p_select_debug_pattern : process (i_clk) is
+    begin
+      if rising_edge(i_clk) then
+        if debug_dac_pattern_sel = '1' then
+          dac_pattern0 <= debug_dac_pattern0;
+          dac_pattern1 <= debug_dac_pattern1;
+          dac_pattern2 <= debug_dac_pattern2;
+          dac_pattern3 <= debug_dac_pattern3;
+          dac_pattern4 <= debug_dac_pattern4;
+          dac_pattern5 <= debug_dac_pattern5;
+          dac_pattern6 <= debug_dac_pattern6;
+          dac_pattern7 <= debug_dac_pattern7;
+        else
+          dac_pattern0 <= pkg_DAC_PATTERN0;
+          dac_pattern1 <= pkg_DAC_PATTERN1;
+          dac_pattern2 <= pkg_DAC_PATTERN2;
+          dac_pattern3 <= pkg_DAC_PATTERN3;
+          dac_pattern4 <= pkg_DAC_PATTERN4;
+          dac_pattern5 <= pkg_DAC_PATTERN5;
+          dac_pattern6 <= pkg_DAC_PATTERN6;
+          dac_pattern7 <= pkg_DAC_PATTERN7;
+        end if;
+      end if;
+    end process p_select_debug_pattern;
+
+  end generate gen_debug_pattern;
+
   inst_dac_top : entity work.dac_top
     generic map(
       g_DAC_DELAY_WIDTH => dac_delay'length
@@ -999,21 +1068,32 @@ begin
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------
-      i_clk       => i_clk,
-      i_rst       => i_rst,
+      i_clk            => i_clk,
+      i_rst            => i_rst,
       -- from regdecode
       -----------------------------------------------------------------
-      i_dac_delay => dac_delay,
+      i_dac_en_pattern => dac_en_pattern,
+      i_dac_pattern0   => dac_pattern0,
+      i_dac_pattern1   => dac_pattern1,
+      i_dac_pattern2   => dac_pattern2,
+      i_dac_pattern3   => dac_pattern3,
+      i_dac_pattern4   => dac_pattern4,
+      i_dac_pattern5   => dac_pattern5,
+      i_dac_pattern6   => dac_pattern6,
+      i_dac_pattern7   => dac_pattern7,
+      -- delay
+      i_dac_delay      => dac_delay,
       -- input data 
       ---------------------------------------------------------------------
-      i_dac_valid => pixel_valid3,
-      i_dac       => pixel_result3,
+      i_dac_valid      => pixel_valid3,
+      i_dac            => pixel_result3,
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      o_dac_valid => dac_valid4,
-      o_dac_frame => dac_frame4,
-      o_dac       => dac4
+      o_dac_valid      => dac_valid4,
+      o_dac_frame      => dac_frame4,
+      o_dac1           => dac1_4,
+      o_dac0           => dac0_4
       );
 
   ---------------------------------------------------------------------
@@ -1025,10 +1105,11 @@ begin
   begin
     o_dac_valid <= dac_valid4;
     o_dac_frame <= dac_frame4;
-    o_dac       <= dac4;
+    o_dac1      <= dac1_4;
+    o_dac0      <= dac0_4;
   end generate gen_not_dac_debug;
 
-  gen_dac_debug : if g_FPASIM_DEBUG = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_dac_debug : if g_FPASIM_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
   begin
     select_path : process (i_clk) is
     begin
@@ -1037,9 +1118,11 @@ begin
         o_dac_frame <= dac_frame4;
 
         if debug_dac_sel = '1' then
-          o_dac <= debug_dac;
+          o_dac1 <= debug_dac1;
+          o_dac0 <= debug_dac0;
         else
-          o_dac <= dac4;
+          o_dac1 <= dac1_4;
+          o_dac0 <= dac0_4;
         end if;
       end if;
     end process select_path;
@@ -1190,6 +1273,7 @@ begin
         clk => i_clk,
 
         -- probe0
+        probe0(36)          => dac_en_pattern,
         probe0(35)          => tes_pixel_neg_out_valid1,
         probe0(34)          => fifo_rec_adc_rd,
         probe0(33)          => fifo_rec_adc_sof,
@@ -1209,12 +1293,14 @@ begin
         probe0(19)          => pixel_valid3,
         probe0(18)          => frame_sof3,
         probe0(17)          => frame_eof3,
-        probe0(16 downto 6) => frame_id3, -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
-        probe0(5 downto 0)  => pixel_id3, -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+        probe0(16 downto 6) => frame_id3,  -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
+        probe0(5 downto 0)  => pixel_id3,  -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
 
         -- probe1
-        probe1(32)           => dac_frame4,
-        probe1(31 downto 16) => dac4,
+        probe1(56)           => dac_frame4,
+        probe1(55 downto 48) => inter_squid_gain,
+        probe1(47 downto 32) => dac1_4,
+        probe1(31 downto 16) => dac0_4,
         probe1(15 downto 0)  => pixel_result3,
 
         -- probe2
@@ -1230,23 +1316,23 @@ begin
         probe3(19)          => pixel_valid1,
         probe3(18)          => frame_sof1,
         probe3(17)          => frame_eof1,
-        probe3(16 downto 6) => frame_id1, -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
-        probe3(5 downto 0)  => pixel_id1, -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+        probe3(16 downto 6) => frame_id1,  -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
+        probe3(5 downto 0)  => pixel_id1,  -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
 
         -- probe4
         probe4(45 downto 22) => debug_pulse_cnt_r1_tmp,
-        probe4(21 downto 11) => debug_frame_id_pulse_sof_r1, -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
-        probe4(10 downto 0)  => debug_frame_id_pulse_eof_r1, -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
+        probe4(21 downto 11) => debug_frame_id_pulse_sof_r1,  -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
+        probe4(10 downto 0)  => debug_frame_id_pulse_eof_r1,  -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
         -- probe5
         probe5(31 downto 16) => debug_sample_pixel_cnt_tmp,
         probe5(15 downto 0)  => debug_sample_frame_cnt_tmp,
 
         -- probe6
         probe6(32)           => tes_pixel_neg_out_error1,
-        probe6(31 downto 26) => tes_pixel_neg_out_pixel_id1, -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+        probe6(31 downto 26) => tes_pixel_neg_out_pixel_id1,  -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
         probe6(25 downto 10) => cmd_pulse_height,
-        probe6(9 downto 4)   => cmd_pixel_id, -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>)"
-        probe6(3 downto 0)   => cmd_time_shift, -- @suppress "Incorrect array size in assignment: expected (<4>) but was (<pkg_MAKE_PULSE_TIME_SHIFT_WIDTH>)"
+        probe6(9 downto 4)   => cmd_pixel_id,  -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>)"
+        probe6(3 downto 0)   => cmd_time_shift,  -- @suppress "Incorrect array size in assignment: expected (<4>) but was (<pkg_MAKE_PULSE_TIME_SHIFT_WIDTH>)"
 
         -- probe7
         probe7(47 downto 32) => rec_adc_cmd_nb_words_by_block,
@@ -1256,13 +1342,22 @@ begin
 
     inst_fpasim_top_vio_0 : entity work.fpasim_top_vio_0
       port map (
-        clk           => i_clk, -- @suppress "All references must have the same capitalization as their declaration: Expected 'CLK' but was 'clk'"
+        clk           => i_clk,  -- @suppress "All references must have the same capitalization as their declaration: Expected 'CLK' but was 'clk'"
         probe_out0(0) => debug_adc_sel,
         probe_out1    => debug_adc_mux_squid_feedback,
         probe_out2    => debug_adc_amp_squid_offset_correction,
         probe_out3(0) => debug_dac_sel,
-        probe_out4    => debug_dac
-
+        probe_out4    => debug_dac0,
+        probe_out5    => debug_dac1,
+        probe_out6(0) => debug_dac_pattern_sel,
+        probe_out7    => debug_dac_pattern0,
+        probe_out8    => debug_dac_pattern1,
+        probe_out9    => debug_dac_pattern2,
+        probe_out10   => debug_dac_pattern3,
+        probe_out11   => debug_dac_pattern4,
+        probe_out12   => debug_dac_pattern5,
+        probe_out13   => debug_dac_pattern6,
+        probe_out14   => debug_dac_pattern7
         );
 
   end generate gen_debug;

@@ -8,7 +8,8 @@ add wave -noupdate -group io_top -expand -group dac -expand -group in /tb_fpga_s
 add wave -noupdate -group io_top -expand -group dac -expand -group in -group rst /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/i_dac_io_rst
 add wave -noupdate -group io_top -expand -group dac -expand -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/i_dac_valid
 add wave -noupdate -group io_top -expand -group dac -expand -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/i_dac_frame
-add wave -noupdate -group io_top -expand -group dac -expand -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/i_dac
+add wave -noupdate -group io_top -expand -group dac -expand -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/i_dac1
+add wave -noupdate -group io_top -expand -group dac -expand -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/i_dac0
 add wave -noupdate -group io_top -expand -group dac -expand -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/o_dac_errors
 add wave -noupdate -group io_top -expand -group dac -expand -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/o_dac_status
 add wave -noupdate -group io_top -expand -group dac -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/o_dac_clk_p
@@ -45,17 +46,17 @@ add wave -noupdate -group dac_demux -group out /tb_fpga_system_fpasim_top/inst_f
 add wave -noupdate -group dac_demux -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/inst_dac3283_demux/o_dac0
 add wave -noupdate -group dac_demux -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/inst_dac3283_demux/o_dac1_valid
 add wave -noupdate -group dac_demux -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/inst_dac3283_demux/o_dac1
-add wave -noupdate -expand -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/i_make_pulse_valid
-add wave -noupdate -expand -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/i_make_pulse
-add wave -noupdate -expand -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_auto_conf_busy
-add wave -noupdate -expand -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_ready
-add wave -noupdate -expand -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/i_adc_clk
-add wave -noupdate -expand -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/i_adc0_real
-add wave -noupdate -expand -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/i_adc1_real
-add wave -noupdate -expand -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_ref_clk
-add wave -noupdate -expand -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_sync
-add wave -noupdate -expand -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_dac_real_valid
-add wave -noupdate -expand -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_dac_real
+add wave -noupdate -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/i_make_pulse_valid
+add wave -noupdate -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/i_make_pulse
+add wave -noupdate -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_auto_conf_busy
+add wave -noupdate -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_ready
+add wave -noupdate -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/i_adc_clk
+add wave -noupdate -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/i_adc0_real
+add wave -noupdate -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/i_adc1_real
+add wave -noupdate -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_ref_clk
+add wave -noupdate -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_sync
+add wave -noupdate -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_dac_real_valid
+add wave -noupdate -group fpga_system_fpasim_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/o_dac_real
 add wave -noupdate -group convert_adc0 /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_ads62p49_top/inst_ads62p49_convert_adc0/i_clk
 add wave -noupdate -group convert_adc0 /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_ads62p49_top/inst_ads62p49_convert_adc0/i_adc
 add wave -noupdate -group convert_adc0 -group step /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_ads62p49_top/inst_ads62p49_convert_adc0/f_adc_tmp0
@@ -68,12 +69,22 @@ add wave -noupdate -group convert_adc1 -radix unsigned /tb_fpga_system_fpasim_to
 add wave -noupdate -group dac_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_clk
 add wave -noupdate -group dac_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_rst
 add wave -noupdate -group dac_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/c_LATENCY_OUT
+add wave -noupdate -group dac_top -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac_en_pattern
+add wave -noupdate -group dac_top -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac_pattern0
+add wave -noupdate -group dac_top -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac_pattern1
+add wave -noupdate -group dac_top -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac_pattern2
+add wave -noupdate -group dac_top -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac_pattern3
+add wave -noupdate -group dac_top -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac_pattern4
+add wave -noupdate -group dac_top -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac_pattern5
+add wave -noupdate -group dac_top -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac_pattern6
+add wave -noupdate -group dac_top -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac_pattern7
 add wave -noupdate -group dac_top -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac_valid
 add wave -noupdate -group dac_top -group in /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac
 add wave -noupdate -group dac_top -group in -radix unsigned /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/i_dac_delay
-add wave -noupdate -group dac_top -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/o_dac_valid
-add wave -noupdate -group dac_top -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/o_dac_frame
-add wave -noupdate -group dac_top -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/o_dac
+add wave -noupdate -group dac_top -expand -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/o_dac_valid
+add wave -noupdate -group dac_top -expand -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/o_dac_frame
+add wave -noupdate -group dac_top -expand -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/o_dac1
+add wave -noupdate -group dac_top -expand -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_dac_top/o_dac0
 add wave -noupdate -group sync_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_sync_top/i_clk
 add wave -noupdate -group sync_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_sync_top/i_rst
 add wave -noupdate -group sync_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_sync_top/i_rst_status
@@ -84,15 +95,25 @@ add wave -noupdate -group sync_top -expand -group in /tb_fpga_system_fpasim_top/
 add wave -noupdate -group sync_top -expand -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_sync_top/o_sync_valid
 add wave -noupdate -group sync_top -expand -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_sync_top/o_sync
 add wave -noupdate -group sync_top -expand -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_fpasim_top/inst_sync_top/o_errors
+add wave -noupdate -group io_dac_data_insert /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/inst_io_dac/inst_io_dac_data_insert/data_valid_tmp1
+add wave -noupdate -group io_dac_data_insert -group word1 /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/inst_io_dac/inst_io_dac_data_insert/dac_frame_word1
+add wave -noupdate -group io_dac_data_insert -group word1 /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/inst_io_dac/inst_io_dac_data_insert/dac1_word1
+add wave -noupdate -group io_dac_data_insert -group word1 /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/inst_io_dac/inst_io_dac_data_insert/dac0_word1
+add wave -noupdate -group io_dac_data_insert -group word0 /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/inst_io_dac/inst_io_dac_data_insert/dac_frame_word0
+add wave -noupdate -group io_dac_data_insert -group word0 /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/inst_io_dac/inst_io_dac_data_insert/dac1_word0
+add wave -noupdate -group io_dac_data_insert -group word0 /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/inst_io_dac/inst_io_dac_data_insert/dac0_word0
+add wave -noupdate -group io_dac_data_insert -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/inst_io_dac/inst_io_dac_data_insert/o_dac_valid
+add wave -noupdate -group io_dac_data_insert -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/inst_io_dac/inst_io_dac_data_insert/o_dac_frame
+add wave -noupdate -group io_dac_data_insert -group out /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_system_fpasim_top/inst_io_top/inst_io_dac/inst_io_dac_data_insert/o_dac
 add wave -noupdate -group dac3283_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/dac_clk
 add wave -noupdate -group dac3283_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/dac_frame
 add wave -noupdate -group dac3283_top -radix unsigned /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/dac
-add wave -noupdate -group dac3283_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/dac0_valid
-add wave -noupdate -group dac3283_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/dac0
 add wave -noupdate -group dac3283_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/dac1_valid
 add wave -noupdate -group dac3283_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/dac1
+add wave -noupdate -group dac3283_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/dac0_valid
+add wave -noupdate -group dac3283_top /tb_fpga_system_fpasim_top/inst_fpga_system_fpasim_top/inst_fpga_system_fpasim/inst_dac3283_top/dac0
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {4288100 ps} 0}
+WaveRestoreCursors {{Cursor 1} {5443100 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 234
 configure wave -valuecolwidth 100
@@ -108,4 +129,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {4230728 ps} {4345472 ps}
+WaveRestoreZoom {40473097 ps} {40530469 ps}

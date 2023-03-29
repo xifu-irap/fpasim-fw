@@ -113,15 +113,15 @@ function cdce_spi_enable(level_p, mode_p, verbosity_p) {
     //---------------------------------------------------------------------
 
     // en the spi links
-    rst = 0;
-    en = 1;
+    const rst = 0;
+    const en = 1;
     fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     if (verbosity_p < 0) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_spi_enable]: Enable the SPI";
+            const msg = "[cdce_spi_enable]: Enable the SPI";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
     }
@@ -138,8 +138,8 @@ function cdce_write_command(addr_p, data_p) {
     //---------------------------------------------------------------------
     // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
-    spi_mode = 1; // 0: rd, 1: wr
-    spi_id = 0; // 0: cdce,1: adc, 2: dac, 3: amc
+    const spi_mode = 1; // 0: rd, 1: wr
+    const spi_id = 0; // 0: cdce,1: adc, 2: dac, 3: amc
     fpasim_set_spi_conf0(spi_id_p = spi_id, spi_mode_p = spi_mode, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     //---------------------------------------------------------------------
@@ -169,8 +169,8 @@ function cdce_read_command(addr_p) {
     //---------------------------------------------------------------------
     // write in the SPI_CONF0 register
     //---------------------------------------------------------------------
-    spi_mode = 0; // 0: rd, 1: wr
-    spi_id = 0; // 0: cdce,1: adc, 2: dac, 3: amc
+    const spi_mode = 0; // 0: rd, 1: wr
+    const spi_id = 0; // 0: cdce,1: adc, 2: dac, 3: amc
     fpasim_set_spi_conf0(spi_id_p = spi_id, spi_mode_p = spi_mode, level_p = 0, mode_p = 0, verbosity_p = -1);
 
     //---------------------------------------------------------------------
@@ -288,7 +288,7 @@ function cdce_set_config0(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config0]: Set the register value ";
+            const msg = "[cdce_set_config0]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -373,7 +373,7 @@ function cdce_set_config1(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config1]: Set the register value ";
+            const msg = "[cdce_set_config1]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -447,7 +447,7 @@ function cdce_set_config2(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config2]: Set the register value ";
+            const msg = "[cdce_set_config2]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -524,7 +524,7 @@ function cdce_set_config3(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config3]: Set the register data: ";
+            const msg = "[cdce_set_config3]: Set the register data: ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -597,7 +597,7 @@ function cdce_set_config4(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config4]: Set the register data: ";
+            const msg = "[cdce_set_config4]: Set the register data: ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -669,7 +669,7 @@ function cdce_set_config5(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config5]: Set the register value ";
+            const msg = "[cdce_set_config5]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -746,7 +746,7 @@ function cdce_set_config6(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config6]: Set the register value ";
+            const msg = "[cdce_set_config6]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -762,7 +762,7 @@ function cdce_set_config6(
             display_bit(bit_name_p = "en6div_p", bit_value_p = en6div_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
             display_bit(bit_name_p = "out6divrsel_p", bit_value_p = out6divrsel_p, bit_width_p = 7, level_p = level2, mode_p = mode_p);
             display_bit(bit_name_p = "ph6adjc_p", bit_value_p = ph6adjc_p, bit_width_p = 7, level_p = level2, mode_p = mode_p);
-            display_bit(bit_name_p = "det_start_bypass", bit_value_p = det_start_bypass, bit_width_p = 2, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "det_start_bypass", bit_value_p = det_start_bypass_p, bit_width_p = 2, level_p = level2, mode_p = mode_p);
             display_bit(bit_name_p = "fb_start_bypass_p", bit_value_p = fb_start_bypass_p, bit_width_p = 2, level_p = level2, mode_p = mode_p);
             display_bit(bit_name_p = "fbdeterm_div2_dis_p", bit_value_p = fbdeterm_div2_dis_p, bit_width_p = 2, level_p = level2, mode_p = mode_p);
             display_bit(bit_name_p = "fbdeterm_div_sel_p", bit_value_p = fbdeterm_div_sel_p, bit_width_p = 2, level_p = level2, mode_p = mode_p);
@@ -822,7 +822,7 @@ function cdce_set_config7(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config7]: Set the register value ";
+            const msg = "[cdce_set_config7]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -900,7 +900,7 @@ function cdce_set_config8(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config8]: Set the register value ";
+            const msg = "[cdce_set_config8]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -994,7 +994,7 @@ function cdce_set_config9(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config9]: Set the register data: ";
+            const msg = "[cdce_set_config9]: Set the register data: ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1065,7 +1065,7 @@ function cdce_set_config10(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config10]: Set the register value ";
+            const msg = "[cdce_set_config10]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1075,7 +1075,7 @@ function cdce_set_config10(
 
         if (verbosity_p >= c_CDCE_BIT_VERBOSITY_MIN) {
             display_bit(bit_name_p = "div_n_p", bit_value_p = div_n_p, bit_width_p = 14, level_p = level2, mode_p = mode_p);
-            display_bit(bit_name_p = "div_m_p", bit_value_p = div_m_pbit_width_p = 14, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "div_m_p", bit_value_p = div_m_p, bit_width_p = 14, level_p = level2, mode_p = mode_p);
 
         }
     }
@@ -1137,7 +1137,7 @@ function cdce_set_config11(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config11]: Set the register value ";
+            const msg = "[cdce_set_config11]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1224,7 +1224,7 @@ function cdce_set_config12(
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_set_config12]: Set the register value ";
+            const msg = "[cdce_set_config12]: Set the register value ";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1296,7 +1296,7 @@ function cdce_get_config0(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config0]: Get the register value";
+            const msg = "[cdce_get_config0]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
 
@@ -1367,7 +1367,7 @@ function cdce_get_config1(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config1]: Get the register value";
+            const msg = "[cdce_get_config1]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1431,7 +1431,7 @@ function cdce_get_config2(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config2]: Get the register value";
+            const msg = "[cdce_get_config2]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1494,7 +1494,7 @@ function cdce_get_config3(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config3]: Get the register value";
+            const msg = "[cdce_get_config3]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1556,7 +1556,7 @@ function cdce_get_config4(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config4]: Get the register value";
+            const msg = "[cdce_get_config4]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1614,7 +1614,7 @@ function cdce_get_config5(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config5]: Get the register value";
+            const msg = "[cdce_get_config5]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1678,7 +1678,7 @@ function cdce_get_config6(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config6]: Get the register value";
+            const msg = "[cdce_get_config6]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1742,7 +1742,7 @@ function cdce_get_config7(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config7]: Get the register value";
+            const msg = "[cdce_get_config7]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1807,7 +1807,7 @@ function cdce_get_config8(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config8]: Get the register value";
+            const msg = "[cdce_get_config8]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1881,7 +1881,7 @@ function cdce_get_config9(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config9]: Get the register value";
+            const msg = "[cdce_get_config9]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -1948,7 +1948,7 @@ function cdce_get_config10(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config10]: Get the register value";
+            const msg = "[cdce_get_config10]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -2007,7 +2007,7 @@ function cdce_get_config11(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config11]: Get the register value";
+            const msg = "[cdce_get_config11]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -2078,7 +2078,7 @@ function cdce_get_config12(level_p, mode_p, verbosity_p) {
         // do nothing
     } else {
         if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            msg = "[cdce_get_config12]: Get the register value";
+            const msg = "[cdce_get_config12]: Get the register value";
             display(msg_p = msg, level_p = level0, mode_p = mode_p);
         }
         if (verbosity_p >= c_CDCE_ADDR_VERBOSITY_MIN) {
@@ -2234,13 +2234,13 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     const level0 = level_p;
     const level1 = level_p + 1;
 
-    msg = "CDCE72010_configure";
+    const msg = "CDCE72010_configure";
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
 
     // Enable the SPI on the FPGA board
     cdce_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2264,23 +2264,23 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [2]: R/W: prisel[0]
     // [1:0]: R/W: inbufselyx[1:0]
 
-    outbufsel0yx = parseInt('01', 2); // disable output0
-    cmosmode0nyx = parseInt('10', 2); // disable output0
-    cmosmode0pyx = parseInt('10', 2); // disable output0
-    pecl0hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    irefres = 0;
-    icp = parseInt('1111', 2);
-    cp_pre = 0; // Preset charge pump output voltage to VCC_CP/2, on [1], off [0] 
-    cp_opa = 0;
-    cp_snk = 0;
-    cp_src = 0;
-    cp_dir = 0;
-    delay_pfd = parseInt('00', 2); // delay on the reset path: 1.5 ns (default)
-    refselcntrl = 1; // 1: use register0 to select ref_clk
-    vcxosel = 1; // 0; use register0 to select ref_clk, 1: use VCXO/AUX-clock
-    secsel = 0; // use prim_ref
-    prisel = 1;
-    inbufselyx = parseInt('01', 2); //LVDS PRI_Ref/SEC_Ref
+    const outbufsel0yx = parseInt('01', 2); // disable output0
+    const cmosmode0nyx = parseInt('10', 2); // disable output0
+    const cmosmode0pyx = parseInt('10', 2); // disable output0
+    const pecl0hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
+    const irefres = 0;
+    const icp = parseInt('1111', 2);
+    const cp_pre = 0; // Preset charge pump output voltage to VCC_CP/2, on [1], off [0] 
+    const cp_opa = 0;
+    const cp_snk = 0;
+    const cp_src = 0;
+    const cp_dir = 0;
+    const delay_pfd = parseInt('00', 2); // delay on the reset path: 1.5 ns (default)
+    const refselcntrl = 1; // 1: use register0 to select ref_clk
+    const vcxosel = 1; // 0; use register0 to select ref_clk, 1: use VCXO/AUX-clock
+    const secsel = 0; // use prim_ref
+    const prisel = 1;
+    const inbufselyx = parseInt('01', 2); //LVDS PRI_Ref/SEC_Ref
 
     cdce_set_config0(
         outbufsel0yx_p = outbufsel0yx, cmosmode0nyx_p = cmosmode0nyx,
@@ -2292,7 +2292,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2312,19 +2312,19 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [1]: R/W: hysten[0]
     // [0]: R/W: acdcsel[0]
 
-    outbufsel1yx = parseInt('01', 2); // disable output1
-    cmosmode1nyx = parseInt('10', 2); // disable output1
-    cmosmode1pyx = parseInt('10', 2); // disable output1
-    pecl1hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en01div = 0; //0: divider is disabled on output0/output1
-    out1divrsel = parseInt('000_0000', 2);
-    ph1adjc = parseInt('000_0000', 2);
-    failsafe = 0;
-    secinvbb = 0;
-    priinvbb = 0;
-    termsel = 0;
-    hysten = 1;
-    acdcsel = 0;
+    const outbufsel1yx = parseInt('01', 2); // disable output1
+    const cmosmode1nyx = parseInt('10', 2); // disable output1
+    const cmosmode1pyx = parseInt('10', 2); // disable output1
+    const pecl1hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
+    const en01div = 0; //0: divider is disabled on output0/output1
+    const out1divrsel = parseInt('000_0000', 2);
+    const ph1adjc = parseInt('000_0000', 2);
+    const failsafe = 0;
+    const secinvbb = 0;
+    const priinvbb = 0;
+    const termsel = 0;
+    const hysten = 1;
+    const acdcsel = 0;
 
     cdce_set_config1(
         outbufsel1yx_p = outbufsel1yx, cmosmode1nyx_p = cmosmode1nyx,
@@ -2335,7 +2335,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2350,15 +2350,15 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [12:6]: R/W: ph2adjc[6:0]
     // [5:3]: R/W: dlyn[2:0]
     // [2:0]: R/W: dlym[2:0]
-    outbufsel2yx = parseInt('10', 2); // LVPECL output2
-    cmosmode2nyx = parseInt('00', 2); // LVPECL output2
-    cmosmode2pyx = parseInt('00', 2); // LVPECL output2
-    pecl2hiswing = 1; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en2div = 1; //0: divider is disabled on output2, 1: otherwise
-    out2divrsel = parseInt('1000000', 2); // Output Divider 2 ratio select: divided by 2
-    ph2adjc = parseInt('0000000', 2);
-    dlyn = parseInt('00', 2); // Feedback phase delay. (default:'00' <=> 0ps (page 55)).If Progr Delay N is set, all Yx outputs are leading to the Reference Clock according to the value set
-    dlym = parseInt('00', 2); // Reference phase delay. (default:'00' <=> 0ps (page 55)). If Progr Delay M is set, all Yx outputs are lagging to the Reference Clock according to the value set
+    const outbufsel2yx = parseInt('10', 2); // LVPECL output2
+    const cmosmode2nyx = parseInt('00', 2); // LVPECL output2
+    const cmosmode2pyx = parseInt('00', 2); // LVPECL output2
+    const pecl2hiswing = 1; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
+    const en2div = 1; //0: divider is disabled on output2, 1: otherwise
+    const out2divrsel = parseInt('1000000', 2); // Output Divider 2 ratio select: divided by 2
+    const ph2adjc = parseInt('0000000', 2);
+    const dlyn = parseInt('00', 2); // Feedback phase delay. (default:'00' <=> 0ps (page 55)).If Progr Delay N is set, all Yx outputs are leading to the Reference Clock according to the value set
+    const dlym = parseInt('00', 2); // Reference phase delay. (default:'00' <=> 0ps (page 55)). If Progr Delay M is set, all Yx outputs are lagging to the Reference Clock according to the value set
 
     cdce_set_config2(
         outbufsel2yx_p = outbufsel2yx, cmosmode2nyx_p = cmosmode2nyx,
@@ -2368,7 +2368,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2386,17 +2386,17 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [1]: R/W: dis_fdet_fb[0]
     // [0]: R/W: dis_fdet_ref[0]
 
-    outbufsel3yx = parseInt('01', 2); // disable output3
-    cmosmode3nyx = parseInt('10', 2); // disable output3
-    cmosmode3pyx = parseInt('10', 2); // disable output3
-    pecl3hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en3div = 0; //0: divider is disabled on output3, 1: otherwise
-    out3divrsel = parseInt('0000000', 2);
-    ph3adjc = parseInt('0000000', 2);
-    bias_div23 = parseInt('00', 2);
-    bias_div01 = parseInt('00', 2);
-    dis_fdet_fb = 0;
-    dis_fdet_ref = 0; // 0: ref clock frequency detector is ON, 1: otherwise
+    const outbufsel3yx = parseInt('01', 2); // disable output3
+    const cmosmode3nyx = parseInt('10', 2); // disable output3
+    const cmosmode3pyx = parseInt('10', 2); // disable output3
+    const pecl3hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
+    const en3div = 0; //0: divider is disabled on output3, 1: otherwise
+    const out3divrsel = parseInt('0000000', 2);
+    const ph3adjc = parseInt('0000000', 2);
+    const bias_div23 = parseInt('00', 2);
+    const bias_div01 = parseInt('00', 2);
+    const dis_fdet_fb = 0;
+    const dis_fdet_ref = 0; // 0: ref clock frequency detector is ON, 1: otherwise
 
     cdce_set_config3(
         outbufsel3yx_p = outbufsel3yx, cmosmode3nyx_p = cmosmode3nyx,
@@ -2407,7 +2407,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2422,14 +2422,14 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [12:6]: R/W: ph4adjc[6:0]
     // [4]: R/W: holdonlor[0]
 
-    outbufsel4yx = parseInt('11', 2); // LVDS output4
-    cmosmode4nyx = parseInt('10', 2); // LVDS output4
-    cmosmode4pyx = parseInt('10', 2); // LVDS output4
-    pecl4hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en4div = 1; //0: divider is disabled on output4, 1: otherwise
-    out4divrsel = parseInt('1000000', 2); // Output Divider 4 ratio select: divided by 2
-    ph4adjc = parseInt('000_0000', 2);
-    holdonlor = 0; //If set to 0, CP remains active and will discharge loop filter if input reference clock is lost
+    const outbufsel4yx = parseInt('11', 2); // LVDS output4
+    const cmosmode4nyx = parseInt('10', 2); // LVDS output4
+    const cmosmode4pyx = parseInt('10', 2); // LVDS output4
+    const pecl4hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
+    const en4div = 1; //0: divider is disabled on output4, 1: otherwise
+    const out4divrsel = parseInt('1000000', 2); // Output Divider 4 ratio select: divided by 2
+    const ph4adjc = parseInt('000_0000', 2);
+    const holdonlor = 0; //If set to 0, CP remains active and will discharge loop filter if input reference clock is lost
 
     cdce_set_config4(
         outbufsel4yx_p = outbufsel4yx, cmosmode4nyx_p = cmosmode4nyx,
@@ -2439,7 +2439,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2454,15 +2454,15 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [12:6]: R/W: ph5adjc[6:0]
     // [3:2]: R/W: bias_div67[1:0]
     // [1:0]: R/W: bias_div45[1:0]
-    outbufsel5yx = parseInt('01', 2); // disable output5
-    cmosmode5nyx = parseInt('10', 2); // disable output5
-    cmosmode5pyx = parseInt('10', 2); // disable output5
-    pecl5hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en5div = 0; //0: divider is disabled on output5, 1: otherwise
-    out5divrsel = parseInt('0000000', 2);
-    ph5adjc = parseInt('0000000', 2);
-    bias_div67 = parseInt('00', 2); //00, No current reduction for all output-divider
-    bias_div45 = parseInt('00', 2); //00, No current reduction for all output-divider
+    const outbufsel5yx = parseInt('01', 2); // disable output5
+    const cmosmode5nyx = parseInt('10', 2); // disable output5
+    const cmosmode5pyx = parseInt('10', 2); // disable output5
+    const pecl5hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
+    const en5div = 0; //0: divider is disabled on output5, 1: otherwise
+    const out5divrsel = parseInt('0000000', 2);
+    const ph5adjc = parseInt('0000000', 2);
+    const bias_div67 = parseInt('00', 2); //00, No current reduction for all output-divider
+    const bias_div45 = parseInt('00', 2); //00, No current reduction for all output-divider
 
     cdce_set_config5(
         outbufsel5yx_p = outbufsel5yx, cmosmode5nyx_p = cmosmode5nyx,
@@ -2472,7 +2472,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2490,18 +2490,18 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [3]: R/W: fbdeterm_div2_dis[0]
     // [2]: R/W: fbdeterm_div_sel[0]
     // [0]: R/W: fb_fd_desel[0]
-    outbufsel6yx = parseInt('01', 2); // disable output6
-    cmosmode6nyx = parseInt('10', 2); // disable output6
-    cmosmode6pyx = parseInt('10', 2); // disable output6
-    pecl6hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en6div = 0; //0: divider is disabled on output6, 1: otherwise
-    out6divrsel = parseInt('0000000', 2);
-    ph6adjc = parseInt('0000000', 2);
-    det_start_bypass = 0; // 0: Output-Dividers started with delay block (RC), normal operation, 1:Output-Dividers can be started with external NRESET-signal (pin)
-    fb_start_bypass = 0;
-    fbdeterm_div2_dis = 0;
-    fbdeterm_div_sel = 0;
-    fb_fd_desel = 0;
+    const outbufsel6yx = parseInt('01', 2); // disable output6
+    const cmosmode6nyx = parseInt('10', 2); // disable output6
+    const cmosmode6pyx = parseInt('10', 2); // disable output6
+    const pecl6hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
+    const en6div = 0; //0: divider is disabled on output6, 1: otherwise
+    const out6divrsel = parseInt('0000000', 2);
+    const ph6adjc = parseInt('0000000', 2);
+    const det_start_bypass = 0; // 0: Output-Dividers started with delay block (RC), normal operation, 1:Output-Dividers can be started with external NRESET-signal (pin)
+    const fb_start_bypass = 0;
+    const fbdeterm_div2_dis = 0;
+    const fbdeterm_div_sel = 0;
+    const fb_fd_desel = 0;
 
     cdce_set_config6(
         outbufsel6yx_p = outbufsel6yx, cmosmode6nyx_p = cmosmode6nyx,
@@ -2512,7 +2512,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2528,16 +2528,16 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [5]: R/W: adlock[0]
     // [4:3]: R/W: lockc[1:0]
     // [1:0]: R/W: lockw[1:0]
-    outbufsel7yx = parseInt('10', 2); // LVPECL output7
-    cmosmode7nyx = parseInt('00', 2); // LVPECL output7
-    cmosmode7pyx = parseInt('00', 2); // LVPECL output7
-    pecl7hiswing = 1; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en7div = 1; //0: divider is disabled on output7, 1: otherwise
-    out7divrsel = parseInt('1000000', 2); // Output Divider 7 ratio select: divided by 2
-    ph7adjc = parseInt('0000000', 2);
-    adlock = 0;
-    lockc = parseInt('00', 2); // Number of coherent lock events (page 59) ("00": default : 1 successive lock event)
-    lockw = parseInt('01', 2); // Lock-detect window (default : 01)
+    const outbufsel7yx = parseInt('10', 2); // LVPECL output7
+    const cmosmode7nyx = parseInt('00', 2); // LVPECL output7
+    const cmosmode7pyx = parseInt('00', 2); // LVPECL output7
+    const pecl7hiswing = 1; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
+    const en7div = 1; //0: divider is disabled on output7, 1: otherwise
+    const out7divrsel = parseInt('1000000', 2); // Output Divider 7 ratio select: divided by 2
+    const ph7adjc = parseInt('0000000', 2);
+    const adlock = 0;
+    const lockc = parseInt('00', 2); // Number of coherent lock events (page 59) ("00": default : 1 successive lock event)
+    const lockw = parseInt('01', 2); // Lock-detect window (default : 01)
 
     cdce_set_config7(
         outbufsel7yx_p = outbufsel7yx, cmosmode7nyx_p = cmosmode7nyx,
@@ -2547,7 +2547,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2565,18 +2565,18 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [3]: R/W: vcxohysten[0]
     // [2]: R/W: vcxoacdcsel[0]
     // [1:0]: R/W: vcxobufselyx[1:0]
-    outbufsel8yx = parseInt('01', 2); // disable output8
-    cmosmode8nyx = parseInt('10', 2); // disable output8
-    cmosmode8pyx = parseInt('10', 2); // disable output8
-    pecl8hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    en89div = 0; //0: divider is disabled on output8/9, 1: otherwise
-    out8divrsel = parseInt('0000000', 2);
-    ph8adjc = parseInt('0000000', 2);
-    vcxoinvbb = 0;
-    vcxotermsel = 0;
-    vcxohysten = 1;
-    vcxoacdcsel = 0;
-    vcxobufselyx = parseInt('01', 2); // VCXO and AUX Input Buffer Type Select (LVPECL,LVDS or LVCMOS): 01: LVPECL, 11: LVDS, 00: CMOS
+    const outbufsel8yx = parseInt('01', 2); // disable output8
+    const cmosmode8nyx = parseInt('10', 2); // disable output8
+    const cmosmode8pyx = parseInt('10', 2); // disable output8
+    const pecl8hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
+    const en89div = 0; //0: divider is disabled on output8/9, 1: otherwise
+    const out8divrsel = parseInt('0000000', 2);
+    const ph8adjc = parseInt('0000000', 2);
+    const vcxoinvbb = 0;
+    const vcxotermsel = 0;
+    const vcxohysten = 1;
+    const vcxoacdcsel = 0;
+    const vcxobufselyx = parseInt('01', 2); // VCXO and AUX Input Buffer Type Select (LVPECL,LVDS or LVCMOS): 01: LVPECL, 11: LVDS, 00: CMOS
 
     cdce_set_config8(
         outbufsel8yx_p = outbufsel8yx, cmosmode8nyx_p = cmosmode8nyx,
@@ -2587,7 +2587,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2613,26 +2613,26 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [3]: R/W: holdtr[0]
     // [2]: R/W: hold_n[0]
     // [0]: R/W: holdf[0]
-    outbufsel9yx = parseInt('01', 2); // disable output9
-    cmosmode9nyx = parseInt('10', 2); // disable output9
-    cmosmode9pyx = parseInt('10', 2); // disable output9
-    pecl9hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
-    dis_aux_y9 = 0;
-    auxinvbb = 0;
-    bias_div89 = parseInt('00', 2);
-    bias_div_fb = parseInt('00', 2);
-    npreset_mdiv = 1; // 1: M-Divider NOT preseted by NHOLD, 0:M-Divider uses NHOLD as NPRESET
-    low_fd_fb_en = 0;
-    pll_lock_bp = 1;
-    indet_bp = 0;
-    start_bypass = 0; // When set to 0, START-Signal is synchronized to VCXO-Clock,  When set to 1, START-Sync Block is bypassed
-    divsync_dis = 0;
-    noinv_reshol_int = 0;
-    lockw32 = parseInt('11', 2); // Extended Lock-detect window => 19.3 ns
-    hold_cnt = parseInt('00', 2);
-    holdtr = 1;
-    hold_n = 1;
-    holdf = 0;
+    const outbufsel9yx = parseInt('01', 2); // disable output9
+    const cmosmode9nyx = parseInt('10', 2); // disable output9
+    const cmosmode9pyx = parseInt('10', 2); // disable output9
+    const pecl9hiswing = 0; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
+    const dis_aux_y9 = 0;
+    const auxinvbb = 0;
+    const bias_div89 = parseInt('00', 2);
+    const bias_div_fb = parseInt('00', 2);
+    const npreset_mdiv = 1; // 1: M-Divider NOT preseted by NHOLD, 0:M-Divider uses NHOLD as NPRESET
+    const low_fd_fb_en = 0;
+    const pll_lock_bp = 1;
+    const indet_bp = 0;
+    const start_bypass = 0; // When set to 0, START-Signal is synchronized to VCXO-Clock,  When set to 1, START-Sync Block is bypassed
+    const divsync_dis = 0;
+    const noinv_reshol_int = 0;
+    const lockw32 = parseInt('11', 2); // Extended Lock-detect window => 19.3 ns
+    const hold_cnt = parseInt('00', 2);
+    const holdtr = 1;
+    const hold_n = 1;
+    const holdf = 0;
     cdce_set_config9(
         outbufsel9yx_p = outbufsel9yx, cmosmode9nyx_p = cmosmode9nyx,
         cmosmode9pyx_p = cmosmode9pyx, pecl9hiswing_p = pecl9hiswing, dis_aux_y9_p = dis_aux_y9,
@@ -2644,7 +2644,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2652,8 +2652,8 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     //###############################################################
     // [27:14]: R/W: div_m[13:0]
     // [13:0]: R/W: div_n[13:0]
-    div_n = parseInt('00000101111111', 2); // VCXO Divider N (382)
-    div_m = parseInt('00001001110000', 2); // Reference Divider M (624)
+    const div_n = parseInt('00000101111111', 2); // VCXO Divider N (382)
+    const div_m = parseInt('00001001110000', 2); // Reference Divider M (624)
 
     cdce_set_config10(
         div_n_p = div_n,
@@ -2661,7 +2661,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2682,21 +2682,21 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [2]: R/W: fb_dis[0]
     // [1]: R/W: sec_div2[0]
     // [0]: R/W: pri_div2[0]
-    eplock = 0;
-    reset_hold_mode = 0; // f set to 1 the RESET or HOLD pin acts as HOLD, set to 0 it acts as RESET
-    sel_del1 = 0; // If set to 0 it enables short delay for fast operation, If Set to 1 Long Delay recommended for Input References below 150Mhz
-    nreshape1 = 0;
-    fb_sel = 0; // Feed Back Path Selects FB/VCXO-Path when set to 0 (TI Test-GTME), The econdary Reference clock input is selected when set to 1 (TI Test-GTME)
-    out_mux_sel = 0; // if Set to 0 it selects the VCXO Clock and if Set to 1 it selects the AUX Clock
-    fb_mux_sel = 0; //0: VCXO clock is selected from (clock tree, FB-DIV and Det), 1: AUX clock is selected
-    pd_pll = 0; //0: PLL in normal mode, 1: PLL is powered down
-    fb_phase = parseInt('0000000', 2); // Feedback Phase Adjust Bit0
-    fb_count32 = parseInt('0000010', 2); // Feedback Counter: divided by 2
-    fb_inclk_inv = 0;
-    fb_cml_sel = 0;
-    fb_dis = 0;
-    sec_div2 = 0; // of set to 1 enables Secondary Reference Divide by 2, 0: otherwise divided by 1 => PRI_REF: 100 MHz -> 100 MHz.
-    pri_div2 = 0; // if set to 1 enables Primary Reference Divide by 2,  0: otherwise divided by 1
+    const eplock = 0;
+    const reset_hold_mode = 0; // f set to 1 the RESET or HOLD pin acts as HOLD, set to 0 it acts as RESET
+    const sel_del1 = 0; // If set to 0 it enables short delay for fast operation, If Set to 1 Long Delay recommended for Input References below 150Mhz
+    const nreshape1 = 0;
+    const fb_sel = 0; // Feed Back Path Selects FB/VCXO-Path when set to 0 (TI Test-GTME), The econdary Reference clock input is selected when set to 1 (TI Test-GTME)
+    const out_mux_sel = 0; // if Set to 0 it selects the VCXO Clock and if Set to 1 it selects the AUX Clock
+    const fb_mux_sel = 0; //0: VCXO clock is selected from (clock tree, FB-DIV and Det), 1: AUX clock is selected
+    const pd_pll = 0; //0: PLL in normal mode, 1: PLL is powered down
+    const fb_phase = parseInt('0000000', 2); // Feedback Phase Adjust Bit0
+    const fb_count32 = parseInt('0000010', 2); // Feedback Counter: divided by 2
+    const fb_inclk_inv = 0;
+    const fb_cml_sel = 0;
+    const fb_dis = 0;
+    const sec_div2 = 0; // of set to 1 enables Secondary Reference Divide by 2, 0: otherwise divided by 1 => PRI_REF: 100 MHz -> 100 MHz.
+    const pri_div2 = 0; // if set to 1 enables Primary Reference Divide by 2,  0: otherwise divided by 1
 
     cdce_set_config11(
         eplock_p = eplock, reset_hold_mode_p = reset_hold_mode, sel_del1_p = sel_del1,
@@ -2706,7 +2706,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     //###############################################################
@@ -2726,20 +2726,20 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     // [6]: R: pll_lock[0]
     // [5]: R: indet_vcxo[0]
     // [4]: R: indet_aux[0]
-    secactivity = 0;
-    priactivity = 0;
-    titstcfg = parseInt('0000', 2);
-    v_status = parseInt('0000', 2);
-    shold = 0;
-    sxoiref = 0;
-    pd_io = 0;
-    revision = parseInt('000', 2);
-    gtme = 0;
-    reset_hold_n = 1;
-    sleep_n = 1;
-    pll_lock = 0;
-    indet_vcxo = 0;
-    indet_aux = 0;
+    const secactivity = 0;
+    const priactivity = 0;
+    const titstcfg = parseInt('0000', 2);
+    const v_status = parseInt('0000', 2);
+    const shold = 0;
+    const sxoiref = 0;
+    const pd_io = 0;
+    const revision = parseInt('000', 2);
+    const gtme = 0;
+    const reset_hold_n = 1;
+    const sleep_n = 1;
+    const pll_lock = 0;
+    const indet_vcxo = 0;
+    const indet_aux = 0;
 
     cdce_set_config12(
         secactivity_p = secactivity, priactivity_p = priactivity, titstcfg_p = titstcfg,
@@ -2749,7 +2749,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
         sleep_n_p = sleep_n, pll_lock_p = pll_lock, indet_vcxo_p = indet_vcxo, indet_aux_p = indet_aux,
         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
     );
-    msg = "";
+    const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 }

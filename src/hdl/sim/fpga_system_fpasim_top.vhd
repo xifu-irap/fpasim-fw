@@ -385,6 +385,42 @@ begin
       );
 
     ---------------------------------------------------------------------
+    -- set DEBUG_CTRL
+    ---------------------------------------------------------------------
+    v_opal_kelly_addr := x"18";
+    --v_data            := 2**4; -- dac_en_pattern=1
+    v_data            := 0; -- dac_en_pattern=0
+    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
+    SetWireInValue(
+      i_ep               => v_opal_kelly_addr,
+      i_val              => v_data_vect,
+      i_mask             => c_WIRE_NO_MASK,
+      b_front_panel_conf => v_front_panel_conf
+      );
+
+    UpdateWireIns(
+      b_front_panel_conf => v_front_panel_conf,
+      o_internal_wr_if   => usb_wr_if0,
+      i_internal_rd_if   => usb_rd_if0);
+
+    pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+
+    ---------------------------------------------------------------------
+    -- trig debug_valid bit
+    ---------------------------------------------------------------------
+    v_opal_kelly_addr := x"40";
+    v_data            := 2**16;
+    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
+    ActivateTriggerIn_by_data(
+      i_ep             => v_opal_kelly_addr,
+      i_data           => v_data_vect,
+      o_internal_wr_if => usb_wr_if0,
+      i_internal_rd_if => usb_rd_if0
+      );
+
+
+    ---------------------------------------------------------------------
     -- set Ctrl: enable
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"00";

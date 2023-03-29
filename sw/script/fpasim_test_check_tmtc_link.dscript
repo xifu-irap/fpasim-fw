@@ -35,6 +35,57 @@
 include("./fpasim/utils_tools.dscript");
 include("./fpasim/fpasim_tools.dscript");
 
+
+/**
+ * Test the dac pattern
+ *   The steps are:
+ *     . reset the fpasim
+ *     . configure the dac with default value
+ *     . configure the dac to check a pre-defined pattern
+ * @param {number} level_p - level of indentation at the beginning
+ * @param {number} mode_p - define the print output
+ * @param {number} verbosity_p - level of verbosity
+ */
+function test_dac_pattern(level_p, mode_p, verbosity_p) {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    /* 
+     ***************************************************************************
+     * check: dac pattern generation
+     ***************************************************************************
+     */
+    msg = "FPASIM : Check dac pattern";
+    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+    // enable dac pattern check
+    fpasim_dac_enable_pattern(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+
+
+
+    // tempo
+    waitMs(2000);
+
+    // disable dac pattern check
+    fpasim_dac_disable_pattern(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    // disable dac pattern check
+    iotest_results = fpasim_dac_get_pattern_result(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+
+
+    // check the read data Vs the written data
+    msg = "Check iotest_results value";
+    check_equal(value0_p = 0, value1_p = iotest_results, msg_p = msg, level_p = level2, mode_p = mode_p);
+
+
+}
+
 /**
  * Test the adc recording.
  *   The steps are:
@@ -876,11 +927,11 @@ function test_wire(level_p, mode_p, verbosity_p) {
 
     msg = "Set register: DEBUG_CTRL";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
-
+    dac_en_pattern = 0;
     rst_status = 0;
     debug_pulse = 1;
     // build the data to send
-    data0 = fpasim_build_debug_ctrl(rst_status_p = rst_status, debug_pulse_p = debug_pulse);
+    data0 = fpasim_build_debug_ctrl(dac_en_pattern_p = dac_en_pattern, rst_status_p = rst_status, debug_pulse_p = debug_pulse);
     fpasim_set_debug_wirein_by_name(reg_name_p = 'DEBUG_CTRL', data_p = data0, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     // read the register
     data1 = fpasim_get_wireout_by_name(reg_name_p = "DEBUG_CTRL", level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
@@ -988,26 +1039,33 @@ function main(level_p, mode_p, verbosity_p) {
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
 
     // 1st Test to execute
-    str_en_wire = getText("Test: Check wire registers", "0 or 1");
+    str_en_wire = getText("Test: Check wire registers (0 or 1)", "0");
     en_wire = parseInt(str_en_wire, 10);
     msg = "Test: Check wire registers: " + str_en_wire;
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     // 2nd Test to execute
-    str_en_rec = getText("Test: Check ADC recording", "0 or 1");
+    str_en_rec = getText("Test: Check ADC recording (0 or 1)", "0");
     en_rec = parseInt(str_en_rec, 10);
     msg = "Test: Check adc recording: " + str_en_rec;
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     // 3rd Test to execute
-    str_en_ram_conf = getText("Test: Check RAM configuration", "0 or 1");
+    str_en_ram_conf = getText("Test: Check RAM configuration (0 or 1)", "0");
     en_ram_conf = parseInt(str_en_ram_conf, 10);
     msg = "Test: Check RAM configuration: " + str_en_ram_conf;
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    // 4th Test to execute
+    str_dac_en_pattern = getText("Test: Check DAC pattern generation (0 or 1)", "0");
+    dac_en_pattern = parseInt(str_dac_en_pattern, 10);
+    msg = "Test: Check DAC pattern generation: " + str_dac_en_pattern;
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     // en_wire = 0;
     // en_rec = 1;
     // en_ram_conf = 0;
+    //dac_en_pattern = 1;
 
     /* 
      ***************************************************************************
@@ -1025,7 +1083,7 @@ function main(level_p, mode_p, verbosity_p) {
      */
     msg = "Reset the fpasim function";
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
-    fpasim_reset(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+    // fpasim_reset(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
 
     /* 
@@ -1062,6 +1120,18 @@ function main(level_p, mode_p, verbosity_p) {
         display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
         test_ram_conf(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
     }
+
+    /* 
+     ***************************************************************************
+     * Check: dac pattern generation
+     ***************************************************************************
+     */
+    if (dac_en_pattern == 1) {
+        msg = "Check: DAC pattern generation";
+        display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+        test_dac_pattern(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+    }
+
 
     /* 
      ***************************************************************************
