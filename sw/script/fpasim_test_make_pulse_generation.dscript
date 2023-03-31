@@ -24,12 +24,14 @@
 // -------------------------------------------------------------------------------------------------------------
 //    @details
 //   This test generates several make_pulse and make_pulseS commands.
+//
 //   This javascript does the following steps:
-//      1. configure the spi devices
-//      2. reset the FPGA functions
-//      3. configure the FPASIM functions
-//      4. generate few make_pulse command
-//      4. generate few make_pulse_all command
+//       1. configure the spi devices
+//       2. reset the FPASim functions
+//       3. configure the FPASIM RAMs
+//       4. configure the FPASIM registers
+//       5. generate few make_pulse commands
+//       6. generate few make_pulse_all commands
 //
 //
 // -------------------------------------------------------------------------------------------------------------
@@ -143,13 +145,16 @@ function main(level_p, mode_p, verbosity_p) {
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     msg = [
         "1. configure the spi devices",
-        "2. reset the FPGA functions",
-        "3. configure the FPASIM functions",
-        "4. generate few make_pulse command",
-        "4. generate few make_pulse_all command"
+        "2. reset the FPASim functions",
+        "3. configure the FPASIM RAMs",
+        "4. configure the FPASIM registers",
+        "5. generate few make_pulse commands",
+        "6. generate few make_pulse_all commands"
     ]
     display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /* 
      ***************************************************************************
@@ -264,7 +269,7 @@ function main(level_p, mode_p, verbosity_p) {
     msg = "Set register: CONF0";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     data = fpasim_build_conf0(inter_squid_gain_p = inter_squid_gain);
-    fpasim_set_debug_wirein_by_name(reg_name_p = 'CONF0', data_p = data, level_p = level1, mode_p = mode_p)
+    fpasim_set_debug_wirein_by_name(reg_name_p = 'CONF0', data_p = data, level_p = level2, mode_p = mode_p);
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
@@ -274,7 +279,7 @@ function main(level_p, mode_p, verbosity_p) {
      configure the mux_squid_tf RAM: ramp
       ***************************************************************************
       */
-    msg = "Configure the mux_squid_tf RAM: ramp";
+    msg = "Configure the FPASim mux_squid_tf RAM: ramp";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     mux_quid_tf_conf_ram();
 
@@ -286,7 +291,7 @@ function main(level_p, mode_p, verbosity_p) {
      configure the amp_squid_tf RAM: ramp
       ***************************************************************************
       */
-    msg = "Configure the amp_squid_tf RAM: ramp";
+    msg = "Configure the FPASim amp_squid_tf RAM: ramp";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     amp_quid_tf_conf_ram();
 
@@ -298,12 +303,13 @@ function main(level_p, mode_p, verbosity_p) {
      configure a ramp in the tes_steady_state
       ***************************************************************************
       */
-    msg = "Configure the tes_steady_state RAM: max possible value";
+    msg = "Configure the FPASim tes_steady_state RAM: constant (max value)";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     tes_steady_state_conf_ram();
 
     msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
 
     /*
      ***************************************************************************
@@ -326,12 +332,13 @@ function main(level_p, mode_p, verbosity_p) {
 
     /* 
      ***************************************************************************
-     * Generate make_pulse commands
+     * Generate make_pulse commands (1 pixel)
      ***************************************************************************
      */
-    tempo = 1000; // tempo (in ms) between the make_pulse command
+    // tempo = 1000; // tempo (in ms) between the make_pulse command
     nb_iteration = 5; // number of make_pulse command
-    msg0 = "nb_iteration= " + nb_iteration.toString(10) + ", tempo= " + nb_iteration.toString(10);
+    // msg0 = "nb_iteration= " + nb_iteration.toString(10) + ", tempo= " + tempo.toString(10);
+    msg0 = "nb_iteration= " + nb_iteration.toString(10);
     msg = "Generate make_pulse commands: " + msg0;
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
 
@@ -341,15 +348,17 @@ function main(level_p, mode_p, verbosity_p) {
     pulse_height_tab = Array(nb_iteration);
 
     // user-defined: edit indivual tab values.
+    pixel_id_tab[4] = 0;
+    pixel_id_tab[3] = 0;
+    pixel_id_tab[2] = 0;
+    pixel_id_tab[1] = 0;
+    pixel_id_tab[0] = 0;
 
-    /*
-        pulse_height_tab[4] = convert_percentage_to_pulse_heigth(percentage_p = 20);
-        pulse_height_tab[3] = convert_percentage_to_pulse_heigth(percentage_p = 40);
-        pulse_height_tab[2] = convert_percentage_to_pulse_heigth(percentage_p = 60);
-        pulse_height_tab[1] = convert_percentage_to_pulse_heigth(percentage_p = 80);
-        pulse_height_tab[0] = convert_percentage_to_pulse_heigth(percentage_p = 100);
-    	
-    	*/
+    time_shift_tab[4] = 0;
+    time_shift_tab[3] = 0;
+    time_shift_tab[2] = 0;
+    time_shift_tab[1] = 0;
+    time_shift_tab[0] = 0;
 
     pulse_height_tab[4] = convert_percentage_to_pulse_heigth(percentage_p = 14);
     pulse_height_tab[3] = convert_percentage_to_pulse_heigth(percentage_p = 12);
@@ -370,52 +379,45 @@ function main(level_p, mode_p, verbosity_p) {
 
         session_name = getText("make_pulse iteration" + i.toString(10) + ", pulse_heigth:" + pulse_height.toString(16));
 
-        sendToFPA_makePulse(pixelId = pixel_id, timeShift = time_shift, pulseHeigth = pulse_height);
-        //data = fpasim_build_make_pulse(pixel_all_p=0, pixel_id_p=pixel_id, time_shift_p=time_shift, pulse_height_p=pulse_height);
-        //fpasim_set_debug_wirein_by_name(reg_name_p="MAKE_PULSE", data_p=data, level_p=0, mode_p=0, verbosity_p=-1);
+        msg = "Set Make_pulse (1 pixel): pixel_id: "+pixel_id.toString(10)+", time_shift: "+time_shift.toString(10)+", pulse_height: 0x"+pulse_height.toString(16);
+        display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
+        sendToFPA_makePulse(pixelId = pixel_id, timeShift = time_shift, pulseHeigth = pulse_height);
 
         // waitMs(tempo);
     }
 
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
     /* 
      ***************************************************************************
-     * Generate make_pulses commands
+     * Generate make_pulses commands (all pixels)
      ***************************************************************************
      */
-    tempo = 1000; // tempo (in ms) between the make_pulse command
+    // tempo = 1000; // tempo (in ms) between the make_pulse command
     nb_iteration = 5; // number of make_pulse command
-    msg0 = "nb_iteration= " + nb_iteration.toString(10) + ", tempo= " + nb_iteration.toString(10);
+    // msg0 = "nb_iteration= " + nb_iteration.toString(10) + ", tempo= " + tempo.toString(10);
+    msg0 = "nb_iteration= " + nb_iteration.toString(10);
     msg = "Generate make_pulses commands: " + msg0;
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
 
     // declare
     time_shift_tab = Array(nb_iteration);
     pulse_height_tab = Array(nb_iteration);
-    /*
-        pulse_height_tab[4] = convert_percentage_to_pulse_heigth(percentage_p = 20);
-        pulse_height_tab[3] = convert_percentage_to_pulse_heigth(percentage_p = 25);
-        pulse_height_tab[2] = convert_percentage_to_pulse_heigth(percentage_p = 30);
-        pulse_height_tab[1] = convert_percentage_to_pulse_heigth(percentage_p = 40);
-        pulse_height_tab[0] = convert_percentage_to_pulse_heigth(percentage_p = 100);
-    	*/
-    /*
-        pulse_height_tab[4] = convert_percentage_to_pulse_heigth(percentage_p = 10);
-        pulse_height_tab[3] = convert_percentage_to_pulse_heigth(percentage_p = 12);
-        pulse_height_tab[2] = convert_percentage_to_pulse_heigth(percentage_p = 10);
-        pulse_height_tab[1] = convert_percentage_to_pulse_heigth(percentage_p = 12);
-        pulse_height_tab[0] = convert_percentage_to_pulse_heigth(percentage_p = 100);
-    	*/
+
+    // user-defined: edit indivual tab values.
+    time_shift_tab[4] = 0;
+    time_shift_tab[3] = 0;
+    time_shift_tab[2] = 0;
+    time_shift_tab[1] = 0;
+    time_shift_tab[0] = 0;
 
     pulse_height_tab[4] = convert_percentage_to_pulse_heigth(percentage_p = 14);
     pulse_height_tab[3] = convert_percentage_to_pulse_heigth(percentage_p = 12);
     pulse_height_tab[2] = convert_percentage_to_pulse_heigth(percentage_p = 10);
     pulse_height_tab[1] = convert_percentage_to_pulse_heigth(percentage_p = 8);
     pulse_height_tab[0] = convert_percentage_to_pulse_heigth(percentage_p = 6);
-
-
-    // user-defined: edit indivual tab values.
 
 
     // loop
@@ -427,12 +429,34 @@ function main(level_p, mode_p, verbosity_p) {
         pulse_height = pulse_height_tab[i];
         session_name = getText("make_pulseS iteration" + i.toString(10) + ", pulse_heigth:" + pulse_height.toString(16));
 
+        msg = "Set Make_pulse (all pixels): pixel_id: N/A, time_shift: "+time_shift.toString(10)+", pulse_height: 0x"+pulse_height.toString(16);
+        display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
         sendToFPA_makePulses(timeShift = time_shift, pulseHeigth = pulse_height);
         //data = fpasim_build_make_pulse(pixel_all_p=1, pixel_id_p=pixel_id, time_shift_p=time_shift, pulse_height_p=pulse_height);
         //fpasim_set_debug_wirein_by_name(reg_name_p="MAKE_PULSE", data_p=data, level_p=0, mode_p=0, verbosity_p=-1);
 
         //waitMs(tempo);
     }
+
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    /*
+    disable the FPASim
+    */
+    msg = "Set CTRL: Enable Off"
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    rst = 0;
+    en = 0;
+    // build the data to send
+    data = fpasim_build_ctrl(rst_p = rst, en_p = en);
+    sendToFPA_configureControl(data);
+    //fpasim_set_debug_wirein_by_name(reg_name_p = 'CTRL', data_p = data, level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
+    msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    
 
     /* 
      ***************************************************************************
