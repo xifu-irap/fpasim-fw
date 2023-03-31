@@ -92,16 +92,8 @@ function adc_spi_enable(level_p, mode_p, verbosity_p) {
     // en the spi links
     const rst = 0;
     const en = 1;
-    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = 0, mode_p = 0, verbosity_p = -1);
+    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
 
-    if (verbosity_p < 0) {
-        // do nothing
-    } else {
-        if (verbosity_p >= c_ADC_REG_VERBOSITY_MIN) {
-            const msg = "[adc_spi_enable]: Enable the SPI";
-            display(msg_p = msg, level_p = level0, mode_p = mode_p);
-        }
-    }
 }
 
 /**
@@ -2247,15 +2239,21 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
 
     const level0 = level_p;
     const level1 = level_p + 1;
+    const level2 = level_p + 2;
 
-    const msg = "adc_generate_pattern0";
-    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
-
-    // Enable the SPI on the FPGA board
-    adc_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+    const msg = "[adc_generate_pattern0]";
+    display(msg_p = msg, level_p = level0, mode_p = mode_p);
 
     const msg = "";
+    display(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+    // Enable the SPI on the FPGA board
+    const msg = "Enable the FPASim SPI Bridge";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    adc_spi_enable(level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    const msg = "";
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2270,12 +2268,15 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     */
     const rst = 0; //  Software reset applied – resets all internal registers and self-clears to 0.
     const serial_out = 0; //0: Serial readout disabled. SDOUT is forced low by the device (and not put in high impedance state).1:Serial readout enabled, Pin SDOUT functions as serial data readout.
+
+    const msg = "Configure the spi device in read mode";
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
     adc_set_config0(
         rst_p = rst, serial_out_p = serial_out,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+        level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
     );
     const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2285,14 +2286,17 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     //      0: LOW SPEED mode disabled. Use for sampling frequency > 80 MSPS
     //      1: Enable LOW SPEED mode for sampling frequencies ≤ 80 MSPS.
     */
-    const enable_low_speed = 0;
-    adc_set_config1(
-        enable_low_speed_p = enable_low_speed,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
+    // const enable_low_speed = 0;
 
-    const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    // const msg = "Set ADC in high speed mode";
+    // display(msg_p = msg, level_p = level2, mode_p = mode_p);
+    // adc_set_config1(
+    //     enable_low_speed_p = enable_low_speed,
+    //     level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
+    // );
+
+    // const msg = "";
+    // display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2308,15 +2312,15 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     //      1 Both ADC channels are put in standby. Internal references, output buffers are active. This results in
     //   quick wake-up time from standby.
     */
-    const ref = parseInt('00', 2);
-    const standby = 0;
-    adc_set_config2(
-        ref_p = ref, standby_p = standby,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
+    // const ref = parseInt('00', 2);
+    // const standby = 0;
+    // adc_set_config2(
+    //     ref_p = ref, standby_p = standby,
+    //     level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
+    // );
 
-    const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    // const msg = "";
+    // display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2335,14 +2339,14 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     //      Channel A and B data is multiplexed and output on DA13 to DA0 pins. Refer to the Multiplexed
     //      Output Mode section in the APPLICATION INFORMATION for additional information.
     */
-    const power_down = parseInt('1000', 2);
-    adc_set_config3(
-        power_down_p = power_down,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
+    // const power_down = parseInt('1000', 2);
+    // adc_set_config3(
+    //     power_down_p = power_down,
+    //     level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
+    // );
 
-    const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    // const msg = "";
+    // display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2352,14 +2356,14 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     //   0 Parallel CMOS interface
     //   1 DDR LVDS interface
     */
-    const lvds_cmos = 1;
-    adc_set_config4(
-        lvds_cmos_p = lvds_cmos,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
+    // const lvds_cmos = 1;
+    // adc_set_config4(
+    //     lvds_cmos_p = lvds_cmos,
+    //     level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
+    // );
 
-    const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    // const msg = "";
+    // display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     /*
     //###############################################################
@@ -2392,16 +2396,16 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     //       (2) Keep the same duty cycle, move both edges by the same amount (i.e., write both D<4:2> and D<7:5> to be
     //       the same value).
     */
-    const clkout_pos_rise = parseInt('000', 2);
-    const clkout_pos_fall = parseInt('000', 2);
+    // const clkout_pos_rise = parseInt('000', 2);
+    // const clkout_pos_fall = parseInt('000', 2);
 
-    adc_set_config5(
-        clkout_pos_rise_p = clkout_pos_rise, clkout_pos_fall_p = clkout_pos_fall,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
+    // adc_set_config5(
+    //     clkout_pos_rise_p = clkout_pos_rise, clkout_pos_fall_p = clkout_pos_fall,
+    //     level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
+    // );
 
-    const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    // const msg = "";
+    // display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
 
 
@@ -2421,13 +2425,16 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     const en_independant_chan_ctrl = 1;
     const data_format = parseInt('10', 2);
 
+    const msg = "Configure ADC device with independent channels";
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
+
     adc_set_config6(
         en_independant_chan_ctrl_p = en_independant_chan_ctrl, data_format_p = data_format,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+        level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
     const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     //###############################################################
     // register12
@@ -2447,13 +2454,17 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     //   110 Unused
     //   111 Unused
     const test_pattern_common_or_cha = parseInt('011', 2);
+
+    const msg = "Set the pattern mode of the ADC0";
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
+
     adc_set_config12(
         test_pattern_common_or_cha_p = test_pattern_common_or_cha,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+        level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
     const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     //###############################################################
     // register17
@@ -2474,13 +2485,16 @@ function adc_generate_pattern0(level_p, mode_p, verbosity_p) {
     //     111 Unused
     const test_pattern_chb = parseInt('100', 2);
 
+    const msg = "Set the pattern mode of the ADC1";
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
+
     adc_set_config17(
         test_pattern_chb_p = test_pattern_chb,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+        level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
     const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
 
 }
@@ -2545,6 +2559,8 @@ function ADS62P49_configure(level_p, mode_p, verbosity_p) {
     display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
 
     // Enable the SPI on the FPGA board
+    const msg = "Enable the FPASim SPI bridge";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
     adc_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
     const msg = "";

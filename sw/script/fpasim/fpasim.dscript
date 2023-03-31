@@ -339,6 +339,56 @@ function fpasim_get_status(sel_error_p, level_p, mode_p, verbosity_p) {
 }
 
 
+/**
+ * Set the "CTRL" register.
+ * @param {number} rst_p - TODO.
+ * @param {number} en_p - TODO.
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ */
+function fpasim_set_ctrl(rst_p,en_p, level_p, mode_p, verbosity_p) {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const data = fpasim_build_ctrl(rst_p=rst_p,en_p=en_p);
+    const addr = FPASIM_ADDR_WIREIN["CTRL"];
+
+    sendToFPA_debugSetWireIn(addr, data);
+
+    const trig_pos = FPASIM_POS_TRIGIN['ctrl_valid'];
+    const trig_addr = FPASIM_ADDR_TRIGIN['TRIG'];
+    sendToFPA_debugSetTriggerIn(trig_addr, trig_pos);
+
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_FPASIM_REG_VERBOSITY_MIN) {
+            msg = "[fpasim_set_ctrl]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_FPASIM_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+        if (verbosity_p >= c_FPASIM_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "rst_p", bit_value_p = rst_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "en_p", bit_value_p = en_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+
+        }
+
+    }
+
+
+}
+
 
 /**
  * Set the "SPI_CTRL" register.
@@ -517,6 +567,57 @@ function fpasim_set_spi_wr_data(data_p, level_p, mode_p, verbosity_p) {
 }
 
 /**
+ * Set the "DEBUG_CTRL" register.
+ * @param {number} dac_en_pattern_p - enable the dac pattern generator.
+ * @param {number} rst_status_p - reset errors.
+ * @param {number} debug_pulse_p - '1': errors are pipelined, 0': errors are latches.
+ * @param {number} level_p - level of indentation at the beginning.
+ * @param {number} mode_p - define the print output.
+ * @param {number} verbosity_p - level of verbosity.
+ */
+function fpasim_set_debug_ctrl(dac_en_pattern_p ,rst_status_p, debug_pulse_p, level_p, mode_p, verbosity_p) {
+    // default function parameter values
+    if (typeof(level_p) === 'undefined') level_p = 0;
+    if (typeof(mode_p) === 'undefined') mode_p = 0;
+    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+
+    const level0 = level_p;
+    const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const data = fpasim_build_debug_ctrl(dac_en_pattern_p, rst_status_p, debug_pulse_p)
+    const addr = FPASIM_ADDR_WIREIN["DEBUG_CTRL"];
+
+    sendToFPA_debugSetWireIn(addr, data);
+
+    const trig_pos = FPASIM_POS_TRIGIN['debug_valid'];
+    const trig_addr = FPASIM_ADDR_TRIGIN['TRIG'];
+    sendToFPA_debugSetTriggerIn(trig_addr, trig_pos);
+
+    if (verbosity_p < 0) {
+        // do nothing
+    } else {
+        if (verbosity_p >= c_FPASIM_REG_VERBOSITY_MIN) {
+            msg = "[fpasim_set_debug_ctrl]: Set the register value ";
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_FPASIM_ADDR_VERBOSITY_MIN) {
+            display_register(addr_p = addr, addr_width_p = 32, data_p = data, data_width_p = 32, level_p = level1, mode_p = mode_p);
+        }
+
+        if (verbosity_p >= c_FPASIM_BIT_VERBOSITY_MIN) {
+            display_bit(bit_name_p = "dac_en_pattern_p", bit_value_p = dac_en_pattern_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "rst_status_p", bit_value_p = rst_status_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+            display_bit(bit_name_p = "debug_pulse_p", bit_value_p = debug_pulse_p, bit_width_p = 1, level_p = level2, mode_p = mode_p);
+
+        }
+    }
+
+
+}
+
+/**
  * Set the selected register value.
  *   Note: for few registers, the sendToFPA_debugSetTriggerIn function is called.
  * @param {string} reg_name_p - Name of the FPASIM register.
@@ -590,8 +691,8 @@ function fpasim_set_debug_wirein_by_name(reg_name_p, data_p, level_p, mode_p, ve
             //     break;
         case 'REC_CTRL':
             addr = FPASIM_ADDR_WIREIN[reg_name_p];
-            // trig_pos = FPASIM_POS_TRIGIN['rec_valid'];
-            trig_pos = -1;
+            trig_pos = FPASIM_POS_TRIGIN['rec_valid'];
+            // trig_pos = -1;
             break;
         case 'REC_CONF0':
             addr = FPASIM_ADDR_WIREIN[reg_name_p];
@@ -1571,6 +1672,7 @@ function fpasim_get_wireout_debug_ctrl(level_p, mode_p, verbosity_p) {
         }
 
         if (verbosity_p >= c_FPASIM_BIT_VERBOSITY_MIN) {
+            display_bit_from_data(bit_name_p = "dac_en_pattern", bit_pos_p = 4, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
             display_bit_from_data(bit_name_p = "rst_status", bit_pos_p = 1, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
             display_bit_from_data(bit_name_p = "debug_pulse", bit_pos_p = 0, bit_width_p = 1, data_p = data, level_p = level2, mode_p = mode_p);
         }
@@ -1846,7 +1948,6 @@ function fpasim_get_wireout_by_name(reg_name_p, level_p, mode_p, verbosity_p) {
     const level0 = level_p;
     const level1 = level_p + 1;
 
-    error = 0;
     data = 0;
     switch (reg_name_p) {
         case 'CTRL':
@@ -1970,9 +2071,8 @@ function fpasim_get_wireout_by_name(reg_name_p, level_p, mode_p, verbosity_p) {
             data = fpasim_get_wireout_firmware_version(level_p = level0, mode_p, verbosity_p);
             break;
         default:
-            msg = "[fpasim_get_wireout_by_name]: Error" + reg_name_p + " doesn't exist."
-            display_error(msg_p = msg, level_p = level0, mode_p = mode_p);
-            error = 1;
+            const msg = "[fpasim_get_wireout_by_name]: Error " + reg_name_p + " doesn't exist."
+            display(msg_p = msg, level_p = level0, mode_p = mode_p);
             break;
     }
 
