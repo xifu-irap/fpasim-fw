@@ -215,7 +215,14 @@ function display_bit_from_data(bit_name_p, bit_pos_p, bit_width_p, data_p, level
 
 
     mask = Math.pow(2, bit_width_p) - 1; // 2**bit_width_p - 1;
-    value = (data_p >> bit_pos_p) & mask;
+    value = (data_p >> bit_pos_p) & mask; // return a int32_t
+
+    // convert int to uint
+    if (value < 0)
+    {
+        // value = Math.pow(2, bit_width_p) - value;
+        value += (1 << 30) * 4;
+    }
 
     display_bit(bit_name_p = bit_name_p, bit_value_p = value, bit_width_p = bit_width_p, level_p = level_p, mode_p = mode_p);
 
@@ -269,6 +276,8 @@ function convert_int_to_str_hex(value_p, width_p) {
     // compute the number of hex decimal to output
     nb_hex_char = Math.ceil(width_p / 4);
     str_hex = value_p.toString(16);
+    
+    // extends on the left side the hexadecimal string with 0
     while (str_hex.length < nb_hex_char) {
         str_hex = "0" + str_hex;
     }
