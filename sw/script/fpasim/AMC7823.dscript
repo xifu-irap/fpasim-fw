@@ -108,16 +108,9 @@ function amc_spi_enable(level_p, mode_p, verbosity_p) {
     // en the spi links
     const rst = 0;
     const en = 1;
-    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = 0, mode_p = 0, verbosity_p = -1);
+    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
 
-    if (verbosity_p < 0) {
-        // do nothing
-    } else {
-        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            const msg = "[dac_init_device]: Enable the SPI";
-            display(msg_p = msg, level_p = level0, mode_p = mode_p);
-        }
-    }
+
 }
 
 /**

@@ -115,16 +115,9 @@ function cdce_spi_enable(level_p, mode_p, verbosity_p) {
     // en the spi links
     const rst = 0;
     const en = 1;
-    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = 0, mode_p = 0, verbosity_p = -1);
+    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
 
-    if (verbosity_p < 0) {
-        // do nothing
-    } else {
-        if (verbosity_p >= c_CDCE_REG_VERBOSITY_MIN) {
-            const msg = "[cdce_spi_enable]: Enable the SPI";
-            display(msg_p = msg, level_p = level0, mode_p = mode_p);
-        }
-    }
+
 }
 
 /**
@@ -2220,6 +2213,16 @@ function cdce_display_all_config(level_p, mode_p, verbosity_p) {
 
 /**
  * Default Configuration of the cdcd72010 spi device (FMC150 board).
+ *   To compute the output frequency, use the following formula (python code)
+ *     def compute_frequency(M,N,P,R):
+ *        # P : 1 to 80: fb_count32 (feedbock counter reg11)
+ *        # M: div_m (reg10)
+ *        # N: div_n (reg10)
+ *        # R: out(i)divrsel (reg0 to reg9) (output i)
+ *        # fin = 100*10**6 Hz for the FMC150
+ *        fin = 100*10**6
+ *        fout = fin*P*N/(R*M)
+ *        return fout
  * @param {number} level_p - level of indentation at the beginning.
  * @param {number} mode_p - define the print output.
  * @param {number} verbosity_p - level of verbosity.
@@ -2534,6 +2537,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     const pecl7hiswing = 1; //0: no High output voltage swing in LVPECL/LVDS mode, 1: otherwise
     const en7div = 1; //0: divider is disabled on output7, 1: otherwise
     const out7divrsel = parseInt('1000000', 2); // Output Divider 7 ratio select: divided by 2
+    // const out7divrsel = parseInt('0100000', 2); // Output Divider 7 ratio select: divided by 1
     const ph7adjc = parseInt('0000000', 2);
     const adlock = 0;
     const lockc = parseInt('00', 2); // Number of coherent lock events (page 59) ("00": default : 1 successive lock event)
@@ -2691,7 +2695,7 @@ function CDCE72010_configure(level_p, mode_p, verbosity_p) {
     const fb_mux_sel = 0; //0: VCXO clock is selected from (clock tree, FB-DIV and Det), 1: AUX clock is selected
     const pd_pll = 0; //0: PLL in normal mode, 1: PLL is powered down
     const fb_phase = parseInt('0000000', 2); // Feedback Phase Adjust Bit0
-    const fb_count32 = parseInt('0000010', 2); // Feedback Counter: divided by 2
+    const fb_count32 = parseInt('0000010', 2); // Feedback Counter: divided by 8
     const fb_inclk_inv = 0;
     const fb_cml_sel = 0;
     const fb_dis = 0;
