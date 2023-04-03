@@ -22,7 +22,9 @@
 //    Automatic Generation    No
 //    Code Rules Reference    
 // -------------------------------------------------------------------------------------------------------------
-//    @details                
+//    @details        
+//
+//    This script combines imported functions in order to build higher level functions.        
 //
 // -------------------------------------------------------------------------------------------------------------
 include("./fpasim/CDCE72010.dscript");
@@ -434,7 +436,7 @@ function check_equal_tab(tab0_p, tab1_p, msg_p, level_p, mode_p)
 }
 
 /**
- * Enable the test with the dac pattern checker.
+ * Enable the dac pattern checker at the dac device side and the dac pattern generator at the FPGA side.
  * @param {number} level_p - level of indentation at the beginning.
  * @param {number} mode_p - define the print output.
  * @param {number} verbosity_p - level of verbosity.
@@ -579,7 +581,7 @@ function fpasim_dac_enable_pattern(level_p, mode_p, verbosity_p) {
 
 }
 /**
- * Disable the test with the dac pattern checker.
+ * Disable the dac pattern checker at the dac device side and the dac pattern generator at the FPGA side.
  * @param {number} level_p - level of indentation at the beginning.
  * @param {number} mode_p - define the print output.
  * @param {number} verbosity_p - level of verbosity.
@@ -688,7 +690,7 @@ function fpasim_dac_disable_pattern(level_p, mode_p, verbosity_p) {
 }
 
 /**
- * Check if the dac pattern checker has detected an error.
+ * Check if the dac pattern checker (at the dac device side) has detected an error.
  * @param {number} level_p - level of indentation at the beginning.
  * @param {number} mode_p - define the print output.
  * @param {number} verbosity_p - level of verbosity.

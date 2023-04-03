@@ -22,9 +22,12 @@
 //    Automatic Generation    No
 //    Code Rules Reference    
 // -------------------------------------------------------------------------------------------------------------
-//    @details                
-//    This javascript defines the Display functions.
-//    This class provides methods to print in the console (coloring, indentation, ...).
+//    @details      
+//          
+//     This script defines 2 main types of functions:
+//        . printing/displaying functions. Thoses functions are used to beautify the report.
+//        . helping function such as: convert_hex_to_ascii
+//       
 //
 // -------------------------------------------------------------------------------------------------------------
 

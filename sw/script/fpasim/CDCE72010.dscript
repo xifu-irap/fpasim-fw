@@ -24,8 +24,7 @@
 // -------------------------------------------------------------------------------------------------------------
 //    @details
 //
-//   This script defines functions in order to configure (read/write) the registers of the cdcd72010 spi device (FMC150 board) knowing the FPASIM function
-//   has a role of bridge between the software and the spi device.
+//   This script defines base functions to access (read/write) the CDCE device (FMC150 card) via the FPASim SPI module bridge.
 //
 //    Note:
 //       . Tested with javascript
@@ -36,7 +35,7 @@
 include("./fpasim/utils_tools.dscript");
 include("./fpasim/fpasim.dscript");
 
-// define the SPI device registers
+// define the SPI device registers (see datasheet: cdce72010 device)
 const CDCE_ADDR = {};
 CDCE_ADDR['reg0'] = 0x00;
 CDCE_ADDR['reg1'] = 0x01;

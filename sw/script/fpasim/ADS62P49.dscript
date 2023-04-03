@@ -24,8 +24,8 @@
 // -------------------------------------------------------------------------------------------------------------
 //    @details
 //
-//   This script defines functions in order to configure (read/write) the registers of the ads62p49 spi device (FMC150 board) knowing the FPASIM function
-//   has a role of bridge between the software and the spi device.
+//   This script defines base functions to access (read/write) the ADC device (FMC150 card) via the FPASim SPI module bridge.
+//
 //   Note:
 //      . Tested with javascript
 //
@@ -36,7 +36,7 @@ include("./fpasim/utils_tools.dscript");
 include("./fpasim/fpasim.dscript");
 
 
-// define the SPI device registers
+// define the SPI device registers (see datasheet: ads62p49  device)
 const ADC_ADDR = {};
 ADC_ADDR['reg0'] = 0x00;
 ADC_ADDR['reg1'] = 0x20;

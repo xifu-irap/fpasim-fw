@@ -23,15 +23,16 @@
 //    Code Rules Reference
 // -------------------------------------------------------------------------------------------------------------
 //    @details
-//   This test generates several make_pulse and make_pulseS commands.
 //
-//   This javascript does the following steps:
-//       1. configure the spi devices
-//       2. reset the FPASim functions
-//       3. configure the FPASIM RAMs
-//       4. configure the FPASIM registers
-//       5. generate few make_pulse commands
-//       6. generate few make_pulse_all commands
+//    This test generates several make_pulse and make_pulseS commands.
+//
+//    This javascript does the following steps:
+//        1. configure the spi devices
+//        2. reset the FPASim functions
+//        3. configure the FPASIM RAMs
+//        4. configure the FPASIM registers
+//        5. generate few make_pulse commands
+//        6. generate few make_pulse_all commands
 //
 //
 // -------------------------------------------------------------------------------------------------------------

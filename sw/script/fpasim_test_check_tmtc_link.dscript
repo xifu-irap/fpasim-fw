@@ -26,17 +26,17 @@
 //
 //   This test does the following tests:
 //      . test_wire: test the FPASim registers
-//          . For the main registers: write -> read -> check
+//          . For the main registers: write -> read back -> check
 //      . test_ram_conf: test the FPASim RAM configuration
-//          . Write -> read -> check
-//      . test_recording: test the link between the FPASim and the adc device.
-//          . configure the adc device into pattern generator
+//          . Write -> read back -> check
+//      . test_recording: test the link adc device -> FPASim
+//          . configure the adc device into a pattern generator
 //          . records ADC samples
-//          . check the ADC values
-//      . test_dac_pattern: test the link between the FPASim and the dac device
-//          . configure the dac device into pattern checker
-//          . configure the FPASim into a pattern generator
-//          . check the error ( read the associated adc device register)
+//          . compare the recorded ADC samples with the generated one.
+//      . test_dac_pattern: test the link FPASim -> dac device.
+//          . configure the dac device into a pattern checker.
+//          . configure the FPASim into a pattern generator.
+//          . compare the generated DAC samples with the checked one.
 //
 //   Note:
 //      . Tested with javascript
@@ -444,8 +444,6 @@ function test_wire(level_p, mode_p, verbosity_p) {
 
     const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
-
-
 }
 
 /**
@@ -941,8 +939,6 @@ function test_ram_conf(level_p, mode_p, verbosity_p) {
 
     const msg = "";
     display(msg_p = msg, level_p = level0, mode_p = mode_p);
-
-
 }
 
 /**
@@ -964,6 +960,15 @@ function test_dac_pattern(level_p, mode_p, verbosity_p) {
     const level0 = level_p;
     const level1 = level_p + 1;
     const level2 = level_p + 2;
+
+    /* 
+     ***************************************************************************
+     * reset the fpasim function
+     ***************************************************************************
+     */
+    const msg = "Reset the FPASim function";
+    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+    fpasim_reset(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
     /* 
      ***************************************************************************
@@ -1040,7 +1045,7 @@ function test_dac_pattern(level_p, mode_p, verbosity_p) {
     nbPixels = nbPixels - 1; // add -1 because we start from 0
     nbSamplesPerPixel = nbSamplesPerPixel - 1; // add -1 because we start from 0
     totalFrameSize = totalFrameSize - 1; // add -1 because we start from 0
-    
+
     const msg = "Set register: TES_CONF";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     sendToFPA_configureTES_conf(nbPixels = nbPixels, nbSamplesPerPixel = nbSamplesPerPixel, totalFrameSize = totalFrameSize);
@@ -1087,7 +1092,7 @@ function test_dac_pattern(level_p, mode_p, verbosity_p) {
 
     const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
-    
+
     // check
     const msg = "Error detection";
     display_subtitle(msg_p = msg, level_p = level0, mode_p = mode_p);
@@ -1103,10 +1108,6 @@ function test_dac_pattern(level_p, mode_p, verbosity_p) {
 
     const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
-
-
-
-
 
 }
 
