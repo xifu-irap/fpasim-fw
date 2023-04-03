@@ -24,8 +24,7 @@
 // -------------------------------------------------------------------------------------------------------------
 //    @details
 //
-//   This script defines functions in order to configure (read/write) the registers of the dac3283 spi device (FMC150 board) knowing the FPASIM function
-//   has a role of bridge between the software and the spi device.
+//   This script defines base functions to access (read/write) the DAC device (FMC150 card) via the FPASim SPI module bridge.
 //
 //   Note:
 //      . Tested with javascript
@@ -36,7 +35,7 @@
 include("./fpasim/utils_tools.dscript");
 include("./fpasim/fpasim.dscript");
 
-// define the SPI device registers
+// define the SPI device registers (see datasheet: dac3283 device)
 const DAC_ADDR = {};
 DAC_ADDR['reg0'] = 0x00;
 DAC_ADDR['reg1'] = 0x01;
@@ -105,16 +104,8 @@ function dac_spi_enable(level_p, mode_p, verbosity_p) {
     // en the spi links
     const rst = 0;
     const en = 1;
-    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = 0, mode_p = 0, verbosity_p = -1);
+    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
 
-    if (verbosity_p < 0) {
-        // do nothing
-    } else {
-        if (verbosity_p >= c_DAC_REG_VERBOSITY_MIN) {
-            const msg = "[dac_spi_enable]: Enable the SPI";
-            display(msg_p = msg, level_p = level0, mode_p = mode_p);
-        }
-    }
 }
 
 /**
@@ -3654,7 +3645,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     const spi_dac_tx_enable = 0;
     // const data = (spi_dac_tx_enable << 0)
 
-    const msg = "Set SPI_CONF1: Disable the DAC TX";
+    const msg = "Set SPI_CONF1: Disable the DAC TX pin";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     // addr = FPASIM_ADDR_WIREIN['SPI_CONF1'];
     // sendToFPA_debugSetWireIn(addr, data);
@@ -3730,7 +3721,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     // [0]: R/W: twos[0]
     const qmc_offset_ena = 0;
     const qmc_correct_ena = 0;
-    const fir0_ena = 1;
+    const fir0_ena = 0;
     const fir1_ena = 0;
     const iotest_ena = 0;
     const twos = 1;
@@ -4158,12 +4149,6 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     const clkpath_sleep_a = 0;
     const clkpath_sleep_b = 0;
 
-    const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
-    dac_set_config20(
-        qmc_offseta_p = qmc_offseta,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
 
     const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
@@ -4191,6 +4176,14 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
 
     const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    const msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    dac_set_config20(
+        qmc_offseta_p = qmc_offseta,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
+
     //###############################################################
     // dac_config24
     //###############################################################
@@ -4274,15 +4267,9 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     const qmc_gaina = parseInt('10000000000', 2);
     const qmc_gainb = parseInt('10000000000', 2);
     const qmc_phase = parseInt('000000000', 2);
-
-
-    dac_set_config27(
-        qmc_gaina_p = qmc_gaina,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    // const qmc_gaina = parseInt('01111111111', 2);
+    // const qmc_gainb = parseInt('01111111111', 2);
+    // const qmc_phase = parseInt('000000000', 2);
 
     dac_set_config28(
         qmc_gainb_p = qmc_gainb,
@@ -4309,6 +4296,16 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
 
     const msg = "";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    dac_set_config27(
+        qmc_gaina_p = qmc_gaina,
+        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+    );
+
+    const msg = "";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+
     //###############################################################
     // dac_config31
     //###############################################################
@@ -4342,7 +4339,7 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
     const spi_dac_tx_enable = 1;
     // const data = (spi_dac_tx_enable << 0)
 
-    const msg = "Set SPI_CONF1: Enable the DAC TX";
+    const msg = "Set SPI_CONF1: Enable the DAC TX pin";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
     // addr = FPASIM_ADDR_WIREIN['SPI_CONF1'];
     // sendToFPA_debugSetWireIn(addr, data);
@@ -4361,66 +4358,71 @@ function DAC3283_configure(level_p, mode_p, verbosity_p) {
  *
  */
 
-function DAC3283_enable_pattern(level_p, mode_p, verbosity_p) {
-    // default function parameter values
-    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
-    if (typeof(level_p) === 'undefined') level_p = 0;
-    if (typeof(mode_p) === 'undefined') mode_p = 0;
+// function DAC3283_enable_pattern(level_p, mode_p, verbosity_p) {
+//     // default function parameter values
+//     if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+//     if (typeof(level_p) === 'undefined') level_p = 0;
+//     if (typeof(mode_p) === 'undefined') mode_p = 0;
 
 
-    const level0 = level_p;
-    const level1 = level_p + 1;
+//     const level0 = level_p;
+//     const level1 = level_p + 1;
 
-    const msg = "DAC3283_enable_pattern";
-    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
+//     const msg = "[DAC3283_enable_pattern]";
+//     display(msg_p = msg, level_p = level0, mode_p = mode_p);
 
-    // Enable the SPI on the FPGA board
-    dac_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+//     // Enable the SPI on the FPGA board
+//     const msg = "Enable the FPASim spi bridge";
+//     display(msg_p = msg, level_p = level1, mode_p = mode_p);
+//     dac_spi_enable(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
 
-    const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
-
-
-    //###############################################################
-    // dac_config1
-    //###############################################################
-    // When asserted the QMC offset correction circuitry is enabled.
-    // [7]: R/W: qmc_offset_ena[0]
-    //
-    // When asserted the QMC phase and gain correction circuitry is enabled.
-    // [6]: R/W: qmc_correct_ena[0]
-    //
-    // When asserted FIR0 is activated enabling 2x interpolation.
-    // [5]: R/W: fir0_ena[0]
-    //
-    // When asserted FIR1 is activated enabling 4x interpolation. fir0_ena must be set to '1' for 4x interpolation.
-    // [4]: R/W: fir1_ena[0]
-    //
-    // When asserted enables the data pattern checker operation.
-    // [2]: R/W: iotest_ena[0]
-    //
-    // When asserted the inputs are expected to be in 2's complement format. When
-    // de-asserted the input format is expected to be offset-binary.
-    // [0]: R/W: twos[0]
-    const qmc_offset_ena = 0;
-    const qmc_correct_ena = 0;
-    const fir0_ena = 0;
-    const fir1_ena = 0;
-    const iotest_ena = 1;
-    const twos = 1;
-
-    dac_set_config1(qmc_offset_ena_p = qmc_offset_ena, qmc_correct_ena_p = qmc_correct_ena,
-        fir0_ena_p = fir0_ena, fir1_ena_p = fir1_ena,
-        iotest_ena_p = iotest_ena, twos_p = twos,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+//     const msg = "";
+//     display(msg_p = msg, level_p = level1, mode_p = mode_p);
 
 
+//     //###############################################################
+//     // dac_config1
+//     //###############################################################
+//     // When asserted the QMC offset correction circuitry is enabled.
+//     // [7]: R/W: qmc_offset_ena[0]
+//     //
+//     // When asserted the QMC phase and gain correction circuitry is enabled.
+//     // [6]: R/W: qmc_correct_ena[0]
+//     //
+//     // When asserted FIR0 is activated enabling 2x interpolation.
+//     // [5]: R/W: fir0_ena[0]
+//     //
+//     // When asserted FIR1 is activated enabling 4x interpolation. fir0_ena must be set to '1' for 4x interpolation.
+//     // [4]: R/W: fir1_ena[0]
+//     //
+//     // When asserted enables the data pattern checker operation.
+//     // [2]: R/W: iotest_ena[0]
+//     //
+//     // When asserted the inputs are expected to be in 2's complement format. When
+//     // de-asserted the input format is expected to be offset-binary.
+//     // [0]: R/W: twos[0]
+//     const qmc_offset_ena = 0;
+//     const qmc_correct_ena = 0;
+//     const fir0_ena = 0;
+//     const fir1_ena = 0;
+//     const iotest_ena = 1;
+//     const twos = 1;
 
-}
+//     const msg = "Enable the spi dac pattern checker";
+//     display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+//     dac_set_config1(qmc_offset_ena_p = qmc_offset_ena, qmc_correct_ena_p = qmc_correct_ena,
+//         fir0_ena_p = fir0_ena, fir1_ena_p = fir1_ena,
+//         iotest_ena_p = iotest_ena, twos_p = twos,
+//         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+//     );
+
+//     const msg = "";
+//     display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+
+
+// }
 
 /**
  * Enable the dac pattern checker of the dac3283 (dac) spi device (FMC150 board).
@@ -4430,60 +4432,63 @@ function DAC3283_enable_pattern(level_p, mode_p, verbosity_p) {
  *
  */
 
-function DAC3283_disable_pattern(level_p, mode_p, verbosity_p) {
-    // default function parameter values
-    if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
-    if (typeof(level_p) === 'undefined') level_p = 0;
-    if (typeof(mode_p) === 'undefined') mode_p = 0;
+// function DAC3283_disable_pattern(level_p, mode_p, verbosity_p) {
+//     // default function parameter values
+//     if (typeof(verbosity_p) === 'undefined') verbosity_p = 0;
+//     if (typeof(level_p) === 'undefined') level_p = 0;
+//     if (typeof(mode_p) === 'undefined') mode_p = 0;
 
 
-    const level0 = level_p;
-    const level1 = level_p + 1;
+//     const level0 = level_p;
+//     const level1 = level_p + 1;
 
-    const msg = "DAC3283_disable_pattern";
-    display_title(msg_p = msg, level_p = level0, mode_p = mode_p);
-
-
-    //###############################################################
-    // dac_config1
-    //###############################################################
-    // When asserted the QMC offset correction circuitry is enabled.
-    // [7]: R/W: qmc_offset_ena[0]
-    //
-    // When asserted the QMC phase and gain correction circuitry is enabled.
-    // [6]: R/W: qmc_correct_ena[0]
-    //
-    // When asserted FIR0 is activated enabling 2x interpolation.
-    // [5]: R/W: fir0_ena[0]
-    //
-    // When asserted FIR1 is activated enabling 4x interpolation. fir0_ena must be set to '1' for 4x interpolation.
-    // [4]: R/W: fir1_ena[0]
-    //
-    // When asserted enables the data pattern checker operation.
-    // [2]: R/W: iotest_ena[0]
-    //
-    // When asserted the inputs are expected to be in 2's complement format. When
-    // de-asserted the input format is expected to be offset-binary.
-    // [0]: R/W: twos[0]
-    const qmc_offset_ena = 0;
-    const qmc_correct_ena = 0;
-    const fir0_ena = 0;
-    const fir1_ena = 0;
-    const iotest_ena = 0;
-    const twos = 1;
-
-    dac_set_config1(qmc_offset_ena_p = qmc_offset_ena, qmc_correct_ena_p = qmc_correct_ena,
-        fir0_ena_p = fir0_ena, fir1_ena_p = fir1_ena,
-        iotest_ena_p = iotest_ena, twos_p = twos,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
-    );
-
-    const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+//     const msg = "[DAC3283_disable_pattern]";
+//     display(msg_p = msg, level_p = level0, mode_p = mode_p);
 
 
+//     //###############################################################
+//     // dac_config1
+//     //###############################################################
+//     // When asserted the QMC offset correction circuitry is enabled.
+//     // [7]: R/W: qmc_offset_ena[0]
+//     //
+//     // When asserted the QMC phase and gain correction circuitry is enabled.
+//     // [6]: R/W: qmc_correct_ena[0]
+//     //
+//     // When asserted FIR0 is activated enabling 2x interpolation.
+//     // [5]: R/W: fir0_ena[0]
+//     //
+//     // When asserted FIR1 is activated enabling 4x interpolation. fir0_ena must be set to '1' for 4x interpolation.
+//     // [4]: R/W: fir1_ena[0]
+//     //
+//     // When asserted enables the data pattern checker operation.
+//     // [2]: R/W: iotest_ena[0]
+//     //
+//     // When asserted the inputs are expected to be in 2's complement format. When
+//     // de-asserted the input format is expected to be offset-binary.
+//     // [0]: R/W: twos[0]
+//     const qmc_offset_ena = 0;
+//     const qmc_correct_ena = 0;
+//     const fir0_ena = 0;
+//     const fir1_ena = 0;
+//     const iotest_ena = 0;
+//     const twos = 1;
 
-}
+//     const msg = "Disable the spi dac pattern checker";
+//     display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+//     dac_set_config1(qmc_offset_ena_p = qmc_offset_ena, qmc_correct_ena_p = qmc_correct_ena,
+//         fir0_ena_p = fir0_ena, fir1_ena_p = fir1_ena,
+//         iotest_ena_p = iotest_ena, twos_p = twos,
+//         level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+//     );
+
+//     const msg = "";
+//     display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+
+
+// }
 
 /**
  * Monitor the dacclk.
@@ -4502,6 +4507,18 @@ function DAC3283_get_dacclk_errors(level_p, mode_p, verbosity_p) {
 
     const level0 = level_p;
     const level1 = level_p + 1;
+    const level2 = level_p + 2;
+
+    const msg = "[DAC3283_get_dacclk_errors]";
+    display(msg_p = msg, level_p = level0, mode_p = mode_p);
+
+    // Enable the SPI on the FPGA board
+    const msg = "Enable the FPASim SPI bridge";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    dac_spi_enable(level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
+
+    const msg = "";
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     //###############################################################
     // dac_config17
@@ -4527,14 +4544,17 @@ function DAC3283_get_dacclk_errors(level_p, mode_p, verbosity_p) {
     const clk_alarm_ena = 0;
     const tx_off_ena = 0;
 
+    const msg = "(clk_alarm,tx_off) bits: are masked and disabled";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     dac_set_config17(
         clk_alarm_mask_p = clk_alarm_mask, tx_off_mask_p = tx_off_mask,
         clk_alarm_ena_p = clk_alarm_ena, tx_off_ena_p = tx_off_ena,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+        level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
     const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     //###############################################################
     // dac_config17
@@ -4560,14 +4580,17 @@ function DAC3283_get_dacclk_errors(level_p, mode_p, verbosity_p) {
     const clk_alarm_ena = 1;
     const tx_off_ena = 1;
 
+    const msg = "(clk_alarm,tx_off) bits: masked and enabled";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     dac_set_config17(
         clk_alarm_mask_p = clk_alarm_mask, tx_off_mask_p = tx_off_mask,
         clk_alarm_ena_p = clk_alarm_ena, tx_off_ena_p = tx_off_ena,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+        level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
     const msg = "";
-    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     //###############################################################
     // dac_config17
@@ -4593,14 +4616,28 @@ function DAC3283_get_dacclk_errors(level_p, mode_p, verbosity_p) {
     const clk_alarm_ena = 1;
     const tx_off_ena = 1;
 
+    const msg = "(clk_alarm,tx_off) bits: unmasked and enabled";
+    display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
     dac_set_config17(
         clk_alarm_mask_p = clk_alarm_mask, tx_off_mask_p = tx_off_mask,
         clk_alarm_ena_p = clk_alarm_ena, tx_off_ena_p = tx_off_ena,
-        level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p
+        level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p
     );
 
     const msg = "";
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
+
+    /*
+     * Tempo
+     *
+     */
+    const msg = "wait for 10ms";
     display(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    waitMs(10);
+    const msg = "";
+    display(msg_p = msg, level_p = level2, mode_p = mode_p);
 
     /**
      * Get the register31 value from the spi device.
@@ -4623,13 +4660,21 @@ function DAC3283_get_dacclk_errors(level_p, mode_p, verbosity_p) {
      * [5:0]: R: version[5:0]
      *
      */
-    const data = dac_get_config31(level_p = level1, mode_p = mode_p, verbosity_p = verbosity_p);
+    // msg = "check clk_alarm and tx_off";
+    // display_title(msg_p = msg, level_p = level1, mode_p = mode_p);
+
+    const data = dac_get_config31(level_p = level2, mode_p = mode_p, verbosity_p = verbosity_p);
     const clk_alarm = (data >> 7) & 0x1;
     const tx_off = (data >> 7) & 0x1;
 
     if ((clk_alarm == 1) && (tx_off == 1)) {
+
+        const msg = "[KO]: clk_alarm=1 and tx_off=1";
+        display(msg_p = msg, level_p = level1, mode_p = mode_p);
         return 1;
     } else {
+        const msg = "[OK]: clk_alarm=0 and tx_off=0";
+        display(msg_p = msg, level_p = level1, mode_p = mode_p);
         return 0;
     }
 

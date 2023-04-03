@@ -24,8 +24,8 @@
 // -------------------------------------------------------------------------------------------------------------
 //    @details
 //
-//   This script defines functions in order to configure (read/write) the registers of the amc7823 spi device (FMC150 board) knowing the FPASIM function
-//   has a role of bridge between the software and the spi device.
+//   This script defines base functions to access (read/write) the AMC device (FMC150 card) via the FPASim SPI module bridge.
+//
 //
 //    Note:
 //       . Tested with javascript
@@ -36,7 +36,7 @@
 include("./fpasim/utils_tools.dscript");
 include("./fpasim/fpasim.dscript");
 
-// define the SPI device registers
+// define the SPI device registers (see datasheet: amc7823 device)
 const AMC_ADDR = {};
 AMC_ADDR['reg0'] = 0x00;
 AMC_ADDR['reg1'] = 0x01;
@@ -108,16 +108,9 @@ function amc_spi_enable(level_p, mode_p, verbosity_p) {
     // en the spi links
     const rst = 0;
     const en = 1;
-    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = 0, mode_p = 0, verbosity_p = -1);
+    fpasim_set_spi_ctrl(rst_p = rst, en_p = en, level_p = level0, mode_p = mode_p, verbosity_p = verbosity_p);
 
-    if (verbosity_p < 0) {
-        // do nothing
-    } else {
-        if (verbosity_p >= c_AMC_REG_VERBOSITY_MIN) {
-            const msg = "[dac_init_device]: Enable the SPI";
-            display(msg_p = msg, level_p = level0, mode_p = mode_p);
-        }
-    }
+
 }
 
 /**
