@@ -42,9 +42,11 @@ package pkg_regdecode is
   -- 
   ---------------------------------------------------------------------
   -- user-defined: Firmware version
+  -- requirement: FPASIM-FW-REQ-0290
   constant pkg_FIRMWARE_VERSION_VALUE : integer := 3;
 
   -- user-defined: FIRMWARE ID (name)
+  -- requirement: FPASIM-FW-REQ-0280
   constant pkg_FIRMWARE_ID_CHAR3 : character := 'f';  -- ascii character
   constant pkg_FIRMWARE_ID_CHAR2 : character := 'p';  -- ascii character
   constant pkg_FIRMWARE_ID_CHAR1 : character := 'a';  -- ascii character
@@ -63,28 +65,38 @@ package pkg_regdecode is
   -- user-defined: address width of the register 
   constant pkg_REG_ADDR_WIDTH : positive := 16;
 
+  -- requirement: FPASIM-FW-REQ-0100
   -- user-defined : minimal address value associated to the tes_pulse_shape ram
   constant pkg_TES_PULSE_SHAPE_ADDR_RANGE_MIN : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"0000";
+  -- requirement: FPASIM-FW-REQ-0100
   -- user-defined : maximal address value associated to the tes_pulse_shape ram
   constant pkg_TES_PULSE_SHAPE_ADDR_RANGE_MAX : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"7FFF";
 
+  -- requirement: FPASIM-FW-REQ-0160
   -- user-defined : minimal address value associated to the amp_squid_tf ram
   constant pkg_AMP_SQUID_TF_ADDR_RANGE_MIN : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"8000";
+  -- requirement: FPASIM-FW-REQ-0160
   -- user-defined : maximal address value associated to the amp_squid_tf ram
   constant pkg_AMP_SQUID_TF_ADDR_RANGE_MAX : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"BFFF";
 
+  -- requirement: FPASIM-FW-REQ-0130
   -- user-defined : minimal address value associated to the mux_squid_tf ram
   constant pkg_MUX_SQUID_TF_ADDR_RANGE_MIN : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"C000";
+  -- requirement: FPASIM-FW-REQ-0130
   -- user-defined : maximal address value associated to the mux_squid_tf ram
   constant pkg_MUX_SQUID_TF_ADDR_RANGE_MAX : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"DFFF";
 
+  -- requirement: FPASIM-FW-REQ-0090
   -- user-defined : minimal address value associated to the tes_std_state ram
   constant pkg_TES_STD_STATE_ADDR_RANGE_MIN : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"E000";
+  -- requirement: FPASIM-FW-REQ-0090
   -- user-defined : maximal address value associated to the tes_std_state ram
   constant pkg_TES_STD_STATE_ADDR_RANGE_MAX : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"E03F";
 
+  -- requirement: FPASIM-FW-REQ-0140
   -- user-defined : minimal address value associated to the mux_squid_offset ram
   constant pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"E040";
+  -- requirement: FPASIM-FW-REQ-0140
   -- user-defined : maximal address value associated to the mux_squid_offset ram
   constant pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MAX : std_logic_vector(pkg_REG_ADDR_WIDTH - 1 downto 0) := x"E07F";
 
@@ -110,6 +122,7 @@ package pkg_regdecode is
   -- user-defined: ctrl_valid (bit index)
   constant pkg_TRIGIN_CTRL_VALID_IDX_H       : integer := 12;
   -- user-defined: read_all (bit index)
+  -- requirement: FPASIM-FW-REQ-0260
   constant pkg_TRIGIN_READ_ALL_VALID_IDX_H   : integer := 8;
   -- user-defined: make_pulse valid (bit index)
   constant pkg_TRIGIN_MAKE_PULSE_VALID_IDX_H : integer := 4;
@@ -129,24 +142,30 @@ package pkg_regdecode is
   -- user-defined: pixel all (bit index)
   constant pkg_MAKE_PULSE_PIXEL_ALL_IDX_H : integer := 31;
 
+  -- requirement: FPASIM-FW-REQ-0110
   -- user-defined: pixel id (bit index low)
   constant pkg_MAKE_PULSE_PIXEL_ID_IDX_L : integer := 24;
+  -- requirement: FPASIM-FW-REQ-0110
   -- auto-computed: pixel id width
   constant pkg_MAKE_PULSE_PIXEL_ID_WIDTH : integer := pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH;
   -- auto-computed : pixel id (bit index high)
   constant pkg_MAKE_PULSE_PIXEL_ID_IDX_H : integer := pkg_MAKE_PULSE_PIXEL_ID_IDX_L + pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1;
 
 
+  -- requirement: FPASIM-FW-REQ-0110
   -- user-defined: time shift (bit index low)
   constant pkg_MAKE_PULSE_TIME_SHIFT_IDX_L : integer := 16;
+  -- requirement: FPASIM-FW-REQ-0110
   -- auto-computed: time shift width
   constant pkg_MAKE_PULSE_TIME_SHIFT_WIDTH : integer := work.pkg_utils.pkg_width_from_value(pkg_PULSE_SHAPE_OVERSAMPLE);
   -- auto-computed : time shift (bit index high)
   constant pkg_MAKE_PULSE_TIME_SHIFT_IDX_H : integer := pkg_MAKE_PULSE_TIME_SHIFT_IDX_L + pkg_MAKE_PULSE_TIME_SHIFT_WIDTH - 1;
 
 
+  -- requirement: FPASIM-FW-REQ-0110
   -- user-defined: pulse height (bit index low)
   constant pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_L : integer := 0;
+  -- requirement: FPASIM-FW-REQ-0110
   -- auto-computed: pulse height width
   constant pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH : integer := pkg_TES_MULT_SUB_Q_WIDTH_B - 1;  -- we substract 1 because one bit was added to pass from unsigned -> signed value
   -- auto-computed: pulse height (bit index high)
@@ -154,8 +173,10 @@ package pkg_regdecode is
 
   -- user-defined: fpasim_gain
   ---------------------------------------------------------------------
+  -- requirement: FPASIM-FW-REQ-0190
   -- user-defined: fpasim_gain (bit index high)
   constant pkg_FPASIM_GAIN_IDX_H : integer := 2;
+  -- requirement: FPASIM-FW-REQ-0190
   -- user-defined: fpasim_gain (bit index low)
   constant pkg_FPASIM_GAIN_IDX_L : integer := 0;
   -- auto-computed: fpasim_gain width
@@ -164,8 +185,10 @@ package pkg_regdecode is
 
   -- user-defined: mux_sq_fb_delay
   ---------------------------------------------------------------------
+  -- requirement: FPASIM-FW-REQ-0210
   -- user-defined: mux_sq_fb_delay (bit index high)
   constant pkg_MUX_SQ_FB_DELAY_IDX_H : integer := 5;
+  -- requirement: FPASIM-FW-REQ-0210
   -- user-defined: mux_sq_fb_delay (bit index low)
   constant pkg_MUX_SQ_FB_DELAY_IDX_L : integer := 0;
   -- auto-computed: mux_sq_fb_delay width
@@ -173,8 +196,10 @@ package pkg_regdecode is
 
   -- user-defined: amp_sq_of_delay
   ---------------------------------------------------------------------
+  -- requirement: FPASIM-FW-REQ-0220
   -- user-defined: amp_sq_of_delay (bit index high)
   constant pkg_AMP_SQ_OF_DELAY_IDX_H : integer := 5;
+  -- requirement: FPASIM-FW-REQ-0220
   -- user-defined: amp_sq_of_delay (bit index low)
   constant pkg_AMP_SQ_OF_DELAY_IDX_L : integer := 0;
   -- auto-computed: amp_sq_of_delay width
@@ -183,8 +208,10 @@ package pkg_regdecode is
   ---------------------------------------------------------------------
   -- user-defined: error_delay
   ---------------------------------------------------------------------
+  -- requirement: FPASIM-FW-REQ-0230
   -- user-defined: error_delay (bit index high)
   constant pkg_ERROR_DELAY_IDX_H : integer := 5;
+  -- requirement: FPASIM-FW-REQ-0230
   -- user-defined: error_delay (bit index low)
   constant pkg_ERROR_DELAY_IDX_L : integer := 0;
   -- auto-computed: error_delay width
@@ -193,8 +220,10 @@ package pkg_regdecode is
   ---------------------------------------------------------------------
   -- user-defined: ra_delay
   ---------------------------------------------------------------------
+  -- requirement: FPASIM-FW-REQ-0240
   -- user-defined: ra_delay (bit index high)
   constant pkg_RA_DELAY_IDX_H : integer := 5;
+  -- requirement: FPASIM-FW-REQ-0240
   -- user-defined: ra_delay (bit index low)
   constant pkg_RA_DELAY_IDX_L : integer := 0;
   -- auto-computed: ra_delay width
@@ -202,15 +231,19 @@ package pkg_regdecode is
 
   -- user-defined: tes_conf 
   ---------------------------------------------------------------------
+  -- requirement: FPASIM-FW-REQ-0030
   -- user-defined: pixel_nb (bit index high)
   constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H : integer := 29;
+  -- requirement: FPASIM-FW-REQ-0030
   -- user-defined: pixel_nb (bit index low)
   constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L : integer := 24;
   -- auto-computed: pixel_nb width
   constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);
 
+  -- requirement: FPASIM-FW-REQ-0060
   -- user-defined: pixel_length (bit index high)
   constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H : integer := 22;
+  -- requirement: FPASIM-FW-REQ-0060
   -- user-defined: pixel_length (bit index low)
   constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L : integer := 16;
   -- auto-computed: pixel_length width
@@ -226,8 +259,10 @@ package pkg_regdecode is
   ---------------------------------------------------------------------
   -- user-defined: conf0
   ---------------------------------------------------------------------
+  -- requirement: FPASIM-FW-REQ-0135
   -- user-defined: inter_squid_gain (bit index high)
   constant pkg_CONF0_INTER_SQUID_GAIN_IDX_H : integer := 7;
+  -- requirement: FPASIM-FW-REQ-0135
   -- user-defined: inter_squid_gain (bit index low)
   constant pkg_CONF0_INTER_SQUID_GAIN_IDX_L : integer := 0;
   -- auto-computed: inter_squid_gain width

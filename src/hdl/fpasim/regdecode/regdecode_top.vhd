@@ -691,6 +691,9 @@ begin
   ---------------------------------------------------------------------
   usb_wireout_firmware_id      <= pkg_FIRMWARE_ID;
   usb_wireout_firmware_version <= pkg_FIRMWARE_VERSION;
+
+  -- board_id
+  -- requirement: FPASIM-FW-REQ-0270
   usb_wireout_board_id         <= std_logic_vector(resize(unsigned(i_board_id), usb_wireout_board_id'length));
 
   -- from trigin: extract bits signal

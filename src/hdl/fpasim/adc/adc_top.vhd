@@ -93,7 +93,8 @@ architecture RTL of adc_top is
 begin
 
   ---------------------------------------------------------------------
-  -- apply a different delay on each adc data
+  -- apply a dynamic delay on the adc0 path
+  -- requirement: FPASIM-FW-REQ-0210
   ---------------------------------------------------------------------
   inst_dynamic_shift_register_with_valid_adc0 : entity work.dynamic_shift_register_with_valid
     generic map(
@@ -108,7 +109,10 @@ begin
       o_data       => adc0_rx
     );
 
-
+---------------------------------------------------------------------
+  -- apply a dynamic delay on the adc1 path
+  -- requirement: FPASIM-FW-REQ-0220
+  ---------------------------------------------------------------------
   inst_dynamic_shift_register_with_valid_adc1 : entity work.dynamic_shift_register_with_valid
     generic map(
       g_ADDR_WIDTH => i_adc1_delay'length, -- width of the address. Possibles values: [2, integer max value[ 

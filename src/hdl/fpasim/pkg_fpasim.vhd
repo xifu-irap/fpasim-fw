@@ -57,19 +57,24 @@ package pkg_fpasim is
   -- hardcoded : latency of the dynamic shif register when its input delay is set to 0
   constant pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY : natural := 1;
 
-  -- pixel
+  -- pixel: 
+  -- requirement: FPASIM-FW-REQ-0030
   -- user-defined: maximal number of pixels by column authorized by the design (must be a power of 2)
   constant pkg_MUX_FACT_MAX                 : positive := 64;
   -- parameter renaming
   constant pkg_NB_PIXEL_BY_FRAME_MAX        : positive := pkg_MUX_FACT_MAX;
+
+  -- requirement: FPASIM-FW-REQ-0060
   -- user-defined: maximum number of samples by pixel authorized by the design (must be a power of 2)
   --   IMPORTANT: the corresponding time depends on the data sampling frequency and the expected pixel frequency.
   constant pkg_NB_SAMPLE_BY_PIXEL_MAX       : positive := 64;
   -- auto-computed:  minimal bus width (expressed in bits) to represent the pkg_PIXEL_SIZE value
   constant pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH : natural  := work.pkg_utils.pkg_width_from_value(pkg_NB_SAMPLE_BY_PIXEL_MAX);
+  -- requirement: FPASIM-FW-REQ-0100
   -- user-defined: number of frames by pulse_shape
   --   Note: This value is equal to the number of value of a pulse shape
   constant pkg_NB_FRAME_BY_PULSE_SHAPE      : positive := 2048;
+  -- requirement: FPASIM-FW-REQ-0100
   -- user-defined: define the oversample factor of each word of the pulse shape memory
   constant pkg_PULSE_SHAPE_OVERSAMPLE       : natural  := 16;
 
@@ -102,6 +107,7 @@ package pkg_fpasim is
   constant pkg_TES_PULSE_SHAPE_RAM_NB_WORDS         : positive := pkg_PULSE_SHAPE_OVERSAMPLE * pkg_NB_FRAME_BY_PULSE_SHAPE;
   -- auto-computed: ram address bus width
   constant pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH       : positive := work.pkg_utils.pkg_width_from_value(pkg_TES_PULSE_SHAPE_RAM_NB_WORDS);
+  -- requirement: FPASIM-FW-REQ-0100
   -- user-defined: ram data bus width
   constant pkg_TES_PULSE_SHAPE_RAM_DATA_WIDTH       : positive := 16;
   -- user-defined: ram configuration file
@@ -112,10 +118,12 @@ package pkg_fpasim is
   constant pkg_TES_STD_STATE_RAM_A_RD_LATENCY     : natural  := 3;
   -- auto-computed: read latency of the RAM (port B). Possible values: [2; max integer value[. Indeed, by design, memory are in parallel. So, we fixe the same latency
   constant pkg_TES_STD_STATE_RAM_B_RD_LATENCY     : natural  := pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY;
+  -- requirement: FPASIM-FW-REQ-0090
   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
   constant pkg_TES_STD_STATE_RAM_NB_WORDS         : positive := pkg_NB_PIXEL_BY_FRAME_MAX;
   -- auto-computed: ram address bus width
   constant pkg_TES_STD_STATE_RAM_ADDR_WIDTH       : positive := work.pkg_utils.pkg_width_from_value(pkg_TES_STD_STATE_RAM_NB_WORDS);
+  -- requirement: FPASIM-FW-REQ-0090
   -- user-defined: ram data bus width
   constant pkg_TES_STD_STATE_RAM_DATA_WIDTH       : positive := 16;
   -- user-defined: ram configuration file
@@ -126,10 +134,12 @@ package pkg_fpasim is
   constant pkg_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY     : natural  := 3;
   -- user-defined: read latency of the RAM (port B). Possible values: [2; max integer value[
   constant pkg_MUX_SQUID_OFFSET_RAM_B_RD_LATENCY     : natural  := 2;
+  -- requirement: FPASIM-FW-REQ-0140
   -- auto-computed: number of words. The number of words should accomodate the maximal number of pixels
   constant pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS         : positive := pkg_NB_PIXEL_BY_FRAME_MAX;
   -- auto-computed: ram address bus width
   constant pkg_MUX_SQUID_OFFSET_RAM_ADDR_WIDTH       : positive := work.pkg_utils.pkg_width_from_value(pkg_NB_PIXEL_BY_FRAME_MAX);
+  -- requirement: FPASIM-FW-REQ-0140
   -- user-defined: data bus width
   constant pkg_MUX_SQUID_OFFSET_RAM_DATA_WIDTH       : positive := 16;
   -- user-defined: ram configuration file
@@ -140,10 +150,12 @@ package pkg_fpasim is
   constant pkg_MUX_SQUID_TF_RAM_A_RD_LATENCY     : natural  := 3;
   -- user-defined: read latency of the RAM (port B). Possible values: [2; max integer value[.
   constant pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY     : natural  := 2;
+  -- requirement: FPASIM-FW-REQ-0130
   -- user-defined: number of words.
   constant pkg_MUX_SQUID_TF_RAM_NB_WORDS         : positive := 2 ** 13;
   -- auto-computed: ram address bus width
   constant pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH       : positive := work.pkg_utils.pkg_width_from_value(pkg_MUX_SQUID_TF_RAM_NB_WORDS);
+  -- requirement: FPASIM-FW-REQ-0130
   -- user-defined: ram data bus width
   constant pkg_MUX_SQUID_TF_RAM_DATA_WIDTH       : positive := 16;
   -- user-defined: ram configuration file
@@ -155,10 +167,12 @@ package pkg_fpasim is
   constant pkg_AMP_SQUID_TF_RAM_A_RD_LATENCY     : natural := 3;
   -- user-defined: read latency of the RAM (port B). Possible values: [2; max integer value[
   constant pkg_AMP_SQUID_TF_RAM_B_RD_LATENCY     : natural := 2;
+  -- requirement: FPASIM-FW-REQ-0160
   -- user-defined: number of words.
   constant pkg_AMP_SQUID_TF_RAM_NB_WORDS         : natural := 2 ** 14;
   -- auto-computed: ram address bus width
   constant pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH       : natural := work.pkg_utils.pkg_width_from_value(pkg_AMP_SQUID_TF_RAM_NB_WORDS);
+  -- requirement: FPASIM-FW-REQ-0160
   -- user-defined: ram data bus width
   constant pkg_AMP_SQUID_TF_RAM_DATA_WIDTH       : natural := 16;
   -- user-defined: ram configuration file
@@ -209,32 +223,40 @@ package pkg_fpasim is
   ---------------------------------------------------------------------
 
   -- pulse shape
+  -- requirement: FPASIM-FW-REQ-0100
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
   constant pkg_TES_MULT_SUB_Q_M_A     : positive := 17;
+  -- requirement: FPASIM-FW-REQ-0100
   -- user-defined: number of fraction bits
   constant pkg_TES_MULT_SUB_Q_N_A     : natural  := 0;
   -- auto-computed: bus width of the TES_Q_A
   constant pkg_TES_MULT_SUB_Q_WIDTH_A : positive := pkg_TES_MULT_SUB_Q_M_A + pkg_TES_MULT_SUB_Q_N_A;
 
   -- pulse heigth
+  -- requirement: FPASIM-FW-REQ-0110
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
   constant pkg_TES_MULT_SUB_Q_M_B     : positive := 1;
+  -- requirement: FPASIM-FW-REQ-0110
   -- user-defined: number of fraction bits
   constant pkg_TES_MULT_SUB_Q_N_B     : natural  := 16;
   -- auto-computed: bus width of the TES_Q_B
   constant pkg_TES_MULT_SUB_Q_WIDTH_B : positive := pkg_TES_MULT_SUB_Q_M_B + pkg_TES_MULT_SUB_Q_N_B;
 
   -- steady state
+  -- requirement: FPASIM-FW-REQ-0090
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
   constant pkg_TES_MULT_SUB_Q_M_C     : positive := 17;
+  -- requirement: FPASIM-FW-REQ-0090
   -- user-defined: number of fraction bits
   constant pkg_TES_MULT_SUB_Q_N_C     : natural  := 0;
   -- auto-computed: bus width of the TES_Q_C
   constant pkg_TES_MULT_SUB_Q_WIDTH_C : positive := pkg_TES_MULT_SUB_Q_M_C + pkg_TES_MULT_SUB_Q_N_C;
 
   -- result: steady state - (pulse heigth*pulse shape)
+  -- requirement: FPASIM-FW-REQ-0120
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
   constant pkg_TES_MULT_SUB_Q_M_S     : positive := 17;
+  -- requirement: FPASIM-FW-REQ-0120
   -- user-defined: number of fraction bits
   constant pkg_TES_MULT_SUB_Q_N_S     : natural  := 0;
   -- auto-computed: bus width of the TES_Q_S
@@ -291,32 +313,40 @@ package pkg_fpasim is
 
   -- mult_add
   -- inter_squid_gain
+  -- requirement: FPASIM-FW-REQ-0135
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
   constant pkg_MUX_SQUID_MULT_ADD_Q_M_A     : positive := 1;
+  -- requirement: FPASIM-FW-REQ-0135
   -- user-defined: number of fraction bits
   constant pkg_MUX_SQUID_MULT_ADD_Q_N_A     : natural  := 8;
   -- auto-computed: bus width
   constant pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_A : positive := pkg_MUX_SQUID_MULT_ADD_Q_M_A + pkg_MUX_SQUID_MULT_ADD_Q_N_A;
 
   -- mux_squid_tf
+  -- requirement: FPASIM-FW-REQ-0130
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
   constant pkg_MUX_SQUID_MULT_ADD_Q_M_B     : positive := 17;
+  -- requirement: FPASIM-FW-REQ-0130
   -- user-defined: number of fraction bits
   constant pkg_MUX_SQUID_MULT_ADD_Q_N_B     : natural  := 0;
   -- auto-computed: bus width
   constant pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_B : positive := pkg_MUX_SQUID_MULT_ADD_Q_M_B + pkg_MUX_SQUID_MULT_ADD_Q_N_B;
 
   -- mux_squid_offset
+  -- requirement: FPASIM-FW-REQ-0140
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
   constant pkg_MUX_SQUID_MULT_ADD_Q_M_C     : positive := 16;
+  -- requirement: FPASIM-FW-REQ-0140
   -- user-defined: number of fraction bits
   constant pkg_MUX_SQUID_MULT_ADD_Q_N_C     : natural  := 0;
   -- auto-computed: bus width
   constant pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_C : positive := pkg_MUX_SQUID_MULT_ADD_Q_M_C + pkg_MUX_SQUID_MULT_ADD_Q_N_C;
 
   -- result
+  -- requirement: FPASIM-FW-REQ-0150
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
   constant pkg_MUX_SQUID_MULT_ADD_Q_M_S     : positive := 18;
+  -- requirement: FPASIM-FW-REQ-0150
   -- user-defined: number of fraction bits
   constant pkg_MUX_SQUID_MULT_ADD_Q_N_S     : natural  := 0;
   -- auto-computed: bus width
@@ -437,6 +467,7 @@ package pkg_fpasim is
   ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
+  -- FPASIM-FW-REQ-0080
   -- user-defined: width of the sync pulse (expressed in number of clock cycles) on the FPGA pin. Possible values: [1;integer max value[
   constant pkg_SYNC_PULSE_DURATION                 : positive := 4;
   -- hardcoded: latency of the "sync_pulse_generator" module

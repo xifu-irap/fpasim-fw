@@ -71,6 +71,10 @@ architecture RTL of amp_squid_fpagain_table is
 
 begin
 
+---------------------------------------------------------------------
+-- convert command to fpasim_gain
+-- requirement: FPASIM-FW-REQ-0190
+---------------------------------------------------------------------
   p_table : process(i_clk) is
   begin
     if rising_edge(i_clk) then
