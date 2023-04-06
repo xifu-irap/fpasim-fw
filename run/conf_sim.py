@@ -550,9 +550,18 @@ if __name__ == '__main__':
     opal_kelly_path = env.path
 
     
+    ############################################################################
+    # Section2: set root path
+    ############################################################################
+    dic = {}
+    description_list = []
+    description_list.append('Project Base Path: root path of the git repository')
+    dic['description'] = description_list
+    dic['path'] = root_path
+    json_data['root_path'] = dic
 
     ############################################################################
-    # Section2: copy the vendor opal kelly files defined by the environment variable
+    # Section3: copy the vendor opal kelly files defined by the environment variable
     #      in the @root_project_path/ip/opal_kelly directory
     ############################################################################
     relpath = 'ip/opal_kelly'
@@ -566,15 +575,6 @@ if __name__ == '__main__':
     msg0 = 'to the project directory: '+dst_path
     obj_display.display(msg_p=msg0, level_p=level2, color_p='green')
 
-    ############################################################################
-    # Section3: set root path
-    ############################################################################
-    dic = {}
-    description_list = []
-    description_list.append('Project Base Path: root path of the git repository')
-    dic['description'] = description_list
-    dic['path'] = root_path
-    json_data['root_path'] = dic
 
 
     ############################################################################
