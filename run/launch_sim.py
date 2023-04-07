@@ -92,10 +92,10 @@ if __name__ == '__main__':
     parser.add_argument('--simulator', '-s', default='questa', choices=['modelsim', 'questa'],
                         help='Specify the VHDL simulator to use (must be VHDL 2008 compatible).')
     # add an optional argument with a list of values
-    parser.add_argument('--test_name_list', '-t', default=['test0_tb_system_fpasim'], nargs='*',
-                        help='define a list of test_list name to simulate. These test_list names are defined in the launch_sim.json file')
+    parser.add_argument('--test_name_list', '-t', default=['tb_system_fpasim_top_test_variant00'], nargs='*',
+                        help='define a test name or  list of test names (separated by space) to simulate. The test_section_dic of the launch_sim_processed.json file defines the available test name')
     # add an optional argument 
-    parser.add_argument('--display', default='False', choices=['True', 'False'],
+    parser.add_argument('--gui_mode', default='False', choices=['True', 'False'],
                         help='Specify if the simulator is in gui mode or not. Possible values: true or false')
     # add an optional argument
     parser.add_argument('--verbosity','-v', default=0, choices=[0, 1, 2], type=int,
@@ -103,10 +103,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    simulator = args.simulator
+    simulator      = args.simulator
     test_name_list = args.test_name_list
-    display = args.display
-    verbosity = args.verbosity
+    gui_mode       = args.gui_mode
+    verbosity      = args.verbosity
 
     ############################################################################
     # Search the Project Base Path: root of the git repository
@@ -150,7 +150,8 @@ if __name__ == '__main__':
     # Execute each individual test of a test_list
     ############################################################################
     for test_name in test_name_list:
-        test_list = json_data.get(test_name)
+        test_dic = json_data.get('test_section_dic')
+        test_list = test_dic.get(test_name)
         if test_list is None:
             msg0 = "ERROR: This " + test_name + " isn't defined in the json file (" + json_filepath_input +')'
             obj_display.display(msg_p=msg0, level_p=level1, color_p='red')
@@ -208,9 +209,9 @@ if __name__ == '__main__':
             # # specify the verbosity
             cmd.append('--verbosity')
             cmd.append(str(verbosity))
-            # specify if the display mode of the simulator is activated
-            cmd.append('--display')
-            cmd.append(display)
+            # specify if the gui_mode mode of the simulator is activated
+            cmd.append('--gui_mode')
+            cmd.append(gui_mode)
             # identify the test to run
             cmd.append('--json_key_path')
             cmd.append(json_key_path)

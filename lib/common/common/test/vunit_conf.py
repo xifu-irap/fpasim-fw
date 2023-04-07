@@ -148,7 +148,7 @@ class VunitConf:
         """
 
         json_key_path = self.json_key_path
-        json_data = self.json_data
+        json_data = self.json_data['test_section_dic']
 
         # get the test_group_name as well as the test_name
         key_test_name, key_name = json_key_path.split('/')

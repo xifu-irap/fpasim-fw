@@ -959,37 +959,46 @@ if __name__ == '__main__':
     ############################################################################
     # Section6 : Define 1 or several list of individual tests
     ############################################################################
+    json_test_dic = {}
+    description_list = []
+    description_list.append('This section defines the names of the available tests.')
+    description_list.append('   . Each test consists of one or more individual test(s).')
+    description_list.append('   . Each individual test can run one or more test_variant(s) (set of simulation parameters).')
+    json_test_dic["description_list"] = description_list
+
     # 0: first sequence of individual tests
     # fpga_system_fpasim
-    json_data["tb_fpga_system_fpasim_top_debug_test0"] = [solo_test_dic['tb_fpga_system_fpasim_top_debug']]
+    json_test_dic["tb_fpga_system_fpasim_top_debug_test0"] = [solo_test_dic['tb_fpga_system_fpasim_top_debug']]
 
     # system_fpasim
-    json_data["tb_system_fpasim_test0"] = [solo_test_dic['tb_system_fpasim_top']]
-    json_data["tb_system_fpasim_top_test_variant00"] = [solo_test_dic['tb_system_fpasim_top_test_variant00']]
-    json_data["tb_system_fpasim_top_test_variant01"] = [solo_test_dic['tb_system_fpasim_top_test_variant01']]
-    json_data["tb_system_fpasim_top_test_variant02"] = [solo_test_dic['tb_system_fpasim_top_test_variant02']]
+    json_test_dic["tb_system_fpasim_test0"] = [solo_test_dic['tb_system_fpasim_top']]
+    json_test_dic["tb_system_fpasim_top_test_variant00"] = [solo_test_dic['tb_system_fpasim_top_test_variant00']]
+    json_test_dic["tb_system_fpasim_top_test_variant01"] = [solo_test_dic['tb_system_fpasim_top_test_variant01']]
+    json_test_dic["tb_system_fpasim_top_test_variant02"] = [solo_test_dic['tb_system_fpasim_top_test_variant02']]
 
     # tes_top
-    json_data["tb_tes_top_debug_test0"] = [solo_test_dic['tb_tes_top_debug']]
-    json_data["tb_tes_top_test_variant00"] = [solo_test_dic['tb_tes_top_test_variant00']]
-    json_data["tb_tes_top_test_variant01"] = [solo_test_dic['tb_tes_top_test_variant01']]
-    json_data["tb_tes_top_test_variant02"] = [solo_test_dic['tb_tes_top_test_variant02']]
-    json_data["tb_tes_top_test_variant03"] = [solo_test_dic['tb_tes_top_test_variant03']]
+    json_test_dic["tb_tes_top_debug_test0"] = [solo_test_dic['tb_tes_top_debug']]
+    json_test_dic["tb_tes_top_test_variant00"] = [solo_test_dic['tb_tes_top_test_variant00']]
+    json_test_dic["tb_tes_top_test_variant01"] = [solo_test_dic['tb_tes_top_test_variant01']]
+    json_test_dic["tb_tes_top_test_variant02"] = [solo_test_dic['tb_tes_top_test_variant02']]
+    json_test_dic["tb_tes_top_test_variant03"] = [solo_test_dic['tb_tes_top_test_variant03']]
 
     # mux_squid_top
-    json_data["tb_mux_squid_top_test0"] = [solo_test_dic['tb_mux_squid_top']]
-    json_data["tb_mux_squid_top_test_variant00"] = [solo_test_dic['tb_mux_squid_top_test_variant00']]
+    json_test_dic["tb_mux_squid_top_test0"] = [solo_test_dic['tb_mux_squid_top']]
+    json_test_dic["tb_mux_squid_top_test_variant00"] = [solo_test_dic['tb_mux_squid_top_test_variant00']]
 
     # amp_squid_top
-    json_data["tb_amp_squid_top_test2"] = [solo_test_dic['tb_amp_squid_top']]
-    json_data["tb_amp_squid_top_test_variant00"] = [solo_test_dic['tb_amp_squid_top_test_variant00']]
+    json_test_dic["tb_amp_squid_top_test2"] = [solo_test_dic['tb_amp_squid_top']]
+    json_test_dic["tb_amp_squid_top_test_variant00"] = [solo_test_dic['tb_amp_squid_top_test_variant00']]
 
     # spi_top
-    json_data["tb_spi_top_debug_test0"] = [solo_test_dic['tb_spi_top_conf_debug']]
+    json_test_dic["tb_spi_top_debug_test0"] = [solo_test_dic['tb_spi_top_conf_debug']]
 
     ############################################################################
     # Section7: Output the result in an output json file
     ############################################################################
+    # build the key: test_section_dic
+    json_data['test_section_dic'] = json_test_dic
     # Serializing then json dictionary
     json_object = json.dumps(json_data, indent=4)
     # Writing to the output json file

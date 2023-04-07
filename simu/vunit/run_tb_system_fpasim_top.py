@@ -126,7 +126,7 @@ if __name__ == '__main__':
     cli.parser.add_argument('--simulator','-s', default='questa',help=help0)
 
     help0 = 'Specify if the simulator is in gui mode or not.'
-    cli.parser.add_argument('--display', default='False',choices = ['True','False'], help=help0)
+    cli.parser.add_argument('--gui_mode', default='False',choices = ['True','False'], help=help0)
 
     help0 = 'Specify the verbosity level. Possible values (uint): 0 to 2'
     cli.parser.add_argument('--verbosity', default=0,choices = [0,1,2], type = int, help=help0)
@@ -137,18 +137,18 @@ if __name__ == '__main__':
     args = cli.parse_args()
 
     # retrieve the command line arguments
-    simulator     = args.simulator
-    display       = args.display
-    verbosity     = args.verbosity
-    json_key_path   = args.json_key_path
+    simulator      = args.simulator
+    gui_mode       = args.gui_mode
+    verbosity      = args.verbosity
+    json_key_path  = args.json_key_path
 
 
     ###########################################################
     # It's impossible to pass a boolean to a subprocess call
     # We can't directly use the vunit defined --gui argument (boolean type)
-    # So, we use an intermediary "--display" custom argument (string type) to pass the command
+    # So, we use an intermediary "--gui_mode" custom argument (string type) to pass the command
     ###########################################################
-    if display == 'False':
+    if gui_mode == 'False':
         args.gui = False 
     else:
         args.gui = True
