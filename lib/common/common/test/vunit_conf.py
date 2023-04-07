@@ -179,8 +179,8 @@ class VunitConf:
         json_data = self.json_data
         base_path_dic = self.base_path_dic
         # extract the project root path/Vivado install path from the json file
-        root_path = str(Path(json_data['root_path']['path']))
-        vivado_path = str(Path(json_data['vunit_vivado_path']['path']))
+        root_path = str(Path(json_data['path_section_dic']['root_path']['path']))
+        vivado_path = str(Path(json_data['path_section_dic']['vunit_vivado_path']['path']))
 
         # derived paths
         base_path_dic['ip_xilinx_coregen_path'] = str(Path(root_path, 'ip/xilinx/coregen'))
@@ -309,11 +309,11 @@ class VunitConf:
         level2 = level0 + 2
 
         # retrieve paths from the json file
-        modelsim_path = json_data['vunit_modelsim_path']["path"]
-        questa_path = json_data['vunit_questa_path']["path"]
-        modelsim_compile_lib_path = json_data['vunit_modelsim_compile_lib_path']["path"]
-        questa_compile_lib_path = json_data['vunit_questa_compile_lib_path']["path"]
-        root_path = str(Path(json_data['root_path']['path']))
+        modelsim_path             = json_data['path_section_dic']['vunit_modelsim_path']["path"]
+        questa_path               = json_data['path_section_dic']['vunit_questa_path']["path"]
+        modelsim_compile_lib_path = json_data['path_section_dic']['vunit_modelsim_compile_lib_path']["path"]
+        questa_compile_lib_path   = json_data['path_section_dic']['vunit_questa_compile_lib_path']["path"]
+        root_path        = str(Path(json_data['path_section_dic']['root_path']['path']))
 
         display_obj.display_title(msg_p='Simulator Configuration', level_p=level0)
         display_obj.display(msg_p='Selected Simulator: ' + name_p, level_p=level1)
