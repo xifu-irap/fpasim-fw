@@ -25,7 +25,8 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details                
 #    This script generates the launch_sim_processed.json file.
-#    This generated file will be used by the run python scripts during the VHDL simulation
+#    This generated output file will be used by the run python scripts during the VHDL simulation
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -255,7 +256,6 @@ class DUT:
         self.tb_filename = ""
         self.vunit_outpath = ""
         self.wave_filename = ""
-        self.script_filename = ""
         self.obj_display = Display()
 
     def add_description(self, text_p):
@@ -294,16 +294,6 @@ class DUT:
         :return: None
         """
         self.tb_filename = filename_p
-        return None
-
-    def set_script_filename(self, filename_p):
-        """
-        This method set a python script filename (with extension)
-        Example: tb_XXX.py
-        :param filename_p: (string) python script filename
-        :return: None
-        """
-        self.script_filename = filename_p
         return None
 
     def set_vunit_run_filepath(self, filepath_p, level_p=0):
@@ -385,7 +375,6 @@ class DUT:
         dic_vunit["run_filepath"] = self.run_filepath
         dic_vunit["vunit_outpath"] = self.vunit_outpath
         dic_vunit["wave_filename"] = self.wave_filename
-        dic_vunit["script_filename"] = self.script_filename
         dic_vunit["tb_entity_name"] = self.tb_entity_name
 
         dic = {}
@@ -656,7 +645,6 @@ if __name__ == '__main__':
     test0.set_tb_filename(filename_p=tb_filename)
     for test_variant_filename in test_variant_filename_list:
         test0.add_test_variant_filename(filename_p=test_variant_filename)
-    test0.set_script_filename(filename_p="")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p=waveform_filename)
@@ -698,7 +686,6 @@ if __name__ == '__main__':
     test0.set_tb_filename(filename_p=tb_filename)
     for test_variant_filename in test_variant_filename_list:
         test0.add_test_variant_filename(filename_p=test_variant_filename)
-    test0.set_script_filename(filename_p="")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p=waveform_filename)
@@ -740,7 +727,6 @@ if __name__ == '__main__':
     test0.set_tb_filename(filename_p=tb_filename)
     for test_variant_filename in test_variant_filename_list:
         test0.add_test_variant_filename(filename_p=test_variant_filename)
-    test0.set_script_filename(filename_p="")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p=waveform_filename)
@@ -783,7 +769,6 @@ if __name__ == '__main__':
     test0.set_tb_filename(filename_p=tb_filename)
     for test_variant_filename in test_variant_filename_list:
         test0.add_test_variant_filename(filename_p=test_variant_filename)
-    test0.set_script_filename(filename_p="")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p=waveform_filename)
@@ -826,7 +811,6 @@ if __name__ == '__main__':
     test0.set_tb_filename(filename_p=tb_filename)
     for test_variant_filename in test_variant_filename_list:
         test0.add_test_variant_filename(filename_p=test_variant_filename)
-    test0.set_script_filename(filename_p="tb_tes_top.py")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p=waveform_filename)
@@ -869,7 +853,6 @@ if __name__ == '__main__':
     test0.set_tb_filename(filename_p=tb_filename)
     for test_variant_filename in test_variant_filename_list:
         test0.add_test_variant_filename(filename_p=test_variant_filename)
-    test0.set_script_filename(filename_p="tb_tes_top.py")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p=waveform_filename)
@@ -911,7 +894,6 @@ if __name__ == '__main__':
     test0.set_tb_filename(filename_p=tb_filename)
     for test_variant_filename in test_variant_filename_list:
         test0.add_test_variant_filename(filename_p=test_variant_filename)
-    test0.set_script_filename(filename_p="tb_tes_top.py")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p=waveform_filename)
@@ -954,7 +936,6 @@ if __name__ == '__main__':
     test0.set_tb_filename(filename_p=tb_filename)
     for test_variant_filename in test_variant_filename_list:
         test0.add_test_variant_filename(filename_p=test_variant_filename)
-    test0.set_script_filename(filename_p="tb_tes_top.py")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p=waveform_filename)
@@ -1079,7 +1060,6 @@ if __name__ == '__main__':
     test0.set_tb_filename(filename_p=tb_filename)
     for test_variant_filename in test_variant_filename_list:
         test0.add_test_variant_filename(filename_p=test_variant_filename)
-    test0.set_script_filename(filename_p="tb_tes_top.py")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p=waveform_filename)
@@ -1204,7 +1184,6 @@ if __name__ == '__main__':
     test0.set_tb_filename(filename_p=tb_filename)
     for test_variant_filename in test_variant_filename_list:
         test0.add_test_variant_filename(filename_p=test_variant_filename)
-    test0.set_script_filename(filename_p="")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p=waveform_filename)
@@ -1246,7 +1225,6 @@ if __name__ == '__main__':
     test0.set_tb_filename(filename_p=tb_filename)
     for test_variant_filename in test_variant_filename_list:
         test0.add_test_variant_filename(filename_p=test_variant_filename)
-    test0.set_script_filename(filename_p="")
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
     test0.set_sim_wave_filepath(filename_p=waveform_filename)
@@ -1295,9 +1273,16 @@ if __name__ == '__main__':
     # spi_top
     json_test_dic["tb_spi_top_debug_test0"] = [solo_test_dic['tb_spi_top_conf_debug']]
 
+    # variant00: tes_top, mux_squid_top, amp_squid_top, system_fpasim_top
+    json_test_dic["tb_all_variant00"] = []
+    json_test_dic["tb_all_variant00"].append(solo_test_dic['tb_tes_top_test_variant00'])
+    json_test_dic["tb_all_variant00"].append(solo_test_dic['tb_mux_squid_top_test_variant00'])
+    json_test_dic["tb_all_variant00"].append(solo_test_dic['tb_amp_squid_top_test_variant00'])
+    json_test_dic["tb_all_variant00"].append(solo_test_dic['tb_system_fpasim_top_test_variant00'])
+
     ############################################################################
     # Section7: Output the result in an output json file
-    #   save section1, section2,section3,section4,section6
+    #   save section1, section2, section3, section4, section6
     ############################################################################
     # build the key: test_section_dic
     json_data['test_section_dic'] = json_test_dic
