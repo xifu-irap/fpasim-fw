@@ -196,6 +196,7 @@ begin
   ---------------------------------------------------------------------
   -- apply a dynamic delay on the data path
   --   . the latency is 1 clock cycle when i_dac_delay = 0
+  -- requirement: FPASIM-FW-REQ-0230
   ---------------------------------------------------------------------
   data_pipe_tmp0(c_IDX3_H)                 <= dac_valid_r1;
   data_pipe_tmp0(c_IDX2_H)                 <= dac_frame_r1;

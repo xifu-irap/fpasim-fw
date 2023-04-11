@@ -1046,9 +1046,11 @@ begin
       -- port A: AMD Q notation (fixed point)
       g_UQ_M_A => cnt_sample_pulse_shape_r1'length,
       g_UQ_N_A => 0,
+      -- requirement: FPASIM-FW-REQ-0110
       -- port B: AMD Q notation (fixed point)
       g_UQ_M_B => c_SHIFT_MAX_VECTOR'length,
       g_UQ_N_B => 0,
+      -- requirement: FPASIM-FW-REQ-0110
       -- port C: AMC Q notation (fixed point)
       g_UQ_M_C => time_shift_r1'length,
       g_UQ_N_C => 0,
@@ -1329,6 +1331,7 @@ begin
 
   ---------------------------------------------------------------------
   -- TES computation
+  -- requirement: FPASIM-FW-REQ-0120
   ---------------------------------------------------------------------
   assert not ((pulse_shape_doutb'length) /= (pulse_shape_tmp'length - 1)) report "[tes_pulse_shape_manager]: pulse shape => register/command width and sfixed package definition width doesn't match." severity error;
   assert not ((pulse_heigth_rx'length) /= (pulse_heigth_tmp'length - 1)) report "[tes_pulse_shape_manager]: pulse heigth => register/command width and sfixed package definition width doesn't match." severity error;

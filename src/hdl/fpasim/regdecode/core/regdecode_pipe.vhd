@@ -17,37 +17,39 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   regdecode_pipe.vhd 
+--    @file                   regdecode_pipe.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
---!   This module has the following functionnalities:
---!      . de-multiplexes the input data flow (i_addr/i_data) in order to configure each RAM
---!      . multiplexe the reading of each RAM into the output data flow (o_fifo_addr/o_fifo_data)
---!      . for each ram, it automatically generates read address in order to retrieve the RAM contents by taking into account
---!        the different RAM depth.
---!        
---!   The architecture is as follows:
---! @i_clk source clock domain                                         |    @ i_out_clk destination clock domain
---!                                                  |--- fsm ---- fifo_async -------------- RAM0
---!                                                  |--- fsm ---- fifo_async ----------- RAM1 |
---!    i_addr/i_data    ----> addr_decode----------> |--- fsm ---- fifo_async ------- RAM2  |  |
---!                                                  |--- fsm ---- fifo_async ---- RAM3 |   |  |
---!                                                  |--- fsm ---- fifo_async - RAM4 |  |   |  |
---!                                                                              |   |  |   |  |
---!                                        |------------------------fifo_async----   |  |   |  |                        
---!                                        |------------------------fifo_async--------  |   |  |                          
---!   o_fifo_addr/o_fifo_data <--fsm <---- |------------------------fifo_async----------    |  |
---!                                        |------------------------fifo_async--------------   | 
---!                                        |------------------------fifo_async-----------------
---!     
---!     
---!     
---!     
---!   Note:
---!     . In all cases, the module manages the clock domain crossing.
+--    @details                
+--    This module has the following functionnalities:
+--       . de-multiplexes the input data flow (i_addr/i_data) in order to configure each RAM
+--       . multiplexe the reading of each RAM into the output data flow (o_fifo_addr/o_fifo_data)
+--       . for each ram, it automatically generates read address in order to retrieve the RAM contents by taking into account
+--         the different RAM depth.
+--         
+--    The architecture is as follows:
+--       @i_clk source clock domain                                         |    @ i_out_clk destination clock domain
+--                                                        |--- fsm ---- fifo_async -------------- RAM0
+--                                                        |--- fsm ---- fifo_async ----------- RAM1 |
+--          i_addr/i_data    ----> addr_decode----------> |--- fsm ---- fifo_async ------- RAM2  |  |
+--                                                        |--- fsm ---- fifo_async ---- RAM3 |   |  |
+--                                                        |--- fsm ---- fifo_async - RAM4 |  |   |  |
+--                                                                                    |   |  |   |  |
+--                                              |------------------------fifo_async----   |  |   |  |                        
+--                                              |------------------------fifo_async--------  |   |  |                          
+--         o_fifo_addr/o_fifo_data <--fsm <---- |------------------------fifo_async----------    |  |
+--                                              |------------------------fifo_async--------------   | 
+--                                              |------------------------fifo_async-----------------
+--      
+--      
+--      
+--    requirement: FPASIM-FW-REQ-0260
+--
+--    Note:
+--      . In all cases, the module manages the clock domain crossing.
+--  
 -- -------------------------------------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;

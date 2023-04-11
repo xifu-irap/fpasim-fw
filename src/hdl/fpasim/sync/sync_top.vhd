@@ -17,22 +17,22 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   sync_top.vhd 
+--    @file                   sync_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details                
 --
--- This module can dynamically delays the input pulse sync signal by a user-defined value.
--- Then it generates from it a pulse with a static user-defined duration.
+--    This module can dynamically delays the input pulse sync signal by a user-defined value.
+--    Then it generates from it a pulse with a static user-defined duration.
 --
--- Example0:
---  g_PULSE_DURATION |   3 
---  i_sync_valid     |   1   1   1   1   1   1   1   1   1   1
---  i_sync           |   1   0   0   0   0   1   0   0   0   0
---  o_sync_valid     |   x   1   1   1   0   0   1   1   1   0
---  o_sync           |   x   1   1   1   0   0   1   1   1   0
+--    Example0:
+--     g_PULSE_DURATION |   3 
+--     i_sync_valid     |   1   1   1   1   1   1   1   1   1   1
+--     i_sync           |   1   0   0   0   0   1   0   0   0   0
+--     o_sync_valid     |   x   1   1   1   0   0   1   1   1   0
+--     o_sync           |   x   1   1   1   0   0   1   1   1   0
 --
 -- -------------------------------------------------------------------------------------------------------------
 library ieee;
@@ -145,6 +145,7 @@ begin
   ---------------------------------------------------------------------
   -- apply a dynamic delay on the data path
   --   . the latency is 1 clock cycle when i_sync_delay = 0
+  -- requirement: FPASIM-FW-REQ-0240
   ---------------------------------------------------------------------
   data_pipe_tmp0(c_IDX1_H) <= sync_valid_r1;
   data_pipe_tmp0(c_IDX0_H) <= sync_r1;

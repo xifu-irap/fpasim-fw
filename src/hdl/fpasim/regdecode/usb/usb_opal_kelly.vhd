@@ -26,6 +26,7 @@
 --
 --    This module instanciates the necessary different opal kelly component
 --
+--    requirement: FPASIM-FW-REQ-0250
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;

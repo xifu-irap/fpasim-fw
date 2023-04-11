@@ -201,6 +201,7 @@ begin
 
   -------------------------------------------------------------------
   -- sub_sfixed_amp_squid_out : out = pixel_result_tmp - amp_squid_offset_correction_tmp
+  -- requirement: FPASIM-FW-REQ-0170 (part0)
   -------------------------------------------------------------------
   assert not ((i_pixel_result'length) /= pkg_AMP_SQUID_SUB_Q_WIDTH_A) report "[mux_squid]: i_pixel_result => port width and sfixed package definition width doesn't match." severity error;
   assert not ((i_amp_squid_offset_correction'length) /= pkg_AMP_SQUID_SUB_Q_WIDTH_B) report "[mux_squid]: i_amp_squid_offset_correction => port width and sfixed package definition width doesn't match." severity error;
@@ -257,7 +258,8 @@ begin
   pixel_id_rx    <= data_pipe_tmp1(c_IDX0_H downto c_IDX0_L);
 
   ---------------------------------------------------------------------
-  -- RAM: mux_squid_tf
+  -- RAM: amp_squid_tf
+  -- requirement: FPASIM-FW-REQ-0170 (part1)
   ---------------------------------------------------------------------
   amp_squid_tf_ena   <= i_amp_squid_tf_wr_en or i_amp_squid_tf_rd_en;
   amp_squid_tf_wea   <= i_amp_squid_tf_wr_en;

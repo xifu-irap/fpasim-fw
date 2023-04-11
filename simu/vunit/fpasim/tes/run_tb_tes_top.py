@@ -127,7 +127,7 @@ if __name__ == '__main__':
     cli.parser.add_argument('--simulator','-s', default='questa',help=help0)
 
     help0 = 'Specify if the simulator is in gui mode or not.'
-    cli.parser.add_argument('--display', default='False',choices = ['True','False'], help=help0)
+    cli.parser.add_argument('--gui_mode', default='False',choices = ['True','False'], help=help0)
 
     help0 = 'Specify the verbosity level. Possible values (uint): 0 to 2'
     cli.parser.add_argument('--verbosity', default=0,choices = [0,1,2], type = int, help=help0)
@@ -139,17 +139,17 @@ if __name__ == '__main__':
 
     # retrieve the command line arguments
     simulator     = args.simulator
-    display       = args.display
+    gui_mode      = args.gui_mode
     verbosity     = args.verbosity
-    json_key_path   = args.json_key_path
+    json_key_path = args.json_key_path
 
 
     ###########################################################
     # It's impossible to pass a boolean to a subprocess call
     # We can't directly use the vunit defined --gui argument (boolean type)
-    # So, we use an intermediary "--display" custom argument (string type) to pass the command
+    # So, we use an intermediary "--gui_mode" custom argument (string type) to pass the command
     ###########################################################
-    if display == 'False':
+    if gui_mode == 'False':
         args.gui = False 
     else:
         args.gui = True
@@ -244,16 +244,25 @@ if __name__ == '__main__':
     #####################################################
     # Set the simulator options
     obj.set_waveform(level_p=level1)
+    # Get the simulator wave
+    wave_filepath = obj.get_waveform(level_p=level1)
+
+    if wave_filepath is None:
+        sim_title = __file__.replace('\\','/')
+    else:
+        str0 = "run_filepath:"+__file__.replace('\\','/')
+        str1 = "waveform_filepath:"+wave_filepath.replace('\\','/')
+        sim_title = str0 + '__' + str1
 
     #####################################################
     # Set the simulation options
     #####################################################
-    VU.set_sim_option("modelsim.vsim_flags", ["-stats=-cmd,-time",'-c','-t','ps','-voptargs=+acc','-title',__file__.replace('\\','/')])
+    VU.set_sim_option("modelsim.vsim_flags", ["-stats=-cmd,-time",'-c','-t','ps','-voptargs=+acc','-title',sim_title])
 
     ######################################################
-    # get the list of conf_filepath (if any)
+    # get the list of test_variant_filepath (if any)
     ######################################################
-    conf_filepath_list = obj.get_conf_filepath(level_p=level1)
+    test_variant_filepath_list = obj.get_test_variant_filepath(level_p=level1)
 
     ######################################################
     # get the list of ram configuration filepath
@@ -272,16 +281,16 @@ if __name__ == '__main__':
     tb_name = obj.get_testbench_name()
 
     # loop on all configuration files
-    for conf_filepath in conf_filepath_list :
+    for test_variant_filepath in test_variant_filepath_list :
 
         str0 = 'Start the Test'
         obj_display.display_title(msg_p=str0, level_p=level1)
-        str0 = 'conf_filepath='+conf_filepath   
+        str0 = 'test_variant_filepath='+test_variant_filepath   
         obj_display.display(msg_p=str0, level_p=level2)
         str0 = 'tb_name='+tb_name   
         obj_display.display(msg_p=str0, level_p=level2)
 
-        conf_filename = str(Path(conf_filepath).stem)
+        conf_filename = str(Path(test_variant_filepath).stem)
 
         name = conf_filename
         test_name = tb_name
@@ -291,7 +300,7 @@ if __name__ == '__main__':
         ####################################################################
         data_gen_obj = TesTopDataGen()
         data_gen_obj.set_indentation_level(level_p= level1)
-        data_gen_obj.set_conf_filepath(conf_filepath_p= conf_filepath)
+        data_gen_obj.set_test_variant_filepath(filepath_p= test_variant_filepath)
         data_gen_obj.set_vunit_conf_obj(obj_p= obj)
         data_gen_obj.set_mif_files(filepath_list_p=ram_filepath_list)
 

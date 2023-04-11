@@ -6,7 +6,11 @@
 # if this file contains constraints for signals not in your design).
 #
 # Copyright (c) 2004-2014 Opal Kelly Incorporated
+#
+#
+# requirement: FPASIM-FW-REQ-0040 (applicable to the file)
 ############################################################################
+
 
 set_property CFGBVS GND [current_design]
 set_property CONFIG_VOLTAGE 1.8 [current_design]

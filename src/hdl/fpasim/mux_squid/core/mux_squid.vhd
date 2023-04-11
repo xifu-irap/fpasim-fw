@@ -244,6 +244,7 @@ begin
 
   -------------------------------------------------------------------
   -- sub_sfixed_mux_squid_out
+  -- requirement: FPASIM-FW-REQ-0150 (part0)
   -------------------------------------------------------------------
   -- we assume i_pixel_result is always >=0 => set the sign bit (MSB bits) to '0' 
   pixel_result_tmp       <= '0' & i_pixel_result(i_pixel_result'high - 1 downto 0); -- @suppress "Incorrect array size in assignment: expected (<17>) but was (<g_PIXEL_RESULT_INPUT_WIDTH>)"
@@ -548,7 +549,8 @@ begin
       );
 
   ---------------------------------------------------------------------
-  -- add mux_squid_offset + mux_squid_tf
+  -- compute: inter_squid_gain* mux_squid_tf + mux_squid_offset
+  -- requirement: FPASIM-FW-REQ-0150 (part1)
   ---------------------------------------------------------------------
   assert not ((i_inter_squid_gain'length) /= ((inter_squid_gain_tmp'length) - 1)) report "[mux_squid]: inter_squid_gain_tmp => port width and sfixed package definition width doesn't match." severity error;
   assert not ((mux_squid_tf_doutb'length) /= ((mux_squid_tf_tmp'length) - 1)) report "[mux_squid]: mux_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;

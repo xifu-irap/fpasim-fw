@@ -25,7 +25,8 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details                
 #    This script generates the launch_sim_processed.json file.
-#    This generated file will be used by the run python scripts during the VHDL simulation
+#    This generated output file will be used by the run python scripts during the VHDL simulation
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -249,13 +250,12 @@ class DUT:
         This method initializes the class instance
         """
         self.description_list = []
-        self.name = ""
-        self.conf_filename_list = []
+        self.tb_entity_name = ""
+        self.test_variant_filename_list = []
         self.run_filepath = ""
         self.tb_filename = ""
         self.vunit_outpath = ""
         self.wave_filename = ""
-        self.script_filename = ""
         self.obj_display = Display()
 
     def add_description(self, text_p):
@@ -267,23 +267,23 @@ class DUT:
         self.description_list.append(text_p)
         return None
 
-    def set_name(self, name_p):
+    def set_tb_entity_name(self, name_p):
         """
-        This method set a name
+        This method set a tb_entity_name
         :param name_p: (string) define the name
         :return: None
         """
-        self.name = name_p
+        self.tb_entity_name = name_p
         return None
 
-    def add_conf_filename(self, filename_p):
+    def add_test_variant_filename(self, filename_p):
         """
         This method adds a configuration filename
         :param filename_p: (string) filename
         :return: None
         """
 
-        self.conf_filename_list.append(filename_p)
+        self.test_variant_filename_list.append(filename_p)
         return None
 
     def set_tb_filename(self, filename_p):
@@ -294,16 +294,6 @@ class DUT:
         :return: None
         """
         self.tb_filename = filename_p
-        return None
-
-    def set_script_filename(self, filename_p):
-        """
-        This method set a python script filename (with extension)
-        Example: tb_XXX.py
-        :param filename_p: (string) python script filename
-        :return: None
-        """
-        self.script_filename = filename_p
         return None
 
     def set_vunit_run_filepath(self, filepath_p, level_p=0):
@@ -379,18 +369,17 @@ class DUT:
         self._check_class_configuration(level_p=level_p)
 
         dic_conf = {}
-        dic_conf["filename_list"] = self.conf_filename_list
+        dic_conf["filename_list"] = self.test_variant_filename_list
         dic_vunit = {}
         dic_vunit["tb_filename"] = self.tb_filename
         dic_vunit["run_filepath"] = self.run_filepath
         dic_vunit["vunit_outpath"] = self.vunit_outpath
         dic_vunit["wave_filename"] = self.wave_filename
-        dic_vunit["script_filename"] = self.script_filename
+        dic_vunit["tb_entity_name"] = self.tb_entity_name
 
         dic = {}
         dic["description"] = self.description_list
-        dic["name"] = self.name
-        dic["conf"] = dic_conf
+        dic["test_variant"] = dic_conf
         dic["vunit"] = dic_vunit
         return dic
 
@@ -489,14 +478,14 @@ if __name__ == '__main__':
     # Section1: get environment variable
     #   => set the values in the output file
     ############################################################################
-
+    json_data_path = {}
     # get the VUNIT_PATH environment variable
     ############################################################################
     env_name = "VUNIT_PATH"
     env = Env(env_name_p=env_name, mandatory_p=1, level_p=level1)
     env.add_description(
         text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
-    json_data[env_name.lower()] = env.get_dic()
+    json_data_path[env_name.lower()] = env.get_dic()
     vunit_path = env.path
 
     # get the VUNIT_VIVADO_PATH environment variable
@@ -505,7 +494,7 @@ if __name__ == '__main__':
     env = Env(env_name_p=env_name, mandatory_p=1, level_p=level1)
     env.add_description(
         text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
-    json_data[env_name.lower()] = env.get_dic()
+    json_data_path[env_name.lower()] = env.get_dic()
     vivado_path = env.path
 
     # get the VUNIT_MODELSIM_PATH environment variable
@@ -514,7 +503,7 @@ if __name__ == '__main__':
     env = Env(env_name_p=env_name, mandatory_p=0, level_p=level1)
     env.add_description(
         text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
-    json_data[env_name.lower()] = env.get_dic()
+    json_data_path[env_name.lower()] = env.get_dic()
 
     # get the VUNIT_QUESTA_PATH environment variable
     ############################################################################
@@ -522,7 +511,7 @@ if __name__ == '__main__':
     env = Env(env_name_p=env_name, mandatory_p=0, level_p=level1)
     env.add_description(
         text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
-    json_data[env_name.lower()] = env.get_dic()
+    json_data_path[env_name.lower()] = env.get_dic()
 
     # get the VUNIT_MODELSIM_COMPILE_LIB_PATH environment variable
     ############################################################################
@@ -530,7 +519,7 @@ if __name__ == '__main__':
     env = Env(env_name_p=env_name, mandatory_p=0, level_p=level1)
     env.add_description(
         text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
-    json_data[env_name.lower()] = env.get_dic()
+    json_data_path[env_name.lower()] = env.get_dic()
 
     # get the VUNIT_QUESTA_COMPILE_LIB_PATH environment variable
     ############################################################################
@@ -538,7 +527,7 @@ if __name__ == '__main__':
     env = Env(env_name_p=env_name, mandatory_p=0, level_p=level1)
     env.add_description(
         text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
-    json_data[env_name.lower()] = env.get_dic()
+    json_data_path[env_name.lower()] = env.get_dic()
 
     # get the VUNIT_QUESTA_COMPILE_LIB_PATH environment variable
     ############################################################################
@@ -546,13 +535,25 @@ if __name__ == '__main__':
     env = Env(env_name_p=env_name, mandatory_p=1, level_p=level1)
     env.add_description(
         text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
-    json_data[env_name.lower()] = env.get_dic()
+    json_data_path[env_name.lower()] = env.get_dic()
     opal_kelly_path = env.path
 
     
+    ############################################################################
+    # Section2: set root path
+    ############################################################################
+    dic = {}
+    description_list = []
+    description_list.append('Project Base Path: root path of this project git repository')
+    dic['description'] = description_list
+    dic['path'] = root_path
+    json_data_path['root_path'] = dic
+
+    # build the key: test_section_dic
+    json_data['path_section_dic'] = json_data_path
 
     ############################################################################
-    # Section2: copy the vendor opal kelly files defined by the environment variable
+    # Section3: copy the vendor opal kelly files defined by the environment variable
     #      in the @root_project_path/ip/opal_kelly directory
     ############################################################################
     relpath = 'ip/opal_kelly'
@@ -566,15 +567,6 @@ if __name__ == '__main__':
     msg0 = 'to the project directory: '+dst_path
     obj_display.display(msg_p=msg0, level_p=level2, color_p='green')
 
-    ############################################################################
-    # Section3: set root path
-    ############################################################################
-    dic = {}
-    description_list = []
-    description_list.append('Project Base Path: root path of the git repository')
-    dic['description'] = description_list
-    dic['path'] = root_path
-    json_data['root_path'] = dic
 
 
     ############################################################################
@@ -621,375 +613,679 @@ if __name__ == '__main__':
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_system_fpasim_top'
+    # name of the testbench entity
     tb_name = 'tb_system_fpasim_top'
-    test_name = 'tb_system_fpasim_top'
-
+    # name of the testbench file
+    tb_filename = 'tb_system_fpasim_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = []
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
-    # generate individual test
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
     vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+    # generate individual test
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    # test0.add_conf_filename(filename_p="")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_script_filename(filename_p="")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_system_fpasim_top_test_variant00'
+    # name of the testbench entity
     tb_name = 'tb_system_fpasim_top'
-    test_name = 'tb_system_fpasim_top_test_variant00'
+    # name of the testbench file
+    tb_filename = 'tb_system_fpasim_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = ["tb_system_fpasim_top_test_variant00.json"]
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
-    # generate individual test
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_tb_system_fpasim_top_test_variant00.do"
+    # output simulation directory path
     vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+    # generate individual test
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_system_fpasim_top_test_variant00.json")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_script_filename(filename_p="")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_tb_system_fpasim_top_test_variant00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_system_fpasim_top_test_variant01'
+    # name of the testbench entity
     tb_name = 'tb_system_fpasim_top'
-    test_name = 'tb_system_fpasim_top_test_variant01'
+    # name of the testbench file
+    tb_filename = 'tb_system_fpasim_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = ["tb_system_fpasim_top_test_variant01.json"]
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
-    # generate individual test
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_tb_system_fpasim_top_test_variant01.do"
+    # output simulation directory path
     vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+    # generate individual test
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_system_fpasim_top_test_variant01.json")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_script_filename(filename_p="")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_tb_system_fpasim_top_test_variant01.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    # name of the unitary test
+    unit_test_name = 'tb_system_fpasim_top_test_variant02'
+    # name of the testbench entity
     tb_name = 'tb_system_fpasim_top'
-    test_name = 'tb_system_fpasim_top_test_variant02'
+    # name of the testbench file
+    tb_filename = 'tb_system_fpasim_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = ["tb_system_fpasim_top_test_variant02.json"]
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
-    # generate individual test
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_tb_system_fpasim_top_test_variant01.do"
+    # output simulation directory path
     vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+    # generate individual test
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_system_fpasim_top_test_variant02.json")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_script_filename(filename_p="")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_tb_system_fpasim_top_test_variant01.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_tes_top_test_variant00'
+    # name of the testbench entity
     tb_name = 'tb_tes_top'
-    test_name = 'tb_tes_top_test_variant00'
+    # name of the testbench file
+    tb_filename = 'tb_tes_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = ["tb_tes_top_test_variant00.json"]
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
 
     # generate individual test
-    vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_tes_top_test_variant00.json")
-    test0.set_script_filename(filename_p="tb_tes_top.py")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_tes_top_test_variant01'
+    # name of the testbench entity
     tb_name = 'tb_tes_top'
-    test_name = 'tb_tes_top_test_variant01'
+    # name of the testbench file
+    tb_filename = 'tb_tes_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = ["tb_tes_top_test_variant01.json"]
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
+
 
     # generate individual test
-    vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_tes_top_test_variant01.json")
-    test0.set_script_filename(filename_p="tb_tes_top.py")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     # individual test
     ############################################################################
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_tes_top_test_variant02'
+    # name of the testbench entity
     tb_name = 'tb_tes_top'
-    test_name = 'tb_tes_top_test_variant02'
+    # name of the testbench file
+    tb_filename = 'tb_tes_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = ["tb_tes_top_test_variant02.json"]
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
 
     # generate individual test
-    vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_tes_top_test_variant02.json")
-    test0.set_script_filename(filename_p="tb_tes_top.py")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     # individual test
     ############################################################################
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_tes_top_test_variant03'
+    # name of the testbench entity
     tb_name = 'tb_tes_top'
-    test_name = 'tb_tes_top_test_variant03'
+    # name of the testbench file
+    tb_filename = 'tb_tes_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = ["tb_tes_top_test_variant03.json"]
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
+
 
     # generate individual test
-    vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_tes_top_test_variant03.json")
-    test0.set_script_filename(filename_p="tb_tes_top.py")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_amp_squid_top'
+    # name of the testbench entity
     tb_name = 'tb_amp_squid_top'
-    test_name = tb_name
+    # name of the testbench file
+    tb_filename = 'tb_amp_squid_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = []
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
 
     # generate individual test
-    vunit_outpath = str(Path(root_path, 'vunit_out'))
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    #test0.add_conf_filename(filename_p="")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_mux_squid_top'
+    # name of the testbench entity
     tb_name = 'tb_mux_squid_top'
-    test_name = tb_name
+    # name of the testbench file
+    tb_filename = 'tb_mux_squid_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = []
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
-    # generate individual test
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
     vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+    # generate individual test
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    #test0.add_conf_filename(filename_p="")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_tes_top_debug'
+    # name of the testbench entity
     tb_name = 'tb_tes_top'
-    test_name = 'tb_tes_top_debug'
+    # name of the testbench file
+    tb_filename = 'tb_tes_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = ["tb_tes_top_conf_debug.json"]
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
-    # generate individual test
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
     vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+    # generate individual test
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_tes_top_conf_debug.json")
-    test0.set_script_filename(filename_p="tb_tes_top.py")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_mux_squid_top_test_variant00'
+    # name of the testbench entity
     tb_name = 'tb_mux_squid_top'
-    test_name = 'tb_mux_squid_top_test_variant00'
+    # name of the testbench file
+    tb_filename = 'tb_mux_squid_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = ["tb_mux_squid_top_test_variant00.json"]
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
-    # generate individual test
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
     vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+    # generate individual test
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_mux_squid_top_test_variant00.json")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_amp_squid_top_test_variant00'
+    # name of the testbench entity
     tb_name = 'tb_amp_squid_top'
-    test_name = 'tb_amp_squid_top_test_variant00'
+    # name of the testbench file
+    tb_filename = 'tb_amp_squid_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = ["tb_amp_squid_top_test_variant00.json"]
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
-    # generate individual test
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
     vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+    # generate individual test
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    test0.add_conf_filename(filename_p="tb_amp_squid_top_test_variant00.json")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     
-
-
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_spi_top_conf_debug'
+    # name of the testbench entity
     tb_name = 'tb_spi_top'
-    test_name = 'tb_spi_top_conf_debug'
+    # name of the testbench file
+    tb_filename = 'tb_spi_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = []
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
-    # generate individual test
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
     vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+    # generate individual test
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    # test0.add_conf_filename(filename_p=".json")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_script_filename(filename_p="")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
+    solo_test_dic[unit_test_name] = test_dic0
 
     # individual test
     ############################################################################
-    # search run python script file
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_fpga_system_fpasim_top_debug'
+    # name of the testbench entity
     tb_name = 'tb_fpga_system_fpasim_top'
-    test_name = 'tb_fpga_system_fpasim_top_debug'
+    # name of the testbench file
+    tb_filename = 'tb_fpga_system_fpasim_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = []
+    # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
-    run_filename = 'run_' + tb_name + '.py'
-    # generate individual test
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
     vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+    # generate individual test
     test0 = DUT()
-    test0.add_description(text_p="")
-    test0.set_name(name_p=tb_name)
-    # test0.add_conf_filename(filename_p=".json")
-    test0.set_tb_filename(filename_p=tb_name + ".vhd")
-    test0.set_script_filename(filename_p="")
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
     test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
     test0.set_vunit_outpath(path_p=vunit_outpath)
-    test0.set_sim_wave_filepath(filename_p="wave_" + tb_name + "00.do")
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
     test_dic0 = test0.get_dic(level_p=level2)
     # save the individual test for further use (sequence building)
-    solo_test_dic[test_name] = test_dic0
-
+    solo_test_dic[unit_test_name] = test_dic0
 
 
     ############################################################################
     # Section6 : Define 1 or several list of individual tests
+    #  the syntax is as follows:
+    #   json_test_dic[test_name_in_output_file] = [solo_test_dic[unit_test_name0],..,solo_test_dic[unit_test_namei]]
     ############################################################################
+    json_test_dic = {}
+    description_list = []
+    description_list.append('This section defines the names of the available tests.')
+    description_list.append('   . Each test consists of one or more individual test(s).')
+    description_list.append('   . Each individual test can run one or more test_variant(s) (set of simulation parameters).')
+    json_test_dic["description_list"] = description_list
+
     # 0: first sequence of individual tests
     # fpga_system_fpasim
-    json_data["tb_fpga_system_fpasim_top_debug_test0"] = [solo_test_dic['tb_fpga_system_fpasim_top_debug']]
+    json_test_dic["tb_fpga_system_fpasim_top_debug_test0"] = [solo_test_dic['tb_fpga_system_fpasim_top_debug']]
 
     # system_fpasim
-    json_data["tb_system_fpasim_test0"] = [solo_test_dic['tb_system_fpasim_top']]
-    json_data["tb_system_fpasim_top_test_variant00"] = [solo_test_dic['tb_system_fpasim_top_test_variant00']]
-    json_data["tb_system_fpasim_top_test_variant01"] = [solo_test_dic['tb_system_fpasim_top_test_variant01']]
-    json_data["tb_system_fpasim_top_test_variant02"] = [solo_test_dic['tb_system_fpasim_top_test_variant02']]
+    json_test_dic["tb_system_fpasim_test0"] = [solo_test_dic['tb_system_fpasim_top']]
+    json_test_dic["tb_system_fpasim_top_test_variant00"] = [solo_test_dic['tb_system_fpasim_top_test_variant00']]
+    json_test_dic["tb_system_fpasim_top_test_variant01"] = [solo_test_dic['tb_system_fpasim_top_test_variant01']]
+    json_test_dic["tb_system_fpasim_top_test_variant02"] = [solo_test_dic['tb_system_fpasim_top_test_variant02']]
 
     # tes_top
-    json_data["tb_tes_top_debug_test0"] = [solo_test_dic['tb_tes_top_debug']]
-    json_data["tb_tes_top_test_variant00"] = [solo_test_dic['tb_tes_top_test_variant00']]
-    json_data["tb_tes_top_test_variant01"] = [solo_test_dic['tb_tes_top_test_variant01']]
-    json_data["tb_tes_top_test_variant02"] = [solo_test_dic['tb_tes_top_test_variant02']]
-    json_data["tb_tes_top_test_variant03"] = [solo_test_dic['tb_tes_top_test_variant03']]
+    json_test_dic["tb_tes_top_debug_test0"] = [solo_test_dic['tb_tes_top_debug']]
+    json_test_dic["tb_tes_top_test_variant00"] = [solo_test_dic['tb_tes_top_test_variant00']]
+    json_test_dic["tb_tes_top_test_variant01"] = [solo_test_dic['tb_tes_top_test_variant01']]
+    json_test_dic["tb_tes_top_test_variant02"] = [solo_test_dic['tb_tes_top_test_variant02']]
+    json_test_dic["tb_tes_top_test_variant03"] = [solo_test_dic['tb_tes_top_test_variant03']]
 
     # mux_squid_top
-    json_data["tb_mux_squid_top_test0"] = [solo_test_dic['tb_mux_squid_top']]
-    json_data["tb_mux_squid_top_test_variant00"] = [solo_test_dic['tb_mux_squid_top_test_variant00']]
+    json_test_dic["tb_mux_squid_top_test0"] = [solo_test_dic['tb_mux_squid_top']]
+    json_test_dic["tb_mux_squid_top_test_variant00"] = [solo_test_dic['tb_mux_squid_top_test_variant00']]
 
     # amp_squid_top
-    json_data["tb_amp_squid_top_test2"] = [solo_test_dic['tb_amp_squid_top']]
-    json_data["tb_amp_squid_top_test_variant00"] = [solo_test_dic['tb_amp_squid_top_test_variant00']]
+    json_test_dic["tb_amp_squid_top_test2"] = [solo_test_dic['tb_amp_squid_top']]
+    json_test_dic["tb_amp_squid_top_test_variant00"] = [solo_test_dic['tb_amp_squid_top_test_variant00']]
 
     # spi_top
-    json_data["tb_spi_top_debug_test0"] = [solo_test_dic['tb_spi_top_conf_debug']]
+    json_test_dic["tb_spi_top_debug_test0"] = [solo_test_dic['tb_spi_top_conf_debug']]
+
+    # variant00: tes_top, mux_squid_top, amp_squid_top, system_fpasim_top
+    json_test_dic["tb_all_variant00"] = []
+    json_test_dic["tb_all_variant00"].append(solo_test_dic['tb_tes_top_test_variant00'])
+    json_test_dic["tb_all_variant00"].append(solo_test_dic['tb_mux_squid_top_test_variant00'])
+    json_test_dic["tb_all_variant00"].append(solo_test_dic['tb_amp_squid_top_test_variant00'])
+    json_test_dic["tb_all_variant00"].append(solo_test_dic['tb_system_fpasim_top_test_variant00'])
 
     ############################################################################
     # Section7: Output the result in an output json file
+    #   save section1, section2, section3, section4, section6
     ############################################################################
+    # build the key: test_section_dic
+    json_data['test_section_dic'] = json_test_dic
     # Serializing then json dictionary
     json_object = json.dumps(json_data, indent=4)
     # Writing to the output json file
