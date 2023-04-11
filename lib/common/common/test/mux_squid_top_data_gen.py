@@ -60,7 +60,7 @@ class MuxSquidTopDataGen:
         This method initializes the class instance
         """
         # path to the configuration file
-        self.conf_filepath = None
+        self.test_variant_filepath = None
         # display object
         self.display_obj = Display()
         # set indentation level (integer >=0)
@@ -75,29 +75,29 @@ class MuxSquidTopDataGen:
         #  => use its method to retrieve filepath
         self.vunit_conf_obj = None
 
-    def set_conf_filepath(self,conf_filepath_p):
+    def set_test_variant_filepath(self,filepath_p):
         """
-        This method set the json configuration filepath and get its dictionary
-        :param conf_filepath_p: (string) configuration filepath
+        This method set the json test_variant filepath and get its dictionary
+        :param filepath_p: (string) test_variant filepath
         :return: None
         """
 
-        conf_filepath = conf_filepath_p
+        test_variant_filepath = filepath_p
         display_obj = self.display_obj
         level0 = self.level
         level1= level0 + 1
 
-        msg0 = "MuxSquidTopDataGen._get_json_content: Process Configuration File"
+        msg0 = "MuxSquidTopDataGen.set_test_variant_filepath: Process Configuration File"
         display_obj.display_title(msg_p=msg0,level_p=level0)
 
-        msg0 = 'conf_filepath='+conf_filepath
+        msg0 = 'test_variant_filepath='+test_variant_filepath
         display_obj.display(msg_p=msg0,level_p=level1)
 
         ################################################
         # Extract data from the configuration json file
         ################################################
         # Opening JSON file
-        fid_in = open(conf_filepath, 'r')
+        fid_in = open(test_variant_filepath, 'r')
 
         # returns JSON object as
         # a dictionary
@@ -108,7 +108,7 @@ class MuxSquidTopDataGen:
         # save the json dictionary
         self.json_data = json_data
         # save the configuration filepath
-        self.conf_filepath = conf_filepath
+        self.test_variant_filepath = test_variant_filepath
         return None
 
     def set_vunit_conf_obj(self,obj_p):
@@ -176,7 +176,7 @@ class MuxSquidTopDataGen:
         """
         tb_input_base_path = tb_input_base_path_p
         tb_output_base_path = tb_output_base_path_p
-        conf_filepath = self.conf_filepath
+        test_variant_filepath = self.test_variant_filepath
         display_obj = self.display_obj
         level0 = self.level
         level1 = level0 + 1
@@ -532,7 +532,7 @@ class MuxSquidTopDataGen:
         :return: boolean
         """
         display_obj   = self.display_obj
-        conf_filepath = self.conf_filepath
+        test_variant_filepath = self.test_variant_filepath
         verbosity     = self.verbosity
 
         output_path = output_path

@@ -260,9 +260,9 @@ if __name__ == '__main__':
     VU.set_sim_option("modelsim.vsim_flags", ["-stats=-cmd,-time",'-c','-t','ps','-voptargs=+acc','-title',sim_title])
 
     ######################################################
-    # get the list of conf_filepath (if any)
+    # get the list of test_variant_filepath (if any)
     ######################################################
-    conf_filepath_list = obj.get_conf_filepath(level_p=level1)
+    test_variant_filepath_list = obj.get_test_variant_filepath(level_p=level1)
 
     ######################################################
     # get the list of ram configuration filepath
@@ -281,16 +281,16 @@ if __name__ == '__main__':
     tb_name = obj.get_testbench_name()
 
     # loop on all configuration files
-    for conf_filepath in conf_filepath_list :
+    for test_variant_filepath in test_variant_filepath_list :
 
         str0 = 'Start the Test'
         obj_display.display_title(msg_p=str0, level_p=level1)
-        str0 = 'conf_filepath='+conf_filepath   
+        str0 = 'test_variant_filepath='+test_variant_filepath   
         obj_display.display(msg_p=str0, level_p=level2)
         str0 = 'tb_name='+tb_name   
         obj_display.display(msg_p=str0, level_p=level2)
 
-        conf_filename = str(Path(conf_filepath).stem)
+        conf_filename = str(Path(test_variant_filepath).stem)
 
         name = conf_filename
         test_name = tb_name
@@ -300,7 +300,7 @@ if __name__ == '__main__':
         ####################################################################
         data_gen_obj = TesTopDataGen()
         data_gen_obj.set_indentation_level(level_p= level1)
-        data_gen_obj.set_conf_filepath(conf_filepath_p= conf_filepath)
+        data_gen_obj.set_test_variant_filepath(filepath_p= test_variant_filepath)
         data_gen_obj.set_vunit_conf_obj(obj_p= obj)
         data_gen_obj.set_mif_files(filepath_list_p=ram_filepath_list)
 

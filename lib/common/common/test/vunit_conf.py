@@ -107,8 +107,8 @@ class VunitConf:
         # wave_filepath
         self.wave_filepath = None
 
-        # conf_filename_list
-        self.conf_filename_list = None
+        # test_variant_filename_list
+        self.test_variant_filename_list = None
 
         # script_filepath
         self.script_filepath = None
@@ -151,24 +151,26 @@ class VunitConf:
         json_data = self.json_data['test_section_dic']
 
         # get the test_group_name as well as the test_name
-        key_test_name, key_name = json_key_path.split('/')
+        key_test_name, key_tb_entity_name = json_key_path.split('/')
 
         test_list = json_data.get(key_test_name)
         dic_tmp = {}
         for dic in test_list:
-            name = dic['name']
-            if name == key_name:
+            tb_entity_name = dic["vunit"]['tb_entity_name']
+            if tb_entity_name == key_tb_entity_name:
                 dic_tmp = dic
                 break
-        tb_filename = dic_tmp["vunit"]["tb_filename"]
-        wave_filename = dic_tmp["vunit"]["wave_filename"]
-        script_filename = dic_tmp["vunit"]["script_filename"]
-        conf_filename_list = dic_tmp["conf"]["filename_list"]
-        self.tb_name = str(Path(tb_filename).stem)
-        self.tb_filename = tb_filename
-        self.wave_filename = wave_filename
-        self.script_filename = script_filename
-        self.conf_filename_list = conf_filename_list
+        tb_entity_name     = dic_tmp["vunit"]["tb_entity_name"]
+        tb_filename        = dic_tmp["vunit"]["tb_filename"]
+        wave_filename      = dic_tmp["vunit"]["wave_filename"]
+        script_filename    = dic_tmp["vunit"]["script_filename"]
+        test_variant_filename_list = dic_tmp["test_variant"]["filename_list"]
+        # self.tb_name = str(Path(tb_filename).stem)
+        self.tb_name            = tb_entity_name
+        self.tb_filename        = tb_filename
+        self.wave_filename      = wave_filename
+        self.script_filename    = script_filename
+        self.test_variant_filename_list = test_variant_filename_list
         return None
 
     def _build_path(self):
@@ -859,7 +861,7 @@ class VunitConf:
         else:
             return tb_obj
 
-    def get_conf_filepath(self, level_p=None):
+    def get_test_variant_filepath(self, level_p=None):
         """
         This method returns a list of conf filepath
         :param level_p: (integer >= 0) define the level of indentation of the message to print
@@ -868,12 +870,12 @@ class VunitConf:
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['conf_path']
         display_obj = self.display_obj
-        filename_list = self.conf_filename_list
+        filename_list = self.test_variant_filename_list
         level0 = self._get_indentation_level(level_p=level_p)
         level1 = level0 + 1
         level2 = level0 + 2
 
-        str0 = "VunitConf.get_conf_filepath"
+        str0 = "VunitConf.get_test_variant_filepath"
         display_obj.display_title(msg_p=str0, level_p=level0)
         str0 = 'Search in base_path='+base_path
         display_obj.display(msg_p=str0, level_p=level1)

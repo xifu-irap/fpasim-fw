@@ -162,20 +162,20 @@ if __name__ == '__main__':
         for dic in test_list:
 
             # extract parameter values from the json
-            name = dic['name']
+            tb_entity_name = dic['vunit']['tb_entity_name']
             run_file_path = str(Path(dic['vunit']['run_filepath']))
             output_path = str(Path(dic['vunit']['vunit_outpath']))
             tb_filename = str(Path(dic['vunit']['tb_filename']))
             wave_filename = str(Path(dic['vunit']['wave_filename']))
-            conf_filename_list = dic['conf']['filename_list']
+            test_variant_filename_list = dic['test_variant']['filename_list']
 
             # build a key to uniquely identify a test
             #   True if an individual test is listed only one time in the test_list
-            json_key_path = test_name + '/' + name
+            json_key_path = test_name + '/' + tb_entity_name
 
             # build a unique test_report name
             #   True if an individual test is listed only one time in the test_list
-            test_key = test_name + "__" + name
+            test_key = test_name + "__" + tb_entity_name
             report_filename = 'report__'+test_key+'.xml'
             report_path = str(Path(output_path, report_filename))
 
@@ -185,7 +185,7 @@ if __name__ == '__main__':
             msg_list.append('output_path             : ' + output_path)
             msg_list.append('report_path             : ' + report_path)
             msg_list.append('test_list name          : ' + test_name)
-            msg_list.append('individual test name    : ' + name)
+            msg_list.append('tb entity name    : ' + tb_entity_name)
 
             for msg in msg_list:
                 obj_display.display(msg_p=msg, level_p=level2, color_p='green')
