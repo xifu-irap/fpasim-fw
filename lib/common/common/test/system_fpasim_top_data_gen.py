@@ -191,8 +191,8 @@ class SystemFpasimTopDataGen:
         data_width = 32 # number max of bit of a register
 
 
-        seq_dic = json_data["sequence"]
-        def_dic = json_data["def"]
+        seq_dic = json_data["command_sequence_section"]
+        def_dic = json_data["register_definition_section"]
         cmd_list = seq_dic["cmd_list"]
 
         output_tb_filename = seq_dic["output_tb_filename"]
