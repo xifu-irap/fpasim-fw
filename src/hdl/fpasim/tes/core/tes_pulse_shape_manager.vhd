@@ -1402,7 +1402,8 @@ begin
 
 
   -------------------------------------------------------------------
-  -- force output value when negative.
+  -- force output value to when the true value is negative (<=> max function)
+  -- requirement: FPASIM-FW-REQ-0120
   --------------------------------------------------------------------
   sign_value_tmp6 <= result_ry(result_ry'high);
   p_force_output_value_when_negative : process (i_clk) is
