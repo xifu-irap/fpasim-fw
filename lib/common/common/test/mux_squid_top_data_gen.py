@@ -185,6 +185,9 @@ class MuxSquidTopDataGen:
         json_data = self.json_data
         vunit_conf_obj = self.vunit_conf_obj
 
+        # force the initial seed of the random value generator
+        random.seed(10)
+
        
 
         ################################################
