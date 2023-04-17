@@ -30,21 +30,7 @@
 #      or specify the submodules to be exported.
 # -------------------------------------------------------------------------------------------------------------
 
-# standard library
-import os
 
-# user library
-from .ci.utils.console_colors import *
-from .ci.utils.filepath_list_builder import FilepathListBuilder
-from .ci.utils.display import Display
-from .ci.core.valid_sequencer import ValidSequencer
-from .ci.vunit_conf import VunitConf
-from .ci.tes_top_data_gen import TesTopDataGen
-from .ci.mux_squid_top_data_gen import MuxSquidTopDataGen
-from .ci.amp_squid_top_data_gen import AmpSquidTopDataGen
-from .ci.system_fpasim_top_data_gen import SystemFpasimTopDataGen
-
-# Enable the coloring in the console
-os.system("")
-
-
+from .console_colors import *
+from .filepath_list_builder import FilepathListBuilder
+from .display import Display

@@ -30,61 +30,85 @@
 #
 # -------------------------------------------------------------------------------------------------------------
 
+# standard library
 import os
 from pathlib import Path
-from common.display import *
+
+# user library
+from .display import Display
 
 
 class FilepathListBuilder:
     """
-    This class provides methods to search files in directory and subdirectories
-    Note:
-        The searched files can be filtered by file extension
-        Method name starting by '_' are local to the class (ex:def _toto(...)).
-        It should not be usually used by the user
+    Search files in directory and its subdirectories
     """
+
     def __init__(self):
         """
-        This method initializes the class instance
+        Initialize the class instance.
         """
         # default authorized file extensions
-        self.file_extension_list = ['.vhd', '.v', '.sv', '.vh']
-        self.filepath_list = []
+        self._file_extension_list = ['.vhd', '.v', '.sv', '.vh']
+        # list of filepath to find
+        self._filepath_list = []
         # display object
-        self.obj_display = Display()
+        self._obj_display = Display()
         # set indentation level (integer >=0)
-        self.level = 0
+        self._level = 0
 
     def set_indentation_level(self, level_p):
         """
-        This method set the indentation level of the print message
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        set the indentation level of the print message
+        Parameters
+        ----------
+        level_p: int
+            (int >= 0): define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
         """
-        self.level = level_p
+        self._level = level_p
         return None
 
     def _get_indentation_level(self, level_p):
         """
-        This method select the indentation level to use.
-        If level_p is None, the class attribute is used. Otherwise, the level_p method argument is used
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: (integer >=0) level of indentation of the message to print
+        Select the indentation level to use.
+        Note:
+            . If level_p is None, the class attribute is used. Otherwise, the level_p method argument is used
+
+        Parameters
+        ----------
+        level_p: int
+           (int >= 0) Define the level of indentation of the message to print.
+
+        Returns
+        -------
+        indentation level value
+
         """
+
         level = level_p
         if level is None:
-            return self.level
+            return self._level
         else:
             return level
 
     def set_file_extension(self, file_extension_list_p):
         """
-        This method set the authorized file extension
-        :param file_extension_list_p: (list of string) list of the authorized file extension
-        ex: file_extension_list_p=['.vhd','.v']
-        :return: None
+        Set the authorized file extension
+        Parameters
+        ----------
+        file_extension_list_p: list of str
+            list of the authorized file extension.
+            ex: ['.vhd','.v']
+        Returns
+        -------
+        None
+
         """
-        self.file_extension_list = file_extension_list_p
+        self._file_extension_list = file_extension_list_p
         return None
 
     def add_basepath(self, basepath_p, requirement_filename_p=''):
@@ -99,12 +123,19 @@ class FilepathListBuilder:
                 1. search all files in the root directory (defined by basepath_p) and its subdirectories
                 2. filter files by extensions
                 3. build the corresponding filepaths
-        :param basepath_p: (string) search path
-        :param requirement_filename_p: (string) filename
-        :return: None
-        """
+        Parameters
+        ----------
+        basepath_p: str
+            search path
+        requirement_filename_p: str
+            filename
 
-        file_extension_list = self.file_extension_list
+        Returns
+        -------
+        None
+
+        """
+        file_extension_list = self._file_extension_list
         tmp_list = []
         for (root, dirs, file) in os.walk(basepath_p):
             if requirement_filename_p in file:
@@ -126,51 +157,79 @@ class FilepathListBuilder:
                 for f in file:
                     extension = str(Path(f).suffix)
                     if extension in file_extension_list:
-                        tmp_list.append(str(Path(root,f).resolve()))
-        self.filepath_list.extend(tmp_list)
+                        tmp_list.append(str(Path(root, f).resolve()))
+        self._filepath_list.extend(tmp_list)
 
         return None
 
     def add_filepath(self, basepath_p, filename_p):
         """
-        This method adds an individual filepath
-        :param basepath_p: (string) base path of the file
-        :param filename_p: (string) filename
-        :return: None
+        Add an individual filepath.
+
+        Parameters
+        ----------
+        basepath_p: str
+            base path of the file
+        filename_p: str
+            filename
+
+        Returns
+        -------
+        None
+
         """
-        self.filepath_list.append(str(Path(basepath_p, filename_p).resolve()))
+        self._filepath_list.append(str(Path(basepath_p, filename_p).resolve()))
         return None
 
     def add_filepath(self, filepath_p):
         """
-        This method adds an individual filepath
-        :param filepath_p: (string) filepath to add
-        :return: None
+        Add an individual filepath.
+
+        Parameters
+        ----------
+        filepath_p: str
+            filepath
+
+        Returns
+        -------
+        None.
+
         """
-        self.filepath_list.append(str(Path(filepath_p).resolve()))
+        self._filepath_list.append(str(Path(filepath_p).resolve()))
         return None
 
     def get_filepath_list(self):
         """
-        This method returns the computed filepath list
-        :return: (list of string) list of filepath
+        Get the computed filepath list
+
+        Returns
+        -------
+        list of filepath
         """
-        return self.filepath_list   
+        return self._filepath_list
 
     def get_filepath_by_filename(self, basepath_p, filename_p, level_p=None):
         """
-        This method search in the directory defined by basepath_p as well as its subdirectories a file with
-        the filename_p name
-        Note: the search stops at the first match
-        :param basepath_p: (string) define the search base path
-        :param filename_p: (string) filename to search
-        :return: (string/None)
-           If the filename_p is found then the filepath is returned. Otherwise, None
+        Search in the directory defined by basepath_p as well as its subdirectories a file with
+        the filename_p name.
+
+        Parameters
+        ----------
+        basepath_p: str
+            define the search base path
+        filename_p: str
+            filename to search
+        level_p: int
+            level of indentation of the print message
+
+        Returns
+        -------
+            If the filename_p is found then the filepath is returned. Otherwise, None
         """
 
-        file_extension_list = self.file_extension_list
-        obj_display         = self.obj_display
-        file_extension_list = self.file_extension_list
+        file_extension_list = self._file_extension_list
+        obj_display = self._obj_display
+        file_extension_list = self._file_extension_list
         level0 = self._get_indentation_level(level_p=level_p)
 
         base_path = str(Path(basepath_p).resolve())
@@ -195,14 +254,11 @@ class FilepathListBuilder:
 
         if tmp_filepath is None:
             str0 = "ERROR: FilepathListBuilder.get_filepath_by_filename:"
-            str1 = "  searched file_extension_list_p="+' '.join(file_extension_list)
+            str1 = "  searched file_extension_list_p=" + ' '.join(file_extension_list)
             str2 = "  the filename_p=" + filename_p + " is not found in the director/subdirectories of " + basepath_p
-            obj_display.display(msg_p=str0,color_p='red',level_p=level0)
-            obj_display.display(msg_p=str1,color_p='red',level_p=level0)
-            obj_display.display(msg_p=str2,color_p='red',level_p=level0)
+            obj_display.display(msg_p=str0, color_p='red', level_p=level0)
+            obj_display.display(msg_p=str1, color_p='red', level_p=level0)
+            obj_display.display(msg_p=str2, color_p='red', level_p=level0)
             pass
-        
+
         return tmp_filepath
-
-
-

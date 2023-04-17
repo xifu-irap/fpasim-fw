@@ -24,8 +24,8 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details
-#    This python script defines the AmpSquidTopDataGen class.
-#    This class defines methods to generate data for the amp_squid_top test bench
+#    This python script defines the MuxSquidTopDataGen class.
+#    This class defines methods to generate data for the mux_squid_top test bench
 #    
 #    Note:
 #       . This script is aware of the json configuration file
@@ -33,23 +33,28 @@
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
-
-from common import Display
-from common import ValidSequencer
-from common import TesSignallingModel
-from common import AmpSquidModel
-from pathlib import Path,PurePosixPath
 import json
 import os
 import shutil
-import random
 import copy
-import shutil
+from pathlib import Path,PurePosixPath
+
+# user library
+from .utils import Display
+
+from .core import ValidSequencer
+from .core import File
+from .core import Generator
+from .core import Attribute
+from .core import OverSample
+from .core import TesSignalling
+from .core import TesPulseShapeManager
+from .core import MuxSquidTop
 
 
-class AmpSquidTopDataGen:
+class MuxSquidTopDataGen:
     """
-        This class defines methods to generate data for the VHDL amp_squid_top testbench file.
+        This class defines methods to generate data for the VHDL mux_squid_top testbench file.
         Note:
             Method name starting by '_' are local to the class (ex:def _toto(...)).
             It should not be usually used by the user
@@ -78,7 +83,7 @@ class AmpSquidTopDataGen:
     def set_test_variant_filepath(self,filepath_p):
         """
         This method set the json test_variant filepath and get its dictionary
-        :param filepath_p: (string) filepath
+        :param filepath_p: (string) test_variant filepath
         :return: None
         """
 
@@ -87,7 +92,7 @@ class AmpSquidTopDataGen:
         level0 = self.level
         level1= level0 + 1
 
-        msg0 = "AmpSquidTopDataGen.set_test_variant_filepath: Process Configuration File"
+        msg0 = "MuxSquidTopDataGen.set_test_variant_filepath: Process Configuration File"
         display_obj.display_title(msg_p=msg0,level_p=level0)
 
         msg0 = 'test_variant_filepath='+test_variant_filepath
@@ -149,18 +154,21 @@ class AmpSquidTopDataGen:
 
         nb_pixel_by_frame = json_data['data']['value']['nb_pixel_by_frame']
 
-        ram1_check = json_data['ram1']['generic']['check']
+        ram1_check     = json_data['ram1']['generic']['check']
         ram1_verbosity = json_data['ram1']['generic']['verbosity']
 
-        fpagain = json_data['register']['value']['fpagain']
+        ram2_check     = json_data['ram2']['generic']['check']
+        ram2_verbosity = json_data['ram2']['generic']['verbosity']
 
+        inter_squid_gain  = json_data["register"]["value"]["inter_squid_gain"]
 
         dic = {}
+        dic['g_INTER_SQUID_GAIN'] = int(inter_squid_gain)
         dic['g_NB_PIXEL_BY_FRAME'] = int(nb_pixel_by_frame)
         dic['g_RAM1_CHECK'] = bool(ram1_check)
         dic['g_RAM1_VERBOSITY'] = ram1_verbosity
-        dic['g_FPAGAIN'] = fpagain
-
+        dic['g_RAM2_CHECK'] = bool(ram2_check)
+        dic['g_RAM2_VERBOSITY'] = ram2_verbosity
         return dic
 
 
@@ -182,19 +190,18 @@ class AmpSquidTopDataGen:
         json_data = self.json_data
         vunit_conf_obj = self.vunit_conf_obj
 
-        # force the initial seed of the random value generator
-        random.seed(10)
-
-        ################################################
-        # process valid sequences
-        ################################################
+       
+        ########################################################
+        # Generate the testbench input valid sequence files
+        ########################################################
         csv_separator = ';'
-        msg0 = 'AmpSquidTopDataGen._run: Generate sequence files'
+        msg0 = 'MuxSquidTopDataGen._run: Generate the testbench input valid sequence files'
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
         dic_sequence = []
         dic_sequence.append(json_data["data"]["sequence"])
         dic_sequence.append(json_data["ram1"]["sequence"])
+        dic_sequence.append(json_data["ram2"]["sequence"])
 
         for dic in dic_sequence:
             filename = dic["filename"]
@@ -221,145 +228,18 @@ class AmpSquidTopDataGen:
             msg0 = 'filepath='+filepath
             display_obj.display(msg_p=msg0,level_p=level1)
 
-        ####################################################
-        # process data
-        ####################################################
-        msg0 = 'AmpSquidTopDataGen._run: Generate data file'
-        display_obj.display_subtitle(msg_p=msg0,level_p=level0)
-
-        filename           = json_data["data"]["value"]["filename"]
-        nb_sample_by_pixel = json_data["data"]["value"]["nb_sample_by_pixel"]
-        nb_pixel_by_frame  = json_data["data"]["value"]["nb_pixel_by_frame"]
-        nb_frame_by_pulse  = json_data["data"]["value"]["nb_frame_by_pulse"]
-        nb_pulse           = json_data["data"]["value"]["nb_pulse"]
-        # amp_squid_offset_correction
-        amp_squid_offset_correction           = json_data["data"]["value"]["amp_squid_offset_correction"]
-        amp_squid_offset_correction_mode     = amp_squid_offset_correction["mode"]
-        amp_squid_offset_correction_min_val     = amp_squid_offset_correction["min_value"]
-        amp_squid_offset_correction_max_val     = amp_squid_offset_correction["max_value"]
-
-        # pixel_result
-        pixel_result           = json_data["data"]["value"]["pixel_result"]
-        pixel_result_mode     = pixel_result["mode"]
-        pixel_result_min_val     = pixel_result["min_value"]
-        pixel_result_max_val     = pixel_result["max_value"]
-
-        filepath = str(Path(tb_input_base_path,filename))
-        obj = TesSignallingModel()
-        obj.set_conf(nb_sample_by_pixel_p=nb_sample_by_pixel, nb_pixel_by_frame_p=nb_pixel_by_frame, nb_frame_by_pulse_p=nb_frame_by_pulse, nb_pulse_p=nb_pulse)
-        pixel_sof_list,pixel_eof_list,pixel_id_list,frame_sof_list,frame_eof_list,frame_id_list = obj.get_data()
-        
-
-        def gen_seq(mode_p,min_value_p,max_value_p):
-            mode = mode_p
-            min_value = min_value_p
-            max_value = max_value_p
-
-            if mode == 0:
-                return list(range(min_value,max_value+1))
-            elif mode == 1:
-                tmp = []
-                for i in range(min_value,max_value+1):
-                    tmp.append(random.randint(min_value,max_value))
-                return tmp
-
-        def gen_pixel(data_list_p,nb_pixel_p):
-            data_list = data_list_p
-            nb_pixel = nb_pixel_p
-            tmp = []
-            L = len(data_list)
-            cnt = 1
-            for i in range(nb_pixel):
-                for data in data_list:
-                    tmp.append(data)
-                    if cnt == nb_pixel:
-                        break;
-                    else:
-                        cnt += 1
-            return tmp
-
-        def oversample(data_list_p,oversample_p):
-            res = []
-
-            for data in data_list_p:
-                for i in range(oversample_p):
-                    res.append(data)
-            return res
-        # create a sequence of pixel
-        amp_squid_offset_correction_seq_list    = gen_seq(mode_p=amp_squid_offset_correction_mode,min_value_p=amp_squid_offset_correction_min_val,max_value_p=amp_squid_offset_correction_max_val)
-        pixel_result_seq_list = gen_seq(mode_p=pixel_result_mode,min_value_p=pixel_result_min_val,max_value_p=pixel_result_max_val)
-
-        # duplicate the seq_list until the number of element is equal to nb_pixel
-        nb_pixel = nb_pixel_by_frame * nb_frame_by_pulse * nb_pulse
-        amp_squid_offset_correction_list = gen_pixel(data_list_p=amp_squid_offset_correction_seq_list,nb_pixel_p=nb_pixel)
-        pixel_result_list = gen_pixel(data_list_p=pixel_result_seq_list,nb_pixel_p=nb_pixel)
-
-        # oversample each sample
-        amp_squid_offset_correction_oversample_list    = oversample(data_list_p=amp_squid_offset_correction_list,oversample_p=nb_sample_by_pixel)
-        pixel_result_oversample_list = oversample(data_list_p=pixel_result_list,oversample_p=nb_sample_by_pixel)
-
-        fid = open(filepath,'w')
-        # header
-        fid.write('pixel_sof')
-        fid.write(csv_separator)
-        fid.write('pixel_eof')
-        fid.write(csv_separator)
-        fid.write('pixel_id')
-        fid.write(csv_separator)
-        fid.write('pixel_result')
-        fid.write(csv_separator)
-        fid.write('frame_sof')
-        fid.write(csv_separator)
-        fid.write('frame_eof')
-        fid.write(csv_separator)
-        fid.write('frame_id')
-        fid.write(csv_separator)
-        fid.write('amp_squid_offset_correction')
-        fid.write('\n')
-
-        L = len(pixel_sof_list)
-        index_max = L - 1
-        for i in range(L):
-            pixel_sof = pixel_sof_list[i]
-            pixel_eof = pixel_eof_list[i]
-            pixel_id = pixel_id_list[i]
-            pixel_result = pixel_result_oversample_list[i]
-            frame_sof = frame_sof_list[i]
-            frame_eof = frame_eof_list[i]
-            frame_id = frame_id_list[i]
-            amp_squid_offset_correction = amp_squid_offset_correction_oversample_list[i]
-            # header
-            fid.write(str(pixel_sof))
-            fid.write(csv_separator)
-            fid.write(str(pixel_eof))
-            fid.write(csv_separator)
-            fid.write(str(pixel_id))
-            fid.write(csv_separator)
-            fid.write(str(pixel_result))
-            fid.write(csv_separator)
-            fid.write(str(frame_sof))
-            fid.write(csv_separator)
-            fid.write(str(frame_eof))
-            fid.write(csv_separator)
-            fid.write(str(frame_id))
-            fid.write(csv_separator)
-            fid.write(str(amp_squid_offset_correction))
-
-            if i != index_max:
-                fid.write('\n')
-
-        ####################################################
-        # copy file
-        ####################################################
+        ########################################################
+        # Copy the testbench input RAM configuration files
+        ########################################################
         vunit_conf_obj = self.vunit_conf_obj
-        msg0 = 'AmpSquidTopDataGen._run: copy ram files'
+        msg0 = 'MuxSquidTopDataGen._run: Copy the testbench input RAM configuration files'
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
         dic_sequence = []
         dic_sequence.append(json_data["ram1"])
+        dic_sequence.append(json_data["ram2"])
 
-        dic_ram_content_tmp = {}
-
+        ram_filepath_dic = {}
 
         for dic in dic_sequence:
             input_filename = dic["value"]['input_filename']
@@ -368,65 +248,186 @@ class AmpSquidTopDataGen:
             output_filepath = str(Path(tb_input_base_path,output_filename)) 
             input_filepath = vunit_conf_obj.get_data_filepath(filename_p=input_filename,level_p=level1)
 
-            msg0 = 'input_filepath=' + input_filepath
+            msg0 = 'from: ' + input_filepath
             display_obj.display(msg_p=msg0,level_p=level2)
-            msg0 = 'output_filepath=' + output_filepath
+            msg0 = 'to: ' + output_filepath
             display_obj.display(msg_p=msg0,level_p=level2)
 
             shutil.copyfile(input_filepath,output_filepath)
 
-            #####################################################
-            # extract the ram contents in order to compute the expected value 
-            # we assume the data are string representation of integer value
-            #####################################################
-            data_list = []
-            fid_tmp = open(input_filepath,'r')
-            lines = fid_tmp.readlines()
-            fid_tmp.close()
-
-            L = len(lines)
-
-            for i in range(L):
-                line = lines[i]
-                str_addr,str_data = line.split(csv_separator)
-                # skip the header
-                if i != 0:
-                    data_list.append(int(str_data)) 
-
             # save the ram content
-            dic_ram_content_tmp[name] = data_list
+            ram_filepath_dic[name] = output_filepath
+
+        ########################################################
+        # Get the testbench parameters
+        ########################################################
+        msg0 = 'MuxSquidTopDataGen._run: Get the testbench parameters'
+        display_obj.display_subtitle(msg_p=msg0,level_p=level0)
+
+        
+        nb_sample_by_pixel = json_data["data"]["value"]["nb_sample_by_pixel"]
+        nb_pixel_by_frame  = json_data["data"]["value"]["nb_pixel_by_frame"]
+        nb_frame_by_pulse  = json_data["data"]["value"]["nb_frame_by_pulse"]
+        nb_pulse           = json_data["data"]["value"]["nb_pulse"]
+
+        # pixel_result
+        tes_dic          = json_data["data"]["value"]["pixel_result"]
+        tes_out_mode     = tes_dic["mode"]
+        tes_out_min_val  = tes_dic["min_value"]
+        tes_out_max_val  = tes_dic["max_value"]
+        
+        # mux_squid
+        mux_squid                       = json_data["data"]["value"]["mux_squid"]
+        adc_mux_squid_feedback_mode     = mux_squid["mode"]
+        adc_mux_squid_feedback_min_val  = mux_squid["min_value"]
+        adc_mux_squid_feedback_max_val  = mux_squid["max_value"]
+
+        inter_squid_gain  = int(json_data["register"]["value"]["inter_squid_gain"])
+
+        mux_squid_offset_name     = json_data["ram1"]["generic"]["name"]
+        mux_squid_offset_filepath = ram_filepath_dic[mux_squid_offset_name]
+
+        mux_squid_tf_name     = json_data["ram2"]["generic"]["name"]
+        mux_squid_tf_filepath = ram_filepath_dic[mux_squid_tf_name]
+
+        ########################################################
+        # Compute the testbench reference output values
+        ########################################################
+        msg0 = 'MuxSquidTopDataGen._run: compute the testbench reference output values'
+        display_obj.display_subtitle(msg_p=msg0,level_p=level0)
+
+        # adc: compute parameters
+        ########################################################
+        nb_pts     = nb_pixel_by_frame * nb_frame_by_pulse * nb_pulse
+        nb_sample_by_frame = nb_pixel_by_frame*nb_sample_by_pixel
+        oversample = nb_sample_by_pixel
 
 
-        #########################################################
-        # compute the expected output
-        #########################################################
-        fpasim_gain = json_data["register"]["value"]["fpagain"]
-        amp_squid_tf_name = json_data["ram1"]["generic"]["name"]
-        obj = AmpSquidModel()
-        obj.set_ram_amp_squid_tf(data_list_p=dic_ram_content_tmp[amp_squid_tf_name])
-        obj.set_data(data_list_p=pixel_result_oversample_list)
-        obj.set_amp_offset_correction(data_list_p=amp_squid_offset_correction_oversample_list)
-        obj.set_fpasim_gain(data_p=fpasim_gain)
-        obj.run()
+        # generate data
+        ########################################################
+        # adc
+        obj_gen = Generator(nb_pts_p=nb_pts)
+        pts_list = obj_gen.run()
 
-        result_list = obj.get_result()
+        obj_attr = Attribute(pts_list_p=pts_list)
+        obj_attr.set_attribute(name_p="adc_mux_squid_feedback", mode_p=adc_mux_squid_feedback_mode, min_value_p=adc_mux_squid_feedback_min_val, max_value_p=adc_mux_squid_feedback_max_val)
+        pts_list = obj_attr.run()
+
+        obj_attr = Attribute(pts_list_p=pts_list)
+        obj_attr.set_random_seed(value_p=10)
+        obj_attr.set_attribute(name_p="tes_out", mode_p=tes_out_mode, min_value_p=tes_out_min_val, max_value_p=tes_out_max_val)
+        pts_list = obj_attr.run()
+
+        obj_over = OverSample(pts_list_p=pts_list)
+        obj_over.set_oversampling(value_p=oversample)
+        pts_list = obj_over.run()
+
+        # tes
+        obj_sign = TesSignalling(pts_list_p=pts_list)
+        obj_sign.set_conf(nb_pixel_by_frame_p=nb_pixel_by_frame, nb_sample_by_pixel_p=nb_sample_by_pixel,nb_sample_by_frame_p=nb_sample_by_frame, nb_frame_by_pulse_p=nb_frame_by_pulse)
+        pts_list = obj_sign.run()
+
+        # obj_tes = TesTop(pts_list_p=pts_list)
+        # obj_tes.set_ram_tes_pulse_shape(filepath_p=tes_pulse_shape_filepath)
+        # obj_tes.set_ram_tes_steady_state(filepath_p=tes_std_state_filepath)
+        # obj_tes.add_command(pixel_id_p=cmd_pixel_id, time_shift_p=cmd_time_shift, pulse_heigth_p=cmd_pulse_heigth,skip_nb_samples_p=skip_nb_samples)
+        # pts_list = obj_tes.run(output_attribute_name_p="tes_out")
+
+        # mux_squid
+        obj_mux = MuxSquidTop(pts_list_p=pts_list)
+        obj_mux.set_ram_mux_squid_offset(filepath_p=mux_squid_offset_filepath)
+        obj_mux.set_ram_mux_squid_tf(filepath_p=mux_squid_tf_filepath)
+        obj_mux.set_conf0(inter_squid_gain_p=inter_squid_gain)
+        pts_list = obj_mux.run(output_attribute_name_p="mux_squid_out")
+
+        ########################################################
+        # Generate the testbench reference output file
+        ########################################################
+        msg0 = 'MuxSquidTopDataGen._run: Generate the testbench reference output file'
+        display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
         output_filename = json_data["model"]["value"]["output_filename"]
         output_filepath = str(Path(tb_input_base_path_p,output_filename))
-        fid = open(output_filepath,'w')
-        # write header
-        fid.write("expected_output_int")
-        fid.write('\n')
-        L = len(result_list)
-        index_max = L - 1
-        for index in range(L):
-            result = result_list[index]
-            fid.write(str(result))
-            if index != index_max:
-                fid.write('\n')
 
-        fid.close()
+        with open(output_filepath,'w') as fid:
+            csv_separator = ';'
+            L = len(pts_list)
+            index_max = L - 1
+            for index,obj_pt in enumerate(pts_list):
+                if index == 0:
+                    # header
+                    fid.write('mux_squid_out')
+                    fid.write('\n')
+                # get point attribute
+                mux_squid_out  = obj_pt.get_attribute(name_p="mux_squid_out")
 
+                fid.write(str(mux_squid_out))
+                if index != index_max:
+                    fid.write('\n')
+
+        msg0 = 'filepath= '+output_filepath
+        display_obj.display(msg_p=msg0,level_p=level1)
+
+        ########################################################
+        # Generate the testbench input data file
+        ########################################################
+        msg0 = 'TesTopDataGen._run: Generate the testbench input data file'
+        display_obj.display_subtitle(msg_p=msg0,level_p=level0)
+
+        filename = json_data["data"]["value"]["filename"]
+        filepath = str(Path(tb_input_base_path,filename))
+        with open(filepath,'w') as fid:
+            csv_separator = ';'
+            L = len(pts_list)
+            index_max = L - 1
+            for index,obj_pt in enumerate(pts_list):
+                if index == 0:
+                    # header
+                    fid.write('pixel_sof')
+                    fid.write(csv_separator)
+                    fid.write('pixel_eof')
+                    fid.write(csv_separator)
+                    fid.write('pixel_id')
+                    fid.write(csv_separator)
+                    fid.write('tes_out')
+                    fid.write(csv_separator)
+                    fid.write('frame_sof')
+                    fid.write(csv_separator)
+                    fid.write('frame_eof')
+                    fid.write(csv_separator)
+                    fid.write('frame_id')
+                    fid.write(csv_separator)
+                    fid.write('adc_mux_squid_feedback')
+                    fid.write('\n')
+                # get point attributes
+                pixel_sof = obj_pt.get_attribute(name_p="pixel_sof")
+                pixel_eof = obj_pt.get_attribute(name_p="pixel_eof")
+                pixel_id  = obj_pt.get_attribute(name_p="pixel_id")
+                tes_out   = obj_pt.get_attribute(name_p="tes_out")
+                frame_sof = obj_pt.get_attribute(name_p="frame_sof")
+                frame_eof = obj_pt.get_attribute(name_p="frame_eof")
+                frame_id  = obj_pt.get_attribute(name_p="frame_id")
+                adc_mux_squid_feedback  = obj_pt.get_attribute(name_p="adc_mux_squid_feedback")
+
+                fid.write(str(pixel_sof))
+                fid.write(csv_separator)
+                fid.write(str(pixel_eof))
+                fid.write(csv_separator)
+                fid.write(str(pixel_id))
+                fid.write(csv_separator)
+                fid.write(str(tes_out))
+                fid.write(csv_separator)
+                fid.write(str(frame_sof))
+                fid.write(csv_separator)
+                fid.write(str(frame_eof))
+                fid.write(csv_separator)
+                fid.write(str(frame_id))
+                fid.write(csv_separator)
+                fid.write(str(adc_mux_squid_feedback))
+                if index != index_max:
+                    fid.write('\n')
+        msg0 = 'filepath='+filepath
+        display_obj.display(msg_p=msg0,level_p=level1)
 
 
         return None
@@ -503,7 +504,7 @@ class AmpSquidTopDataGen:
         output_path = str(Path(script_path.parents[1],"modelsim"))
 
         # copy each files
-        msg0 =  "[AmpSquidTopDataGen._copy_mif_files]: Copy the IP init files into the Vunit output simulation directory"
+        msg0 =  "[mux_squid_top_data_gen._copy_mif_files]: Copy the IP init files into the Vunit output simulation directory"
         display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
         for filepath in self.filepath_list_mif:
             msg0 =  'Copy: ' + filepath + " to " + output_path
@@ -531,7 +532,7 @@ class AmpSquidTopDataGen:
         level0      = self.level
         level1      = level0 + 1
 
-        str0 = "AmpSquidTopDataGen.pre_config"
+        str0 = "MuxSquidTopDataGen.pre_config"
         display_obj.display_title(msg_p=str0, level_p=level0)
 
         ###############################
@@ -552,7 +553,7 @@ class AmpSquidTopDataGen:
         ##########################################################    
         self._run(tb_input_base_path_p=tb_input_base_path, tb_output_base_path_p=tb_output_base_path)
 
-        str0 = "AmpSquidTopDataGen.pre_config: Simulation transcript"
+        str0 = "MuxSquidTopDataGen.pre_config: Simulation transcript"
         display_obj.display_title(msg_p=str0, level_p=level0)
 
         str0 = ""

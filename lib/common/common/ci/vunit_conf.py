@@ -47,12 +47,13 @@ from pathlib import Path
 import re
 import json
 
-from common import FilepathListBuilder, Display
+from .utils import FilepathListBuilder
+from .utils import Display
 
 
 class VunitConf:
     """
-    This class defines methods to compile VHDL files (source files, testbench)
+    Define methods to compile VHDL files (source files, testbench)
     These methods hide as much as possible the project tree.
     Note:
         Method name starting by '_' are local to the class (ex:def _toto(...)).
@@ -61,10 +62,16 @@ class VunitConf:
 
     def __init__(self, json_filepath_p, json_key_path_p, script_name_p):
         """
-        This method initializes the class instance
-        :param json_filepath_p: (string) json filepath
-        :param json_key_path_p: (string) json keys to get a specific individual test
-        :param script_name_p: (string) script name
+        Initialize the class instance
+
+        Parameters
+        ----------
+        json_filepath_p: str
+            json filepath
+        json_key_path_p: str
+            json keys to get a specific individual test
+        script_name_p: str
+            script name
         """
         self.filepath_list_mif = None
         # current conf filepath
@@ -143,10 +150,13 @@ class VunitConf:
 
     def _extract_test_param_from_json(self):
         """
-        This method retrieves parameters of the individual test from the json file
-        :return: None
-        """
+        Retrieve parameters of the individual test from the json file.
 
+        Returns
+        -------
+        None
+
+        """
         json_key_path = self.json_key_path
         json_data = self.json_data['test_section_dic']
 
@@ -160,21 +170,25 @@ class VunitConf:
             if tb_entity_name == key_tb_entity_name:
                 dic_tmp = dic
                 break
-        tb_entity_name     = dic_tmp["vunit"]["tb_entity_name"]
-        tb_filename        = dic_tmp["vunit"]["tb_filename"]
-        wave_filename      = dic_tmp["vunit"]["wave_filename"]
+        tb_entity_name = dic_tmp["vunit"]["tb_entity_name"]
+        tb_filename = dic_tmp["vunit"]["tb_filename"]
+        wave_filename = dic_tmp["vunit"]["wave_filename"]
         test_variant_filename_list = dic_tmp["test_variant"]["filename_list"]
         # self.tb_name = str(Path(tb_filename).stem)
-        self.tb_name            = tb_entity_name
-        self.tb_filename        = tb_filename
-        self.wave_filename      = wave_filename
+        self.tb_name = tb_entity_name
+        self.tb_filename = tb_filename
+        self.wave_filename = wave_filename
         self.test_variant_filename_list = test_variant_filename_list
         return None
 
     def _build_path(self):
         """
-        This method builds project directory paths necessary to the simulation
-        :return: None
+        Build the Git project directory paths necessary to the VHDL simulation.
+
+        Returns
+        -------
+        None
+
         """
         json_data = self.json_data
         base_path_dic = self.base_path_dic
@@ -211,16 +225,23 @@ class VunitConf:
 
         self.base_path_dic = base_path_dic
         self.root_path = root_path
-        
+
         return None
 
     def _get_indentation_level(self, level_p):
         """
-        This method select the indentation level to use.
-        If level_p is None, the class attribute is used. Otherwise, the level_p method argument is used
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: (integer >=0) level of indentation of the message to print
+        Select the print indentation level to use.
+
+        Parameters
+        ----------
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        level value to use
         """
+
         level = level_p
         if level is None:
             return self.level
@@ -229,16 +250,27 @@ class VunitConf:
 
     def _add_external_library(self, library_name_p, path_p, level_p=None):
         """
-        This method set an external library
-        :param library_name_p: (string) library name
-        :param path_p: (string) path of the library name
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Set an external library.
+
+        Parameters
+        ----------
+        library_name_p: str
+            library name
+        path_p: str
+            path of the library name
+        level_p: int
+            (int >= 0): define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
         """
+
         VU = self.VU
         display_obj = self.display_obj
 
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
         level1 = level0 + 1
 
         library_list = VU.get_libraries(library_name_p, allow_empty=True)
@@ -252,18 +284,27 @@ class VunitConf:
             display_obj.display(msg_p=path_p, level_p=level1)
 
             # build the external library
-            path = path_p.replace('\\','/')
-            str0 = " ".join(["vmap",library_name_p,path])
+            path = path_p.replace('\\', '/')
+            str0 = " ".join(["vmap", library_name_p, path])
             self.do_ext_lib_list.append(str0)
             # obj_do.add_external_library(library_name_p=library_name_p,path_p=path_p)
         return None
 
     def _add_library(self, library_name_p):
         """
-        This method ensures that the library is added once
-        :param library_name_p: (string) library name to add if not already defined
-        :return: None
+        Ensures that the library is added once.
+
+        Parameters
+        ----------
+        library_name_p: str
+            library name to add if not already defined
+
+        Returns
+        -------
+        None
+
         """
+
         VU = self.VU
 
         library_list = VU.get_libraries(library_name_p, allow_empty=True)
@@ -278,29 +319,47 @@ class VunitConf:
 
             # obj_do.add_library(library_name_p=library_name_p)
             # Define the library
-            str0 = " ".join(["vlib",library_name_p])
+            str0 = " ".join(["vlib", library_name_p])
             self.do_lib_list.append(str0)
         return None
 
     def set_verbosity(self, verbosity_p):
         """
-        Set the level of verbosity
-        :param verbosity_p: (integer >=0) level of verbosity
-        :return: None
+        Set the level of verbosity of the print message
+        Parameters
+        ----------
+        verbosity_p: int
+             (int >=0) level of verbosity
+
+        Returns
+        -------
+        None
+
         """
+
         self.verbosity = verbosity_p
         return None
 
     def set_vunit_simulator(self, name_p, level_p=None):
         """
-        This function set the environment variables necessary to the VUNIT library
+        Set the environment variables necessary to the VUNIT library.
         These environment variables are mandatory to correctly work with the modelsim/questa simulator
         Note: This function must be called before creating a VUNIT object (ex: VU = VUnit.from_args(args=args))
-        in the run python script
-        :param name_p: (string) -> possibles values are: 'modelsim' or 'questa'
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: 0 if no error. Otherwise, -1
+        in the run python script.
+
+        Parameters
+        ----------
+        name_p: str
+            VHDL simulator name. The possibles values are: 'modelsim' or 'questa'
+        level_p: int
+            (int >=0) level of verbosity of the print message
+
+        Returns
+        -------
+        int
+            0 if no error. Otherwise, -1
         """
+
 
         json_data = self.json_data
         display_obj = self.display_obj
@@ -309,11 +368,11 @@ class VunitConf:
         level2 = level0 + 2
 
         # retrieve paths from the json file
-        modelsim_path             = json_data['path_section_dic']['vunit_modelsim_path']["path"]
-        questa_path               = json_data['path_section_dic']['vunit_questa_path']["path"]
+        modelsim_path = json_data['path_section_dic']['vunit_modelsim_path']["path"]
+        questa_path = json_data['path_section_dic']['vunit_questa_path']["path"]
         modelsim_compile_lib_path = json_data['path_section_dic']['vunit_modelsim_compile_lib_path']["path"]
-        questa_compile_lib_path   = json_data['path_section_dic']['vunit_questa_compile_lib_path']["path"]
-        root_path        = str(Path(json_data['path_section_dic']['root_path']['path']))
+        questa_compile_lib_path = json_data['path_section_dic']['vunit_questa_compile_lib_path']["path"]
+        root_path = str(Path(json_data['path_section_dic']['root_path']['path']))
 
         display_obj.display_title(msg_p='Simulator Configuration', level_p=level0)
         display_obj.display(msg_p='Selected Simulator: ' + name_p, level_p=level1)
@@ -351,34 +410,58 @@ class VunitConf:
 
     def set_vunit(self, vunit_object_p):
         """
-        This method set the Vunit class instance
-        Note: this method must be called after the VunitConf.set_vunit_simulator method
-        :param vunit_object_p: (VUNIT Instance) VUNIT class instance
-        :return: None
+        Set the Vunit class instance
+
+        Parameters
+        ----------
+        vunit_object_p: Vunit instance
+            instance of the Vunit object
+
+        Returns
+        -------
+        None
+
         """
+
         self.VU = vunit_object_p
         # self.obj_do.set_vunit(vunit_object_p=vunit_object_p)
         return None
 
     def set_indentation_level(self, level_p):
         """
-        This method set the indentation level of the print message
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Set the indentation level of the print message.
+
+        Parameters
+        ----------
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
         """
+
         self.level = level_p
         return None
 
     def xilinx_compile_lib_default_lib(self, level_p=None):
         """
-        This method defines and set a list of default pre-compiled Xilinx libraries
-        :param level_p:  (integer >= 0) define the level of indentation of the message to print
-        :return: None
-        """
+        Defines and set a list of default pre-compiled Xilinx libraries.
 
+        Parameters
+        ----------
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
+        """
         basepath = self.compile_lib_basepath
         display_obj = self.display_obj
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
         level1 = level0 + 1
         # define a list of pre-compiled Xilinx libraries to set as external libraries
         library_name_list = []
@@ -400,13 +483,25 @@ class VunitConf:
 
     def _add_source_file(self, filepath_list_p, msg_p, library_name_p, version_p, level_p):
         """
-        This method adds source files to the Vunit object
-        :param filepath_list_p: (list of string) list of filepath to add to the Vunit object
-        :param msg_p: (string) first part of a msg to print in the console
-        :param library_name_p: (string) library name where to compile the library
-        :param version_p: (string) VHDL version if relevant (not applicable for verilog or system verilog file)
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Add source files to the Vunit object.
+
+        Parameters
+        ----------
+        filepath_list_p: list of str
+            list of filepath to add to the Vunit object
+        msg_p: str
+            first part of a msg to print in the console
+        library_name_p: str
+             library name to use during the library compilation.
+        version_p: str
+            VHDL version if relevant (not applicable for verilog or system verilog file)
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
         """
         VU = self.VU
         display_obj = self.display_obj
@@ -414,7 +509,7 @@ class VunitConf:
         library_name = library_name_p
         version = version_p
         filepath_list = filepath_list_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
         level1 = level0 + 1
 
         display_obj.display_title(msg_p=msg + ' Compilation (library_name:version:path)', level_p=level0)
@@ -426,15 +521,15 @@ class VunitConf:
 
             # build the external library
             suffix = Path(filepath).suffix
-            filepath = filepath.replace('\\','/')
+            filepath = filepath.replace('\\', '/')
             if suffix == '.vhd':
-                str0 = " ".join(['vcom','-work',library_name,'-'+version,filepath])
+                str0 = " ".join(['vcom', '-work', library_name, '-' + version, filepath])
             elif suffix == '.vhdl':
-                str0 = " ".join(['vcom','-work',library_name,'-'+version,filepath])
+                str0 = " ".join(['vcom', '-work', library_name, '-' + version, filepath])
             elif suffix == '.v':
-                str0 = " ".join(['vlog','-work',library_name,filepath])
+                str0 = " ".join(['vlog', '-work', library_name, filepath])
             elif suffix == '.sv':
-                str0 = " ".join(['vlog','-work',library_name,filepath])
+                str0 = " ".join(['vlog', '-work', library_name, filepath])
             self.do_list.append(str0)
             self.do_filepath_list.append(filepath)
             # obj_do.add_source_file(filepath_p=filepath,library_name_p=library_name,version_p=version)
@@ -443,19 +538,29 @@ class VunitConf:
 
     def compile_glbl_lib(self, name_p='vivado_glbl', library_name_p='fpasim', version_p='2008', level_p=None):
         """
-        This method compiles the glbl library
-        :param name_p: (string) name to print in the console
-        :param library_name_p: (string) library name where to compile the library
-        :param version_p: (string) VHDL version if relevant (not applicable for verilog or system verilog file)
-        :param level_p:  (integer >= 0) define the level of indentation of the message to print
-        :return: None
-        """
+        Compile the glbl library
 
+        Parameters
+        ----------
+        name_p: str
+            name to print in the console
+        library_name_p: str
+            library name to use during the library compilation.
+        version_p: str
+            VHDL version if relevant (not applicable for verilog or system verilog file)
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
+        """
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['vivado_glbl_path']
 
         library_name = library_name_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
 
         # list of files to compile
         filepath_list = []
@@ -477,19 +582,31 @@ class VunitConf:
 
     def compile_xilinx_xpm_ip(self, name_p='ip_xpm', library_name_p='fpasim', version_p='2008', level_p=None):
         """
-        This method compiles the user vhdl files associated to the Xilinx XPM
-        :param name_p: (string) name to print in the console
-        :param library_name_p: (string) library name where to compile the library
-        :param version_p: (string) VHDL version if relevant (not applicable for verilog or system verilog file)
-        :param level_p:  (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Compile the user vhdl files associated to the Xilinx XPM.
+
+        Parameters
+        ----------
+        name_p: str
+            name to print in the console
+        library_name_p: str
+            library name to use during the library compilation.
+        version_p: str
+            VHDL version if relevant (not applicable for verilog or system verilog file)
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
         """
+
 
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['ip_xilinx_xpm_path']
 
         library_name = library_name_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
 
         # add the library name
         self._add_library(library_name_p=library_name)
@@ -507,19 +624,30 @@ class VunitConf:
 
     def compile_xilinx_coregen_ip(self, name_p='ip_coregen', library_name_p='fpasim', version_p='2008', level_p=None):
         """
-        This method compiles the simulation files associated to the Xilinx Coregen
-        :param name_p: (string) name to print in the console
-        :param library_name_p: (string) library name where to compile the library
-        :param version_p: (string) VHDL version if relevant (not applicable for verilog or system verilog file)
-        :param level_p:  (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Compile the simulation files associated to the Xilinx Coregen.
+
+        Parameters
+        ----------
+        name_p: str
+            name to print in the console
+        library_name_p: str
+            library name to use during the library compilation.
+        version_p: str
+            VHDL version if relevant (not applicable for verilog or system verilog file)
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
         """
 
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['ip_xilinx_coregen_path']
 
         library_name = library_name_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
 
         # list of files to compile
         filepath_list = []
@@ -539,13 +667,12 @@ class VunitConf:
         filepath_list.append(str(Path(base_path, 'system_fpasim_top_ila/sim/system_fpasim_top_ila.vhd')))
         filepath_list.append(str(Path(base_path, 'fpasim_top_ila_0/sim/fpasim_top_ila_0.vhd')))
         filepath_list.append(str(Path(base_path, 'fpasim_top_vio_0/sim/fpasim_top_vio_0.vhd')))
-        
+
         filepath_list.append(str(Path(base_path, 'fpasim_regdecode_top_ila_0/sim/fpasim_regdecode_top_ila_0.vhd')))
         filepath_list.append(str(Path(base_path, 'fpasim_regdecode_top_ila_1/sim/fpasim_regdecode_top_ila_1.vhd')))
         filepath_list.append(str(Path(base_path, 'fpasim_spi_device_select_ila/sim/fpasim_spi_device_select_ila.vhd')))
-        
-        filepath_list.append(str(Path(base_path, 'fpasim_spi_device_select_vio/sim/fpasim_spi_device_select_vio.vhd')))
 
+        filepath_list.append(str(Path(base_path, 'fpasim_spi_device_select_vio/sim/fpasim_spi_device_select_vio.vhd')))
 
         # add the library name
         self._add_library(library_name_p=library_name)
@@ -562,19 +689,30 @@ class VunitConf:
 
     def compile_opal_kelly_ip(self, name_p='ip_opal_kelly', library_name_p='fpasim', version_p='2008', level_p=None):
         """
-        This method compiles the files provided by the Opal Kelly company
-        :param name_p: (string) name to print in the console
-        :param library_name_p: (string) library name where to compile the library
-        :param version_p: (string) VHDL version if relevant (not applicable for verilog or system verilog file)
-        :param level_p:  (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Compile the source files provided by the Opal Kelly company.
+
+        Parameters
+        ----------
+        name_p: str
+            name to print in the console
+        library_name_p: str
+            library name to use during the library compilation.
+        version_p: str
+            VHDL version if relevant (not applicable for verilog or system verilog file)
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
         """
 
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['ip_opal_kelly_simu_path']
 
         library_name = library_name_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
 
         # add the library name
         self._add_library(library_name_p=library_name)
@@ -588,21 +726,32 @@ class VunitConf:
                               library_name_p=library_name, level_p=level0)
         return None
 
-    def compile_opal_kelly_lib(self, name_p='opal_kelly_lib', library_name_p='opal_kelly_lib', version_p='2008', level_p=None):
+    def compile_opal_kelly_lib(self, name_p='opal_kelly_lib', library_name_p='opal_kelly_lib', version_p='2008',
+                               level_p=None):
         """
-        This method compiles the user-defined files associated to the opal kelly IP
-        :param name_p: (string) name to print in the console
-        :param library_name_p: (string) library name where to compile the library
-        :param version_p: (string) VHDL version if relevant (not applicable for verilog or system verilog file)
-        :param level_p:  (integer >= 0) define the level of indentation of the message to print
-        :return: None
-        """
+        Compile the user-defined files associated to the opal kelly IP.
 
+        Parameters
+        ----------
+        name_p: str
+            name to print in the console
+        library_name_p: str
+            library name to use during the library compilation.
+        version_p: str
+            VHDL version if relevant (not applicable for verilog or system verilog file)
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
+        """
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['lib_opal_kelly_simu_path']
 
         library_name = library_name_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
 
         # add the library name
         self._add_library(library_name_p=library_name)
@@ -619,19 +768,29 @@ class VunitConf:
 
     def compile_csv_lib(self, name_p='csv_lib', library_name_p='csv_lib', version_p='2008', level_p=None):
         """
-        This method compiles the user-defined files associated to the vhdl csv lib
-        :param name_p: (string) name to print in the console
-        :param library_name_p: (string) library name where to compile the library
-        :param version_p: (string) VHDL version if relevant (not applicable for verilog or system verilog file)
-        :param level_p:  (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Compile the user-defined files associated to the vhdl csv lib.
+
+        Parameters
+        ----------
+        name_p: str
+            name to print in the console
+        library_name_p: str
+            library name to use during the library compilation.
+        version_p: str
+            VHDL version if relevant (not applicable for verilog or system verilog file)
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+
         """
 
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['lib_csv_path']
 
         library_name = library_name_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
 
         # add the library name
         self._add_library(library_name_p=library_name)
@@ -648,19 +807,30 @@ class VunitConf:
 
     def compile_common_lib(self, name_p='common_lib', library_name_p='common_lib', version_p='2008', level_p=None):
         """
-        This method compiles the user-defined files associated to the vhdl utility lib
-        :param name_p: (string) name to print in the console
-        :param library_name_p: (string) library name where to compile the library
-        :param version_p: (string) VHDL version if relevant (not applicable for verilog or system verilog file)
-        :param level_p:  (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Compile the user-defined files associated to the vhdl utility lib.
+
+        Parameters
+        ----------
+        name_p: str
+            name to print in the console
+        library_name_p: str
+            library name to use during the library compilation.
+        version_p: str
+            VHDL version if relevant (not applicable for verilog or system verilog file)
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
         """
 
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['lib_common_path']
 
         library_name = library_name_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
 
         # add the library name
         self._add_library(library_name_p=library_name)
@@ -677,22 +847,31 @@ class VunitConf:
 
     def compile_src_directory(self, directory_name_p, library_name_p='fpasim', version_p='2008', level_p=None):
         """
-        This method compiles source files from a directory and its subdirectories
-        :param directory_name_p: (string) name to print in the console
-        :param library_name_p: (string) library name where to compile the library
-        :param version_p: (string) VHDL version if relevant (not applicable for verilog or system verilog file)
-        :param level_p:  (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Compile source files from a directory and its subdirectories.
+
+        Parameters
+        ----------
+        directory_name_p: str
+            name to print in the console
+        library_name_p: str
+            library name to use during the library compilation.
+        version_p: str
+             VHDL version if relevant (not applicable for verilog or system verilog file)
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
         """
-
-
         base_path_dic = self.base_path_dic
 
         library_name = library_name_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
         directory_name = directory_name_p.lower()
 
-        if directory_name in ['system', 'clocking', 'fpasim', 'io', 'utils', 'usb','reset','spi','sim']:
+        if directory_name in ['system', 'clocking', 'fpasim', 'io', 'utils', 'usb', 'reset', 'spi', 'sim']:
             # based on the _build_path method, build the dictionary keys
             key_name = 'src_' + directory_name + '_path'
             base_path = base_path_dic[key_name]
@@ -712,19 +891,29 @@ class VunitConf:
 
     def compile_src(self, filename_p, library_name_p='fpasim', version_p='2008', level_p=None):
         """
-        This method research a file in the file source directory and compile it.
-        :param filename_p: (string) filename to search
-        :param library_name_p: (string) library name where to compile the library
-        :param version_p: (string) VHDL version if relevant (not applicable for verilog or system verilog file)
-        :param level_p:  (integer >= 0) define the level of indentation of the message to print
-        :return: None
-        """
+        Search a file in the file source directory and compile it.
 
+        Parameters
+        ----------
+        filename_p: str
+            filename to search
+        library_name_p: str
+            library name to use during the library compilation.
+        version_p: str
+             VHDL version if relevant (not applicable for verilog or system verilog file)
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
+        """
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['src_path']
 
         library_name = library_name_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
         name = str(Path(filename_p).stem)
         filename = filename_p
 
@@ -742,21 +931,29 @@ class VunitConf:
 
     def compile_tb(self, library_name_p='tb_fpasim', version_p='2008', level_p=None):
         """
-        This method research a testbench file in the file testbench directory and compile it.
-        :param library_name_p: (string) library name where to compile the library
-        :param version_p: (string) VHDL version if relevant (not applicable for verilog or system verilog file)
-        :param level_p:  (integer >= 0) define the level of indentation of the message to print
-        :return: None
-        """
+        Search a testbench file in the file testbench directory and compile it.
 
+        Parameters
+        ----------
+        library_name_p: str
+            library name to use during the library compilation.
+        version_p: str
+             VHDL version if relevant (not applicable for verilog or system verilog file)
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+        """
         VU = self.VU
         base_path_dic = self.base_path_dic
         filename = self.tb_filename
-        tb_name     = self.tb_name
+        tb_name = self.tb_name
         base_path = base_path_dic['tb_path']
 
         library_name = library_name_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
         name = str(Path(filename).stem)
 
         # add the library name
@@ -776,9 +973,17 @@ class VunitConf:
 
     def set_waveform(self, level_p=None):
         """
-        This method set the waveform for Modelsim and Questa simulator
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Set the waveform for Modelsim and Questa simulator
+
+        Parameters
+        ----------
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
+
         """
         VU = self.VU
         display_obj = self.display_obj
@@ -788,7 +993,6 @@ class VunitConf:
         level1 = level0 + 1
         filename = self.wave_filename
         base_path = base_path_dic['wave_path']
-
 
         extension = str(Path(filename).suffix)
         display_obj.display_title(msg_p='Set the Simulator Waveform', level_p=level0)
@@ -822,10 +1026,20 @@ class VunitConf:
 
     def get_waveform(self, level_p=None):
         """
-        This method get the waveform for Modelsim and Questa simulator
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: filepath
+        Get the waveform for Modelsim and Questa simulator.
+
+        Parameters
+        ----------
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        str
+            waveform filepath
+
         """
+
         display_obj = self.display_obj
         level0 = self._get_indentation_level(level_p=level_p)
         display_obj.display_title(msg_p='Set the Simulator Waveform', level_p=level0)
@@ -833,16 +1047,28 @@ class VunitConf:
 
     def get_testbench_name(self):
         """
-        This method returns the testbench name
-        :return: (string) testbench name
+        Get the testbench name.
+        Returns
+        -------
+        str
+            testbench name
+
         """
         return self.tb_name
 
     def get_testbench(self, level_p=None):
         """
-        This method retrieves the Vunit Testbench object
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: Vunit Testbench object if the testbench was found. Otherwise None
+        Get  the Vunit Testbench object
+
+        Parameters
+        ----------
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        Vunit Testbench object if the testbench was found. Otherwise None
+
         """
 
         display_obj = self.display_obj
@@ -850,7 +1076,7 @@ class VunitConf:
         level0 = self._get_indentation_level(level_p=level_p)
 
         str0 = "VunitConf.get_testbench"
-        display_obj.display_title(msg_p=str0,level_p=level0)
+        display_obj.display_title(msg_p=str0, level_p=level0)
 
         if tb_obj is None:
             msg0 = 'ERROR: call the compile_tb method before'
@@ -861,10 +1087,20 @@ class VunitConf:
 
     def get_test_variant_filepath(self, level_p=None):
         """
-        This method returns a list of conf filepath
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: (list of string) list of filepath
+        Get a list of variant filepath
+
+        Parameters
+        ----------
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        list of str
+            list of variant filepath
+
         """
+
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['conf_path']
         display_obj = self.display_obj
@@ -875,26 +1111,34 @@ class VunitConf:
 
         str0 = "VunitConf.get_test_variant_filepath"
         display_obj.display_title(msg_p=str0, level_p=level0)
-        str0 = 'Search in base_path='+base_path
+        str0 = 'Search in base_path=' + base_path
         display_obj.display(msg_p=str0, level_p=level1)
 
         obj = FilepathListBuilder()
         obj.set_file_extension(file_extension_list_p=['.json'])
         filepath_list = []
         for filename in filename_list:
-            str0 = 'Searched filename='+filename
-            display_obj.display(msg_p=str0,level_p=level2)
+            str0 = 'Searched filename=' + filename
+            display_obj.display(msg_p=str0, level_p=level2)
             filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
             filepath_list.append(filepath)
-        
+
         return filepath_list
 
-    def get_ram_filepath(self,filename_list_p, level_p=None):
+    def get_ram_filepath(self, filename_list_p, level_p=None):
         """
-        This method returns a list of conf ram filepath
-        :param filename_list_p: (list of string) define a list of filename to search
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: (list of string) list of filepath
+        Get a list of ram filepath
+
+        Parameters
+        ----------
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        list of str
+            list of filepath
+
         """
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['src_path']
@@ -906,26 +1150,36 @@ class VunitConf:
 
         str0 = "VunitConf.get_ram_filepath"
         display_obj.display_title(msg_p=str0, level_p=level0)
-        str0 = 'Search in base_path='+base_path
+        str0 = 'Search in base_path=' + base_path
         display_obj.display(msg_p=str0, level_p=level1)
 
         obj = FilepathListBuilder()
         obj.set_file_extension(file_extension_list_p=['.mem'])
         filepath_list = []
         for filename in filename_list:
-            str0 = 'Searched filename='+filename
-            display_obj.display(msg_p=str0,level_p=level2)
+            str0 = 'Searched filename=' + filename
+            display_obj.display(msg_p=str0, level_p=level2)
             filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
             filepath_list.append(filepath)
-        
+
         return filepath_list
 
-    def get_data_filepath(self,filename_p, level_p=None):
+    def get_data_filepath(self, filename_p, level_p=None):
         """
-        This method returns a list of data filepath
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :param filename_p: (string) filename to search
-        :return: (list of string) list of filepath
+        Get a list of data filepath
+
+        Parameters
+        ----------
+        filename_p: str
+            filename to search
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        list of str
+            list of filepath
+
         """
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['data_path']
@@ -939,53 +1193,70 @@ class VunitConf:
 
         str0 = "VunitConf.get_data_filepath"
         display_obj.display_title(msg_p=str0, level_p=level0)
-        str0 = 'Search in base_path='+base_path
+        str0 = 'Search in base_path=' + base_path
         display_obj.display(msg_p=str0, level_p=level1)
 
         obj = FilepathListBuilder()
         obj.set_file_extension(file_extension_list_p=[ext])
-        str0 = 'Searched filename='+filename
-        display_obj.display(msg_p=str0,level_p=level2)
+        str0 = 'Searched filename=' + filename
+        display_obj.display(msg_p=str0, level_p=level2)
         filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
-       
-        
+
         return filepath
 
     def _get_script_filepath(self, filename_p, level_p=None):
         """
-        This method returns the filepath of the filename_p
-        :param filename_p: (string) filename
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: (string) filepath
-        """
+        Get the filepath of the filename_p.
 
+        Parameters
+        ----------
+        filename_p: str
+            filename to search
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        str
+            filepath
+
+
+        """
         filename = filename_p
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['script_path']
-        display_obj   = self.display_obj
-        level0        = self._get_indentation_level(level_p=level_p)
-        level1        = level0 + 1
-        level2        = level0 + 2
+        display_obj = self.display_obj
+        level0 = self._get_indentation_level(level_p=level_p)
+        level1 = level0 + 1
+        level2 = level0 + 2
 
         str0 = "VunitConf._get_script_filepath"
         display_obj.display_title(msg_p=str0, level_p=level0)
-        str0 = 'Search in base_path='+base_path
+        str0 = 'Search in base_path=' + base_path
         display_obj.display(msg_p=str0, level_p=level1)
 
         obj = FilepathListBuilder()
         obj.set_file_extension(file_extension_list_p=['.py'])
-        str0 = 'Searched filename='+filename
-        display_obj.display(msg_p=str0,level_p=level2)
+        str0 = 'Searched filename=' + filename
+        display_obj.display(msg_p=str0, level_p=level2)
         filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
 
         return filepath
 
     def _create_directory(self, path_p, level_p=None):
         """
-        This function create the directory tree defined by the "path" argument (if not exist)
-        :param path_p: (string) -> path to the directory to create
-        :param level_p:   (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Create the directory tree defined by the "path" argument (if not exist).
+
+        Parameters
+        ----------
+        path_p: str
+            path to the directory to create
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
         """
         display_obj = self.display_obj
         level0 = self._get_indentation_level(level_p=level_p)
@@ -1007,47 +1278,58 @@ class VunitConf:
 
     def set_mif_files(self, filepath_list_p):
         """
-        This method stores a list of *.mif files.
-        For Modelsim/Questa simulator, these *.mif files will be copied
-        into a specific directory in order to be "seen" by the simulator
-        Note: 
-           This method is used for Xilinx IP which uses RAM
-           This method should be called before the pre_config method (if necessary)
-        :param filepath_list_p: (list of strings) -> list of filepaths
-        :return: None
+        Store a list of *.mif files.
+        Note:
+            For Modelsim/Questa simulator, these *.mif files will be copied
+            into a specific directory in order to be "seen" by the simulator
+        Parameters
+        ----------
+        filepath_list_p: list of str
+            List of filepath
+        Returns
+        -------
+        None
         """
         self.filepath_list_mif = filepath_list_p
         return None
 
     def _copy_mif_files(self, output_path_p, level_p=None):
         """
-        copy a list of init files such as *.mif and/or *.mem into the Vunit simulation directory ("./Vunit_out/modelsim")
-        Note: the expected destination directory is "./Vunit_out/modelsim"
-        :param output_path_p: (string) -> output path provided by the Vunit library
-        :param level_p:   (integer >= 0) define the level of indentation of the message to print
-        :return: None
+        Copy a list of init files such as *.mif and/or *.mem into the Vunit simulation directory ("./Vunit_out/modelsim")
+        Note:
+            the expected destination directory is "./Vunit_out/modelsim"
+
+        Parameters
+        ----------
+        output_path_p: str
+            output path provided by the Vunit library
+        level_p: int
+            (int >= 0) define the level of indentation of the message to print
+
+        Returns
+        -------
+        None
         """
         display_obj = self.display_obj
         script_name = self.script_name
         output_path = output_path_p
-        level0   = self._get_indentation_level(level_p=level_p)
+        level0 = self._get_indentation_level(level_p=level_p)
         level1 = level0 + 1
 
         # get absolute path
         script_path = Path(output_path).resolve()
         # move into the hierarchy : vunit_out/modelsim
-        output_path = str(Path(script_path.parents[1],"modelsim"))
+        output_path = str(Path(script_path.parents[1], "modelsim"))
 
         # copy each files
         msg0 = script_name + ": Copy the IP init files into the Vunit output simulation directory"
         display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
         for filepath in self.filepath_list_mif:
-            msg0 =  'Copy: ' + filepath + " to " + output_path
+            msg0 = 'Copy: ' + filepath + " to " + output_path
             display_obj.display(msg_p=msg0, level_p=level1, color_p='green')
             copy(filepath, output_path)
 
         return None
-
 
     def pre_config(self, output_path):
         """
@@ -1055,31 +1337,41 @@ class VunitConf:
         2 actions are provided:
             . execute a python script with a predefined set of command line arguments
             . copy the "mif files" into the Vunit simulation director for the compatible Xilinx IP
-        Note: This method is the main entry point for the Vunit library
-        :param output_path: (string) Vunit Output Simulation Path (auto-computed by Vunit)
-        :return: boolean
+        Note:
+            This method is the main entry point for the Vunit library
+
+        Parameters
+        ----------
+        output_path: str
+            Vunit Output Simulation Path (auto-computed by Vunit)
+
+        Returns
+        -------
+        bool
+            True if successful, False otherwise
         """
-        display_obj   = self.display_obj
+
+        display_obj = self.display_obj
         conf_filepath = self.conf_filepath
         script_filepath = self.script_filepath
-        script_name   = self.script_name
-        verbosity     = self.verbosity
+        script_name = self.script_name
+        verbosity = self.verbosity
 
         output_path = output_path
-        level0      = self.level
-        level1      = level0 + 1
+        level0 = self.level
+        level1 = level0 + 1
 
         str0 = "VunitConf.pre_config"
         display_obj.display_title(msg_p=str0, level_p=level0)
 
         ###############################
-        #create directories (if not exist) for the VHDL testbench
+        # create directories (if not exist) for the VHDL testbench
         # .input directory  for the input data/command files
         # .output directory for the output data files
-        tb_input_base_path = str(Path(output_path,'inputs').resolve())
-        tb_output_base_path = str(Path(output_path,'outputs').resolve())
-        self._create_directory(path_p=tb_input_base_path,level_p = level1)
-        self._create_directory(path_p=tb_output_base_path,level_p =level1)
+        tb_input_base_path = str(Path(output_path, 'inputs').resolve())
+        tb_output_base_path = str(Path(output_path, 'outputs').resolve())
+        self._create_directory(path_p=tb_input_base_path, level_p=level1)
+        self._create_directory(path_p=tb_output_base_path, level_p=level1)
 
         # launch a python script to generate data and commands
         if script_filepath is not None:
@@ -1101,13 +1393,12 @@ class VunitConf:
             cmd.append('--verbosity')
             cmd.append(str(verbosity))
 
-            result = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+            result = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
             result.wait()
 
             if verbosity >= 1:
-                str0 = "VunitConf.pre_config: command: "+ " ".join(cmd)
+                str0 = "VunitConf.pre_config: command: " + " ".join(cmd)
                 display_obj.display_title(msg_p=str0, level_p=level1)
-
 
         # copy the mif files into the Vunit simulation directory
         if self.filepath_list_mif is not None:
@@ -1125,7 +1416,7 @@ class VunitConf:
     #     VU = self.VU
     #     display_obj   = self.display_obj
     #     root_path =self.root_path
-        
+
     #     level0 = level_p
     #     level1 = level_p + 1
 
@@ -1167,7 +1458,6 @@ class VunitConf:
     #         filepath = filepath_p
     #         library_name = library_name_p
     #         version = version_p
-
 
     #         compile_lib_list = []
     #         compile_lib_list.append('xilinx_vip')
@@ -1211,7 +1501,7 @@ class VunitConf:
     #         return str0
 
     #     # print("test**************************************************************\n")
-        
+
     #     do_cmd_list.append("###################### Source files ######################")
 
     #     print("orderedfilepath")
@@ -1228,7 +1518,6 @@ class VunitConf:
     #         str0 = get_src_do_compile(filepath_p=filepath,library_name_p=library_name,version_p=vhdl_standard)
     #         str0 = str0.replace(root_path,"${PR_DIR}")
     #         do_cmd_list.append(str0)
-
 
     #     ##########################################
     #     # write in the output file

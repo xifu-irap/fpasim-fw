@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------------------
 #                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
 # -------------------------------------------------------------------------------------------------------------
@@ -17,34 +18,57 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   __init__.py
+#    @file                   test_oversample.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
-#    @details                
-#    This python script imports python module.
+#    @details
+#    
 #    Note:
-#      This is the first file to be loaded.
-#      So you can use it to execute code that you want to run each time a module is loaded, 
-#      or specify the submodules to be exported.
+#       . This script was tested with python 3.10
 # -------------------------------------------------------------------------------------------------------------
-
 # standard library
-import os
+import sys
+from pathlib import Path, PurePosixPath
+
+# Add the ci directory path to the system path
+filepath = Path(__file__)
+ci_root_path = str(filepath.parents[1])
+sys.path.append(ci_root_path)
 
 # user library
-from .ci.utils.console_colors import *
-from .ci.utils.filepath_list_builder import FilepathListBuilder
-from .ci.utils.display import Display
-from .ci.core.valid_sequencer import ValidSequencer
-from .ci.vunit_conf import VunitConf
-from .ci.tes_top_data_gen import TesTopDataGen
-from .ci.mux_squid_top_data_gen import MuxSquidTopDataGen
-from .ci.amp_squid_top_data_gen import AmpSquidTopDataGen
-from .ci.system_fpasim_top_data_gen import SystemFpasimTopDataGen
-
-# Enable the coloring in the console
-os.system("")
+from core import Generator
+from core import Attribute
+from core import OverSample
 
 
+def test_oversample():
+    ########################################################
+    # Generate data
+    ########################################################
+
+    nb_pts = 16
+    overSample = 2
+    obj_gen = Generator(nb_pts_p=nb_pts)
+    pts_list = obj_gen.run()
+
+    obj_attr = Attribute(pts_list_p=pts_list)
+    obj_attr.set_attribute(name_p="bob", mode_p=0, min_value_p=0, max_value_p=7)
+    pts_list = obj_attr.run()
+
+    obj_attr = Attribute(pts_list_p=pts_list)
+    obj_attr.set_attribute(name_p="bobi", mode_p=1, min_value_p=0, max_value_p=8)
+    pts_list = obj_attr.run()
+
+    obj_over = OverSample(pts_list_p=pts_list)
+    obj_over.set_oversampling(value_p=overSample)
+    pts_list = obj_over.run()
+
+    for pts in pts_list:
+        str0 = pts.get_info("bob", "bobi")
+        print(str0)
+
+
+if __name__ == '__main__':
+    test_oversample()
