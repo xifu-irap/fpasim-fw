@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------------------
 #                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
 # -------------------------------------------------------------------------------------------------------------
@@ -18,55 +17,22 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   file.py
+#    @file                   __init__.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
-#    @details
-#    
+#    @details                
+#    This python script imports python module.
 #    Note:
-#       . This script was tested with python 3.10
+#      This is the first file to be loaded.
+#      So you can use it to execute code that you want to run each time a module is loaded, 
+#      or specify the submodules to be exported.
 # -------------------------------------------------------------------------------------------------------------
 
 
-class File:
-    """
-    Extract the RAM content from csv file
-    """
-    def __init__(self, filepath_p):
-        """
-        Initialize the class instance.
+__all__ = ['vunit_utils', 
+           ]
 
-        Parameters
-        ----------
-        filepath_p: str
-            filepath
-        """
-        # filepath
-        self._filepath = filepath_p
-        # data list
-        self._data_list = []
-        # separator of the csv file
-        self.csv_separator = ";"
-
-    def run(self):
-        """
-        Extract the data part of a *.csv file
-        Returns
-        -------
-        list of values
-        """
-        with open(self._filepath, 'r') as fid:
-            lines = fid.readlines()
-            nb_lines = len(lines)
-
-            for i in range(nb_lines):
-                line = lines[i]
-                str_addr, str_data = line.split(self.csv_separator)
-                # skip the header
-                if i != 0:
-                    self._data_list.append(int(str_data))
-
-        return self._data_list
-
+# deprecated to keep older scripts who import this from breaking
+from .vunit_utils import VunitUtils

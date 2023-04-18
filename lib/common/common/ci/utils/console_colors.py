@@ -24,7 +24,8 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details                
-#    This python defines colors which can be printed in the cmd/powershell console
+#    
+#    This class map a name to a console color code.   
 #
 # -------------------------------------------------------------------------------------------------------------
 
@@ -36,24 +37,30 @@ os.system("")
 
 
 class ConsoleColors:
+    """
+    Map a name to a console color code.
+    """
     def __init__(self):
-        self.colors = {}
-        self.colors['black'] = '\033[30m'
-        self.colors['red'] = '\033[31m'
-        self.colors['green'] = '\033[32m'
-        self.colors['orange'] = '\033[33m'
-        self.colors['blue'] = '\033[34m'
-        self.colors['purple'] = '\033[35m'
-        self.colors['cyan'] = '\033[36m'
-        self.colors['lightgrey'] = '\033[37m'
-        self.colors['darkgrey'] = '\033[90m'
-        self.colors['lightred'] = '\033[91m'
-        self.colors['lightgreen'] = '\033[92m'
-        self.colors['yellow'] = '\033[93m'
-        self.colors['lightblue'] = '\033[94m'
-        self.colors['pink'] = '\033[95m'
-        self.colors['lightcyan'] = '\033[96m'
-        self.colors['reset'] = '\033[0m'
+        """
+        Initialize the class instance.
+        """
+        self._colors = {}
+        self._colors['black'] = '\033[30m'
+        self._colors['red'] = '\033[31m'
+        self._colors['green'] = '\033[32m'
+        self._colors['orange'] = '\033[33m'
+        self._colors['blue'] = '\033[34m'
+        self._colors['purple'] = '\033[35m'
+        self._colors['cyan'] = '\033[36m'
+        self._colors['lightgrey'] = '\033[37m'
+        self._colors['darkgrey'] = '\033[90m'
+        self._colors['lightred'] = '\033[91m'
+        self._colors['lightgreen'] = '\033[92m'
+        self._colors['yellow'] = '\033[93m'
+        self._colors['lightblue'] = '\033[94m'
+        self._colors['pink'] = '\033[95m'
+        self._colors['lightcyan'] = '\033[96m'
+        self._colors['reset'] = '\033[0m'
 
     def get_color(self, name_p):
         """
@@ -69,7 +76,7 @@ class ConsoleColors:
         console color value
 
         """
-        value = self.colors[name_p]
+        value = self._colors[name_p]
         if value is None:
             print(f"[ConsoleColors.get_colors]: KO: the colors {name_p} doesn't exist")
         return value

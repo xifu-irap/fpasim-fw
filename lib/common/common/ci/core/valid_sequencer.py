@@ -53,19 +53,19 @@ class ValidSequencer:
             sequence name
         """
 
-        self.name = name_p
+        self._name = name_p
         # define the mode
-        self.ctrl = None
+        self._ctrl = None
         # define the first (min_value, max_value)
-        self.min_value1 = None
-        self.max_value1 = None
+        self._min_value1 = None
+        self._max_value1 = None
         # define the second (min_value, max_value)
-        self.min_value2 = None
-        self.max_value2 = None
+        self._min_value2 = None
+        self._max_value2 = None
         # set the number of clock cycle before starting the generation
-        self.time_shift = None
+        self._time_shift = None
         # set the level of verbosity
-        self.verbosity = 0
+        self._verbosity = 0
 
     def set_verbosity(self, verbosity_p):
         """
@@ -80,7 +80,7 @@ class ValidSequencer:
         None
 
         """
-        self.verbosity = verbosity_p
+        self._verbosity = verbosity_p
         return None
 
     def set_sequence(self, ctrl_p, min_value1_p, max_value1_p, min_value2_p, max_value2_p, time_shift_p=0):
@@ -122,15 +122,15 @@ class ValidSequencer:
         None:
 
         """
-        self.ctrl = ctrl_p
+        self._ctrl = ctrl_p
 
-        self.min_value1 = min_value1_p
-        self.max_value1 = max_value1_p
+        self._min_value1 = min_value1_p
+        self._max_value1 = max_value1_p
 
-        self.min_value2 = min_value2_p
-        self.max_value2 = max_value2_p
+        self._min_value2 = min_value2_p
+        self._max_value2 = max_value2_p
 
-        self.time_shift = time_shift_p
+        self._time_shift = time_shift_p
 
     def save(self, filepath_p, csv_separator_p=';'):
         """
@@ -148,16 +148,16 @@ class ValidSequencer:
 
         """
         filepath = filepath_p
-        ctrl = self.ctrl
+        ctrl = self._ctrl
 
-        min_value1 = self.min_value1
-        max_value1 = self.max_value1
+        min_value1 = self._min_value1
+        max_value1 = self._max_value1
 
-        min_value2 = self.min_value2
-        max_value2 = self.max_value2
+        min_value2 = self._min_value2
+        max_value2 = self._max_value2
 
-        time_shift = self.time_shift
-        verbosity = self.verbosity
+        time_shift = self._time_shift
+        verbosity = self._verbosity
 
         with open(filepath, 'w') as fid:
             ###########################################################
@@ -198,7 +198,7 @@ class ValidSequencer:
 
         if verbosity >= 1:
             print('*' * 20)
-            print('Sequencer : ' + self.name)
+            print('Sequencer : ' + self._name)
             print('filepath = {0}'.format(filepath))
 
         return None

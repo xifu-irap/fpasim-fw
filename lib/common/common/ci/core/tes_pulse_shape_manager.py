@@ -60,7 +60,7 @@ class TesPulseShapeManager(Points):
         # define the content of the tes_steady_state RAM
         self._tes_steady_state_list = []
         # list of the make pulse command
-        self._cmd_dic_list = []
+        self._make_pulse_dic_list = []
         # define the oversampling factor applied to each sample of a pulse
         self._pulse_shape_oversampling_factor = 16
         # define the number of frames in order to generate a pulse
@@ -129,7 +129,7 @@ class TesPulseShapeManager(Points):
         dic['pulse_height'] = pulse_height_p
         dic['skip_nb_samples'] = skip_nb_samples_p
 
-        self._cmd_dic_list.append(dic)
+        self._make_pulse_dic_list.append(dic)
 
     def _compute(self, pulse_shape_p, pulse_height_p, i0_p):
         """
@@ -180,7 +180,7 @@ class TesPulseShapeManager(Points):
         pulse_shape_oversampling_factor = self._pulse_shape_oversampling_factor
         pulse_shape_nb_samples_by_frame = self._pulse_shape_nb_samples_by_frame
 
-        for cmd_dic in self._cmd_dic_list:
+        for cmd_dic in self._make_pulse_dic_list:
             cmd_pixel_id = cmd_dic['pixel_id']
             cmd_time_shift = cmd_dic['time_shift']
             cmd_pulse_height = cmd_dic['pulse_height']

@@ -51,11 +51,12 @@ from .core import TesSignalling
 from .core import TesPulseShapeManager
 from .core import MuxSquidTop
 from .core import AmpSquidTop
+from .vunit_core import VunitUtils
 
 
 
 
-class SystemFpasimTopDataGen:
+class SystemFpasimTopDataGen(VunitUtils):
     """
         This class defines methods to generate data for the VHDL system_fpasim_top testbench file.
         Note:
@@ -67,18 +68,14 @@ class SystemFpasimTopDataGen:
         """
         This method initializes the class instance
         """
-        # path to the configuration file
-        self.test_variant_filepath = None
         # display object
         self.display_obj = Display()
-        # set indentation level (integer >=0)
-        self.level = 0
-        # set the level of verbosity
-        self.verbosity = 0
-        # path to the Xilinx mif files (for Xilinx RAM, ...)
-        self.filepath_list_mif = None
+        super().__init__(self.display_obj)
+
+        # path to the configuration file
+        self.test_variant_filepath = None
         # JSON object as a dictionary
-        self.json_data = None
+        self.json_variant = None
         # instance of the VunitConf class
         #  => use its method to retrieve filepath
         self.vunit_conf_obj = None
@@ -87,6 +84,7 @@ class SystemFpasimTopDataGen:
         self.addr_list = []
         self.data_list = []
         self.cmt_list = []
+        self.data_width = 32 # number max of bit of a register
 
 
     def set_test_variant_filepath(self,filepath_p):
@@ -115,12 +113,12 @@ class SystemFpasimTopDataGen:
 
         # returns JSON object as
         # a dictionary
-        json_data = json.load(fid_in)
+        json_variant = json.load(fid_in)
 
         # Closing file
         fid_in.close()
         # save the json dictionary
-        self.json_data = json_data
+        self.json_variant = json_variant
         # save the configuration filepath
         self.test_variant_filepath = test_variant_filepath
         return None
@@ -134,24 +132,6 @@ class SystemFpasimTopDataGen:
         self.vunit_conf_obj = obj_p
         return None
 
-    def set_indentation_level(self, level_p):
-        """
-        This method set the indentation level of the print message
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: None
-        """
-        self.level = level_p
-        return None
-
-    def set_verbosity(self, verbosity_p):
-        """
-        Set the level of verbosity
-        :param verbosity_p: (integer >=0) level of verbosity
-        :return: None
-        """
-        self.verbosity = verbosity_p
-        return None
-
     def get_generic_dic(self):
         """
         Get the testbench vhdl generic parameters
@@ -159,19 +139,19 @@ class SystemFpasimTopDataGen:
         dictionary where key name are the VHDL generic parameter names
         :return: (dictionary)
         """
-        json_data = self.json_data
+        json_variant = self.json_variant
 
         #TODO
 
-        # nb_pixel_by_frame = json_data['data']['value']['nb_pixel_by_frame']
+        # nb_pixel_by_frame = json_variant['data']['value']['nb_pixel_by_frame']
 
-        # ram1_check = json_data['ram1']['generic']['check']
-        # ram1_verbosity = json_data['ram1']['generic']['verbosity']
+        # ram1_check = json_variant['ram1']['generic']['check']
+        # ram1_verbosity = json_variant['ram1']['generic']['verbosity']
 
-        # ram2_check = json_data['ram2']['generic']['check']
-        # ram2_verbosity = json_data['ram2']['generic']['verbosity']
-        # opal_addr_pipe_in = json_data['RAM']['wr']['opal_kelly_addr']
-        # opal_addr_pipe_out = json_data['RAM']['rd']['opal_kelly_addr']
+        # ram2_check = json_variant['ram2']['generic']['check']
+        # ram2_verbosity = json_variant['ram2']['generic']['verbosity']
+        # opal_addr_pipe_in = json_variant['RAM']['wr']['opal_kelly_addr']
+        # opal_addr_pipe_out = json_variant['RAM']['rd']['opal_kelly_addr']
 
         dic = {}
         # dic['g_NB_PIXEL_BY_FRAME'] = int(nb_pixel_by_frame)
@@ -220,7 +200,7 @@ class SystemFpasimTopDataGen:
 
                 if width is not None:
                     # test if the field range is not bigger than the register width
-                    reg_bit_pos_max = data_width - 1
+                    reg_bit_pos_max = self.data_width - 1
                     bit_pos_max = bit_pos_min + (width - 1)
 
                     if bit_pos_max > reg_bit_pos_max:
@@ -248,14 +228,14 @@ class SystemFpasimTopDataGen:
         level1 = level0 + 1
         level2 = level0 + 2
         verbosity = self.verbosity
-        json_data = self.json_data
+        json_variant = self.json_variant
         vunit_conf_obj = self.vunit_conf_obj
         csv_separator = ";"
-        data_width = 32 # number max of bit of a register
+        
 
 
-        seq_dic = json_data["command_sequence_section"]
-        def_dic = json_data["register_definition_section"]
+        seq_dic = json_variant["command_sequence_section"]
+        def_dic = json_variant["register_definition_section"]
         cmd_list = seq_dic["cmd_list"]
 
         output_tb_filename = seq_dic["output_tb_filename"]
@@ -442,87 +422,6 @@ class SystemFpasimTopDataGen:
 
         return None
 
-
-    def _get_indentation_level(self, level_p):
-        """
-        This method select the indentation level to use.
-        If level_p is None, the class attribute is used. Otherwise, the level_p method argument is used
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: (integer >=0) level of indentation of the message to print
-        """
-        level = level_p
-        if level is None:
-            return self.level
-        else:
-            return level
-
-    def _create_directory(self, path_p, level_p=None):
-        """
-        This function create the directory tree defined by the "path" argument (if not exist)
-        :param path_p: (string) -> path to the directory to create
-        :param level_p:   (integer >= 0) define the level of indentation of the message to print
-        :return: None
-        """
-        display_obj = self.display_obj
-        level0 = self._get_indentation_level(level_p=level_p)
-        level1 = level0 + 1
-
-        if not os.path.exists(path_p):
-            os.makedirs(path_p)
-            msg0 = "Create Directory: "
-            display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
-            msg0 = path_p
-            display_obj.display(msg_p=msg0, level_p=level1, color_p='green')
-        else:
-            msg0 = "Warning: Directory already exists: "
-            display_obj.display(msg_p=msg0, level_p=level0, color_p='yellow')
-            msg0 = path_p
-            display_obj.display(msg_p=msg0, level_p=level1, color_p='yellow')
-
-        return None
-
-    def set_mif_files(self, filepath_list_p):
-        """
-        This method stores a list of *.mif files.
-        For Modelsim/Questa simulator, these *.mif files will be copied
-        into a specific directory in order to be "seen" by the simulator
-        Note: 
-           This method is used for Xilinx IP which uses RAM
-           This method should be called before the pre_config method (if necessary)
-        :param filepath_list_p: (list of strings) -> list of filepaths
-        :return: None
-        """
-        self.filepath_list_mif = filepath_list_p
-        return None
-
-    def _copy_mif_files(self, output_path_p, level_p=None):
-        """
-        copy a list of init files such as *.mif and/or *.mem into the Vunit simulation directory ("./Vunit_out/modelsim")
-        Note: the expected destination directory is "./Vunit_out/modelsim"
-        :param output_path_p: (string) -> output path provided by the Vunit library
-        :param level_p:   (integer >= 0) define the level of indentation of the message to print
-        :return: None
-        """
-        display_obj = self.display_obj
-        output_path = output_path_p
-        level0   = self._get_indentation_level(level_p=level_p)
-        level1 = level0 + 1
-
-        # get absolute path
-        script_path = Path(output_path).resolve()
-        # move into the hierarchy : vunit_out/modelsim
-        output_path = str(Path(script_path.parents[1],"modelsim"))
-
-        # copy each files
-        msg0 =  "[SystemFpasimTopDataGen._copy_mif_files]: Copy the IP init files into the Vunit output simulation directory"
-        display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
-        for filepath in self.filepath_list_mif:
-            msg0 =  'Copy: ' + filepath + " to " + output_path
-            display_obj.display(msg_p=msg0, level_p=level1, color_p='green')
-            shutil.copy(filepath, output_path)
-
-        return None
-
     
     def pre_config(self, output_path):
         """
@@ -552,12 +451,12 @@ class SystemFpasimTopDataGen:
         # .output directory for the output data files
         tb_input_base_path = str(Path(output_path,'inputs').resolve())
         tb_output_base_path = str(Path(output_path,'outputs').resolve())
-        self._create_directory(path_p=tb_input_base_path,level_p = level1)
-        self._create_directory(path_p=tb_output_base_path,level_p =level1)
+        self.create_directory(path_p=tb_input_base_path,level_p = level1)
+        self.create_directory(path_p=tb_output_base_path,level_p =level1)
 
         # copy the mif files into the Vunit simulation directory
         if self.filepath_list_mif is not None:
-            self._copy_mif_files(output_path_p=output_path, level_p=level1)
+            self.copy_mif_files(output_path_p=output_path, level_p=level1)
 
         ############################################
         # Generate Modelsim/Questa compilation file: *.do

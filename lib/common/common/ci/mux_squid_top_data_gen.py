@@ -50,9 +50,10 @@ from .core import OverSample
 from .core import TesSignalling
 from .core import TesPulseShapeManager
 from .core import MuxSquidTop
+from .vunit_core import VunitUtils
 
 
-class MuxSquidTopDataGen:
+class MuxSquidTopDataGen(VunitUtils):
     """
         This class defines methods to generate data for the VHDL mux_squid_top testbench file.
         Note:
@@ -64,18 +65,14 @@ class MuxSquidTopDataGen:
         """
         This method initializes the class instance
         """
-        # path to the configuration file
-        self.test_variant_filepath = None
         # display object
         self.display_obj = Display()
-        # set indentation level (integer >=0)
-        self.level = 0
-        # set the level of verbosity
-        self.verbosity = 0
-        # path to the Xilinx mif files (for Xilinx RAM, ...)
-        self.filepath_list_mif = None
+        super().__init__(self.display_obj)
+
+        # path to the configuration file
+        self.test_variant_filepath = None
         # JSON object as a dictionary
-        self.json_data = None
+        self.json_variant = None
         # instance of the VunitConf class
         #  => use its method to retrieve filepath
         self.vunit_conf_obj = None
@@ -106,12 +103,12 @@ class MuxSquidTopDataGen:
 
         # returns JSON object as
         # a dictionary
-        json_data = json.load(fid_in)
+        json_variant = json.load(fid_in)
 
         # Closing file
         fid_in.close()
         # save the json dictionary
-        self.json_data = json_data
+        self.json_variant = json_variant
         # save the configuration filepath
         self.test_variant_filepath = test_variant_filepath
         return None
@@ -125,24 +122,6 @@ class MuxSquidTopDataGen:
         self.vunit_conf_obj = obj_p
         return None
 
-    def set_indentation_level(self, level_p):
-        """
-        This method set the indentation level of the print message
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: None
-        """
-        self.level = level_p
-        return None
-
-    def set_verbosity(self, verbosity_p):
-        """
-        Set the level of verbosity
-        :param verbosity_p: (integer >=0) level of verbosity
-        :return: None
-        """
-        self.verbosity = verbosity_p
-        return None
-
     def get_generic_dic(self):
         """
         Get the testbench vhdl generic parameters
@@ -150,17 +129,17 @@ class MuxSquidTopDataGen:
         dictionary where key name are the VHDL generic parameter names
         :return: (dictionary)
         """
-        json_data = self.json_data
+        json_variant = self.json_variant
 
-        nb_pixel_by_frame = json_data['data']['value']['nb_pixel_by_frame']
+        nb_pixel_by_frame = json_variant['data']['value']['nb_pixel_by_frame']
 
-        ram1_check     = json_data['ram1']['generic']['check']
-        ram1_verbosity = json_data['ram1']['generic']['verbosity']
+        ram1_check     = json_variant['ram1']['generic']['check']
+        ram1_verbosity = json_variant['ram1']['generic']['verbosity']
 
-        ram2_check     = json_data['ram2']['generic']['check']
-        ram2_verbosity = json_data['ram2']['generic']['verbosity']
+        ram2_check     = json_variant['ram2']['generic']['check']
+        ram2_verbosity = json_variant['ram2']['generic']['verbosity']
 
-        inter_squid_gain  = json_data["register"]["value"]["inter_squid_gain"]
+        inter_squid_gain  = json_variant["register"]["value"]["inter_squid_gain"]
 
         dic = {}
         dic['g_INTER_SQUID_GAIN'] = int(inter_squid_gain)
@@ -187,7 +166,7 @@ class MuxSquidTopDataGen:
         level1 = level0 + 1
         level2 = level0 + 2
         verbosity = self.verbosity
-        json_data = self.json_data
+        json_variant = self.json_variant
         vunit_conf_obj = self.vunit_conf_obj
 
        
@@ -199,9 +178,9 @@ class MuxSquidTopDataGen:
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
         dic_sequence = []
-        dic_sequence.append(json_data["data"]["sequence"])
-        dic_sequence.append(json_data["ram1"]["sequence"])
-        dic_sequence.append(json_data["ram2"]["sequence"])
+        dic_sequence.append(json_variant["data"]["sequence"])
+        dic_sequence.append(json_variant["ram1"]["sequence"])
+        dic_sequence.append(json_variant["ram2"]["sequence"])
 
         for dic in dic_sequence:
             filename = dic["filename"]
@@ -236,8 +215,8 @@ class MuxSquidTopDataGen:
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
         dic_sequence = []
-        dic_sequence.append(json_data["ram1"])
-        dic_sequence.append(json_data["ram2"])
+        dic_sequence.append(json_variant["ram1"])
+        dic_sequence.append(json_variant["ram2"])
 
         ram_filepath_dic = {}
 
@@ -265,29 +244,29 @@ class MuxSquidTopDataGen:
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
         
-        nb_sample_by_pixel = json_data["data"]["value"]["nb_sample_by_pixel"]
-        nb_pixel_by_frame  = json_data["data"]["value"]["nb_pixel_by_frame"]
-        nb_frame_by_pulse  = json_data["data"]["value"]["nb_frame_by_pulse"]
-        nb_pulse           = json_data["data"]["value"]["nb_pulse"]
+        nb_sample_by_pixel = json_variant["data"]["value"]["nb_sample_by_pixel"]
+        nb_pixel_by_frame  = json_variant["data"]["value"]["nb_pixel_by_frame"]
+        nb_frame_by_pulse  = json_variant["data"]["value"]["nb_frame_by_pulse"]
+        nb_pulse           = json_variant["data"]["value"]["nb_pulse"]
 
         # pixel_result
-        tes_dic          = json_data["data"]["value"]["pixel_result"]
+        tes_dic          = json_variant["data"]["value"]["pixel_result"]
         tes_out_mode     = tes_dic["mode"]
         tes_out_min_val  = tes_dic["min_value"]
         tes_out_max_val  = tes_dic["max_value"]
         
         # mux_squid
-        mux_squid                       = json_data["data"]["value"]["mux_squid"]
+        mux_squid                       = json_variant["data"]["value"]["mux_squid"]
         adc_mux_squid_feedback_mode     = mux_squid["mode"]
         adc_mux_squid_feedback_min_val  = mux_squid["min_value"]
         adc_mux_squid_feedback_max_val  = mux_squid["max_value"]
 
-        inter_squid_gain  = int(json_data["register"]["value"]["inter_squid_gain"])
+        inter_squid_gain  = int(json_variant["register"]["value"]["inter_squid_gain"])
 
-        mux_squid_offset_name     = json_data["ram1"]["generic"]["name"]
+        mux_squid_offset_name     = json_variant["ram1"]["generic"]["name"]
         mux_squid_offset_filepath = ram_filepath_dic[mux_squid_offset_name]
 
-        mux_squid_tf_name     = json_data["ram2"]["generic"]["name"]
+        mux_squid_tf_name     = json_variant["ram2"]["generic"]["name"]
         mux_squid_tf_filepath = ram_filepath_dic[mux_squid_tf_name]
 
         ########################################################
@@ -346,7 +325,7 @@ class MuxSquidTopDataGen:
         msg0 = 'MuxSquidTopDataGen._run: Generate the testbench reference output file'
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
-        output_filename = json_data["model"]["value"]["output_filename"]
+        output_filename = json_variant["model"]["value"]["output_filename"]
         output_filepath = str(Path(tb_input_base_path_p,output_filename))
 
         with open(output_filepath,'w') as fid:
@@ -374,7 +353,7 @@ class MuxSquidTopDataGen:
         msg0 = 'TesTopDataGen._run: Generate the testbench input data file'
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
-        filename = json_data["data"]["value"]["filename"]
+        filename = json_variant["data"]["value"]["filename"]
         filepath = str(Path(tb_input_base_path,filename))
         with open(filepath,'w') as fid:
             csv_separator = ';'
@@ -432,87 +411,6 @@ class MuxSquidTopDataGen:
 
         return None
 
-
-    def _get_indentation_level(self, level_p):
-        """
-        This method select the indentation level to use.
-        If level_p is None, the class attribute is used. Otherwise, the level_p method argument is used
-        :param level_p: (integer >= 0) define the level of indentation of the message to print
-        :return: (integer >=0) level of indentation of the message to print
-        """
-        level = level_p
-        if level is None:
-            return self.level
-        else:
-            return level
-
-    def _create_directory(self, path_p, level_p=None):
-        """
-        This function create the directory tree defined by the "path" argument (if not exist)
-        :param path_p: (string) -> path to the directory to create
-        :param level_p:   (integer >= 0) define the level of indentation of the message to print
-        :return: None
-        """
-        display_obj = self.display_obj
-        level0 = self._get_indentation_level(level_p=level_p)
-        level1 = level0 + 1
-
-        if not os.path.exists(path_p):
-            os.makedirs(path_p)
-            msg0 = "Create Directory: "
-            display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
-            msg0 = path_p
-            display_obj.display(msg_p=msg0, level_p=level1, color_p='green')
-        else:
-            msg0 = "Warning: Directory already exists: "
-            display_obj.display(msg_p=msg0, level_p=level0, color_p='yellow')
-            msg0 = path_p
-            display_obj.display(msg_p=msg0, level_p=level1, color_p='yellow')
-
-        return None
-
-    def set_mif_files(self, filepath_list_p):
-        """
-        This method stores a list of *.mif files.
-        For Modelsim/Questa simulator, these *.mif files will be copied
-        into a specific directory in order to be "seen" by the simulator
-        Note: 
-           This method is used for Xilinx IP which uses RAM
-           This method should be called before the pre_config method (if necessary)
-        :param filepath_list_p: (list of strings) -> list of filepaths
-        :return: None
-        """
-        self.filepath_list_mif = filepath_list_p
-        return None
-
-    def _copy_mif_files(self, output_path_p, level_p=None):
-        """
-        copy a list of init files such as *.mif and/or *.mem into the Vunit simulation directory ("./Vunit_out/modelsim")
-        Note: the expected destination directory is "./Vunit_out/modelsim"
-        :param output_path_p: (string) -> output path provided by the Vunit library
-        :param level_p:   (integer >= 0) define the level of indentation of the message to print
-        :return: None
-        """
-        display_obj = self.display_obj
-        output_path = output_path_p
-        level0   = self._get_indentation_level(level_p=level_p)
-        level1 = level0 + 1
-
-        # get absolute path
-        script_path = Path(output_path).resolve()
-        # move into the hierarchy : vunit_out/modelsim
-        output_path = str(Path(script_path.parents[1],"modelsim"))
-
-        # copy each files
-        msg0 =  "[mux_squid_top_data_gen._copy_mif_files]: Copy the IP init files into the Vunit output simulation directory"
-        display_obj.display(msg_p=msg0, level_p=level0, color_p='green')
-        for filepath in self.filepath_list_mif:
-            msg0 =  'Copy: ' + filepath + " to " + output_path
-            display_obj.display(msg_p=msg0, level_p=level1, color_p='green')
-            shutil.copy(filepath, output_path)
-
-        return None
-
     
     def pre_config(self, output_path):
         """
@@ -541,12 +439,12 @@ class MuxSquidTopDataGen:
         # .output directory for the output data files
         tb_input_base_path = str(Path(output_path,'inputs').resolve())
         tb_output_base_path = str(Path(output_path,'outputs').resolve())
-        self._create_directory(path_p=tb_input_base_path,level_p = level1)
-        self._create_directory(path_p=tb_output_base_path,level_p =level1)
+        self.create_directory(path_p=tb_input_base_path,level_p = level1)
+        self.create_directory(path_p=tb_output_base_path,level_p =level1)
 
         # copy the mif files into the Vunit simulation directory
         if self.filepath_list_mif is not None:
-            self._copy_mif_files(output_path_p=output_path, level_p=level1)
+            self.copy_mif_files(output_path_p=output_path, level_p=level1)
 
         ##########################################################
         # generate files
