@@ -76,6 +76,8 @@ class MuxSquidTopDataGen(VunitUtils):
         # instance of the VunitConf class
         #  => use its method to retrieve filepath
         self.vunit_conf_obj = None
+        # separator of the *.csv file
+        self.csv_separator = ';'
 
     def set_test_variant_filepath(self,filepath_p):
         """
@@ -168,12 +170,12 @@ class MuxSquidTopDataGen(VunitUtils):
         verbosity = self.verbosity
         json_variant = self.json_variant
         vunit_conf_obj = self.vunit_conf_obj
+        csv_separator = self.csv_separator
 
        
         ########################################################
         # Generate the testbench input valid sequence files
         ########################################################
-        csv_separator = ';'
         msg0 = 'MuxSquidTopDataGen._run: Generate the testbench input valid sequence files'
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
@@ -329,7 +331,6 @@ class MuxSquidTopDataGen(VunitUtils):
         output_filepath = str(Path(tb_input_base_path_p,output_filename))
 
         with open(output_filepath,'w') as fid:
-            csv_separator = ';'
             L = len(pts_list)
             index_max = L - 1
             for index,obj_pt in enumerate(pts_list):
@@ -356,7 +357,6 @@ class MuxSquidTopDataGen(VunitUtils):
         filename = json_variant["data"]["value"]["filename"]
         filepath = str(Path(tb_input_base_path,filename))
         with open(filepath,'w') as fid:
-            csv_separator = ';'
             L = len(pts_list)
             index_max = L - 1
             for index,obj_pt in enumerate(pts_list):

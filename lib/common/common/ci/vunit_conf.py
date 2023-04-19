@@ -62,7 +62,7 @@ class VunitConf(VunitUtils):
         It should not be usually used by the user
     """
 
-    def __init__(self, json_filepath_p, json_key_path_p, script_name_p):
+    def __init__(self, json_filepath_p, json_key_path_p):
         """
         Initialize the class instance
 
@@ -72,8 +72,6 @@ class VunitConf(VunitUtils):
             json filepath
         json_key_path_p: str
             json keys to get a specific individual test
-        script_name_p: str
-            script name
         """
         # display object
         self.display_obj = Display()
@@ -101,9 +99,6 @@ class VunitConf(VunitUtils):
         # set the json_key_path_p
         self.json_key_path = json_key_path_p
 
-        # script name
-        self.script_name = script_name_p
-
         # tb_filename
         self.tb_filename = None
 
@@ -130,7 +125,7 @@ class VunitConf(VunitUtils):
             self.json_data = json.load(fid_in)
 
         # extract the individual test field
-        self._extract_test_param_from_json()
+        self._extract_unit_test_param_from_json()
 
         # build the list of paths (project tree structure)
         self._build_path()
@@ -143,7 +138,7 @@ class VunitConf(VunitUtils):
         self.do_list = []
         self.do_filepath_list = []
 
-    def _extract_test_param_from_json(self):
+    def _extract_unit_test_param_from_json(self):
         """
         Retrieve parameters of the individual test from the json file.
 
@@ -310,7 +305,7 @@ class VunitConf(VunitUtils):
         name_p: str
             VHDL simulator name. The possibles values are: 'modelsim' or 'questa'
         level_p: int
-            (int >=0) level of verbosity of the print message
+            (int >=0) level of indentation of the print message
 
         Returns
         -------
@@ -1097,6 +1092,9 @@ class VunitConf(VunitUtils):
 
         return filepath_list
 
+    def set_sim_option(self,name_p,value_p):
+        self.VU.set_sim_option(name_p, value_p)
+
     def get_data_filepath(self, filename_p, level_p=None):
         """
         Get a list of data filepath
@@ -1137,44 +1135,6 @@ class VunitConf(VunitUtils):
 
         return filepath
 
-    def _get_script_filepath(self, filename_p, level_p=None):
-        """
-        Get the filepath of the filename_p.
-
-        Parameters
-        ----------
-        filename_p: str
-            filename to search
-        level_p: int
-            (int >= 0) define the level of indentation of the message to print
-
-        Returns
-        -------
-        str
-            filepath
-
-
-        """
-     
-        base_path_dic = self.base_path_dic
-        base_path = base_path_dic['script_path']
-        display_obj = self.display_obj
-        level0 = self.get_indentation_level(level_p=level_p)
-        level1 = level0 + 1
-        level2 = level0 + 2
-
-        str0 = "VunitConf._get_script_filepath"
-        display_obj.display_title(msg_p=str0, level_p=level0)
-        str0 = 'Search in base_path=' + base_path
-        display_obj.display(msg_p=str0, level_p=level1)
-
-        obj = FilepathListBuilder()
-        obj.set_file_extension(file_extension_list_p=['.py'])
-        str0 = 'Searched filename=' + filename_p
-        display_obj.display(msg_p=str0, level_p=level2)
-        filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename_p, level_p=level2)
-
-        return filepath
 
     def pre_config(self, output_path):
         """

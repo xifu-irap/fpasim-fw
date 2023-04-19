@@ -79,6 +79,30 @@ class SystemFpasimTopDataGen(VunitUtils):
         # instance of the VunitConf class
         #  => use its method to retrieve filepath
         self.vunit_conf_obj = None
+        # separator of *.csv file
+        self.csv_separator = ';'
+
+        # register field
+        # ctrl register
+        self.en = 0
+        # fpasim_gain register
+        self.fpasim_gain = 0
+        # tes_conf register
+        self.nb_pixel_by_frame = 0
+        self.nb_sample_by_pixel = 0
+        self.nb_sample_by_frame = 0
+        # conf0 register
+        self.inter_squid_gain = 0
+        # make pulse register
+        self.pixel_all_list = []
+        self.pixel_id_list = []
+        self.time_shift_list = []
+        self.pulse_heigth_list = []
+
+        # model
+        # keep track of the input ram filepath
+        self.ram_dic = {}
+
 
         self.reg_id_list = []
         self.addr_list = []
@@ -162,12 +186,27 @@ class SystemFpasimTopDataGen(VunitUtils):
         # dic['g_OPAL_ADDR_PIPE_OUT'] = int(opal_addr_pipe_out,16)
         return dic
 
-    def _compute_reg_from_field(self, dic_usb_p,value_list_p):
+    def _compute_reg_from_field(self, reg_def_section_dic_p, cmd_p):
+
+            cmd_name,mode,*value_list = cmd_p.split(';')
+            cmd = cmd_p
+
+            key = '@'+cmd_name.lower()
+            reg_dic = reg_def_section_dic_p.get(key)
+
+            dic_mode = reg_dic.get(mode)
+            if dic_mode is None:
+                msg0 = 'SystemFpasimTopDataGen._run: ERROR: the mode ' + str(mode) + " doesn't exist ("+cmd+')'
+                display_obj.display(msg_p=msg0,level_p=level1,color_p='red')
+
+            reg_id = str(reg_dic[mode]["reg_id"])
+            usb_addr = dic_mode["usb_addr"]
+            usb_addr = '{0:02x}'.format(int(usb_addr,16))
 
             # work on a deep copy of the field in order to not modify the source dictionnary for further cmd processing
-            dic_field = copy.deepcopy(dic_usb_p["field"])
+            dic_field = copy.deepcopy(reg_dic["field"])
 
-            for item in value_list_p:
+            for item in value_list:
                 field_name_tmp, str_new_value = item.split('=')
                 # convert str to integer
                 new_value = int(str_new_value)
@@ -211,7 +250,15 @@ class SystemFpasimTopDataGen(VunitUtils):
 
                 result += (value << bit_pos_min)
 
+            str_result = '{0:08x}'.format(result)
+
+            self.reg_id_list.append(reg_id)
+            self.addr_list.append(usb_addr)
+            self.cmt_list.append('"'+cmd+'"')
+            self.data_list.append(str_result)
+
             return result, dic_field
+
 
     def _run(self, tb_input_base_path_p, tb_output_base_path_p):
         """
@@ -230,48 +277,30 @@ class SystemFpasimTopDataGen(VunitUtils):
         verbosity = self.verbosity
         json_variant = self.json_variant
         vunit_conf_obj = self.vunit_conf_obj
-        csv_separator = ";"
+        csv_separator = self.csv_separator
         
-
-
+        # get the list of command and get the output file name
         seq_dic = json_variant["command_sequence_section"]
-        def_dic = json_variant["register_definition_section"]
         cmd_list = seq_dic["cmd_list"]
-
         output_tb_filename = seq_dic["output_tb_filename"]
         output_tb_filepath = str(Path(tb_input_base_path,output_tb_filename))
+
+        # get the register definition
+        reg_def_section_dic = json_variant["register_definition_section"]
+
 
         msg0 = 'output_tb_filepath=' + output_tb_filepath
         display_obj.display(msg_p=msg0,level_p=level2)
 
-        ############################################
-        # write the header
-        ###########################################
-        fid = open(output_tb_filepath,'w')
 
-        description_list = []
-        description_list.append("the reg_id is used to select the wire_in or the wire_out .....")
-        description = ', '.join(description_list)
-
-        fid.write("reg_id")
-        fid.write(csv_separator)
-        fid.write("opal_kelly_addr_hex")
-        fid.write(csv_separator)
-        fid.write("data_hex(addr+data)")
-        fid.write(csv_separator)
-        fid.write("comment")
-        fid.write("\n")
-
-        ####################################################
-        # RAM data Generation
-        ####################################################
+        ########################################################
+        # Generate the testbench input data file
+        ########################################################
         vunit_conf_obj = self.vunit_conf_obj
         msg0 = 'SystemFpasimTopDataGen._run: ram data generation from files'
         display_obj.display_subtitle(msg_p=msg0,level_p=level0)
 
-        
-            
-
+       
         
         for cmd in cmd_list:
             msg0 = 'SystemFpasimTopDataGen._run: Generate the cmd: '+ cmd
@@ -280,31 +309,20 @@ class SystemFpasimTopDataGen(VunitUtils):
             cmd_name,mode,*value_list = cmd.split(';')
 
             key = '@'+cmd_name.lower()
-            dic_cmd = def_dic.get(key)
+            reg_dic = reg_def_section_dic.get(key)
 
 
-            if dic_cmd is None:
+            if reg_dic is None:
                 msg0 = 'SystemFpasimTopDataGen._run: ERROR: the key ' + str(key) + " doesn't exist ("+cmd+')'
                 display_obj.display(msg_p=msg0,level_p=level1,color_p='red')
                 continue
      
-            if key == "@nop":
-                reg_id = str(dic_cmd[mode]["reg_id"])
-                usb_addr = "FF"
-                self.reg_id_list.append(reg_id)
-                self.addr_list.append(usb_addr)
-                self.cmt_list.append('"'+cmd+'"')
+            if key == "@usb_ram":                
+                dic_field = reg_dic["field"]
 
-                result,_ = self._compute_reg_from_field(dic_usb_p=dic_cmd,value_list_p=value_list)
-                str_result = '{0:08x}'.format(result)
-                self.data_list.append(str_result)
-
-            elif key == "@usb_ram":                
-                dic_field = dic_cmd["field"]
-
-                for value in value_list:
-                    new_cmd = cmd_name+';'+mode+';'+value
-                    dic = dic_field[value]
+                for ram_name in value_list:
+                    new_cmd = cmd_name+';'+mode+';'+ram_name
+                    dic = dic_field[ram_name]
 
                     dic_mode = dic.get(mode)
                     if dic_mode is None:
@@ -325,9 +343,9 @@ class SystemFpasimTopDataGen(VunitUtils):
                     msg0 = 'input_filepath=' + input_filepath
                     display_obj.display(msg_p=msg0,level_p=level2)  
 
-                    fid_tmp = open(input_filepath,'r')
-                    lines = fid_tmp.readlines()
-                    fid_tmp.close()
+                    with open(input_filepath,'r') as fid_tmp:
+                        lines = fid_tmp.readlines()
+                    
                     # delete the header
                     del lines[0]    
                     addr_ref_list = []
@@ -357,67 +375,91 @@ class SystemFpasimTopDataGen(VunitUtils):
                         addr_ref_list.append(str(new_addr))
                         data_ref_list.append(str_value)
 
+                    with open(ref_output_tb_filepath,'w') as ref_fid:
 
-                    ref_fid = open(ref_output_tb_filepath,'w')
-                    #########################################
-                    # build header file
-                    ref_fid.write('addr_uint')
-                    ref_fid.write(csv_separator)
-                    ref_fid.write('data_uint')
-                    ref_fid.write('\n')
-                    L_ref = len(data_ref_list)
-                    index_max = L_ref - 1
-                    for j in range(0,L_ref):
-                        addr_ref = addr_ref_list[j]
-                        data_ref = data_ref_list[j]
-                        ref_fid.write(addr_ref)
+                        #########################################
+                        # build header file
+                        ref_fid.write('addr_uint')
                         ref_fid.write(csv_separator)
-                        ref_fid.write(data_ref)
-                        if j != index_max:
-                            ref_fid.write('\n')
-                    ref_fid.close()
+                        ref_fid.write('data_uint')
+                        ref_fid.write('\n')
+                        L_ref = len(data_ref_list)
+                        index_max = L_ref - 1
+                        for j in range(0,L_ref):
+                            addr_ref = addr_ref_list[j]
+                            data_ref = data_ref_list[j]
+                            ref_fid.write(addr_ref)
+                            ref_fid.write(csv_separator)
+                            ref_fid.write(data_ref)
+                            if j != index_max:
+                                ref_fid.write('\n')
+                  
+            elif key == '@usb_ctrl':
+                result,dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic,cmd_p=cmd)
+                self.en = dic_field['en']['value']
+            elif key == '@usb_fpgasim_gain':
+                result,dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic,cmd_p=cmd)
+                self.fpasim_gain = dic_field['gain']['value']
 
+            elif key == '@usb_tes_conf':
+                result,dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic,cmd_p=cmd)
+                self.nb_pixel_by_frame = dic_field['nb_pixel_by_frame']['value']
+                self.nb_sample_by_pixel = dic_field['nb_sample_by_pixel']['value']
+                self.nb_sample_by_frame = dic_field['nb_sample_by_frame']['value']
 
+            elif key == '@usb_conf0':
+                result,dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic,cmd_p=cmd)
+                self.inter_squid_gain = dic_field['inter_squid_gain']['value']
+
+            elif key == '@usb_make_pulse':
+
+                result,dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic,cmd_p=cmd)
+                pixel_all = dic_field['pixel_all']['value']
+                pixel_id = dic_field['pixel_id']['value']
+                time_shift = dic_field['time_shift']['value']
+                pulse_heigth = dic_field['pulse_heigth']['value']
+                self.pixel_id_list.append(pixel_id)
+                self.time_shift_list.append(time_shift)
+                self.pulse_heigth_list.append(pulse_heigth)
                 
             else:
                 # manage trig/wire
-                
-                dic_mode = dic_cmd.get(mode)
-                if dic_mode is None:
-                    msg0 = 'SystemFpasimTopDataGen._run: ERROR: the mode ' + str(mode) + " doesn't exist ("+cmd+')'
-                    display_obj.display(msg_p=msg0,level_p=level1,color_p='red')
-                    continue
-                reg_id = str(dic_cmd[mode]["reg_id"])
-                usb_addr = dic_mode["usb_addr"]
-                usb_addr = '{0:02x}'.format(int(usb_addr,16))
-                self.reg_id_list.append(reg_id)
-                self.addr_list.append(usb_addr)
-                self.cmt_list.append('"'+cmd+'"')
-
-                result,_ = self._compute_reg_from_field(dic_usb_p=dic_cmd,value_list_p=value_list)
+                result,_ = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic,cmd_p=cmd)
       
-                str_result = '{0:08x}'.format(result)
-                self.data_list.append(str_result)
+        
+        with open(output_tb_filepath,'w') as fid:
+            fid.write("reg_id")
+            fid.write(csv_separator)
+            fid.write("opal_kelly_addr_hex")
+            fid.write(csv_separator)
+            fid.write("data_hex(addr+data)")
+            fid.write(csv_separator)
+            fid.write("comment")
+            fid.write("\n")
+            L = len(self.data_list)
+            index_max = L - 1
+            for i in range(L):
+                reg_id = self.reg_id_list[i]
+                str_addr = self.addr_list[i]
+                str_data = self.data_list[i]
+                str_cmt = self.cmt_list[i]
+                fid.write(reg_id)
+                fid.write(csv_separator)
+                fid.write(str_addr)
+                fid.write(csv_separator)
+                fid.write(str_data)
+                fid.write(csv_separator)
+                fid.write(str_cmt)
+                if i != index_max:
+                    fid.write('\n')
 
-                        
-                
-        L = len(self.data_list)
-        index_max = L - 1
-        for i in range(L):
-            reg_id = self.reg_id_list[i]
-            str_addr = self.addr_list[i]
-            str_data = self.data_list[i]
-            str_cmt = self.cmt_list[i]
-            fid.write(reg_id)
-            fid.write(csv_separator)
-            fid.write(str_addr)
-            fid.write(csv_separator)
-            fid.write(str_data)
-            fid.write(csv_separator)
-            fid.write(str_cmt)
-            if i != index_max:
-                fid.write('\n')
-        fid.close()
+
+        ########################################################
+        # compute the reference file
+        ########################################################
+        # retrieve RAM configuration file
+
+  
 
 
         return None

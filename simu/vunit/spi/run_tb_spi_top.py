@@ -175,7 +175,7 @@ if __name__ == '__main__':
     #  3. create the VUNIT class instance
     #  4. call the VunitConf.set_vunit instance method
     #####################################################
-    obj = VunitConf( json_filepath_p =json_filepath,script_name_p = script_name, json_key_path_p = json_key_path)
+    obj = VunitConf( json_filepath_p =json_filepath, json_key_path_p = json_key_path)
     obj.set_vunit_simulator(name_p = simulator,level_p=level1)
     obj.set_verbosity(verbosity_p = verbosity)
 

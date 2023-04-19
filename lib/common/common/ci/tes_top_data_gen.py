@@ -73,6 +73,8 @@ class TesTopDataGen(VunitUtils):
         # instance of the VunitConf class
         #  => use its method to retrieve filepath
         self.vunit_conf_obj = None
+        # separator of the *.csv file
+        self.csv_separator = ';'
 
     def set_test_variant_filepath(self, filepath_p):
         """
@@ -163,11 +165,11 @@ class TesTopDataGen(VunitUtils):
         verbosity = self.verbosity
         json_variant = self.json_variant
         vunit_conf_obj = self.vunit_conf_obj
+        csv_separator = self.csv_separator
 
         ########################################################
         # Generate the testbench input valid sequence files
         ########################################################
-        csv_separator = ';'
         msg0 = 'TesTopDataGen._run: Generate the testbench input valid sequence files'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
