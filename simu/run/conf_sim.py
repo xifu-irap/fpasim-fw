@@ -80,7 +80,7 @@ root_path, _ = find_file_in_hierarchy(filename_p='DONT_DELETE.txt')
 ############################################################################
 # add python common library
 ############################################################################
-sys.path.append(str(Path(root_path, 'lib/common')))
+sys.path.append(str(Path(root_path, 'simu/lib/common')))
 from common import Display, FilepathListBuilder
 
 
@@ -427,7 +427,7 @@ if __name__ == '__main__':
     ############################################################################
     # compute the path of the output json file
     ############################################################################
-    json_filepath_output = str(Path(root_path, 'launch_sim_processed.json').resolve())
+    json_filepath_output = str(Path(root_path,'simu', 'launch_sim_processed.json').resolve())
     # Opening JSON file
     fid_out = open(json_filepath_output, 'w')
 
@@ -438,7 +438,7 @@ if __name__ == '__main__':
     ############################################################################
 
     # common
-    relpath = './lib/common'
+    relpath = './simu/lib/common'
     lib_common_base_path_py = str(Path(root_path, relpath).resolve())
 
     json_data = {}
