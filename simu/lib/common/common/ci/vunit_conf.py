@@ -235,7 +235,7 @@ class VunitConf(VunitUtils):
         base_path_dic['src_utils_path'] = str(Path(root_path, 'src/hdl/utils'))
         base_path_dic['src_reset_path'] = str(Path(root_path, 'src/hdl/reset'))
         base_path_dic['src_spi_path'] = str(Path(root_path, 'src/hdl/spi'))
-        base_path_dic['src_sim_path'] = str(Path(root_path, 'src/hdl/sim'))
+        base_path_dic['src_cosim_path'] = str(Path(root_path, 'simu/cosim'))
 
         base_path_dic['tb_path'] = str(Path(root_path, 'simu/tb'))
         base_path_dic['wave_path'] = str(Path(root_path, 'simu/wave'))

@@ -100,7 +100,7 @@ def get_python_library_from_json_file(filepath_p):
 #   => project specific python library can now be imported
 #################################################################
 root_path,filepath = find_file_in_hierarchy()
-json_filepath = str(Path(root_path,'./launch_sim_processed.json').resolve())
+json_filepath = str(Path(root_path,'simu','./launch_sim_processed.json').resolve())
 path_list = get_python_library_from_json_file(filepath_p=json_filepath)
 if path_list != None:
     for path in path_list:
@@ -132,8 +132,8 @@ if __name__ == '__main__':
     help0 = 'Specify the verbosity level. Possible values (uint): 0 to 2'
     cli.parser.add_argument('--verbosity', default=0,choices = [0,1,2], type = int, help=help0)
 
-    help0 = 'Specify the json key path'
-    cli.parser.add_argument('--json_key_path', default='test0_tb_tes_top/tb_tes_top',help=help0)
+    help0 = 'Specify the json key path: test_name/tb_entity_name'
+    cli.parser.add_argument('--json_key_path', default='tb_tes_top_test_variant00/tb_tes_top',help=help0)
 
     args = cli.parse_args()
 
@@ -290,9 +290,9 @@ if __name__ == '__main__':
         str0 = 'tb_name='+tb_name   
         obj_display.display(msg_p=str0, level_p=level2)
 
-        conf_filename = str(Path(test_variant_filepath).stem)
+        variant_filename = str(Path(test_variant_filepath).stem)
 
-        name = conf_filename
+        name = variant_filename
         test_name = tb_name
         
         ####################################################################

@@ -78,7 +78,7 @@ root_path, _ = find_file_in_hierarchy()
 ############################################################################
 # add python common library
 ############################################################################
-path = str(Path(root_path, 'lib/common'))
+path = str(Path(root_path, 'simu/lib/common'))
 sys.path.append(path)
 from common import Display
 
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     ############################################################################
     # Search the Project Base Path: root of the git repository
     ############################################################################
-    json_filepath_input = str(Path(root_path, 'launch_sim_processed.json').resolve())
+    json_filepath_input = str(Path(root_path, 'simu', 'launch_sim_processed.json').resolve())
 
     ############################################################################
     # build the display object
