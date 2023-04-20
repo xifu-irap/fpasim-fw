@@ -30,21 +30,20 @@
 #      or specify the submodules to be exported.
 # -------------------------------------------------------------------------------------------------------------
 
-# standard library
-import os
 
-# user library
-from .ci.utils.console_colors import *
-from .ci.utils.filepath_list_builder import FilepathListBuilder
-from .ci.utils.display import Display
-from .ci.core.valid_sequencer import ValidSequencer
-from .ci.vunit_conf import VunitConf
-from .ci.tes_top_data_gen import TesTopDataGen
-from .ci.mux_squid_top_data_gen import MuxSquidTopDataGen
-from .ci.amp_squid_top_data_gen import AmpSquidTopDataGen
-from .ci.system_fpasim_top_data_gen import SystemFpasimTopDataGen
+__all__ = ['point', 'points', 'file', 'generator', 'attribute',
+           'oversampling', 'tes_signalling', 'tes_pulse_shape_manager', 'mux_squid_top', 'amp_squid_top',
+           'valid_sequencer']
 
-# Enable the coloring in the console
-os.system("")
-
-
+# deprecated to keep older scripts who import this from breaking
+from .point import Point
+from .points import Points
+from .file import File
+from .generator import Generator
+from .attribute import Attribute
+from .oversampling import OverSample
+from .tes_signalling import TesSignalling
+from .tes_pulse_shape_manager import TesPulseShapeManager
+from .mux_squid_top import MuxSquidTop
+from .amp_squid_top import AmpSquidTop
+from .valid_sequencer import ValidSequencer

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------------------
 #                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
 # -------------------------------------------------------------------------------------------------------------
@@ -17,34 +18,50 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   __init__.py
+#    @file                   generator.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
-#    @details                
-#    This python script imports python module.
+#    @details
+#    
+#     Generate a list of Point instances with no attributes
+#
 #    Note:
-#      This is the first file to be loaded.
-#      So you can use it to execute code that you want to run each time a module is loaded, 
-#      or specify the submodules to be exported.
+#       . This script was tested with python 3.10
 # -------------------------------------------------------------------------------------------------------------
 
-# standard library
-import os
-
 # user library
-from .ci.utils.console_colors import *
-from .ci.utils.filepath_list_builder import FilepathListBuilder
-from .ci.utils.display import Display
-from .ci.core.valid_sequencer import ValidSequencer
-from .ci.vunit_conf import VunitConf
-from .ci.tes_top_data_gen import TesTopDataGen
-from .ci.mux_squid_top_data_gen import MuxSquidTopDataGen
-from .ci.amp_squid_top_data_gen import AmpSquidTopDataGen
-from .ci.system_fpasim_top_data_gen import SystemFpasimTopDataGen
-
-# Enable the coloring in the console
-os.system("")
+from . import Point
 
 
+class Generator:
+    """
+    Generate a list of Point instances with no attributes
+    """
+    def __init__(self, nb_pts_p):
+        """
+        Initialize the class instance.
+
+        Parameters
+        ----------
+        nb_pts_p: int
+            define the number of Point instances to generate
+        """
+        self._nb_pts = nb_pts_p
+        self._obj_pts_list = []
+
+    def run(self):
+        """
+        Generate a list of Point instances
+
+        Returns
+        -------
+        list of Point instance
+
+        """
+        for i in range(self._nb_pts):
+            obj_pt = Point()
+            self._obj_pts_list.append(obj_pt)
+
+        return self._obj_pts_list

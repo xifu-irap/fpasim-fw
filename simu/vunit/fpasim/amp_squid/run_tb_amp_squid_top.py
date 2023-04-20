@@ -110,10 +110,11 @@ if path_list != None:
 #################################################################
 # import specific library
 #################################################################
-from vunit import VUnit, VUnitCLI
-from common import Display, VunitConf
+from vunit import VUnitCLI
+from vunit import VUnit
+from common import Display
+from common import VunitConf
 from common import AmpSquidTopDataGen
-# from vunit.about import version
 from vunit import about
      
 
@@ -174,7 +175,7 @@ if __name__ == '__main__':
     #  3. create the VUNIT class instance
     #  4. call the VunitConf.set_vunit instance method
     #####################################################
-    obj = VunitConf( json_filepath_p =json_filepath,script_name_p = script_name, json_key_path_p = json_key_path)
+    obj = AmpSquidTopDataGen( json_filepath_p =json_filepath, json_key_path_p = json_key_path)
     obj.set_vunit_simulator(name_p = simulator,level_p=level1)
     obj.set_verbosity(verbosity_p = verbosity)
 
@@ -256,7 +257,7 @@ if __name__ == '__main__':
     #####################################################
     # Set the simulation options
     #####################################################
-    VU.set_sim_option("modelsim.vsim_flags", ["-stats=-cmd,-time",'-c','-t','ps','-voptargs=+acc','-title',sim_title])
+    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=["-stats=-cmd,-time",'-c','-t','ps','-voptargs=+acc','-title',sim_title])
 
     ######################################################
     # get the list of test_variant_filepath (if any)
@@ -296,23 +297,21 @@ if __name__ == '__main__':
         ####################################################################
         # generate the input command/data files and others actions before launching the simulator
         ####################################################################
-        data_gen_obj = AmpSquidTopDataGen()
-        data_gen_obj.set_indentation_level(level_p= level1)
-        data_gen_obj.set_test_variant_filepath(filepath_p= test_variant_filepath)
-        data_gen_obj.set_vunit_conf_obj(obj_p= obj)
-        data_gen_obj.set_mif_files(filepath_list_p=ram_filepath_list)
+        obj.set_indentation_level(level_p= level1)
+        obj.set_test_variant_filepath(filepath_p= test_variant_filepath)
+        obj.set_mif_files(filepath_list_p=ram_filepath_list)
 
         # get a dictionnary of generics parameter
-        generic_dic = data_gen_obj.get_generic_dic()
+        generic_dic = obj.get_generic_dic()
         #####################################################
         # Mandatory: The simulator modelsim/Questa wants generics filepaths in the Linux format
         #####################################################
         tb.add_config(
                       name=test_name,
-                      pre_config=data_gen_obj.pre_config,
+                      pre_config=obj.pre_config,
                       generics = generic_dic
                         )
 
 
-    VU.main()
+    obj.main()
     # conf.pre_config(output_path = "test")

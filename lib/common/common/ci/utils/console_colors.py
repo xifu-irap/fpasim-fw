@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------------------
 #                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
 # -------------------------------------------------------------------------------------------------------------
@@ -17,34 +18,66 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   __init__.py
+#    @file                   console_colors.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details                
-#    This python script imports python module.
-#    Note:
-#      This is the first file to be loaded.
-#      So you can use it to execute code that you want to run each time a module is loaded, 
-#      or specify the submodules to be exported.
+#    
+#    This class map a name to a console color code.   
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
 import os
 
-# user library
-from .ci.utils.console_colors import *
-from .ci.utils.filepath_list_builder import FilepathListBuilder
-from .ci.utils.display import Display
-from .ci.core.valid_sequencer import ValidSequencer
-from .ci.vunit_conf import VunitConf
-from .ci.tes_top_data_gen import TesTopDataGen
-from .ci.mux_squid_top_data_gen import MuxSquidTopDataGen
-from .ci.amp_squid_top_data_gen import AmpSquidTopDataGen
-from .ci.system_fpasim_top_data_gen import SystemFpasimTopDataGen
-
 # Enable the coloring in the console
 os.system("")
 
+
+class ConsoleColors:
+    """
+    Map a name to a console color code.
+    """
+    def __init__(self):
+        """
+        Initialize the class instance.
+        """
+        self._colors = {}
+        self._colors['black'] = '\033[30m'
+        self._colors['red'] = '\033[31m'
+        self._colors['green'] = '\033[32m'
+        self._colors['orange'] = '\033[33m'
+        self._colors['blue'] = '\033[34m'
+        self._colors['purple'] = '\033[35m'
+        self._colors['cyan'] = '\033[36m'
+        self._colors['lightgrey'] = '\033[37m'
+        self._colors['darkgrey'] = '\033[90m'
+        self._colors['lightred'] = '\033[91m'
+        self._colors['lightgreen'] = '\033[92m'
+        self._colors['yellow'] = '\033[93m'
+        self._colors['lightblue'] = '\033[94m'
+        self._colors['pink'] = '\033[95m'
+        self._colors['lightcyan'] = '\033[96m'
+        self._colors['reset'] = '\033[0m'
+
+    def get_color(self, name_p):
+        """
+        Get the console color value from the color name
+
+        Parameters
+        ----------
+        name_p: str
+            Color name
+
+        Returns
+        -------
+        console color value
+
+        """
+        value = self._colors[name_p]
+        if value is None:
+            print(f"[ConsoleColors.get_colors]: KO: the colors {name_p} doesn't exist")
+        return value
 

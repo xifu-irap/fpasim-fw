@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------------------
 #                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
 # -------------------------------------------------------------------------------------------------------------
@@ -17,34 +18,80 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   __init__.py
+#    @file                   oversample.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
-#    @details                
-#    This python script imports python module.
+#    @details
+#    
+#    This class oversamples an input list of Point instances by duplicating each Point instance
 #    Note:
-#      This is the first file to be loaded.
-#      So you can use it to execute code that you want to run each time a module is loaded, 
-#      or specify the submodules to be exported.
+#       . This script was tested with python 3.10
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
-import os
+import random
+import copy
 
 # user library
-from .ci.utils.console_colors import *
-from .ci.utils.filepath_list_builder import FilepathListBuilder
-from .ci.utils.display import Display
-from .ci.core.valid_sequencer import ValidSequencer
-from .ci.vunit_conf import VunitConf
-from .ci.tes_top_data_gen import TesTopDataGen
-from .ci.mux_squid_top_data_gen import MuxSquidTopDataGen
-from .ci.amp_squid_top_data_gen import AmpSquidTopDataGen
-from .ci.system_fpasim_top_data_gen import SystemFpasimTopDataGen
-
-# Enable the coloring in the console
-os.system("")
+from . import Points
 
 
+class OverSample(Points):
+    """
+    Apply an oversampling factor on a list of Point instances.
+    """
+    def __init__(self, pts_list_p):
+        """
+        Initialize the class instance.
+
+        Parameters
+        ----------
+        pts_list_p: list of Point instance.
+            Define a list of Point instance.
+
+        """
+        super().__init__(pts_list_p=pts_list_p)
+
+        self._oversampling_value = None
+
+    def set_oversampling(self, value_p):
+        """
+        Define the number of Point instances to over sample.
+
+        Parameters
+        ----------
+        value_p: int
+            number of oversampled point. 
+            value_p must be in the range [1; max_integer value] with 1: no oversampled point.
+
+        Returns
+        -------
+        None
+
+        """
+        if value_p < 1:
+            print("[OverSample.set_oversampling]: value_p should be >= 1, value_p is forced to 1")
+            value = 1
+        else:
+            value = value_p
+        self._oversampling_value = value
+
+    def run(self):
+        """
+        Generate a list of oversampled Point instances.
+
+        Returns 
+        -------
+        list of oversampled Point instances.
+
+        """
+        res = []
+        for obj_pt in self._pts_list:
+            for i in range(self._oversampling_value):
+                # do a true object copy.
+                # Otherwise, the object is shared between several elements of the list
+                copy_pt = copy.deepcopy(obj_pt)
+                res.append(copy_pt)
+        return res

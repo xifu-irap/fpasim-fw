@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------------------
 #                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
 # -------------------------------------------------------------------------------------------------------------
@@ -17,34 +18,32 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   __init__.py
+#    @file                   points.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
-#    @details                
-#    This python script imports python module.
+#    @details
+#
+#    The class Point stores a list of Points Instance
+#
 #    Note:
-#      This is the first file to be loaded.
-#      So you can use it to execute code that you want to run each time a module is loaded, 
-#      or specify the submodules to be exported.
+#       . This script was tested with python 3.10
 # -------------------------------------------------------------------------------------------------------------
 
-# standard library
-import os
 
-# user library
-from .ci.utils.console_colors import *
-from .ci.utils.filepath_list_builder import FilepathListBuilder
-from .ci.utils.display import Display
-from .ci.core.valid_sequencer import ValidSequencer
-from .ci.vunit_conf import VunitConf
-from .ci.tes_top_data_gen import TesTopDataGen
-from .ci.mux_squid_top_data_gen import MuxSquidTopDataGen
-from .ci.amp_squid_top_data_gen import AmpSquidTopDataGen
-from .ci.system_fpasim_top_data_gen import SystemFpasimTopDataGen
+class Points:
+    """
+    Store a list of Point instances.
+    """
+    def __init__(self, pts_list_p):
+        """
+        Initialize the class instance.
 
-# Enable the coloring in the console
-os.system("")
+        Parameters
+        ----------
+        pts_list_p: list of Point object.
+            Defines a list of Point instances.
 
-
+        """
+        self._pts_list = pts_list_p

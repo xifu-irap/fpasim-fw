@@ -183,6 +183,7 @@
                 "This command is a command created specifically for the simulation.",
                 "It adds delays between 2 consecutive commands (expressed in clock cycles)",
                 "The parameters are:",
+                "   :param wr/addr  (hexadecimal string): 0xFF: fake wire address for the processing.",
                 "   :param wr/reg_id (integer): -1: select the nop function in the vhdl procedure.",
                 "",
                 "   :param rd/reg_id (integer): -1: select the nop function in the vhdl procedure.",
@@ -194,6 +195,7 @@
                 "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
             ],
             "wr": {
+                "usb_addr":"0xFF",
                 "reg_id": -1
             },
             "rd": {

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------------------
 #                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
 # -------------------------------------------------------------------------------------------------------------
@@ -18,35 +17,16 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   console_colors.py
+#    @file                   __init__.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details                
-#    This python script defines the console print colors
-#
+#    This python script imports python module.
+#    Note:
+#      This is the first file to be loaded.
+#      So you can use it to execute code that you want to run each time a module is loaded, 
+#      or specify the submodules to be exported.
 # -------------------------------------------------------------------------------------------------------------
-
-import os
-# Enable the coloring in the console
-os.system("")
-
-colors = {}
-colors['black'] = '\033[30m'
-colors['red'] = '\033[31m'
-colors['green'] = '\033[32m'
-colors['orange'] = '\033[33m'
-colors['blue'] = '\033[34m'
-colors['purple'] = '\033[35m'
-colors['cyan'] = '\033[36m'
-colors['lightgrey'] = '\033[37m'
-colors['darkgrey'] = '\033[90m'
-colors['lightred'] = '\033[91m'
-colors['lightgreen'] = '\033[92m'
-colors['yellow'] = '\033[93m'
-colors['lightblue'] = '\033[94m'
-colors['pink'] = '\033[95m'
-colors['lightcyan'] = '\033[96m'
-colors['reset'] = '\033[0m'
 

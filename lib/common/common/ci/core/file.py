@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # -------------------------------------------------------------------------------------------------------------
 #                              Copyright (C) 2022-2030 Ken-ji de la Rosa, IRAP Toulouse.
 # -------------------------------------------------------------------------------------------------------------
@@ -17,34 +18,55 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   __init__.py
+#    @file                   file.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
-#    @details                
-#    This python script imports python module.
+#    @details
+#    
 #    Note:
-#      This is the first file to be loaded.
-#      So you can use it to execute code that you want to run each time a module is loaded, 
-#      or specify the submodules to be exported.
+#       . This script was tested with python 3.10
 # -------------------------------------------------------------------------------------------------------------
 
-# standard library
-import os
 
-# user library
-from .ci.utils.console_colors import *
-from .ci.utils.filepath_list_builder import FilepathListBuilder
-from .ci.utils.display import Display
-from .ci.core.valid_sequencer import ValidSequencer
-from .ci.vunit_conf import VunitConf
-from .ci.tes_top_data_gen import TesTopDataGen
-from .ci.mux_squid_top_data_gen import MuxSquidTopDataGen
-from .ci.amp_squid_top_data_gen import AmpSquidTopDataGen
-from .ci.system_fpasim_top_data_gen import SystemFpasimTopDataGen
+class File:
+    """
+    Extract the RAM content from csv file
+    """
+    def __init__(self, filepath_p):
+        """
+        Initialize the class instance.
 
-# Enable the coloring in the console
-os.system("")
+        Parameters
+        ----------
+        filepath_p: str
+            filepath
+        """
+        # filepath
+        self._filepath = filepath_p
+        # data list
+        self._data_list = []
+        # separator of the csv file
+        self.csv_separator = ";"
 
+    def run(self):
+        """
+        Extract the data part of a *.csv file
+        Returns
+        -------
+        list of values
+        """
+        with open(self._filepath, 'r') as fid:
+            lines = fid.readlines()
+            nb_lines = len(lines)
+
+            for i in range(nb_lines):
+                line = lines[i]
+                str_addr, str_data = line.split(self.csv_separator)
+                # skip the header
+                if i != 0:
+                    self._data_list.append(int(str_data))
+
+        return self._data_list
 
