@@ -77,9 +77,6 @@ class VunitConf(VunitUtils):
         self.display_obj = Display()
         super().__init__(self.display_obj)
 
-
-        # current conf filepath
-        self.conf_filepath = None
         # current python script filepath
         self.script_filepath = None
         # path to the Xilinx pre-compiled libraries
@@ -90,8 +87,6 @@ class VunitConf(VunitUtils):
         self.base_path_dic = {}
         # Vunit object (This object will be created in the Vunit run python scripts)
         self.VU = None
-        # list of authorized simulator
-        self.authorized_simulator_name_list = ['modelsim', 'questa']
         # name of the current simulator
         self.simulator_name = None
         # Vunit testbench object
@@ -110,6 +105,10 @@ class VunitConf(VunitUtils):
 
         # test_variant_filename_list
         self.test_variant_filename_list = None
+        # path to the configuration file
+        self.test_variant_filepath = None
+        # JSON object as a dictionary
+        self.json_variant = None
 
         # script_filepath
         self.script_filepath = None
@@ -137,6 +136,39 @@ class VunitConf(VunitUtils):
         self.do_lib_list = []
         self.do_list = []
         self.do_filepath_list = []
+
+    def set_test_variant_filepath(self, filepath_p):
+        """
+        This method set the json test_variant filepath and get its dictionary
+        :param filepath_p: (string) filepath
+        :return: None
+        """
+
+        test_variant_filepath = filepath_p
+        display_obj = self.display_obj
+        level0 = self.level
+        level1 = level0 + 1
+
+        msg0 = "VunitConf.set_test_variant_filepath: Process Configuration File"
+        display_obj.display_title(msg_p=msg0, level_p=level0)
+
+        msg0 = 'test_variant_filepath=' + test_variant_filepath
+        display_obj.display(msg_p=msg0, level_p=level1)
+
+        ################################################
+        # Extract data from the configuration json file
+        ################################################
+        # Opening JSON file
+        with open(test_variant_filepath, 'r') as fid_in:
+            # returns JSON object as
+            # a dictionary
+            json_variant = json.load(fid_in)
+
+        # save the json dictionary
+        self.json_variant = json_variant
+        # save the configuration filepath
+        self.test_variant_filepath = test_variant_filepath
+        return None
 
     def _extract_unit_test_param_from_json(self):
         """
@@ -717,7 +749,8 @@ class VunitConf(VunitUtils):
 
         return None
 
-    def compile_opal_kelly_lib(self, name_p='opal_kelly_lib', library_name_p='opal_kelly_lib', version_p='2008',level_p=None):
+    def compile_opal_kelly_lib(self, name_p='opal_kelly_lib', library_name_p='opal_kelly_lib', version_p='2008',
+                               level_p=None):
         """
         Compile the user-defined files associated to the opal kelly IP.
 
@@ -861,7 +894,8 @@ class VunitConf(VunitUtils):
 
         msg = str(Path(filename_p).stem)
 
-        self._compile_by_filename(base_path_p=base_path, filename_p=filename_p, msg_p=msg, library_name_p=library_name_p,
+        self._compile_by_filename(base_path_p=base_path, filename_p=filename_p, msg_p=msg,
+                                  library_name_p=library_name_p,
                                   version_p=version_p, level_p=level_p)
         return None
 
@@ -1092,7 +1126,7 @@ class VunitConf(VunitUtils):
 
         return filepath_list
 
-    def set_sim_option(self,name_p,value_p):
+    def set_sim_option(self, name_p, value_p):
         self.VU.set_sim_option(name_p, value_p)
 
     def get_data_filepath(self, filename_p, level_p=None):
@@ -1135,7 +1169,6 @@ class VunitConf(VunitUtils):
 
         return filepath
 
-
     def pre_config(self, output_path):
         """
         Define a list of actions to do before launching the simulator
@@ -1157,7 +1190,7 @@ class VunitConf(VunitUtils):
         """
 
         display_obj = self.display_obj
-        conf_filepath = self.conf_filepath
+        test_variant_filepath = self.test_variant_filepath
         script_filepath = self.script_filepath
         verbosity = self.verbosity
 
@@ -1183,9 +1216,9 @@ class VunitConf(VunitUtils):
             cmd.append('python')
             # set the script path to call
             cmd.append(script_filepath)
-            # set the --conf_filepath
-            cmd.append('--conf_filepath')
-            cmd.append(conf_filepath)
+            # set the --test_variant_filepath
+            cmd.append('--test_variant_filepath')
+            cmd.append(test_variant_filepath)
             # set the tb_input_base_path
             cmd.append('--tb_input_base_path')
             cmd.append(tb_input_base_path)

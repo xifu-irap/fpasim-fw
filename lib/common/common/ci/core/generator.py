@@ -25,11 +25,13 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details
 #    
+#     Generate a list of Point instances with no attributes
+#
 #    Note:
 #       . This script was tested with python 3.10
 # -------------------------------------------------------------------------------------------------------------
 
-# import Point
+# user library
 from . import Point
 
 
@@ -52,9 +54,11 @@ class Generator:
     def run(self):
         """
         Generate a list of Point instances
+
         Returns
         -------
         list of Point instance
+
         """
         for i in range(self._nb_pts):
             obj_pt = Point()

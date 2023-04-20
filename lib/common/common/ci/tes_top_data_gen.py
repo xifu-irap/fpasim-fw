@@ -47,10 +47,10 @@ from .core import Generator
 from .core import OverSample
 from .core import TesSignalling
 from .core import TesPulseShapeManager
-from .vunit_core import VunitUtils
+from .vunit_conf import VunitConf
 
 
-class TesTopDataGen(VunitUtils):
+class TesTopDataGen(VunitConf):
     """
         This class defines methods to generate data for the VHDL tes_top testbench file.
         Note:
@@ -58,68 +58,14 @@ class TesTopDataGen(VunitUtils):
             It should not be usually used by the user
     """
 
-    def __init__(self):
+    def __init__(self, json_filepath_p, json_key_path_p):
         """
         This method initializes the class instance
         """
-        # display object
-        self.display_obj = Display()
-        super().__init__(self.display_obj)
+        super().__init__(json_filepath_p=json_filepath_p, json_key_path_p=json_key_path_p)
 
-        # path to the configuration file
-        self.test_variant_filepath = None
-        # JSON object as a dictionary
-        self.json_variant = None
-        # instance of the VunitConf class
-        #  => use its method to retrieve filepath
-        self.vunit_conf_obj = None
         # separator of the *.csv file
         self.csv_separator = ';'
-
-    def set_test_variant_filepath(self, filepath_p):
-        """
-        This method set the json test_variant filepath and get its dictionary
-        :param filepath_p: (string) test_variant filepath
-        :return: None
-        """
-
-        test_variant_filepath = filepath_p
-        display_obj = self.display_obj
-        level0 = self.level
-        level1 = level0 + 1
-
-        msg0 = "TesTopDataGen.set_test_variant_filepath: Process Configuration File"
-        display_obj.display_title(msg_p=msg0, level_p=level0)
-
-        msg0 = 'test_variant_filepath=' + test_variant_filepath
-        display_obj.display(msg_p=msg0, level_p=level1)
-
-        ################################################
-        # Extract data from the configuration json file
-        ################################################
-        # Opening JSON file
-        fid_in = open(test_variant_filepath, 'r')
-
-        # returns JSON object as
-        # a dictionary
-        json_variant = json.load(fid_in)
-
-        # Closing file
-        fid_in.close()
-        # save the json dictionary
-        self.json_variant = json_variant
-        # save the configuration filepath
-        self.test_variant_filepath = test_variant_filepath
-        return None
-
-    def set_vunit_conf_obj(self, obj_p):
-        """
-        This method set the VunitConf instance
-        :param obj_p: (VunitConf instance) instance of the VunitConf class
-        :return: None
-        """
-        self.vunit_conf_obj = obj_p
-        return None
 
     def get_generic_dic(self):
         """
@@ -164,7 +110,6 @@ class TesTopDataGen(VunitUtils):
         level2 = level0 + 2
         verbosity = self.verbosity
         json_variant = self.json_variant
-        vunit_conf_obj = self.vunit_conf_obj
         csv_separator = self.csv_separator
 
         ########################################################
@@ -290,7 +235,6 @@ class TesTopDataGen(VunitUtils):
         ########################################################
         # Copy the testbench input RAM configuration files
         ########################################################
-        vunit_conf_obj = self.vunit_conf_obj
         msg0 = 'TesTopDataGen._run: Copy the testbench input RAM configuration files'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
@@ -305,7 +249,7 @@ class TesTopDataGen(VunitUtils):
             output_filename = dic["value"]['output_filename']
             name = dic["generic"]['name']
             output_filepath = str(Path(tb_input_base_path, output_filename))
-            input_filepath = vunit_conf_obj.get_data_filepath(filename_p=input_filename, level_p=level1)
+            input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
 
             msg0 = 'from: ' + input_filepath
             display_obj.display(msg_p=msg0, level_p=level2)
