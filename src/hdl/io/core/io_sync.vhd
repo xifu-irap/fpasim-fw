@@ -61,8 +61,10 @@ entity io_sync is
     i_io_clk_rst : in  std_logic;       -- small reset pulse width
     i_io_rst     : in  std_logic;       -- large reset pulse width
     -- data
-    o_sync_clk   : out std_logic;       -- sync clock
-    o_sync       : out std_logic;       -- sync pulse
+    o_sync_clk_p   : out std_logic;       -- differential sync clock_p
+    o_sync_clk_n   : out std_logic;       -- differential sync clock_n
+    o_sync_p       : out std_logic;       -- differential sync_p pulse
+    o_sync_n       : out std_logic;       -- differential sync_n pulse
 
     ---------------------------------------------------------------------
     -- errors/status @i_clk
@@ -132,10 +134,14 @@ architecture RTL of io_sync is
   ---------------------------------------------------------------------
   -- oddr
   ---------------------------------------------------------------------
-  -- temporary sync value
-  signal sync_tmp : std_logic;
-  -- temporary clock value
-  signal clk_tmp  : std_logic;
+  -- temporary differential sync pulse p
+  signal sync_p_tmp : std_logic;
+  -- temporary differential sync pulse n
+  signal sync_n_tmp : std_logic;
+  -- temporary differential clock p
+  signal clk_p_tmp  : std_logic;
+  -- temporary differential clock n
+  signal clk_n_tmp  : std_logic;
 
   ---------------------------------------------------------------------
   -- error latching
@@ -220,27 +226,34 @@ begin
   gen_io_sync : if true generate
     -- sync pulse
     signal data_tmp0 : std_logic_vector(0 downto 0);
-    -- sync pulse
-    signal data_tmp1 : std_logic_vector(0 downto 0);
+    -- differential sync pulse p
+    signal data_p_tmp1 : std_logic_vector(0 downto 0);
+    -- differential sync pulse n
+    signal data_n_tmp1 : std_logic_vector(0 downto 0);
   begin
     data_tmp0(0) <= sync_rx;
     inst_selectio_wiz_sync : entity work.selectio_wiz_sync
       port map(
         data_out_from_device => data_tmp0,
-        data_out_to_pins     => data_tmp1,
-        clk_to_pins          => clk_tmp,
+        data_out_to_pins_p   => data_p_tmp1,
+        data_out_to_pins_n   => data_n_tmp1,
+        clk_to_pins_p        => clk_p_tmp,
+        clk_to_pins_n        => clk_n_tmp,
         clk_in               => i_out_clk,
         clk_reset            => i_io_clk_rst,
         io_reset             => i_io_rst
         );
-    sync_tmp <= data_tmp1(0);
+    sync_p_tmp <= data_p_tmp1(0);
+    sync_n_tmp <= data_n_tmp1(0);
   end generate gen_io_sync;
 
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
-  o_sync_clk <= clk_tmp;
-  o_sync     <= sync_tmp;
+  o_sync_clk_p   <= clk_p_tmp;
+  o_sync_clk_n   <= clk_n_tmp;
+  o_sync_p       <= sync_n_tmp;
+  o_sync_n       <= sync_p_tmp;
 
 
   ---------------------------------------------------------------------

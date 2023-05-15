@@ -134,8 +134,10 @@ entity io_top is
     o_sync_status : out std_logic_vector(7 downto 0);   -- sync status
 
     -- to the fpga pads : @sync_clk
-    o_sync_clk : out std_logic;         -- sync/ref clock
-    o_sync     : out std_logic;         -- sync signal value
+    o_sync_clk_p : out std_logic;         -- differential sync/ref clock p
+    o_sync_clk_n : out std_logic;         -- differential sync/ref clock n
+    o_sync_p     : out std_logic;         -- differential sync_p
+    o_sync_n     : out std_logic;         -- differential sync_n
 
     ---------------------------------------------------------------------
     -- dac
@@ -370,8 +372,10 @@ begin
       i_io_clk_rst => i_sync_io_clk_rst,
       i_io_rst     => i_sync_io_rst,
       -- data
-      o_sync_clk   => o_sync_clk,
-      o_sync       => o_sync,
+      o_sync_clk_p   => o_sync_clk_p,
+      o_sync_clk_n   => o_sync_clk_n,
+      o_sync_p       => o_sync_p,
+      o_sync_n       => o_sync_n,
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------

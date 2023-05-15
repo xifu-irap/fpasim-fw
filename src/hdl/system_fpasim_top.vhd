@@ -105,8 +105,10 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     -- FMC: to sync
     ---------------------------------------------------------------------
-    o_clk_ref    : out std_logic;       -- reference clock
-    o_clk_frame  : out std_logic;  -- sync pulse at the beginning of the first pixel of a column/frame (@o_ref_clk)
+    o_clk_ref_p   : out std_logic;  -- differential reference clock_p
+    o_clk_ref_n   : out std_logic;  -- differential reference clock_n
+    o_clk_frame_p      : out std_logic;  -- differential clk_frame_p pulse (at the beginning of the first pixel of a column (@o_ref_clk))
+    o_clk_frame_n      : out std_logic;  -- differential clk_frame_n pulse (at the beginning of the first pixel of a column (@o_ref_clk))
     ---------------------------------------------------------------------
     -- FMC: to dac
     ---------------------------------------------------------------------
@@ -176,6 +178,10 @@ entity system_fpasim_top is
     i_mon_n_int   : in  std_logic;  -- galr_n: Global analog input out-of-range alarm.
     o_mon_n_reset : out std_logic;      -- reset_n: hardware reset
 
+    ---------------------------------------------------------------------
+    -- debug
+    ---------------------------------------------------------------------
+    o_spy : out std_logic_vector(15 downto 0);
     ---------------------------------------------------------------------
     -- leds
     ---------------------------------------------------------------------
@@ -323,6 +329,11 @@ architecture RTL of system_fpasim_top is
   signal mon_n_reset : std_logic;       -- reset_n: hardware reset
 
 
+
+  ---------------------------------------------------------------------
+  -- debug
+  ---------------------------------------------------------------------
+  signal spy : std_logic_vector(15 downto 0);
 
 begin
 
@@ -479,11 +490,19 @@ begin
       ---------------------------------------------------------------------
       o_pulse_valid                     => open,
       o_pulse_sof                       => pulse_sof,
-      o_pulse_eof                       => open
+      o_pulse_eof                       => open,
+
+      ---------------------------------------------------------------------
+      -- debug
+      ---------------------------------------------------------------------
+      o_spy => spy
       );
 
   adc_amp_squid_offset_correction <= adc_b;
   adc_mux_squid_feedback          <= adc_a;
+
+  -- debug
+  o_spy <= spy;
 
   ---------------------------------------------------------------------
   -- Xilinx IOs
@@ -564,9 +583,11 @@ begin
       o_sync_errors => sync_errors,
       o_sync_status => sync_status,
 
-      -- to the fpga pads: @sync_clk
-      o_sync_clk   => o_clk_ref,
-      o_sync       => o_clk_frame,
+      -- to the fpga pads: @sync_clk 
+      o_sync_clk_p   => o_clk_ref_p,
+      o_sync_clk_n   => o_clk_ref_n,
+      o_sync_p       => o_clk_frame_p,
+      o_sync_n       => o_clk_frame_n,
       ---------------------------------------------------------------------
       -- dac
       ---------------------------------------------------------------------

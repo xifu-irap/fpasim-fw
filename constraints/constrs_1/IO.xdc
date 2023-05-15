@@ -311,7 +311,7 @@ set tsu          1.000;           # destination device setup time requirement
 set thd          1.500;           # destination device hold time requirement
 set trce_dly_max 0.000;            # maximum board trace delay
 set trce_dly_min 0.000;            # minimum board trace delay
-set output_ports {o_clk_frame};   # list of output ports
+set output_ports {o_clk_frame_p};   # list of output ports
 
 # Output Delay Constraints
 set_output_delay -clock $fwclk -max [expr $trce_dly_max + $tsu] [get_ports $output_ports];
@@ -488,6 +488,34 @@ set output_ports {o_leds[2]};   # list of output ports
 set_output_delay -clock $fwclk -max [expr $trce_dly_max + $tsu] [get_ports $output_ports];
 set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $output_ports];
 
+##################################################################################
+# spy (output ports)
+##################################################################################
+# Rising Edge System Synchronous Outputs 
+#
+# A System Synchronous design interface is a clocking technique in which the same 
+# active-edge of a system clock is used for both the source and destination device. 
+#
+# dest        __________            __________
+# clk    ____|          |__________|
+#                                  |
+#     (trce_dly_max+tsu) <---------|
+#             (trce_dly_min-thd) <-|
+#                        __    __
+# data   XXXXXXXXXXXXXXXX__DATA__XXXXXXXXXXXXX
+#
+
+set destination_clock sys_clk;    # Name of destination clock
+set tsu               2.000;      # Destination device setup time requirement
+set thd               0.500;      # Destination device hold time requirement
+set trce_dly_max      0.000;      # Maximum board trace delay
+set trce_dly_min      0.000;      # Minimum board trace delay
+set output_ports      {o_spy*};   # List of output ports
+
+# Output Delay Constraint
+set_output_delay -clock $destination_clock -max [expr $trce_dly_max + $tsu] [get_ports $output_ports];
+set_output_delay -clock $destination_clock -min [expr $trce_dly_min - $thd] [get_ports $output_ports];
+
 
 ###############################################################################################################
 # Unrelated asynchronuous clocks
@@ -603,8 +631,8 @@ set_property IOB true [get_ports i_mon_n_int];
 ##################################################################################
 # Sync: IO
 ##################################################################################
-set_property IOB true [get_ports o_clk_ref];
-set_property IOB true [get_ports o_clk_frame];
+set_property IOB true [get_ports o_clk_ref_p]
+set_property IOB true [get_ports o_clk_frame_p]
 
 ##################################################################################
 # usb: IO
@@ -638,3 +666,8 @@ set_property IOB true [get_ports o_clk_frame];
 ##################################################################################
 # set_property IOB true [get_ports o_leds[3]];
 set_property IOB true [get_ports o_leds[2]];
+
+##################################################################################
+# spy: IO
+##################################################################################
+set_property IOB true [get_ports o_spy]

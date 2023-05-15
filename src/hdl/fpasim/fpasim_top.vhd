@@ -136,7 +136,12 @@ entity fpasim_top is
     -- first processed sample of a pulse
     o_pulse_sof   : out std_logic;
     -- last processed sample of a pulse
-    o_pulse_eof   : out std_logic
+    o_pulse_eof   : out std_logic;
+    
+    ---------------------------------------------------------------------
+    -- debug
+    ---------------------------------------------------------------------
+    o_spy : out std_logic_vector(15 downto 0)
     );
 end entity fpasim_top;
 
@@ -460,6 +465,39 @@ architecture RTL of fpasim_top is
   signal dac0_4     : std_logic_vector(o_dac0'range);  -- dac0 data
 
   ---------------------------------------------------------------------
+  -- signals synchronization with dac_top output
+  ---------------------------------------------------------------------
+  constant c_DAC_IDX0_L : integer := 0;
+  constant c_DAC_IDX0_H : integer := c_DAC_IDX0_L + pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1;
+
+  constant c_DAC_IDX1_L : integer := c_DAC_IDX0_H + 1;
+  constant c_DAC_IDX1_H : integer := c_DAC_IDX1_L + 1 - 1;
+
+  constant c_DAC_IDX2_L : integer := c_DAC_IDX1_H + 1;
+  constant c_DAC_IDX2_H : integer := c_DAC_IDX2_L + 1 - 1;
+
+  constant c_DAC_IDX3_L : integer := c_DAC_IDX2_H + 1;
+  constant c_DAC_IDX3_H : integer := c_DAC_IDX3_L + pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1;
+
+  constant c_DAC_IDX4_L : integer := c_DAC_IDX3_H + 1;
+  constant c_DAC_IDX4_H : integer := c_DAC_IDX4_L + 1 - 1;
+
+  constant c_DAC_IDX5_L : integer := c_DAC_IDX4_H + 1;
+  constant c_DAC_IDX5_H : integer := c_DAC_IDX5_L + 1 - 1;
+
+  signal data_pipe_tmp2 : std_logic_vector(c_IDX5_H downto 0);
+  signal data_pipe_tmp3 : std_logic_vector(c_IDX5_H downto 0);
+
+  signal pixel_sof4        : std_logic;  -- @suppress "signal pixel_sof3 is never read"
+  signal pixel_eof4        : std_logic;  -- @suppress "signal pixel_eof3 is never read"
+  signal pixel_valid4      : std_logic;
+  signal pixel_id4         : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);  -- @suppress "signal pixel_id3 is never read"
+  signal frame_sof4        : std_logic;
+  signal frame_eof4        : std_logic;  -- @suppress "signal frame_eof3 is never read"
+  signal frame_id4         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  -- @suppress "signal frame_id3 is never read"
+  
+
+  ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
   signal sync_valid5      : std_logic;                      -- sync valid
@@ -500,6 +538,10 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- debug
   ---------------------------------------------------------------------
+  -- pipe: spy
+  signal data_pipe_tmp4 : std_logic_vector(15 downto 0);
+  signal data_pipe_tmp5 : std_logic_vector(15 downto 0);
+  
   -- Select the dac pattern source: '1': custom debug pattern, '0': hardcoded pattern
   signal debug_dac_pattern_sel : std_logic := '0';
   signal debug_dac_pattern0    : std_logic_vector(7 downto 0);  -- custom dac pattern0
@@ -517,6 +559,8 @@ architecture RTL of fpasim_top is
   signal debug_dac1    : std_logic_vector(15 downto 0);
   -- custom debug dac0 source
   signal debug_dac0    : std_logic_vector(15 downto 0);
+
+
 
 begin
 
@@ -1104,14 +1148,14 @@ begin
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      o_pixel_sof                   => pixel_sof3,  -- not connected
-      o_pixel_eof                   => pixel_eof3,  -- not connected
+      o_pixel_sof                   => pixel_sof3,
+      o_pixel_eof                   => pixel_eof3,
       o_pixel_valid                 => pixel_valid3,
-      o_pixel_id                    => pixel_id3,   -- not connected
+      o_pixel_id                    => pixel_id3,
       o_pixel_result                => pixel_result3,
       o_frame_sof                   => frame_sof3,
-      o_frame_eof                   => frame_eof3,  -- not connected
-      o_frame_id                    => frame_id3,   -- not connected
+      o_frame_eof                   => frame_eof3,
+      o_frame_id                    => frame_id3,
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------
@@ -1225,6 +1269,34 @@ begin
       o_dac1           => dac1_4,
       o_dac0           => dac0_4
       );
+
+  ---------------------------------------------------------------------
+  -- signals synchronization with dac_top output
+  ---------------------------------------------------------------------
+  data_pipe_tmp2(c_DAC_IDX5_H)                     <= pixel_sof3;
+  data_pipe_tmp2(c_DAC_IDX4_H)                     <= pixel_eof3;
+  data_pipe_tmp2(c_DAC_IDX3_H downto c_DAC_IDX3_L) <= pixel_id3;
+  data_pipe_tmp2(c_DAC_IDX2_H)                     <= frame_sof3;
+  data_pipe_tmp2(c_DAC_IDX1_H)                     <= frame_eof3;
+  data_pipe_tmp2(c_DAC_IDX0_H downto c_DAC_IDX0_L) <= frame_id3;
+
+ inst_pipeliner_sync_with_dac_top_out : entity work.pipeliner
+    generic map(
+      g_NB_PIPES   => pkg_DAC_TOP_LATENCY,
+      g_DATA_WIDTH => data_pipe_tmp2'length
+      )
+    port map(
+      i_clk  => i_clk,
+      i_data => data_pipe_tmp2,
+      o_data => data_pipe_tmp3
+      );
+
+  pixel_sof4 <= data_pipe_tmp3(c_DAC_IDX5_H);
+  pixel_eof4 <= data_pipe_tmp3(c_DAC_IDX4_H);
+  pixel_id4 <= data_pipe_tmp3(c_DAC_IDX3_H downto c_DAC_IDX3_L);
+  frame_sof4 <= data_pipe_tmp3(c_DAC_IDX2_H);
+  frame_eof4 <= data_pipe_tmp3(c_DAC_IDX1_H);
+  frame_id4 <= data_pipe_tmp3(c_DAC_IDX0_H downto c_DAC_IDX0_L);
 
   ---------------------------------------------------------------------
   -- output
@@ -1384,6 +1456,29 @@ begin
   ---------------------------------------------------------------------
   -- debug
   ---------------------------------------------------------------------
+  data_pipe_tmp4(15)           <= sync5;
+  data_pipe_tmp4(14 downto 11) <= (others => '0');
+  data_pipe_tmp4(10 downto 5)  <= pixel_id3;
+  data_pipe_tmp4(4)            <= pixel_sof3;
+  data_pipe_tmp4(3)            <= pixel_eof3;
+  data_pipe_tmp4(2)            <= pixel_valid3;
+  data_pipe_tmp4(1)            <= frame_sof3;
+  data_pipe_tmp4(0)            <= frame_eof3;
+
+  inst_pipeliner_spy : entity work.pipeliner
+    generic map(
+      g_NB_PIPES   => 2,
+      g_DATA_WIDTH => data_pipe_tmp4'length
+      )
+    port map(
+      i_clk  => i_clk,
+      i_data => data_pipe_tmp4,
+      o_data => data_pipe_tmp5
+      );
+
+  o_spy <= data_pipe_tmp5;
+
+
   gen_debug : if g_FPASIM_DEBUG = true generate
     -- frame id when pulse_sof is detected (pixel 0)
     signal debug_frame_id_pulse_sof_r1 : std_logic_vector(frame_id1'range);
