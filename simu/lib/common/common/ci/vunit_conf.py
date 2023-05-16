@@ -222,9 +222,9 @@ class VunitConf(VunitUtils):
         base_path_dic['ip_xilinx_coregen_path'] = str(Path(root_path, 'ip/xilinx/coregen'))
         base_path_dic['ip_xilinx_xpm_path'] = str(Path(root_path, 'ip/xilinx/xpm'))
         base_path_dic['ip_opal_kelly_simu_path'] = str(Path(root_path, 'ip/opal_kelly/simu'))
-        base_path_dic['lib_opal_kelly_simu_path'] = str(Path(root_path, 'lib/opal_kelly/opal_kelly/vhdl/src'))
-        base_path_dic['lib_csv_path'] = str(Path(root_path, 'lib/csv/csv/vhdl/src'))
-        base_path_dic['lib_common_path'] = str(Path(root_path, 'lib/common/common/vhdl/src'))
+        base_path_dic['lib_opal_kelly_simu_path'] = str(Path(root_path, 'simu/lib/opal_kelly/opal_kelly/vhdl/src'))
+        base_path_dic['lib_csv_path'] = str(Path(root_path, 'simu/lib/csv/csv/vhdl/src'))
+        base_path_dic['lib_common_path'] = str(Path(root_path, 'simu/lib/common/common/vhdl/src'))
 
         base_path_dic['src_path'] = str(Path(root_path, 'src/hdl'))
         base_path_dic['src_system_path'] = str(Path(root_path, 'src/hdl'))
@@ -858,7 +858,7 @@ class VunitConf(VunitUtils):
         base_path_dic = self.base_path_dic
         directory_name = directory_name_p.lower()
 
-        if directory_name in ['system', 'clocking', 'fpasim', 'io', 'utils', 'usb', 'reset', 'spi', 'sim']:
+        if directory_name in ['system', 'clocking', 'fpasim', 'io', 'utils', 'usb', 'reset', 'spi', 'cosim']:
             # based on the _build_path method, build the dictionary keys
             key_name = 'src_' + directory_name + '_path'
             base_path = base_path_dic[key_name]
@@ -1004,7 +1004,7 @@ class VunitConf(VunitUtils):
 
         display_obj = self.display_obj
         level0 = self.get_indentation_level(level_p=level_p)
-        display_obj.display_title(msg_p='Set the Simulator Waveform', level_p=level0)
+        display_obj.display_title(msg_p='Get the Simulator Waveform', level_p=level0)
         return self.wave_filepath
 
     def get_testbench_name(self):

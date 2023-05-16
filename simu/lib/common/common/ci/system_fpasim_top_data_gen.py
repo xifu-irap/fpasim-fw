@@ -440,8 +440,9 @@ class SystemFpasimTopDataGen(VunitConf):
 
         ##########################################################
         # generate files
-        ##########################################################    
-        self._run(tb_input_base_path_p=tb_input_base_path, tb_output_base_path_p=tb_output_base_path)
+        ##########################################################
+        if self.json_variant is not None:    
+            self._run(tb_input_base_path_p=tb_input_base_path, tb_output_base_path_p=tb_output_base_path)
 
         str0 = "SystemFpasimTopDataGen.pre_config: Simulation transcript"
         display_obj.display_title(msg_p=str0, level_p=level0)

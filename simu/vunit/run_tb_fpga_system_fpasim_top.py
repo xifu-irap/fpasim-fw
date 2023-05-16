@@ -245,7 +245,7 @@ if __name__ == '__main__':
     #####################################################
     # simulator configuration
     #####################################################
-    # Set the simulator options
+    # Set the simulator wave
     obj.set_waveform(level_p=level1)
     # Get the simulator wave
     wave_filepath = obj.get_waveform(level_p=level1)
@@ -256,6 +256,7 @@ if __name__ == '__main__':
         str0 = "run_filepath:"+__file__.replace('\\','/')
         str1 = "waveform_filepath:"+wave_filepath.replace('\\','/')
         sim_title = str0 + '__' + str1
+
 
     #####################################################
     # Set the simulation options
@@ -325,9 +326,8 @@ if __name__ == '__main__':
         obj.set_mif_files(filepath_list_p = ram_filepath_list)
         tb.add_config(
                           name=test_name,
-                          # pre_config=obj.pre_config
+                          pre_config=obj.pre_config
                             )
-
 
 
     obj.main()
