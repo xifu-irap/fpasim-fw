@@ -160,7 +160,7 @@ class AmpSquidTop(Points):
         
         
 
-        sub = mux_out_p - adc_amp_squid_offset_correction_p
+        sub = mux_out_p - (adc_amp_squid_offset_correction_p * 8)
 
         if sub < 0:
             addr = self.amp_squid_tf_ram_nb_words + sub

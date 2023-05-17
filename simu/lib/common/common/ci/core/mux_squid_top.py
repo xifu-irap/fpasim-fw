@@ -162,7 +162,7 @@ class MuxSquidTop(Points):
 
         inter_squid_gain = self._inter_squid_gain / (2 ** self._inter_squid_gain_width)
 
-        sub = tes_out_p - adc_mux_squid_feedback_p
+        sub = tes_out_p - (adc_mux_squid_feedback_p*4)
 
         # convert int into uint
         if sub < 0:

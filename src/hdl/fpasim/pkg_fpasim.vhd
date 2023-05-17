@@ -294,7 +294,7 @@ package pkg_fpasim is
 
   -- mux_squid_feedback
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_MUX_SQUID_SUB_Q_M_B     : positive := 14;
+  constant pkg_MUX_SQUID_SUB_Q_M_B     : positive := 16;
   -- user-defined: number of fraction bits
   constant pkg_MUX_SQUID_SUB_Q_N_B     : natural  := 0;
   -- auto-computed: bus width
@@ -376,7 +376,7 @@ package pkg_fpasim is
 
   -- mux_squid_feedback
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_AMP_SQUID_SUB_Q_M_B     : positive := 14;
+  constant pkg_AMP_SQUID_SUB_Q_M_B     : positive := 15;
   -- user-defined: number of fraction bits
   constant pkg_AMP_SQUID_SUB_Q_N_B     : natural  := 0;
   -- auto-computed: bus width
@@ -464,7 +464,6 @@ package pkg_fpasim is
 
   -- user-defined: dac_pattern7 (see dac3283 datasheet figure 34)
   constant pkg_DAC_PATTERN7 : std_logic_vector(7 downto 0):= x"04";
-
 
   ---------------------------------------------------------------------
   -- sync_top
