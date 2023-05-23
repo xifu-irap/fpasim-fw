@@ -17,12 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   tb_mux_squid_top.vhd 
+--    @file                   tb_mux_squid_top.vhd 
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details   
+--
+--    Testbench of the mux_squid_top module.             
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -140,7 +142,7 @@ architecture simulate of tb_mux_squid_top is
   -- errors/status
   ---------------------------------------------------------------------
   signal o_errors : std_logic_vector(15 downto 0);
-  signal o_status : std_logic_vector(7 downto 0); -- @suppress "signal o_status is never read"
+  signal o_status : std_logic_vector(7 downto 0); 
 
   ---------------------------------------------------------------------
   -- Clock definition
@@ -157,7 +159,7 @@ architecture simulate of tb_mux_squid_top is
   signal data_gen_finish        : std_logic := '0';
   signal data_valid             : std_logic := '0';
   signal data_count_in          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_in : std_logic; -- @suppress "signal data_count_overflow_in is never read"
+  signal data_count_overflow_in : std_logic; 
 
   -- ram tes pulse shape
   signal ram1_wr_start      : std_logic                    := '0';
@@ -165,7 +167,7 @@ architecture simulate of tb_mux_squid_top is
   signal ram1_rd_valid      : std_logic                    := '0';
   signal ram1_wr_gen_finish : std_logic                    := '0';
   signal ram1_rd_gen_finish : std_logic                    := '0';
-  signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0'); -- @suppress "signal ram1_error is never read"
+  signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0'); 
 
   -- ram tes steady state
   signal ram2_wr_start      : std_logic                    := '0';
@@ -173,14 +175,14 @@ architecture simulate of tb_mux_squid_top is
   signal ram2_rd_valid      : std_logic                    := '0';
   signal ram2_wr_gen_finish : std_logic                    := '0';
   signal ram2_rd_gen_finish : std_logic                    := '0';
-  signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0'); -- @suppress "signal ram2_error is never read"
+  signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0'); 
 
   -- check
   signal data_count_out          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_out : std_logic; -- @suppress "signal data_count_overflow_out is never read"
+  signal data_count_overflow_out : std_logic; 
 
   signal data_stop      : std_logic := '0';
-  signal data_out_error : std_logic_vector(0 downto 0); -- @suppress "signal data_out_error is never read"
+  signal data_out_error : std_logic_vector(0 downto 0);
 
   ---------------------------------------------------------------------
   -- filepath definition
@@ -216,13 +218,13 @@ architecture simulate of tb_mux_squid_top is
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers 
-  constant c_LOGGER_SUMMARY     : logger_t  := get_logger("log:summary"); -- @suppress "Expression does not result in a constant"
+  constant c_LOGGER_SUMMARY     : logger_t  := get_logger("log:summary");
   -- checkers
-  constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_DATA_COUNT : checker_t := new_checker("check:data_count"); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM1       : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM2       : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME); -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_DATA       : checker_t := new_checker("check:out:data_out"); -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors");
+  constant c_CHECKER_DATA_COUNT : checker_t := new_checker("check:data_count");
+  constant c_CHECKER_RAM1       : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME);
+  constant c_CHECKER_RAM2       : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME);
+  constant c_CHECKER_DATA       : checker_t := new_checker("check:out:data_out");
 
 begin
 
@@ -251,20 +253,21 @@ begin
     ---------------------------------------------------------------------
     -- VUNIT - Scoreboard object : Visibility definition
     ---------------------------------------------------------------------
-    if g_VUNIT_DEBUG = true then        -- @suppress "Redundant boolean equality check with true"
+    if g_VUNIT_DEBUG = true then
       -- the simulator doesn't stop on errors => stop on failure
       set_stop_level(failure);
     end if;
 
     show(get_logger("log:summary"), display_handler, pass);
-    show(get_logger("check:data_count"), display_handler, pass);
     show(get_logger("check:errors"), display_handler, pass);
+    show(get_logger("check:data_count"), display_handler, pass);
     if g_RAM1_VERBOSITY > 0 then
       show(get_logger("check:ram1"), display_handler, pass);
     end if;
     if g_RAM2_VERBOSITY > 0 then
       show(get_logger("check:ram2"), display_handler, pass);
     end if;
+    --show(get_logger("check:out:data_out"), display_handler, pass);
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
@@ -335,17 +338,11 @@ begin
     wait until rising_edge(i_clk) and ram2_wr_gen_finish = '1';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
-    ---------------------------------------------------------------------
-    -- Data Generation
-    ---------------------------------------------------------------------
-    info("Start data Generation");
-    data_start <= '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- RAM Check: RAM1
     ---------------------------------------------------------------------
-    if g_RAM1_CHECK = true then         -- @suppress "Redundant boolean equality check with true"
+    if g_RAM1_CHECK = true then
       info("Start RAM reading: " & g_RAM1_NAME);
       ram1_rd_start <= '1';
       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
@@ -356,13 +353,20 @@ begin
     ---------------------------------------------------------------------
     -- RAM Check: RAM2
     ---------------------------------------------------------------------
-    if g_RAM2_CHECK = true then         -- @suppress "Redundant boolean equality check with true"
+    if g_RAM2_CHECK = true then
       info("Start RAM reading: " & g_RAM2_NAME);
       ram2_rd_start <= '1';
       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
       info("wait RAM reading");
       wait until rising_edge(i_clk) and ram2_rd_gen_finish = '1';
     end if;
+
+    ---------------------------------------------------------------------
+    -- Data Generation
+    ---------------------------------------------------------------------
+    info("Start data Generation");
+    data_start <= '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- Wait end of input data generation
@@ -726,7 +730,7 @@ begin
   ---------------------------------------------------------------------
   -- log: data out
   ---------------------------------------------------------------------
-  gen_log : if g_ENABLE_LOG = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_log : if g_ENABLE_LOG = true generate 
     signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
     signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
     signal frame_sof_vect_tmp : std_logic_vector(0 downto 0);
@@ -791,7 +795,7 @@ begin
  ---------------------------------------------------------------------
  -- check data
  ---------------------------------------------------------------------
-  gen_check_data : if g_ENABLE_CHECK = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_check_data : if g_ENABLE_CHECK = true generate
   begin
 
     inst_pkg_vunit_data_checker : pkg_vunit_data_checker_1(
