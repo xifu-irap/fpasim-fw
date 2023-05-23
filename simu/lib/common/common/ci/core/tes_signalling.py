@@ -24,9 +24,23 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details
+#
+#    The TesSignalling class is a python model of the VHDL function (tes_signalling.vhd).
+#    It computes the expected output values.
+#
+#    Note:
+#       This class automatically create the pixel_sof, pixel_eof, pixel_id, frame_sof, frame_eof, frame_id attributes on the
+#       input list of Point instance.
 #    
 #    Note:
+#       . Used for the VHDL simulation.
+#       . This class can be instanciated by the user.
+#       . It should be instanciated after:
+#            . Generator class
+#            . optional: OverSample class
+#            . optional: Attribute Class 
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # user library
@@ -35,9 +49,8 @@ from .points import Points
 
 class TesSignalling(Points):
     """
-    Generate the pixel_sof, pixel_eof, pixel_id, frame_sof, frame_eof, frame_id attributes on a list
-    of input Point instances.
-
+    Python model of the VHDL function (tes_signalling.vhd).
+    It computes the expected output values.
     """
     def __init__(self, pts_list_p):
         """
@@ -50,7 +63,7 @@ class TesSignalling(Points):
 
         """
         super().__init__(pts_list_p=pts_list_p)
-        # define the number of pixel by frame
+        # define the number of pixels by frame
         self._nb_pixel_by_frame = 0
         # define the number of samples by pixel
         self._nb_sample_by_pixel = 0
@@ -61,55 +74,64 @@ class TesSignalling(Points):
 
     def set_conf(self, nb_pixel_by_frame_p, nb_sample_by_pixel_p, nb_frame_by_pulse_p, nb_sample_by_frame_p):
         """
-        Set the parameters.
+        Set the configuration parameters.
 
         Parameters
         ----------
         nb_pixel_by_frame_p: int
-            Define the number of pixels by frame
+            Define the number of pixels by frame.
         nb_sample_by_pixel_p: int
-            Define the number of samples by pixel
+            Define the number of samples by pixel.
         nb_frame_by_pulse_p: int
-            Define the number of frame by pulse
+            Define the number of frame by pulse.
         nb_sample_by_frame_p:
-            Define the number of sample by frame
+            Define the number of sample by frame.
 
         Returns
         -------
-        None
+            None
 
         """
         self._nb_pixel_by_frame = nb_pixel_by_frame_p
         self._nb_sample_by_pixel = nb_sample_by_pixel_p
         self._nb_frame_by_pulse = nb_frame_by_pulse_p
         self._nb_sample_by_frame = nb_sample_by_frame_p
+        return None
 
     def _compute(self, name_sof_p, name_eof_p, name_id_p, nb_samples_p, nb_id_p):
         """
-        Compute the flag signals and add the new attributes: name_sof_p, name_eof_p and name_id_p
+        Compute the "name_sof_p", name_eof_p, name_id_p attribute values.
+        Example: 
+            If nb_samples_p = 4 and nb_id_p = 3 then the input list of Point Instances will have the following attribute values:
+                name_sof_p: 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0  ..........
+                name_eof_p: 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0 1  ..........
+                name_id_p : 0 0 0 0 1 1 1 1 2 2 2 2 0 0 0 0  ..........
+
         Note:
-          . The computed Id flag range is [0;nb_id_p-1]
+          . The computed Id attribute range is [0;nb_id_p-1].
 
         Parameters
         ----------
         name_sof_p: str
-            Name of the Start Of Frame flags (first sample of a block)
+            Name of the "Start Of Frame" attribute (first sample of a block).
         name_eof_p: str
-            Name of the End Of Frame flags (last sample of a block)
+            Name of the "End Of Frame" attribute (last sample of a block).
         name_id_p: str
-            Name of the Id flags
+            Name of the "Id" attribute.
         nb_samples_p: int
-            Numbers of samples of a block. The value range is [1; max integer value]
+            (int >= 1) Numbers of samples of a block. The value range is [1; max integer value].
         nb_id_p: int
-            Numbers of blocks (Id).
+            (int >= 1) Numbers of blocks (Id).
 
         Returns
         -------
-        None
+            None
 
         """
+        # count samples
         cnt = 0
         cnt_max = nb_samples_p - 1
+        # count id block
         cnt_id = 0
         cnt_id_max = nb_id_p - 1
 
@@ -139,12 +161,15 @@ class TesSignalling(Points):
 
     def run(self):
         """
-        Compute the flags associated to a pixel: pixel_sof, pixel_eof and pixel_id
-        Compute the flags associated to a frame: frame_sof, frame_eof and frame_id
+        Compute the expected output values of the VHDL function (tes_signalling).
+        Note:
+            It automatically generate the following attributes:
+                . pixel_sof, pixel_eof and pixel_id
+                . frame_sof, frame_eof and frame_id
 
         Returns
         -------
-        a list of Points instances with new added attributes
+            a list of Points instances.
         """
         self._compute(name_sof_p="pixel_sof", name_eof_p="pixel_eof", name_id_p='pixel_id',
                       nb_samples_p=self._nb_sample_by_pixel, nb_id_p=self._nb_pixel_by_frame)

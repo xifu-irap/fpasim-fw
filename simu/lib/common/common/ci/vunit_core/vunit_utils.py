@@ -25,9 +25,13 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details
 #
+#    The VunitUtils class defines shared methods.#
 #    
 #    Note:
+#       . Used for the VHDL simulation.
 #       . This script was tested with python 3.10
+#       
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library

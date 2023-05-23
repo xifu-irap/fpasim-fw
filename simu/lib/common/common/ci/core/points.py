@@ -25,10 +25,13 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details
 #
-#    The class Point stores a list of Points Instance
+#    The class Point stores a list of Points Instance.
 #
 #    Note:
+#       . Used for the VHDL simulation.
+#       . The user shouln't directly instanciate this class.
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 

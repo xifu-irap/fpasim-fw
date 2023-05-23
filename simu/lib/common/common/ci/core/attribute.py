@@ -25,14 +25,19 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details
 #
-#    This class process a list of point instances.
-#    For each point instance, we create:
-#       a attribute with constant value or
+#    This class process a list of point instances. 
+#    On the point instances, we can create:
+#       a attribute with the same constant value or
 #       a attribute with an incremental value or
-#       a attribute with a random value or
+#       a attribute with a random value.
 #
 #    Note:
+#       . Used for the VHDL simulation.
+#       . This class can be instanciated by the user. 
+#       . It should be instanciated after:
+#            . Generator class
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -44,7 +49,7 @@ from . import Points
 
 class Attribute(Points):
     """
-    Generate an attribute (name,value) on each point of a list of Points Instances
+    Generate an attribute (name,value) on each point of the input list of the Point instances.
     """
     def __init__(self, pts_list_p):
         """
@@ -77,57 +82,64 @@ class Attribute(Points):
     @staticmethod
     def set_random_seed(value_p):
         """
-        Set the seed of the random generator
+        Set the seed of the random value generator.
 
         Parameters
         ----------
         value_p: int
-            Seed value
+            Seed value.
 
         Returns
         -------
-
+            None
         """
+
         random.seed(value_p)
+        return None
 
     def set_attribute2(self, name_p, value_p):
         """
-        Set an attribute name with a constant value
+        Set an attribute name with a constant value.
 
         Parameters
         ----------
         name_p: str
-            Define the attribute name to set
+            Define the attribute name to set.
         value_p: int, float,...
-            Define the attribute value to set
+            Define the attribute value to set.
 
         Returns
         -------
         None
 
         """
+
         self._id = 0
         self._attr_name = name_p
         self._new_value = value_p
 
+        return None
+
     def set_attribute(self, name_p, mode_p, min_value_p, max_value_p):
         """
-        Set an attribute name with an incremental/random value.
+        Set an attribute name with an incremental or a random value.
 
         Parameters
         ----------
         name_p: str
-            Define the attribute name to set
+            Define the attribute name to set.
         mode_p: int
-            Define how the output value is computed. 0: incremental value, 1: random value
+            Define how the output value is computed.
+                0: incremental value.
+                1: random value.
         min_value_p: int
-            Define the minimal value
+            Define the minimal value.
         max_value_p: int
-            Define the maximal value
+            Define the maximal value.
 
         Returns
         -------
-        None
+            None
 
         """
         self._id = 1
@@ -136,13 +148,15 @@ class Attribute(Points):
         self._min_value = min_value_p
         self._max_value = max_value_p
 
+        return None
+
     def _compute(self):
         """
         Compute an incremental value or a random value.
 
-        Returns
+        Returns:
         -------
-        computed value.
+            computed value.
 
         """
         if self._mode == 0:
@@ -169,10 +183,11 @@ class Attribute(Points):
 
     def run(self):
         """
-        For each Point instance, generate an attribute (name, value)
+            For each Point instance, generate an attribute (name, value).
+
         Returns
         -------
-
+            list of Point instances.
         """
         for pts in self._pts_list:
             if self._id == 0:

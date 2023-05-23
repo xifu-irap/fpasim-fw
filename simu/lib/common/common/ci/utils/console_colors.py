@@ -25,7 +25,8 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details                
 #    
-#    This class map a name to a console color code.   
+#    This class defines the available colors of the windows console.  
+#
 #
 # -------------------------------------------------------------------------------------------------------------
 
@@ -64,7 +65,7 @@ class ConsoleColors:
 
     def get_color(self, name_p):
         """
-        Get the console color value from the color name
+        Get the console color value from a color name
 
         Parameters
         ----------
@@ -73,7 +74,7 @@ class ConsoleColors:
 
         Returns
         -------
-        console color value
+        console code value for the color.
 
         """
         value = self._colors[name_p]

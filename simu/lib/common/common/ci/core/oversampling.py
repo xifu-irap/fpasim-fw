@@ -25,9 +25,16 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details
 #    
-#    This class oversamples an input list of Point instances by duplicating each Point instance
+#    This OverSample class oversamples an input list of Point instances by duplicating each Point instance.
+#
+#
 #    Note:
+#       . Used for the VHDL simulation.
+#       . This class can be instanciated by the user.
+#       . It should be instanciated after:
+#            . Generator class
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -40,7 +47,7 @@ from . import Points
 
 class OverSample(Points):
     """
-    Apply an oversampling factor on a list of Point instances.
+    Apply an oversampling factor on an input list of Point instances.
     """
     def __init__(self, pts_list_p):
         """
@@ -58,17 +65,18 @@ class OverSample(Points):
 
     def set_oversampling(self, value_p):
         """
-        Define the number of Point instances to over sample.
+        Define the number of oversampled Point instances.
 
         Parameters
         ----------
         value_p: int
             number of oversampled point. 
-            value_p must be in the range [1; max_integer value] with 1: no oversampled point.
+            value_p must be in the range [1; max_integer value].
+                with 1: no oversampled point.
 
         Returns
         -------
-        None
+            None
 
         """
         if value_p < 1:
@@ -77,6 +85,7 @@ class OverSample(Points):
         else:
             value = value_p
         self._oversampling_value = value
+        return None
 
     def run(self):
         """
@@ -84,7 +93,7 @@ class OverSample(Points):
 
         Returns 
         -------
-        list of oversampled Point instances.
+            list of oversampled Point instances.
 
         """
         res = []

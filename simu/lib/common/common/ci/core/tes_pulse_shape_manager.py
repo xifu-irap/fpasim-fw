@@ -25,10 +25,22 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details
 #
-#   This class is a model of the VHDL tes function.
+#    The TesPulseShapeManager class is a python model of the VHDL function (tes_pulse_shape_manager.vhd).
+#    It computes the expected output values.
 #
 #    Note:
+#       Before using this class, the user needs to process the input list of point instances with the TesSignalling object.
+#
+#    Note:
+#       . Used for the VHDL simulation.
+#       . This class can be instanciated by the user. 
+#       . It should be instanciated after:
+#            . Generator class
+#            . optional: OverSample class
+#            . optional: Attribute Class 
+#            . TesSignalling Class 
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -42,7 +54,8 @@ from .points import Points
 
 class TesPulseShapeManager(Points):
     """
-    Computation of the TesPulseShapeManager model on a list of Point Instances.
+    Python model of the VHDL function (tes_pulse_shape_manager.vhd).
+    It computes the expected output values.
     """
     def __init__(self, pts_list_p):
         """
@@ -55,18 +68,28 @@ class TesPulseShapeManager(Points):
 
         """
         super().__init__(pts_list_p=pts_list_p)
+
         # define the content of the tes_pulse_shape RAM
+        #  => the value at the index0 is equal to the value at the address0
         self._tes_pulse_shape_list = []
+
         # define the content of the tes_steady_state RAM
+        #  => the value at the index0 is equal to the value at the address0
         self._tes_steady_state_list = []
+
         # list of the make pulse command
         self._make_pulse_dic_list = []
+
         # define the oversampling factor applied to each sample of a pulse
+        #   => this value must be equal to the pkg_fpasim/pkg_PULSE_SHAPE_OVERSAMPLE value
         self._pulse_shape_oversampling_factor = 16
+
         # define the number of frames in order to generate a pulse
+        # => this value must be equal to the pkg_fpasim/pkg_NB_FRAME_BY_PULSE_SHAPE value
         self._pulse_shape_nb_samples_by_frame = 2048
 
         # data width of the pulse_height parameter
+        # => this value must be equal to the pkg_fpasim/pkg_TES_PULSE_SHAPE_RAM_DATA_WIDTH value
         self._pulse_height_width = 16
 
     def set_ram_tes_pulse_shape(self, filepath_p):
@@ -86,9 +109,11 @@ class TesPulseShapeManager(Points):
         obj_file = File(filepath_p=filepath_p)
         self._tes_pulse_shape_list = obj_file.run()
 
+        return None
+
     def set_ram_tes_steady_state(self, filepath_p):
         """
-        Define the content of the tes_steady_state.
+        Define the content of the tes_steady_state ram.
 
         Parameters
         ----------
@@ -102,6 +127,7 @@ class TesPulseShapeManager(Points):
         """
         obj_file = File(filepath_p=filepath_p)
         self._tes_steady_state_list = obj_file.run()
+        return None
 
     def add_make_pulse_command(self, pixel_id_p, time_shift_p, pulse_height_p, skip_nb_samples_p=0):
         """
@@ -110,13 +136,13 @@ class TesPulseShapeManager(Points):
         Parameters
         ----------
         pixel_id_p: int
-            Define the pixel id value
+            Define the pixel id value.
         time_shift_p: int
-            Define the time shift value
+            Define the time shift value.
         pulse_height_p: int
-            Define the pulse height value
+            Define the pulse height value.
         skip_nb_samples_p: int
-            Define the number of data samples to skip before generated the command
+            Define the number of data samples to skip before generated the command.
 
         Returns
         -------
@@ -130,19 +156,20 @@ class TesPulseShapeManager(Points):
         dic['skip_nb_samples'] = skip_nb_samples_p
 
         self._make_pulse_dic_list.append(dic)
+        return None
 
     def _compute(self, pulse_shape_p, pulse_height_p, i0_p):
         """
-        Compute the output value of the tes function model.
+        Compute an expected output value.
 
         Parameters
         ----------
         pulse_shape_p: int
-            Define the pulse_shape value
+            Define the pulse_shape value.
         pulse_height_p: int
-            Define the pulse_height value
+            Define the pulse_height value.
         i0_p: int
-            Define the I0 value
+            Define the I0 value.
 
         Returns
         -------
@@ -166,16 +193,17 @@ class TesPulseShapeManager(Points):
 
     def run(self, output_attribute_name_p="tes_out"):
         """
-        Apply the tes model on a list of point instances.
+        Compute the expected output values of the VHDL function (tes_pulse_shape_manager.vhd).
         
         Parameters
         ----------
         output_attribute_name_p: str
-            attribute name where to store the result of the tes function output
+            attribute name where to store the result of the tes function output.
 
         Returns
         -------
-        list of Point instances
+            list of Point instances.
+            
         """
         pulse_shape_oversampling_factor = self._pulse_shape_oversampling_factor
         pulse_shape_nb_samples_by_frame = self._pulse_shape_nb_samples_by_frame

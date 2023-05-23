@@ -25,10 +25,13 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details
 #    
-#     Generate a list of Point instances with no attributes
+#     Generate a list of Point instances with no attributes.
 #
 #    Note:
+#       . Used for the VHDL simulation.
+#       . This class can be instanciated by the user.
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # user library
@@ -37,7 +40,7 @@ from . import Point
 
 class Generator:
     """
-    Generate a list of Point instances with no attributes
+    Generate a list of Point instances with no attributes.
     """
     def __init__(self, nb_pts_p):
         """
@@ -46,18 +49,18 @@ class Generator:
         Parameters
         ----------
         nb_pts_p: int
-            define the number of Point instances to generate
+            define the number of Point instances to generate.
         """
         self._nb_pts = nb_pts_p
         self._obj_pts_list = []
 
     def run(self):
         """
-        Generate a list of Point instances
+        Generate a list of Point instances.
 
         Returns
         -------
-        list of Point instance
+            list of Point instance.
 
         """
         for i in range(self._nb_pts):

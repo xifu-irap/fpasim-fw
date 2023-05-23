@@ -25,11 +25,14 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details
 #
-#    The class Point defines a container for point attributes
-#    Each point can represent a data sample
+#    The class Point defines a container for point attributes.
+#    Each point can represent a data sample.
 #
 #    Note:
+#       . Used for the VHDL simulation.
+#       . The user shouln't directly instanciate this class.
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 class Point:
@@ -43,17 +46,22 @@ class Point:
 
         # dictionary of point attribute
         self._attribute_dic = {}
-        # debug message: 0: no print, 1: print a message
+
+        # level of verbosity (debug message)
+        #    0: no print
+        #    1: print a message
         self._verbosity = 0
 
     def set_verbosity(self, verbosity_p):
         """
-        Set the level of _verbosity for the message display.
+        Set the level of verbosity for the displayed message.
 
         Parameters
         ----------
         verbosity_p: int
-            Define the level of _verbosity. 0: no print, 1: print.
+            Define the level of verbosity.
+                0: no print.
+                1: print.
 
         Returns
         -------
@@ -61,18 +69,22 @@ class Point:
 
         """
         self._verbosity = verbosity_p
+        return None
 
     def set_attribute(self, name_p, value_p):
         """
         Set an attribute: (name, value).
-        Note: If the attribute name doesn't exist, the attribute name is created.
+
+        Note: 
+            If the attribute name doesn't exist, the attribute name is created.
 
         Parameters
         ----------
         name_p: str
-            Define the Attribute name
+            Define the attribute name.
+
         value_p: int, float, str
-            Define the Attribute value
+            Define the attribute value.
 
         Returns
         -------
@@ -82,21 +94,23 @@ class Point:
         self._attribute_dic[name_p] = value_p
         if self._verbosity == 1:
             print("[Point.set_attribute]: ", name_p, ":", value_p)
+        return None
 
     def get_attribute(self, name_p):
         """
-        Get an attribute value from an attribute name.
+        Get an attribute value from its attribute name.
+
         Note:
             if the attribute name doesn't exist, an error message is printed.
 
         Parameters
         ----------
         name_p: str
-            attribute name to use in order to retrieve the attribute value
+            attribute name to use in order to retrieve the attribute value.
 
         Returns
         -------
-            The attribute value
+            The attribute value.
 
         """
         value = self._attribute_dic.get(name_p)
@@ -106,8 +120,9 @@ class Point:
 
     def delete_attribute(self, name_p):
         """
-        Delete an attribute by name.
-        Note: If the attribute doesn't exist, an error is printed.
+        Delete an attribute by its name.
+        Note: 
+            If the attribute doesn't exist, an error is printed.
 
         Parameters
         ----------
@@ -120,10 +135,13 @@ class Point:
 
 
         """
+        
         try:
             self._attribute_dic.pop(name_p)
         finally:
             print('[Point.delete_attribute]: no Key: ' + name_p)
+
+        return None
 
     def get_info(self, *name_p):
         """

@@ -24,13 +24,15 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------      
 #    @details                
-#    This python script defines the ValidSequencer class.
-#    This class provides methods to generate an output csv file in order to
-#    configure the VHDL pkg_valid_sequencer procedure (see pkg_sequence.vhd)
+#    
+#    This ValidSequencer class provides methods to generate an output csv file in order to
+#    configure the VHDL pkg_valid_sequencer procedure (see common/vhdl/src/pkg_sequencer/pkg_sequence.vhd)
 #
 #     Note: 
 #       . The first pulse can be delayed by a certain amount defined by time_shift value
+#       . Used for the VHDL simulation.
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -40,7 +42,7 @@ import os
 class ValidSequencer:
     """
     This class provides methods to generate an output csv file in order to
-    configure the VHDL pkg_valid_sequencer procedure (see pkg_sequence.vhd)
+    configure the VHDL pkg_valid_sequencer procedure.
     """
 
     def __init__(self, name_p):
@@ -69,11 +71,12 @@ class ValidSequencer:
 
     def set_verbosity(self, verbosity_p):
         """
-        Set the level of verbosity
+        Set the level of verbosity.
+
         Parameters
         ----------
         verbosity_p: int
-            (integer >=0) level of verbosity
+            (integer >=0) level of verbosity.
 
         Returns
         -------
@@ -85,41 +88,41 @@ class ValidSequencer:
 
     def set_sequence(self, ctrl_p, min_value1_p, max_value1_p, min_value2_p, max_value2_p, time_shift_p=0):
         """
-        define the different mode of pulse generation.
+        Define the mode of pulse generation.
 
         Parameters
         ----------
         ctrl_p: int
-            define the different mode of pulse generation. The possibles values are:
-            .0: continuous valid generation
-                . min_value1, max_value1, min_value2, max_value2 values are ignored
-            .1. constant short pulse generation
+            define the mode of pulse generation. The possibles values are:
+            .0: continuous valid generation.
+                . min_value1_p, max_value1_p, min_value2_p, max_value2_p values are ignored.
+            .1. constant short pulse generation.
                 . a positive pulse with a width of 1 clock cycle followed by
-                . a negative pulse with a constant width defined by the min_value2 value
-            .2. constant pulse generation
-                . a positive pulse with a width defined by the min_value1_v value followed by
-                . a negative pulse with a width defined by the min_value2_v value
-            .3: random short pulse generation
+                . a negative pulse with a constant width defined by the min_value2_p value.
+            .2. constant pulse generation.
+                . a positive pulse with a width defined by the min_value1_p value followed by
+                . a negative pulse with a width defined by the min_value2_p value.
+            .3: random short pulse generation.
                 . a positive pulse with a width of 1 clock cycle followed by
-                . a negative pulse with a random width between min_value2 and max_value2
-            .4. random pulse generation
-                . a positive pulse with a width defined by a random value between min_value1_v and max_value1_v followed by
-                . a negative pulse with a width defined by a random value between min_value2_v and max_value2_
+                . a negative pulse with a random width between min_value2_p and max_value2_p.
+            .4. random pulse generation.
+                . a positive pulse with a width defined by a random value between min_value1_p and max_value1_p followed by
+                . a negative pulse with a width defined by a random value between min_value2_p and max_value2_p.
             others values : continuous valid generation
         min_value1_p: int
-            define the min value for the positive pulse
+            define the min value for the positive pulse.
         max_value1_p: int
-            define the max value for the positive pulse
+            define the max value for the positive pulse.
         min_value2_p: int
-            define the min value for the negative pulse
+            define the min value for the negative pulse.
         max_value2_p: int
-            define the min value for the negative pulse
+            define the min value for the negative pulse.
         time_shift_p: int
-            define the number of clock cycles to skip before generating pulses
+            define the number of clock cycles to skip before generating the pulses.
 
         Returns
         -------
-        None:
+            None
 
         """
         self._ctrl = ctrl_p
@@ -132,19 +135,22 @@ class ValidSequencer:
 
         self._time_shift = time_shift_p
 
+        return None
+
     def save(self, filepath_p, csv_separator_p=';'):
         """
+        Save the result in an output file.
 
         Parameters
         ----------
         filepath_p: str
-            Define the filepath of the output *.csv file
+            Define the filepath of the output *.csv file.
         csv_separator_p: str
-            Define the separator of the csv file
+            Define the separator of the csv file.
 
         Returns
         -------
-        None
+            None
 
         """
         filepath = filepath_p

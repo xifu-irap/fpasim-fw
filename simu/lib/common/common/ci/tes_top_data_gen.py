@@ -24,11 +24,11 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details
-#    This python script defines the TesTopDataGen class.
-#    This class defines methods to generate data for the tes_top test bench
+#
+#    This TesTopDataGen class provides methods for the run_tb_tes_top.py.
+#    By processing the tb_tes_top_XXXX.json file, it can generate the input/output files expected by the VHDL tb_tes_top testbench.
 #    
 #    Note:
-#       . This script is aware of the json configuration file
 #       . This script was tested with python 3.10
 # -------------------------------------------------------------------------------------------------------------
 
@@ -52,15 +52,20 @@ from .vunit_conf import VunitConf
 
 class TesTopDataGen(VunitConf):
     """
-        This class defines methods to generate data for the VHDL tes_top testbench file.
-        Note:
-            Method name starting by '_' are local to the class (ex:def _toto(...)).
-            It should not be usually used by the user
+        This TesTopDataGen class provides methods for the run_tb_tes_top.py.
+        By processing the tb_tes_top_XXXX.json file, it can generate the input/output files expected by the VHDL tb_tes_top testbench.
     """
 
     def __init__(self, json_filepath_p, json_key_path_p):
         """
-        This method initializes the class instance
+        This method initializes the class instance.
+
+        Parameters
+        ----------
+        json_filepath_p: str
+            json filepath
+        json_key_path_p: str
+            json keys to get a specific individual test
         """
         super().__init__(json_filepath_p=json_filepath_p, json_key_path_p=json_key_path_p)
 
@@ -69,10 +74,15 @@ class TesTopDataGen(VunitConf):
 
     def get_generic_dic(self):
         """
-        Get the testbench vhdl generic parameters
-        Note: Vunit set the testbench vhdl generic parameters with a python
-        dictionary where key name are the VHDL generic parameter names
-        :return: (dictionary)
+        Get the testbench vhdl generic parameters.
+
+        Note:
+            The Vunit library set the testbench vhdl generic parameters with a python
+            dictionary where key name are the VHDL generic names.
+
+        Returns: dic
+        -------
+            dictionnary of testbench VHDL generic values.
         """
         json_variant = self.json_variant
 
@@ -96,10 +106,19 @@ class TesTopDataGen(VunitConf):
 
     def _run(self, tb_input_base_path_p, tb_output_base_path_p):
         """
-        This method generates output files for the testbench
-        :param tb_input_base_path_p: (string) base path of the testbench VHDL input files
-        :param tb_output_base_path_p: (string) base path of the testbench VHDL output files
-        :return: None
+        Generate the VHDL testbench output files.
+
+        Parameters
+        ----------
+        tb_input_base_path_p: str
+            base path of the testbench VHDL input files
+        tb_output_base_path_p: str
+            base path of the testbench VHDL output files
+
+        Returns
+        -------
+            None
+
         """
         tb_input_base_path = tb_input_base_path_p
         tb_output_base_path = tb_output_base_path_p
@@ -113,7 +132,7 @@ class TesTopDataGen(VunitConf):
         csv_separator = self.csv_separator
 
         ########################################################
-        # Generate the testbench input valid sequence files
+        # Generate the vhdl testbench input valid sequence files
         ########################################################
         msg0 = 'TesTopDataGen._run: Generate the testbench input valid sequence files'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
@@ -150,7 +169,7 @@ class TesTopDataGen(VunitConf):
             display_obj.display(msg_p=msg0, level_p=level1)
 
         ########################################################
-        # Generate the testbench input register file
+        # Generate the VHDL testbench input register file
         ########################################################
         msg0 = 'TesTopDataGen._run: Generate the testbench input register file'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
@@ -194,7 +213,7 @@ class TesTopDataGen(VunitConf):
         display_obj.display(msg_p=msg0, level_p=level1)
 
         ########################################################
-        # Generate the testbench input command file
+        # Generate the vhdl testbench input command file
         ########################################################
         msg0 = 'TesTopDataGen._run: Generate the testbench input command file'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
@@ -233,7 +252,7 @@ class TesTopDataGen(VunitConf):
         display_obj.display(msg_p=msg0, level_p=level1)
 
         ########################################################
-        # Copy the testbench input RAM configuration files
+        # Copy the vhdl testbench input RAM configuration files
         ########################################################
         msg0 = 'TesTopDataGen._run: Copy the testbench input RAM configuration files'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
@@ -262,7 +281,7 @@ class TesTopDataGen(VunitConf):
             ram_filepath_dic[name] = output_filepath
 
         ########################################################
-        # compute the testbench reference output values
+        # compute the vhdl testbench reference output values
         ########################################################
         msg0 = 'TesTopDataGen._run: compute the testbench reference output values'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
@@ -289,12 +308,12 @@ class TesTopDataGen(VunitConf):
         obj_over.set_oversampling(value_p=oversampling)
         pts_list = obj_over.run()
 
+        # tes
         obj_sign = TesSignalling(pts_list_p=pts_list)
         obj_sign.set_conf(nb_pixel_by_frame_p=nb_pixel_by_frame, nb_sample_by_pixel_p=nb_sample_by_pixel,
                           nb_sample_by_frame_p=nb_sample_by_frame, nb_frame_by_pulse_p=nb_frame_by_pulse)
         pts_list = obj_sign.run()
 
-        # tes
         obj_tes = TesPulseShapeManager(pts_list_p=pts_list)
         obj_tes.set_ram_tes_pulse_shape(filepath_p=tes_pulse_shape_filepath)
         obj_tes.set_ram_tes_steady_state(filepath_p=tes_steady_state_filepath)
@@ -305,8 +324,7 @@ class TesTopDataGen(VunitConf):
                                            skip_nb_samples_p=skip_nb_samples)
         pts_list = obj_tes.run(output_attribute_name_p="tes_out")
 
-        ########################################################
-        # Generate the testbench reference output file
+        # Generate the vhdl testbench reference output file
         ########################################################
         msg0 = 'TesTopDataGen._run: Generate the testbench reference output file'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
@@ -335,8 +353,7 @@ class TesTopDataGen(VunitConf):
         msg0 = 'filepath= ' + output_filepath
         display_obj.display(msg_p=msg0, level_p=level1)
 
-        ########################################################
-        # Generate the testbench input data file
+        # Generate the vhdl testbench input data file
         ########################################################
         msg0 = 'TesTopDataGen._run: Generate the testbench input data file'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
@@ -361,13 +378,20 @@ class TesTopDataGen(VunitConf):
 
     def pre_config(self, output_path):
         """
-        Define a list of actions to do before launching the simulator
-        2 actions are provided:
-            . execute a python script with a predefined set of command line arguments
-            . copy the "mif files" into the Vunit simulation director for the compatible Xilinx IP
-        Note: This method is the main entry point for the Vunit library
-        :param output_path: (string) Vunit Output Simulation Path (auto-computed by Vunit)
-        :return: boolean
+        Define a list of actions to do before launching the VHDL simulator.
+
+        Note:
+            This method is the main entry point for the Vunit library
+
+        Parameters
+        ----------
+        output_path: str
+            Vunit Output Simulation Path (auto-computed by the Vunit library)
+
+        Returns
+        -------
+            bool
+
         """
         display_obj = self.display_obj
         test_variant_filepath = self.test_variant_filepath

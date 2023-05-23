@@ -23,7 +23,8 @@
 #    Automatic Generation    No
 #    Code Rules Reference    
 # -------------------------------------------------------------------------------------------------------------
-#    @details                
+#    @details     
+#           
 #    This python script defines the Display class.
 #    This class provides methods to print in the console (coloring, indentation, ...).
 #
@@ -58,36 +59,16 @@ class Display(ConsoleColors):
         # number of character by indentation level
         self._nb_char_indent = 4
 
-        # self.script_name = ''
-
-    # def set_script_name(self, name_p):
-    #     """
-    #     Define the script name.
-
-    #     Parameters
-    #     ----------
-    #     name_p: str
-    #         Script name
-
-    #     Returns
-    #     -------
-    #     None
-
-    #     """
-
-    #     self.script_name = name_p
-    #     return None
-
     def set_indent(self, char_p=' ', nb_char_p=4):
         """
-        Define the indentation.
+        Set the indentation properties.
 
         Parameters
         ----------
         char_p: str
             indentation character.
         nb_char_p: int
-            (integer >=0) Number of characters by level of indentation
+            (integer >=0) Number of indentation characters.
 
         Returns
         -------
@@ -100,11 +81,21 @@ class Display(ConsoleColors):
 
     def set_section(self, char_p='*', nb_char_p=70):
         """
-        This method set the section properties.
+        Set the section properties.
+
         Note: the section properties allows to build separators for title, subtitle, ... in the console
-        :param char_p: (character) section character (can be a string)
-        :param nb_char_p: (integer >=0) Number of characters by section line
-        :return: None
+
+        Parameters
+        ----------
+        char_p: str
+            section character (can be a string)
+        nb_char_p: int
+            (integer >=0) Number of characters by section line
+
+        Returns
+        -------
+            None
+
         """
         self._char_section = char_p
         self._nb_char_section = nb_char_p
@@ -113,7 +104,8 @@ class Display(ConsoleColors):
     def display_title(self, msg_p, level_p=0, color_p='yellow'):
         """
         Print a title.
-            Ex:
+
+        Example:
             *************************
             * Tile
             ************************
@@ -126,8 +118,9 @@ class Display(ConsoleColors):
             Define the level of indentation of the message to print
         color_p: str
             Color to print.
-            Note:
-                . The list of colors can be found in the common.console_colors
+
+        Note:
+            . The list of the available colors (color_p) can be found in the common.ci.utils.console_colors
 
         Returns
         -------
@@ -154,7 +147,8 @@ class Display(ConsoleColors):
     def display_subtitle(self, msg_p, level_p=0, color_p='yellow'):
         """
         Print a subtitle.
-            Ex:
+
+        Example:
             * subtitle
             ************************
 
@@ -166,8 +160,9 @@ class Display(ConsoleColors):
             Define the level of indentation of the message to print
         color_p: str
             Color to print.
-            Note:
-                . The list of colors can be found in the common.console_colors
+
+        Note:
+            . The list of the available colors (color_p) can be found in the common.ci.utils.console_colors
 
         Returns
         -------
@@ -201,8 +196,9 @@ class Display(ConsoleColors):
             Define the level of indentation of the message to print
         color_p: str
             Color to print.
-            Note:
-                . The list of colors can be found in the common.console_colors
+
+        Note:
+            . The list of the available colors (color_p) can be found in the common.ci.utils.console_colors
 
         Returns
         -------
@@ -229,9 +225,11 @@ class Display(ConsoleColors):
         ----------
         msg_p: str of list of str
             message to convert
+
         Returns
         -------
-        list of strings
+            list of strings
+
         """
 
         test = isinstance(msg_p, str)

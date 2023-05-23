@@ -24,9 +24,9 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details
-#    This python script defines the FilepathListBuilder class.
-#    This class provides methods to search files in a root directory and its subdirectory.
-#    The searched files are filtered by user-defined file extension.
+#
+#   This python script defines the FilepathListBuilder class.
+#   It provides methods to search files in a root directory and its subdirectory.
 #
 # -------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +58,8 @@ class FilepathListBuilder:
 
     def set_indentation_level(self, level_p):
         """
-        set the indentation level of the print message
+        set the indentation level of the print message.
+
         Parameters
         ----------
         level_p: int
@@ -75,8 +76,9 @@ class FilepathListBuilder:
     def _get_indentation_level(self, level_p):
         """
         Select the indentation level to use.
+
         Note:
-            . If level_p is None, the class attribute is used. Otherwise, the level_p method argument is used
+            . If level_p is None, the class attribute is used. Otherwise, the level_p method argument is used.
 
         Parameters
         ----------
@@ -85,7 +87,7 @@ class FilepathListBuilder:
 
         Returns
         -------
-        indentation level value
+        Selected indentation level value.
 
         """
 
@@ -97,32 +99,37 @@ class FilepathListBuilder:
 
     def set_file_extension(self, file_extension_list_p):
         """
-        Set the authorized file extension
+        Set the authorized file extension to search.
+
         Parameters
         ----------
         file_extension_list_p: list of str
             list of the authorized file extension.
-            ex: ['.vhd','.v']
+            example: ['.vhd','.v']
+
         Returns
         -------
         None
 
         """
+
         self._file_extension_list = file_extension_list_p
         return None
 
     def add_basepath(self, basepath_p, requirement_filename_p=''):
         """
         This method has 2 modes:
-            . if the requirement_filename_p isn't an empty string then
-                1. search all requirement_filename_p files in the root directory (defined by basepath_p) and its subdirectories
-                2. in each requirement_filename_p files, extracts the list of filename (with extension)
-                3. build the corresponding filepaths
-                Note: in a directory, a requirement_filename_p file lists only the authorized file of this directory
-            . if the requirement_filename_p is an empty string then
-                1. search all files in the root directory (defined by basepath_p) and its subdirectories
-                2. filter files by extensions
-                3. build the corresponding filepaths
+            . If the requirement_filename_p isn't an empty string then
+                1. search all requirement_filename_p files in the root directory (defined by basepath_p) and its subdirectories.
+                2. in each requirement_filename_p file, extracts the list of filename (with extension).
+                3. build the corresponding filepaths.
+                Note: 
+                    In a directory, a requirement_filename_p file lists only the authorized files of this directory.
+            . If the requirement_filename_p is an empty string then
+                1. search all files in the root directory (defined by basepath_p) and its subdirectories.
+                2. filter files by file extension.
+                3. build the corresponding filepaths.
+
         Parameters
         ----------
         basepath_p: str
@@ -132,7 +139,7 @@ class FilepathListBuilder:
 
         Returns
         -------
-        None
+            None
 
         """
         file_extension_list = self._file_extension_list
@@ -164,7 +171,12 @@ class FilepathListBuilder:
 
     def add_filepath(self, basepath_p, filename_p):
         """
-        Add an individual filepath.
+        Add a full individual filepath.
+        Example:
+            with: 
+                basepath_p= "C:\\project"
+                filename_p = "test.vhd"
+            The result is: "C:\\project\\test.vhd"
 
         Parameters
         ----------
@@ -175,7 +187,7 @@ class FilepathListBuilder:
 
         Returns
         -------
-        None
+            None
 
         """
         self._filepath_list.append(str(Path(basepath_p, filename_p).resolve()))
@@ -183,7 +195,8 @@ class FilepathListBuilder:
 
     def add_filepath(self, filepath_p):
         """
-        Add an individual filepath.
+        Add a full individual filepath.
+        Example: filepath_p= "C:\\project\\test.vhd"
 
         Parameters
         ----------
@@ -192,7 +205,7 @@ class FilepathListBuilder:
 
         Returns
         -------
-        None.
+            None
 
         """
         self._filepath_list.append(str(Path(filepath_p).resolve()))
@@ -200,11 +213,12 @@ class FilepathListBuilder:
 
     def get_filepath_list(self):
         """
-        Get the computed filepath list
+        Get the computed filepath list.
 
-        Returns
+        Returns: list of str
         -------
-        list of filepath
+            list of filepath
+
         """
         return self._filepath_list
 
@@ -212,6 +226,11 @@ class FilepathListBuilder:
         """
         Search in the directory defined by basepath_p as well as its subdirectories a file with
         the filename_p name.
+
+        Example:
+            If the file to search is "C:\\project\\hdl\\src\\test.vhd" then
+            basepath_p can only be: "C:\\project" and
+            filepath_p can be: "test.vhd"
 
         Parameters
         ----------

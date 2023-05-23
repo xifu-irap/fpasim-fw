@@ -24,9 +24,16 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details
+#
+#    The File class extracts the data part of a *.csv file with the following structure:
+#       address_name; data_name
+#         addr0     ; data0
+#         addr1     ; data1
 #    
 #    Note:
+#       . Used for the VHDL simulation.
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 
@@ -52,10 +59,15 @@ class File:
 
     def run(self):
         """
-        Extract the data part of a *.csv file
+        Extract the data part of a *.csv file with the following structure:
+        address_name; data_name
+          addr0     ; data0
+          addr1     ; data1
+
         Returns
         -------
-        list of values
+            list of values
+
         """
         with open(self._filepath, 'r') as fid:
             lines = fid.readlines()
