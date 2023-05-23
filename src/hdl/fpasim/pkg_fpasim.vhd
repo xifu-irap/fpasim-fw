@@ -302,6 +302,7 @@ package pkg_fpasim is
 
   -- result
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
+  --   => this value must be equal to log2(pkg_MUX_SQUID_TF_RAM_NB_WORDS)
   constant pkg_MUX_SQUID_SUB_Q_M_S     : positive := 13;
   -- user-defined: number of fraction bits
   constant pkg_MUX_SQUID_SUB_Q_N_S     : natural  := 0;
@@ -383,6 +384,7 @@ package pkg_fpasim is
 
   -- result: pixel_result - mux_squid_feedback
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
+  --   => this value must be equal to log2(pkg_AMP_SQUID_TF_RAM_NB_WORDS)
   constant pkg_AMP_SQUID_SUB_Q_M_S     : positive := 14;
   -- user-defined: number of fraction bits
   constant pkg_AMP_SQUID_SUB_Q_N_S     : natural  := 0;
