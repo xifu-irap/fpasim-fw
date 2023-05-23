@@ -24,13 +24,29 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details
+#
+#    The MuxSquidTop class is a python model of the VHDL function (mux_squid_top.vhd).
+#    It computes the expected output values.
+#
+#    Note:
+#       Before using this class, the user needs to process the input list of point instances with the TesSignalling object.
 #    
 #    Note:
+#       . Used for the VHDL simulation.
+#       . This class can be instanciated by the user. 
+#       . It should be instanciated after:
+#            . Generator class
+#            . optional: OverSample class
+#            . optional: Attribute Class 
+#            . TesSignalling Class 
+#            . TesPulseShapeManager Class 
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
 from pathlib import Path, PurePosixPath
+import math
 
 # user library
 from .file import File
@@ -39,7 +55,8 @@ from .points import Points
 
 class MuxSquidTop(Points):
     """
-    Computation of the MuxSquidTop model on a list of Point Instances.
+    Python model of the VHDL function (mux_squid.vhd).
+    It computes the expected output values.
     """
     def __init__(self, pts_list_p):
         """
@@ -53,13 +70,23 @@ class MuxSquidTop(Points):
         """
         super().__init__(pts_list_p=pts_list_p)
         # define the content of the mux_squid_offset RAM
+        #  => the value at the index0 is equal to the value at the address0
         self._mux_squid_offset_list = []
+
         # define the content of the mux_squid_tf RAM
+        #  => the value at the index0 is equal to the value at the address0
         self._mux_squid_tf_list = []
+
         # define the inter_squid_gain
         self._inter_squid_gain = 0
+        
         # define the inter_squid_gain width
+        #  => the value must match the pkg_regdecode/pkg_CONF0_INTER_SQUID_GAIN_WIDTH value
         self._inter_squid_gain_width = 8
+
+        # number of words of the MUX_SQUID_TF RAM
+        #  => the value must match the pkg_fpasim/pkg_MUX_SQUID_TF_RAM_NB_WORDS value
+        self._mux_squid_tf_ram_nb_words = 2**13
 
     def set_ram_mux_squid_offset(self, filepath_p):
         """
@@ -77,6 +104,7 @@ class MuxSquidTop(Points):
         """
         obj_file = File(filepath_p=filepath_p)
         self._mux_squid_offset_list = obj_file.run()
+        return None
 
     def set_ram_mux_squid_tf(self, filepath_p):
         """
@@ -94,6 +122,7 @@ class MuxSquidTop(Points):
         """
         obj_file = File(filepath_p=filepath_p)
         self._mux_squid_tf_list = obj_file.run()
+        return None
 
     def set_conf0(self, inter_squid_gain_p):
         """
@@ -102,7 +131,7 @@ class MuxSquidTop(Points):
         Parameters
         ----------
         inter_squid_gain_p: int
-            Define the inter_squid_gain field value of the register
+            Define the inter_squid_gain value of the conf0 register
 
         Returns
         -------
@@ -110,10 +139,11 @@ class MuxSquidTop(Points):
 
         """
         self._inter_squid_gain = inter_squid_gain_p
+        return None
 
     def _compute(self, pixel_id_p, tes_out_p, adc_mux_squid_feedback_p):
         """
-        Compute the output value of the mux_squid function model.
+        Compute an expected output value.
 
         Parameters
         ----------
@@ -124,23 +154,21 @@ class MuxSquidTop(Points):
         adc_mux_squid_feedback_p: int
             Define the adc_mux_squid_feedback value
 
-        Returns
+        Returns: int
         -------
-        the computed output value of the mux_squid function model
+            the computed output value of the model
         """
 
         inter_squid_gain = self._inter_squid_gain / (2 ** self._inter_squid_gain_width)
 
         sub = tes_out_p - adc_mux_squid_feedback_p
 
-        # convert sub into unsigned int
+        # convert int into uint
         if sub < 0:
-            addr = 2 ** 16 - sub
+            addr = self._mux_squid_tf_ram_nb_words + sub
         else:
             addr = sub
 
-        # compute the modulo on the addr_width
-        addr = addr % (2 ** 14)
         # get the mux_squid_tf value
         mux_squid_tf = self._mux_squid_tf_list[addr]
 
@@ -151,12 +179,27 @@ class MuxSquidTop(Points):
         mux_squid_offset = self._mux_squid_offset_list[pixel_id_p]
 
         add = mux_squid_offset + mux_squid_tf_with_gain
+        res = math.floor(add)
 
-        return add
+        # print(" ")
+        # print("index: ",self.i)
+        # print('pixel_id_p', pixel_id_p)
+        # print('tes_out_p', tes_out_p)
+        # print('adc_mux_squid_feedback_p', adc_mux_squid_feedback_p)
+        # print('sub: ', sub)
+        # print('addr', addr)
+        # print('mux_squid_tf: ', mux_squid_tf)
+        # print('mux_squid_tf_with_gain: ', mux_squid_tf_with_gain)
+        # print('mux_squid_offset: ', mux_squid_offset)
+        # print('add: ',add)
+        # print('res: ',res)
+        # self.i = self.i + 1
+
+        return res
 
     def run(self, output_attribute_name_p="mux_squid_out"):
         """
-        Apply the mux_squid model on a list of point instances.
+        Compute the expected output values of the VHDL function (mux_squid_top.vhd).
         
         Parameters
         ----------
@@ -168,6 +211,7 @@ class MuxSquidTop(Points):
         list of Point instances
 
         """
+        self.i = 0
         for obj_pt in self._pts_list:
             pixel_id = obj_pt.get_attribute(name_p='pixel_id')
             tes_out = obj_pt.get_attribute(name_p='tes_out')
