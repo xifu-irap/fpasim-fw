@@ -24,11 +24,11 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details
-#    This python script defines the AmpSquidTopDataGen class.
-#    This class defines methods to generate data for the amp_squid_top test bench
+#
+#    This AmpSquidTopDataGen class provides methods for the run_tb_amp_squid_top.py.
+#    By processing the tb_amp_squid_top_XXXX.json file, it can generate the input/output files expected by the VHDL tb_amp_squid_top testbench.    
 #    
 #    Note:
-#       . This script is aware of the json configuration file
 #       . This script was tested with python 3.10
 # -------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +43,6 @@ from pathlib import Path, PurePosixPath
 from .utils import Display
 
 from .core import ValidSequencer
-from .core import File
 from .core import Generator
 from .core import Attribute
 from .core import OverSample
@@ -56,15 +55,20 @@ from .vunit_conf import VunitConf
 
 class AmpSquidTopDataGen(VunitConf):
     """
-        This class defines methods to generate data for the VHDL amp_squid_top testbench file.
-        Note:
-            Method name starting by '_' are local to the class (ex:def _toto(...)).
-            It should not be usually used by the user
+    This AmpSquidTopDataGen class provides methods for the run_tb_amp_squid_top.py.
+    By processing the tb_amp_squid_top_XXXX.json file, it can generate the input/output files expected by the VHDL tb_amp_squid_top testbench.   
     """
 
     def __init__(self, json_filepath_p, json_key_path_p):
         """
-        This method initializes the class instance
+        This method initializes the class instance.
+
+        Parameters
+        ----------
+        json_filepath_p: str
+            json filepath
+        json_key_path_p: str
+            json keys to get a specific individual test
         """
         super().__init__(json_filepath_p=json_filepath_p, json_key_path_p=json_key_path_p)
 
@@ -73,10 +77,15 @@ class AmpSquidTopDataGen(VunitConf):
 
     def get_generic_dic(self):
         """
-        Get the testbench vhdl generic parameters
-        Note: Vunit set the testbench vhdl generic parameters with a python
-        dictionary where key name are the VHDL generic parameter names
-        :return: (dictionary)
+        Get the testbench vhdl generic parameters.
+
+        Note:
+            The Vunit library set the testbench vhdl generic parameters with a python
+            dictionary where key name are the VHDL generic names.
+
+        Returns: dic
+        -------
+            dictionnary of testbench VHDL generic values.
         """
         json_variant = self.json_variant
 
@@ -97,10 +106,19 @@ class AmpSquidTopDataGen(VunitConf):
 
     def _run(self, tb_input_base_path_p, tb_output_base_path_p):
         """
-        This method generates output files for the testbench
-        :param tb_input_base_path_p: (string) base path of the testbench VHDL input files
-        :param tb_output_base_path_p: (string) base path of the testbench VHDL output files
-        :return: None
+        Generate the VHDL testbench output files.
+
+        Parameters
+        ----------
+        tb_input_base_path_p: str
+            base path of the testbench VHDL input files
+        tb_output_base_path_p: str
+            base path of the testbench VHDL output files
+
+        Returns
+        -------
+            None
+
         """
         tb_input_base_path = tb_input_base_path_p
         tb_output_base_path = tb_output_base_path_p
@@ -114,7 +132,7 @@ class AmpSquidTopDataGen(VunitConf):
         csv_separator = self.csv_separator
 
         ########################################################
-        # Generate the testbench input valid sequence files
+        # Generate the vhdl testbench input valid sequence files
         ########################################################
         msg0 = 'AmpSquidTopDataGen._run: Generate the testbench input valid sequence files'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
@@ -263,8 +281,7 @@ class AmpSquidTopDataGen(VunitConf):
         obj_amp.set_fpasim_gain(fpasim_gain_p=fpasim_gain)
         pts_list = obj_amp.run(output_attribute_name_p="amp_squid_out")
 
-        ########################################################
-        # Generate the testbench reference output file
+        # Generate the vhdl testbench reference output file
         ########################################################
         msg0 = 'AmpSquidTopDataGen._run: Generate the testbench reference output file'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
@@ -291,7 +308,7 @@ class AmpSquidTopDataGen(VunitConf):
         display_obj.display(msg_p=msg0, level_p=level1)
 
         ########################################################
-        # Generate the testbench input data file
+        # Generate the vhdl testbench input data file
         ########################################################
         msg0 = 'AmpSquidTopDataGen._run: Generate the testbench input data file'
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
@@ -347,7 +364,6 @@ class AmpSquidTopDataGen(VunitConf):
                 fid.write(str(adc_amp_squid_offset_correction))
                 if index != index_max:
                     fid.write('\n')
-
         msg0 = 'filepath=' + filepath
         display_obj.display(msg_p=msg0, level_p=level1)
 
@@ -355,13 +371,20 @@ class AmpSquidTopDataGen(VunitConf):
 
     def pre_config(self, output_path):
         """
-        Define a list of actions to do before launching the simulator
-        2 actions are provided:
-            . execute a python script with a predefined set of command line arguments
-            . copy the "mif files" into the Vunit simulation director for the compatible Xilinx IP
-        Note: This method is the main entry point for the Vunit library
-        :param output_path: (string) Vunit Output Simulation Path (auto-computed by Vunit)
-        :return: boolean
+        Define a list of actions to do before launching the VHDL simulator.
+
+        Note:
+            This method is the main entry point for the Vunit library
+
+        Parameters
+        ----------
+        output_path: str
+            Vunit Output Simulation Path (auto-computed by the Vunit library)
+
+        Returns
+        -------
+            bool
+
         """
         display_obj = self.display_obj
         test_variant_filepath = self.test_variant_filepath

@@ -24,9 +24,22 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details
+#
+#    The AmpSquidTop class is a python model of the VHDL function (amp_squid_top.vhd).
+#    It computes the expected output values.
+#
 #    
 #    Note:
+#       . Used for the VHDL simulation.
+#       . It should be instanciated after:
+#            . Generator class
+#            . optional: OverSample class
+#            . optional: Attribute Class 
+#            . TesSignalling Class 
+#            . TesPulseShapeManager Class 
+#            . MuxSquidTop Class 
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -58,7 +71,8 @@ class AmpSquidTop(Points):
         self.amp_squid_tf_list = []
 
         # address width of the amp_squid_tf RAM
-        self.addr_ram_width = 14
+        #  => the value must match the pkg_fpasim/pkg_AMP_SQUID_TF_RAM_NB_WORDS value
+        self.amp_squid_tf_ram_nb_words = 2**16
 
         # define the fpasim_gain computed by the vhdl code
         self._vhdl_fpasim_gain = 0
@@ -80,19 +94,20 @@ class AmpSquidTop(Points):
         """
         obj_file = File(filepath_p=filepath_p)
         self.amp_squid_tf_list = obj_file.run()
+        return None
 
     def set_fpasim_gain(self, fpasim_gain_p):
         """
-        set the fpasim_gain field value from the FPASIM_GAIN register
+        set the fpasim_gain (from the register) in order to compute the corresponding gain.
    
         Parameters
         ----------
         fpasim_gain_p: int
-            define the fpasim_gain value
+            define the fpasim_gain value (from the register)
 
         Returns
         -------
-        the fpasim_gain value used in the VHDL code.
+        None
 
         """
 
@@ -115,9 +130,11 @@ class AmpSquidTop(Points):
             data = 4
         self._vhdl_fpasim_gain = data
 
+        return None
+
     def _compute(self, mux_out_p, adc_amp_squid_offset_correction_p):
         """
-        Compute the output value of the amp_squid function model.
+        Compute an expected output value.
 
         Parameters
         ----------
@@ -129,17 +146,18 @@ class AmpSquidTop(Points):
 
         Returns
         -------
-        the computed output value of the amp_squid function model
+        the computed output value of the model.
+
         """
-        addr_max = (2 ** self.addr_ram_width - 1)
+
         sub = mux_out_p - adc_amp_squid_offset_correction_p
-        # check if 0 <= sub<= 2**14-1
-        amp_squid_tf = 0
-        if (0 <= sub) and (sub <= addr_max):
-            amp_squid_tf = self.amp_squid_tf_list[sub]
+
+        if sub < 0:
+            addr = self.amp_squid_tf_ram_nb_words + sub
         else:
-            msg0 = '[AmpSquidModel]: ERROR  0 <= (data - amp_offset_correction) <= (2**14-1) is not verified'
-            print(msg0)
+            addr = sub
+
+        amp_squid_tf = self.amp_squid_tf_list[addr]
 
         mult = math.floor(self._vhdl_fpasim_gain * amp_squid_tf)
 
@@ -147,7 +165,7 @@ class AmpSquidTop(Points):
 
     def run(self, output_attribute_name_p="amp_squid_out"):
         """
-        Apply the amp_squid model on a list of point instances
+        Compute the expected output values of the VHDL function (amp_squid_top.vhd).
 
         Parameters
         ----------
