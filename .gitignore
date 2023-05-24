@@ -89,3 +89,9 @@ launch_sim_processed.json
 /simu/script/*.mem
 /simu/script/*.log
 /simu/script/*.ini
+
+# untracked pycharm files
+/.idea
+
+# untracked temporary files
+/constraints/*/*_tmp.xdc
