@@ -18,16 +18,19 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   tes_ram_gen.py
+#    @file                   convert_mem_to_csv.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
-#    @details                
-#    This script reads an input txt file in order to generate an output csv file.
+#    @details  
+#              
+#    This script search the *.mem files in the src directory in order to generate the corresponding output csv files.
 #       . The line number will be copied in the address column
 #       . The line values will be copied in the data column
-#    Note: This generated file will be used by the run python scripts during the VHDL simulation
+#    Note:
+#      . This generated file will be used by the run python scripts during the VHDL simulation
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -41,10 +44,19 @@ def find_file_in_hierarchy(filename_p='DONT_DELETE.txt', depth_level_p=10):
     """
     This function searches in this script parent directories, the filename_p parameter.
     If found, it returns the base path of the filename_p as well as its corresponding filepath
-    :param filename_p: (string) filename to search in the hierarchy
-    :param depth_level_p: (integer >= 0) search depth limit (ascending way)
-    :return: base_path, filepath: (string, string) (base_path of filename_p, filepath of filename_p) if found.
-                                                  Otherwise (None, None)
+
+    Parameters
+    ----------
+    filename_p: str
+            filename to search in the hierarchy
+    depth_level_p: int
+        (int >= 0) search depth limit
+
+    Returns
+    -------
+    basepath, filepath: (string, string) (basepath of filename_p, filepath of filename_p) if found.
+    Otherwise (None, None)
+    
     """
     script_name0 = str(Path(__file__).stem)
     start_path = Path(__file__)

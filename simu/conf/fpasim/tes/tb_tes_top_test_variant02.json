@@ -17,8 +17,6 @@
         {
             "description_list": [
                 "The parameters are:",
-                "  :param en (integer:0,1): 1: enable the function, 0: disable the function.",
-                "",
                 "  :param nb_pixel_by_frame (integer) : define the current number of pixels in a column",
                 "     The range is [1, 64]: 1: 1 pixel, 2: 2 pixels and so on",
                 "         The max value (64) should match the pkg_fpasim/pkg_MUX_FACT_MAX constant",
@@ -37,7 +35,6 @@
                 "  :param filename (string): filename expected by the vhdl testbench.",
                 "         Note: This file is a *.csv file"
             ],
-            "en": 1,
             "nb_pixel_by_frame": 8,
             "nb_sample_by_pixel": 8,
             "nb_frame_by_pulse": 2048,
@@ -239,11 +236,13 @@
             "description_list": [
                 "This section defines the file to copy and rename in the output simulation directory",
                 "   .The parameters are",
-                "       :param input_filename (string): filename to copy and to rename",
+                "       :param input_filename_datapath (string): filename to use in order to compute data on the datapath",
+                "       :param input_filename (string): filename to use in order to check memory",
                 "       :param output_filename (string): expected VHDL testbench filename"
 
             ],
-            "input_filename": "tes_pulse_shape.csv",
+            "input_filename_datapath": "tes_pulse_shape.csv",
+            "input_filename": "random_tes_pulse_shape.csv",
             "output_filename": "py_ram_tes_shape.csv"
         },
         "sequence": {
@@ -309,10 +308,12 @@
             "description_list": [
                 "This section defines the file to copy and rename in the output simulation directory",
                 "   .The parameters are",
-                "       :param input_filename (string): source filename to copy and to rename",
-                "       :param output_filename (string): destination filename (expected by VHDL testbench file)"
+                "       :param input_filename_datapath (string): filename to use in order to compute data on the datapath",
+                "       :param input_filename (string): filename to use in order to check memory",
+                "       :param output_filename (string): expected VHDL testbench filename"
             ],
-            "input_filename": "tes_std_state.csv",
+            "input_filename_datapath": "tes_std_state.csv",
+            "input_filename": "random_tes_std_state.csv",
             "output_filename": "py_ram_tes_steady_state.csv"
         },
         "sequence": {

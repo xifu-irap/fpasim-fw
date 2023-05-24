@@ -55,31 +55,34 @@ entity tb_tes_top is
     g_CMD_PIXEL_ID_WIDTH         : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH;  -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
     -- pixel
     -- pixel
-    g_PIXEL_LENGTH_WIDTH         : positive := 6;  -- bus width in order to define the number of samples by pixel
+    g_PIXEL_LENGTH_WIDTH         : positive := pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH;  -- bus width which define the number of samples by pixel (expressed in bit)
     -- frame
-    g_FRAME_LENGTH_WIDTH         : positive := 11;  -- bus width in order to define the number of samples by frame
+    g_FRAME_LENGTH_WIDTH         : positive := pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH;  -- bus width which define the number of samples by frame (expressed in bit)
     g_FRAME_ID_WIDTH             : positive := pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH;  -- frame id bus width (expressed in bits). Possible values [1;max integer value[
     -- addr
-    g_PULSE_SHAPE_RAM_ADDR_WIDTH : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
+    g_PULSE_SHAPE_RAM_ADDR_WIDTH : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width of the pulse_shape RAM (expressed in bits)
     -- output
-    g_PIXEL_RESULT_OUTPUT_WIDTH  : positive := pkg_TES_MULT_SUB_Q_WIDTH_S;
+    g_PIXEL_RESULT_OUTPUT_WIDTH  : positive := pkg_TES_MULT_SUB_Q_WIDTH_S; -- bus width of the output of the tes function
+
+    -- number max of pixels ~ reset time of the tes function
+    g_NB_SAMPLE_BY_PIXEL_MAX : positive := pkg_NB_SAMPLE_BY_PIXEL_MAX; -- number max of pixels supported by the tes function.
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
-    g_NB_PIXEL_BY_FRAME          : positive := 1;
-    g_NB_FRAME_BY_PULSE          : positive := pkg_NB_FRAME_BY_PULSE_SHAPE;
-    g_VUNIT_DEBUG                : boolean  := true;
-    g_TEST_NAME                  : string   := "";
-    g_ENABLE_CHECK               : boolean  := true;
-    g_ENABLE_LOG                 : boolean  := true;
+    g_NB_PIXEL_BY_FRAME          : positive := 1;-- number of pixel by frames.
+    g_NB_FRAME_BY_PULSE          : positive := pkg_NB_FRAME_BY_PULSE_SHAPE; -- number of frames by pulse.
+    g_VUNIT_DEBUG                : boolean  := true; -- true: stop simulator on failures, false: stop the simulator on errors.
+    g_TEST_NAME                  : string   := ""; -- name of the test
+    g_ENABLE_CHECK               : boolean  := true;-- true: compare the simulation output with the reference one, false: do nothing.
+    g_ENABLE_LOG                 : boolean  := true;-- true: save simulation data in files, false: don't save simulation data in files 
     -- RAM1
-    g_RAM1_NAME                  : string   := "tes_pulse_shape";
-    g_RAM1_CHECK                 : boolean  := true;
-    g_RAM1_VERBOSITY             : integer  := 0;
+    g_RAM1_NAME                  : string   := "tes_pulse_shape";-- RAM1: simulation name
+    g_RAM1_CHECK                 : boolean  := true;--RAM1: 1: check the memory contents, 0: don't check the memory content
+    g_RAM1_VERBOSITY             : integer  := 0; -- RAM1: 0: don't print each memory content check, 1: 0: print each memory content check
     -- RAM2
-    g_RAM2_NAME                  : string   := "tes_steady_state";
-    g_RAM2_CHECK                 : boolean  := true;
-    g_RAM2_VERBOSITY             : integer  := 0
+    g_RAM2_NAME                  : string   := "tes_steady_state";-- RAM2: simulation name
+    g_RAM2_CHECK                 : boolean  := true;--RAM2: true: check the memory contents, false: don't check the memory content
+    g_RAM2_VERBOSITY             : integer  := 0 -- RAM2: 0: don't print each memory content check, 1: 0: print each memory content check
     );
 end tb_tes_top;
 
@@ -98,7 +101,7 @@ architecture simulate of tb_tes_top is
 
   -- input command: from the regdecode
   ---------------------------------------------------------------------
-  signal i_en                      : std_logic;
+  signal i_en                      : std_logic := '0';
   signal i_nb_sample_by_pixel      : std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);
   signal i_nb_pixel_by_frame       : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
   signal i_nb_sample_by_frame      : std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0);
@@ -355,7 +358,11 @@ begin
     i_rst         <= '0';
     i_rst_status  <= '0';
     i_debug_pulse <= '0';
+    i_en          <= '1';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    info("wait few clock cycles in order to reset the tes funcion");
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => g_NB_SAMPLE_BY_PIXEL_MAX, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- Register Configuration
@@ -369,23 +376,6 @@ begin
     -- set timeout for the vunit.watchdog
     --set_timeout(runner, 2 ms);
 
-    ---------------------------------------------------------------------
-    -- RAM1 Configuration
-    ---------------------------------------------------------------------
-    info("Start RAM configuration (wr): " & g_RAM1_NAME);
-    ram1_wr_start <= '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-    wait until rising_edge(i_clk) and ram1_wr_gen_finish = '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-
-    ---------------------------------------------------------------------
-    -- RAM2 Configuration
-    ---------------------------------------------------------------------
-    info("Start RAM configuration (wr): " & g_RAM2_NAME);
-    ram2_wr_start <= '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-    wait until rising_edge(i_clk) and ram2_wr_gen_finish = '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- Command Configuration
@@ -396,28 +386,6 @@ begin
     wait until rising_edge(i_clk) and cmd_gen_finish = '1';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
-
-    ---------------------------------------------------------------------
-    -- RAM Check: RAM1
-    ---------------------------------------------------------------------
-    if g_RAM1_CHECK = true then  
-      info("Start RAM reading: " & g_RAM1_NAME);
-      ram1_rd_start <= '1';
-      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-      info("wait RAM reading");
-      wait until rising_edge(i_clk) and ram1_rd_gen_finish = '1';
-    end if;
-
-    ---------------------------------------------------------------------
-    -- RAM Check: RAM2
-    ---------------------------------------------------------------------
-    if g_RAM2_CHECK = true then
-      info("Start RAM reading: " & g_RAM2_NAME);
-      ram2_rd_start <= '1';
-      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-      info("wait RAM reading");
-      wait until rising_edge(i_clk) and ram2_rd_gen_finish = '1';
-    end if;
 
     ---------------------------------------------------------------------
     -- Data Generation
@@ -440,7 +408,58 @@ begin
       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
     end loop;
 
-    --wait until rising_edge(i_clk) and data_gen_finish = '1';
+    ---------------------------------------------------------------------
+    -- disable the i_en
+    --   to have access to the RAM without generating an error, the datapath
+    --   needs to be emptied.
+    ---------------------------------------------------------------------
+    info("disable the i_en");
+    i_en <= '0';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    -- wait few clock cycles
+    --   => empty the datapath
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 16, i_margin => 12 ps);
+
+    ---------------------------------------------------------------------
+    -- RAM1 Configuration
+    ---------------------------------------------------------------------
+    info("Start RAM configuration (wr): " & g_RAM1_NAME);
+    ram1_wr_start <= '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    wait until rising_edge(i_clk) and ram1_wr_gen_finish = '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    ---------------------------------------------------------------------
+    -- RAM2 Configuration
+    ---------------------------------------------------------------------
+    info("Start RAM configuration (wr): " & g_RAM2_NAME);
+    ram2_wr_start <= '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    wait until rising_edge(i_clk) and ram2_wr_gen_finish = '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    ---------------------------------------------------------------------
+    -- RAM Check: RAM1
+    ---------------------------------------------------------------------
+    if g_RAM1_CHECK = true then  
+      info("Start RAM reading: " & g_RAM1_NAME);
+      ram1_rd_start <= '1';
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      info("wait RAM reading");
+      wait until rising_edge(i_clk) and ram1_rd_gen_finish = '1';
+    end if;
+
+    ---------------------------------------------------------------------
+    -- RAM Check: RAM2
+    ---------------------------------------------------------------------
+    if g_RAM2_CHECK = true then
+      info("Start RAM reading: " & g_RAM2_NAME);
+      ram2_rd_start <= '1';
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+      info("wait RAM reading");
+      wait until rising_edge(i_clk) and ram2_rd_gen_finish = '1';
+    end if;
 
     ---------------------------------------------------------------------
     -- End of simulation: wait few more clock cycles
@@ -507,7 +526,7 @@ begin
 
     -- data generation
     ---------------------------------------------------------------------
-    inst_pkg_data_generator : pkg_data_generator_4(
+    inst_pkg_data_generator : pkg_data_generator_3(
       i_clk            => i_clk,
       i_start          => reg_start,
       ---------------------------------------------------------------------
@@ -523,22 +542,22 @@ begin
       i_DATA0_TYP      => "UINT",
       i_DATA1_TYP      => "UINT",
       i_DATA2_TYP      => "UINT",
-      i_DATA3_TYP      => "UINT",
+      --i_DATA3_TYP      => "UINT",
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
       i_ready          => reg_rd_valid,
       o_data_valid     => reg_valid,    -- not connected
-      o_data0_std_vect => sig_vect,
-      o_data1_std_vect => i_nb_sample_by_pixel,
-      o_data2_std_vect => i_nb_pixel_by_frame,
-      o_data3_std_vect => i_nb_sample_by_frame,
+      --o_data0_std_vect => sig_vect,
+      o_data0_std_vect => i_nb_sample_by_pixel,
+      o_data1_std_vect => i_nb_pixel_by_frame,
+      o_data2_std_vect => i_nb_sample_by_frame,
       ---------------------------------------------------------------------
       -- status
       ---------------------------------------------------------------------
       o_finish         => reg_gen_finish
       );
-    i_en <= sig_vect(0);
+    --i_en <= sig_vect(0);
   end generate gen_reg;
 
   ---------------------------------------------------------------------

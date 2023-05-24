@@ -175,7 +175,6 @@ class TesTopDataGen(VunitConf):
         display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         filename = json_variant["register"]["value"]["filename"]
-        en = json_variant["register"]["value"]["en"]
         nb_sample_by_pixel = json_variant["register"]["value"]["nb_sample_by_pixel"]
         nb_pixel_by_frame = json_variant["register"]["value"]["nb_pixel_by_frame"]
         nb_frame_by_pulse = json_variant["register"]["value"]["nb_frame_by_pulse"]
@@ -192,8 +191,6 @@ class TesTopDataGen(VunitConf):
         filepath = str(Path(tb_input_base_path, filename))
         with open(filepath, 'w') as fid:
             # header
-            fid.write('en_uint1_t')
-            fid.write(csv_separator)
             fid.write('nb_samples_by_pixel_uint')
             fid.write(csv_separator)
             fid.write('nb_pixel_by_frame_uint')
@@ -201,8 +198,6 @@ class TesTopDataGen(VunitConf):
             fid.write('nb_samples_by_frame_uint')
             fid.write('\n')
             # data
-            fid.write(str(en))
-            fid.write(csv_separator)
             fid.write(str(nb_sample_by_pixel_tmp))
             fid.write(csv_separator)
             fid.write(str(nb_pixel_by_frame_tmp))
@@ -278,7 +273,24 @@ class TesTopDataGen(VunitConf):
             shutil.copyfile(input_filepath, output_filepath)
 
             # save the ram content
-            ram_filepath_dic[name] = output_filepath
+            # ram_filepath_dic[name] = output_filepath
+
+        msg0 = 'TesTopDataGen._run: Process RAM configuration files for the computation on the datapath'
+        display_obj.display_subtitle(msg_p=msg0, level_p=level0)
+        # process Memory files for the datapath computation
+        for dic in dic_sequence:
+            input_filename = dic["value"]['input_filename_datapath']
+            name = dic["generic"]['name']
+            input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
+
+            msg0 = 'used files for the datapath computation: ' + input_filepath
+            display_obj.display(msg_p=msg0, level_p=level2)
+
+            shutil.copyfile(input_filepath, output_filepath)
+
+            # save the ram content
+            ram_filepath_dic[name] = input_filepath
+
 
         ########################################################
         # compute the vhdl testbench reference output values
