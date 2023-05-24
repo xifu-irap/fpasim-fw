@@ -22,20 +22,32 @@
 #    Automatic Generation    No
 #    Code Rules Reference    
 # -------------------------------------------------------------------------------------------------------------
-#    @details                
-# 
+#    @details         
+#
+#     This script performs the necessary steps to launch the VHDL simulation.
+#     The main steps are:
+#        . compilation of the VHDL libraries.
+#        . compilation of the VHDL source files.
+#        . compilation of the VHDL testbench file.
+#        . Set the waveform (if exists).
+#        . Set the configuration memory files (if exist).
+#        . loop on the *.json file (test variant).
+#        . run the selected VHDL simulator.
+#               
+#     Note: 
+#       . Used for the VHDL simulation.
+#       . This script should be called by the launch_sim.py python script. But, it can be run in standalone.
+#
 # -------------------------------------------------------------------------------------------------------------
 
-
-
-
+# standard library
 import os
 # Enable the coloring in the console
 os.system("")
 import sys
 import argparse
-from pathlib import Path,PurePosixPath
-# Json lib
+from pathlib import Path
+from pathlib import PurePosixPath
 import json
 
 # get the name of the script name without file extension
@@ -47,10 +59,18 @@ def find_file_in_hierarchy(filename_p='DONT_DELETE.txt', depth_level_p=10):
     This function searches in this script parent directories, the filename_p parameter.
     If found, it returns the base path of the filename_p as well as its corresponding filepath
 
-    :param filename_p: (string) filename to search in the hierarchy
-    :param depth_level_p: (integer >= 0) search depth limit
-    :return: basepath, filepath: (string, string) (basepath of filename_p, filepath of filename_p) if found.
-                                                  Otherwise (None, None)
+    Parameters
+    ----------
+    filename_p: str
+            filename to search in the hierarchy
+    depth_level_p: int
+        (int >= 0) search depth limit
+
+    Returns
+    -------
+    basepath, filepath: (string, string) (basepath of filename_p, filepath of filename_p) if found.
+    Otherwise (None, None)
+
     """
     script_name0 = str(Path(__file__).stem)
     start_path = Path(__file__)
@@ -74,6 +94,18 @@ def find_file_in_hierarchy(filename_p='DONT_DELETE.txt', depth_level_p=10):
 
 # retrieve all python library path in order to import them
 def get_python_library_from_json_file(filepath_p):
+    """
+    Get the path to the simulation python libraries.
+
+    Parameters
+    ----------
+    filepath_p: str
+        configuration json filepath (test variant)
+
+    Returns: list of str.
+    -------
+        list of path.
+    """
 
     filepath = filepath_p
     # Opening JSON file
@@ -110,11 +142,12 @@ if path_list != None:
 #################################################################
 # import specific library
 #################################################################
-from vunit import VUnit, VUnitCLI
-from common import Display, VunitConf
-from common import SystemFpasimTopDataGen
-# from vunit.about import version
+from vunit import VUnitCLI
+from vunit import VUnit
 from vunit import about
+from common import Display
+from common import VunitConf
+from common import SystemFpasimTopDataGen
      
 
 if __name__ == '__main__':
@@ -131,7 +164,7 @@ if __name__ == '__main__':
     help0 = 'Specify the verbosity level. Possible values (uint): 0 to 2'
     cli.parser.add_argument('--verbosity', default=0,choices = [0,1,2], type = int, help=help0)
 
-    help0 = 'Specify the json key path: test_name/tb_entity_name'
+    help0 = 'Specify the json key path: test_name/tb_entity_name (see the launch_sim_processed.json file)'
     cli.parser.add_argument('--json_key_path', default='tb_fpga_system_fpasim_top_debug_test0/tb_fpga_system_fpasim_top',help=help0)
 
     args = cli.parse_args()
@@ -142,17 +175,15 @@ if __name__ == '__main__':
     verbosity     = args.verbosity
     json_key_path = args.json_key_path
 
-
     ###########################################################
-    # It's impossible to pass a boolean to a subprocess call
-    # We can't directly use the vunit defined --gui argument (boolean type)
-    # So, we use an intermediary "--gui_mode" custom argument (string type) to pass the command
+    # When this script is called by an another python script with the subprocess function,
+    # I don't know how to pass a boolean as command line argument (--gui argument defined by the Vunit library).
+    # Instead, we use an intermediary "--gui_mode" custom argument (string type) to pass the command.
     ###########################################################
     if gui_mode == 'False':
         args.gui = False 
     else:
         args.gui = True
-
 
     ################################################
     # build the display object
@@ -171,8 +202,7 @@ if __name__ == '__main__':
     # So, the following steps need to be followed:
     #  1. Create the VunitConf class instance
     #  2. Call the VunitConf.set_vunit_simulator instance method
-    #  3. create the VUNIT class instance
-    #  4. call the VunitConf.set_vunit instance method
+    #  3. call the VunitConf.set_vunit instance method
     #####################################################
     obj = SystemFpasimTopDataGen( json_filepath_p =json_filepath, json_key_path_p = json_key_path)
     obj.set_vunit_simulator(name_p = simulator,level_p=level1)
@@ -224,7 +254,7 @@ if __name__ == '__main__':
     obj.compile_common_lib(level_p=level1)
     
     #####################################################
-    # add source files
+    # add the VHDL/verilog source files
     #####################################################
     obj.compile_src(filename_p='system_fpasim_top.vhd',level_p=level1)
     obj.compile_src(filename_p='pkg_system_fpasim_debug.vhd',level_p=level1)
@@ -238,14 +268,14 @@ if __name__ == '__main__':
     obj.compile_src_directory(directory_name_p='cosim',level_p=level1)
 
     #####################################################
-    # add testbench file
+    # add the VHDL testbench file
     #####################################################
     obj.compile_tb(level_p=level1)
 
     #####################################################
-    # simulator configuration
+    # Set the simulator waveform
     #####################################################
-    # Set the simulator wave
+    # Set the simulator waveform
     obj.set_waveform(level_p=level1)
     # Get the simulator wave
     wave_filepath = obj.get_waveform(level_p=level1)
@@ -257,14 +287,13 @@ if __name__ == '__main__':
         str1 = "waveform_filepath:"+wave_filepath.replace('\\','/')
         sim_title = str0 + '__' + str1
 
-
     #####################################################
-    # Set the simulation options
+    # Set the simulator options
     #####################################################
-    obj.set_sim_option("modelsim.vsim_flags", ["-stats=-cmd,-time",'-c','-t','ps','fpasim.glbl','-voptargs=+acc','-title',sim_title])
+    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=["-stats=-cmd,-time",'-c','-t','ps','fpasim.glbl','-voptargs=+acc','-title',sim_title])
 
     ######################################################
-    # get the list of test_variant_filepath (if any)
+    # get the list of json test_variant_filepath (if any)
     ######################################################
     test_variant_filepath_list = obj.get_test_variant_filepath(level_p=level1)
 
@@ -279,16 +308,13 @@ if __name__ == '__main__':
     ram_filename_list.append('amp_squid_tf.mem')
     ram_filepath_list = obj.get_ram_filepath(filename_list_p=ram_filename_list,level_p=level1)
 
-    
-
-    
     ######################################################
     # get the Vunit testbench object + testbench name
     ######################################################
     tb = obj.get_testbench(level_p=level1)
     tb_name = obj.get_testbench_name()
 
-    # loop on all configuration files
+    # loop on all test variant files
     if (test_variant_filepath_list != []) or (test_variant_filepath_list is None):
         for test_variant_filepath in test_variant_filepath_list :
 
@@ -299,9 +325,9 @@ if __name__ == '__main__':
             str0 = 'tb_name='+tb_name   
             obj_display.display(msg_p=str0, level_p=level2)
 
-            conf_filename = str(Path(test_variant_filepath).stem)
+            variant_filename = str(Path(test_variant_filepath).stem)
 
-            name = conf_filename
+            name = variant_filename
             test_name = tb_name
             
             ####################################################################
@@ -311,7 +337,7 @@ if __name__ == '__main__':
             obj.set_test_variant_filepath(filepath_p= test_variant_filepath)
             obj.set_mif_files(filepath_list_p=ram_filepath_list)
 
-            # get a dictionnary of generics parameter
+            # get the vhdl testbench generic parameters.
             generic_dic = obj.get_generic_dic()
             #####################################################
             # Mandatory: The simulator modelsim/Questa wants generics filepaths in the Linux format
@@ -331,4 +357,3 @@ if __name__ == '__main__':
 
 
     obj.main()
-    # conf.pre_config(output_path = "test")
