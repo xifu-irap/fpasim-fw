@@ -41,7 +41,7 @@
             "nb_pixel_by_frame": 2,
             "nb_sample_by_pixel": 8,
             "nb_frame_by_pulse": 2048,
-            "nb_pulse": 0,
+            "nb_pulse": 1,
             "filename": "py_reg_in.csv"
         },
         "sequence": {
@@ -77,9 +77,9 @@
             "filename": "py_reg_valid_sequencer_in.csv",
             "ctrl": 0,
             "min_value1": 0,
-            "max_value1": 1,
-            "min_value2": 1,
-            "max_value2": 2,
+            "max_value1": 0,
+            "min_value2": 0,
+            "max_value2": 0,
             "time_shift": 0
         }
     },
@@ -132,9 +132,9 @@
             "filename": "py_data_valid_sequencer_in.csv",
             "ctrl": 0,
             "min_value1": 0,
-            "max_value1": 1,
-            "min_value2": 1,
-            "max_value2": 2,
+            "max_value1": 0,
+            "min_value2": 0,
+            "max_value2": 0,
             "time_shift": 0
         }
     },
@@ -167,7 +167,9 @@
                 "         The max value (15) should match the value: (pkg_fpasim/pkg_PULSE_SHAPE_OVERSAMPLE) - 1",
                 "",
                 "    :param filename (string): filename expected by the vhdl testbench.",
-                "         Note: This file is a *.csv file"
+                "         Note: This file is a *.csv file",
+                "Remark:",
+                "   For the moment, the python model doesn't support multiple make_pulse commands. So the pulse_height_list, pixel_id_list and time_shift_list must be a list with only one element."
             ],
             "pulse_height_list": [65535],
             "pixel_id_list": [0],
@@ -205,11 +207,11 @@
                 "       :param time_shift (integer>=0): define a starting offset before generating pulses"
             ],
             "filename": "py_cmd_valid_sequencer_in.csv",
-            "ctrl": "0",
+            "ctrl": 0,
             "min_value1": 0,
-            "max_value1": 1,
-            "min_value2": 1,
-            "max_value2": 2,
+            "max_value1": 0,
+            "min_value2": 0,
+            "max_value2": 0,
             "time_shift": 0
         }
     },
@@ -230,7 +232,7 @@
                 "       :param verbosity (integer >= 0): 1: print all check (if enable), 0: no print"
             ],
             "name": "tes_shape_pulse",
-            "check": 0,
+            "check": 1,
             "verbosity": 0
         },
         "value": {
@@ -275,11 +277,11 @@
                 "       :param time_shift (integer>=0): define a starting offset before generating pulses"
             ],
             "filename": "py_ram_tes_shape_valid_sequencer_in.csv",
-            "ctrl": "0",
+            "ctrl": 0,
             "min_value1": 0,
-            "max_value1": 1,
-            "min_value2": 1,
-            "max_value2": 2,
+            "max_value1": 0,
+            "min_value2": 0,
+            "max_value2": 0,
             "time_shift": 0
         }
     },
@@ -301,7 +303,7 @@
             ],
             "name": "tes_steady_state",
             "check": 1,
-            "verbosity": 1
+            "verbosity": 0
         },
         "value": {
             "description_list": [
@@ -344,11 +346,11 @@
                 "       :param time_shift (integer>=0): define a starting offset before generating pulses"
             ],
             "filename": "py_ram_tes_steady_state_valid_sequencer_in.csv",
-            "ctrl": "0",
+            "ctrl": 0,
             "min_value1": 0,
-            "max_value1": 1,
-            "min_value2": 1,
-            "max_value2": 2,
+            "max_value1": 0,
+            "min_value2": 0,
+            "max_value2": 0,
             "time_shift": 0
         }
     },
