@@ -1248,7 +1248,7 @@
                     },
                     "name": "tes_shape_pulse",
                     "offset_addr": "0x0000",
-                    "input_filename": "tes_response.csv",
+                    "input_filename": "random_tes_pulse_shape.csv",
                     "output_tb_filename": "py_tes_pulse_shape_ref.csv"
                 },
                 "amp_squid_tf": {
@@ -1288,7 +1288,7 @@
                     },
                     "name": "amp_squid_tf",
                     "offset_addr": "0x8000",
-                    "input_filename": "amp_squid_tf.csv",
+                    "input_filename": "random_amp_squid_tf.csv",
                     "output_tb_filename": "py_amp_squid_tf_ref.csv"
                 },
                 "mux_squid_tf": {
@@ -1328,7 +1328,7 @@
                     },
                     "name": "mux_squid_tf",
                     "offset_addr": "0xC000",
-                    "input_filename": "mux_squid_tf.csv",
+                    "input_filename": "random_mux_squid_tf.csv",
                     "output_tb_filename": "py_mux_squid_tf_ref.csv"
                 },
                 "tes_steady_state": {
@@ -1368,7 +1368,7 @@
                     },
                     "name": "tes_steady_state",
                     "offset_addr": "0xE000",
-                    "input_filename": "tes_steady_state.csv",
+                    "input_filename": "random_tes_std_state.csv",
                     "output_tb_filename": "py_tes_steady_state_ref.csv"
                 },
                 "mux_squid_offset": {
@@ -1408,7 +1408,7 @@
                     },
                     "name": "mux_squid_offset",
                     "offset_addr": "0xE040",
-                    "input_filename": "mux_squid_offset.csv",
+                    "input_filename": "random_mux_squid_offset.csv",
                     "output_tb_filename": "py_mux_squid_offset_ref.csv"
                 }
             }

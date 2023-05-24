@@ -1315,7 +1315,7 @@
                     },
                     "name": "tes_shape_pulse",
                     "offset_addr": "0x0000",
-                    "input_filename": "tes_response.csv",
+                    "input_filename": "tes_pulse_shape.csv",
                     "output_tb_filename": "py_tes_pulse_shape_ref.csv"
                 },
                 "amp_squid_tf": {
@@ -1435,7 +1435,7 @@
                     },
                     "name": "tes_steady_state",
                     "offset_addr": "0xE000",
-                    "input_filename": "tes_steady_state.csv",
+                    "input_filename": "tes_std_state.csv",
                     "output_tb_filename": "py_tes_steady_state_ref.csv"
                 },
                 "mux_squid_offset": {

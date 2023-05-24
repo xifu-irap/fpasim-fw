@@ -290,6 +290,11 @@ class SystemFpasimTopDataGen(VunitConf):
                     addr_ref_list = []
                     data_ref_list = []
                     for line in lines:
+                        line_tmp = line.rstrip()
+                        if line_tmp == "":
+                            # skip empty line. 
+                            # In particular, at the end of the file
+                            continue
                         str_addr, str_value = line.split(csv_separator)
                         str_addr = str_addr.replace('\n', '')
                         str_value = str_value.replace('\n', '')
