@@ -18,20 +18,18 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   amp_squid_ram_gen.py
+#    @file                   convert_mem_to_csv.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
-#    @details 
-#               
-#    This script generates an output csv file.
-#       . The line number will be used as addresses in the address column.
-#       . The generated data will be copied in the data column (incremental value).
-#
-#    Note: 
-#       . This generated file will be used by the run python scripts during the VHDL simulation.
-#       . This script was tested with python 3.10
+#    @details  
+#              
+#    This script search the *.mem files in the src directory in order to generate the corresponding output csv files.
+#       . The line number will be copied in the address column
+#       . The line values will be copied in the data column
+#    Note:
+#      . This generated file will be used by the run python scripts during the VHDL simulation
 #
 # -------------------------------------------------------------------------------------------------------------
 
@@ -58,7 +56,7 @@ def find_file_in_hierarchy(filename_p='DONT_DELETE.txt', depth_level_p=10):
     -------
     basepath, filepath: (string, string) (basepath of filename_p, filepath of filename_p) if found.
     Otherwise (None, None)
-                                          Otherwise (None, None)
+    
     """
     script_name0 = str(Path(__file__).stem)
     start_path = Path(__file__)
@@ -91,7 +89,8 @@ root_path, _ = find_file_in_hierarchy(filename_p='DONT_DELETE.txt')
 # add python common library
 ############################################################################
 sys.path.append(str(Path(root_path, 'simu/lib/common')))
-from common import Display, FilepathListBuilder
+from common import Display
+from common import FilepathListBuilder
 
 
 if __name__ == '__main__':
@@ -111,31 +110,54 @@ if __name__ == '__main__':
     ##############################################
     # process the provided file to fill the tes RAM
     ##############################################
-    addr_width = 14
-    depth = 2**addr_width
     script_base_path = str(Path(__file__).parents[0])
-    output_filepath = str(Path(script_base_path,'amp_squid_tf.csv'))
+    src_base_path = str(Path(root_path,'src'))
 
-    msg0 = 'Write output filepath: '+output_filepath
-    obj_display.display(msg_p=msg0,level_p=level1)
+    ##############################################
+    # search *.mem file
+    ##############################################
+    search_obj = FilepathListBuilder()
+    search_obj.set_file_extension(file_extension_list_p=['.mem'])
+
+    input_filename_list = []
+    input_filename_list.append('amp_squid_tf')
+
+    for filename in input_filename_list:
+
+  
+        input_filepath = search_obj.get_filepath_by_filename(basepath_p=src_base_path,filename_p=filename+'.mem')
+        output_filepath = str(Path(script_base_path,filename+'.csv'))
+
+        msg0 = 'Read input filepath: '+input_filepath
+        obj_display.display(msg_p=msg0,level_p=level1)
+
+        msg0 = 'Write output filepath: '+output_filepath
+        obj_display.display(msg_p=msg0,level_p=level1)
 
 
-    fid = open(output_filepath,'w')
-    cnt = 1
-    index_max = depth - 1
-    for index in range(depth):
-        if index == 0:
-            fid.write('offset_addr_uint' + str(addr_width) + '_t')
+        fid = open(input_filepath,'r')
+        lines = fid.readlines()
+        fid.close()
+
+        # skip first line (address line)
+        lines = lines[1:]
+
+        fid = open(output_filepath,'w')
+        index_max = len(lines) - 1
+        for index,str_line in enumerate(lines):
+            str_line = str_line.replace('\n','')
+            str_line = str(int(str_line,16))
+            if index == 0:
+                fid.write('offset_addr_uint15_t')
+                fid.write(csv_separator)
+                fid.write('data_uint16_t')
+                fid.write('\n')
+            fid.write(str(index))
             fid.write(csv_separator)
-            fid.write('data_uint16_t')
-            fid.write('\n')
-        fid.write(str(index))
-        fid.write(csv_separator)
-        fid.write(str(cnt))
-        if index != index_max:
-            fid.write('\n')
-        cnt += 1
-    fid.close()
+            fid.write(str_line)
+            if index != index_max:
+                fid.write('\n')
+        fid.close()
 
 
 

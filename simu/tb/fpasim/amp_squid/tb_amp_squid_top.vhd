@@ -60,17 +60,17 @@ entity tb_amp_squid_top is
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
-    g_NB_PIXEL_BY_FRAME           : positive := 1;
-    g_VUNIT_DEBUG                 : boolean  := true;
-    g_TEST_NAME                   : string   := "";
-    g_ENABLE_CHECK                : boolean  := true;
-    g_ENABLE_LOG                  : boolean  := true;
+    g_NB_PIXEL_BY_FRAME           : positive := 1;-- number of pixel by frames.
+    g_VUNIT_DEBUG                 : boolean  := true;-- true: stop simulator on failures, false: stop the simulator on errors.
+    g_TEST_NAME                   : string   := ""; -- name of the test
+    g_ENABLE_CHECK                : boolean  := true;-- true: compare the simulation output with the reference one, false: do nothing.
+    g_ENABLE_LOG                  : boolean  := true;-- true: save simulation data in files, false: don't save simulation data in files 
     -- RAM1
-    g_RAM1_NAME                   : string   := "amp_squid_tf";
-    g_RAM1_CHECK                  : boolean  := true;
-    g_RAM1_VERBOSITY              : integer  := 0;
+    g_RAM1_NAME                   : string   := "mux_squid_offset";-- RAM1: simulation name
+    g_RAM1_CHECK                  : boolean  := true;--RAM1: 1: check the memory contents, 0: don't check the memory content
+    g_RAM1_VERBOSITY              : integer  := 0;-- RAM1: 0: don't print each memory content check, 1: 0: print each memory content check
     -- FPAGAIN Register
-    g_FPAGAIN                     : integer  := 0
+    g_FPAGAIN                     : integer  := 0 -- FPASIM gain value
   );
 end tb_amp_squid_top;
 
@@ -214,6 +214,7 @@ begin
   ---------------------------------------------------------------------
   p_master_fsm : process is
     variable val_v : integer := 0;
+    variable v_test : integer := 0;
 
   begin
     if runner_cfg'length > 0 then
@@ -287,6 +288,28 @@ begin
     i_fpasim_gain <= std_logic_vector(to_unsigned(g_FPAGAIN, i_fpasim_gain'length));
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
+
+    ---------------------------------------------------------------------
+    -- Data Generation
+    ---------------------------------------------------------------------
+    info("Start data Generation");
+    data_start <= '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    ---------------------------------------------------------------------
+    -- Wait end of input data generation
+    ---------------------------------------------------------------------
+    info("wait end of data generation");
+    while v_test = 0 loop
+      if data_gen_finish = '1' then
+        v_test := 1;
+      end if;
+      if o_pixel_valid = '1' and o_frame_sof = '1' then
+        info("o_frame_id: "&to_string(to_integer(unsigned(o_frame_id))));
+      end if;
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    end loop;
+
     ---------------------------------------------------------------------
     -- RAM1 Configuration
     ---------------------------------------------------------------------
@@ -306,20 +329,6 @@ begin
       info("wait RAM reading");
       wait until rising_edge(i_clk) and ram1_rd_gen_finish = '1';
     end if;
-
-    ---------------------------------------------------------------------
-    -- Data Generation
-    ---------------------------------------------------------------------
-    info("Start data Generation");
-    data_start <= '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-
-    ---------------------------------------------------------------------
-    -- Wait end of input data generation
-    ---------------------------------------------------------------------
-    info("wait end of data generation");
-    wait until rising_edge(i_clk) and data_gen_finish = '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- End of simulation: wait few more clock cycles
