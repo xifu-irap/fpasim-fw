@@ -481,11 +481,11 @@ begin
       i_DATA0_TYP      => "UINT",
       i_DATA1_TYP      => "UINT",
       i_DATA2_TYP      => "UINT",
-      i_DATA3_TYP      => "UINT",
+      i_DATA3_TYP      => "INT",
       i_DATA4_TYP      => "UINT",
       i_DATA5_TYP      => "UINT",
       i_DATA6_TYP      => "UINT",
-      i_DATA7_TYP      => "UINT",
+      i_DATA7_TYP      => "INT",
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
@@ -647,7 +647,7 @@ begin
         i_DATA0_TYP      => "UINT",
         i_DATA1_TYP      => "UINT",
         i_DATA2_TYP      => "UINT",
-        i_DATA3_TYP      => "UINT",
+        i_DATA3_TYP      => "INT",
         i_DATA4_TYP      => "UINT",
         i_DATA5_TYP      => "UINT",
         i_DATA6_TYP      => "UINT",
@@ -688,7 +688,7 @@ begin
       --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
       --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
       --  data type = "STD_VEC" => no data convertion before writing in the output file
-      i_DATA0_TYP      => "UINT",
+      i_DATA0_TYP      => "INT",
       ---------------------------------------------------------------------
       -- Vunit Scoreboard objects
       ---------------------------------------------------------------------

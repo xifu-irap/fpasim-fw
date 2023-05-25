@@ -72,7 +72,7 @@ class AmpSquidTop(Points):
 
         # address width of the amp_squid_tf RAM
         #  => the value must match the pkg_fpasim/pkg_AMP_SQUID_TF_RAM_NB_WORDS value
-        self.amp_squid_tf_ram_nb_words = 2**16
+        self.amp_squid_tf_ram_nb_words = 2**14
 
         # define the fpasim_gain computed by the vhdl code
         self._vhdl_fpasim_gain = 0
@@ -156,6 +156,9 @@ class AmpSquidTop(Points):
             addr = self.amp_squid_tf_ram_nb_words + sub
         else:
             addr = sub
+
+        # limit the value at the address with of the memory
+        addr = addr % self.amp_squid_tf_ram_nb_words
 
         amp_squid_tf = self.amp_squid_tf_list[addr]
 
