@@ -1195,6 +1195,48 @@ if __name__ == '__main__':
     # save the individual test for further use (sequence building)
     solo_test_dic[unit_test_name] = test_dic0
 
+    # individual test
+    ############################################################################
+    # unitary test parameters
+    # ########################
+
+    # description of the unitary test
+    #   No description <=> [""]
+    unit_test_description_list = [""]
+    # name of the unitary test
+    unit_test_name = 'tb_tes_top_test_variant10'
+    # name of the testbench entity
+    tb_name = 'tb_tes_top'
+    # name of the testbench file
+    tb_filename = 'tb_tes_top.vhd'
+    # list of test_variant_filename
+    #  No filename <=> []
+    test_variant_filename_list = ["tb_tes_top_test_variant10.json"]
+    # base path where to find the run_tb_XXXX script python
+    run_basepath = str(Path(root_path, 'simu/vunit'))
+    # filename of the run_XXXX python script
+    run_filename = 'run_'+tb_name+'.py'
+    # filename of the simulator waveform
+    waveform_filename = "wave_" + tb_name + "00.do"
+    # output simulation directory path
+    vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+
+    # generate individual test
+    test0 = DUT()
+    for msg in unit_test_description_list:
+        test0.add_description(text_p=msg)
+    test0.set_tb_entity_name(name_p=tb_name)
+    test0.set_tb_filename(filename_p=tb_filename)
+    for test_variant_filename in test_variant_filename_list:
+        test0.add_test_variant_filename(filename_p=test_variant_filename)
+    test0.set_vunit_run_filename(basepath_p=run_basepath, filename_p= run_filename , level_p=level2)
+    test0.set_vunit_outpath(path_p=vunit_outpath)
+    test0.set_sim_wave_filepath(filename_p=waveform_filename)
+    test_dic0 = test0.get_dic(level_p=level2)
+    # save the individual test for further use (sequence building)
+    solo_test_dic[unit_test_name] = test_dic0
+
 
     # individual test
     ############################################################################
@@ -1478,6 +1520,7 @@ if __name__ == '__main__':
     json_test_dic["tb_tes_top_test_variant07"] = [solo_test_dic['tb_tes_top_test_variant07']]
     json_test_dic["tb_tes_top_test_variant08"] = [solo_test_dic['tb_tes_top_test_variant08']]
     json_test_dic["tb_tes_top_test_variant09"] = [solo_test_dic['tb_tes_top_test_variant09']]
+    json_test_dic["tb_tes_top_test_variant10"] = [solo_test_dic['tb_tes_top_test_variant10']]
 
     # mux_squid_top
     json_test_dic["tb_mux_squid_top_test0"] = [solo_test_dic['tb_mux_squid_top']]
