@@ -244,6 +244,7 @@ begin
   ---------------------------------------------------------------------
   p_master_fsm : process is
     variable val_v : integer := 0;
+    variable v_test : integer := 0;
 
   begin
     if runner_cfg'length > 0 then
@@ -332,8 +333,15 @@ begin
     -- Wait end of input data generation
     ---------------------------------------------------------------------
     info("wait end of data generation");
-    wait until rising_edge(i_clk) and data_gen_finish = '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    while v_test = 0 loop
+      if data_gen_finish = '1' then
+        v_test := 1;
+      end if;
+      if o_pixel_valid = '1' and o_frame_sof = '1' then
+        info("o_frame_id: "&to_string(to_integer(unsigned(o_frame_id))));
+      end if;
+      pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+    end loop;
 
     ---------------------------------------------------------------------
     -- RAM1 Configuration
@@ -598,11 +606,11 @@ begin
       i_DATA0_TYP      => "UINT",
       i_DATA1_TYP      => "UINT",
       i_DATA2_TYP      => "UINT",
-      i_DATA3_TYP      => "UINT",
+      i_DATA3_TYP      => "INT",
       i_DATA4_TYP      => "UINT",
       i_DATA5_TYP      => "UINT",
       i_DATA6_TYP      => "UINT",
-      i_DATA7_TYP      => "UINT",
+      i_DATA7_TYP      => "INT",
       ---------------------------------------------------------------------
       -- command
       ---------------------------------------------------------------------
@@ -813,7 +821,7 @@ begin
       --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
       --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
       --  data type = "STD_VEC" => no data convertion before writing in the output file
-      i_DATA0_TYP      => "UINT",
+      i_DATA0_TYP      => "INT",
       ---------------------------------------------------------------------
       -- Vunit Scoreboard objects
       ---------------------------------------------------------------------

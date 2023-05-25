@@ -81,12 +81,13 @@ class MuxSquidTop(Points):
         self._inter_squid_gain = 0
         
         # define the inter_squid_gain width
-        #  => the value must match the pkg_regdecode/pkg_CONF0_INTER_SQUID_GAIN_WIDTH value
+        #  => the value must match the pkg_regdecode/pkg_CONF0_INTER_SQUID_GAIN_WIDTH + 1 value
         self._inter_squid_gain_width = 8
 
         # number of words of the MUX_SQUID_TF RAM
         #  => the value must match the pkg_fpasim/pkg_MUX_SQUID_TF_RAM_NB_WORDS value
         self._mux_squid_tf_ram_nb_words = 2**13
+
 
     def set_ram_mux_squid_offset(self, filepath_p):
         """
@@ -168,6 +169,9 @@ class MuxSquidTop(Points):
             addr = self._mux_squid_tf_ram_nb_words + sub
         else:
             addr = sub
+
+        # limit the value at the address with of the memory
+        addr = addr % self._mux_squid_tf_ram_nb_words
 
         # get the mux_squid_tf value
         mux_squid_tf = self._mux_squid_tf_list[addr]
