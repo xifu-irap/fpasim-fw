@@ -58,24 +58,24 @@ entity tb_mux_squid_top is
     g_MUX_SQUID_TF_RAM_ADDR_WIDTH : positive := pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
     -- computation
     g_PIXEL_RESULT_INPUT_WIDTH    : positive := pkg_TES_MULT_SUB_Q_WIDTH_S; -- pixel input result bus width (expressed in bits). Possible values: [1; max integer value[
-    g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S;
+    g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S; -- bus width at the output of the mux_squid function
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
-    g_NB_PIXEL_BY_FRAME           : positive := 1;
-    g_INTER_SQUID_GAIN            : natural := 255;
-    g_VUNIT_DEBUG                 : boolean  := true;
-    g_TEST_NAME                   : string   := "";
-    g_ENABLE_CHECK                : boolean  := true;
-    g_ENABLE_LOG                  : boolean  := true;
+    g_NB_PIXEL_BY_FRAME           : positive := 1;-- number of pixel by frames.
+    g_INTER_SQUID_GAIN            : natural := 255; -- default inter_squid_gain value
+    g_VUNIT_DEBUG                 : boolean  := true;-- true: stop simulator on failures, false: stop the simulator on errors.
+    g_TEST_NAME                   : string   := ""; -- name of the test
+    g_ENABLE_CHECK                : boolean  := true;-- true: compare the simulation output with the reference one, false: do nothing.
+    g_ENABLE_LOG                  : boolean  := true;-- true: save simulation data in files, false: don't save simulation data in files 
     -- RAM1
-    g_RAM1_NAME                   : string   := "mux_squid_offset";
-    g_RAM1_CHECK                  : boolean  := true;
-    g_RAM1_VERBOSITY              : integer  := 0;
+    g_RAM1_NAME                   : string   := "mux_squid_offset";-- RAM1: simulation name
+    g_RAM1_CHECK                  : boolean  := true;--RAM1: 1: check the memory contents, 0: don't check the memory content
+    g_RAM1_VERBOSITY              : integer  := 0;-- RAM1: 0: don't print each memory content check, 1: 0: print each memory content check
     -- RAM2
-    g_RAM2_NAME                   : string   := "mux_squid_tf";
-    g_RAM2_CHECK                  : boolean  := true;
-    g_RAM2_VERBOSITY              : integer  := 0
+    g_RAM2_NAME                   : string   := "mux_squid_tf";-- RAM2: simulation name
+    g_RAM2_CHECK                  : boolean  := true;--RAM2: 1: check the memory contents, 0: don't check the memory content
+    g_RAM2_VERBOSITY              : integer  := 0-- RAM2: 0: don't print each memory content check, 1: 0: print each memory content check
   );
 end tb_mux_squid_top;
 
@@ -320,6 +320,21 @@ begin
     i_debug_pulse <= '0';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
+
+    ---------------------------------------------------------------------
+    -- Data Generation
+    ---------------------------------------------------------------------
+    info("Start data Generation");
+    data_start <= '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
+    ---------------------------------------------------------------------
+    -- Wait end of input data generation
+    ---------------------------------------------------------------------
+    info("wait end of data generation");
+    wait until rising_edge(i_clk) and data_gen_finish = '1';
+    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
     ---------------------------------------------------------------------
     -- RAM1 Configuration
     ---------------------------------------------------------------------
@@ -360,21 +375,7 @@ begin
       info("wait RAM reading");
       wait until rising_edge(i_clk) and ram2_rd_gen_finish = '1';
     end if;
-
-    ---------------------------------------------------------------------
-    -- Data Generation
-    ---------------------------------------------------------------------
-    info("Start data Generation");
-    data_start <= '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-
-    ---------------------------------------------------------------------
-    -- Wait end of input data generation
-    ---------------------------------------------------------------------
-    info("wait end of data generation");
-    wait until rising_edge(i_clk) and data_gen_finish = '1';
-    pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
-
+    
     ---------------------------------------------------------------------
     -- End of simulation: wait few more clock cycles
     ---------------------------------------------------------------------

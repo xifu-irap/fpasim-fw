@@ -30,6 +30,7 @@
 #    
 #    Note:
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -196,8 +197,22 @@ class MuxSquidTopDataGen(VunitConf):
 
             shutil.copyfile(input_filepath, output_filepath)
 
+
+        msg0 = 'MuxSquidTopDataGen._run: Process RAM configuration files for the computation on the datapath'
+        display_obj.display_subtitle(msg_p=msg0, level_p=level0)
+        # process Memory files for the datapath computation
+        for dic in dic_sequence:
+            input_filename = dic["value"]['input_filename_datapath']
+            name = dic["generic"]['name']
+            input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
+
+            msg0 = 'used files for the datapath computation: ' + input_filepath
+            display_obj.display(msg_p=msg0, level_p=level2)
+
+            shutil.copyfile(input_filepath, output_filepath)
+
             # save the ram content
-            ram_filepath_dic[name] = output_filepath
+            ram_filepath_dic[name] = input_filepath
 
         ########################################################
         # Get the testbench parameters

@@ -121,9 +121,9 @@
             "filename": "py_data_valid_sequencer_in.csv",
             "ctrl": 0,
             "min_value1": 0,
-            "max_value1": 1,
-            "min_value2": 1,
-            "max_value2": 2,
+            "max_value1": 0,
+            "min_value2": 0,
+            "max_value2": 0,
             "time_shift": 0
         }
     },
@@ -152,11 +152,13 @@
             "description_list": [
                 "This section defines the file to copy and rename in the output simulation directory",
                 "   .The parameters are",
-                "       :param input_filename (string): filename to copy and to rename",
+                "       :param input_filename_datapath (string): filename to use in order to compute data on the datapath",
+                "       :param input_filename (string): filename to use in order to check memory",
                 "       :param output_filename (string): expected VHDL testbench filename"
 
             ],
-            "input_filename": "mux_squid_offset.csv",
+            "input_filename_datapath": "mux_squid_offset.csv",
+            "input_filename": "random_mux_squid_offset.csv",
             "output_filename": "py_ram_mux_squid_offset.csv"
         },
         "sequence": {
@@ -190,11 +192,11 @@
                 "       :param time_shift (integer>=0): define a starting offset before generating pulses"
             ],
             "filename": "py_ram_mux_squid_offset_valid_sequencer_in.csv",
-            "ctrl": "0",
+            "ctrl": 0,
             "min_value1": 0,
-            "max_value1": 1,
-            "min_value2": 1,
-            "max_value2": 2,
+            "max_value1": 0,
+            "min_value2": 0,
+            "max_value2": 0,
             "time_shift": 0
         }
     },
@@ -222,10 +224,12 @@
             "description_list": [
                 "This section defines the file to copy and rename in the output simulation directory",
                 "   .The parameters are",
-                "       :param input_filename (string): source filename to copy and to rename",
-                "       :param output_filename (string): destination filename (expected by VHDL testbench file)"
+                "       :param input_filename_datapath (string): filename to use in order to compute data on the datapath",
+                "       :param input_filename (string): filename to use in order to check memory",
+                "       :param output_filename (string): expected VHDL testbench filename"
             ],
-            "input_filename": "mux_squid_tf.csv",
+            "input_filename_datapath": "mux_squid_tf.csv",
+            "input_filename": "random_mux_squid_tf.csv",
             "output_filename": "py_ram_mux_squid_tf.csv"
         },
         "sequence": {
@@ -261,9 +265,9 @@
             "filename": "py_ram_mux_squid_tf_valid_sequencer_in.csv",
             "ctrl": "0",
             "min_value1": 0,
-            "max_value1": 1,
-            "min_value2": 1,
-            "max_value2": 2,
+            "max_value1": 0,
+            "min_value2": 0,
+            "max_value2": 0,
             "time_shift": 0
         }
     },
