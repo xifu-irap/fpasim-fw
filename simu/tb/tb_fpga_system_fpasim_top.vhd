@@ -24,8 +24,8 @@
 -- -------------------------------------------------------------------------------------------------------------
 --    @details         
 --
---    this testbench is only used to verify the adc interface       
---
+--     Testbench of the fpga_system_fpasim_top module.
+-- 
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -70,10 +70,10 @@ entity tb_fpga_system_fpasim_top is
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
-    g_VUNIT_DEBUG  : boolean := true;
-    g_TEST_NAME    : string  := "";
-    g_ENABLE_CHECK : boolean := true;
-    g_ENABLE_LOG   : boolean := true
+    g_VUNIT_DEBUG : boolean  := true; -- true: stop simulator on failures, false: stop the simulator on errors.
+    g_TEST_NAME   : string   := ""; -- name of the test
+    g_ENABLE_CHECK: boolean  := true;-- true: compare the simulation output with the reference one, false: do nothing.
+    g_ENABLE_LOG  : boolean  := true-- true: save simulation data in files, false: don't save simulation data in files 
     );
 end tb_fpga_system_fpasim_top;
 

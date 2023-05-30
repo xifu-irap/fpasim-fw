@@ -156,10 +156,11 @@ if __name__ == '__main__':
             msg0 = "ERROR: This " + test_name + " isn't defined in the json file (" + json_filepath_input +')'
             obj_display.display(msg_p=msg0, level_p=level1, color_p='red')
             break
-        msg0 = 'Start: ' + test_name + ' test'
+        msg0 = 'Run Test Name: ' + test_name
         obj_display.display_subtitle(msg_p=msg0, level_p=level1, color_p='yellow')
+
         # search in test_list a name with test_name value
-        for dic in test_list:
+        for test_id, dic in enumerate(test_list):
 
             # extract parameter values from the json
             tb_entity_name = dic['vunit']['tb_entity_name']
@@ -171,21 +172,25 @@ if __name__ == '__main__':
 
             # build a key to uniquely identify a test
             #   True if an individual test is listed only one time in the test_list
-            json_key_path = test_name + '/' + tb_entity_name
+            json_key_path = test_name + '/' + str(test_id)
 
             # build a unique test_report name
             #   True if an individual test is listed only one time in the test_list
-            test_key = test_name + "__" + tb_entity_name
+            test_key = test_name + "__test_id_" + '{0:04d}'.format(test_id)
             report_filename = 'report__'+test_key+'.xml'
             report_path = str(Path(output_path, report_filename))
 
             # build a message
             msg_list = []
-            msg_list.append('run_file_path           : ' + run_file_path)
-            msg_list.append('output_path             : ' + output_path)
-            msg_list.append('report_path             : ' + report_path)
-            msg_list.append('test_list name          : ' + test_name)
-            msg_list.append('tb entity name    : ' + tb_entity_name)
+            msg_list.append('test_id                     : ' + str(test_id))
+            msg_list.append('test_name_list              : ' + test_name)
+            msg_list.append('tb entity name              : ' + tb_entity_name)
+            msg_list.append('test_variant_filename_list: : ' + ", ".join(dic['test_variant']["filename_list"]) )
+            msg_list.append('run_file_path               : ' + run_file_path)
+            msg_list.append('run_json_key                : ' + json_key_path)
+            msg_list.append('output_simulation_path      : ' + output_path)
+            msg_list.append('report_simulation_path      : ' + report_path)
+            msg_list.append('')
 
             for msg in msg_list:
                 obj_display.display(msg_p=msg, level_p=level2, color_p='green')
@@ -234,7 +239,8 @@ if __name__ == '__main__':
 
             # Print test output immediately and not only when failure
             # Default: False
-            cmd.append("-v")
+            if verbosity > 1:
+                cmd.append("-v")
 
             # Export project information to a JSON file.
             # cmd.append("--export-json")

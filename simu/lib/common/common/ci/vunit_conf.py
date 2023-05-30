@@ -137,6 +137,14 @@ class VunitConf(VunitUtils):
         self.do_list = []
         self.do_filepath_list = []
 
+        # compute vhdl test name (used by the testbench)
+        self.vhdl_test_name = ''
+
+        # list the test_variant_filepath to simulate.
+        #  => the order could be different to the test_variant_filename_list variable
+        #  => the number should be less or equal to test_variant_filename_list variable 
+        self.new_test_variant_filepath_list = []
+
     def set_test_variant_filepath(self, filepath_p):
         """
         This method set the json test_variant filepath and get its dictionary
@@ -149,11 +157,12 @@ class VunitConf(VunitUtils):
         level0 = self.level
         level1 = level0 + 1
 
-        msg0 = "VunitConf.set_test_variant_filepath: Process Configuration File"
-        display_obj.display_title(msg_p=msg0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = "VunitConf.set_test_variant_filepath: Process Configuration File"
+            display_obj.display_title(msg_p=msg0, level_p=level0)
 
-        msg0 = 'test_variant_filepath=' + test_variant_filepath
-        display_obj.display(msg_p=msg0, level_p=level1)
+            msg0 = 'test_variant_filepath=' + test_variant_filepath
+            display_obj.display(msg_p=msg0, level_p=level1)
 
         ################################################
         # Extract data from the configuration json file
@@ -168,6 +177,56 @@ class VunitConf(VunitUtils):
         self.json_variant = json_variant
         # save the configuration filepath
         self.test_variant_filepath = test_variant_filepath
+        #
+        self.new_test_variant_filepath_list = [test_variant_filepath]
+
+        # build the vhdl test name
+        key_test_name, key_test_id = self.json_key_path.split('/')
+        variant_filename = Path(test_variant_filepath).name
+        self.vhdl_test_name = "test_name: "+key_test_name+', test_id: '+'{0:04d}'.format(int(key_test_id))+', variant: '+variant_filename
+
+        return None
+
+    def add_test_variant_filepath(self, filepath_p):
+        """
+        This method set the json test_variant filepath and get its dictionary
+        :param filepath_p: (string) filepath
+        :return: None
+        """
+
+        test_variant_filepath = filepath_p
+        display_obj = self.display_obj
+        level0 = self.level
+        level1 = level0 + 1
+
+        if self.verbosity > 0:
+            msg0 = "VunitConf.set_test_variant_filepath: Process Configuration File"
+            display_obj.display_title(msg_p=msg0, level_p=level0)
+
+            msg0 = 'test_variant_filepath=' + test_variant_filepath
+            display_obj.display(msg_p=msg0, level_p=level1)
+
+        ################################################
+        # Extract data from the configuration json file
+        ################################################
+        # Opening JSON file
+        with open(test_variant_filepath, 'r') as fid_in:
+            # returns JSON object as
+            # a dictionary
+            json_variant = json.load(fid_in)
+
+        # save the json dictionary
+        self.json_variant = json_variant
+        # save the configuration filepath
+        self.test_variant_filepath = test_variant_filepath
+        #
+        self.new_test_variant_filepath_list.append(test_variant_filepath)
+
+        # build the vhdl test name
+        key_test_name, key_test_id = self.json_key_path.split('/')
+        variant_filename = Path(test_variant_filepath).name
+        self.vhdl_test_name = "test_name: "+key_test_name+', test_id: '+'{0:04d}'.format(int(key_test_id))+', variant: '+variant_filename
+
         return None
 
     def _extract_unit_test_param_from_json(self):
@@ -183,24 +242,21 @@ class VunitConf(VunitUtils):
         json_data = self.json_data['test_section_dic']
 
         # get the test_group_name as well as the test_name
-        key_test_name, key_tb_entity_name = json_key_path.split('/')
+        key_test_name, key_test_id = json_key_path.split('/')
 
         test_list = json_data.get(key_test_name)
-        dic_tmp = {}
-        for dic in test_list:
-            tb_entity_name = dic["vunit"]['tb_entity_name']
-            if tb_entity_name == key_tb_entity_name:
-                dic_tmp = dic
-                break
+        dic_tmp   = test_list[int(key_test_id)]
+
         tb_entity_name = dic_tmp["vunit"]["tb_entity_name"]
-        tb_filename = dic_tmp["vunit"]["tb_filename"]
-        wave_filename = dic_tmp["vunit"]["wave_filename"]
+        tb_filename    = dic_tmp["vunit"]["tb_filename"]
+        wave_filename  = dic_tmp["vunit"]["wave_filename"]
         test_variant_filename_list = dic_tmp["test_variant"]["filename_list"]
         # self.tb_name = str(Path(tb_filename).stem)
         self.tb_name = tb_entity_name
         self.tb_filename = tb_filename
         self.wave_filename = wave_filename
         self.test_variant_filename_list = test_variant_filename_list
+
         return None
 
     def _build_path(self):
@@ -281,9 +337,11 @@ class VunitConf(VunitUtils):
             if library_name_p == library_obj.name:
                 found = 1
         if found == 0:
-            display_obj.display_subtitle(msg_p=library_name_p + ': Added external library', level_p=level0)
+            if self.verbosity > 0:
+                display_obj.display_subtitle(msg_p=library_name_p + ': Added external library', level_p=level0)
             VU.add_external_library(library_name=library_name_p, path=path_p)
-            display_obj.display(msg_p=path_p, level_p=level1)
+            if self.verbosity > 0:
+                display_obj.display(msg_p=path_p, level_p=level1)
 
             # build the external library
             path = path_p.replace('\\', '/')
@@ -358,8 +416,9 @@ class VunitConf(VunitUtils):
         questa_compile_lib_path = json_data['path_section_dic']['vunit_questa_compile_lib_path']["path"]
         root_path = str(Path(json_data['path_section_dic']['root_path']['path']))
 
-        display_obj.display_title(msg_p='Simulator Configuration', level_p=level0)
-        display_obj.display(msg_p='Selected Simulator: ' + name_p, level_p=level1)
+        if self.verbosity > 0:
+            display_obj.display_title(msg_p='Simulator Configuration', level_p=level0)
+            display_obj.display(msg_p='Selected Simulator: ' + name_p, level_p=level1)
         # build environment variable for the VUNIT library
         if name_p == 'modelsim':
             os.environ['VUNIT_SIMULATOR'] = 'modelsim'
@@ -377,17 +436,18 @@ class VunitConf(VunitUtils):
             display_obj.display(msg_p=msg0, level_p=level1, color_p='red')
             return -1
 
-        msg0 = 'Set the environment variables:'
-        display_obj.display(msg_p=msg0, level_p=level1)
+        if self.verbosity > 0:
+            msg0 = 'Set the environment variables:'
+            display_obj.display(msg_p=msg0, level_p=level1)
 
-        msg0 = 'VUNIT_SIMULATOR = ' + os.environ['VUNIT_SIMULATOR']
-        display_obj.display(msg_p=msg0, level_p=level2)
+            msg0 = 'VUNIT_SIMULATOR = ' + os.environ['VUNIT_SIMULATOR']
+            display_obj.display(msg_p=msg0, level_p=level2)
 
-        msg0 = 'VUNIT_MODELSIM_PATH = ' + os.environ['VUNIT_MODELSIM_PATH']
-        display_obj.display(msg_p=msg0, level_p=level2)
+            msg0 = 'VUNIT_MODELSIM_PATH = ' + os.environ['VUNIT_MODELSIM_PATH']
+            display_obj.display(msg_p=msg0, level_p=level2)
 
-        msg0 = 'VUNIT_MODELSIM_INI = ' + os.environ['VUNIT_MODELSIM_INI']
-        display_obj.display(msg_p=msg0, level_p=level2)
+            msg0 = 'VUNIT_MODELSIM_INI = ' + os.environ['VUNIT_MODELSIM_INI']
+            display_obj.display(msg_p=msg0, level_p=level2)
 
         self.simulator_name = name_p
         return 0
@@ -439,8 +499,9 @@ class VunitConf(VunitUtils):
         library_name_list.append('unimacro_ver')
         library_name_list.append('unifast')
         library_name_list.append('secureip')
-        msg0 = 'External compiled Xilinx library: ' + basepath
-        display_obj.display_title(msg_p=msg0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = 'External compiled Xilinx library: ' + basepath
+            display_obj.display_title(msg_p=msg0, level_p=level0)
         for library_name in library_name_list:
             path = str(Path(basepath, library_name))
             self._add_external_library(library_name_p=library_name, path_p=path, level_p=level1)
@@ -477,13 +538,14 @@ class VunitConf(VunitUtils):
         filepath_list = filepath_list_p
         level0 = self.get_indentation_level(level_p=level_p)
         level1 = level0 + 1
-
-        display_obj.display_title(msg_p=msg + ' Compilation (library_name:version:path)', level_p=level0)
+        if self.verbosity > 0:
+            display_obj.display_title(msg_p=msg + ' Compilation (library_name:version:path)', level_p=level0)
         for filepath in filepath_list:
             file_tmp = VU.add_source_file(filepath, vhdl_standard=version, library_name=library_name)
             path = str(Path(file_tmp.name).resolve())
             msg0 = library_name + ':' + version + ":" + path
-            display_obj.display(msg_p=msg0, level_p=level1)
+            if self.verbosity > 0:
+                display_obj.display(msg_p=msg0, level_p=level1)
 
             # build the external library
             suffix = Path(filepath).suffix
@@ -957,24 +1019,28 @@ class VunitConf(VunitUtils):
         base_path = base_path_dic['wave_path']
 
         extension = str(Path(filename).suffix)
-        display_obj.display_title(msg_p='Set the Simulator Waveform', level_p=level0)
+        if self.verbosity > 0:
+            display_obj.display_title(msg_p='Set the Simulator Waveform', level_p=level0)
         if extension in ['.do']:
             obj = FilepathListBuilder()
             obj.set_file_extension(file_extension_list_p=['.do'])
             filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename)
             if filepath is None:
-                msg0 = 'No Waveform'
-                display_obj.display(msg_p=msg0, level_p=level1)
+                if self.verbosity > 0:
+                    msg0 = 'No Waveform'
+                    display_obj.display(msg_p=msg0, level_p=level1)
             else:
                 # set Linux separator
                 if simulator_name is None:
-                    msg0 = "ERROR: VunitConf.set_waveform: The set_vunit_simulator method should be called before"
-                    display_obj.display(msg_p=msg0, level_p=level1)
+                    if self.verbosity > 0:
+                        msg0 = "ERROR: VunitConf.set_waveform: The set_vunit_simulator method should be called before"
+                        display_obj.display(msg_p=msg0, level_p=level1)
                 elif simulator_name in ['modelsim', 'questa']:
                     filepath = filepath.replace('\\', '/')
                     VU.set_sim_option('modelsim.init_file.gui', filepath)
-                    msg0 = 'Enable the Waveform (linux separator mandatory): ' + filepath
-                    display_obj.display(msg_p=msg0, level_p=level1)
+                    if self.verbosity > 0:
+                        msg0 = 'Enable the Waveform (linux separator mandatory): ' + filepath
+                        display_obj.display(msg_p=msg0, level_p=level1)
                 else:
                     msg0 = "ERROR: VunitConf.set_waveform: isn't defined for simulator other than modelsim, questa"
                     display_obj.display(msg_p=msg0, level_p=level1)
@@ -982,8 +1048,9 @@ class VunitConf(VunitUtils):
 
         else:
             self.wave_filepath = None
-            msg0 = 'No Waveform'
-            display_obj.display(msg_p=msg0, level_p=level1)
+            if self.verbosity > 0:
+                msg0 = 'No Waveform'
+                display_obj.display(msg_p=msg0, level_p=level1)
         return None
 
     def get_waveform(self, level_p=None):
@@ -1004,7 +1071,8 @@ class VunitConf(VunitUtils):
 
         display_obj = self.display_obj
         level0 = self.get_indentation_level(level_p=level_p)
-        display_obj.display_title(msg_p='Get the Simulator Waveform', level_p=level0)
+        if self.verbosity > 0:
+            display_obj.display_title(msg_p='Get the Simulator Waveform', level_p=level0)
         return self.wave_filepath
 
     def get_testbench_name(self):
@@ -1037,11 +1105,12 @@ class VunitConf(VunitUtils):
         tb_obj = self.tb_obj
         level0 = self.get_indentation_level(level_p=level_p)
 
-        str0 = "VunitConf.get_testbench"
-        display_obj.display_title(msg_p=str0, level_p=level0)
+        if self.verbosity > 0:
+            str0 = "VunitConf.get_testbench"
+            display_obj.display_title(msg_p=str0, level_p=level0)
 
         if tb_obj is None:
-            msg0 = 'ERROR: call the compile_tb method before'
+            msg0 = 'VunitConf.get_testbench: KO: call the compile_tb method before'
             display_obj.display(msg_p=msg0, level_p=level0, color_p='red')
             return None
         else:
@@ -1071,17 +1140,19 @@ class VunitConf(VunitUtils):
         level1 = level0 + 1
         level2 = level0 + 2
 
-        str0 = "VunitConf.get_test_variant_filepath"
-        display_obj.display_title(msg_p=str0, level_p=level0)
-        str0 = 'Search in base_path=' + base_path
-        display_obj.display(msg_p=str0, level_p=level1)
+        if self.verbosity > 0:
+            str0 = "VunitConf.get_test_variant_filepath"
+            display_obj.display_title(msg_p=str0, level_p=level0)
+            str0 = 'Search in base_path=' + base_path
+            display_obj.display(msg_p=str0, level_p=level1)
 
         obj = FilepathListBuilder()
         obj.set_file_extension(file_extension_list_p=['.json'])
         filepath_list = []
         for filename in filename_list:
-            str0 = 'Searched filename=' + filename
-            display_obj.display(msg_p=str0, level_p=level2)
+            if self.verbosity > 0:
+                str0 = 'Searched filename=' + filename
+                display_obj.display(msg_p=str0, level_p=level2)
             filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
             filepath_list.append(filepath)
 
@@ -1110,17 +1181,19 @@ class VunitConf(VunitUtils):
         level1 = level0 + 1
         level2 = level0 + 2
 
-        str0 = "VunitConf.get_ram_filepath"
-        display_obj.display_title(msg_p=str0, level_p=level0)
-        str0 = 'Search in base_path=' + base_path
-        display_obj.display(msg_p=str0, level_p=level1)
+        if self.verbosity > 0:
+            str0 = "VunitConf.get_ram_filepath"
+            display_obj.display_title(msg_p=str0, level_p=level0)
+            str0 = 'Search in base_path=' + base_path
+            display_obj.display(msg_p=str0, level_p=level1)
 
         obj = FilepathListBuilder()
         obj.set_file_extension(file_extension_list_p=['.mem'])
         filepath_list = []
         for filename in filename_list_p:
-            str0 = 'Searched filename=' + filename
-            display_obj.display(msg_p=str0, level_p=level2)
+            if self.verbosity > 0:
+                str0 = 'Searched filename=' + filename
+                display_obj.display(msg_p=str0, level_p=level2)
             filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
             filepath_list.append(filepath)
 
@@ -1156,15 +1229,17 @@ class VunitConf(VunitUtils):
         # get file extension
         ext = str(Path(filename_p).suffix)
 
-        str0 = "VunitConf.get_data_filepath"
-        display_obj.display_title(msg_p=str0, level_p=level0)
-        str0 = 'Search in base_path=' + base_path
-        display_obj.display(msg_p=str0, level_p=level1)
+        if self.verbosity > 0:
+            str0 = "VunitConf.get_data_filepath"
+            display_obj.display_title(msg_p=str0, level_p=level0)
+            str0 = 'Search in base_path=' + base_path
+            display_obj.display(msg_p=str0, level_p=level1)
 
         obj = FilepathListBuilder()
         obj.set_file_extension(file_extension_list_p=[ext])
-        str0 = 'Searched filename=' + filename_p
-        display_obj.display(msg_p=str0, level_p=level2)
+        if self.verbosity > 0:
+            str0 = 'Searched filename=' + filename_p
+            display_obj.display(msg_p=str0, level_p=level2)
         filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename_p, level_p=level2)
 
         return filepath
@@ -1197,8 +1272,9 @@ class VunitConf(VunitUtils):
         level0 = self.level
         level1 = level0 + 1
 
-        str0 = "VunitConf.pre_config"
-        display_obj.display_title(msg_p=str0, level_p=level0)
+        if self.verbosity > 0:
+            str0 = "VunitConf.pre_config"
+            display_obj.display_title(msg_p=str0, level_p=level0)
 
         ###############################
         # create directories (if not exist) for the VHDL testbench

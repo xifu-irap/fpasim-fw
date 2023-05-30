@@ -164,8 +164,8 @@ if __name__ == '__main__':
     help0 = 'Specify the verbosity level. Possible values (uint): 0 to 2'
     cli.parser.add_argument('--verbosity', default=0,choices = [0,1,2], type = int, help=help0)
 
-    help0 = 'Specify the json key path: test_name/tb_entity_name (see the launch_sim_processed.json file)'
-    cli.parser.add_argument('--json_key_path', default='tb_tes_top_test_variant00/tb_tes_top',help=help0)
+    help0 = 'Specify the json key path: test_name/test_id with test_name: name of the test and test_id: test index of the test list defined in test_name (see the launch_sim_processed.json file)'
+    cli.parser.add_argument('--json_key_path', default='tb_tes_top_test_variant00/0',help=help0)
 
     args = cli.parse_args()
 
@@ -174,6 +174,11 @@ if __name__ == '__main__':
     gui_mode      = args.gui_mode
     verbosity     = args.verbosity
     json_key_path = args.json_key_path
+
+    ###############################################
+    # extract parameters which uniquely identify the test
+    ###############################################
+    key_test_name, key_id = json_key_path.split('/')
 
     ###########################################################
     # When this script is called by an another python script with the subprocess function,
@@ -192,8 +197,9 @@ if __name__ == '__main__':
     level1 = 1
     level2 = 2
     obj_display = Display()
-    msg0 = 'Start Python Script: '+__file__
-    obj_display.display_title(msg_p=msg0,level_p=0)
+    if verbosity > 0:
+        msg0 = 'Start Python Script: '+__file__
+        obj_display.display_title(msg_p=msg0,level_p=0)
 
     #####################################################
     # Order matter:
@@ -309,37 +315,40 @@ if __name__ == '__main__':
 
     # loop on all test variant files
     for test_variant_filepath in test_variant_filepath_list :
-
-        str0 = 'Start the Test'
-        obj_display.display_title(msg_p=str0, level_p=level1)
-        str0 = 'test_variant_filepath='+test_variant_filepath   
-        obj_display.display(msg_p=str0, level_p=level2)
-        str0 = 'tb_name='+tb_name   
-        obj_display.display(msg_p=str0, level_p=level2)
+        if verbosity > 0:
+            str0 = 'Start the Test'
+            obj_display.display_title(msg_p=str0, level_p=level1)
+            str0 = 'test_variant_filepath='+test_variant_filepath   
+            obj_display.display(msg_p=str0, level_p=level2)
+            str0 = 'tb_name='+tb_name   
+            obj_display.display(msg_p=str0, level_p=level2)
 
         variant_filename = str(Path(test_variant_filepath).stem)
 
-        name = variant_filename
-        test_name = tb_name
+        # build the output directory name
+        dir_out_name = key_test_name + '.test_id_' +'{0:04d}'.format(int(key_id)) + '.' + variant_filename
         
         ####################################################################
         # generate the input command/data files and others actions before launching the simulator
         ####################################################################
         obj.set_indentation_level(level_p= level1)
-        obj.set_test_variant_filepath(filepath_p= test_variant_filepath)
+        obj.add_test_variant_filepath(filepath_p= test_variant_filepath)
         obj.set_mif_files(filepath_list_p=ram_filepath_list)
 
         # get the vhdl testbench generic parameters.
+        # => to be updated, this function must be called after the set_test_variant_filepath/add_test_variant_filepath functions
         generic_dic = obj.get_generic_dic()
         #####################################################
         # Mandatory: The simulator modelsim/Questa wants generics filepaths in the Linux format
         #####################################################
         #tb.set_attribute(".requirement-117", None)
         tb.add_config(
-                      name=test_name,
+                      name=dir_out_name,
                       pre_config=obj.pre_config,
                       generics = generic_dic
                         )
 
-
+    # should be:
+    #   . outside the loop on the test_variant_filepath if add_test_variant_filepath is called
+    #   . inside the loop on the test_variant_filepath if set_test_variant_filepath is called
     obj.main()

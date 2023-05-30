@@ -30,6 +30,7 @@
 #    
 #    Note:
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -72,6 +73,9 @@ class TesTopDataGen(VunitConf):
         # separator of the *.csv file
         self.csv_separator = ';'
 
+        # count the number of pre_config call
+        self.index = 0
+
     def get_generic_dic(self):
         """
         Get the testbench vhdl generic parameters.
@@ -96,6 +100,7 @@ class TesTopDataGen(VunitConf):
         ram2_verbosity = json_variant['ram2']['generic']['verbosity']
 
         dic = {}
+        dic['g_TEST_NAME'] = self.vhdl_test_name
         dic['g_NB_PIXEL_BY_FRAME'] = int(nb_pixel_by_frame)
         dic['g_NB_FRAME_BY_PULSE'] = int(nb_frame_by_pulse)
         dic['g_RAM1_CHECK'] = bool(ram1_check)
@@ -104,12 +109,14 @@ class TesTopDataGen(VunitConf):
         dic['g_RAM2_VERBOSITY'] = ram2_verbosity
         return dic
 
-    def _run(self, tb_input_base_path_p, tb_output_base_path_p):
+    def _run(self,test_variant_filepath_p, tb_input_base_path_p, tb_output_base_path_p):
         """
         Generate the VHDL testbench output files.
 
         Parameters
         ----------
+        test_variant_filepath_p: str
+            filepath to the test_variant json file.
         tb_input_base_path_p: str
             base path of the testbench VHDL input files
         tb_output_base_path_p: str
@@ -122,20 +129,29 @@ class TesTopDataGen(VunitConf):
         """
         tb_input_base_path = tb_input_base_path_p
         tb_output_base_path = tb_output_base_path_p
-        test_variant_filepath = self.test_variant_filepath
+        test_variant_filepath = test_variant_filepath_p
         display_obj = self.display_obj
         level0 = self.level
         level1 = level0 + 1
         level2 = level0 + 2
         verbosity = self.verbosity
-        json_variant = self.json_variant
         csv_separator = self.csv_separator
+
+        ################################################
+        # Extract data from the configuration json file
+        ################################################
+        # Opening JSON file
+        with open(test_variant_filepath, 'r') as fid_in:
+            # returns JSON object as
+            # a dictionary
+            json_variant = json.load(fid_in)
 
         ########################################################
         # Generate the vhdl testbench input valid sequence files
         ########################################################
-        msg0 = 'TesTopDataGen._run: Generate the testbench input valid sequence files'
-        display_obj.display_subtitle(msg_p=msg0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = 'TesTopDataGen._run: Generate the testbench input valid sequence files'
+            display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         dic_sequence = []
         dic_sequence.append(json_variant["register"]["sequence"])
@@ -165,14 +181,16 @@ class TesTopDataGen(VunitConf):
                              time_shift_p=time_shift)
             seq.save(filepath_p=filepath, csv_separator_p=csv_separator)
 
-            msg0 = 'filepath=' + filepath
-            display_obj.display(msg_p=msg0, level_p=level1)
+            if self.verbosity > 0:
+                msg0 = 'filepath=' + filepath
+                display_obj.display(msg_p=msg0, level_p=level1)
 
         ########################################################
         # Generate the VHDL testbench input register file
         ########################################################
-        msg0 = 'TesTopDataGen._run: Generate the testbench input register file'
-        display_obj.display_subtitle(msg_p=msg0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = 'TesTopDataGen._run: Generate the testbench input register file'
+            display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         filename = json_variant["register"]["value"]["filename"]
         nb_sample_by_pixel = json_variant["register"]["value"]["nb_sample_by_pixel"]
@@ -204,14 +222,16 @@ class TesTopDataGen(VunitConf):
             fid.write(csv_separator)
             fid.write(str(nb_samples_by_frame_tmp))
 
-        msg0 = 'filepath=' + filepath
-        display_obj.display(msg_p=msg0, level_p=level1)
+        if self.verbosity > 0:
+            msg0 = 'filepath=' + filepath
+            display_obj.display(msg_p=msg0, level_p=level1)
 
         ########################################################
         # Generate the vhdl testbench input command file
         ########################################################
-        msg0 = 'TesTopDataGen._run: Generate the testbench input command file'
-        display_obj.display_subtitle(msg_p=msg0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = 'TesTopDataGen._run: Generate the testbench input command file'
+            display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         filename = json_variant["cmd"]["value"]["filename"]
         cmd_pulse_height_list = json_variant["cmd"]["value"]["pulse_height_list"]
@@ -231,8 +251,7 @@ class TesTopDataGen(VunitConf):
             fid.write('\n')
             index_max = len(cmd_pulse_height_list) - 1
             index = 0
-            for pulse_height, pixel_id, time_shift in zip(cmd_pulse_height_list, cmd_pixel_id_list,
-                                                          cmd_time_shift_list):
+            for pulse_height, pixel_id, time_shift in zip(cmd_pulse_height_list, cmd_pixel_id_list,cmd_time_shift_list):
                 fid.write(str(pulse_height))
                 fid.write(csv_separator)
                 fid.write(str(pixel_id))
@@ -243,14 +262,16 @@ class TesTopDataGen(VunitConf):
 
                 index += 1
 
-        msg0 = 'filepath=' + filepath
-        display_obj.display(msg_p=msg0, level_p=level1)
+        if self.verbosity > 0:
+            msg0 = 'filepath=' + filepath
+            display_obj.display(msg_p=msg0, level_p=level1)
 
         ########################################################
         # Copy the vhdl testbench input RAM configuration files
         ########################################################
-        msg0 = 'TesTopDataGen._run: Copy the testbench input RAM configuration files'
-        display_obj.display_subtitle(msg_p=msg0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = 'TesTopDataGen._run: Copy the testbench input RAM configuration files'
+            display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         dic_sequence = []
         dic_sequence.append(json_variant["ram1"])
@@ -265,26 +286,26 @@ class TesTopDataGen(VunitConf):
             output_filepath = str(Path(tb_input_base_path, output_filename))
             input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
 
-            msg0 = 'from: ' + input_filepath
-            display_obj.display(msg_p=msg0, level_p=level2)
-            msg0 = 'to: ' + output_filepath
-            display_obj.display(msg_p=msg0, level_p=level2)
+            if self.verbosity > 0:
+                msg0 = 'from: ' + input_filepath
+                display_obj.display(msg_p=msg0, level_p=level2)
+                msg0 = 'to: ' + output_filepath
+                display_obj.display(msg_p=msg0, level_p=level2)
 
             shutil.copyfile(input_filepath, output_filepath)
 
-            # save the ram content
-            # ram_filepath_dic[name] = output_filepath
-
-        msg0 = 'TesTopDataGen._run: Process RAM configuration files for the computation on the datapath'
-        display_obj.display_subtitle(msg_p=msg0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = 'TesTopDataGen._run: Process RAM configuration files for the computation on the datapath'
+            display_obj.display_subtitle(msg_p=msg0, level_p=level0)
         # process Memory files for the datapath computation
         for dic in dic_sequence:
             input_filename = dic["value"]['input_filename_datapath']
             name = dic["generic"]['name']
             input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
 
-            msg0 = 'used files for the datapath computation: ' + input_filepath
-            display_obj.display(msg_p=msg0, level_p=level2)
+            if self.verbosity > 0:
+                msg0 = 'used files for the datapath computation: ' + input_filepath
+                display_obj.display(msg_p=msg0, level_p=level2)
 
             shutil.copyfile(input_filepath, output_filepath)
 
@@ -295,8 +316,9 @@ class TesTopDataGen(VunitConf):
         ########################################################
         # compute the vhdl testbench reference output values
         ########################################################
-        msg0 = 'TesTopDataGen._run: compute the testbench reference output values'
-        display_obj.display_subtitle(msg_p=msg0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = 'TesTopDataGen._run: compute the testbench reference output values'
+            display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         # adc: compute parameters
         ########################################################
@@ -338,8 +360,9 @@ class TesTopDataGen(VunitConf):
 
         # Generate the vhdl testbench reference output file
         ########################################################
-        msg0 = 'TesTopDataGen._run: Generate the testbench reference output file'
-        display_obj.display_subtitle(msg_p=msg0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = 'TesTopDataGen._run: Generate the testbench reference output file'
+            display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         output_filename = json_variant["model"]["value"]["output_filename"]
         output_filepath = str(Path(tb_input_base_path_p, output_filename))
@@ -362,13 +385,15 @@ class TesTopDataGen(VunitConf):
                 if index != index_max:
                     fid.write('\n')
 
-        msg0 = 'filepath= ' + output_filepath
-        display_obj.display(msg_p=msg0, level_p=level1)
+        if self.verbosity > 0:
+            msg0 = 'filepath= ' + output_filepath
+            display_obj.display(msg_p=msg0, level_p=level1)
 
         # Generate the vhdl testbench input data file
         ########################################################
-        msg0 = 'TesTopDataGen._run: Generate the testbench input data file'
-        display_obj.display_subtitle(msg_p=msg0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = 'TesTopDataGen._run: Generate the testbench input data file'
+            display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         filename = json_variant["data"]["value"]["filename"]
         filepath = str(Path(tb_input_base_path, filename))
@@ -383,8 +408,9 @@ class TesTopDataGen(VunitConf):
                 if index != index_max:
                     fid.write('\n')
 
-        msg0 = 'filepath=' + filepath
-        display_obj.display(msg_p=msg0, level_p=level1)
+        if self.verbosity > 0:
+            msg0 = 'filepath=' + filepath
+            display_obj.display(msg_p=msg0, level_p=level1)
 
         return None
 
@@ -406,15 +432,19 @@ class TesTopDataGen(VunitConf):
 
         """
         display_obj = self.display_obj
-        test_variant_filepath = self.test_variant_filepath
         verbosity = self.verbosity
+        test_variant_filepath = self.new_test_variant_filepath_list[self.index]
+        self.index += 1
 
         output_path = output_path
         level0 = self.level
         level1 = level0 + 1
 
-        str0 = "TesTopDataGen.pre_config"
-        display_obj.display_title(msg_p=str0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = ""
+            display_obj.display(msg_p=msg0, level_p=level0)
+            str0 = "TesTopDataGen.pre_config"
+            display_obj.display_title(msg_p=str0, level_p=level0)
 
         ###############################
         # create directories (if not exist) for the VHDL testbench
@@ -431,14 +461,17 @@ class TesTopDataGen(VunitConf):
 
         ##########################################################
         # generate files
-        ##########################################################    
-        self._run(tb_input_base_path_p=tb_input_base_path, tb_output_base_path_p=tb_output_base_path)
+        ##########################################################
+        self._run(test_variant_filepath_p=test_variant_filepath, tb_input_base_path_p=tb_input_base_path, tb_output_base_path_p=tb_output_base_path)
+    
+        if self.verbosity > 0:
+            str0 = "TesTopDataGen.pre_config: Simulation transcript"
+            display_obj.display_title(msg_p=str0, level_p=level0)
+            str0 = test_variant_filepath 
+            display_obj.display(msg_p=str0, level_p=level1)
 
-        str0 = "TesTopDataGen.pre_config: Simulation transcript"
-        display_obj.display_title(msg_p=str0, level_p=level0)
-
-        str0 = ""
-        display_obj.display(msg_p=str0, level_p=level0)
+            str0 = ""
+            display_obj.display(msg_p=str0, level_p=level0)
 
         # return True is mandatory for Vunit
         return True

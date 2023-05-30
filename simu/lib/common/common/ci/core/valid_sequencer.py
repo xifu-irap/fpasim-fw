@@ -202,7 +202,8 @@ class ValidSequencer:
             fid.write(str(time_shift))
             fid.write('\n')
 
-        if verbosity >= 1:
+        if verbosity > 2:
+            print('')
             print('*' * 20)
             print('Sequencer : ' + self._name)
             print('filepath = {0}'.format(filepath))

@@ -24,12 +24,13 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details
-#    This python script defines the SystemFpasimTopDataGen class.
-#    This class defines methods to generate data for the system_fpasim_top dic_field bench
+#
+#    This SystemFpasimTopDataGen class provides methods for the run_tb_tes_top.py.
+#    By processing the tb_tes_top_XXXX.json file, it can generate the input/output files expected by the VHDL tb_tes_top testbench.
 #    
 #    Note:
-#       . This script is aware of the json configuration file
 #       . This script was tested with python 3.10
+#
 # -------------------------------------------------------------------------------------------------------------
 
 # standard library
@@ -37,7 +38,7 @@ import json
 import os
 import shutil
 import copy
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 
 # user library
 from .utils import Display
@@ -56,19 +57,24 @@ from .vunit_conf import VunitConf
 
 class SystemFpasimTopDataGen(VunitConf):
     """
-        This class defines methods to generate data for the VHDL system_fpasim_top testbench file.
-        Note:
-            Method name starting by '_' are local to the class (ex:def _toto(...)).
-            It should not be usually used by the user
+        This class provides methods for the run_tb_system_fpasim_top.py and run_tb_fpga_system_fpasim_top.py.
+        By processing the tb_system_fpasim_top_XXXX.json file, it can generate the input/output files expected by the VHDL tb_system_fpasim_top testbench.
     """
 
     def __init__(self, json_filepath_p, json_key_path_p):
         """
-        This method initializes the class instance
+        This method initializes the class instance.
+
+        Parameters
+        ----------
+        json_filepath_p: str
+            json filepath
+        json_key_path_p: str
+            json keys to get a specific individual test
         """
         super().__init__(json_filepath_p=json_filepath_p, json_key_path_p=json_key_path_p)
 
-        # separator of *.csv file
+        # separator of the *.csv file
         self.csv_separator = ';'
 
         # register field
@@ -98,34 +104,26 @@ class SystemFpasimTopDataGen(VunitConf):
         self.cmt_list = []
         self.data_width = 32  # number max of bit of a register
 
+        # count the number of pre_config call
+        self.index = 0
+
     def get_generic_dic(self):
         """
-        Get the testbench vhdl generic parameters
-        Note: Vunit set the testbench vhdl generic parameters with a python
-        dictionary where key name are the VHDL generic parameter names
-        :return: (dictionary)
+        Get the testbench vhdl generic parameters.
+
+        Note:
+            The Vunit library set the testbench vhdl generic parameters with a python
+            dictionary where key name are the VHDL generic names.
+
+        Returns: dic
+        -------
+            dictionnary of testbench VHDL generic values.
         """
         json_variant = self.json_variant
 
-        # TODO
-
-        # nb_pixel_by_frame = json_variant['data']['value']['nb_pixel_by_frame']
-
-        # ram1_check = json_variant['ram1']['generic']['check']
-        # ram1_verbosity = json_variant['ram1']['generic']['verbosity']
-
-        # ram2_check = json_variant['ram2']['generic']['check']
-        # ram2_verbosity = json_variant['ram2']['generic']['verbosity']
-        # opal_addr_pipe_in = json_variant['RAM']['wr']['opal_kelly_addr']
-        # opal_addr_pipe_out = json_variant['RAM']['rd']['opal_kelly_addr']
-
         dic = {}
-        # dic['g_NB_PIXEL_BY_FRAME'] = int(nb_pixel_by_frame)
-        # dic['g_RAM1_CHECK'] = bool(ram1_check)
-        # dic['g_RAM1_VERBOSITY'] = ram1_verbosity
-        # dic['g_RAM2_CHECK'] = bool(ram2_check)
-        # dic['g_OPAL_ADDR_PIPE_IN'] = int(opal_addr_pipe_in,16)
-        # dic['g_OPAL_ADDR_PIPE_OUT'] = int(opal_addr_pipe_out,16)
+        dic['g_TEST_NAME'] = self.vhdl_test_name
+
         return dic
 
     def _compute_reg_from_field(self, reg_def_section_dic_p, cmd_p):
@@ -205,23 +203,42 @@ class SystemFpasimTopDataGen(VunitConf):
 
         return result, dic_field
 
-    def _run(self, tb_input_base_path_p, tb_output_base_path_p):
+    def _run(self,test_variant_filepath_p, tb_input_base_path_p, tb_output_base_path_p):
         """
-        This method generates output files for the testbench
-        :param tb_input_base_path_p: (string) base path of the testbench VHDL input files
-        :param tb_output_base_path_p: (string) base path of the testbench VHDL output files
-        :return: None
+        Generate the VHDL testbench output files.
+
+        Parameters
+        ----------
+        test_variant_filepath_p: str
+            filepath to the test_variant json file.
+        tb_input_base_path_p: str
+            base path of the testbench VHDL input files
+        tb_output_base_path_p: str
+            base path of the testbench VHDL output files
+
+        Returns
+        -------
+            None
+
         """
         tb_input_base_path = tb_input_base_path_p
         tb_output_base_path = tb_output_base_path_p
-        test_variant_filepath = self.test_variant_filepath
+        test_variant_filepath = test_variant_filepath_p
         display_obj = self.display_obj
         level0 = self.level
         level1 = level0 + 1
         level2 = level0 + 2
         verbosity = self.verbosity
-        json_variant = self.json_variant
         csv_separator = self.csv_separator
+
+        ################################################
+        # Extract data from the configuration json file
+        ################################################
+        # Opening JSON file
+        with open(test_variant_filepath, 'r') as fid_in:
+            # returns JSON object as
+            # a dictionary
+            json_variant = json.load(fid_in)
 
         # get the list of command and get the output file name
         seq_dic = json_variant["command_sequence_section"]
@@ -232,18 +249,21 @@ class SystemFpasimTopDataGen(VunitConf):
         # get the register definition
         reg_def_section_dic = json_variant["register_definition_section"]
 
-        msg0 = 'output_tb_filepath=' + output_tb_filepath
-        display_obj.display(msg_p=msg0, level_p=level2)
+        if self.verbosity > 0:
+            msg0 = 'output_tb_filepath=' + output_tb_filepath
+            display_obj.display(msg_p=msg0, level_p=level2)
 
         ########################################################
-        # Generate the testbench input data file
+        # Generate the vhdl testbench input valid sequence files
         ########################################################
-        msg0 = 'SystemFpasimTopDataGen._run: ram data generation from files'
-        display_obj.display_subtitle(msg_p=msg0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = 'SystemFpasimTopDataGen._run: ram data generation from files'
+            display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         for cmd in cmd_list:
-            msg0 = 'SystemFpasimTopDataGen._run: Generate the cmd: ' + cmd
-            display_obj.display(msg_p=msg0, level_p=level1)
+            if self.verbosity > 0:
+                msg0 = 'SystemFpasimTopDataGen._run: Generate the cmd: ' + cmd
+                display_obj.display(msg_p=msg0, level_p=level1)
 
             cmd_name, mode, *value_list = cmd.split(';')
 
@@ -279,8 +299,9 @@ class SystemFpasimTopDataGen(VunitConf):
                     ref_output_tb_filepath = str(Path(tb_input_base_path, ref_output_tb_filename))
                     input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
 
-                    msg0 = 'input_filepath=' + input_filepath
-                    display_obj.display(msg_p=msg0, level_p=level2)
+                    if self.verbosity > 0:
+                        msg0 = 'input_filepath=' + input_filepath
+                        display_obj.display(msg_p=msg0, level_p=level2)
 
                     with open(input_filepath, 'r') as fid_tmp:
                         lines = fid_tmp.readlines()
@@ -405,24 +426,36 @@ class SystemFpasimTopDataGen(VunitConf):
 
     def pre_config(self, output_path):
         """
-        Define a list of actions to do before launching the simulator
-        2 actions are provided:
-            . execute a python script with a predefined set of command line arguments
-            . copy the "mif files" into the Vunit simulation director for the compatible Xilinx IP
-        Note: This method is the main entry point for the Vunit library
-        :param output_path: (string) Vunit Output Simulation Path (auto-computed by Vunit)
-        :return: boolean
+        Define a list of actions to do before launching the VHDL simulator.
+
+        Note:
+            This method is the main entry point for the Vunit library
+
+        Parameters
+        ----------
+        output_path: str
+            Vunit Output Simulation Path (auto-computed by the Vunit library)
+
+        Returns
+        -------
+            bool
+
         """
         display_obj = self.display_obj
-        test_variant_filepath = self.test_variant_filepath
         verbosity = self.verbosity
+        if self.new_test_variant_filepath_list != []:
+            test_variant_filepath = self.new_test_variant_filepath_list[self.index]
+        self.index += 1
 
         output_path = output_path
         level0 = self.level
         level1 = level0 + 1
 
-        str0 = "SystemFpasimTopDataGen.pre_config"
-        display_obj.display_title(msg_p=str0, level_p=level0)
+        if self.verbosity > 0:
+            msg0 = ""
+            display_obj.display(msg_p=msg0, level_p=level0)
+            str0 = "SystemFpasimTopDataGen.pre_config"
+            display_obj.display_title(msg_p=str0, level_p=level0)
 
         ###############################
         # create directories (if not exist) for the VHDL testbench
@@ -437,23 +470,20 @@ class SystemFpasimTopDataGen(VunitConf):
         if self.filepath_list_mif is not None:
             self.copy_mif_files(output_path_p=output_path, level_p=level1)
 
-        ############################################
-        # Generate Modelsim/Questa compilation file: *.do
-        #   This file is for example purpose
-        # do_filepath = str(Path(output_path,'fpasim_compile.do'))
-        # self.save_do_file(filepath_p=do_filepath)
-
         ##########################################################
         # generate files
         ##########################################################
-        if self.json_variant is not None:    
-            self._run(tb_input_base_path_p=tb_input_base_path, tb_output_base_path_p=tb_output_base_path)
+        if self.new_test_variant_filepath_list != []:   
+            self._run(test_variant_filepath_p=test_variant_filepath, tb_input_base_path_p=tb_input_base_path, tb_output_base_path_p=tb_output_base_path)
+    
+        if self.verbosity > 0:
+            str0 = "SystemFpasimTopDataGen.pre_config: Simulation transcript"
+            display_obj.display_title(msg_p=str0, level_p=level0)
+            str0 = test_variant_filepath 
+            display_obj.display(msg_p=str0, level_p=level1)
 
-        str0 = "SystemFpasimTopDataGen.pre_config: Simulation transcript"
-        display_obj.display_title(msg_p=str0, level_p=level0)
-
-        str0 = ""
-        display_obj.display(msg_p=str0, level_p=level0)
+            str0 = ""
+            display_obj.display(msg_p=str0, level_p=level0)
 
         # return True is mandatory for Vunit
         return True
