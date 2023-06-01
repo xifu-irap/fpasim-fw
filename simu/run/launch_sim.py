@@ -92,7 +92,7 @@ if __name__ == '__main__':
     parser.add_argument('--simulator', '-s', default='questa', choices=['modelsim', 'questa'],
                         help='Specify the VHDL simulator to use (must be VHDL 2008 compatible).')
     # add an optional argument with a list of values
-    parser.add_argument('--test_name_list', '-t', default=['tb_system_fpasim_top_test_variant00'], nargs='*',
+    parser.add_argument('--test_name_list', '-t', default=['tb_system_fpasim_top_test_variant_func00'], nargs='*',
                         help='define a test name or  list of test names (separated by space) to simulate. The test_section_dic of the launch_sim_processed.json file defines the available test name')
     # add an optional argument 
     parser.add_argument('--gui_mode', default='False', choices=['True', 'False'],
@@ -101,8 +101,13 @@ if __name__ == '__main__':
     parser.add_argument('--verbosity','-v', default=0, choices=[0, 1, 2], type=int,
                         help='Specify the verbosity level. Possible values (uint): 0 to 2')
 
-    args = parser.parse_args()
+    args_known = parser. parse_known_args()
+    # get arguments defined in this file.
+    args = args_known[0]
+    # get arguments not defined in this file in order to pass them to the called script.
+    args_unknown = args_known[1]
 
+ 
     simulator      = args.simulator
     test_name_list = args.test_name_list
     gui_mode       = args.gui_mode
@@ -217,6 +222,11 @@ if __name__ == '__main__':
             # specify if the gui_mode mode of the simulator is activated
             cmd.append('--gui_mode')
             cmd.append(gui_mode)
+
+            # pass arguments not defined in this file.
+            for str0 in args_unknown:
+                cmd.append(str0)
+          
             # identify the test to run
             cmd.append('--json_key_path')
             cmd.append(json_key_path)
