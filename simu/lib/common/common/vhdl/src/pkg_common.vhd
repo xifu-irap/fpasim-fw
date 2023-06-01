@@ -56,13 +56,16 @@ package pkg_common is
   function pkg_to_integer(s : std_logic) return integer;
 
   ---------------------------------------------------------------------
-  -- This function generates a integer random_by_range value
+  -- This procedure generates a integer random_by_range value
   --  between i_min_value and i_max_value
   ---------------------------------------------------------------------
-  function pkg_random_by_range(
+  procedure pkg_random_by_range(
     constant i_min_value : in integer;
-    constant i_max_value : in integer
-  ) return integer;
+    constant i_max_value : in integer;
+    variable v_seed1     : inout positive;
+    variable v_seed2     : inout positive;
+    variable v_result    : out integer
+  );
 
   ---------------------------------------------------------------------
   -- this function generates an uniform random value between min_value and max_value
@@ -72,7 +75,7 @@ package pkg_common is
     constant i_max_value : in integer;
     variable v_seed1     : inout positive;
     variable v_seed2     : inout positive;
-    variable v_result    : inout integer
+    variable v_result    : out integer
   );
 
   ---------------------------------------------------------------------
@@ -177,19 +180,19 @@ package body pkg_common is
   end function;
 
   ---------------------------------------------------------------------
-  -- This function generates an integer random value
+  -- This procedure generates an integer random value
   --  between i_min_value and i_max_value
   ---------------------------------------------------------------------
-  function pkg_random_by_range(
+  procedure pkg_random_by_range(
     constant i_min_value : in integer;
-    constant i_max_value : in integer
-  ) return integer is
-    variable v_rand_result : integer;
-    variable v_seed1       : positive := 10;
-    variable v_seed2       : positive := 1000;
+    constant i_max_value : in integer;
+    variable v_seed1     : inout positive;
+    variable v_seed2     : inout positive;
+    variable v_result    : out integer
+
+  ) is
   begin
-    pkg_random_uniform_by_range(i_min_value, i_max_value, v_seed1, v_seed2, v_rand_result);
-    return v_rand_result;
+    pkg_random_uniform_by_range(i_min_value, i_max_value, v_seed1, v_seed2, v_result);
   end;
 
   ---------------------------------------------------------------------
@@ -200,7 +203,7 @@ package body pkg_common is
     constant i_max_value : in integer;
     variable v_seed1     : inout positive;
     variable v_seed2     : inout positive;
-    variable v_result    : inout integer
+    variable v_result    : out integer
   ) is
     variable v_rand : real;
   begin

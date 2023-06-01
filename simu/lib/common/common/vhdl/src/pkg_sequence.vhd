@@ -168,7 +168,11 @@ package body pkg_sequence is
     variable v_tempo_neg : integer   := 0;
     variable v_valid     : std_logic := '0';
 
-    variable v_cnt_tempo : integer := 0;
+    variable v_cnt_tempo : integer := 1;
+
+    -- random generator seed
+    variable v_seed1     :  positive := 16;
+    variable v_seed2     :  positive := 32;
 
   begin
     while c_TEST loop
@@ -202,7 +206,7 @@ package body pkg_sequence is
             -- get the v_num_rising_edge_before_pulse_gen
             v_num_rising_edge_before_pulse := v_csv_file.read_integer;
 
-            if v_num_rising_edge_before_pulse < 0 then
+            if v_num_rising_edge_before_pulse <= 0 then
               v_fsm_state := E_RUN;
             else
               v_tempo_neg := v_num_rising_edge_before_pulse;
@@ -215,6 +219,7 @@ package body pkg_sequence is
 
         when E_RUN =>
 
+          v_cnt_tempo := 1;
           case v_ctrl is
             when 0 =>
               -- continuous pulse signal (infinite width)
@@ -225,8 +230,13 @@ package body pkg_sequence is
               --   a positive pulse with a width of 1 clock cycle followed by
               --   a negative pulse with a constant width defined by the min_value2 value
               v_valid     := '1';
-              v_cnt_tempo := 1;
               v_tempo_neg := v_min_value2;
+
+              if v_tempo_neg <= 1 then
+              -- be sure the negative pulse has a width of 1 clock period
+                v_tempo_neg := 1;
+              end if;
+
               v_fsm_state := E_TEMPO_NEG;
             when 2 =>
               -- constant pulse
@@ -235,14 +245,33 @@ package body pkg_sequence is
               v_valid     := '1';
               v_tempo_pos := v_min_value1;
               v_tempo_neg := v_min_value2;
-              v_fsm_state := E_TEMPO_POS;
+              
+              if v_min_value2 <= 1 then
+              -- be sure the negative pulse has a width of 1 clock period
+                v_tempo_neg := 1;
+              end if;
+
+              if v_tempo_pos <= 1 then
+              -- be sure the positive pulse has a width of 1 clock period
+              -- pas directly to the negative pulse
+                v_fsm_state := E_TEMPO_NEG;
+              else
+              -- the positive pulse has a width > 1 clock periods
+                v_tempo_pos := v_tempo_pos - 1;
+                v_fsm_state := E_TEMPO_POS;
+              end if;
+
             when 3 =>
               -- random short pulse : 
               --   a positive pulse with a width of 1 clock cycle followed by
               --   a negative pulse with a random width between the min_value2 value and the max_value2 value
               v_valid     := '1';
-              v_cnt_tempo := 1;
-              v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
+              pkg_random_by_range(v_min_value2, v_max_value2, v_seed1, v_seed2, v_tempo_neg);
+              
+              if v_tempo_neg < 1 then
+                -- be sure the negative pulse has a minimal width of 1 clock period
+                v_tempo_neg := 1;
+              end if;
               v_fsm_state := E_TEMPO_NEG;
 
             when 4 =>
@@ -250,9 +279,23 @@ package body pkg_sequence is
               --   a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
               --   a negative pulse with a width defined by a random value between v_min_value2 and v_max_value2
               v_valid     := '1';
-              v_tempo_pos := pkg_random_by_range(v_min_value1, v_max_value1);
-              v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
-              v_fsm_state := E_TEMPO_POS;
+              pkg_random_by_range(v_min_value1, v_max_value1, v_seed1, v_seed2, v_tempo_pos);
+              pkg_random_by_range(v_min_value2, v_max_value2, v_seed1, v_seed2, v_tempo_neg);
+
+              if v_tempo_neg < 1 then
+                -- be sure the negative pulse has a minimal width of 1 clock period
+                v_tempo_neg := 1;
+              end if;
+
+              if v_tempo_pos <= 1 then
+              -- be sure the positive pulse has a width of 1 clock period
+              -- pas directly to the negative pulse
+                v_fsm_state := E_TEMPO_NEG;
+              else
+              -- the positive pulse has a width > 1 clock periods
+                v_tempo_pos := v_tempo_pos - 1;
+                v_fsm_state := E_TEMPO_POS;
+              end if;
 
             when others =>
               -- continuous valid
@@ -343,7 +386,11 @@ package body pkg_sequence is
     variable v_tempo_neg : integer   := 0;
     variable v_valid     : std_logic := '0';
 
-    variable v_cnt_tempo : integer := 0;
+    variable v_cnt_tempo : integer := 1;
+    
+    -- random generator seed
+    variable v_seed1     :  positive := 16;
+    variable v_seed2     :  positive := 32;
 
   begin
     while c_TEST loop
@@ -372,7 +419,7 @@ package body pkg_sequence is
             -- get the v_num_rising_edge_before_pulse_gen
             v_num_rising_edge_before_pulse := i_num_rising_edge_before_pulse;
 
-            if v_num_rising_edge_before_pulse < 0 then
+            if v_num_rising_edge_before_pulse <= 0 then
               v_fsm_state := E_RUN;
             else
               v_tempo_neg := v_num_rising_edge_before_pulse;
@@ -385,6 +432,7 @@ package body pkg_sequence is
 
         when E_RUN =>
 
+          v_cnt_tempo := 1;
           case v_ctrl is
             when 0 =>
               -- continuous pulse signal (infinite width)
@@ -395,8 +443,13 @@ package body pkg_sequence is
               --   a positive pulse with a width of 1 clock cycle followed by
               --   a negative pulse with a constant width defined by the min_value2 value
               v_valid     := '1';
-              v_cnt_tempo := 0;
               v_tempo_neg := v_min_value2;
+
+              if v_tempo_neg <= 1 then
+              -- be sure the negative pulse has a width of 1 clock period
+                v_tempo_neg := 1;
+              end if;
+
               v_fsm_state := E_TEMPO_NEG;
             when 2 =>
               -- constant pulse
@@ -405,14 +458,33 @@ package body pkg_sequence is
               v_valid     := '1';
               v_tempo_pos := v_min_value1;
               v_tempo_neg := v_min_value2;
-              v_fsm_state := E_TEMPO_POS;
+              
+              if v_min_value2 <= 1 then
+              -- be sure the negative pulse has a width of 1 clock period
+                v_tempo_neg := 1;
+              end if;
+
+              if v_tempo_pos <= 1 then
+              -- be sure the positive pulse has a width of 1 clock period
+              -- pas directly to the negative pulse
+                v_fsm_state := E_TEMPO_NEG;
+              else
+              -- the positive pulse has a width > 1 clock periods
+                v_tempo_pos := v_tempo_pos - 1;
+                v_fsm_state := E_TEMPO_POS;
+              end if;
+
             when 3 =>
               -- random short pulse : 
               --   a positive pulse with a width of 1 clock cycle followed by
               --   a negative pulse with a random width between the min_value2 value and the max_value2 value
               v_valid     := '1';
-              v_cnt_tempo := 0;
-              v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
+              pkg_random_by_range(v_min_value2, v_max_value2, v_seed1, v_seed2, v_tempo_neg);
+              
+              if v_tempo_neg < 1 then
+               -- be sure the negative pulse has a minimal width of 1 clock period
+                v_tempo_neg := 1;
+              end if;
               v_fsm_state := E_TEMPO_NEG;
 
             when 4 =>
@@ -420,9 +492,23 @@ package body pkg_sequence is
               --   a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
               --   a negative pulse with a width defined by a random value between v_min_value2 and v_max_value2
               v_valid     := '1';
-              v_tempo_pos := pkg_random_by_range(v_min_value1, v_max_value1);
-              v_tempo_neg := pkg_random_by_range(v_min_value2, v_max_value2);
-              v_fsm_state := E_TEMPO_POS;
+              pkg_random_by_range(v_min_value1, v_max_value1, v_seed1, v_seed2, v_tempo_pos);
+              pkg_random_by_range(v_min_value2, v_max_value2, v_seed1, v_seed2, v_tempo_neg);
+
+              if v_tempo_neg < 1 then
+                -- be sure the negative pulse has a minimal width of 1 clock period
+                v_tempo_neg := 1;
+              end if;
+
+              if v_tempo_pos <= 1 then
+              -- be sure the positive pulse has a width of 1 clock period
+              -- pas directly to the negative pulse
+                v_fsm_state := E_TEMPO_NEG;
+              else
+              -- the positive pulse has a width > 1 clock periods
+                v_tempo_pos := v_tempo_pos - 1;
+                v_fsm_state := E_TEMPO_POS;
+              end if;
 
             when others =>
               -- continuous valid
@@ -433,7 +519,7 @@ package body pkg_sequence is
         when E_TEMPO_NEG =>
           v_valid := '0';
           if v_cnt_tempo = v_tempo_neg then
-            v_cnt_tempo := 0;
+            v_cnt_tempo := 1;
             v_fsm_state := E_RUN;
           else
             v_cnt_tempo := v_cnt_tempo + 1;
@@ -443,7 +529,7 @@ package body pkg_sequence is
         when E_TEMPO_POS =>
           v_valid := '1';
           if v_cnt_tempo = v_tempo_pos then
-            v_cnt_tempo := 0;
+            v_cnt_tempo := 1;
             v_fsm_state := E_TEMPO_NEG;
           else
             v_cnt_tempo := v_cnt_tempo + 1;
