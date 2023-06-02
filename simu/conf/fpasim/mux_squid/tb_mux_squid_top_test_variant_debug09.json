@@ -1,0 +1,290 @@
+{
+    "description_list": [
+        "This file was manually generated"
+    ],
+    "register": {
+        "description_list": [
+            "This section defines:",
+            "  . The parameter associated to the CONF0 register (see value section).",
+            "    . The value will be passed as generic value to the VHDL testbench"
+        ],
+        "value": {
+            "description_list": [
+                "The parameter is:",
+                "  :param inter_squid_gain (integer) : gain at the output of the mux_squid_tf ram",
+                "     This 8 bits value ([0,255]) is interpreted in the VHDL as [0; 1[ (<=> inter_squid_gain/2**8).",
+                "     Note: ",
+                "       The data width should match the pkg_regdecode/pkg_CONF0_INTER_SQUID_GAIN_WIDTH constant value"
+            ],
+            "inter_squid_gain": 223
+        }
+    },
+    "data": {
+        "description_list": [
+            "This section defines:",
+            "  . the parameters associated to the TES_CONF register (see value section).",
+            "    . Some parameters will be later processed by a python script to be fully compatible with the values expected by the VHDL code",
+            "  . additional parameters (nb_frame_by_pulse, nb_pulse) used to compute the number of input data to generate.",
+            "  . the parameters used to generate the adc_mux_squid_feedback values (from ADC).",
+            "  . the parameters used to generate the pixel_result values (from the tes module output).",
+            "  . the filename expected by the VHDL testbench (see value section).",
+            "  . how to read the file in the VHDL testbench file (see sequence section)."
+        ],
+        "value":
+
+        {
+            "description_list": [
+                "The parameters are:",
+                "  :param en (integer:0,1): 1: enable the function, 0: disable the function.",
+                "",
+                "  :param nb_pixel_by_frame (integer) : define the current number of pixels in a column",
+                "     The range is [1, 64]: 1: 1 pixel, 2: 2 pixels and so on",
+                "         Note:",
+                "         The max value (64) should match the pkg_fpasim/pkg_MUX_FACT_MAX constant",
+                "",
+                "  :param nb_sample_by_pixel (integer>1) : define the number of samples by pixels (minus 1)",
+                "     The range is [1, 64]: 1: 1 sample duration, 2: 2 samples duration and so on",
+                "         Note:",
+                "         The max value (64) should match the pkg_fpasim/pkg_NB_SAMPLE_BY_PIXEL_MAX constant",
+                "",
+                "  :param nb_frame_by_pulse (integer) : define the number of frame by pulse",
+                "     The range is [1, 2048]: 1: 1 frame, 2: 2 frame and so on",
+                "         Note:",
+                "         The max value (2048) should match the pkg_fpasim/pkg_NB_FRAME_BY_PULSE_SHAPE constant",
+                "",
+                "  :param nb_pulse (integer) : define the number of pulse to generate",
+                "     The range is [1, integer max]: 1: 1 pulse, 2: 2 pulses and so on",
+                "",
+                "  :param mux_squid/mode (integer) : define how the data is generated on the adc_mux_squid_feedback datapath",
+                "       The range is [0, 1]:",
+                "           0: incremental integer value in the range [mux_squid/min_value, mux_squid/max_value]",
+                "           1: random integer value in the range [mux_squid/min_value, mux_squid/max_value]",
+                "  :param mux_squid/min_value (integer) : minimum value on the adc_mux_squid_feedback datapath",
+                "  :param mux_squid/maximum_value (integer) : maximum value on the adc_mux_squid_feedback datapath",
+                "",
+                "  :param pixel_result/mode (integer) : define how the data is generated on the tes output path",
+                "       The range is [0, 1]:",
+                "           0: incremental integer value in the range [pixel_result/min_value, pixel_result/max_value]",
+                "           1: random integer value in the range [pixel_result/min_value, pixel_result/max_value]",
+                "  :param pixel_result/min_value (integer) : minimum value on the tes output path",
+                "  :param pixel_result/maximum_value (integer) : maximum value on the tes output path",
+                "",
+                "  :param filename (string): filename expected by the vhdl testbench.",
+                "         Note: This file is a *.csv file"
+            ],
+            "nb_sample_by_pixel": 8,
+            "nb_pixel_by_frame": 34,
+            "nb_frame_by_pulse": 2048,
+            "nb_pulse": 1,
+            "mux_squid": {
+                "mode": 1,
+                "min_value": -8192,
+                "max_value": 8191
+            },
+            "pixel_result": {
+                "mode": 1,
+                "min_value": 0,
+                "max_value": 65535
+            },
+            "filename": "py_data_in.csv"
+        },
+        "sequence": {
+            "description_list": [
+                " These parameters control how the file will be read in the vhdl testbench",
+                "   .The parameters are",
+                "       :param filename (string): filename expected by the vhdl testbench.",
+                "              Note: This file is *.csv file",
+                "",
+                "       :param ctrl (integer>=0): define the mode. Possibles values are:",
+                "               .0: continuous valid generation",
+                "                   . min_value1, max_value1, min_value2, max_value2 values are ignored",
+                "               .1. constant short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a constant width defined by the min_value2 value",
+                "               .2. constant pulse generation",
+                "                   . a positive pulse with a width defined by the v_min_value1 value followed by",
+                "                   . a negative pulse with a width defined by the v_min_value2 value",
+                "               .3: random short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a random width between min_value2 and max_value2",
+                "               .4. random pulse generation",
+                "                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by",
+                "                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_",
+                "               others values : continuous valid generation",
+                "               others values : continuous valid generation",
+                "       :param min_value1 (integer>=1): define a min value for the positive pulse",
+                "       :param max_value1 (integer>=1): define a max value for the positive pulse",
+                "       :param min_value2 (integer>=1): define a min value for the negative pulse",
+                "       :param max_value2 (integer>=1): define a min value for the negative pulse",
+                "       :param time_shift (integer>=0): define a starting offset before generating pulses"
+            ],
+            "filename": "py_data_valid_sequencer_in.csv",
+            "ctrl": 0,
+            "min_value1": 0,
+            "max_value1": 0,
+            "min_value2": 0,
+            "max_value2": 0,
+            "time_shift": 0
+        }
+    },
+
+    "ram1": {
+        "description_list": [
+            "This section is associated to the RAM1 configuration",
+            "It defines:",
+            "  . a set of generic parameters expected by the VHDL testbench. Thoses parameters controls the VHDL testbench behaviour (see generic section)",
+            "  . The file to copy and rename in the output simulation directory in order to configure the RAM (see value section).",
+            "  . how to read the RAM configuration file in the VHDL testbench (see sequence section)."
+        ],
+        "generic": {
+            "description_list": [
+                "This section defines a set of generic parameters in order to controls the testbench behaviour.",
+                "   .The parameters are",
+                "       :param name (string): RAM name",
+                "       :param check (integer: 0, 1): 1: the testbench performs the memory reading and checking, 0: no memory reading and checking",
+                "       :param verbosity (integer: 0, 1): 1: print all check (if enable), 0: no print"
+            ],
+            "name": "mux_squid_offset",
+            "check": 1,
+            "verbosity": 0
+        },
+        "value": {
+            "description_list": [
+                "This section defines the file to copy and rename in the output simulation directory",
+                "   .The parameters are",
+                "       :param input_filename_datapath (string): filename to use in order to compute data on the datapath",
+                "       :param input_filename (string): filename to use in order to check memory",
+                "       :param output_filename (string): expected VHDL testbench filename"
+
+            ],
+            "input_filename_datapath": "mux_squid_offset.csv",
+            "input_filename": "random_mux_squid_offset.csv",
+            "output_filename": "py_ram_mux_squid_offset.csv"
+        },
+        "sequence": {
+            "description_list": [
+                " These parameters control how the file will be read in the vhdl testbench",
+                "   .The parameters are",
+                "       :param filename (string): filename expected by the vhdl testbench.",
+                "              Note: This file is *.csv file",
+                "",
+                "       :param ctrl (integer>=0): define the mode. Possibles values are:",
+                "               .0: continuous valid generation",
+                "                   . min_value1, max_value1, min_value2, max_value2 values are ignored",
+                "               .1. constant short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a constant width defined by the min_value2 value",
+                "               .2. constant pulse generation",
+                "                   . a positive pulse with a width defined by the v_min_value1 value followed by",
+                "                   . a negative pulse with a width defined by the v_min_value2 value",
+                "               .3: random short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a random width between min_value2 and max_value2",
+                "               .4. random pulse generation",
+                "                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by",
+                "                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_",
+                "               others values : continuous valid generation",
+                "               others values : continuous valid generation",
+                "       :param min_value1 (integer>=1): define a min value for the positive pulse",
+                "       :param max_value1 (integer>=1): define a max value for the positive pulse",
+                "       :param min_value2 (integer>=1): define a min value for the negative pulse",
+                "       :param max_value2 (integer>=1): define a min value for the negative pulse",
+                "       :param time_shift (integer>=0): define a starting offset before generating pulses"
+            ],
+            "filename": "py_ram_mux_squid_offset_valid_sequencer_in.csv",
+            "ctrl": 0,
+            "min_value1": 0,
+            "max_value1": 0,
+            "min_value2": 0,
+            "max_value2": 0,
+            "time_shift": 0
+        }
+    },
+    "ram2": {
+        "description_list": [
+            "This section is associated to the RAM2 configuration",
+            "It defines:",
+            "  . a set of generic parameters expected by the VHDL testbench. Thoses parameters controls the VHDL testbench behaviour (see generic section)",
+            "  . The file to copy and rename in the output simulation directory in order to configure the RAM (see value section).",
+            "  . how to read the RAM configuration file in the VHDL testbench (see sequence section)."
+        ],
+        "generic": {
+            "description_list": [
+                "This section defines a set of generic parameters in order to controls the testbench behaviour.",
+                "   .The parameters are",
+                "       :param name (string): RAM name",
+                "       :param check (integer: 0, 1): 1: the testbench performs the memory reading and checking, 0: no memory reading and checking",
+                "       :param verbosity (integer: 0, 1): 1: print all check (if enable), 0: no print"
+            ],
+            "name": "mux_squid_tf",
+            "check": 1,
+            "verbosity": 0
+        },
+        "value": {
+            "description_list": [
+                "This section defines the file to copy and rename in the output simulation directory",
+                "   .The parameters are",
+                "       :param input_filename_datapath (string): filename to use in order to compute data on the datapath",
+                "       :param input_filename (string): filename to use in order to check memory",
+                "       :param output_filename (string): expected VHDL testbench filename"
+            ],
+            "input_filename_datapath": "mux_squid_tf.csv",
+            "input_filename": "random_mux_squid_tf.csv",
+            "output_filename": "py_ram_mux_squid_tf.csv"
+        },
+        "sequence": {
+            "description_list": [
+                " These parameters control how the file will be read in the vhdl testbench",
+                "   .The parameters are",
+                "       :param filename (string): filename expected by the vhdl testbench.",
+                "              Note: This file is a *.csv file",
+                "",
+                "       :param ctrl (integer>=0): define the mode. Possibles values are:",
+                "               .0: continuous valid generation",
+                "                   . min_value1, max_value1, min_value2, max_value2 values are ignored",
+                "               .1. constant short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a constant width defined by the min_value2 value",
+                "               .2. constant pulse generation",
+                "                   . a positive pulse with a width defined by the v_min_value1 value followed by",
+                "                   . a negative pulse with a width defined by the v_min_value2 value",
+                "               .3: random short pulse generation",
+                "                   . a positive pulse with a width of 1 clock cycle followed by",
+                "                   . a negative pulse with a random width between min_value2 and max_value2",
+                "               .4. random pulse generation",
+                "                   . a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by",
+                "                   . a negative pulse with a width defined by a random value between v_min_value2 and max_value2_",
+                "               others values : continuous valid generation",
+                "               others values : continuous valid generation",
+                "       :param min_value1 (integer>=1): define a min value for the positive pulse",
+                "       :param max_value1 (integer>=1): define a max value for the positive pulse",
+                "       :param min_value2 (integer>=1): define a min value for the negative pulse",
+                "       :param max_value2 (integer>=1): define a min value for the negative pulse",
+                "       :param time_shift (integer>=0): define a starting offset before generating pulses"
+            ],
+            "filename": "py_ram_mux_squid_tf_valid_sequencer_in.csv",
+            "ctrl": 0,
+            "min_value1": 0,
+            "max_value1": 0,
+            "min_value2": 0,
+            "max_value2": 0,
+            "time_shift": 0
+        }
+    },
+    "model": {
+        "description_list": [
+            "This section defines the reference filename (see value section) to generate in the output simulation directory",
+            "This file is generated by a python model of the VHDL module (see mux_squid_model.py). The values are the expected values",
+            "This file allows the VHDL testbench to automatically compare the simulated output values against the expected one"
+        ],
+        "value": {
+            "description_list": [
+                "This section defines the reference filename expected by the vhdl testbench.",
+                "This file will be used as reference file. The values will be compared to the simulated ones",
+                "   .The parameters are",
+                "       :param output_filename (string): reference filename"
+            ],
+            "output_filename": "py_check_data_out.csv"
+        }
+    }
+}
