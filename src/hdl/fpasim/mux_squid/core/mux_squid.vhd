@@ -360,7 +360,7 @@ begin
   mux_squid_offset_dinb   <= (others => '0');
   mux_squid_offset_enb    <= i_pixel_valid;
   mux_squid_offset_addrb  <= i_pixel_id;
-  mux_squid_offset_regceb <= i_pixel_valid;
+  mux_squid_offset_regceb <= '1';
 
   -------------------------------------------------------------------
   -- sync with rd RAM output
@@ -466,7 +466,7 @@ begin
   mux_squid_tf_dinb   <= (others => '0');
   mux_squid_tf_enb    <= pixel_valid_rx;
   mux_squid_tf_addrb  <= result_sub_rx;  -- @suppress "Incorrect array size in assignment: expected (<g_MUX_SQUID_TF_RAM_ADDR_WIDTH>) but was (<13>)"
-  mux_squid_tf_regceb <= pixel_valid_rx;
+  mux_squid_tf_regceb <= '1';
 
   -------------------------------------------------------------------
   -- sync with rd RAM output
