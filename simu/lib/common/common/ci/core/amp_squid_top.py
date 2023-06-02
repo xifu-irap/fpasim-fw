@@ -77,6 +77,14 @@ class AmpSquidTop(Points):
         # define the fpasim_gain computed by the vhdl code
         self._vhdl_fpasim_gain = 0
 
+        # define the signed output width of the function
+        #  => the value must match the pkg_fpasim/pkg_AMP_SQUID_MULT_Q_WIDTH value
+        self.pkg_amp_squid_mult_q_width = 16
+
+        # autocompute value
+        self.max_uint_value = 2**self.pkg_amp_squid_mult_q_width
+        self.max_int_value = 2**(self.pkg_amp_squid_mult_q_width - 1)
+
     def set_ram_amp_squid_tf(self, filepath_p):
         """
         Define the content of the amp_squid_tf ram.
@@ -149,6 +157,8 @@ class AmpSquidTop(Points):
         the computed output value of the model.
 
         """
+        
+        
 
         sub = mux_out_p - adc_amp_squid_offset_correction_p
 
@@ -164,7 +174,17 @@ class AmpSquidTop(Points):
 
         mult = math.floor(self._vhdl_fpasim_gain * amp_squid_tf)
 
-        return mult
+        # mult is an uint value
+        # we constraints mult in the range [0,2**self.pkg_amp_squid_mult_q_width-1]
+        res0 = mult % self.max_uint_value
+
+        # res1 is an interpretation of res0 as an int value
+        if res0 >= self.max_int_value:
+            res1 = res0 - self.max_uint_value
+        else:
+            res1 = res0
+
+        return res1
 
     def run(self, output_attribute_name_p="amp_squid_out"):
         """
