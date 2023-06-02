@@ -1150,7 +1150,7 @@ begin
   pulse_shape_dinb   <= (others => '0');
   pulse_shape_enb    <= pixel_valid_rc;
   pulse_shape_addrb  <= addr_pulse_shape_rc;
-  pulse_shape_regceb <= pixel_valid_rc;
+  pulse_shape_regceb <= '1';
 
   -------------------------------------------------------------------
   -- sync with rd ram out
@@ -1254,7 +1254,7 @@ begin
   steady_state_dinb   <= (others => '0');
   steady_state_enb    <= pixel_valid_rc;
   steady_state_addrb  <= pixel_id_rc;
-  steady_state_regceb <= pixel_valid_rc;
+  steady_state_regceb <= '1';
 
   -------------------------------------------------------------------
   -- sync with rd RAM output
