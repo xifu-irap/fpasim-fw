@@ -319,7 +319,7 @@ begin
   amp_squid_tf_dinb   <= (others => '0');
   amp_squid_tf_enb    <= pixel_valid_rx;
   amp_squid_tf_addrb  <= result_sub_rx;  -- @suppress "Incorrect array size in assignment: expected (<g_AMP_SQUID_TF_RAM_ADDR_WIDTH>) but was (<14>)"
-  amp_squid_tf_regceb <= pixel_valid_rx;
+  amp_squid_tf_regceb <= '1';
 
   -------------------------------------------------------------------
   -- sync with rd RAM output
