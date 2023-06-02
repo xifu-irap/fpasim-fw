@@ -292,7 +292,16 @@ if __name__ == '__main__':
     #####################################################
     # Set the simulator options
     #####################################################
-    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=["-stats=-cmd,-time",'-c','-t','ps','-voptargs=+acc','-title',sim_title])
+    simulation_option_list = []
+    simulation_option_list.append("-stats=-cmd,-time")
+    simulation_option_list.append("-c")
+    simulation_option_list.append("-t")
+    simulation_option_list.append('ps')
+    simulation_option_list.append('-title')
+    simulation_option_list.append(sim_title)
+    if args.gui == True:
+        simulation_option_list.append('-voptargs=+acc')
+    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list)
 
     ######################################################
     # get the list of json test_variant_filepath (if any)
