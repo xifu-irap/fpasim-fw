@@ -263,7 +263,7 @@
                 "       :param time_shift (integer>=0): define a starting offset before generating pulses"
             ],
             "filename": "py_ram_mux_squid_tf_valid_sequencer_in.csv",
-            "ctrl": "0",
+            "ctrl": 0,
             "min_value1": 0,
             "max_value1": 0,
             "min_value2": 0,
