@@ -128,7 +128,10 @@ begin
   -------------------------------------------------------------------
   -- fsm
   -------------------------------------------------------------------
-  p_decode_state : process(first_r1, data0_r1, data1_r1, i_dac_en_pattern, i_data,
+  p_decode_state : process(data0_r1, data1_r1, first_r1, i_dac_en_pattern,
+                           i_dac_pattern0, i_dac_pattern1, i_dac_pattern2,
+                           i_dac_pattern3, i_dac_pattern4, i_dac_pattern5,
+                           i_dac_pattern6, i_dac_pattern7, i_data,
                            i_data_valid, sm_state_r1) is
   begin
     sof_next        <= '0';
