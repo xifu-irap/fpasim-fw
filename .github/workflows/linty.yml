@@ -26,7 +26,7 @@ jobs:
           path: ./third-party-libraries
 
       - name: Create the 3rd party library directory
-      - run: mkdir -p ./third-party-libraries/ip/
+        run: mkdir -p ./third-party-libraries/ip/
 
       - name: Get Libraries
         run: mv ./third-party-libraries/fpasim-fw/* ./third-party-libraries/ip/
