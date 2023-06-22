@@ -9,12 +9,23 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     env:
-      SONAR_HOST_URL: https://github.com/xifu-irap/fpasim-fw.git
+      SONAR_HOST_URL: ${{vars.LINTY_CLOUD_URL}}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: Git Checkout Third-Party Libraries
+        uses: actions/checkout@v3
+        with:
+          repository: xifu-irap/third-party-libraries-for-linty
+          fetch-depth: 0
+          token: ${{ secrets.THIRD_PARTY_LIBRARIES_TOKEN }}
+          path: ./third-party-libraries
+
+      - name: Get Libraries
+        run: mv ./third-party-libraries/fpasim-fw/* .
 
       - name: Cache
         uses: actions/cache@v3.3.0
@@ -36,13 +47,13 @@ jobs:
           docker run \
             --rm \
             -e SONAR_HOST_URL=${{ env.SONAR_HOST_URL }} \
-            -e SONAR_TOKEN="${{ secrets.SONARQUBE_SCANNER_FOR_PRIVATE_REPOSITORIES_TOKEN }}" \
+            -e SONAR_TOKEN="${{ secrets.LINTY_SCANNER_TOKEN }}" \
             -e GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
             -e GITHUB_REPOSITORY_OWNER="$GITHUB_REPOSITORY_OWNER" \
             -e GITHUB_REPOSITORY="$GITHUB_REPOSITORY" \
             -e TABBY_CAD_LICENSE="$TABBY_CAD_LICENSE" \
             -v "$PWD:/usr/src" \
-            lintyservices/linty-scanner:latest \
+            lintyservices/linty-scanner:beta \
             -Dsonar.qualitygate.wait=true ${{ steps.linty_analysis_parameters.outputs.value }}
         env:
           TABBY_CAD_LICENSE: ${{ secrets.TABBY_CAD_LICENSE }}

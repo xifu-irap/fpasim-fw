@@ -27,6 +27,9 @@ verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_regdecode_top_ila_0/sim/fp
 #"${PR_DIR}/ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v" \
 #"${PR_DIR}/ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0.v" \
 
+verific -work fpasim -sv ./ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v
+verific -work fpasim -sv ./ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0.v
+
 
 verific -work fpasim -vhdl ./src/hdl/utils/others/pipeliner.vhd
 verific -work fpasim -vhdl ./simu/cosim/ads62p49/core/ads62p49_convert.vhd
