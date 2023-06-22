@@ -2,11 +2,12 @@ name: Linty
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   linty:
     name: Linty
-    timeout-minutes: 10
+    timeout-minutes: 100
     runs-on: ubuntu-latest
     env:
       SONAR_HOST_URL: ${{vars.LINTY_CLOUD_URL}}
