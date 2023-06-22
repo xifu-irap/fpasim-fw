@@ -1,17 +1,26 @@
 
-verific -work fpasim -vhdl ./ip/xilinx/coregen/system_fpasim_top_ila/sim/system_fpasim_top_ila.vhd
-verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_spi_device_select_ila/sim/fpasim_spi_device_select_ila.vhd
-verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_spi_device_select_vio/sim/fpasim_spi_device_select_vio.vhd
-verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_regdecode_top_ila_0/sim/fpasim_regdecode_top_ila_0.vhd
-verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_regdecode_top_ila_1/sim/fpasim_regdecode_top_ila_1.vhd
-verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_top_ila_0/sim/fpasim_top_ila_0.vhd
-verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_top_vio_0/sim/fpasim_top_vio_0.vhd
-verific -work fpasim -vhdl ./ip/xilinx/coregen/selectio_wiz_adc/selectio_wiz_adc_sim_netlist.vhdl 
-verific -work fpasim -vhdl ./ip/xilinx/coregen/selectio_wiz_sync/selectio_wiz_sync_sim_netlist.vhdl
-verific -work fpasim -vhdl ./ip/xilinx/coregen/selectio_wiz_dac/selectio_wiz_dac_sim_netlist.vhdl
-verific -work fpasim -vhdl ./ip/xilinx/coregen/selectio_wiz_dac_frame/selectio_wiz_dac_frame_sim_netlist.vhdl
-verific -work fpasim -vhdl ./ip/xilinx/coregen/selectio_wiz_dac_clk/selectio_wiz_dac_clk_sim_netlist.vhdl
-verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0_sim_netlist.vhdl
+verific -work unisims -vhdl ./ip/vivado/2022.1/data/vhdl/src/unisims/unisim_retarget_VCOMP.vhdp
+
+verific -work xpm -sv ./ip/vivado/2022.1/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv
+verific -work xpm -sv ./ip/vivado/2022.1/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv
+verific -work xpm -sv ./ip/vivado/2022.1/data/ip/xpm/xpm_memory/hdl/xpm_memory.sv
+verific -work xpm -vhdl ./ip/vivado/2022.1/data/ip/xpm/xpm_VCOMP.vhd
+
+
+
+verific -work fpasim -vhdl ./ip/xilinx/coregen/system_fpasim_top_ila/system_fpasim_top_ila.vhd_stub
+verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_spi_device_select_ila/fpasim_spi_device_select_ila_stub.vhd
+verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_spi_device_select_vio/fpasim_spi_device_select_vio_stub.vhd
+verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_regdecode_top_ila_0/fpasim_regdecode_top_ila_0_stub.vhd
+verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_regdecode_top_ila_1/fpasim_regdecode_top_ila_1_stub.vhd
+verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_top_ila_0/fpasim_top_ila_0_stub.vhd
+verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_top_vio_0/fpasim_top_vio_0_stub.vhd
+verific -work fpasim -vhdl ./ip/xilinx/coregen/selectio_wiz_adc/selectio_wiz_adc_stub.vhdl 
+verific -work fpasim -vhdl ./ip/xilinx/coregen/selectio_wiz_sync/selectio_wiz_sync_stub.vhdl
+verific -work fpasim -vhdl ./ip/xilinx/coregen/selectio_wiz_dac/selectio_wiz_dac_stub.vhdl
+verific -work fpasim -vhdl ./ip/xilinx/coregen/selectio_wiz_dac_frame/selectio_wiz_dac_frame_stub.vhdl
+verific -work fpasim -vhdl ./ip/xilinx/coregen/selectio_wiz_dac_clk/selectio_wiz_dac_clk_stub.vhdl
+verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0_stub.vhdl
 
 
 #vlog -work fpasim ${VIVADO_DIR}/data/verilog/src/glbl.v  
@@ -21,14 +30,14 @@ verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0
 
 verific -work csv_lib -vhdl ./simu/lib/csv/csv/vhdl/src/pkg_csv_file.vhd
 
-verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_regdecode_top_ila_0/sim/fpasim_regdecode_top_ila_0.vhd
+verific -work fpasim -vhdl ./ip/xilinx/coregen/fpasim_regdecode_top_ila_0/fpasim_regdecode_top_ila_0_stub.vhd
 
 #vlog -work fpasim  -incr -mfcu "+incdir+${PR_DIR}/ip/xilinx/coregen/fpasim_clk_wiz_0" \
 #"${PR_DIR}/ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v" \
 #"${PR_DIR}/ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0.v" \
 
-verific -work fpasim -sv ./ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v
-verific -work fpasim -sv ./ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0.v
+#verific -work fpasim -sv ./ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v
+#verific -work fpasim -sv ./ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0.v
 
 
 verific -work fpasim -vhdl ./src/hdl/utils/others/pipeliner.vhd
@@ -151,19 +160,23 @@ verific -work fpasim -vhdl ./src/hdl/spi/core/spi_device_select.vhd
 verific -work fpasim -vhdl ./src/hdl/spi/spi_top.vhd
 verific -work fpasim -vhdl ./src/hdl/system_fpasim_top.vhd
 verific -work fpasim -vhdl ./simu/cosim/fpga_system_fpasim.vhd
-verific -work fpasim -vhdl ./ip/opal_kelly/simu/parameters.vhd
 
 verific -work opal_kelly_lib -vhdl ./simu/lib/opal_kelly/opal_kelly/vhdl/src/pkg_front_panel.vhd
 
 verific -work common_lib -vhdl ./simu/lib/common/common/vhdl/src/pkg_common.vhd
 
-verific -work fpasim -vhdl ./ip/opal_kelly/simu/mappings.vhd
-verific -work fpasim -vhdl ./ip/opal_kelly/simu/okHost.vhd
-verific -work fpasim -vhdl ./ip/opal_kelly/simu/okPipeIn.vhd
-verific -work fpasim -vhdl ./ip/opal_kelly/simu/okPipeOut.vhd
-verific -work fpasim -vhdl ./ip/opal_kelly/simu/okTriggerIn.vhd
-verific -work fpasim -vhdl ./ip/opal_kelly/simu/okTriggerOut.vhd
-verific -work fpasim -vhdl ./ip/opal_kelly/simu/okWireIn.vhd
-verific -work fpasim -vhdl ./ip/opal_kelly/simu/okWireOR.vhd
-verific -work fpasim -vhdl ./ip/opal_kelly/simu/okWireOut.vhd
+verific -work fpasim -sv ./ip/opal_kelly/okBTPipeIn.v
+verific -work fpasim -sv ./ip/opal_kelly/okBTPipeOut.v
+verific -work fpasim -sv ./ip/opal_kelly/okCoreHarness.v
+verific -work fpasim -sv ./ip/opal_kelly/okLibrary.v
+verific -work fpasim -sv ./ip/opal_kelly/okPipeIn.v
+verific -work fpasim -sv ./ip/opal_kelly/okPipeOut.v
+verific -work fpasim -sv ./ip/opal_kelly/okRegisterBridge.v
+verific -work fpasim -sv ./ip/opal_kelly/okTriggerIn.v
+verific -work fpasim -sv ./ip/opal_kelly/okTriggerOut.v
+verific -work fpasim -sv ./ip/opal_kelly/okWireIn.v
+verific -work fpasim -sv ./ip/opal_kelly/okWireOut.v
+verific -work fpasim -vhdl ./ip/opal_kelly/okLibrary.vhd
+
+
 verific -work fpasim -vhdl ./simu/cosim/fpga_system_fpasim_top.vhd
