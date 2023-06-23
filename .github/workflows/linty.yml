@@ -29,7 +29,7 @@ jobs:
         run: mkdir -p ./third-party-libraries/ip/
 
       - name: Get Libraries
-        run: mv ./third-party-libraries/fpasim-fw/* ./third-party-libraries/ip/ ls -al ./third-party-libraries/ip/
+        run: mv ./third-party-libraries/fpasim-fw/* ./third-party-libraries/ip/ ls -a ./third-party-libraries/ip/
 
       - name: Cache
         uses: actions/cache@v3.3.0
