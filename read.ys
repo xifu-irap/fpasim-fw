@@ -1,34 +1,35 @@
-verific -work fpasim                   -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ltlib_v1_0_0_ver.vh
-verific -work fpasim                   -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ltlib_v1_0_0_lib_fn.vh
+
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ltlib_v1_0_0_ver.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ltlib_v1_0_0_lib_fn.vh
 verific -work ltlib_v1_0_0            -vhdl ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/ltlib_v1_0_vl_rfs.v
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbs_v1_0_2_i2x.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbs_v1_0_2_in.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbs_v1_0_2_i2x.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbs_v1_0_2_in.vh
 verific -work xsdbs_v1_0_2            -vhdl ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/xsdbs_v1_0_vl_rfs.v
 verific -work blk_mem_gen_v8_3_6      -vhdl ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/blk_mem_gen_v8_3_vhsyn_rfs.vhd
 verific -work fifo_generator_v13_1_4  -vhdl ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/fifo_generator_v13_1_vhsyn_rfs.vhd
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_i2x.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_in.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_icn.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_ext.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_core.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_core_ext.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_ports.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bsid_ports.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bsid_vec_ports.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_vec.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_core_vec.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_sl_prt_map.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_id_map.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_id_vec_map.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_i2x.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_in.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_icn.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_ext.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_core.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_core_ext.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_ports.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bsid_ports.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bsid_vec_ports.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_vec.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_bs_core_vec.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_sl_prt_map.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_id_map.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/xsdbm_v3_0_0_id_vec_map.vh
 verific -work xsdbm_v3_0_0            -vhdl ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/xsdbm_v3_0_vl_rfs.v
 verific -work blk_mem_gen_v8_4_5      -vhdl ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/blk_mem_gen_v8_4_vhsyn_rfs.vhd
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ila_v6_2_12_ila_ver.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ila_v6_2_12_ila_ver.vh
 verific -work ila_v6_2_12             -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/ila_v6_2_syn_rfs.v
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ila_v6_2_12_ila_in.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ila_v6_2_12_ila_param.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ila_v6_2_12_ila_lparam.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ila_v6_2_12_ila_lib_fn.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ila_v6_2_12_ila_in.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ila_v6_2_12_ila_param.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ila_v6_2_12_ila_lparam.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ila_v6_2_12_ila_lib_fn.vh
 verific -work fpasim                  -vhdl ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/synth/system_fpasim_top_ila.vhd
 verific -work fpasim                  -vhdl ./third-party-libraries/ip/xilinx/coregen/fpasim_spi_device_select_ila/synth/fpasim_spi_device_select_ila.vhd
 verific -work fpasim                  -vhdl ./third-party-libraries/ip/xilinx/coregen/fpasim_spi_device_select_vio/hdl/vio_v3_0_22_vio_include.v
@@ -48,12 +49,12 @@ verific -work fpasim                  -vhdl ./third-party-libraries/ip/xilinx/co
 verific -work fpasim                  -vhdl ./third-party-libraries/ip/xilinx/coregen/fpasim_top_ila_0/synth/fpasim_top_ila_0.vhd
 verific -work fpasim                  -vhdl ./third-party-libraries/ip/xilinx/coregen/fpasim_regdecode_top_ila_1/synth/fpasim_regdecode_top_ila_1.vhd
 verific -work fpasim                  -vhdl ./third-party-libraries/ip/xilinx/coregen/fpasim_regdecode_top_ila_0/synth/fpasim_regdecode_top_ila_0.vhd
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_7s_mmcm.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_7s_pll.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_us_mmcm.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_us_pll.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_us_plus_pll.vh
-verific -work fpasim                  -sv ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_us_plus_mmcm.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_7s_mmcm.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_7s_pll.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_us_mmcm.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_us_pll.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_us_plus_pll.vh
+verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/mmcm_pll_drp_func_us_plus_mmcm.vh
 verific -work fpasim                  -vhdl ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0_clk_wiz.v
 verific -work fpasim                  -vhdl ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0.v
 verific -work fpasim                  -vhdl ./third-party-libraries/ip/opal_kelly/syn/okCoreHarness.v
