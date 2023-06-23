@@ -434,7 +434,7 @@ class MuxSquidTopDataGen(VunitConf):
         test_variant_filepath = self.new_test_variant_filepath_list[self.index]
         self.index += 1
 
-        output_path = output_path
+      
         level0 = self.level
         level1 = level0 + 1
 
