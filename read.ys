@@ -3,10 +3,10 @@
 # Add XPM library
 #  Those files can be found in the Vivado installation directory (2022.1)
 #############################################################################
-verific -work xpm  -sv ./third-party-libraries/vivado/2022.1/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv
-verific -work xpm  -sv ./third-party-libraries/vivado/2022.1/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv
-verific -work xpm  -sv ./third-party-libraries/vivado/2022.1/data/ip/xpm/xpm_memory/hdl/xpm_memory.sv
-verific -work xpm  -vhdl ./third-party-libraries/vivado/2022.1/data/ip/xpm/xpm_VCOMP.vhd
+verific -work xpm  -sv ./third-party-libraries/ip/vivado/2022.1/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv
+verific -work xpm  -sv ./third-party-libraries/ip/vivado/2022.1/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv
+verific -work xpm  -sv ./third-party-libraries/ip/vivado/2022.1/data/ip/xpm/xpm_memory/hdl/xpm_memory.sv
+verific -work xpm  -vhdl ./third-party-libraries/ip/vivado/2022.1/data/ip/xpm/xpm_VCOMP.vhd
 
 
 ##############################################################################
