@@ -319,12 +319,12 @@ if __name__ == '__main__':
                           pre_config=obj.pre_config
                           # generics = generic_dic
                             )
-        else:
-            tb.add_config(
-                              name=test_name,
-                              # pre_config=obj.pre_config
-                              # generics = generic_dic
-                                )
+    else:
+        tb.add_config(
+                        name=test_name,
+                        # pre_config=obj.pre_config
+                        # generics = generic_dic
+                    )
 
 
     obj.main()
