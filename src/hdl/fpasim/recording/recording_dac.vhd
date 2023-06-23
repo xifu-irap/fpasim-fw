@@ -254,6 +254,10 @@ begin
           sm_state_next   <= E_RUN;
         end if;
 
+      when others => 
+
+        sm_state_next <= E_RST;
+
     end case;
   end process p_decode_state;
 
