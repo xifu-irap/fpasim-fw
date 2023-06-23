@@ -1,4 +1,20 @@
 
+#############################################################################
+# Add XPM library
+#  Those files can be found in the Vivado installation directory (2022.1)
+#############################################################################
+verific -work xpm  -sv ./third-party-libraries/vivado/2022.1/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv
+verific -work xpm  -sv ./third-party-libraries/vivado/2022.1/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv
+verific -work xpm  -sv ./third-party-libraries/vivado/2022.1/data/ip/xpm/xpm_memory/hdl/xpm_memory.sv
+verific -work xpm  -vhdl ./third-party-libraries/vivado/2022.1/data/ip/xpm/xpm_VCOMP.vhd
+
+
+##############################################################################
+# The list of source files was generated from Vivado by a TCL command
+#  report_compile_order -used_in synthesis -verbose   -file D:/compilation_order_synthesis.txt
+# Note:
+#   The output file was manually edited in order to be compatible with the Linty tools.
+##############################################################################
 verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ltlib_v1_0_0_ver.vh
 verific -vlog-incdir ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/verilog/ltlib_v1_0_0_lib_fn.vh
 verific -work ltlib_v1_0_0            -sv ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/hdl/ltlib_v1_0_vl_rfs.v
