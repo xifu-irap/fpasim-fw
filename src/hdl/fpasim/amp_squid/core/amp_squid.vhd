@@ -105,7 +105,7 @@ architecture RTL of amp_squid is
   --   S = i_pixel_result - i_mux_squid_feedback
   ---------------------------------------------------------------------
   signal pixel_result_tmp                : std_logic_vector(i_pixel_result'range);
-  signal amp_squid_offset_correction_tmp : std_logic_vector(i_amp_squid_offset_correction'range);
+  signal amp_squid_offset_correction_tmp : std_logic_vector(pkg_AMP_SQUID_SUB_Q_WIDTH_B - 1 downto 0):= (others => '0');
   signal result_sub_rx                   : std_logic_vector(pkg_AMP_SQUID_SUB_Q_WIDTH_S - 1 downto 0);
 
   ---------------------------------------------------------------------
@@ -203,11 +203,15 @@ begin
   -- sub_sfixed_amp_squid_out : out = pixel_result_tmp - amp_squid_offset_correction_tmp
   -- requirement: FPASIM-FW-REQ-0170 (part0)
   -------------------------------------------------------------------
-  assert not ((i_pixel_result'length) /= pkg_AMP_SQUID_SUB_Q_WIDTH_A) report "[mux_squid]: i_pixel_result => port width and sfixed package definition width doesn't match." severity error;
-  assert not ((i_amp_squid_offset_correction'length) /= pkg_AMP_SQUID_SUB_Q_WIDTH_B) report "[mux_squid]: i_amp_squid_offset_correction => port width and sfixed package definition width doesn't match." severity error;
+  assert not ((i_pixel_result'length) /= pkg_AMP_SQUID_SUB_Q_WIDTH_A) report "[amp_squid]: i_pixel_result => port width and sfixed package definition width doesn't match." severity error;
+  assert not ((amp_squid_offset_correction_tmp'length) < i_amp_squid_offset_correction'length) report "[amp_squid]: amp_squid_offset_correction_tmp'length must be >= i_amp_squid_offset_correction'length" severity error;
   -- no conversion: already sfixed
   pixel_result_tmp                <= i_pixel_result;
-  amp_squid_offset_correction_tmp <= i_amp_squid_offset_correction;
+
+  -- we assume (amp_squid_offset_correction_tmp'length) >= (i_amp_squid_offset_correction'length) 
+  --    align the MSB bits between amp_squid_offset_correction_tmp and i_amp_squid_offset_correction (<=> amp_squid_offset_correction_tmp <= i_amp_squid_offset_correction*8)
+  --     => the remaining LSB bits of amp_squid_offset_correction_tmp are fixed to '0' 
+  amp_squid_offset_correction_tmp(amp_squid_offset_correction_tmp'high downto (amp_squid_offset_correction_tmp'high - i_amp_squid_offset_correction'high)) <= i_amp_squid_offset_correction;
 
   inst_sub_sfixed_amp_squid : entity work.sub_sfixed
     generic map(
