@@ -16,6 +16,8 @@ verific -work unisim  -vhdl ./third-party-libraries/ip/vivado/2022.1/data/vhdl/s
 verific -work unisim  -vhdl ./third-party-libraries/ip/vivado/2022.1/data/vhdl/src/unisims/primitive/IOBUF.vhd
 verific -work unisim  -vhdl ./third-party-libraries/ip/vivado/2022.1/data/vhdl/src/unisims/primitive/MMCME2_ADV.vhd
 verific -work unisim  -vhdl ./third-party-libraries/ip/vivado/2022.1/data/vhdl/src/unisims/primitive/MMCME2_BASE.vhd
+verific -work unisim  -vhdl ./third-party-libraries/ip/vivado/2022.1/data/vhdl/src/unisims/primitive/BUFG.vhd
+verific -work unisim  -vhdl ./third-party-libraries/ip/vivado/2022.1/data/vhdl/src/unisims/retarget/IBUFG.vhd
 
 ##############################################################################
 # The list of source files was generated from Vivado by a TCL command
