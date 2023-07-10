@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   ads62p49_io.vhd 
+--    @file                   ads62p49_io.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module sends data to the IOs.
 --
@@ -120,7 +120,7 @@ begin
         IS_D2_INVERTED => '0',
         SRTYPE         => "ASYNC"
         )
-      port map (  
+      port map (
         C  => i_clk_phase,
         CE => '1',
         D1 => '1',
@@ -131,13 +131,13 @@ begin
         );
 
     inst_OBUFDS : OBUFDS
-      generic map (  
+      generic map (
         IOSTANDARD => "DEFAULT",        -- Specify the output I/O standard
         SLEW       => "SLOW")           -- Specify the output slew rate
       port map (
         O  => clk_tmp_p,  -- Diff_p output (connect directly to top-level port)
         OB => clk_tmp_n,  -- Diff_n output (connect directly to top-level port)
-        I  => clk_fwd_out               -- Buffer input 
+        I  => clk_fwd_out               -- Buffer input
         );
 
     o_adc_clk_p <= clk_tmp_p;
@@ -174,8 +174,8 @@ begin
     gen_io : for i in data_in_even'range generate
 
       inst_ODDR : ODDR
-        generic map( 
-          DDR_CLK_EDGE => "OPPOSITE_EDGE",  -- "OPPOSITE_EDGE" or "SAME_EDGE" 
+        generic map(
+          DDR_CLK_EDGE => "OPPOSITE_EDGE",  -- "OPPOSITE_EDGE" or "SAME_EDGE"
           INIT         => '0',  -- Initial value for Q port ('1' or '0')
           SRTYPE       => "SYNC")       -- Reset Type ("ASYNC" or "SYNC")
         port map (
@@ -191,13 +191,13 @@ begin
           );
 
       inst_OBUFDS : OBUFDS
-        generic map (  
+        generic map (
           IOSTANDARD => "DEFAULT",      -- Specify the output I/O standard
           SLEW       => "SLOW")         -- Specify the output slew rate
         port map (
           O  => data_out_p(i),  -- Diff_p output (connect directly to top-level port)
           OB => data_out_n(i),  -- Diff_n output (connect directly to top-level port)
-          I  => data_tmp(i)             -- Buffer input 
+          I  => data_tmp(i)             -- Buffer input
           );
     end generate gen_io;
 
@@ -256,8 +256,8 @@ begin
     gen_io : for i in data_in_even'range generate
 
       inst_ODDR : ODDR
-        generic map( 
-          DDR_CLK_EDGE => "OPPOSITE_EDGE",  -- "OPPOSITE_EDGE" or "SAME_EDGE" 
+        generic map(
+          DDR_CLK_EDGE => "OPPOSITE_EDGE",  -- "OPPOSITE_EDGE" or "SAME_EDGE"
           INIT         => '0',  -- Initial value for Q port ('1' or '0')
           SRTYPE       => "SYNC")       -- Reset Type ("ASYNC" or "SYNC")
         port map (
@@ -273,13 +273,13 @@ begin
           );
 
       inst_OBUFDS : OBUFDS
-        generic map (  
+        generic map (
           IOSTANDARD => "DEFAULT",      -- Specify the output I/O standard
           SLEW       => "SLOW")         -- Specify the output slew rate
         port map (
           O  => data_out_p(i),  -- Diff_p output (connect directly to top-level port)
           OB => data_out_n(i),  -- Diff_n output (connect directly to top-level port)
-          I  => data_tmp(i)             -- Buffer input 
+          I  => data_tmp(i)             -- Buffer input
           );
     end generate gen_io;
 

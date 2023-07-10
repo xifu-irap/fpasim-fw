@@ -17,14 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   ads62p49_top.vhd 
+--    @file                   ads62p49_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---   
---    This file is the top_level of the ads62p49 (ADC) model.    
+--    @details
+--
+--    This file is the top_level of the ads62p49 (ADC) model.
 --
 --    Note
 --      . It should be used only for the simulation
@@ -126,7 +126,7 @@ begin
       ---------------------------------------------------------------------
       -- outputs @i_clk
       ---------------------------------------------------------------------
-      o_ddr_adc => ddr_adc0 
+      o_ddr_adc => ddr_adc0
       );
 
 ---------------------------------------------------------------------
@@ -147,7 +147,7 @@ begin
       ---------------------------------------------------------------------
       -- outputs @i_clk
       ---------------------------------------------------------------------
-      o_ddr_adc => ddr_adc1 
+      o_ddr_adc => ddr_adc1
       );
 
 ---------------------------------------------------------------------

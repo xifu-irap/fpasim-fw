@@ -17,14 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   dac3283_top.vhd 
+--    @file                   dac3283_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
---    This file is the top_level of the dac3283 (DAC) model.    
+--    This file is the top_level of the dac3283 (DAC) model.
 --
 --    Note
 --      . It should be used only for the simulation
@@ -46,7 +46,7 @@ entity dac3283_top is
     -- from pads
     ---------------------------------------------------------------------
     i_dac_clk_p : in std_logic;         -- differential_p dac clock
-    i_dac_clk_n : in std_logic;         -- differential_n dac clock 
+    i_dac_clk_n : in std_logic;         -- differential_n dac clock
 
     i_dac_frame_p : in std_logic;       -- differential_p dac frame
     i_dac_frame_n : in std_logic;       -- differential_n dac frame
@@ -76,7 +76,7 @@ entity dac3283_top is
     i_dac7_n : in std_logic;            -- differential_n dac data (lane7)
 
     ---------------------------------------------------------------------
-    -- to sim 
+    -- to sim
     ---------------------------------------------------------------------
     o_dac_real_valid : out std_logic;   -- dac data valid
     o_dac_real       : out real         -- dac value
@@ -98,8 +98,8 @@ architecture RTL of dac3283_top is
   signal dac0_valid : std_logic;
   signal dac0       : std_logic_vector(15 downto 0);
 
-  signal dac1_valid : std_logic;  
-  signal dac1       : std_logic_vector(15 downto 0);  
+  signal dac1_valid : std_logic;
+  signal dac1       : std_logic_vector(15 downto 0);
 
 begin
 

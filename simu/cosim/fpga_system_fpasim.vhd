@@ -17,16 +17,16 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   fpga_system_fpasim.vhd 
+--    @file                   fpga_system_fpasim.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module wraps the fpasim function with the DAC and ADC model.
 --
---    Note: 
+--    Note:
 --      . This file should be used during the co-simulation phase
 --      . The spi/leds signals of the system_fpasim_top are not necessary for the co-simulation with the demux
 --      . This file should only be used for simulation.
@@ -142,39 +142,39 @@ architecture RTL of fpga_system_fpasim is
   signal dac7_n      : std_logic;
 
 -- common: shared link between the spi
-  signal spi_sclk  : std_logic;  
-  signal spi_sdata : std_logic;  
+  signal spi_sclk  : std_logic;
+  signal spi_sdata : std_logic;
 
   -- CDCE: SPI
-  signal cdce_sdo  : std_logic := '0';  
-  signal cdce_n_en : std_logic;  
+  signal cdce_sdo  : std_logic := '0';
+  signal cdce_n_en : std_logic;
 
   -- CDCE: specific signals
-  signal cdce_pll_status : std_logic := '0';  
-  signal cdce_n_reset    : std_logic;  
-  signal cdce_n_pd       : std_logic;  
-  signal ref_en          : std_logic;  
+  signal cdce_pll_status : std_logic := '0';
+  signal cdce_n_reset    : std_logic;
+  signal cdce_n_pd       : std_logic;
+  signal ref_en          : std_logic;
 
   -- ADC: SPI
-  signal adc_sdo   : std_logic := '0';  
-  signal adc_n_en  : std_logic;  
+  signal adc_sdo   : std_logic := '0';
+  signal adc_n_en  : std_logic;
   -- ADC: specific signals
-  signal adc_reset : std_logic;  
+  signal adc_reset : std_logic;
 
   -- DAC: SPI
-  signal dac_sdo        : std_logic := '0';  
-  signal dac_n_en       : std_logic;  
+  signal dac_sdo        : std_logic := '0';
+  signal dac_n_en       : std_logic;
   -- DAC: specific signal
-  signal dac_tx_present : std_logic;  
+  signal dac_tx_present : std_logic;
 
   -- AMC: SPI (monitoring)
-  signal mon_sdo     : std_logic := '0';  
-  signal mon_n_en    : std_logic;  
+  signal mon_sdo     : std_logic := '0';
+  signal mon_n_en    : std_logic;
   -- AMC : specific signals
-  signal mon_n_int   : std_logic := '0';  
-  signal mon_n_reset : std_logic;  
+  signal mon_n_int   : std_logic := '0';
+  signal mon_n_reset : std_logic;
   -- leds
-  signal leds        : std_logic_vector(3 downto 2);  
+  signal leds        : std_logic_vector(3 downto 2);
 
   ---------------------------------------------------------------------
   -- dac3283_top
@@ -254,7 +254,7 @@ begin
       ---------------------------------------------------------------------
       -- FMC: from the card
       ---------------------------------------------------------------------
-      --i_board_id : in    std_logic_vector(7 downto 0);  -- card board id 
+      --i_board_id : in    std_logic_vector(7 downto 0);  -- card board id
       ---------------------------------------------------------------------
       -- FMC: from the adc
       ---------------------------------------------------------------------
@@ -326,7 +326,7 @@ begin
       o_spi_sclk        => spi_sclk,         -- not connected
       o_spi_sdata       => spi_sdata,        -- not connected
       -- CDCE: SPI
-      i_cdce_sdo        => cdce_sdo,         -- not connected 
+      i_cdce_sdo        => cdce_sdo,         -- not connected
       o_cdce_n_en       => cdce_n_en,        -- not connected
       -- CDCE: specific signals
       i_cdce_pll_status => cdce_pll_status,  -- not connected
@@ -388,7 +388,7 @@ begin
       i_dac7_p         => dac7_p,
       i_dac7_n         => dac7_n,
       ---------------------------------------------------------------------
-      -- to sim 
+      -- to sim
       ---------------------------------------------------------------------
       o_dac_real_valid => dac_real_valid,
       o_dac_real       => dac_real

@@ -17,13 +17,13 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   dac3283_demux.vhd 
+--    @file                   dac3283_demux.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---    
+--    @details
+--
 --    The input data stream is a Time-division multiplexing signal (dac0-dac1-dac0-dac1).
 --    By using the frame signal, this module extracts for each dacs its associated data.
 --
@@ -141,7 +141,7 @@ begin
         data1_next       <= i_dac;
         sm_state_next    <= E_RUN0;
 
-      when others =>  
+      when others =>
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;

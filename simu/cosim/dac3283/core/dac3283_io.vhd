@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   dac3283_io.vhd 
+--    @file                   dac3283_io.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module retrieves data from IOs
 --
@@ -43,7 +43,7 @@ entity dac3283_io is
     -- from pads
     ---------------------------------------------------------------------
     i_dac_clk_p   : in  std_logic; -- differential_p dac clock
-    i_dac_clk_n   : in  std_logic; -- differential_n dac clock 
+    i_dac_clk_n   : in  std_logic; -- differential_n dac clock
 
     i_dac_frame_p : in  std_logic; -- differential_p dac frame
     i_dac_frame_n : in  std_logic; -- differential_n dac frame
@@ -92,8 +92,8 @@ begin
   gen_clk : if true generate
   begin
     inst_IBUFDS : IBUFDS
-      generic map (  
-        DIFF_TERM    => false,          -- Differential Termination 
+      generic map (
+        DIFF_TERM    => false,          -- Differential Termination
         IBUF_LOW_PWR => true,  -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
         IOSTANDARD   => "DEFAULT")
       port map (
@@ -111,8 +111,8 @@ begin
     signal frame_tmp : std_logic;
   begin
     inst_IBUFDS : IBUFDS
-      generic map (  
-        DIFF_TERM    => false,          -- Differential Termination 
+      generic map (
+        DIFF_TERM    => false,          -- Differential Termination
         IBUF_LOW_PWR => true,  -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
         IOSTANDARD   => "DEFAULT")
       port map (
@@ -165,8 +165,8 @@ begin
 
     gen_io : for i in data_tmp'range generate
       inst_IBUFDS : IBUFDS
-        generic map (  
-          DIFF_TERM    => false,        -- Differential Termination 
+        generic map (
+          DIFF_TERM    => false,        -- Differential Termination
           IBUF_LOW_PWR => true,  -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
           IOSTANDARD   => "DEFAULT")
         port map (
@@ -176,15 +176,15 @@ begin
           );
 
       inst_IDDR : IDDR
-        generic map (  
-          --DDR_CLK_EDGE => "SAME_EDGE",  -- "OPPOSITE_EDGE", "SAME_EDGE" 
-          DDR_CLK_EDGE => "SAME_EDGE_PIPELINED",  -- "OPPOSITE_EDGE", "SAME_EDGE" 
-          -- or "SAME_EDGE_PIPELINED" 
+        generic map (
+          --DDR_CLK_EDGE => "SAME_EDGE",  -- "OPPOSITE_EDGE", "SAME_EDGE"
+          DDR_CLK_EDGE => "SAME_EDGE_PIPELINED",  -- "OPPOSITE_EDGE", "SAME_EDGE"
+          -- or "SAME_EDGE_PIPELINED"
           INIT_Q1      => '0',          -- Initial value of Q1: '0' or '1'
           INIT_Q2      => '0',          -- Initial value of Q2: '0' or '1'
-          SRTYPE       => "SYNC")       -- Set/Reset type: "SYNC" or "ASYNC" 
+          SRTYPE       => "SYNC")       -- Set/Reset type: "SYNC" or "ASYNC"
         port map (
-          Q1 => data_tmp1(i),  -- 1-bit output for positive edge of clock 
+          Q1 => data_tmp1(i),  -- 1-bit output for positive edge of clock
           Q2 => data_tmp2(i),  -- 1-bit output for negative edge of clock
           C  => clk_tmp,                -- 1-bit clock input
           CE => '1',                    -- 1-bit clock enable input

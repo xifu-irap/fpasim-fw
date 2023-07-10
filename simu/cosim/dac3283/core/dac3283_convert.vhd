@@ -17,16 +17,16 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   dac3283_convert.vhd 
+--    @file                   dac3283_convert.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
---    This module converts an input std_logic_vector (2s'complement) into a real value.    
+--    This module converts an input std_logic_vector (2s'complement) into a real value.
 --
---    Note: 
+--    Note:
 --      . This module is not synthesizable (only for simulation).
 --
 -- -------------------------------------------------------------------------------------------------------------
