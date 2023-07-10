@@ -1354,8 +1354,7 @@ begin
       g_Q_N_C  => pkg_TES_MULT_SUB_Q_N_C,
       -- port S: AMD Q notation (fixed point)
       g_Q_M_S  => pkg_TES_MULT_SUB_Q_M_S,
-      g_Q_N_S  => pkg_TES_MULT_SUB_Q_N_S,
-      g_SIM_EN => pkg_TES_PULSE_MANAGER_COMPUTATION_SIM_EN
+      g_Q_N_S  => pkg_TES_MULT_SUB_Q_N_S
       )
     port map(
       i_clk => i_clk,

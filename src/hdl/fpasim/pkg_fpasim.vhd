@@ -265,9 +265,6 @@ package pkg_fpasim is
   -- hardcoded: latency of the "mult_sub_sfixed" module
   constant pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY : natural := pkg_MULT_SUB_SFIXED_LATENCY;  -- number of pipes to compute the result
 
-  -- user-defined: enable the overflow checking
-  constant pkg_TES_PULSE_MANAGER_COMPUTATION_SIM_EN : boolean := true;
-
   -- hardcoded: latency to force the output value when negative.
   constant pkg_TES_FORCE_OUTPUT_LATENCY : positive := 1;
 
