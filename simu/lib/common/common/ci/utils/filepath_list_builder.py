@@ -248,7 +248,6 @@ class FilepathListBuilder:
 
         file_extension_list = self._file_extension_list
         obj_display = self._obj_display
-        file_extension_list = self._file_extension_list
         level0 = self._get_indentation_level(level_p=level_p)
 
         base_path = str(Path(basepath_p).resolve())

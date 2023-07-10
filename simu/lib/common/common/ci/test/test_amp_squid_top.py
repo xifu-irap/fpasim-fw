@@ -139,7 +139,6 @@ def test_amp_squid_top():
     # save data in a output files
     ########################################################
     with open(output_filepath_out,'w') as fid:
-        csv_separator = ';'
         L = len(pts_list)
         index_max = L - 1
         for index,obj_pt in enumerate(pts_list):

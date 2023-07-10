@@ -282,7 +282,6 @@ class TesTopDataGen(VunitConf):
         for dic in dic_sequence:
             input_filename = dic["value"]['input_filename']
             output_filename = dic["value"]['output_filename']
-            name = dic["generic"]['name']
             output_filepath = str(Path(tb_input_base_path, output_filename))
             input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
 

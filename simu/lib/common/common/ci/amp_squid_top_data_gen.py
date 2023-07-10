@@ -166,7 +166,6 @@ class AmpSquidTopDataGen(VunitConf):
             max_value1 = dic["max_value1"]
             min_value2 = dic["min_value2"]
             max_value2 = dic["max_value2"]
-            max_value2 = dic["max_value2"]
             time_shift = dic["time_shift"]
 
             seq = ValidSequencer(name_p=filename)
@@ -198,7 +197,6 @@ class AmpSquidTopDataGen(VunitConf):
         for dic in dic_sequence:
             input_filename = dic["value"]['input_filename']
             output_filename = dic["value"]['output_filename']
-            name = dic["generic"]['name']
             output_filepath = str(Path(tb_input_base_path, output_filename))
             input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
 
