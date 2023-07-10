@@ -31,7 +31,7 @@
 library ieee;
 use ieee.math_real.all;
 
-PACKAGE pkg_utils IS
+package pkg_utils is
 
   ---------------------------------------------------------------------
   -- This function computes the minimal width bus necessary to represent a value
@@ -61,9 +61,9 @@ PACKAGE pkg_utils IS
   ---------------------------------------------------------------------
   function min(i_value0: in integer ; i_value1 : in integer) return integer;
 
-END pkg_utils;
+end pkg_utils;
 
-PACKAGE BODY pkg_utils IS
+package body pkg_utils is
 
   ---------------------------------------------------------------------
   -- This function computes the minimal width bus necessary to represent a value
@@ -126,4 +126,4 @@ end;
   end;
 
 
-END pkg_utils;
+end pkg_utils;
