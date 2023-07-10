@@ -36,4 +36,4 @@ context opal_kelly_context is
   use opal_kelly_lib.pkg_front_panel.all;
   use opal_kelly_lib.pkg_usb.all;
 
-end context;
+end context opal_kelly_context;

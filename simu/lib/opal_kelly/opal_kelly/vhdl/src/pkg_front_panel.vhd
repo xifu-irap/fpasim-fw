@@ -406,7 +406,7 @@ package pkg_front_panel is
         constant i_margin         : in time
     );
 
-end;
+end pkg_front_panel;
 
 package body pkg_front_panel is
 
@@ -1243,4 +1243,4 @@ package body pkg_front_panel is
         -- Wait for i_margin time, if any
         wait for i_margin;
     end procedure;
-end;
+end pkg_front_panel;

@@ -40,4 +40,4 @@ context common_context is
   use common_lib.pkg_ram_check.all;
   use common_lib.pkg_sequence.all;
 
-end context;
+end context common_context;

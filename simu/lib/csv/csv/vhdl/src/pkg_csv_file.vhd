@@ -128,7 +128,7 @@ package pkg_csv_file is
         procedure writeline(i_dummy : in t_void := VOID);
 
     end protected;
-end;
+end pkg_csv_file;
 
 package body pkg_csv_file is
 
@@ -469,4 +469,4 @@ package body pkg_csv_file is
 
     end protected body;
 
-end;
+end pkg_csv_file;
