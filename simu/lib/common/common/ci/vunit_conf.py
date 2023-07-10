@@ -251,7 +251,7 @@ class VunitConf(VunitUtils):
         tb_filename    = dic_tmp["vunit"]["tb_filename"]
         wave_filename  = dic_tmp["vunit"]["wave_filename"]
         test_variant_filename_list = dic_tmp["test_variant"]["filename_list"]
-        # self.tb_name = str(Path(tb_filename).stem)
+        
         self.tb_name = tb_entity_name
         self.tb_filename = tb_filename
         self.wave_filename = wave_filename

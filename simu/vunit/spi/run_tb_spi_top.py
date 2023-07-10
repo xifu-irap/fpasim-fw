@@ -27,8 +27,6 @@
 # -------------------------------------------------------------------------------------------------------------
 
 
-
-
 import os
 # Enable the coloring in the console
 os.system("")
@@ -112,9 +110,7 @@ if path_list != None:
 #################################################################
 from vunit import VUnit, VUnitCLI
 from common import Display, VunitConf
-# from common import TesTopDataGen
 
-# from vunit.about import version
 from vunit import about
      
 
@@ -227,11 +223,8 @@ if __name__ == '__main__':
     #####################################################
     # add source files
     #####################################################
-    # obj.compile_src(filename_p='top_fpasim_system.vhd',level_p=level1)
     obj.compile_src_directory(directory_name_p='utils',level_p=level1)
-    # obj.compile_src_directory(directory_name_p='clocking',level_p=level1)
     obj.compile_src_directory(directory_name_p='fpasim',level_p=level1)
-    # obj.compile_src_directory(directory_name_p='usb',level_p=level1)
     obj.compile_src_directory(directory_name_p='spi',level_p=level1)
 
     #####################################################
@@ -263,20 +256,6 @@ if __name__ == '__main__':
     # get the list of test_variant_filepath (if any)
     ######################################################
     test_variant_filepath_list = obj.get_test_variant_filepath(level_p=level1)
-
-    # ######################################################
-    # # get the list of ram configuration filepath
-    # ######################################################
-    # ram_filename_list = []
-    # ram_filename_list.append('cdce72010_init_mem_ext.mem')
-    # ram_filename_list.append('cdce72010_init_mem_int.mem')
-    # ram_filename_list.append('ads62p49_init_mem.mem')
-    # ram_filename_list.append('dac3283_init_mem.mem')
-    # ram_filename_list.append('amc7823_init_mem.mem')
-    # ram_filepath_list = obj.get_ram_filepath(filename_list_p=ram_filename_list,level_p=level1)
-
-    # obj.set_mif_files(filepath_list_p = ram_filepath_list)
-
     
     ######################################################
     # get the Vunit testbench object + testbench name
@@ -300,16 +279,6 @@ if __name__ == '__main__':
             name = variant_filename
             test_name = tb_name
                 
-            ####################################################################
-            # generate the input command/data files and others actions before launching the simulator
-            ####################################################################
-            # data_gen_obj = TesTopDataGen()
-            # data_gen_obj.set_indentation_level(level_p= level1)
-            # data_gen_obj.set_conf_filepath(conf_filepath_p= conf_filepath)
-            # data_gen_obj.set_vunit_conf_obj(obj_p= obj)
-
-            # get a dictionnary of generics parameter
-            # generic_dic = data_gen_obj.get_generic_dic()
             #####################################################
             # Mandatory: The simulator modelsim/Questa wants generics filepaths in the Linux format
             #####################################################
@@ -317,15 +286,11 @@ if __name__ == '__main__':
             tb.add_config(
                           name=test_name,
                           pre_config=obj.pre_config
-                          # generics = generic_dic
                             )
     else:
         tb.add_config(
                         name=test_name,
-                        # pre_config=obj.pre_config
-                        # generics = generic_dic
                     )
 
 
     obj.main()
-    # conf.pre_config(output_path = "test")

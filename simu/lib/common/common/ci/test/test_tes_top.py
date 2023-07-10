@@ -63,7 +63,6 @@ def test_tes_top():
     cmd_pixel_id = 0
     cmd_time_shift = 2
     cmd_pulse_height = 16384
-    # skip_nb_samples = 46025
     skip_nb_samples = 0
 
     tes_pulse_shape_filepath = str(Path(input_base_path, "tes_pulse_shape.csv"))

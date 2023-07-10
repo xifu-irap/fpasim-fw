@@ -262,12 +262,8 @@ if __name__ == '__main__':
     #####################################################
     # add the VHDL/verilog source files
     #####################################################
-    # obj.compile_src(filename_p='top_fpasim_system.vhd',level_p=level1)
     obj.compile_src_directory(directory_name_p='utils',level_p=level1)
-    # obj.compile_src_directory(directory_name_p='clocking',level_p=level1)
     obj.compile_src_directory(directory_name_p='fpasim',level_p=level1)
-    # obj.compile_src_directory(directory_name_p='usb',level_p=level1)
-    # obj.compile_src_directory(directory_name_p='io',level_p=level1)
 
     #####################################################
     # add the VHDL testbench file

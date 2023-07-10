@@ -276,7 +276,6 @@ begin
   p_master_fsm : process is
     variable v_val  : integer := 0;
     variable v_test : integer := 0;
-    variable v_cnt  : integer := 0;
 
   begin
     if runner_cfg'length > 0 then

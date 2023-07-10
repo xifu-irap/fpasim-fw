@@ -90,8 +90,6 @@ def test_tes_signalling():
     ########################################################
     for obj_pt in pts_list:
         str0 = obj_pt.get_info("bob", "bobi", "pixel_sof", "pixel_eof", "pixel_id", "frame_sof", "frame_eof", "frame_id")
-        # str0 = obj_pt.get_info("bob","bobi","pixel_sof","pixel_eof","pixel_id")
-        # str0 = obj_pt.get_info("pixel_sof", "pixel_id")
         print(str0)
 
 
