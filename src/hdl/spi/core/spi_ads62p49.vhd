@@ -17,18 +17,19 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   spi_ads62p49.vhd 
+--    @file                   spi_ads62p49.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
--- 
+--    @details
+--
 --    This module provides a spi link in order to configure the ADC ads62p49 of the FMC150 board of abaco system.
 --    The specific additional pins of the device are also configured.
---    
---    Note: 
+--
+--    Note:
 --     . The user must build the full SPI words (typically: addr + data)
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;

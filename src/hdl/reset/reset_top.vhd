@@ -17,14 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   reset_top.vhd 
+--    @file                   reset_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---    
---    This module manages reset mechanism   
+--    @details
+--
+--    This module manages reset mechanism
 --    It performs the following steps:
 --      . generate a software reset (user-defined pulse width) usb_rst @i_usb_clk
 --      . resynchronized the software reset for the IOs:
@@ -103,7 +103,7 @@ architecture RTL of reset_top is
   -- io_adc
   ---------------------------------------------------------------------
   signal adc_rst_tmp1       : std_logic;
-  signal adc_io_clk_rst     : std_logic;  
+  signal adc_io_clk_rst     : std_logic;
   signal adc_io_rst         : std_logic;
   signal adc_io_rst_phase90 : std_logic;
 

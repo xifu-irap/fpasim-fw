@@ -17,18 +17,18 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   fifo_sync_with_prog_full.vhd 
+--    @file                   fifo_sync_with_prog_full.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details             
--- 
+--    @details
+--
 --    The module intanciates a synchronuous FIFO with the empty, full and prog full flags.
 --    The module is a wrapper of the Xilinx XPM sync fifo.
---    Note: the following header documentation is an extract of the associated XPM Xilinx header.      
---    
--- -------------------------------------------------------------------------------------------------------------   
+--    Note: the following header documentation is an extract of the associated XPM Xilinx header.
+--
+-- -------------------------------------------------------------------------------------------------------------
 
 -- -------------------------------------------------------------------------------------------------------------
 -- XPM_FIFO instantiation template for Synchronous FIFO configurations
@@ -485,7 +485,7 @@ entity fifo_sync_with_prog_full is
     -- write side
     ---------------------------------------------------------------------
     i_wr_clk        : in  std_logic;    -- write clock
-    i_wr_rst        : in  std_logic;    -- write reset 
+    i_wr_rst        : in  std_logic;    -- write reset
     i_wr_en         : in  std_logic;    -- write enable
     i_wr_din        : in  std_logic_vector(g_WRITE_DATA_WIDTH - 1 downto 0); -- write data
     o_wr_full       : out std_logic;    -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
@@ -506,16 +506,16 @@ end entity fifo_sync_with_prog_full;
 architecture RTL of fifo_sync_with_prog_full is
 
   constant c_ADV_FEATURES : unsigned(15 downto 0) := (
-    0            => '0',                -- enables overflow flag; Default value of this bit is 1                           
-    1            => '1',                -- enables prog_full flag; Default value of this bit is 1                          
-    2            => '0',                -- enables wr_data_count; Default value of this bit is 1                           
-    3            => '0',                -- enables almost_full flag; Default value of this bit is 0                        
+    0            => '0',                -- enables overflow flag; Default value of this bit is 1
+    1            => '1',                -- enables prog_full flag; Default value of this bit is 1
+    2            => '0',                -- enables wr_data_count; Default value of this bit is 1
+    3            => '0',                -- enables almost_full flag; Default value of this bit is 0
     4            => '0',                -- enables wr_ack flag; Default value of this bit is 0
     7 downto 5   => '0',
-    8            => '0',                -- enables underflow flag; Default value of this bit is 1                          
-    9            => '0',                -- enables prog_empty flag; Default value of this bit is 1                         
-    10           => '0',                -- enables rd_data_count; Default value of this bit is 1                          
-    11           => '0',                -- enables almost_empty flag; Default value of this bit is 0                      
+    8            => '0',                -- enables underflow flag; Default value of this bit is 1
+    9            => '0',                -- enables prog_empty flag; Default value of this bit is 1
+    10           => '0',                -- enables rd_data_count; Default value of this bit is 1
+    11           => '0',                -- enables almost_empty flag; Default value of this bit is 0
     12           => '1',                -- enables data_valid flag; Default value of this bit is 0
     15 downto 13 => '0'
   );

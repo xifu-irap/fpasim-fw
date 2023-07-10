@@ -16,20 +16,21 @@
 --                              You should have received a copy of the GNU General Public License
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   regdecode_recording.vhd 
+--    @file                   regdecode_recording.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details        
---!   This module manage the recording registers as well as the pipe_out link
---!   The architecture principle is as follows:
---!        @i_clk clock domain                          |                   @ i_out_clk clock domain
---!        i_rec_ctrl/i_rec_conf0 -----------------> async_fifo -----------> o_rec_ctrl/o_rec_conf0
---!                                                                       |
---!        o_usb_rec_ctrl/o_usb_rec_conf0 <---------  async_fifo <---------
---!
---!        o_usb_fifo_adc_data   <---------------- sync_FIFO <-- async_fifo <-------------- i_fifo_adc_data 
+--    @details
+--    This module manage the recording registers as well as the pipe_out link
+--    The architecture principle is as follows:
+--         @i_clk clock domain                          |                   @ i_out_clk clock domain
+--         i_rec_ctrl/i_rec_conf0 -----------------> async_fifo -----------> o_rec_ctrl/o_rec_conf0
+--                                                                        |
+--         o_usb_rec_ctrl/o_usb_rec_conf0 <---------  async_fifo <---------
+--
+--         o_usb_fifo_adc_data   <---------------- sync_FIFO <-- async_fifo <-------------- i_fifo_adc_data
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;

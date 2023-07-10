@@ -17,22 +17,22 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   io_dac_data_insert.vhd 
+--    @file                   io_dac_data_insert.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module does the following steps:
 --       . pass data words from @sys_clk to the @i_dac_clk (async FIFO)
---    At the output of the internal async fifo, 
+--    At the output of the internal async fifo,
 --       .for each channel and word, the corresponding dac data bytes are splitted in order to send the MSB bytes first (see dac3283 datasheet).
 --       .for each word, the dac_frame bit is duplicated.
 --
 --    The architecture is as follows:
---      @i_clk                              -------->     @i_dac_clk                  ---->  output 
---      i_dac1 (16 bits) & i_dac0(16 bits)  -------->     ASYNC_FIFO                  ---->  64 bit-word  
+--      @i_clk                              -------->     @i_dac_clk                  ---->  output
+--      i_dac1 (16 bits) & i_dac0(16 bits)  -------->     ASYNC_FIFO                  ---->  64 bit-word
 --      i_dac_frame (1 bits)                -------->                (duplicate bits) ---->  8 bit-word
 --
 --
@@ -52,7 +52,7 @@ entity io_dac_data_insert is
     i_rst         : in std_logic;       -- reset signal
     i_rst_status  : in std_logic;       -- reset error flag(s)
     i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
-    i_dac_valid   : in std_logic;       -- input dac valid  value 
+    i_dac_valid   : in std_logic;       -- input dac valid  value
     i_dac_frame   : in std_logic;       -- first sample of the frame
     i_dac1        : in std_logic_vector(15 downto 0);  -- dac0 value
     i_dac0        : in std_logic_vector(15 downto 0);  -- dac0 value
@@ -183,7 +183,7 @@ begin
       o_rd_empty      => empty1,
       o_rd_rst_busy   => rd_rst_busy1,
       ---------------------------------------------------------------------
-      -- resynchronized errors/status 
+      -- resynchronized errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync0,
       o_empty_sync    => empty_sync0
@@ -208,7 +208,7 @@ begin
   --  with data_tmp(i) <= dac0/1(j)
   --     i: the index is taken from ip/xilinx/coregen/selectio_wiz_dac/selectio_wiz_dac_sim_netlist
   --     j: the index must follows the dac datasheet (dac3283)
-  --  example: 
+  --  example:
   --   .serial link0, data: bit8 -> bit0
   --       dac_tmp(56) <= dac1_word1(0);-- bit0 dac channel1 word1
   --       dac_tmp(48) <= dac1_word1(8);-- bit8 dac channel1 word1

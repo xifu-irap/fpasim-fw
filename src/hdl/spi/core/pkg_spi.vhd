@@ -17,22 +17,22 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   pkg_spi.vhd 
+--    @file                   pkg_spi.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
---    This package defines all constant used by the spi function. 
+--    This package defines all constant used by the spi function.
 --    These constants configure the SPI parameters for the differents device
 --
---  Note: (see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html)  
---   SPI_MODE |CPOL|CPHA| clock polarity (idle state)| clock data sampling | clock data shift out
---   0        |  0 | 0  | 0                          | rising_edge         | falling_edge
---   1        |  0 | 1  | 0                          | falling_edge        | rising_edge
---   2        |  1 | 0  | 1                          | rising_edge         | falling_edge
---   3        |  1 | 1  | 1                          | falling_edge        | rising_edge
+--    Note: (see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html)
+--     SPI_MODE |CPOL|CPHA| clock polarity (idle state)| clock data sampling | clock data shift out
+--     0        |  0 | 0  | 0                          | rising_edge         | falling_edge
+--     1        |  0 | 1  | 0                          | falling_edge        | rising_edge
+--     2        |  1 | 0  | 1                          | rising_edge         | falling_edge
+--     3        |  1 | 1  | 1                          | falling_edge        | rising_edge
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -62,11 +62,11 @@ package pkg_spi is
 
   -------------------------------------------------------------------
   -- CDCE72010
-  --   .see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html 
+  --   .see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html
   -------------------------------------------------------------------
   -- user-defined : SPI clock polarity
   constant pkg_SPI_CDCE_CPOL                 : std_logic := '0';
-  -- user-defined : SPI clock phase 
+  -- user-defined : SPI clock phase
   constant pkg_SPI_CDCE_CPHA                 : std_logic := '0';
   -- auto-computed : input clock frequency of the module (expressed in Hz). (possible values: ]2*g_SPI_FREQUENCY_MAX_HZ: max_integer_value])
   constant pkg_SPI_CDCE_SYSTEM_FREQUENCY_HZ  : positive  := pkg_USB_SYSTEM_FREQUENCY_HZ;
@@ -79,7 +79,7 @@ package pkg_spi is
 
   -------------------------------------------------------------------
   -- ADC (ADS62p49)
-  --   .see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html 
+  --   .see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html
   -------------------------------------------------------------------
   -- user-defined : SPI clock polarity
   constant pkg_SPI_ADC_CPOL                 : std_logic := '1';
@@ -97,7 +97,7 @@ package pkg_spi is
 
   -------------------------------------------------------------------
   -- DAC3283
-  --   .see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html 
+  --   .see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html
   -------------------------------------------------------------------
   -- user-defined : SPI clock polarity
   constant pkg_SPI_DAC_CPOL                 : std_logic := '0';
@@ -114,7 +114,7 @@ package pkg_spi is
 
   -------------------------------------------------------------------
   -- AMC7823
-  --   .see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html 
+  --   .see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html
   -------------------------------------------------------------------
   -- user-defined : SPI clock polarity
   constant pkg_SPI_AMC_CPOL                 : std_logic := '0';

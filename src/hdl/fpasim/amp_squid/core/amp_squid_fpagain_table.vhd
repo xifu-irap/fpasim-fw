@@ -17,13 +17,13 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   amp_squid_fpagain_table.vhd 
+--    @file                   amp_squid_fpagain_table.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
--- 
+--    @details
+--
 -- This module outputs a pre-defined fpasim_gain value from a user-defined command
 --
 -- Note:
@@ -84,17 +84,17 @@ begin
             gain_r1 <= to_sfixed(0.25, gain_r1);
           when "001" =>                 -- 1
             gain_r1 <= to_sfixed(0.5, gain_r1);
-          when "010" =>                 -- 2 
+          when "010" =>                 -- 2
             gain_r1 <= to_sfixed(0.75, gain_r1);
-          when "011" =>                 -- 3 
+          when "011" =>                 -- 3
             gain_r1 <= to_sfixed(1, gain_r1);
-          when "100" =>                 -- 4 
+          when "100" =>                 -- 4
             gain_r1 <= to_sfixed(1.5, gain_r1);
-          when "101" =>                 -- 5 
+          when "101" =>                 -- 5
             gain_r1 <= to_sfixed(2, gain_r1);
-          when "110" =>                 -- 6 
+          when "110" =>                 -- 6
             gain_r1 <= to_sfixed(3, gain_r1);
-          when others =>                 -- 7 
+          when others =>                 -- 7
             gain_r1 <= to_sfixed(4, gain_r1);
         end case;
       end if;

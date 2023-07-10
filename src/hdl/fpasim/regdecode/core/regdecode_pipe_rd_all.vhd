@@ -17,27 +17,28 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   regdecode_pipe_rd_all.vhd 
+--    @file                   regdecode_pipe_rd_all.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details    
---!               
---!   This module multiplexes its 5 inputs into an output FIFO.
---!                
---! 
---!   The architecture is as follows:
---!
---!        i_fifo_addr0/i_fifo_data0-------|
---!        i_fifo_addr1/i_fifo_data1-------|
---!        i_fifo_addr2/i_fifo_data2-------|--- FSM ----->  sync_fifo -----------> o_fifo_data
---!        i_fifo_addr3/i_fifo_data3-------|
---!        i_fifo_addr4/i_fifo_data4-------|
---!        
---!   Note: 
---!     . each input path are fully read until the associated eof flags is reached before passing to the next input.
---!     . the FSM manages the output data flow via the output fifo flag. So, the output data flow can be paused.
+--    @details
+--
+--    This module multiplexes its 5 inputs into an output FIFO.
+--
+--
+--    The architecture is as follows:
+--
+--         i_fifo_addr0/i_fifo_data0-------|
+--         i_fifo_addr1/i_fifo_data1-------|
+--         i_fifo_addr2/i_fifo_data2-------|--- FSM ----->  sync_fifo -----------> o_fifo_data
+--         i_fifo_addr3/i_fifo_data3-------|
+--         i_fifo_addr4/i_fifo_data4-------|
+--
+--    Note:
+--      . each input path are fully read until the associated eof flags is reached before passing to the next input.
+--      . the FSM manages the output data flow via the output fifo flag. So, the output data flow can be paused.
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -51,13 +52,13 @@ entity regdecode_pipe_rd_all is
     );
   port(
     i_clk         : in std_logic;       -- clock
-    i_rst         : in std_logic;       -- reset 
+    i_rst         : in std_logic;       -- reset
     i_rst_status  : in std_logic;       -- reset error flag(s)
     i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
     -- input0
-    o_fifo_rd0         : out std_logic;  -- fifo read enable 
-    i_fifo_sof0        : in  std_logic;  -- fifo first sample 
+    o_fifo_rd0         : out std_logic;  -- fifo read enable
+    i_fifo_sof0        : in  std_logic;  -- fifo first sample
     i_fifo_eof0        : in  std_logic;  -- fifo last sample
     i_fifo_data_valid0 : in  std_logic;  -- fifo data valid
     i_fifo_addr0       : in  std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- address value
@@ -292,7 +293,7 @@ begin
           rd4_next <= '0';
         end if;
 
-      when others =>  
+      when others =>
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -410,7 +411,7 @@ begin
       o_rd_empty      => empty1,
       o_rd_rst_busy   => open,
       ---------------------------------------------------------------------
-      --  errors/status 
+      --  errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync,
       o_empty_sync    => empty_sync

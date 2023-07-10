@@ -17,18 +17,18 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   fifo_async_with_prog_full_wr_count.vhd 
+--    @file                   fifo_async_with_prog_full_wr_count.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---    
+--    @details
+--
 --    The module intanciates an asynchronuous FIFO with the empty, full, prog full and wr_data_count flags/signals.
 --    The module is a wrapper of the Xilinx XPM sync fifo.
---    Note: the following header documentation is an extract of the associated XPM Xilinx header.     
---    
--- -------------------------------------------------------------------------------------------------------------  
+--    Note: the following header documentation is an extract of the associated XPM Xilinx header.
+--
+-- -------------------------------------------------------------------------------------------------------------
 
 -- -------------------------------------------------------------------------------------------------------------
 -- Parameter usage table, organized as follows:
@@ -506,7 +506,7 @@ entity fifo_async_with_prog_full_wr_count is
     -- write side
     ---------------------------------------------------------------------
     i_wr_clk        : in  std_logic;    -- write clock
-    i_wr_rst        : in  std_logic;    -- write reset 
+    i_wr_rst        : in  std_logic;    -- write reset
     i_wr_en         : in  std_logic;    -- write enable
     i_wr_din        : in  std_logic_vector(g_WRITE_DATA_WIDTH - 1 downto 0); -- write data
     o_wr_full       : out std_logic;    -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
@@ -529,16 +529,16 @@ end entity fifo_async_with_prog_full_wr_count;
 architecture RTL of fifo_async_with_prog_full_wr_count is
 
   constant c_ADV_FEATURES : unsigned(15 downto 0) := (
-    0            => '0',                -- enables overflow flag; Default value of this bit is 1                           
-    1            => '1',                -- enables prog_full flag; Default value of this bit is 1                          
-    2            => '1',                -- enables wr_data_count; Default value of this bit is 1                           
-    3            => '0',                -- enables almost_full flag; Default value of this bit is 0                        
+    0            => '0',                -- enables overflow flag; Default value of this bit is 1
+    1            => '1',                -- enables prog_full flag; Default value of this bit is 1
+    2            => '1',                -- enables wr_data_count; Default value of this bit is 1
+    3            => '0',                -- enables almost_full flag; Default value of this bit is 0
     4            => '0',                -- enables wr_ack flag; Default value of this bit is 0
     7 downto 5   => '0',
-    8            => '0',                -- enables underflow flag; Default value of this bit is 1                          
-    9            => '0',                -- enables prog_empty flag; Default value of this bit is 1                         
-    10           => '0',                -- enables rd_data_count; Default value of this bit is 1                          
-    11           => '0',                -- enables almost_empty flag; Default value of this bit is 0                      
+    8            => '0',                -- enables underflow flag; Default value of this bit is 1
+    9            => '0',                -- enables prog_empty flag; Default value of this bit is 1
+    10           => '0',                -- enables rd_data_count; Default value of this bit is 1
+    11           => '0',                -- enables almost_empty flag; Default value of this bit is 0
     12           => '1',                -- enables data_valid flag; Default value of this bit is 0
     15 downto 13 => '0'
   );
@@ -583,7 +583,7 @@ begin
   -- xilinx template
   ---------------------------------------------------------------------
   inst_xpm_fifo_async : xpm_fifo_async
-    generic map(                        
+    generic map(
       CASCADE_HEIGHT      => 0,         -- DECIMAL
       CDC_SYNC_STAGES     => g_CDC_SYNC_STAGES, -- DECIMAL
       DOUT_RESET_VALUE    => "0",       -- String
@@ -604,7 +604,7 @@ begin
       WRITE_DATA_WIDTH    => g_WRITE_DATA_WIDTH, -- DECIMAL
       WR_DATA_COUNT_WIDTH => g_WR_DATA_COUNT_WIDTH -- DECIMAL
     )
-    port map(                           
+    port map(
       almost_empty  => open,            -- 1-bit output: Almost Empty : When asserted, this signal indicates that
       -- only one more read can be performed before the FIFO goes to empty.
 

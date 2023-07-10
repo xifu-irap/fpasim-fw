@@ -17,14 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---   @file                   pkg_utils.vhd 
+--    @file                   pkg_utils.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---   @details                
+--    @details
 --
---   This package defines commonly used function/procedure
+--    This package defines commonly used function/procedure
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -92,7 +92,7 @@ end;
   ---------------------------------------------------------------------
   function pkg_width_from_indexes(i_idx_high : in integer; i_idx_low : in integer) return integer is
     variable v_result : integer;
-  begin 
+  begin
     v_result := (i_idx_high - i_idx_low) + 1;
     return v_result;
   end;

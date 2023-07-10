@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   sub_sfixed.vhd 
+--    @file                   sub_sfixed.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module computes the following formula: s = a - b (sfixed point representation)
 --    It performs the following steps:
@@ -44,7 +44,7 @@ entity sub_sfixed is
   generic(
     -- port A: ARM Q notation (fixed point)
     g_Q_M_A : in positive := 15; -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
-    g_Q_N_A : in natural := 0; -- number of fraction bits. Possible values [0;integer_max_value[ 
+    g_Q_N_A : in natural := 0; -- number of fraction bits. Possible values [0;integer_max_value[
     -- port B: ARM Q notation (fixed point)
     g_Q_M_B : in positive := 15; -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
     g_Q_N_B : in natural := 0; -- number of fraction bits. Possible values [0;integer_max_value[
@@ -90,7 +90,7 @@ architecture RTL of sub_sfixed is
     signal res_r2 : sfixed(sfixed_high(a_r1, '-', b_r1) downto sfixed_low(a_r1, '-', b_r1)):= (others => '0');
 
     -----------------------------------------------------------------
-    -- truncate: 
+    -- truncate:
     --   extract sfixed range
     --   sfixed -> std_logic_vector conversion
     -----------------------------------------------------------------

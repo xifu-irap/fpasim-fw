@@ -17,16 +17,16 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   sdpram.vhd 
+--    @file                   sdpram.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                 
---  
---    The module is a wrapper of the Xilinx XPM Single Dual Port RAM   
---    Note: the following header documentation is an extract of the associated XPM Xilinx header  
---           
+--    @details
+--
+--    The module is a wrapper of the Xilinx XPM Single Dual Port RAM
+--    Note: the following header documentation is an extract of the associated XPM Xilinx header
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 -- -------------------------------------------------------------------------------------------------------------
@@ -370,7 +370,7 @@ entity sdpram is
     -- | As this parameter is a string, please specify the hex values inside double quotes. As an example,                   |
     -- | If the read data width is 8, then specify READ_RESET_VALUE_B = "EA";                                                |
     -- | When ECC is enabled, reset value is not supported.                                                                  |
-    -- g_READ_RESET_VALUE_B : string := "0"; 
+    -- g_READ_RESET_VALUE_B : string := "0";
 
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | CLOCKING_MODE        | String             | Allowed values: common_clock, independent_clock. Default value = common_clock.|
@@ -430,13 +430,13 @@ entity sdpram is
     -- |   "encode_only" - Enables ECC Encoder only                                                                          |
     -- |   "decode_only" - Enables ECC Decoder only                                                                          |
     -- |   "both_encode_and_decode" - Enables both ECC Encoder and Decoder                                                   |
-    -- g_ECC_MODE : string := "no_ecc";                                       
+    -- g_ECC_MODE : string := "no_ecc";
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | MEMORY_OPTIMIZATION  | String             | Allowed values: true, false. Default value = true.                      |
     -- |---------------------------------------------------------------------------------------------------------------------|
     -- | Specify "true" to enable the optimization of unused memory or bits in the memory structure. Specify "false" to      |
     -- | disable the optimization of unused memory or bits in the memory structure.                                          |
-    -- g_MEMORY_OPTIMIZATION : string := "true";     
+    -- g_MEMORY_OPTIMIZATION : string := "true";
 
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | RST_MODE_A           | String             | Allowed values: SYNC, ASYNC. Default value = SYNC.                      |
@@ -445,7 +445,7 @@ entity sdpram is
     -- |                                                                                                                     |
     -- |   "SYNC" - when reset is applied, synchronously resets output port douta to the value specified by parameter READ_RESET_VALUE_A|
     -- |   "ASYNC" - when reset is applied, asynchronously resets output port douta to zero                                  |
-    -- g_RST_MODE_A : string := "SYNC";                                       
+    -- g_RST_MODE_A : string := "SYNC";
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | RST_MODE_B           | String             | Allowed values: SYNC, ASYNC. Default value = SYNC.                      |
     -- |---------------------------------------------------------------------------------------------------------------------|
@@ -453,24 +453,24 @@ entity sdpram is
     -- |                                                                                                                     |
     -- |   "SYNC" - when reset is applied, synchronously resets output port doutb to the value specified by parameter READ_RESET_VALUE_B|
     -- |   "ASYNC" - when reset is applied, asynchronously resets output port doutb to zero                                  |
-    -- g_RST_MODE_B : string := "SYNC";  
+    -- g_RST_MODE_B : string := "SYNC";
 
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | MESSAGE_CONTROL      | Integer            | Range: 0 - 1. Default value = 0.                                        |
     -- |---------------------------------------------------------------------------------------------------------------------|
     -- | Specify 1 to enable the dynamic message reporting such as collision warnings, and 0 to disable the message reporting|
-    -- g_MESSAGE_CONTROL : integer := 0; 
+    -- g_MESSAGE_CONTROL : integer := 0;
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | SIM_ASSERT_CHK       | Integer            | Range: 0 - 1. Default value = 0.                                        |
     -- |---------------------------------------------------------------------------------------------------------------------|
     -- | 0- Disable simulation message reporting. Messages related to potential misuse will not be reported.                 |
     -- | 1- Enable simulation message reporting. Messages related to potential misuse will be reported.                      |
-    -- g_SIM_ASSERT_CHK : integer := 0; 
+    -- g_SIM_ASSERT_CHK : integer := 0;
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | USE_EMBEDDED_CONSTRAINT| Integer            | Range: 0 - 1. Default value = 0.                                        |
     -- |---------------------------------------------------------------------------------------------------------------------|
     -- | Specify 1 to enable the set_false_path constraint addition between clka of Distributed RAM and doutb_reg on clkb    |
-    -- g_USE_EMBEDDED_CONSTRAINT : integer := 1;   
+    -- g_USE_EMBEDDED_CONSTRAINT : integer := 1;
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | USE_MEM_INIT         | Integer            | Range: 0 - 1. Default value = 1.                                        |
     -- |---------------------------------------------------------------------------------------------------------------------|
@@ -479,12 +479,12 @@ entity sdpram is
     -- | Initial memory contents will be all 0s."                                                                            |
     -- | NOTE: This message gets generated only when there is no Memory Initialization specified either through file or      |
     -- | Parameter.                                                                                                          |
-    -- g_USE_MEM_INIT : integer := 1;    
+    -- g_USE_MEM_INIT : integer := 1;
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | USE_MEM_INIT_MMI     | Integer            | Range: 0 - 1. Default value = 0.                                        |
     -- |---------------------------------------------------------------------------------------------------------------------|
     -- | Specify 1 to expose this memory information to be written out in the MMI file.                                      |
-    -- g_USE_MEM_INIT_MMI : integer := 0;      
+    -- g_USE_MEM_INIT_MMI : integer := 0;
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | AUTO_SLEEP_TIME      | Integer            | Range: 0 - 15. Default value = 0.                                       |
     -- |---------------------------------------------------------------------------------------------------------------------|
@@ -494,19 +494,19 @@ entity sdpram is
     -- |   3-15 - Number of auto-sleep latency cycles                                                                        |
     -- |                                                                                                                     |
     -- | Do not change from the value provided in the template instantiation.
-    -- g_AUTO_SLEEP_TIME : integer := 0;   
+    -- g_AUTO_SLEEP_TIME : integer := 0;
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | CASCADE_HEIGHT       | Integer            | Range: 0 - 64. Default value = 0.                                       |
     -- |---------------------------------------------------------------------------------------------------------------------|
     -- | 0- No Cascade Height, Allow Vivado Synthesis to choose.                                                             |
     -- | 1 or more - Vivado Synthesis sets the specified value as Cascade Height.                                            |
-    -- g_CASCADE_HEIGHT : integer := 0;   
+    -- g_CASCADE_HEIGHT : integer := 0;
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | WAKEUP_TIME          | String             | Allowed values: disable_sleep, use_sleep_pin. Default value = disable_sleep.|
     -- |---------------------------------------------------------------------------------------------------------------------|
     -- | Specify "disable_sleep" to disable dynamic power saving option, and specify "use_sleep_pin" to enable the           |
     -- | dynamic power saving option                                                                                         |
-    -- g_WAKEUP_TIME : string := "disable_sleep";  
+    -- g_WAKEUP_TIME : string := "disable_sleep";
     -- +---------------------------------------------------------------------------------------------------------------------+
     -- | WRITE_PROTECT        | Integer            | Range: 0 - 1. Default value = 1.                                        |
     -- |---------------------------------------------------------------------------------------------------------------------|
@@ -514,7 +514,7 @@ entity sdpram is
     -- | When 0, disables write protection. Write enable (WE) directly connected to memory.                                  |
     -- | NOTE: Disable this option only if the advanced users can guarantee that the write enable (WE) cannot be given without enable (EN).|
     -- +---------------------------------------------------------------------------------------------------------------------+
-    -- g_WRITE_PROTECT : integer := 1      
+    -- g_WRITE_PROTECT : integer := 1
 
   );
   port(
@@ -570,7 +570,7 @@ begin
   -- xilinx template
   ---------------------------------------------------------------------
   inst_xpm_memory_sdpram : xpm_memory_sdpram
-    generic map(                        
+    generic map(
       ADDR_WIDTH_A            => g_ADDR_WIDTH_A, -- DECIMAL
       ADDR_WIDTH_B            => g_ADDR_WIDTH_B, -- DECIMAL
       AUTO_SLEEP_TIME         => 0,     -- DECIMAL

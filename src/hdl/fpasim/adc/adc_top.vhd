@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   adc_top.vhd 
+--    @file                   adc_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module performs the following steps:
 --       . for each data path, add an independant user-defined dynamic latency
@@ -64,7 +64,7 @@ entity adc_top is
     i_adc1        : in  std_logic_vector(g_ADC1_WIDTH - 1 downto 0); -- adc1 value
     i_adc0        : in  std_logic_vector(g_ADC0_WIDTH - 1 downto 0); -- adc0 value
     ---------------------------------------------------------------------
-    -- output 
+    -- output
     ---------------------------------------------------------------------
     -- from regdecode
     -----------------------------------------------------------------
@@ -115,7 +115,7 @@ begin
   ---------------------------------------------------------------------
   inst_dynamic_shift_register_with_valid_adc1 : entity work.dynamic_shift_register_with_valid
     generic map(
-      g_ADDR_WIDTH => i_adc1_delay'length, -- width of the address. Possibles values: [2, integer max value[ 
+      g_ADDR_WIDTH => i_adc1_delay'length, -- width of the address. Possibles values: [2, integer max value[
       g_DATA_WIDTH => i_adc1'length  -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(

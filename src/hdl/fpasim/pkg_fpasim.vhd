@@ -17,14 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---   @file                   pkg_fpasim.vhd 
+--    @file                   pkg_fpasim.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---   @details                
+--    @details
 --
---   This package defines all constants associted to the fpasim function and its sub-functions. 
+--    This package defines all constants associted to the fpasim function and its sub-functions.
 --
 --
 --    Note: Frame and column names are interchangeable
@@ -57,7 +57,7 @@ package pkg_fpasim is
   -- hardcoded : latency of the dynamic shif register when its input delay is set to 0
   constant pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY : natural := 1;
 
-  -- pixel: 
+  -- pixel:
   -- requirement: FPASIM-FW-REQ-0030
   -- user-defined: maximal number of pixels by column authorized by the design (must be a power of 2)
   constant pkg_MUX_FACT_MAX                 : positive := 64;

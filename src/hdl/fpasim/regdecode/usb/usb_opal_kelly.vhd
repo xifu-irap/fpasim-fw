@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   usb_opal_kelly.vhd 
+--    @file                   usb_opal_kelly.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module instanciates the necessary different opal kelly component
 --
@@ -220,7 +220,7 @@ begin
   --    Opal Kelly Host
   ----------------------------------------------------
   Opal_Kelly_Host : okHost
-    port map(  
+    port map(
       okUH  => i_okUH,
       okHU  => o_okHU,
       okUHU => b_okUHU,
@@ -626,7 +626,7 @@ begin
 
 
   ---------------------------------------------------------------------
-  -- 
+  --
   ---------------------------------------------------------------------
   inst_okwireout_ep3D : okWireOut
     port map(
@@ -665,7 +665,7 @@ begin
       );
   ----------------------------------------------------
   --    Opal Kelly Pipe in
-  ----------------------------------------------------  
+  ----------------------------------------------------
   inst_okpipein_ep80 : okPipeIn
     port map(
       okHE       => okHE,

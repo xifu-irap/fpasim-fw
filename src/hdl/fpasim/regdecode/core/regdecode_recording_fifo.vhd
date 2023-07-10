@@ -17,18 +17,18 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   regdecode_recording_fifo.vhd 
+--    @file                   regdecode_recording_fifo.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---   @details     
---   
+--   @details
+--
 --   This module can build packet of usb max packet siz
 --
 --   The architecture is as follows:
---   
---   i_fifo_data -> async_fifo (small) -> fifo_sync(max usb packet size) -> o_usb_fifo_data 
+--
+--   i_fifo_data -> async_fifo (small) -> fifo_sync(max usb packet size) -> o_usb_fifo_data
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -103,15 +103,15 @@ architecture RTL of regdecode_recording_fifo is
   signal wr_rst0       : std_logic;
   signal wr_tmp0       : std_logic;
   signal wr_data_tmp0  : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
-  signal wr_full0      : std_logic; 
+  signal wr_full0      : std_logic;
   signal wr_prog_full0 : std_logic;
-  signal wr_rst_busy0  : std_logic; 
+  signal wr_rst_busy0  : std_logic;
 
   signal rd1          : std_logic;
   signal data_valid1  : std_logic;
   signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
   signal empty1       : std_logic;
-  signal rd_rst_busy1 : std_logic; 
+  signal rd_rst_busy1 : std_logic;
 
   signal errors_sync1 : std_logic_vector(3 downto 0);
   signal empty_sync1  : std_logic;
@@ -130,15 +130,15 @@ architecture RTL of regdecode_recording_fifo is
   signal wr_tmp2        : std_logic;
   signal wr_data_tmp2   : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
   signal wr_data_count2 : std_logic_vector(c_WR_DATA_COUNT_WIDTH2 - 1 downto 0);
-  signal wr_full2       : std_logic; 
+  signal wr_full2       : std_logic;
   signal wr_prog_full2  : std_logic;
-  signal wr_rst_busy2   : std_logic; 
+  signal wr_rst_busy2   : std_logic;
 
   signal rd3          : std_logic;
   signal data_valid3  : std_logic;
   signal data_tmp3    : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
   signal empty3       : std_logic;
-  signal rd_rst_busy3 : std_logic; 
+  signal rd_rst_busy3 : std_logic;
 
   signal sof3  : std_logic;
   signal eof3  : std_logic;
@@ -206,7 +206,7 @@ begin
       o_rd_empty      => empty1,
       o_rd_rst_busy   => rd_rst_busy1,
       ---------------------------------------------------------------------
-      -- resynchronized errors/ empty status 
+      -- resynchronized errors/ empty status
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync1,
       o_empty_sync    => empty_sync1
@@ -260,7 +260,7 @@ begin
       o_rd_rst_busy   => rd_rst_busy3,
 ---------------------------------------------------------------------
       -- errors/status
-      --------------------------------------------------------------------- 
+      ---------------------------------------------------------------------
       o_errors_sync   => errors_sync3,
       o_empty_sync    => empty_sync3
       );

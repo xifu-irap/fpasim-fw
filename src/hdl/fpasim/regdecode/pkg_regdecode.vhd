@@ -17,15 +17,15 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   pkg_regdecode.vhd 
+--    @file                   pkg_regdecode.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
--- 
+--    @details
+--
 --  This package defines all constants associtated to the regdecode function and its sub-functions.
--- 
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -39,7 +39,7 @@ use work.pkg_fpasim.all;
 package pkg_regdecode is
 
   ---------------------------------------------------------------------
-  -- 
+  --
   ---------------------------------------------------------------------
   -- user-defined: Firmware version
   -- requirement: FPASIM-FW-REQ-0290
@@ -62,7 +62,7 @@ package pkg_regdecode is
   -- the following constants define the address range associated to each RAM
   -- in order to decode the data flow from the Opal Kelly pipe in
   -------------------------------------------------------------------
-  -- user-defined: address width of the register 
+  -- user-defined: address width of the register
   constant pkg_REG_ADDR_WIDTH : positive := 16;
 
   -- requirement: FPASIM-FW-REQ-0100
@@ -103,7 +103,7 @@ package pkg_regdecode is
   ---------------------------------------------------------------------
   -- register field definition
   -- The following constants define the bit range of each register field.
-  -- Note: 
+  -- Note:
   --   .the bit range should match the bit range of the api_registre_fpasim.xlsx file
   --   . when the field is composed by 1 bit, only 1 XXX_IDX_H constant is defined
   --   . When the field is composed by 2 bits or more, 2 constants are defined:
@@ -229,7 +229,7 @@ package pkg_regdecode is
   -- auto-computed: ra_delay width
   constant pkg_RA_DELAY_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_RA_DELAY_IDX_H, i_idx_low => pkg_RA_DELAY_IDX_L);
 
-  -- user-defined: tes_conf 
+  -- user-defined: tes_conf
   ---------------------------------------------------------------------
   -- requirement: FPASIM-FW-REQ-0030
   -- user-defined: pixel_nb (bit index high)
@@ -306,7 +306,7 @@ package pkg_regdecode is
   constant pkg_SPI_CONF1_DAC_TX_ENABLE_IDX_H : integer := 0;
 
 
-  -- user-defined: debug_ctrl 
+  -- user-defined: debug_ctrl
   ---------------------------------------------------------------------
   -- user-defined: debug_pulse (bit index)
   constant pkg_DEBUG_CTRL_DEBUG_PULSE_IDX_H : integer := 0;

@@ -17,12 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   spi_io.vhd 
+--    @file                   spi_io.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
+--
+--    This is the top level of the IO managements.
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -187,7 +189,7 @@ begin
         IS_D2_INVERTED => '0',
         SRTYPE         => "ASYNC"
         )
-      port map (  
+      port map (
         C  => i_clk,
         CE => '1',
         D1 => i_spi_sclk,
@@ -197,8 +199,8 @@ begin
         S  => '0'
         );
 
-    inst_obuf : unisim.vcomponents.OBUF  
-      port map (  
+    inst_obuf : unisim.vcomponents.OBUF
+      port map (
         I => clk_fwd_out,
         O => clk_to_pins
         );

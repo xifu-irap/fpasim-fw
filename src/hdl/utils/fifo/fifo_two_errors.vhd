@@ -17,23 +17,24 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   fifo_two_errors.vhd 
+--    @file                   fifo_two_errors.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details
 --
--- This module checks the good utilization of a FIFO
---    Usually, the user would like to generate an error for each possible case:
---      . a write access is done on a full fifo
---      . a read access is done on an empty fifo
+--   This module checks the good utilization of a FIFO
+--      Usually, the user would like to generate an error for each possible case:
+--        . a write access is done on a full fifo
+--        . a read access is done on an empty fifo
 --
--- 2 modes of error management is defined:
---    . The transparent mode: the error is delayed by one clock cycle. 
---      . If the input error is a pulse then the output error will also be a pulse.
---      . If the input error is a level then the output error will also be a level.
---    . The capture mode: if the input error is set to '1', the output error is set to '1' until a reset signal is received
+--   2 modes of error management is defined:
+--      . The transparent mode: the error is delayed by one clock cycle.
+--        . If the input error is a pulse then the output error will also be a pulse.
+--        . If the input error is a level then the output error will also be a level.
+--      . The capture mode: if the input error is set to '1', the output error is set to '1' until a reset signal is received.
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -46,13 +47,13 @@ entity fifo_two_errors is
     i_rst : in std_logic; -- reset error flag(s)
 
     i_debug_pulse : in std_logic;-- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
-    
+
     i_fifo_cmd0   : in std_logic;-- fifo command. (Usually: wr or rd signal)
     i_fifo_flag0  : in std_logic;-- fifo flag. (usually: full or empty signal)
-    
+
     i_fifo_cmd1   : in std_logic;-- fifo command. (Usually: wr or rd signal)
     i_fifo_flag1  : in std_logic;-- fifo flag. (usually: full or empty signal)
-    
+
     o_error : out std_logic_vector(1 downto 0) -- output errors
     );
 end entity fifo_two_errors;
@@ -74,7 +75,7 @@ begin
     i_fifo_flag   => i_fifo_flag0,
     o_error       => error0
     );
-    
+
     -- manage the error associated to (i_fifo_cmd1, i_fifo_flag1)
     inst_fifo_one_error2 : entity work.fifo_one_error
     port map(

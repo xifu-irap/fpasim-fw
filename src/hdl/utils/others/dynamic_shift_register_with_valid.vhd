@@ -17,20 +17,20 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   dynamic_shift_register_with_valid.vhd 
+--    @file                   dynamic_shift_register_with_valid.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details
 --
--- This module dynamically adds 1 or several consecutive registers on the data path.
--- It has the following characteristics:
---    . The pipeline depth is defined by (2**i_addr)
---    . if i_data_valid = '1' then
---          . the input data is shifted (to the left)
---          . the number of registers (delay) between the input data port and the output data port is defined by (i_addr + 1)
---    . if i_data_valid = '0' then no change is applied.
+--    This module dynamically adds 1 or several consecutive registers on the data path.
+--    It has the following characteristics:
+--       . The pipeline depth is defined by (2**i_addr)
+--       . if i_data_valid = '1' then
+--             . the input data is shifted (to the left)
+--             . the number of registers (delay) between the input data port and the output data port is defined by (i_addr + 1)
+--       . if i_data_valid = '0' then no change is applied.
 --
 --    Example0:
 --      .i_addr       |  0                                   |
@@ -59,7 +59,7 @@ use ieee.numeric_std.all;
 
 entity dynamic_shift_register_with_valid is
   generic (
-    g_ADDR_WIDTH : positive := 7; -- width of the address. Possibles values: [2, integer max value[ 
+    g_ADDR_WIDTH : positive := 7; -- width of the address. Possibles values: [2, integer max value[
     g_DATA_WIDTH : positive := 1  -- width of the input/output data.  Possibles values: [1, integer max value[
     );
   port (
@@ -81,7 +81,7 @@ architecture RTL of dynamic_shift_register_with_valid is
   signal shift_r : t_array_slv:= (others => (others => '0'));
 
   signal srl_r2 : std_logic_vector(o_data'range):= (others => '0');
-  
+
   -- fpga specific attribute
   attribute shreg_extract : string;
   attribute shreg_extract of srl_r2 : signal is "no";

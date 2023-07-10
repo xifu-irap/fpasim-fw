@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   mult_add_ufixed.vhd 
+--    @file                   mult_add_ufixed.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module computes the following formula: s = c + (a * b) (ufixed point representation).
 --    It performs the following steps:
@@ -72,7 +72,7 @@ end entity mult_add_ufixed;
 
 architecture RTL of mult_add_ufixed is
     -----------------------------------------------------------------
-    -- step0: 
+    -- step0:
     -----------------------------------------------------------------
     signal a_tmp : ufixed(g_UQ_M_A - 1 downto -g_UQ_N_A);
     signal b_tmp : ufixed(g_UQ_M_B - 1 downto -g_UQ_N_B);
@@ -85,7 +85,7 @@ architecture RTL of mult_add_ufixed is
     signal b_r1    : ufixed(b_tmp'range):= (others => '0');
     signal c_r1    : ufixed(c_tmp'range):= (others => '0');
     ---------------------------------------------------------------------
-    -- step2: 
+    -- step2:
     --    mult_r2 = a*b
     --    c_r2 = c_r1
     ---------------------------------------------------------------------
@@ -99,7 +99,7 @@ architecture RTL of mult_add_ufixed is
     signal res_r3 : ufixed(ufixed_high(c_r2, '+', mult_r2) downto ufixed_low(c_r2, '+', mult_r2)):= (others => '0');
 
     -----------------------------------------------------------------
-    -- truncate: 
+    -- truncate:
     --   extract sfixed range
     --   sfixed -> std_logic_vector conversion
     -----------------------------------------------------------------

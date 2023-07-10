@@ -17,21 +17,21 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   sync_pulse_generator.vhd 
+--    @file                   sync_pulse_generator.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details
 --
--- From an input pulse, this module generates a pulse with a static user-defined duration
+--    From an input pulse, this module generates a pulse with a static user-defined duration
 --
--- Example0:
---  g_PULSE_DURATION |   3 
---  i_sync_valid     |   1   1   1   1   1   1   1   1   1   1
---  i_sync           |   1   0   0   0   0   1   0   0   0   0
---  o_sync_valid     |   x   1   1   1   0   0   1   1   1   0
---  o_sync           |   x   1   1   1   0   0   1   1   1   0
+--    Example0:
+--     g_PULSE_DURATION |   3
+--     i_sync_valid     |   1   1   1   1   1   1   1   1   1   1
+--     i_sync           |   1   0   0   0   0   1   0   0   0   0
+--     o_sync_valid     |   x   1   1   1   0   0   1   1   1   0
+--     o_sync           |   x   1   1   1   0   0   1   1   1   0
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -152,7 +152,7 @@ begin
           sm_state_next <= E_RUN;
         end if;
 
-      when others =>                    
+      when others =>
         sm_state_next <= E_RST;
     end case;
   end process p_state_decode;

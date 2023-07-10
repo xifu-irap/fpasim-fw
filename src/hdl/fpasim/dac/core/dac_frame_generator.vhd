@@ -17,15 +17,15 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   dac_frame_generator.vhd 
+--    @file                   dac_frame_generator.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module has 2 modes:
---     . normal mode (i_dac_en_pattern=0): 
+--     . normal mode (i_dac_en_pattern=0):
 --        . After the startup, on the first sample, it generates a pulse on the sof signal one time.
 --        . the input data flow are duplicated on the o_data0 and o_data1 signals
 --     . pattern mode (i_dac_en_pattern=1): (see dac3283 datasheet (figure 34)).
@@ -47,19 +47,19 @@
 --   The output data flow has the following structure:
 --
 --   Example0: normal mode
---     i_dac_valid:   1   1   1   1   1   1   1   1   
---     i_dac      :   a1  a2  a3  a4  a5  a6  a7  a8  
---     o_dac_valid:   1   1   1   1   1   1   1   1  
---     o_dac_frame:   1   0   0   0   0   0   0   0   
---     o_dac0      :  a1  a2  a3  a4  a5  a6  a7  a8  
---     o_dac1      :  a1  a2  a3  a4  a5  a6  a7  a8  
+--     i_dac_valid:   1   1   1   1   1   1   1   1
+--     i_dac      :   a1  a2  a3  a4  a5  a6  a7  a8
+--     o_dac_valid:   1   1   1   1   1   1   1   1
+--     o_dac_frame:   1   0   0   0   0   0   0   0
+--     o_dac0      :  a1  a2  a3  a4  a5  a6  a7  a8
+--     o_dac1      :  a1  a2  a3  a4  a5  a6  a7  a8
 --
 --   Example1: pattern mode (input data is ignored)
---     i_dac_valid      :   1              1           1         1   
---     i_dac            :   a1             a2          a3        a4  
---     o_dac_valid      :   1              1           1         1   
---     o_dac_frame      :   1              0           0         0   
---     o_dac0 (MSB-LSB) :  pat0-pat1  pat4-pat5  pat0-pat1  pat4-pat5 
+--     i_dac_valid      :   1              1           1         1
+--     i_dac            :   a1             a2          a3        a4
+--     o_dac_valid      :   1              1           1         1
+--     o_dac_frame      :   1              0           0         0
+--     o_dac0 (MSB-LSB) :  pat0-pat1  pat4-pat5  pat0-pat1  pat4-pat5
 --     o_dac1 (MSB-LSB) :  pat2-pat3  pat6-pat7  pat2-pat3  pat6-pat7
 --
 --
@@ -170,7 +170,7 @@ begin
           sm_state_next <= E_WAIT;
         end if;
 
-      when E_RUN =>  
+      when E_RUN =>
         if i_data_valid = '1' then
           data_valid_next <= i_data_valid;
           -- duplicate the input data on the 2 outputs
@@ -196,7 +196,7 @@ begin
           sm_state_next <= E_PATTERN;
         end if;
 
-      when others =>  
+      when others =>
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;

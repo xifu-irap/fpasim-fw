@@ -17,13 +17,13 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   reset_io.vhd 
+--    @file                   reset_io.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---    
+--    @details
+--
 --    This module generates 2 pulse reset (user-defined pulse width defined by g_DEST_FF).
 --
 --    The architecture is as follows:
@@ -32,8 +32,8 @@
 --                   <----g_DEST_FF->
 --    i_rst        | 1  0  0  0  0  0  0  0  0  0  0  0  0
 --    o_io_clk_rst | 1  1  ....  1  0  0  0  0  0  0  0  0
---    o_io_rst     | 1  1  ....  1  1  ...   1  0  0  0  0  
---    
+--    o_io_rst     | 1  1  ....  1  1  ...   1  0  0  0  0
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -131,9 +131,9 @@ begin
       g_DATA_WIDTH => data_pipe_tmp0'length
       )
     port map(
-      i_clk  => i_clk,            
-      i_data => data_pipe_tmp0,   
-      o_data => data_pipe_tmp1     
+      i_clk  => i_clk,
+      i_data => data_pipe_tmp0,
+      o_data => data_pipe_tmp1
       );
 
   io_clk_rst_tmp3 <= data_pipe_tmp1(0);

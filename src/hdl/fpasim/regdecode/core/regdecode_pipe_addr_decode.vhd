@@ -17,17 +17,18 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   regdecode_pipe_addr_decode.vhd 
+--    @file                   regdecode_pipe_addr_decode.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
---!
---!   This modules outputs a write enable (ex: o_tes_pulse_shape_wr_en) for each expected RAM
---!
---!   Note:
---!     . the o_addr/o_data are delayed in order to be aligned with the write enable generation. 
+--    @details
+--
+--    This modules outputs a write enable (ex: o_tes_pulse_shape_wr_en) for each expected RAM
+--
+--    Note:
+--      . the o_addr/o_data are delayed in order to be aligned with the write enable generation.
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;

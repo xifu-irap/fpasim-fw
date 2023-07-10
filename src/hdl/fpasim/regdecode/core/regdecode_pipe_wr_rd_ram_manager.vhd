@@ -17,27 +17,27 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   regdecode_pipe_wr_rd_ram_manager.vhd 
+--    @file                   regdecode_pipe_wr_rd_ram_manager.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
 --    @details
---                   
+--
 --    This module is used to configure a RAM. 2 behaviour are managed by the FSM:
---  
+--
 --    This module analyses the field of the i_make_pulse register. 2 behaviour are managed by the FSM:
 --        1. if i_start_auto_rd = '0' then no change is done. The input data are used to write the RAM content.
 --        2. if i_start_auto_rd = '1', then the FSM will automatically generate read addresses in order to fully read the RAM.
---                 
+--
 --    In all cases, the module manages the clock domain crossing.
---  
+--
 --    The architecture is as follows:
 --         @i_clk source clock domain                           |                    @ i_out_clk destination clock domain
 --         i_data/i_addr -----------------FSM ------------> async_fifo -----------> o_ram_wr_rd_addr/o_ram_wr_data
 --                                                                                           |
 --         o_fifo_addr/o_fifo_data <----------------------  async_fifo <------------- i_ram_rd_data
---    Note: 
+--    Note:
 --      . During the reading, the FSM manages the fifo data flow. So, the data flow can automatically be paused.
 --      . i_addr_range_min is used to manage address offset during the read address generation.
 --    Limitation:
@@ -224,7 +224,7 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   signal data_sync_ry : std_logic_vector(i_data'range);
 
   ---------------------------------------------------------------------
-  -- sync with the rd RAM output 
+  -- sync with the rd RAM output
   ---------------------------------------------------------------------
   constant c_PIPE_IDX0_L : integer := 0;
   constant c_PIPE_IDX0_H : integer := c_PIPE_IDX0_L + i_addr'length - 1;
@@ -243,7 +243,7 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
 
   signal sof_sync_rx  : std_logic;
   signal eof_sync_rx  : std_logic;
-  signal rd_sync_rx   : std_logic;  
+  signal rd_sync_rx   : std_logic;
   signal addr_sync_rx : std_logic_vector(o_fifo_addr'range);
 
   ---------------------------------------------------------------------
@@ -354,7 +354,7 @@ begin
 
         end if;
 
-      when others =>  
+      when others =>
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -439,7 +439,7 @@ begin
       o_rd_empty      => empty1,
       o_rd_rst_busy   => rd_rst_busy1,
       ---------------------------------------------------------------------
-      -- resynchronized errors/status 
+      -- resynchronized errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync1,
       o_empty_sync    => empty_sync1
@@ -540,7 +540,7 @@ begin
   ---------------------------------------------------------------------
   --assert not (rd_sync_rx = i_ram_rd_valid) report "[regdecode_pipe_wr_rd_ram_manager]: the internal pipeliner latency is not identical to the rd RAM latency. Change the g_RD_RAM_LATENCY value." severity error;
   ---------------------------------------------------------------------
-  -- cross clock domain: 
+  -- cross clock domain:
   --  from the i_out_clk clock domain to the i_clk clock domain
   ---------------------------------------------------------------------
   wr_tmp2                                       <= i_ram_rd_valid;
@@ -588,7 +588,7 @@ begin
       o_rd_empty      => empty3,
       o_rd_rst_busy   => rd_rst_busy3,
       ---------------------------------------------------------------------
-      -- resynchronized errors/status 
+      -- resynchronized errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync2,
       o_empty_sync    => empty_sync2
@@ -620,7 +620,7 @@ begin
       -- destination
       ---------------------------------------------------------------------
       i_dest_clk => i_clk,              -- destination clock domain
-      o_dest     => prog_full_fsm  -- src_in synchronized to the destination clock domain. This output is registered.   
+      o_dest     => prog_full_fsm  -- src_in synchronized to the destination clock domain. This output is registered.
       );
 
   ---------------------------------------------------------------------

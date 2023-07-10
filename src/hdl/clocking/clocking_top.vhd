@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   clocking_top.vhd 
+--    @file                   clocking_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 -- This module instanciates a fpga specific mmcm to generate some design clocks.
 -- -------------------------------------------------------------------------------------------------------------
@@ -70,14 +70,14 @@ begin
 
   inst_fpasim_clk_wiz_0 : entity work.fpasim_clk_wiz_0
     port map(
-      -- Clock out ports  
+      -- Clock out ports
       clk_out1 => ref_clk,              -- output clock @62.5MHz
       clk_out2 => sys_clk,              -- output clock @250MHz
       clk_out3 => dac_clk,      -- output clock @500MHz with no output buffer
       clk_out4 => dac_clk_phase90,  -- output clock @500MHz with 90° phase with no output buffer
       clk_out5 => dac_clk_div,  -- output clock @125Mhz with no output buffer
       clk_out6 => dac_clk_div_phase90,  -- output clock @125MHz with 90° phase with no output buffer
-      -- Status and control signals                
+      -- Status and control signals
       locked   => locked,
       -- Clock in ports
       clk_in1  => i_clk                 -- input @62.5MHz

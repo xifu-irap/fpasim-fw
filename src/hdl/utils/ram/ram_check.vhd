@@ -17,23 +17,23 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   ram_check.vhd 
+--    @file                   ram_check.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details
 --
--- This module checks the good utilization of a RAM.
--- Usually, RAM doesn't support write and read access on the same memory slot at the same time.
--- So, the module generates an error if a RAM is accessed in reading and in writing at the same time.
+--    This module checks the good utilization of a RAM.
+--    Usually, RAM doesn't support write and read access on the same memory slot at the same time.
+--    So, the module generates an error if a RAM is accessed in reading and in writing at the same time.
 --
--- Note: 
---   . if the write address width = read address width then an immediate comparison is done
---   . if the write address width < read address width then the read side address is converted 
---     => before comparison, the read address is shifted to the right to get the same representation as the write side (word representation)
---   . if the write address width > read address width then the write side address is converted
---     => before comparison, the write address is shifted to the right to get the same representation as the read side (word representation)
+--    Note:
+--      . if the write address width = read address width then an immediate comparison is done
+--      . if the write address width < read address width then the read side address is converted
+--        => before comparison, the read address is shifted to the right to get the same representation as the write side (word representation)
+--      . if the write address width > read address width then the write side address is converted
+--        => before comparison, the write address is shifted to the right to get the same representation as the read side (word representation)
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -161,7 +161,7 @@ begin
 
   ---------------------------------------------------------------------
   -- RAM : asymetric address on the write and the read side
-  --       g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH 
+  --       g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH
   ---------------------------------------------------------------------
   gen_asym_wr_addr_inf_rd_addr_width_g : if g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH generate
     signal wr_addr_tmp : unsigned(i_wr_addr'range);

@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   io_sync.vhd 
+--    @file                   io_sync.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module does the following steps:
 --      . SYNC:
@@ -66,7 +66,7 @@ entity io_sync is
 
     ---------------------------------------------------------------------
     -- errors/status @i_clk
-    --------------------------------------------------------------------- 
+    ---------------------------------------------------------------------
     o_errors : out std_logic_vector(15 downto 0);  -- output errors
     o_status : out std_logic_vector(7 downto 0)    -- output status
     );
@@ -165,7 +165,7 @@ begin
       o_rd_empty      => empty1,
       o_rd_rst_busy   => rd_rst_busy1,
       ---------------------------------------------------------------------
-      -- resynchronized errors/status 
+      -- resynchronized errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync0,
       o_empty_sync    => empty_sync0

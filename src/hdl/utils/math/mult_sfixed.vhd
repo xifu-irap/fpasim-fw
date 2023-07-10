@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   mult_sfixed.vhd 
+--    @file                   mult_sfixed.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module computes the following formula: s = a * b (sfixed point representation)
 --    It performs the following steps:
@@ -101,7 +101,7 @@ architecture RTL of mult_sfixed is
     signal p_r4 : sfixed(mult_r2'range):= (others => '0');
 
     -----------------------------------------------------------------
-    -- truncate: 
+    -- truncate:
     --   extract sfixed range
     --   sfixed -> std_logic_vector conversion
     -----------------------------------------------------------------

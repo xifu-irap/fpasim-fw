@@ -17,20 +17,20 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   regdecode_wire_rd.vhd 
+--    @file                   regdecode_wire_rd.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---  
+--    @details
+--
 --    This module synchronizes a data bus from a source clock domain (@i_clk) to a destination clock domain(@i_out_clk).
--- 
+--
 --    The architecture principle is as follows:
 --         @i_clk clock domain        |                   @ i_out_clk clock domain
 --         i_data ---------------> async_fifo -----------> o_data
--- 
--- 
+--
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -152,7 +152,7 @@ begin
       o_rd_empty      => empty1,
       o_rd_rst_busy   => rd_rst_busy1,
       ---------------------------------------------------------------------
-      -- resynchronized errors/status 
+      -- resynchronized errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync1,
       o_empty_sync    => empty_sync1

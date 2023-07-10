@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   io_top.vhd 
+--    @file                   io_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module does the following steps:
 --      . ADC:
@@ -157,7 +157,7 @@ entity io_top is
     -- to the fpga pads: @i_dac_clk
     -- dac clock @i_dac_clk
     o_dac_clk_p   : out std_logic;      --  differential_p dac clock
-    o_dac_clk_n   : out std_logic;      --  differential_n dac clock 
+    o_dac_clk_n   : out std_logic;      --  differential_n dac clock
     -- dac frame flag @i_dac_clk
     o_dac_frame_p : out std_logic;      --  differential_p dac frame
     o_dac_frame_n : out std_logic;      --  differential_n dac frame

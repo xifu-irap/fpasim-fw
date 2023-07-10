@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   synchronizer.vhd 
+--    @file                   synchronizer.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---   @details                
+--   @details
 --
 --   Asynchronous Input Synchronization
 --
@@ -35,10 +35,11 @@
 --                     Particularly useful for high-fanout nets.
 --   g_INIT            - Initial value of synchronizer registers upon startup, 1'b0 or 1'b1.
 --
---  Note: 
+--  Note:
 --    . This code is based on the code example of the Xilinx language template
 --
---  IMPORTANT: At the output, when the input data is a bus, the bus bits may not keep synchronization between each other
+--  IMPORTANT: At the output, when the input data is a bus, the bus bits may not keep synchronization between each other.
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;

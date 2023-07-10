@@ -17,28 +17,28 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   regdecode_wire_make_pulse.vhd 
+--    @file                   regdecode_wire_make_pulse.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details        
---  
+--    @details
+--
 --    This module analyses the field of the i_make_pulse register. 2 behaviour are managed by the FSM:
 --        1. if pixel_all_tmp = '0' then no change is done on the i_make_pulse register value.
 --        2. if pixel_out_tmp = '1', then the FSM will automatically generate (i_pixel_nb + 1) words from the i_make_pulse value.
 --           All field of the generated words will be identical except the pixel_id field. For each generated word, the pixel_id field
 --           will be incremented from 0 to i_pixel_nb.
---                 
+--
 --    In all cases, the words are synchronized from a i_clk source clock domain to the i_out_clk destination clock domain. Then, the synchronized value(s) is/are read back in the
 --    i_clk source clock domain
---  
+--
 --    The architecture principle is as follows:
 --         @i_clk source clock domain              |                   @ i_out_clk destination clock domain
---         i_make_pulse_valid-------FSM -----> async_fifo -----------> o_data 
+--         i_make_pulse_valid-------FSM -----> async_fifo -----------> o_data
 --                                                                 |
 --         o_fifo_data <----------------------  async_fifo <-------
---    Note: 
+--    Note:
 --      . The read back of the synchronized data bus allows to check the clock domain crossing integrity.
 --      . The number of written data is equal to the number of data to read.
 --
@@ -169,9 +169,9 @@ architecture RTL of regdecode_wire_make_pulse is
   signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
 
 begin
-  -- extract fields 
+  -- extract fields
   pixel_all_tmp <= i_make_pulse(pkg_MAKE_PULSE_PIXEL_ALL_IDX_H);
-  pixel_id_tmp  <= i_make_pulse(pkg_MAKE_PULSE_PIXEL_ID_IDX_H downto pkg_MAKE_PULSE_PIXEL_ID_IDX_L);  
+  pixel_id_tmp  <= i_make_pulse(pkg_MAKE_PULSE_PIXEL_ID_IDX_H downto pkg_MAKE_PULSE_PIXEL_ID_IDX_L);
 
   ---------------------------------------------------------------------
   -- fsm
@@ -192,7 +192,7 @@ begin
       when E_WAIT =>
         if i_make_pulse_valid = '1' then
           data_valid_next   <= '1';
-          pixel_id_max_next <= unsigned(i_pixel_nb) - 1;  -- 1 start @0  
+          pixel_id_max_next <= unsigned(i_pixel_nb) - 1;  -- 1 start @0
 
           if pixel_all_tmp = '1' then
             sof_next      <= '1';
@@ -234,7 +234,7 @@ begin
         else
           sm_state_next <= E_GEN_PIXEL_ID;
         end if;
-      when others =>  
+      when others =>
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -275,7 +275,7 @@ begin
   -- keep the input data fields (above the pixel id field)
   tmp(data_r1'high downto pkg_MAKE_PULSE_PIXEL_ID_IDX_H + 1) <= data_r1(data_r1'high downto pkg_MAKE_PULSE_PIXEL_ID_IDX_H + 1);
   -- replace the pixed id field
-  tmp(pkg_MAKE_PULSE_PIXEL_ID_IDX_H downto pkg_MAKE_PULSE_PIXEL_ID_IDX_L) <= std_logic_vector(pixel_id_r1);  
+  tmp(pkg_MAKE_PULSE_PIXEL_ID_IDX_H downto pkg_MAKE_PULSE_PIXEL_ID_IDX_L) <= std_logic_vector(pixel_id_r1);
   -- keep the input data field (below the pixel id field)
   tmp(pkg_MAKE_PULSE_PIXEL_ID_IDX_L - 1 downto 0)            <= data_r1(pkg_MAKE_PULSE_PIXEL_ID_IDX_L - 1 downto 0);
 

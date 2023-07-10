@@ -17,13 +17,15 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   system_fpasim_top.vhd 
+--    @file                   system_fpasim_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
--- This module is the fpga top level
+--    @details
+--
+--    This module is the fpga top level
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -50,7 +52,7 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     -- FMC: from the card
     ---------------------------------------------------------------------
-    --i_board_id : in    std_logic_vector(7 downto 0);  -- card board id 
+    --i_board_id : in    std_logic_vector(7 downto 0);  -- card board id
 
     ---------------------------------------------------------------------
     -- FMC: from the adc @i_adc_clk_p
@@ -110,7 +112,7 @@ entity system_fpasim_top is
     -- FMC: to dac
     ---------------------------------------------------------------------
     o_dac_clk_p : out std_logic;        -- differential_p dac clock
-    o_dac_clk_n : out std_logic;        -- differential_n dac clock 
+    o_dac_clk_n : out std_logic;        -- differential_n dac clock
 
     o_dac_frame_p : out std_logic;      -- differential_p dac frame
     o_dac_frame_n : out std_logic;      -- differential_n dac frame
@@ -205,7 +207,7 @@ architecture RTL of system_fpasim_top is
   signal sys_rst            : std_logic;
   signal adc_io_clk_rst     : std_logic;
   signal adc_io_rst         : std_logic;
-  signal dac_io_clk_rst     : std_logic;  
+  signal dac_io_clk_rst     : std_logic;
   signal dac_io_rst         : std_logic;
   signal dac_io_rst_phase90 : std_logic;
   signal sync_io_clk_rst    : std_logic;
@@ -382,7 +384,7 @@ begin
       g_FPASIM_DEBUG        => pkg_FPASIM_TOP_DEBUG,
       g_REGDECODE_TOP_DEBUG => pkg_REGDECODE_TOP_DEBUG
       )
-    port map(  
+    port map(
       i_clk         => sys_clk,         -- system clock
       i_rst         => sys_rst,         -- reset sync @sync_clk
       ---------------------------------------------------------------------
@@ -531,14 +533,14 @@ begin
       i_sync_io_clk_rst => sync_io_clk_rst,
       i_sync_io_rst     => sync_io_rst,
 
-      -- from/to the user: @sys_clk 
+      -- from/to the user: @sys_clk
       i_sync_rst    => sys_rst,
       i_sync_valid  => sync_valid,
       i_sync        => sync,
       o_sync_errors => sync_errors,
       o_sync_status => sync_status,
 
-      -- to the fpga pads: @sync_clk 
+      -- to the fpga pads: @sync_clk
       o_sync_clk   => o_ref_clk,
       o_sync       => o_sync,
       ---------------------------------------------------------------------
@@ -691,7 +693,7 @@ begin
 ---------------------------------------------------------------------
 -- debug
 ---------------------------------------------------------------------
-  gen_debug : if g_DEBUG = true generate  
+  gen_debug : if g_DEBUG = true generate
     signal count_r1 : unsigned(31 downto 0) := (others => '0');
     signal pulse_r1 : std_logic             := '0';
 

@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   tes_pulse_shape_manager.vhd 
+--    @file                   tes_pulse_shape_manager.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---   @details                
+--   @details
 --
 --   From a user-defined command, this module tracks the computation history of the associated pixel.
 --   With one state machine and a mechanism of parameters' table, the module can simulate nb_pixel independent state machine (one by pixel).
@@ -37,10 +37,11 @@
 --
 --   Note:
 --     . If the state machine is processing a pulse for the pixel 0 and if a new command is received for the pixel 0, then
---     the state machine stop the previous processing and start a new processing with the new set of paramters.
+--        the state machine stop the previous processing and start a new processing with the new set of paramters.
 --   Remark:
 --     . The minimum number of samples between the i_pixel_sof and i_pixel_eof is given by the following formula:
---        => min_sample = 
+--        => min_sample = pkg_TES_PULSE_MANAGER_SOF_EOF_NB_SAMPLES_MIN
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -61,7 +62,7 @@ entity tes_pulse_shape_manager is
     g_NB_SAMPLE_BY_FRAME_WIDTH             : positive := pkg_NB_SAMPLE_BY_FRAME_WIDTH;  -- frame bus width (expressed in bits). Possible values : [1; max integer value[
     -- addr
     g_PULSE_SHAPE_RAM_ADDR_WIDTH           : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
-    -- output 
+    -- output
     g_PIXEL_RESULT_OUTPUT_WIDTH            : positive := pkg_TES_MULT_SUB_Q_WIDTH_S;  -- pixel output result width (expressed in bits). Possible values : [1; max integer value[
     -- RAM configuration filename
     g_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE : string   := pkg_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE;
@@ -69,8 +70,8 @@ entity tes_pulse_shape_manager is
 
     );
   port(
-    i_clk         : in std_logic;       -- clock 
-    i_rst         : in std_logic;       -- reset 
+    i_clk         : in std_logic;       -- clock
+    i_rst         : in std_logic;       -- reset
     i_rst_status  : in std_logic;       -- reset error flag(s)
     i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
@@ -107,7 +108,7 @@ entity tes_pulse_shape_manager is
     ---------------------------------------------------------------------
     i_pixel_sof   : in std_logic;       -- first pixel sample
     i_pixel_eof   : in std_logic;       -- last pixel sample
-    i_pixel_id    : in std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id 
+    i_pixel_id    : in std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id
     i_pixel_valid : in std_logic;       -- valid pixel sample
 
     ---------------------------------------------------------------------
@@ -561,7 +562,7 @@ begin
       o_rd_empty      => empty1,
       o_rd_rst_busy   => open,
       ---------------------------------------------------------------------
-      --  errors/status 
+      --  errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync,
       o_empty_sync    => empty_sync
@@ -591,12 +592,12 @@ begin
   inst_sdpram_en_table : entity work.sdpram
     generic map(
       g_ADDR_WIDTH_A       => en_table_addra'length,
-      g_BYTE_WRITE_WIDTH_A => en_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A. 
+      g_BYTE_WRITE_WIDTH_A => en_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A.
       g_WRITE_DATA_WIDTH_A => en_table_dina'length,
       g_ADDR_WIDTH_B       => en_table_addrb'length,
       g_WRITE_MODE_B       => "no_change",  -- no_change, read_first, write_first
       g_READ_DATA_WIDTH_B  => en_table_doutb'length,
-      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives. 
+      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives.
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "auto",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_EN_TABLE,
@@ -636,12 +637,12 @@ begin
   inst_sdpram_pulse_heigth_table : entity work.sdpram
     generic map(
       g_ADDR_WIDTH_A       => pulse_heigth_table_addra'length,
-      g_BYTE_WRITE_WIDTH_A => pulse_heigth_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A. 
+      g_BYTE_WRITE_WIDTH_A => pulse_heigth_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A.
       g_WRITE_DATA_WIDTH_A => pulse_heigth_table_dina'length,
       g_ADDR_WIDTH_B       => pulse_heigth_table_addrb'length,
       g_WRITE_MODE_B       => "no_change",  -- no_change, read_first, write_first
       g_READ_DATA_WIDTH_B  => pulse_heigth_table_doutb'length,
-      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives. 
+      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives.
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "auto",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_PULSE_HEIGTH_TABLE,
@@ -681,12 +682,12 @@ begin
   inst_sdpram_time_shift_table : entity work.sdpram
     generic map(
       g_ADDR_WIDTH_A       => time_shift_table_addra'length,
-      g_BYTE_WRITE_WIDTH_A => time_shift_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A. 
+      g_BYTE_WRITE_WIDTH_A => time_shift_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A.
       g_WRITE_DATA_WIDTH_A => time_shift_table_dina'length,
       g_ADDR_WIDTH_B       => time_shift_table_addrb'length,
       g_WRITE_MODE_B       => "no_change",  -- no_change, read_first, write_first
       g_READ_DATA_WIDTH_B  => time_shift_table_doutb'length,
-      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives. 
+      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives.
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "auto",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_TIME_SHIFT_TABLE,
@@ -726,12 +727,12 @@ begin
   inst_sdpram_cnt_sample_pulse_shape_table : entity work.sdpram
     generic map(
       g_ADDR_WIDTH_A       => cnt_sample_pulse_shape_table_addra'length,
-      g_BYTE_WRITE_WIDTH_A => cnt_sample_pulse_shape_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A. 
+      g_BYTE_WRITE_WIDTH_A => cnt_sample_pulse_shape_table_dina'length,  -- to enable word-wide writes on port A, specify the same value as for WRITE_DATA_WIDTH_A.
       g_WRITE_DATA_WIDTH_A => cnt_sample_pulse_shape_table_dina'length,
       g_ADDR_WIDTH_B       => cnt_sample_pulse_shape_table_addrb'length,
       g_WRITE_MODE_B       => "no_change",  -- no_change, read_first, write_first
       g_READ_DATA_WIDTH_B  => cnt_sample_pulse_shape_table_doutb'length,
-      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives. 
+      g_READ_LATENCY_B     => pkg_TES_TABLE_RAM_RD_LATENCY,  -- memory block > 1, Values larger than 2 synthesize additional flip-flops that are not retimed into memory primitives.
       g_CLOCKING_MODE      => "common_clock",
       g_MEMORY_PRIMITIVE   => "auto",
       g_MEMORY_SIZE        => c_MEMORY_SIZE_CNT_SAMPLE_PULSE_SHAPE_TABLE,
@@ -960,7 +961,7 @@ begin
         end if;
 
         if pixel_eof_ra = '1' and pixel_valid_ra = '1' then
-          -- reset the enable signal. 
+          -- reset the enable signal.
           en_next <= '0';
 
           if last_sample_pulse_shape_r1 = '1' then
@@ -976,7 +977,7 @@ begin
           sm_state_next <= E_RUN;
         end if;
 
-      when others =>  
+      when others =>
         sm_state_next <= E_RST0;
     end case;
   end process p_decode_state;
@@ -1367,7 +1368,7 @@ begin
       --------------------------------------------------------------
       -- output : S = C - A*B
       --------------------------------------------------------------
-      o_s   => result_ry   
+      o_s   => result_ry
       );
 
   assert not ((result_ry'length) /= (pkg_TES_MULT_SUB_Q_WIDTH_S)) report "[tes_pulse_shape_manager]: result => output result width and sfixed package definition width doesn't match." severity error;
@@ -1465,9 +1466,9 @@ begin
       g_PIXEL_ID_WIDTH => pixel_id_ry'length  -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[
       )
     port map(
-      i_clk                    => i_clk,      -- clock 
-      i_rst                    => i_rst,      -- reset 
-      i_rst_status             => i_rst_status,     -- reset error flag(s) 
+      i_clk                    => i_clk,      -- clock
+      i_rst                    => i_rst,      -- reset
+      i_rst_status             => i_rst_status,     -- reset error flag(s)
       ---------------------------------------------------------------------
       -- input
       ---------------------------------------------------------------------

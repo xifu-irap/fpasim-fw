@@ -17,25 +17,26 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------h
 --    email                   kenji.delarosa@alten.com
---   @file                   spi_master.vhd 
+--    @file                   spi_master.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---   @details                
--- 
---   This module does the following tasks:
---     . generate a spi clock from the system clock
---     . perform a spi communication:
---         . data serialization for the writting/reading
---         . data de-serialization for the reading  
--- 
---  Note: (see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html)  
---   SPI_MODE |CPOL|CPHA| clock polarity (idle state)| clock data sampling | clock data shift out
---   0        |  0 | 0  | 0                          | rising_edge         | falling_edge
---   1        |  0 | 1  | 0                          | falling_edge        | rising_edge
---   2        |  1 | 0  | 1                          | rising_edge         | falling_edge
---   3        |  1 | 1  | 1                          | falling_edge        | rising_edge
+--    @details
+--
+--    This module does the following tasks:
+--      . generate a spi clock from the system clock
+--      . perform a spi communication:
+--          . data serialization for the writting/reading
+--          . data de-serialization for the reading
+--
+--   Note: (see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html)
+--    SPI_MODE |CPOL|CPHA| clock polarity (idle state)| clock data sampling | clock data shift out
+--    0        |  0 | 0  | 0                          | rising_edge         | falling_edge
+--    1        |  0 | 1  | 0                          | falling_edge        | rising_edge
+--    2        |  1 | 0  | 1                          | rising_edge         | falling_edge
+--    3        |  1 | 1  | 1                          | falling_edge        | rising_edge
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -105,7 +106,7 @@ architecture RTL of spi_master is
   signal tx_cs_n_r1   : std_logic := '1';
 
   signal tx_data_valid_next : std_logic;
-  signal tx_data_valid_r1   : std_logic := '0';  
+  signal tx_data_valid_r1   : std_logic := '0';
 
   signal tx_data_next : std_logic_vector(i_tx_data'range);
   signal tx_data_r1   : std_logic_vector(i_tx_data'range) := (others => '0');
@@ -275,7 +276,7 @@ begin
         else
           sm_wr_state_next <= E_UNSET_CS;
         end if;
-      when others =>  
+      when others =>
         sm_wr_state_next <= E_RST;
     end case;
   end process p_wr_decode_state;

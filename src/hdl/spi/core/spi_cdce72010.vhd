@@ -17,18 +17,19 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   spi_cdce72010.vhd 
+--    @file                   spi_cdce72010.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
--- 
+--    @details
+--
 --    This module provides a spi link in order to configure the cdce72010 of the FMC150 board of abaco system.
 --    The specific additional pins of the device are also configured.
---    
---    Note: 
+--
+--    Note:
 --     . The user must build the full SPI words (typically: addr + data)
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -57,7 +58,7 @@ entity spi_cdce72010 is
     o_spi_rd_data       : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- read data
     o_spi_ready         : out std_logic;  -- 1: the spi link is ready,0: the spi link is busy
     o_spi_finish        : out std_logic;  -- the reading or writting on the spi link is completed (pulse)
-    
+
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
@@ -68,7 +69,7 @@ entity spi_cdce72010 is
     -- spi
     i_cdce_sdo  : in  std_logic;        -- SPI MISO
     o_spi_sclk  : out std_logic;        -- SPI clock
-    o_cdce_n_en : out std_logic;        -- SPI chip select 
+    o_cdce_n_en : out std_logic;        -- SPI chip select
     o_spi_sdata : out std_logic;        -- SPI MOSI
 
     -- specifi signals
@@ -106,7 +107,7 @@ begin
 -- optional pipe
 ---------------------------------------------------------------------
   data_pipe_tmp0(0) <= i_cdce_pll_status;
-  
+
      inst_pipeliner_tx : entity work.pipeliner
       generic map(
         g_NB_PIPES   => g_INPUT_DELAY,  -- number of consecutives registers. Possibles values: [0, integer max value[

@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   io_adc.vhd 
+--    @file                   io_adc.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module does the following steps:
 --         . deserializes data on ADC IOs from @i_adc_clk to @o_adc_clk_div.
@@ -140,14 +140,14 @@ architecture RTL of io_adc is
   signal adc_b_wr_tmp0      : std_logic;
   signal adc_b_data_tmp0    : std_logic_vector(c_ADC_B_WR_FIFO_WIDTH - 1 downto 0);
   --signal adc_b_full0        : std_logic;
-  signal adc_b_wr_rst_busy0 : std_logic;  
+  signal adc_b_wr_rst_busy0 : std_logic;
 
   signal adc_b_rd1          : std_logic;
   signal adc_b_data_tmp1    : std_logic_vector(c_ADC_B_RD_FIFO_WIDTH - 1 downto 0);
   signal adc_b_empty1       : std_logic;
   signal adc_b_rd_rst_busy1 : std_logic;
 
-  signal adc_b_data_valid_tmp1 : std_logic;  
+  signal adc_b_data_valid_tmp1 : std_logic;
 
   signal adc_b_errors_sync1 : std_logic_vector(3 downto 0);
   signal adc_b_empty_sync1  : std_logic;
@@ -179,10 +179,10 @@ begin
       ---------------------------------------------------------------------
       i_adc_clk_p   => i_adc_clk_p,     -- clock
       i_adc_clk_n   => i_adc_clk_n,     -- clock
-      i_adc_a_p     => i_adc_a_p,  -- Diff_p buffer input 
-      i_adc_a_n     => i_adc_a_n,  -- Diff_n buffer input 
-      i_adc_b_p     => i_adc_b_p,  -- Diff_p buffer input 
-      i_adc_b_n     => i_adc_b_n,  -- Diff_n buffer input 
+      i_adc_a_p     => i_adc_a_p,  -- Diff_p buffer input
+      i_adc_a_n     => i_adc_a_n,  -- Diff_n buffer input
+      i_adc_b_p     => i_adc_b_p,  -- Diff_p buffer input
+      i_adc_b_n     => i_adc_b_n,  -- Diff_n buffer input
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
@@ -237,7 +237,7 @@ begin
       o_rd_empty      => adc_a_empty1,
       o_rd_rst_busy   => adc_a_rd_rst_busy1,  -- not connected
       ---------------------------------------------------------------------
-      -- resynchronized errors/status 
+      -- resynchronized errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => adc_a_errors_sync1,
       o_empty_sync    => adc_a_empty_sync1
@@ -287,7 +287,7 @@ begin
       o_rd_empty      => adc_b_empty1,
       o_rd_rst_busy   => adc_b_rd_rst_busy1,     -- not connected
       ---------------------------------------------------------------------
-      -- resynchronized errors/status 
+      -- resynchronized errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => adc_b_errors_sync1,
       o_empty_sync    => adc_b_empty_sync1
@@ -327,7 +327,7 @@ begin
   o_errors(6)           <= error_tmp_bis(5);  -- fifo rst error
   o_errors(5)           <= error_tmp_bis(4);  -- fifo rd empty error
   o_errors(4)           <= error_tmp_bis(3);  -- fifo wr full error
-  o_errors(3)           <= '0';               -- 
+  o_errors(3)           <= '0';               --
   o_errors(2)           <= error_tmp_bis(2);  -- fifo rst error
   o_errors(1)           <= error_tmp_bis(1);  -- fifo rd empty error
   o_errors(0)           <= error_tmp_bis(0);  -- fifo wr full error

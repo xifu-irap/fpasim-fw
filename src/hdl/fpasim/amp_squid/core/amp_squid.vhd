@@ -17,19 +17,19 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   amp_squid.vhd 
+--    @file                   amp_squid.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details       
---         
+--    @details
+--
 --    This module performs the following amp_squid computation steps:
 --      . addr = i_pixel_result - i_amp_squid_offset_correction
 --      . S0 = AMP_SQUID_TF(addr): use the addr value to read a pre-loaded RAM the corresponding value.
 --      . fpagain = gain_table(i_fpasim_gain): use the i_fpasim_gain to read a pre-defined gain value
 --      . o_pixel_result = S0 * fpagain
--- 
+--
 -------------------------------------------------------------------------------
 
 library ieee;
@@ -208,9 +208,9 @@ begin
   -- no conversion: already sfixed
   pixel_result_tmp                <= i_pixel_result;
 
-  -- we assume (amp_squid_offset_correction_tmp'length) >= (i_amp_squid_offset_correction'length) 
+  -- we assume (amp_squid_offset_correction_tmp'length) >= (i_amp_squid_offset_correction'length)
   --    align the MSB bits between amp_squid_offset_correction_tmp and i_amp_squid_offset_correction (<=> amp_squid_offset_correction_tmp <= i_amp_squid_offset_correction*8)
-  --     => the remaining LSB bits of amp_squid_offset_correction_tmp are fixed to '0' 
+  --     => the remaining LSB bits of amp_squid_offset_correction_tmp are fixed to '0'
   amp_squid_offset_correction_tmp(amp_squid_offset_correction_tmp'high downto (amp_squid_offset_correction_tmp'high - i_amp_squid_offset_correction'high)) <= i_amp_squid_offset_correction;
 
   inst_sub_sfixed_amp_squid : entity work.sub_sfixed
@@ -230,7 +230,7 @@ begin
       --------------------------------------------------------------
       -- input
       --------------------------------------------------------------
-      i_a   => pixel_result_tmp,  
+      i_a   => pixel_result_tmp,
       i_b   => amp_squid_offset_correction_tmp,
       --------------------------------------------------------------
       -- output : S = A - B
@@ -322,7 +322,7 @@ begin
   amp_squid_tf_web    <= '0';
   amp_squid_tf_dinb   <= (others => '0');
   amp_squid_tf_enb    <= pixel_valid_rx;
-  amp_squid_tf_addrb  <= result_sub_rx;  
+  amp_squid_tf_addrb  <= result_sub_rx;
   amp_squid_tf_regceb <= '1';
 
   -------------------------------------------------------------------
@@ -448,7 +448,7 @@ begin
       --------------------------------------------------------------
       -- output : S = a * B
       --------------------------------------------------------------
-      o_s   => result_rz  
+      o_s   => result_rz
       );
 
   -----------------------------------------------------------------

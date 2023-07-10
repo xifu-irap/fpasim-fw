@@ -17,33 +17,34 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   recording_adc.vhd 
+--    @file                   recording_adc.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details
 --
--- This module generates flags to tags
---  . the first block sample
---  . the last block sample
---  The block size is defined by the i_nb_samples_by_block input port
-
--- Example0: (i_adc_cmd_nb_words_by_block = 4) with continuous i_adc_data_valid signal
--- data valid | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
--- sof        | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 |
--- eof        | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 |
+--    This module generates flags to tags
+--     . the first block sample
+--     . the last block sample
+--     The block size is defined by the i_nb_samples_by_block input port
 --
--- Example1: (i_adc_cmd_nb_words_by_block = 4)  with non-continuous i_adc_data_valid signal
--- data valid | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 |
--- sof        | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
--- eof        | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 |
+--    Example0: (i_adc_cmd_nb_words_by_block = 4) with continuous i_adc_data_valid signal
+--    data valid | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+--    sof        | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 |
+--    eof        | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 |
 --
--- Note: The State Machine of this module doesn't manage the data flow. So, the user must provide enough space in the output FIFO (by reading it)
---       before sending a command to store a new data block. Otherwise, an error will be fired.
--- Remark: 
---   . The output fifo is configured as standard (1 clock cycle delay between the i_fifo_adc_rd and the o_fifo_adc_data_valid). The user
---   needs to be careful in the management.
+--    Example1: (i_adc_cmd_nb_words_by_block = 4)  with non-continuous i_adc_data_valid signal
+--    data valid | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 |
+--    sof        | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+--    eof        | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 |
+--
+--   Note: The State Machine of this module doesn't manage the data flow. So, the user must provide enough space in the output FIFO (by reading it)
+--         before sending a command to store a new data block. Otherwise, an error will be fired.
+--   Remark:
+--     . The output fifo is configured as standard (1 clock cycle delay between the i_fifo_adc_rd and the o_fifo_adc_data_valid). The user
+--     needs to be careful in the management.
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -107,9 +108,9 @@ architecture RTL of recording_adc is
   constant c_IDX2_L : integer := c_IDX1_H + 1;
   constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
 
-  constant c_FIFO_DEPTH        : integer := g_ADC_FIFO_OUT_DEPTH; 
-  constant c_FIFO_WIDTH        : integer := c_IDX2_H + 1;         
-  constant c_FIFO_READ_LATENCY : integer := 2;                    
+  constant c_FIFO_DEPTH        : integer := g_ADC_FIFO_OUT_DEPTH;
+  constant c_FIFO_WIDTH        : integer := c_IDX2_H + 1;
+  constant c_FIFO_READ_LATENCY : integer := 2;
 
   ---------------------------------------------------------------------
   -- state machine
@@ -144,7 +145,7 @@ architecture RTL of recording_adc is
   signal wr_tmp0      : std_logic;
   signal data_tmp0    : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
   --signal full0        : std_logic;
-  signal wr_rst_busy0 : std_logic; 
+  signal wr_rst_busy0 : std_logic;
 
   signal rd1          : std_logic;
   signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
@@ -226,7 +227,7 @@ begin
           sm_state_next   <= E_RUN;
         end if;
 
-      when others => 
+      when others =>
 
         sm_state_next <= E_RST;
 
@@ -300,7 +301,7 @@ begin
       o_rd_empty      => empty1,
       o_rd_rst_busy   => rd_rst_busy1,  -- not connected
       ---------------------------------------------------------------------
-      -- resynchronized errors/status 
+      -- resynchronized errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync1,
       o_empty_sync    => empty_sync1

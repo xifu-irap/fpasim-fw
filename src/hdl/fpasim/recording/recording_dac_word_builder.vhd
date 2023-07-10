@@ -17,18 +17,19 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   recording_dac_word_builder.vhd 
+--    @file                   recording_dac_word_builder.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details
 --
--- This module generate an output data as follows:
--- i_data_valid | 1 | 1 | 1 | 1
--- i_data       | a0   |a1     |a2    |a3     | a4   |a5     |a6    |a7
--- o_data_valid | 0    |1      |0     |1      | 0    |1      |0     |1      
--- o_data       | N/A  |a1&a0  |N/A   |a3&a2  | N/A  |a5&a4  |N/A   |a7&a6       
+--    This module generate an output data as follows:
+--    i_data_valid | 1 | 1 | 1 | 1
+--    i_data       | a0   |a1     |a2    |a3     | a4   |a5     |a6    |a7
+--    o_data_valid | 0    |1      |0     |1      | 0    |1      |0     |1
+--    o_data       | N/A  |a1&a0  |N/A   |a3&a2  | N/A  |a5&a4  |N/A   |a7&a6
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -110,7 +111,7 @@ begin
           sm_state_next   <= E_DATA1;
         end if;
 
-      when others => 
+      when others =>
         sm_state_next <= E_RST;
 
     end case;

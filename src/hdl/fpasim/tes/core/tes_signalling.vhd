@@ -17,15 +17,15 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   tes_signalling.vhd 
+--    @file                   tes_signalling.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module generates:
---      . pixel id 
+--      . pixel id
 --      . pixel delimiters
 --         . pixel_sof: first pixel sample
 --         . pixel_eof: last pixel sample

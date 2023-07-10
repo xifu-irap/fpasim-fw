@@ -17,19 +17,19 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   spi_device_select.vhd 
+--    @file                   spi_device_select.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
--- 
+--    @details
+--
 --    This module distributes spi commands to the different devices of the FMC150 board (abaco system)
 --    In particular, it manages the shared spi links (o_spi_sclk and o_spi_sdata) between the different devices.
---    
---    Note: 
+--
+--    Note:
 --     . For the different devices, the user must build the corresponding full SPI words (typically: addr + data).
---     
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -182,7 +182,7 @@ architecture RTL of spi_device_select is
   signal cdce_status                : std_logic_vector(7 downto 0);
   -- spi
   signal cdce_spi_clk               : std_logic;  -- SPI clock
-  signal cdce_spi_cs_n_en           : std_logic;  -- SPI chip select 
+  signal cdce_spi_cs_n_en           : std_logic;  -- SPI chip select
   signal cdce_spi_mosi              : std_logic;  -- SPI MOSI
   -- specific signals
   signal cdce_n_reset               : std_logic;  -- reset_n or hold_n
@@ -397,7 +397,7 @@ begin
         else
           sm_state_next <= E_WAIT_AMC;
         end if;
-      when others =>  
+      when others =>
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -521,7 +521,7 @@ begin
     o_ref_en       <= cdce_ref_en1;
   end generate not_gen_vio_debug;
 
-  gen_vio_debug : if g_DEBUG = true generate 
+  gen_vio_debug : if g_DEBUG = true generate
     o_cdce_n_reset <= debug_cdce_n_reset1;
     o_cdce_n_pd    <= debug_cdce_n_pd1;
     o_ref_en       <= debug_cdce_ref_en1;
@@ -579,7 +579,7 @@ begin
       -- spi signal
       i_cdce_sdo          => i_cdce_sdo,  -- SPI MISO
       o_spi_sclk          => cdce_spi_clk,       -- SPI clock
-      o_cdce_n_en         => cdce_spi_cs_n_en,   -- SPI chip select 
+      o_cdce_n_en         => cdce_spi_cs_n_en,   -- SPI chip select
       o_spi_sdata         => cdce_spi_mosi,      -- SPI MOSI
       -- CDCE specific signals
       i_cdce_pll_status   => i_cdce_pll_status,  -- pll_status : This pin is set high if the PLL is in lock.
@@ -677,7 +677,7 @@ begin
       g_DATA_WIDTH  => amc_spi_cmd_wr_data'length,
       g_INPUT_DELAY => 1
       )
-    port map(  
+    port map(
       i_clk               => i_clk,
       i_rst               => i_rst,
       ---------------------------------------------------------------------
@@ -739,7 +739,7 @@ begin
 ---------------------------------------------------------------------
 -- debug
 ---------------------------------------------------------------------
-  gen_debug : if g_DEBUG = true generate  
+  gen_debug : if g_DEBUG = true generate
 
   begin
 

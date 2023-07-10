@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   mult_sub_sfixed.vhd 
+--    @file                   mult_sub_sfixed.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module computes the following formula: s = c - (a * b) (sfixed point representation)
 --    It performs the following steps:
@@ -72,21 +72,21 @@ end entity mult_sub_sfixed;
 
 architecture RTL of mult_sub_sfixed is
     -----------------------------------------------------------------
-    -- step0: 
+    -- step0:
     -----------------------------------------------------------------
     signal a_tmp : sfixed(g_Q_M_A - 1 downto -g_Q_N_A);
     signal b_tmp : sfixed(g_Q_M_B - 1 downto -g_Q_N_B);
     signal c_tmp : sfixed(g_Q_M_C - 1 downto -g_Q_N_C);
 
     -----------------------------------------------------------------
-    -- step1: 
+    -- step1:
     -----------------------------------------------------------------
     signal a_r1    : sfixed(a_tmp'range):= (others => '0');
     signal b_r1    : sfixed(b_tmp'range):= (others => '0');
     signal c_r1    : sfixed(c_tmp'range):= (others => '0');
 
     ---------------------------------------------------------------------
-    -- step2: 
+    -- step2:
     --    mult_r2 = a*b
     --    c_r2 = c_r1
     ---------------------------------------------------------------------
@@ -100,7 +100,7 @@ architecture RTL of mult_sub_sfixed is
     signal res_r3 : sfixed(sfixed_high(c_r2, '-', mult_r2) downto sfixed_low(c_r2, '-', mult_r2)):= (others => '0');
 
     -----------------------------------------------------------------
-    -- truncate: 
+    -- truncate:
     --   extract sfixed range
     --   sfixed -> std_logic_vector conversion
     -----------------------------------------------------------------

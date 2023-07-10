@@ -17,36 +17,38 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   regdecode_wire_errors.vhd 
+--    @file                   regdecode_wire_errors.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
---! 
---!   This module synchronizes the input errors/status from the i_out_clk source clock domain to the i_clk destination clock domain.
---!   Then, it generates a common error pulse signal on the first error detection.
---!   
---!   The architecture principle is as follows:
---!       @i_clk source clock domain                                         |                                 
---!                                                   |<-------------  fifo_async <------------- i_reg_wire_errors0 (@i_out_clk)
---!                                                   |<-------------  fifo_async <-------------         .
---!        o_errors/o_status <--------- select output |<-------------  fifo_async <------------- i_reg_wire_errors3 (@i_out_clk)
---!                                                   |<-------------  pass       <------------- i_usb_reg_errors0 (@i_clk)
---!                                                   |<-------------  pass       <-------------          .  
---!                                                   |<-------------  pass       <------------- i_usb_reg_errorsx (@i_clk)
---!                                                   |-------------------------------------------------------------------->
---!                                                                                                                         |
---!                                                                        |<-------------  /=0 ?    <------------- errorsx synchronized
---!                                                                        |<-------------  /=0 ?    <-------------         .
---!        errors_valid <-- rising_edge detection <-- /= last value? ------|<-------------  /=0 ?    <-------------         .
---!                                                                        |<-------------  /=0 ?    <-------------         .
---!                                                                        |<-------------  /=0 ?    <------------- errors0 synchronized
---!
---!   Note: 
---!      . the output common error pulse is generated only on the first error detection.
---!      So, the user needs to reset the errors to be able to generate an another common error pulse
+--    @details
+--
+--    This module synchronizes the input errors/status from the i_out_clk source clock domain to the i_clk destination clock domain.
+--    Then, it generates a common error pulse signal on the first error detection.
+--
+--    The architecture principle is as follows:
+--        @i_clk source clock domain                                         |
+--                                                    |<-------------  fifo_async <------------- i_reg_wire_errors0 (@i_out_clk)
+--                                                    |<-------------  fifo_async <-------------         .
+--         o_errors/o_status <--------- select output |<-------------  fifo_async <------------- i_reg_wire_errors3 (@i_out_clk)
+--                                                    |<-------------  pass       <------------- i_usb_reg_errors0 (@i_clk)
+--                                                    |<-------------  pass       <-------------          .
+--                                                    |<-------------  pass       <------------- i_usb_reg_errorsx (@i_clk)
+--                                                    |-------------------------------------------------------------------->
+--                                                                                                                          |
+--                                                                         |<-------------  /=0 ?    <------------- errorsx synchronized
+--                                                                         |<-------------  /=0 ?    <-------------         .
+--         errors_valid <-- rising_edge detection <-- /= last value? ------|<-------------  /=0 ?    <-------------         .
+--                                                                         |<-------------  /=0 ?    <-------------         .
+--                                                                         |<-------------  /=0 ?    <------------- errors0 synchronized
+--
+--    Note:
+--       . the output common error pulse is generated only on the first error detection.
+--       So, the user needs to reset the errors to be able to generate an another common error pulse
+--
 -- -------------------------------------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -117,7 +119,7 @@ architecture RTL of regdecode_wire_errors is
   signal status_tmp1 : t_status(0 to c_NB_ERRORS - 1);
 
   ---------------------------------------------------------------------
-  -- select output error and 
+  -- select output error and
   -- for each error word, generate an associated trig bit if the error value is different of 0
   ---------------------------------------------------------------------
   constant c_NB_ERRORS_ALL : integer := 11;
@@ -135,7 +137,7 @@ architecture RTL of regdecode_wire_errors is
   signal trig_common_error_r3 : std_logic;
 
   ---------------------------------------------------------------------
-  -- 
+  --
   ---------------------------------------------------------------------
   signal trig_error_r4           : std_logic;
   signal trig_common_error_re_r5 : std_logic;
@@ -310,7 +312,7 @@ begin
   end generate gen_synchronisateur_status;
 
   -----------------------------------------------------------------
-  -- select output errors and 
+  -- select output errors and
   -- for each error word, generate an associated trig bit if the error value is different of 0
   -----------------------------------------------------------------
   errors_tmp(10) <= errors_tmp1(3);

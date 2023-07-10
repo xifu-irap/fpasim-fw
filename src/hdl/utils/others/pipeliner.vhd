@@ -17,14 +17,15 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   pipeliner.vhd 
+--    @file                   pipeliner.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details
 --
--- This module adds 0 or several consecutive registers on the data path. 
+--    This module adds 0 or several consecutive registers on the data path.
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;

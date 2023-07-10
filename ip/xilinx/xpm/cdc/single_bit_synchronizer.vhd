@@ -17,21 +17,21 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   single_bit_synchronizer.vhd 
+--    @file                   single_bit_synchronizer.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---      
+--    @details
+--
 --    This modules synchronizes a data bit from a source clock domain to a destination clock domain
 --    The architecture is as follows:
 --         @i_src_clk clock domain             |                    @ i_dest_clk clock domain
 --         i_src ---------------------> xpm_cdc_single -----------> o_dest
---                
---    Note: the following header documentation is an extract of the associated XPM Xilinx header      
---    
--- ------------------------------------------------------------------------------------------------------------- 
+--
+--    Note: the following header documentation is an extract of the associated XPM Xilinx header
+--
+-- -------------------------------------------------------------------------------------------------------------
 
 -- -------------------------------------------------------------------------------------------------------------
 -- XPM_CDC instantiation template for Single-bit Synchronizer configurations
@@ -101,13 +101,13 @@ entity single_bit_synchronizer is
       -- +---------------------------------------------------------------------------------------------------------------------+
       -- | DEST_SYNC_FF         | Integer            | Range: 2 - 10. Default value = 4.                                       |
       -- |---------------------------------------------------------------------------------------------------------------------|
-      -- | Number of register stages used to synchronize signal in the destination clock domain.    
+      -- | Number of register stages used to synchronize signal in the destination clock domain.
       g_DEST_SYNC_FF  : integer := 4;
       -- +---------------------------------------------------------------------------------------------------------------------+
       -- | SRC_INPUT_REG        | Integer            | Allowed values: 1, 0. Default value = 1.                                |
       -- |---------------------------------------------------------------------------------------------------------------------|
       -- | 0- Do not register input (src_in)                                                                                   |
-      -- | 1- Register input (src_in) once using src_clk 
+      -- | 1- Register input (src_in) once using src_clk
       g_SRC_INPUT_REG : integer := 0
    );
    port(
@@ -120,7 +120,7 @@ entity single_bit_synchronizer is
       -- destination
       ---------------------------------------------------------------------
       i_dest_clk : in  std_logic;       -- destination clock domain
-      o_dest     : out std_logic        -- src_in synchronized to the destination clock domain. This output is registered.   
+      o_dest     : out std_logic        -- src_in synchronized to the destination clock domain. This output is registered.
 
    );
 end entity single_bit_synchronizer;
@@ -138,7 +138,7 @@ begin
          SIM_ASSERT_CHK => 1,           -- DECIMAL; 0=disable simulation messages, 1=enable simulation messages
          SRC_INPUT_REG  => g_SRC_INPUT_REG -- DECIMAL; 0=do not register input, 1=register input
       )
-      port map(                         
+      port map(
          dest_out => dest,              -- 1-bit output: src_in synchronized to the destination clock domain. This output
          -- is registered.
 

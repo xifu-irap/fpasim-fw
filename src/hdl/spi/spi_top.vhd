@@ -17,17 +17,17 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   spi_top.vhd 
+--    @file                   spi_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
--- 
+--    @details
+--
 --    This module distributes spi commands to the different devices of the FMC150 board (abaco system)
 --    In particular, it manages the shared spi links (o_spi_sclk and o_spi_sdata) between the different devices.
---    
---    Note: 
+--
+--    Note:
 --     . For the different devices, the user must build the corresponding full SPI words (typically: addr + data).
 -- -------------------------------------------------------------------------------------------------------------
 

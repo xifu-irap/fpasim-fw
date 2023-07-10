@@ -17,18 +17,18 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   sync_top.vhd 
+--    @file                   sync_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module can dynamically delays the input pulse sync signal by a user-defined value.
 --    Then it generates from it a pulse with a static user-defined duration.
 --
 --    Example0:
---     g_PULSE_DURATION |   3 
+--     g_PULSE_DURATION |   3
 --     i_sync_valid     |   1   1   1   1   1   1   1   1   1   1
 --     i_sync           |   1   0   0   0   0   1   0   0   0   0
 --     o_sync_valid     |   x   1   1   1   0   0   1   1   1   0
@@ -57,7 +57,7 @@ entity sync_top is
     i_debug_pulse : in  std_logic;      -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     i_sync_delay  : in  std_logic_vector(g_SYNC_DELAY_WIDTH - 1 downto 0); -- delay to apply on the data path.
 
-    -- input data 
+    -- input data
     ---------------------------------------------------------------------
     i_sync_valid  : in  std_logic;      -- valid sync sample
     i_sync        : in  std_logic;      -- sync sample
@@ -68,7 +68,7 @@ entity sync_top is
     o_sync        : out std_logic;      -- sync sample
     ---------------------------------------------------------------------
     -- errors
-    --------------------------------------------------------------------- 
+    ---------------------------------------------------------------------
     o_errors      : out std_logic_vector(15 downto 0) -- output errors
   );
 end entity sync_top;
@@ -152,7 +152,7 @@ begin
 
   inst_dynamic_shift_register_with_valid_sync : entity work.dynamic_shift_register
     generic map(
-      g_ADDR_WIDTH => i_sync_delay'length, -- width of the address. Possibles values: [2, integer max value[ 
+      g_ADDR_WIDTH => i_sync_delay'length, -- width of the address. Possibles values: [2, integer max value[
       g_DATA_WIDTH => data_pipe_tmp0'length                 -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(

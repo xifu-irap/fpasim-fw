@@ -17,24 +17,25 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---   @file                    spi_master_clock_gen.vhd 
+--    @file                    spi_master_clock_gen.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---   @details                
---  This module generates the following signals:
---    . the SPI clock (optionnally inverted)
---    . pulse to tag when a data can be sampled
---    . pulse to tag when a data can be shifted
+--   @details
+--   This module generates the following signals:
+--     . the SPI clock (optionnally inverted)
+--     . pulse to tag when a data can be sampled
+--     . pulse to tag when a data can be shifted
 --
---  Note: To generate the SPI clock, the counter "frequency" = 2*g_SPI_FREQUENCY_MAX_HZ
---  Note: (see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html)  
---   SPI_MODE |CPOL|CPHA| clock polarity (idle state)| clock data sampling | clock data shift out
---   0        |  0 | 0  | 0                          | rising_edge         | falling_edge
---   1        |  0 | 1  | 0                          | falling_edge        | rising_edge
---   2        |  1 | 0  | 1                          | rising_edge         | falling_edge
---   3        |  1 | 1  | 1                          | falling_edge        | rising_edge
+--   Note: To generate the SPI clock, the counter "frequency" = 2*g_SPI_FREQUENCY_MAX_HZ
+--   Note: (see: https://www.analog.com/en/analog-dialogue/articles/introduction-to-spi-interface.html)
+--    SPI_MODE |CPOL|CPHA| clock polarity (idle state)| clock data sampling | clock data shift out
+--    0        |  0 | 0  | 0                          | rising_edge         | falling_edge
+--    1        |  0 | 1  | 0                          | falling_edge        | rising_edge
+--    2        |  1 | 0  | 1                          | rising_edge         | falling_edge
+--    3        |  1 | 1  | 1                          | falling_edge        | rising_edge
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -147,7 +148,7 @@ begin
 
       -- generate pulse when data can be sampled
       --   g_CPHA=1: falling_edge data sampling => cs change will be change on the rising_edge
-      --   g_CPHA=0: rising_edge data sampling  => cs change will be change on the falling_edge 
+      --   g_CPHA=0: rising_edge data sampling  => cs change will be change on the falling_edge
       ---------------------------------------------------------------------
       if (g_CPHA = '0') and (pulse_re2 = '1') then
         pulse_data_sample_r3 <= '1';

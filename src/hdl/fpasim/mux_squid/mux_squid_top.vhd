@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   mux_squid_top.vhd 
+--    @file                   mux_squid_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module is the top level of the mux_squid function
 --
@@ -55,7 +55,7 @@ entity mux_squid_top is
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
-    -- 
+    --
     i_inter_squid_gain : in std_logic_vector(g_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
     -- RAM: mux_squid_offset

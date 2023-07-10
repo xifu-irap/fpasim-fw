@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   tes_negative_output_detection.vhd 
+--    @file                   tes_negative_output_detection.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---   @details                
+--   @details
 --
 --   This module does the following tasks:
 --      . negative value detection:
@@ -34,9 +34,10 @@
 --      . positive value detection:
 --          1. If i_pixel_result_sign = '0' and i_pixel_valid = '1' (nominal case) then the module
 --            . copy i_pixel_id into o_tes_neg_out_pixel_id
---  
--- Note: 
---   . To be able to detect a new negative value, the module need to be resetted
+--
+--  Note:
+--    . To be able to detect a new negative value, the module need to be resetted.
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -53,9 +54,9 @@ entity tes_negative_output_detection is
     g_PIXEL_ID_WIDTH : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH  -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[
     );
   port(
-    i_clk        : in std_logic;        -- clock 
-    i_rst        : in std_logic;        -- reset 
-    i_rst_status : in std_logic;        -- reset error flag(s) 
+    i_clk        : in std_logic;        -- clock
+    i_rst        : in std_logic;        -- reset
+    i_rst_status : in std_logic;        -- reset error flag(s)
 
     ---------------------------------------------------------------------
     -- input
@@ -132,7 +133,7 @@ begin
         sm_state_next <= E_END;
       end if;
 
-      when others => 
+      when others =>
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;

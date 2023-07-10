@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   tes_top.vhd 
+--    @file                   tes_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module is the top_level of the tes funcion
 --
@@ -299,7 +299,7 @@ begin
       o_pixel_result               => pixel_result1,  -- pixel result
       ---------------------------------------------------------------------
       -- output: detect negative output value
-      --------------------------------------------------------------------- 
+      ---------------------------------------------------------------------
       o_tes_pixel_neg_out_valid    => tes_pixel_neg_out_valid1,
       o_tes_pixel_neg_out_error    => tes_pixel_neg_out_error1,
       o_tes_pixel_neg_out_pixel_id => tes_pixel_neg_out_pixel_id1,

@@ -17,23 +17,24 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   fifo_one_error.vhd 
+--    @file                   fifo_one_error.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--    @details
 --
--- This module checks the good utilization of a FIFO
---    Usually, the user would like to generate an error in the following cases:
---      . a write access is done on a full fifo or
---      . a read access is done on an empty fifo
+--    This module checks the good utilization of a FIFO
+--       Usually, the user would like to generate an error in the following cases:
+--         . a write access is done on a full fifo or
+--         . a read access is done on an empty fifo
 --
--- 2 modes of error management is defined:
---    . The transparent mode: the error is delayed by one clock cycle. 
---      . If the input error is a pulse then the output error will also be a pulse.
---      . If the input error is a level then the output error will also be a level.
---    . The capture mode: if the input error is set to '1', the output error is set to '1' until a reset signal is received
+--   2 modes of error management is defined:
+--      . The transparent mode: the error is delayed by one clock cycle.
+--        . If the input error is a pulse then the output error will also be a pulse.
+--        . If the input error is a level then the output error will also be a level.
+--      . The capture mode: if the input error is set to '1', the output error is set to '1' until a reset signal is received
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 

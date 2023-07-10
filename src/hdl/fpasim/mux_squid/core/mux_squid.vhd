@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   mux_squid.vhd 
+--    @file                   mux_squid.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module performs the following mux_squid computation steps:
 --      . addr0 = i_pixel_result - i_mux_squid_feedback
@@ -33,7 +33,7 @@
 --
 --    Note:
 --       . i_inter_squid_gain is not aligned with the data flow.
---     
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -246,11 +246,11 @@ begin
   -- sub_sfixed_mux_squid_out
   -- requirement: FPASIM-FW-REQ-0150 (part0)
   -------------------------------------------------------------------
-  -- we assume i_pixel_result is always >=0 => set the sign bit (MSB bits) to '0' 
-  pixel_result_tmp       <= '0' & i_pixel_result(i_pixel_result'high - 1 downto 0); 
-  -- we assume (mux_squid_feedback_tmp'length) >= (i_mux_squid_feedback'length) 
+  -- we assume i_pixel_result is always >=0 => set the sign bit (MSB bits) to '0'
+  pixel_result_tmp       <= '0' & i_pixel_result(i_pixel_result'high - 1 downto 0);
+  -- we assume (mux_squid_feedback_tmp'length) >= (i_mux_squid_feedback'length)
   --    align the MSB bits between mux_squid_feedback_tmp and i_mux_squid_feedback (<=> mux_squid_feedback_tmp <= i_mux_squid_feedback*4).
-  --     => the remaining LSB bits of mux_squid_feedback_tmp are fixed to '0' 
+  --     => the remaining LSB bits of mux_squid_feedback_tmp are fixed to '0'
   mux_squid_feedback_tmp(mux_squid_feedback_tmp'high downto (mux_squid_feedback_tmp'high - i_mux_squid_feedback'high)) <= i_mux_squid_feedback;
 
   inst_sub_sfixed_mux_squid : entity work.sub_sfixed
@@ -468,7 +468,7 @@ begin
   mux_squid_tf_web    <= '0';
   mux_squid_tf_dinb   <= (others => '0');
   mux_squid_tf_enb    <= pixel_valid_rx;
-  mux_squid_tf_addrb  <= result_sub_rx;  
+  mux_squid_tf_addrb  <= result_sub_rx;
   mux_squid_tf_regceb <= '1';
 
   -------------------------------------------------------------------
@@ -590,7 +590,7 @@ begin
       --------------------------------------------------------------
       -- output : S = C + A*B
       --------------------------------------------------------------
-      o_s   => result_rz   
+      o_s   => result_rz
       );
 
   -----------------------------------------------------------------

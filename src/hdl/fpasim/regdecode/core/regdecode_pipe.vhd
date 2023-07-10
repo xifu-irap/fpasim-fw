@@ -17,18 +17,18 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   regdecode_pipe.vhd 
+--    @file                   regdecode_pipe.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --    This module has the following functionnalities:
 --       . de-multiplexes the input data flow (i_addr/i_data) in order to configure each RAM
 --       . multiplexe the reading of each RAM into the output data flow (o_fifo_addr/o_fifo_data)
 --       . for each ram, it automatically generates read address in order to retrieve the RAM contents by taking into account
 --         the different RAM depth.
---         
+--
 --    The architecture is as follows:
 --       @i_clk source clock domain                                         |    @ i_out_clk destination clock domain
 --                                                        |--- fsm ---- fifo_async -------------- RAM0
@@ -37,20 +37,21 @@
 --                                                        |--- fsm ---- fifo_async ---- RAM3 |   |  |
 --                                                        |--- fsm ---- fifo_async - RAM4 |  |   |  |
 --                                                                                    |   |  |   |  |
---                                              |------------------------fifo_async----   |  |   |  |                        
---                                              |------------------------fifo_async--------  |   |  |                          
+--                                              |------------------------fifo_async----   |  |   |  |
+--                                              |------------------------fifo_async--------  |   |  |
 --         o_fifo_addr/o_fifo_data <--fsm <---- |------------------------fifo_async----------    |  |
---                                              |------------------------fifo_async--------------   | 
+--                                              |------------------------fifo_async--------------   |
 --                                              |------------------------fifo_async-----------------
---      
---      
---      
+--
+--
+--
 --    requirement: FPASIM-FW-REQ-0260
 --
 --    Note:
 --      . In all cases, the module manages the clock domain crossing.
---  
+--
 -- -------------------------------------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -397,7 +398,7 @@ begin
       i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
       i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_TES_PULSE_SHAPE_ADDR_RANGE_MIN,  -- minimal address range 
+      i_addr_range_min  => c_TES_PULSE_SHAPE_ADDR_RANGE_MIN,  -- minimal address range
       -- data
       i_data_valid      => tes_pulse_shape_wr_en0,     -- input data valid
       i_addr            => addr0,       -- input address
@@ -465,7 +466,7 @@ begin
       i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
       i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_AMP_SQUID_TF_ADDR_RANGE_MIN,  -- minimal address range 
+      i_addr_range_min  => c_AMP_SQUID_TF_ADDR_RANGE_MIN,  -- minimal address range
       -- data
       i_data_valid      => amp_squid_tf_wr_en0,          -- input data valid
       i_addr            => addr0,       -- input address
@@ -533,7 +534,7 @@ begin
       i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
       i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_MUX_SQUID_TF_ADDR_RANGE_MIN,  -- minimal address range 
+      i_addr_range_min  => c_MUX_SQUID_TF_ADDR_RANGE_MIN,  -- minimal address range
       -- data
       i_data_valid      => mux_squid_tf_wr_en0,          -- input data valid
       i_addr            => addr0,       -- input address
@@ -601,7 +602,7 @@ begin
       i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
       i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_TES_STD_STATE_ADDR_RANGE_MIN,  -- minimal address range 
+      i_addr_range_min  => c_TES_STD_STATE_ADDR_RANGE_MIN,  -- minimal address range
       -- data
       i_data_valid      => tes_std_state_wr_en0,     -- input data valid
       i_addr            => addr0,       -- input address
@@ -669,7 +670,7 @@ begin
       i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
       i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN,  -- minimal address range 
+      i_addr_range_min  => c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN,  -- minimal address range
       -- data
       i_data_valid      => mux_squid_offset_wr_en0,     -- input data valid
       i_addr            => addr0,       -- input address

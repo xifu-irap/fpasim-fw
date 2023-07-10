@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   add_sfixed.vhd 
+--    @file                   add_sfixed.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module computes the following formula: s = a + b (sfixed point representation).
 --    It performs the following steps:
@@ -72,13 +72,13 @@ end entity add_sfixed;
 architecture RTL of add_sfixed is
 
     -----------------------------------------------------------------
-    -- step0: 
+    -- step0:
     -----------------------------------------------------------------
     signal a_tmp : sfixed(g_Q_M_A - 1 downto -g_Q_N_A);
     signal b_tmp : sfixed(g_Q_M_B - 1 downto -g_Q_N_B);
 
     -----------------------------------------------------------------
-    -- step1: pipe 
+    -- step1: pipe
     -----------------------------------------------------------------
     signal a_r1    : sfixed(a_tmp'high downto a_tmp'low):= (others => '0');
     signal b_r1    : sfixed(b_tmp'high downto b_tmp'low):= (others => '0');
@@ -90,7 +90,7 @@ architecture RTL of add_sfixed is
     signal res_r2 : sfixed(sfixed_high(a_r1, '+', b_r1) downto sfixed_low(a_r1, '+', b_r1)):= (others => '0');
 
     -----------------------------------------------------------------
-    -- truncate: 
+    -- truncate:
     --   extract sfixed range
     --   sfixed -> std_logic_vector conversion
     -----------------------------------------------------------------
@@ -107,7 +107,7 @@ begin
   begin
       if rising_edge(i_clk) then
           -------------------------------------------------------------
-          -- step1 
+          -- step1
           -------------------------------------------------------------
           a_r1    <= sfixed(a_tmp);
           b_r1    <= sfixed(b_tmp);

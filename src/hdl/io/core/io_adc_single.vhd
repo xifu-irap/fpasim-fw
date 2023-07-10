@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   io_adc_single.vhd 
+--    @file                   io_adc_single.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This module retrieves data words from the FPGA IOs by de-serializing the input data.
 --
@@ -31,25 +31,25 @@
 --
 --    Remark:
 --         Ideally (case0): the even and odd data bits will be sampled as follows:
---             bitslip        :  0x0000         ............................................       0x0000        
+--             bitslip        :  0x0000         ............................................       0x0000
 --                                 __________            __________            __________            __________
 --             sampling clock : __|          |__________|          |__________|          |__________|          |__________
---             data bits      :  even(n)  odd(n)  even(n+1)       odd(n+1)  even(n+2)   odd(n+2)   even(n+3)  odd(n+3)  
+--             data bits      :  even(n)  odd(n)  even(n+1)       odd(n+1)  even(n+2)   odd(n+2)   even(n+3)  odd(n+3)
 --
 --         unfortunately (case1): the sampling clock can be dephased, as follows:
 --                                 __________            __________            __________            __________
 --             sampling clock : __|          |__________|          |__________|          |__________|          |__________
---             data bits      :  odd(n-1)  even(n)  odd(n)       even(n+1)  odd(n+1)   even(n+2)   odd(n+2)  even(n+3)  
+--             data bits      :  odd(n-1)  even(n)  odd(n)       even(n+1)  odd(n+1)   even(n+2)   odd(n+2)  even(n+3)
 --
 --         In this case, to pass from case1 to case0, we need to set to '1' the bitslip bit of each lane in order to drop one bit on each one (one time).
 --             bitslip        :   0x3FFF           ......     0x0000                0x0000                0x0000
 --                                 __________      ......      __________            __________            __________
 --             sampling clock : __|          |_____......_____|          |__________|          |__________|          |__________
---             data bits      :  odd(n-x)  even(n-x+1)      even(n+1)   odd(n+1)  even(n+2)   odd(n+2)   even(n+3)  odd(n+3)  
---    Note: 
+--             data bits      :  odd(n-x)  even(n-x+1)      even(n+1)   odd(n+1)  even(n+2)   odd(n+2)   even(n+3)  odd(n+3)
+--    Note:
 --      . An optional pipeliner (after the IO) can be added.
 --      . After the de-serializer, bits are rearranged. For each output word, the bit order must match the bit order defined in the ads62p49 adc datasheet.
---  
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -163,96 +163,96 @@ begin
   --      j: word bit index
   --      k: the index is taken from ip/xilinx/coregen/selectio_wiz_adc/selectio_wiz_adc_sim_netlist.vhdl from Xilinx ip compilation.
   --   Example:
-  --   word0: 
-  --      adc_b_word_tmp1(0)(13) <= adc_tmp0(27); -- word0: serial link13: 2nd bit 
-  --      adc_b_word_tmp1(0)(12) <= adc_tmp0(13); -- word0: serial link13: 1st bit 
-  --      adc_b_word_tmp1(0)(11) <= adc_tmp0(26); -- word0: serial link12: 2nd bit 
-  --      adc_b_word_tmp1(0)(10) <= adc_tmp0(12); -- word0: serial link12: 1st bit 
+  --   word0:
+  --      adc_b_word_tmp1(0)(13) <= adc_tmp0(27); -- word0: serial link13: 2nd bit
+  --      adc_b_word_tmp1(0)(12) <= adc_tmp0(13); -- word0: serial link13: 1st bit
+  --      adc_b_word_tmp1(0)(11) <= adc_tmp0(26); -- word0: serial link12: 2nd bit
+  --      adc_b_word_tmp1(0)(10) <= adc_tmp0(12); -- word0: serial link12: 1st bit
   --      adc_b_word_tmp1(0)(9) <= adc_tmp0(25); -- word0: serial link11: 2nd bit
-  --      adc_b_word_tmp1(0)(8) <= adc_tmp0(11); -- word0: serial link11: 1st bit 
+  --      adc_b_word_tmp1(0)(8) <= adc_tmp0(11); -- word0: serial link11: 1st bit
   --      adc_b_word_tmp1(0)(7) <= adc_tmp0(24); -- word0: serial link10: 2nd bit
-  --      adc_b_word_tmp1(0)(6) <= adc_tmp0(10); -- word0: serial link10: 1st bit 
-  --      adc_b_word_tmp1(0)(5) <= adc_tmp0(23); -- word0: serial link09: 2nd bit 
-  --      adc_b_word_tmp1(0)(4) <= adc_tmp0(09); -- word0: serial link09: 1st bit 
-  --      adc_b_word_tmp1(0)(3) <= adc_tmp0(22); -- word0: serial link08: 2nd bit 
-  --      adc_b_word_tmp1(0)(2) <= adc_tmp0(08); -- word0: serial link08: 1st bit 
-  --      adc_b_word_tmp1(0)(1) <= adc_tmp0(21); -- word0: serial link07: 2nd bit 
-  --      adc_b_word_tmp1(0)(0) <= adc_tmp0(07); -- word0: serial link07: 1st bit 
-  --      adc_a_word_tmp1(0)(13) <= adc_tmp0(20); -- word0: serial link06: 2nd bit 
-  --      adc_a_word_tmp1(0)(12) <= adc_tmp0(06); -- word0: serial link06: 1st bit 
-  --      adc_a_word_tmp1(0)(11) <= adc_tmp0(19); -- word0: serial link05: 2nd bit 
-  --      adc_a_word_tmp1(0)(10) <= adc_tmp0(05); -- word0: serial link05: 1st bit 
-  --      adc_a_word_tmp1(0)(09) <= adc_tmp0(18); -- word0: serial link04: 2nd bit 
-  --      adc_a_word_tmp1(0)(08) <= adc_tmp0(04); -- word0: serial link04: 1st bit 
-  --      adc_a_word_tmp1(0)(07) <= adc_tmp0(17); -- word0: serial link03: 2nd bit 
-  --      adc_a_word_tmp1(0)(06) <= adc_tmp0(03); -- word0: serial link03: 1st bit 
-  --      adc_a_word_tmp1(0)(05) <= adc_tmp0(16); -- word0: serial link02: 2nd bit 
-  --      adc_a_word_tmp1(0)(04) <= adc_tmp0(02); -- word0: serial link02: 1st bit 
-  --      adc_a_word_tmp1(0)(03) <= adc_tmp0(15); -- word0: serial link01: 2nd bit 
-  --      adc_a_word_tmp1(0)(02) <= adc_tmp0(01); -- word0: serial link01: 1st bit 
-  --      adc_a_word_tmp1(0)(01) <= adc_tmp0(14); -- word0: serial link00: 2nd bit 
-  --      adc_a_word_tmp1(0)(00) <= adc_tmp0(00); -- word0: serial link00: 1st bit 
+  --      adc_b_word_tmp1(0)(6) <= adc_tmp0(10); -- word0: serial link10: 1st bit
+  --      adc_b_word_tmp1(0)(5) <= adc_tmp0(23); -- word0: serial link09: 2nd bit
+  --      adc_b_word_tmp1(0)(4) <= adc_tmp0(09); -- word0: serial link09: 1st bit
+  --      adc_b_word_tmp1(0)(3) <= adc_tmp0(22); -- word0: serial link08: 2nd bit
+  --      adc_b_word_tmp1(0)(2) <= adc_tmp0(08); -- word0: serial link08: 1st bit
+  --      adc_b_word_tmp1(0)(1) <= adc_tmp0(21); -- word0: serial link07: 2nd bit
+  --      adc_b_word_tmp1(0)(0) <= adc_tmp0(07); -- word0: serial link07: 1st bit
+  --      adc_a_word_tmp1(0)(13) <= adc_tmp0(20); -- word0: serial link06: 2nd bit
+  --      adc_a_word_tmp1(0)(12) <= adc_tmp0(06); -- word0: serial link06: 1st bit
+  --      adc_a_word_tmp1(0)(11) <= adc_tmp0(19); -- word0: serial link05: 2nd bit
+  --      adc_a_word_tmp1(0)(10) <= adc_tmp0(05); -- word0: serial link05: 1st bit
+  --      adc_a_word_tmp1(0)(09) <= adc_tmp0(18); -- word0: serial link04: 2nd bit
+  --      adc_a_word_tmp1(0)(08) <= adc_tmp0(04); -- word0: serial link04: 1st bit
+  --      adc_a_word_tmp1(0)(07) <= adc_tmp0(17); -- word0: serial link03: 2nd bit
+  --      adc_a_word_tmp1(0)(06) <= adc_tmp0(03); -- word0: serial link03: 1st bit
+  --      adc_a_word_tmp1(0)(05) <= adc_tmp0(16); -- word0: serial link02: 2nd bit
+  --      adc_a_word_tmp1(0)(04) <= adc_tmp0(02); -- word0: serial link02: 1st bit
+  --      adc_a_word_tmp1(0)(03) <= adc_tmp0(15); -- word0: serial link01: 2nd bit
+  --      adc_a_word_tmp1(0)(02) <= adc_tmp0(01); -- word0: serial link01: 1st bit
+  --      adc_a_word_tmp1(0)(01) <= adc_tmp0(14); -- word0: serial link00: 2nd bit
+  --      adc_a_word_tmp1(0)(00) <= adc_tmp0(00); -- word0: serial link00: 1st bit
   --   word1:
-  --      adc_b_word_tmp1(i)(13) <= adc_tmp0(55); -- word1: serial link13 
-  --      adc_b_word_tmp1(i)(12) <= adc_tmp0(41); -- word1: serial link13 
-  --      adc_b_word_tmp1(i)(11) <= adc_tmp0(54); -- word1: serial link12 
-  --      adc_b_word_tmp1(i)(10) <= adc_tmp0(40); -- word1: serial link12 
-  --      adc_b_word_tmp1(i)(9) <= adc_tmp0(53); -- word1: serial link11 
-  --      adc_b_word_tmp1(i)(8) <= adc_tmp0(39); -- word1: serial link11 
-  --      adc_b_word_tmp1(i)(7) <= adc_tmp0(52); -- word1: serial link10 
-  --      adc_b_word_tmp1(i)(6) <= adc_tmp0(38); -- word1: serial link10 
-  --      adc_b_word_tmp1(i)(5) <= adc_tmp0(51); -- word1: serial link09 
-  --      adc_b_word_tmp1(i)(4) <= adc_tmp0(37); -- word1: serial link09 
-  --      adc_b_word_tmp1(i)(3) <= adc_tmp0(50); -- word1: serial link08 
-  --      adc_b_word_tmp1(i)(2) <= adc_tmp0(36); -- word1: serial link08 
-  --      adc_b_word_tmp1(i)(1) <= adc_tmp0(49); -- word1: serial link07 
-  --      adc_b_word_tmp1(i)(0) <= adc_tmp0(25); -- word1: serial link07 
-  --      adc_a_word_tmp1(1)(13) <= adc_tmp0(48); -- word1: serial link06: 4th bit 
-  --      adc_a_word_tmp1(1)(12) <= adc_tmp0(34); -- word1: serial link06: 3th bit 
-  --      adc_a_word_tmp1(1)(11) <= adc_tmp0(47); -- word1: serial link05: 4th bit 
-  --      adc_a_word_tmp1(1)(10) <= adc_tmp0(33); -- word1: serial link05: 3th bit 
-  --      adc_a_word_tmp1(1)(09) <= adc_tmp0(46); -- word1: serial link04: 4th bit 
-  --      adc_a_word_tmp1(1)(08) <= adc_tmp0(32); -- word1: serial link04: 3th bit 
-  --      adc_a_word_tmp1(1)(07) <= adc_tmp0(45); -- word1: serial link03: 4th bit 
-  --      adc_a_word_tmp1(1)(06) <= adc_tmp0(31); -- word1: serial link03: 3th bit 
-  --      adc_a_word_tmp1(1)(05) <= adc_tmp0(44); -- word1: serial link02: 4th bit 
-  --      adc_a_word_tmp1(1)(04) <= adc_tmp0(30); -- word1: serial link02: 3th bit 
-  --      adc_a_word_tmp1(1)(03) <= adc_tmp0(43); -- word1: serial link01: 4th bit 
-  --      adc_a_word_tmp1(1)(02) <= adc_tmp0(29); -- word1: serial link01: 3th bit 
-  --      adc_a_word_tmp1(1)(01) <= adc_tmp0(42); -- word1: serial link00: 4th bit 
-  --      adc_a_word_tmp1(1)(00) <= adc_tmp0(28); -- word1: serial link00: 3th bit 
+  --      adc_b_word_tmp1(i)(13) <= adc_tmp0(55); -- word1: serial link13
+  --      adc_b_word_tmp1(i)(12) <= adc_tmp0(41); -- word1: serial link13
+  --      adc_b_word_tmp1(i)(11) <= adc_tmp0(54); -- word1: serial link12
+  --      adc_b_word_tmp1(i)(10) <= adc_tmp0(40); -- word1: serial link12
+  --      adc_b_word_tmp1(i)(9) <= adc_tmp0(53); -- word1: serial link11
+  --      adc_b_word_tmp1(i)(8) <= adc_tmp0(39); -- word1: serial link11
+  --      adc_b_word_tmp1(i)(7) <= adc_tmp0(52); -- word1: serial link10
+  --      adc_b_word_tmp1(i)(6) <= adc_tmp0(38); -- word1: serial link10
+  --      adc_b_word_tmp1(i)(5) <= adc_tmp0(51); -- word1: serial link09
+  --      adc_b_word_tmp1(i)(4) <= adc_tmp0(37); -- word1: serial link09
+  --      adc_b_word_tmp1(i)(3) <= adc_tmp0(50); -- word1: serial link08
+  --      adc_b_word_tmp1(i)(2) <= adc_tmp0(36); -- word1: serial link08
+  --      adc_b_word_tmp1(i)(1) <= adc_tmp0(49); -- word1: serial link07
+  --      adc_b_word_tmp1(i)(0) <= adc_tmp0(25); -- word1: serial link07
+  --      adc_a_word_tmp1(1)(13) <= adc_tmp0(48); -- word1: serial link06: 4th bit
+  --      adc_a_word_tmp1(1)(12) <= adc_tmp0(34); -- word1: serial link06: 3th bit
+  --      adc_a_word_tmp1(1)(11) <= adc_tmp0(47); -- word1: serial link05: 4th bit
+  --      adc_a_word_tmp1(1)(10) <= adc_tmp0(33); -- word1: serial link05: 3th bit
+  --      adc_a_word_tmp1(1)(09) <= adc_tmp0(46); -- word1: serial link04: 4th bit
+  --      adc_a_word_tmp1(1)(08) <= adc_tmp0(32); -- word1: serial link04: 3th bit
+  --      adc_a_word_tmp1(1)(07) <= adc_tmp0(45); -- word1: serial link03: 4th bit
+  --      adc_a_word_tmp1(1)(06) <= adc_tmp0(31); -- word1: serial link03: 3th bit
+  --      adc_a_word_tmp1(1)(05) <= adc_tmp0(44); -- word1: serial link02: 4th bit
+  --      adc_a_word_tmp1(1)(04) <= adc_tmp0(30); -- word1: serial link02: 3th bit
+  --      adc_a_word_tmp1(1)(03) <= adc_tmp0(43); -- word1: serial link01: 4th bit
+  --      adc_a_word_tmp1(1)(02) <= adc_tmp0(29); -- word1: serial link01: 3th bit
+  --      adc_a_word_tmp1(1)(01) <= adc_tmp0(42); -- word1: serial link00: 4th bit
+  --      adc_a_word_tmp1(1)(00) <= adc_tmp0(28); -- word1: serial link00: 3th bit
 
   gen_nb_words : for i in adc_a_word_tmp1'range generate
     -- adc_b
-    adc_b_word_tmp1(i)(13) <= adc_tmp0(i*28 + 27);  -- wordj: serial link13 
-    adc_b_word_tmp1(i)(12) <= adc_tmp0(i*28 + 13);  -- wordj: serial link13 
-    adc_b_word_tmp1(i)(11) <= adc_tmp0(i*28 + 26);  -- wordj: serial link12 
-    adc_b_word_tmp1(i)(10) <= adc_tmp0(i*28 + 12);  -- wordj: serial link12 
-    adc_b_word_tmp1(i)(9)  <= adc_tmp0(i*28 + 25);  -- wordj: serial link11 
-    adc_b_word_tmp1(i)(8)  <= adc_tmp0(i*28 + 11);  -- wordj: serial link11 
-    adc_b_word_tmp1(i)(7)  <= adc_tmp0(i*28 + 24);  -- wordj: serial link10 
-    adc_b_word_tmp1(i)(6)  <= adc_tmp0(i*28 + 10);  -- wordj: serial link10 
-    adc_b_word_tmp1(i)(5)  <= adc_tmp0(i*28 + 23);  -- wordj: serial link09 
-    adc_b_word_tmp1(i)(4)  <= adc_tmp0(i*28 + 09);  -- wordj: serial link09 
-    adc_b_word_tmp1(i)(3)  <= adc_tmp0(i*28 + 22);  -- wordj: serial link08 
-    adc_b_word_tmp1(i)(2)  <= adc_tmp0(i*28 + 08);  -- wordj: serial link08 
-    adc_b_word_tmp1(i)(1)  <= adc_tmp0(i*28 + 21);  -- wordj: serial link07 
-    adc_b_word_tmp1(i)(0)  <= adc_tmp0(i*28 + 07);  -- wordj: serial link07 
+    adc_b_word_tmp1(i)(13) <= adc_tmp0(i*28 + 27);  -- wordj: serial link13
+    adc_b_word_tmp1(i)(12) <= adc_tmp0(i*28 + 13);  -- wordj: serial link13
+    adc_b_word_tmp1(i)(11) <= adc_tmp0(i*28 + 26);  -- wordj: serial link12
+    adc_b_word_tmp1(i)(10) <= adc_tmp0(i*28 + 12);  -- wordj: serial link12
+    adc_b_word_tmp1(i)(9)  <= adc_tmp0(i*28 + 25);  -- wordj: serial link11
+    adc_b_word_tmp1(i)(8)  <= adc_tmp0(i*28 + 11);  -- wordj: serial link11
+    adc_b_word_tmp1(i)(7)  <= adc_tmp0(i*28 + 24);  -- wordj: serial link10
+    adc_b_word_tmp1(i)(6)  <= adc_tmp0(i*28 + 10);  -- wordj: serial link10
+    adc_b_word_tmp1(i)(5)  <= adc_tmp0(i*28 + 23);  -- wordj: serial link09
+    adc_b_word_tmp1(i)(4)  <= adc_tmp0(i*28 + 09);  -- wordj: serial link09
+    adc_b_word_tmp1(i)(3)  <= adc_tmp0(i*28 + 22);  -- wordj: serial link08
+    adc_b_word_tmp1(i)(2)  <= adc_tmp0(i*28 + 08);  -- wordj: serial link08
+    adc_b_word_tmp1(i)(1)  <= adc_tmp0(i*28 + 21);  -- wordj: serial link07
+    adc_b_word_tmp1(i)(0)  <= adc_tmp0(i*28 + 07);  -- wordj: serial link07
     -- adc_a
-    adc_a_word_tmp1(i)(13) <= adc_tmp0(i*28 + 20);  -- wordj: serial link06 
-    adc_a_word_tmp1(i)(12) <= adc_tmp0(i*28 + 06);  -- wordj: serial link06 
-    adc_a_word_tmp1(i)(11) <= adc_tmp0(i*28 + 19);  -- wordj: serial link05 
-    adc_a_word_tmp1(i)(10) <= adc_tmp0(i*28 + 05);  -- wordj: serial link05 
-    adc_a_word_tmp1(i)(09) <= adc_tmp0(i*28 + 18);  -- wordj: serial link04 
-    adc_a_word_tmp1(i)(08) <= adc_tmp0(i*28 + 04);  -- wordj: serial link04 
-    adc_a_word_tmp1(i)(07) <= adc_tmp0(i*28 + 17);  -- wordj: serial link03 
-    adc_a_word_tmp1(i)(06) <= adc_tmp0(i*28 + 03);  -- wordj: serial link03 
-    adc_a_word_tmp1(i)(05) <= adc_tmp0(i*28 + 16);  -- wordj: serial link02 
-    adc_a_word_tmp1(i)(04) <= adc_tmp0(i*28 + 02);  -- wordj: serial link02 
-    adc_a_word_tmp1(i)(03) <= adc_tmp0(i*28 + 15);  -- wordj: serial link01 
-    adc_a_word_tmp1(i)(02) <= adc_tmp0(i*28 + 01);  -- wordj: serial link01 
-    adc_a_word_tmp1(i)(01) <= adc_tmp0(i*28 + 14);  -- wordj: serial link00 
-    adc_a_word_tmp1(i)(00) <= adc_tmp0(i*28 + 00);  -- wordj: serial link00 
+    adc_a_word_tmp1(i)(13) <= adc_tmp0(i*28 + 20);  -- wordj: serial link06
+    adc_a_word_tmp1(i)(12) <= adc_tmp0(i*28 + 06);  -- wordj: serial link06
+    adc_a_word_tmp1(i)(11) <= adc_tmp0(i*28 + 19);  -- wordj: serial link05
+    adc_a_word_tmp1(i)(10) <= adc_tmp0(i*28 + 05);  -- wordj: serial link05
+    adc_a_word_tmp1(i)(09) <= adc_tmp0(i*28 + 18);  -- wordj: serial link04
+    adc_a_word_tmp1(i)(08) <= adc_tmp0(i*28 + 04);  -- wordj: serial link04
+    adc_a_word_tmp1(i)(07) <= adc_tmp0(i*28 + 17);  -- wordj: serial link03
+    adc_a_word_tmp1(i)(06) <= adc_tmp0(i*28 + 03);  -- wordj: serial link03
+    adc_a_word_tmp1(i)(05) <= adc_tmp0(i*28 + 16);  -- wordj: serial link02
+    adc_a_word_tmp1(i)(04) <= adc_tmp0(i*28 + 02);  -- wordj: serial link02
+    adc_a_word_tmp1(i)(03) <= adc_tmp0(i*28 + 15);  -- wordj: serial link01
+    adc_a_word_tmp1(i)(02) <= adc_tmp0(i*28 + 01);  -- wordj: serial link01
+    adc_a_word_tmp1(i)(01) <= adc_tmp0(i*28 + 14);  -- wordj: serial link00
+    adc_a_word_tmp1(i)(00) <= adc_tmp0(i*28 + 00);  -- wordj: serial link00
     ---------------------------------------------------------------------
     -- optionnally add latency after input IO
     ---------------------------------------------------------------------

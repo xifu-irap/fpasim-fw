@@ -17,20 +17,20 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   dac_check_dataflow.vhd 
+--!   @file                   dac_check_dataflow.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
+--!   @details
 --
 -- This module generates an error if the module detects the following pattern in the data flow:
 --  data_valid -> hole -> data_valid
 --
--- Note: 
+-- Note:
 --   . the error signal is valid only if it was detected when the function is enabled
---   
--- 
+--
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -111,7 +111,7 @@ begin
         error_next    <= '1';
         sm_state_next <= E_WAIT;
 
-      when others =>                    
+      when others =>
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -139,13 +139,13 @@ begin
         -- +---------------------------------------------------------------------------------------------------------------------+
         -- | DEST_SYNC_FF         | Integer            | Range: 2 - 10. Default value = 4.                                       |
         -- |---------------------------------------------------------------------------------------------------------------------|
-        -- | Number of register stages used to synchronize signal in the destination clock domain.    
+        -- | Number of register stages used to synchronize signal in the destination clock domain.
         g_DEST_SYNC_FF  => 2,
         -- +---------------------------------------------------------------------------------------------------------------------+
         -- | SRC_INPUT_REG        | Integer            | Allowed values: 1, 0. Default value = 1.                                |
         -- |---------------------------------------------------------------------------------------------------------------------|
         -- | 0- Do not register input (src_in)                                                                                   |
-        -- | 1- Register input (src_in) once using src_clk 
+        -- | 1- Register input (src_in) once using src_clk
         g_SRC_INPUT_REG => 1
       )
       port map(
@@ -158,7 +158,7 @@ begin
         -- destination
         ---------------------------------------------------------------------
         i_dest_clk => i_clk,            -- destination clock domain
-        o_dest     => errors_tmp0_sync(i) -- src_in synchronized to the destination clock domain. This output is registered.   
+        o_dest     => errors_tmp0_sync(i) -- src_in synchronized to the destination clock domain. This output is registered.
       );
 
   end generate gen_errors_sync;

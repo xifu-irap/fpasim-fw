@@ -17,20 +17,20 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   single_bit_array_synchronizer.vhd 
+--    @file                   single_bit_array_synchronizer.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---                 
+--    @details
+--
 --    This modules synchronizes a data bus from a source clock domain to a destination clock domain
 --    The architecture is as follows:
 --         @i_src_clk clock domain               |                        @ i_dest_clk clock domain
 --         i_src ---------------------> xpm_cdc_array_single -----------> o_dest
---                                                       
---    Note: the following header documentation is an extract of the associated XPM Xilinx header          
---    
+--
+--    Note: the following header documentation is an extract of the associated XPM Xilinx header
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 -- XPM_CDC instantiation template for Single-bit Array Synchronizer configurations

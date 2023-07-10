@@ -17,24 +17,24 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   regdecode_wire_wr_rd.vhd 
+--    @file                   regdecode_wire_wr_rd.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---  
+--    @details
+--
 --    This module synchronizes a data bus from a source clock domain (@i_clk) to a destination clock domain(@i_out_clk).
 --    Then, the output synchronized data bus is read back from the destination clock domain to the source clock domain.
--- 
+--
 --    The architecture principle is as follows:
 --         @i_clk clock domain        |                   @ i_out_clk clock domain
 --         i_data ---------------> async_fifo -----------> o_data
 --                                                       |
---         o_fifo_data <---------  async_fifo <---------- 
--- 
+--         o_fifo_data <---------  async_fifo <----------
+--
 --    Note: The read back of the synchronized data bus allows to check the clock domain crossing integrity.
--- 
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -112,7 +112,7 @@ architecture RTL of regdecode_wire_wr_rd is
   signal empty_sync1  : std_logic;
 
   ---------------------------------------------------------------------
-  -- sync with the rd RAM output 
+  -- sync with the rd RAM output
   ---------------------------------------------------------------------
   constant c_PIPE_IDX0_L : integer := 0;
   constant c_PIPE_IDX0_H : integer := c_PIPE_IDX0_L + i_data'length - 1;
@@ -203,7 +203,7 @@ begin
       o_rd_empty      => empty1,
       o_rd_rst_busy   => rd_rst_busy1,
       ---------------------------------------------------------------------
-      -- resynchronized errors/status 
+      -- resynchronized errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync1,
       o_empty_sync    => empty_sync1
@@ -240,7 +240,7 @@ begin
   data_sync_rx       <= data_pipe_tmp1(c_PIPE_IDX0_H downto c_PIPE_IDX0_L);
 
   ---------------------------------------------------------------------
-  -- cross clock domain: 
+  -- cross clock domain:
   --  from the i_out_clk clock domain to the i_clk clock domain
   ---------------------------------------------------------------------
   wr_tmp2                                       <= data_valid_sync_rx;
@@ -282,7 +282,7 @@ begin
       o_rd_empty      => empty3,
       o_rd_rst_busy   => rd_rst_busy3,
       ---------------------------------------------------------------------
-      -- resynchronized errors/status 
+      -- resynchronized errors/status
       ---------------------------------------------------------------------
       o_errors_sync   => errors_sync2,
       o_empty_sync    => empty_sync2

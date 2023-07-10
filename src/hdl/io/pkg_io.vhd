@@ -17,13 +17,13 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   pkg_io.vhd 
+--    @file                   pkg_io.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---    This package defines all constant used by the io_top function. 
+--    @details
+--    This package defines all constant used by the io_top function.
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -70,7 +70,7 @@ package pkg_io is
   -- auto-computed: latency of the io_dac_data_insert module
   constant pkg_IO_DAC_DATA_INSERT_LATENCY : natural := pkg_IO_DAC_FIFO;
   -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
-  constant pkg_IO_DAC_OUT_LATENCY         : natural := 1 + 6; -- 
+  constant pkg_IO_DAC_OUT_LATENCY         : natural := 1 + 6; --
   -- auto-computed: latency of the io_dac module
   constant pkg_IO_DAC_LATENCY             : natural := pkg_IO_DAC_DATA_INSERT_LATENCY + pkg_IO_DAC_OUT_LATENCY;  -- fifo CDC + fifo read latency
 

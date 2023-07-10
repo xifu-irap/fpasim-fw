@@ -17,16 +17,17 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   regdecode_pipe_addr_decode_check_addr_range.vhd 
+--    @file                   regdecode_pipe_addr_decode_check_addr_range.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details                
---!
---!   This modules outputs a write enable (o_data_valid) if i_addr_min <= i_addr <= i_addr_range_max when i_data_valid = '1'
---!
---!   Note:
+--    @details
+--
+--    This modules outputs a write enable (o_data_valid) if i_addr_min <= i_addr <= i_addr_range_max when i_data_valid = '1'
+--
+--    Note:
+--
 -- -------------------------------------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;

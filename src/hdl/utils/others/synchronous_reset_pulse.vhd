@@ -17,23 +17,24 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   synchronous_reset_pulse.vhd 
+--    @file                   synchronous_reset_pulse.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---    
+--    @details
+--
 --    This module generate an output user-defined reset pulse width from a synchronized input reset.
 --
---   The architecture principle is as follows:
---       @i_clk: source clock domain       
---                        <--------g_DEST_FF------>                                                                  
---        i_rst ---------------------------------->
---                        |        |              |                                
---        not(g_INIT) -> FF  -->  FF --> ... --> FF ---> o_rst
---    
+--    The architecture principle is as follows:
+--        @i_clk: source clock domain
+--                         <--------g_DEST_FF------>
+--         i_rst ---------------------------------->
+--                         |        |              |
+--         not(g_INIT) -> FF  -->  FF --> ... --> FF ---> o_rst
+--
 --    Note: we assume the input reset (i_rst) is already synchronized to @i_clk
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;

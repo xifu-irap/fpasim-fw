@@ -17,13 +17,13 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   io_dac.vhd 
+--    @file                   io_dac.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
---    
+--    @details
+--
 --    This module does the following steps:
 --       . pass data words from @sys_clk to the @dac_clk_div (async FIFO) and reorder bytes.
 --       . serializes data words from @dac_clk_div to the IOs (@dac_clk)
@@ -132,7 +132,7 @@ architecture RTL of io_dac is
   signal data_pipe_tmp0 : std_logic_vector(c_IDX2_H downto 0);
   signal data_pipe_tmp1 : std_logic_vector(c_IDX2_H downto 0);
 
-  signal dac_valid_tmp1 : std_logic;  
+  signal dac_valid_tmp1 : std_logic;
   signal dac_frame_tmp1 : std_logic_vector(7 downto 0);
   signal dac_tmp1       : std_logic_vector(63 downto 0);
 

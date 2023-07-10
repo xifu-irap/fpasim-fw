@@ -17,22 +17,22 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   fifo_sync_with_prog_full_wr_count.vhd 
+--    @file                   fifo_sync_with_prog_full_wr_count.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                  
--- 
+--    @details
+--
 --    This module intanciates a synchronuous FIFO with the empty, full, prog full and wr data count flags/signals
 --    This module generates 4 types of errors in the following cases:
 --      . a writting when the FIFO is full.
 --      . a writting when the FIFO is in a reset state.
 --      . a reading when the FIFO is empty.
 --      . a reading when the FIFO is in a reset state.
---    Note: the following header documentation is an extract of the associated XPM Xilinx header.      
---     
--- -------------------------------------------------------------------------------------------------------------   
+--    Note: the following header documentation is an extract of the associated XPM Xilinx header.
+--
+-- -------------------------------------------------------------------------------------------------------------
 
 -- -------------------------------------------------------------------------------------------------------------
 -- XPM_FIFO instantiation template for Synchronous FIFO configurations
@@ -486,7 +486,7 @@ entity fifo_sync_with_error_prog_full_wr_count is
     -- write side
     ---------------------------------------------------------------------
     i_wr_clk        : in  std_logic;    -- write clock
-    i_wr_rst        : in  std_logic;    -- write reset 
+    i_wr_rst        : in  std_logic;    -- write reset
     i_wr_en         : in  std_logic;    -- write enable
     i_wr_din        : in  std_logic_vector(g_WRITE_DATA_WIDTH - 1 downto 0); -- write data
     o_wr_full       : out std_logic;    -- When asserted, this signal indicates that the FIFO is full (not destructive to the contents of the FIFO.)
@@ -504,7 +504,7 @@ entity fifo_sync_with_error_prog_full_wr_count is
     o_rd_rst_busy   : out std_logic;    -- Active-High indicator that the FIFO read domain is currently in a reset state
 
     ---------------------------------------------------------------------
-    -- errors/empty status 
+    -- errors/empty status
     ---------------------------------------------------------------------
     o_errors_sync   : out std_logic_vector(3 downto 0); -- output errors
     o_empty_sync    : out std_logic     -- output empty fifo status flag

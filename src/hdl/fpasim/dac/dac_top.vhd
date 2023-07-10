@@ -17,16 +17,16 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   dac_top.vhd 
+--    @file                   dac_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---   @details                
+--   @details
 --
 --   This module generates frame flags.
 --   It has 2 modes:
---     . normal mode (i_dac_en_pattern=0): 
+--     . normal mode (i_dac_en_pattern=0):
 --        . After the startup, on the first sample, it generates a pulse on the sof signal one time.
 --        . the input data flow are duplicated on the o_data0 and o_data1 signals
 --     . pattern mode (i_dac_en_pattern=1): (see dac3283 datasheet (figure 34)).
@@ -48,19 +48,19 @@
 --   The output data flow has the following structure:
 --
 --   Example0: normal mode
---     i_dac_valid:   1   1   1   1   1   1   1   1   
---     i_dac      :   a1  a2  a3  a4  a5  a6  a7  a8  
---     o_dac_valid:   1   1   1   1   1   1   1   1  
---     o_dac_frame:   1   0   0   0   0   0   0   0   
---     o_dac0      :  a1  a2  a3  a4  a5  a6  a7  a8  
---     o_dac1      :  a1  a2  a3  a4  a5  a6  a7  a8  
+--     i_dac_valid:   1   1   1   1   1   1   1   1
+--     i_dac      :   a1  a2  a3  a4  a5  a6  a7  a8
+--     o_dac_valid:   1   1   1   1   1   1   1   1
+--     o_dac_frame:   1   0   0   0   0   0   0   0
+--     o_dac0      :  a1  a2  a3  a4  a5  a6  a7  a8
+--     o_dac1      :  a1  a2  a3  a4  a5  a6  a7  a8
 --
 --   Example1: pattern mode (input data is ignored)
---     i_dac_valid      :   1              1           1         1   
---     i_dac            :   a1             a2          a3        a4  
---     o_dac_valid      :   1              1           1         1   
---     o_dac_frame      :   1              0           0         0   
---     o_dac0 (MSB-LSB) :  pat0-pat1  pat4-pat5  pat0-pat1  pat4-pat5 
+--     i_dac_valid      :   1              1           1         1
+--     i_dac            :   a1             a2          a3        a4
+--     o_dac_valid      :   1              1           1         1
+--     o_dac_frame      :   1              0           0         0
+--     o_dac0 (MSB-LSB) :  pat0-pat1  pat4-pat5  pat0-pat1  pat4-pat5
 --     o_dac1 (MSB-LSB) :  pat2-pat3  pat6-pat7  pat2-pat3  pat6-pat7
 --
 -- -------------------------------------------------------------------------------------------------------------
@@ -95,7 +95,7 @@ entity dac_top is
     i_dac_pattern7   : in  std_logic_vector(7 downto 0);  -- pattern7 value
     -- delay
     i_dac_delay      : in  std_logic_vector(g_DAC_DELAY_WIDTH - 1 downto 0);  -- delay to apply on the data path.
-    -- input data 
+    -- input data
     ---------------------------------------------------------------------
     i_dac_valid      : in  std_logic;   -- valid dac sample flag
     i_dac            : in  std_logic_vector(15 downto 0);  -- dac sample
@@ -205,7 +205,7 @@ begin
 
   inst_dynamic_shift_register_dac : entity work.dynamic_shift_register
     generic map(
-      g_ADDR_WIDTH => i_dac_delay'length,  -- width of the address. Possibles values: [2, integer max value[ 
+      g_ADDR_WIDTH => i_dac_delay'length,  -- width of the address. Possibles values: [2, integer max value[
       g_DATA_WIDTH => data_pipe_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
       )
     port map(
