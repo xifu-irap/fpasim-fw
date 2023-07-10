@@ -32,12 +32,12 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library UNISIM;
-use UNISIM.vcomponents.all;
+library unisim;
+use unisim.vcomponents.all;
 
 
 entity ads62p49_io is
-  port (
+  port(
     i_clk_phase : in  std_logic; -- adc clock (for the clock path): i_clk_phase = i_clk + 90 degree
     i_clk       : in  std_logic; -- adc clock (for the data path)
     ---------------------------------------------------------------------
@@ -107,9 +107,9 @@ begin
 ---------------------------------------------------------------------
 -- clock
   gen_user_to_pads_clk : if true generate
-    signal clk_fwd_out : std_logic;
-    signal clk_tmp_p   : std_logic;
-    signal clk_tmp_n   : std_logic;
+    signal clk_fwd_out : std_logic; -- intermediary clk value
+    signal clk_tmp_p   : std_logic; -- temporary output clock_p value
+    signal clk_tmp_n   : std_logic; -- temporary output clock_n value
   begin
     inst_oddr : unisim.vcomponents.ODDR
       generic map(
@@ -146,12 +146,12 @@ begin
 
 -- adc0
   gen_adc0_user_to_pads : if true generate
-    signal data_in_even : std_logic_vector(6 downto 0);
-    signal data_in_odd  : std_logic_vector(6 downto 0);
-    signal data_tmp     : std_logic_vector(6 downto 0);
+    signal data_in_even : std_logic_vector(6 downto 0); -- even bits of the input adc
+    signal data_in_odd  : std_logic_vector(6 downto 0); -- odd bits of the input adc
+    signal data_tmp     : std_logic_vector(6 downto 0); -- intermediary data value
 
-    signal data_out_p : std_logic_vector(6 downto 0);
-    signal data_out_n : std_logic_vector(6 downto 0);
+    signal data_out_p : std_logic_vector(6 downto 0); -- temporary output data_p value
+    signal data_out_n : std_logic_vector(6 downto 0); -- temporary output data_n value
   begin
     -- rising_edge: even bits
     -- falling_edge: odd bits
@@ -228,12 +228,12 @@ begin
 
 -- adc1
   gen_adc1_user_to_pads : if true generate
-    signal data_in_even : std_logic_vector(6 downto 0);
-    signal data_in_odd  : std_logic_vector(6 downto 0);
-    signal data_tmp     : std_logic_vector(6 downto 0);
+    signal data_in_even : std_logic_vector(6 downto 0); -- even bits of the input adc
+    signal data_in_odd  : std_logic_vector(6 downto 0); -- odd bits of the input adc
+    signal data_tmp     : std_logic_vector(6 downto 0); -- intermediary data value
 
-    signal data_out_p : std_logic_vector(6 downto 0);
-    signal data_out_n : std_logic_vector(6 downto 0);
+    signal data_out_p : std_logic_vector(6 downto 0); -- temporary output data_p value
+    signal data_out_n : std_logic_vector(6 downto 0); -- temporary output data_n value
   begin
     -- rising_edge: even bits
     -- falling_edge: odd bits

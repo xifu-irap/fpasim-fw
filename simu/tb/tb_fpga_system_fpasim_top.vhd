@@ -122,21 +122,6 @@ architecture simulate of tb_fpga_system_fpasim_top is
   constant c_CLK_PERIOD0 : time := 4 ns;
 
 
-  ---------------------------------------------------------------------
-  -- VUnit Scoreboard objects
-  ---------------------------------------------------------------------
-  -- loggers
-  --constant c_LOGGER_SUMMARY               : logger_t  := get_logger("log:summary");
-  ---- checkers
-  --constant c_CHECKER_REG                  : checker_t := new_checker("check:reg:data");
-  --constant c_CHECKER_RAM_TES_PULSE_SHAPE  : checker_t := new_checker("check:ram:tes_pulse_shape");
-  --constant c_CHECKER_RAM_AMP_SQUID_TF     : checker_t := new_checker("check:ram:amp_squid_tf");
-  --constant c_CHECKER_RAM_MUX_SQUID_TF     : checker_t := new_checker("check:ram:mux_squid_tf");
-  --constant c_CHECKER_RAM_TES_STEADY_STATE : checker_t := new_checker("check:ram:tes_steady_state");
-  --constant c_CHECKER_RAM_MUX_SQUID_OFFSET : checker_t := new_checker("check:ram:mux_squid_offset");
-
-
-
 begin
 
   ---------------------------------------------------------------------
@@ -225,20 +210,6 @@ begin
     ---------------------------------------------------------------------
     info("Wait end of simulation");
     wait for 16368 * c_CLK_PERIOD0;
-
-    ---------------------------------------------------------------------
-    -- VUNIT - checking errors and summary
-    ---------------------------------------------------------------------
-    -- summary
-    --info(c_LOGGER_SUMMARY,
-    --     "===Summary===" & LF &
-    --     "c_CHECKER_REG: " & to_string(get_checker_stat(c_CHECKER_REG)) & LF &
-    --     "c_CHECKER_RAM_TES_PULSE_SHAPE: " & to_string(get_checker_stat(c_CHECKER_RAM_TES_PULSE_SHAPE)) & LF &
-    --     "c_CHECKER_RAM_AMP_SQUID_TF: " & to_string(get_checker_stat(c_CHECKER_RAM_AMP_SQUID_TF)) & LF &
-    --     "c_CHECKER_RAM_MUX_SQUID_TF: " & to_string(get_checker_stat(c_CHECKER_RAM_MUX_SQUID_TF)) & LF &
-    --     "c_CHECKER_RAM_TES_STEADY_STATE: " & to_string(get_checker_stat(c_CHECKER_RAM_TES_STEADY_STATE)) & LF &
-    --     "c_CHECKER_RAM_MUX_SQUID_OFFSET: " & to_string(get_checker_stat(c_CHECKER_RAM_MUX_SQUID_OFFSET)) & LF
-    --     );
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk => adc_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 

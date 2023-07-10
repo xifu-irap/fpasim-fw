@@ -497,9 +497,6 @@ architecture RTL of regdecode_top is
   signal make_pulse_wr_data_count_tmp0 : std_logic_vector(15 downto 0);
 
   signal make_pulse_rd_tmp1    : std_logic;
-  --signal make_pulse_data_valid_tmp1  : std_logic;
-  --signal make_pulse_sof_tmp1  : std_logic;
-  --signal make_pulse_eof_tmp1  : std_logic;
   signal make_pulse_data_tmp1  : std_logic_vector(usb_wirein_make_pulse'range);
   signal make_pulse_empty_tmp1 : std_logic;
 

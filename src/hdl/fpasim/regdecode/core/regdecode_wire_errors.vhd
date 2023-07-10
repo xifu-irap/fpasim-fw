@@ -379,10 +379,6 @@ begin
       end case;
 
       for i in errors_tmp1'range loop
-        --if i = to_integer(unsigned(i_error_sel)) then
-        --  errors_r1 <= errors_tmp1(i);
-        --  status_r1 <= status_tmp1(i);
-        --end if;
         -- generate one bit error by error word
         if unsigned(errors_tmp(i)) /= to_unsigned(0, errors_tmp(i)'length) then
           trig_errors_vec_r1(i) <= '1';

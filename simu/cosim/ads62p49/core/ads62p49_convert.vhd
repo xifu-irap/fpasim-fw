@@ -40,7 +40,7 @@ use ieee.fixed_float_types.all;
 entity ads62p49_convert is
   generic (
     g_ADC_VPP   : in natural := 2;  -- ADC differential input voltage ( Vpp expressed in Volts)
-    g_ADC_RES   : in natural := 14; -- ADC resolution (expressed in bits)
+    g_ADC_RES   : in natural := 14;     -- ADC resolution (expressed in bits)
     g_ADC_DELAY : in natural := 0  -- ADC conversion delay (expressed in number of clock cycles @i_clk). The range is: [0;max integer value[)
     );
   port (
@@ -49,37 +49,36 @@ entity ads62p49_convert is
     ---------------------------------------------------------------------
     -- inputs
     ---------------------------------------------------------------------
-    i_adc     : in  real; -- ADC real value
+    i_adc     : in  real;                                     -- ADC real value
     ---------------------------------------------------------------------
     -- ddr outputs @i_clk
     ---------------------------------------------------------------------
-    o_ddr_adc : out std_logic_vector(g_ADC_RES - 1 downto 0) -- ADC value
+    o_ddr_adc : out std_logic_vector(g_ADC_RES - 1 downto 0)  -- ADC value
     );
 end entity ads62p49_convert;
 
 architecture RTL of ads62p49_convert is
 
-  constant c_FACTOR : real    := real(g_ADC_VPP)/2.0;
+  constant c_FACTOR : real    := real(g_ADC_VPP)/2.0; -- multiplicator factor to apply to the real value
   constant c_Q_M    : integer := 0;  -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
   constant c_Q_N    : integer := o_ddr_adc'length - 1;  -- number of fraction bits. Possible values [0;integer_max_value[
 
 ---------------------------------------------------------------------
 -- convert: float -> sfixed
 ---------------------------------------------------------------------
-  signal f_adc_tmp0 : real;
-  signal s_adc_tmp0 : sfixed(c_Q_M downto -c_Q_N);
+  signal f_adc_tmp0 : real; -- real value after multiplication.
+  signal s_adc_tmp0 : sfixed(c_Q_M downto -c_Q_N); -- sfixed representation of real value.
 
 ---------------------------------------------------------------------
 -- convert: sfixed -> std_logic_vector
 ---------------------------------------------------------------------
-  signal adc_tmp1 : std_logic_vector(o_ddr_adc'range);
-  signal adc_tmp2 : std_logic_vector(o_ddr_adc'range);
+  signal adc_tmp1 : std_logic_vector(o_ddr_adc'range); -- input temporary adc value
+  signal adc_tmp2 : std_logic_vector(o_ddr_adc'range); -- output temporary adc value
 
 begin
   -- convert: [-g_ADC_VPP/2;g_ADC_VPP/2[ -> [-1;0.99[
   f_adc_tmp0 <= c_FACTOR * i_adc;
-  --f_adc_tmp0 <= 1.0 * i_adc;
--- convert: float -> sfixed
+  -- convert: float -> sfixed
   s_adc_tmp0 <= to_sfixed(f_adc_tmp0, s_adc_tmp0);
 
 -- convert: sfixed -> std_logic_vector

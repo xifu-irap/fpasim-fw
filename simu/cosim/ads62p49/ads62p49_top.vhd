@@ -37,74 +37,73 @@ use ieee.std_logic_1164.all;
 entity ads62p49_top is
   generic (
     g_ADC_VPP   : in natural := 2;  -- ADC differential input voltage ( Vpp expressed in Volts)
-    g_ADC_RES   : in natural := 14; -- ADC resolution (expressed in bits)
+    g_ADC_RES   : in natural := 14;     -- ADC resolution (expressed in bits)
     g_ADC_DELAY : in natural := 0  -- ADC latency (expressed in number of clock periods) @i_adc_clk. The range is [0;max integer[
     );
-  port (
-
+  port(
     ---------------------------------------------------------------------
     -- inputs
     ---------------------------------------------------------------------
-    i_adc_clk_phase : in std_logic; -- adc clock (for the clock path): i_adc_clk_phase = i_adc_clk + 90 degree
-    i_adc_clk       : in std_logic; -- adc clock (for the data path)
-    i_adc0_real     : in real; -- input adc0 value
-    i_adc1_real     : in real; -- input adc1 value
+    i_adc_clk_phase : in std_logic;  -- adc clock (for the clock path): i_adc_clk_phase = i_adc_clk + 90 degree
+    i_adc_clk       : in std_logic;     -- adc clock (for the data path)
+    i_adc0_real     : in real;          -- input adc0 value
+    i_adc1_real     : in real;          -- input adc1 value
 
     ---------------------------------------------------------------------
     -- outputs
     ---------------------------------------------------------------------
-    o_adc_clk_p : out std_logic; -- differential_p clock adc
-    o_adc_clk_n : out std_logic; -- differential_n clock adc
+    o_adc_clk_p : out std_logic;        -- differential_p clock adc
+    o_adc_clk_n : out std_logic;        -- differential_n clock adc
     -- adc0
-    o_da0_p     : out std_logic; --  differential_p adc_a (lane0)
-    o_da0_n     : out std_logic; --  differential_n adc_a (lane0)
+    o_da0_p     : out std_logic;        --  differential_p adc_a (lane0)
+    o_da0_n     : out std_logic;        --  differential_n adc_a (lane0)
 
-    o_da2_p     : out std_logic; --  differential_p adc_a (lane1)
-    o_da2_n     : out std_logic; --  differential_n adc_a (lane1)
+    o_da2_p : out std_logic;            --  differential_p adc_a (lane1)
+    o_da2_n : out std_logic;            --  differential_n adc_a (lane1)
 
-    o_da4_p     : out std_logic; --  differential_p adc_a (lane2)
-    o_da4_n     : out std_logic; --  differential_n adc_a (lane2)
+    o_da4_p : out std_logic;            --  differential_p adc_a (lane2)
+    o_da4_n : out std_logic;            --  differential_n adc_a (lane2)
 
-    o_da6_p     : out std_logic; --  differential_p adc_a (lane3)
-    o_da6_n     : out std_logic; --  differential_n adc_a (lane3)
+    o_da6_p : out std_logic;            --  differential_p adc_a (lane3)
+    o_da6_n : out std_logic;            --  differential_n adc_a (lane3)
 
-    o_da8_p     : out std_logic; --  differential_p adc_a (lane4)
-    o_da8_n     : out std_logic; --  differential_n adc_a (lane4)
+    o_da8_p : out std_logic;            --  differential_p adc_a (lane4)
+    o_da8_n : out std_logic;            --  differential_n adc_a (lane4)
 
-    o_da10_p    : out std_logic; --  differential_p adc_a (lane5)
-    o_da10_n    : out std_logic; --  differential_n adc_a (lane5)
+    o_da10_p : out std_logic;           --  differential_p adc_a (lane5)
+    o_da10_n : out std_logic;           --  differential_n adc_a (lane5)
 
-    o_da12_p    : out std_logic; --  differential_p adc_a (lane6)
-    o_da12_n    : out std_logic; --  differential_n adc_a (lane6)
+    o_da12_p : out std_logic;           --  differential_p adc_a (lane6)
+    o_da12_n : out std_logic;           --  differential_n adc_a (lane6)
 
     -- adc1
-    o_db0_p  : out std_logic; --  differential_p adc_b (lane0)
-    o_db0_n  : out std_logic; --  differential_n adc_b (lane0)
+    o_db0_p : out std_logic;            --  differential_p adc_b (lane0)
+    o_db0_n : out std_logic;            --  differential_n adc_b (lane0)
 
-    o_db2_p  : out std_logic; --  differential_p adc_b (lane1)
-    o_db2_n  : out std_logic; --  differential_n adc_b (lane1)
+    o_db2_p : out std_logic;            --  differential_p adc_b (lane1)
+    o_db2_n : out std_logic;            --  differential_n adc_b (lane1)
 
-    o_db4_p  : out std_logic; --  differential_p adc_b (lane2)
-    o_db4_n  : out std_logic; --  differential_n adc_b (lane2)
+    o_db4_p : out std_logic;            --  differential_p adc_b (lane2)
+    o_db4_n : out std_logic;            --  differential_n adc_b (lane2)
 
-    o_db6_p  : out std_logic; --  differential_p adc_b (lane3)
-    o_db6_n  : out std_logic; --  differential_n adc_b (lane3)
+    o_db6_p : out std_logic;            --  differential_p adc_b (lane3)
+    o_db6_n : out std_logic;            --  differential_n adc_b (lane3)
 
-    o_db8_p  : out std_logic; --  differential_p adc_b (lane4)
-    o_db8_n  : out std_logic; --  differential_n adc_b (lane4)
+    o_db8_p : out std_logic;            --  differential_p adc_b (lane4)
+    o_db8_n : out std_logic;            --  differential_n adc_b (lane4)
 
-    o_db10_p : out std_logic; --  differential_p adc_b (lane5)
-    o_db10_n : out std_logic; --  differential_n adc_b (lane5)
+    o_db10_p : out std_logic;           --  differential_p adc_b (lane5)
+    o_db10_n : out std_logic;           --  differential_n adc_b (lane5)
 
-    o_db12_p : out std_logic; --  differential_p adc_b (lane6)
-    o_db12_n : out std_logic  --  differential_n adc_b (lane6)
+    o_db12_p : out std_logic;           --  differential_p adc_b (lane6)
+    o_db12_n : out std_logic            --  differential_n adc_b (lane6)
     );
 end entity ads62p49_top;
 
 architecture RTL of ads62p49_top is
 
-  signal ddr_adc0 : std_logic_vector(13 downto 0);
-  signal ddr_adc1 : std_logic_vector(13 downto 0);
+  signal ddr_adc0 : std_logic_vector(13 downto 0); -- channel 0: ddr adc data.
+  signal ddr_adc1 : std_logic_vector(13 downto 0); -- channel 1: ddr adc data.
 
 begin
 
