@@ -173,7 +173,7 @@ package body pkg_data_checker is
 
           v_fsm_state := E_RUN;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
 

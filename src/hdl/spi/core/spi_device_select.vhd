@@ -397,7 +397,7 @@ begin
         else
           sm_state_next <= E_WAIT_AMC;
         end if;
-      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -521,7 +521,7 @@ begin
     o_ref_en       <= cdce_ref_en1;
   end generate not_gen_vio_debug;
 
-  gen_vio_debug : if g_DEBUG = true generate -- @suppress "Redundant boolean equality check with true"
+  gen_vio_debug : if g_DEBUG = true generate 
     o_cdce_n_reset <= debug_cdce_n_reset1;
     o_cdce_n_pd    <= debug_cdce_n_pd1;
     o_ref_en       <= debug_cdce_ref_en1;
@@ -677,7 +677,7 @@ begin
       g_DATA_WIDTH  => amc_spi_cmd_wr_data'length,
       g_INPUT_DELAY => 1
       )
-    port map(  -- @suppress "The order of the associations is different from the declaration order"
+    port map(  
       i_clk               => i_clk,
       i_rst               => i_rst,
       ---------------------------------------------------------------------
@@ -739,7 +739,7 @@ begin
 ---------------------------------------------------------------------
 -- debug
 ---------------------------------------------------------------------
-  gen_debug : if g_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
+  gen_debug : if g_DEBUG = true generate  
 
   begin
 

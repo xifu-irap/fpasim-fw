@@ -98,8 +98,8 @@ architecture RTL of dac3283_top is
   signal dac0_valid : std_logic;
   signal dac0       : std_logic_vector(15 downto 0);
 
-  signal dac1_valid : std_logic;  -- @suppress "signal dac1_valid is never read"
-  signal dac1       : std_logic_vector(15 downto 0);  -- @suppress "signal dac1 is never read"
+  signal dac1_valid : std_logic;  
+  signal dac1       : std_logic_vector(15 downto 0);  
 
 begin
 

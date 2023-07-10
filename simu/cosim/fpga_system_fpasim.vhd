@@ -142,39 +142,39 @@ architecture RTL of fpga_system_fpasim is
   signal dac7_n      : std_logic;
 
 -- common: shared link between the spi
-  signal spi_sclk  : std_logic;  -- @suppress "signal spi_sclk is never read"
-  signal spi_sdata : std_logic;  -- @suppress "signal spi_sdata is never read"
+  signal spi_sclk  : std_logic;  
+  signal spi_sdata : std_logic;  
 
   -- CDCE: SPI
-  signal cdce_sdo  : std_logic := '0';  -- @suppress "signal cdce_sdo is never written"
-  signal cdce_n_en : std_logic;  -- @suppress "signal cdce_n_en is never read"
+  signal cdce_sdo  : std_logic := '0';  
+  signal cdce_n_en : std_logic;  
 
   -- CDCE: specific signals
-  signal cdce_pll_status : std_logic := '0';  -- @suppress "signal cdce_pll_status is never written"
-  signal cdce_n_reset    : std_logic;  -- @suppress "signal cdce_n_reset is never read"
-  signal cdce_n_pd       : std_logic;  -- @suppress "signal cdce_n_pd is never read"
-  signal ref_en          : std_logic;  -- @suppress "signal ref_en is never read"
+  signal cdce_pll_status : std_logic := '0';  
+  signal cdce_n_reset    : std_logic;  
+  signal cdce_n_pd       : std_logic;  
+  signal ref_en          : std_logic;  
 
   -- ADC: SPI
-  signal adc_sdo   : std_logic := '0';  -- @suppress "signal adc_sdo is never written"
-  signal adc_n_en  : std_logic;  -- @suppress "signal adc_n_en is never read"
+  signal adc_sdo   : std_logic := '0';  
+  signal adc_n_en  : std_logic;  
   -- ADC: specific signals
-  signal adc_reset : std_logic;  -- @suppress "signal adc_reset is never read"
+  signal adc_reset : std_logic;  
 
   -- DAC: SPI
-  signal dac_sdo        : std_logic := '0';  -- @suppress "signal dac_sdo is never written"
-  signal dac_n_en       : std_logic;  -- @suppress "signal dac_n_en is never read"
+  signal dac_sdo        : std_logic := '0';  
+  signal dac_n_en       : std_logic;  
   -- DAC: specific signal
-  signal dac_tx_present : std_logic;  -- @suppress "signal dac_tx_present is never read"
+  signal dac_tx_present : std_logic;  
 
   -- AMC: SPI (monitoring)
-  signal mon_sdo     : std_logic := '0';  -- @suppress "signal mon_sdo is never written"
-  signal mon_n_en    : std_logic;  -- @suppress "signal mon_n_en is never read"
+  signal mon_sdo     : std_logic := '0';  
+  signal mon_n_en    : std_logic;  
   -- AMC : specific signals
-  signal mon_n_int   : std_logic := '0';  -- @suppress "signal mon_n_int is never written"
-  signal mon_n_reset : std_logic;  -- @suppress "signal mon_n_reset is never read"
+  signal mon_n_int   : std_logic := '0';  
+  signal mon_n_reset : std_logic;  
   -- leds
-  signal leds        : std_logic_vector(3 downto 2);  -- @suppress "signal leds is never read"
+  signal leds        : std_logic_vector(3 downto 2);  
 
   ---------------------------------------------------------------------
   -- dac3283_top

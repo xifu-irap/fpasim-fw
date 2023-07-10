@@ -105,7 +105,7 @@ architecture RTL of spi_master is
   signal tx_cs_n_r1   : std_logic := '1';
 
   signal tx_data_valid_next : std_logic;
-  signal tx_data_valid_r1   : std_logic := '0';  -- @suppress "signal tx_data_valid_r1 is never read"
+  signal tx_data_valid_r1   : std_logic := '0';  
 
   signal tx_data_next : std_logic_vector(i_tx_data'range);
   signal tx_data_r1   : std_logic_vector(i_tx_data'range) := (others => '0');
@@ -275,7 +275,7 @@ begin
         else
           sm_wr_state_next <= E_UNSET_CS;
         end if;
-      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  
         sm_wr_state_next <= E_RST;
     end case;
   end process p_wr_decode_state;

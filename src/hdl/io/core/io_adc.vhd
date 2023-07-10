@@ -140,14 +140,14 @@ architecture RTL of io_adc is
   signal adc_b_wr_tmp0      : std_logic;
   signal adc_b_data_tmp0    : std_logic_vector(c_ADC_B_WR_FIFO_WIDTH - 1 downto 0);
   --signal adc_b_full0        : std_logic;
-  signal adc_b_wr_rst_busy0 : std_logic;  -- @suppress "signal adc_b_wr_rst_busy0 is never read"
+  signal adc_b_wr_rst_busy0 : std_logic;  
 
   signal adc_b_rd1          : std_logic;
   signal adc_b_data_tmp1    : std_logic_vector(c_ADC_B_RD_FIFO_WIDTH - 1 downto 0);
   signal adc_b_empty1       : std_logic;
   signal adc_b_rd_rst_busy1 : std_logic;
 
-  signal adc_b_data_valid_tmp1 : std_logic;  -- @suppress "signal adc_b_data_valid_tmp1 is never read"
+  signal adc_b_data_valid_tmp1 : std_logic;  
 
   signal adc_b_errors_sync1 : std_logic_vector(3 downto 0);
   signal adc_b_empty_sync1  : std_logic;
@@ -179,10 +179,10 @@ begin
       ---------------------------------------------------------------------
       i_adc_clk_p   => i_adc_clk_p,     -- clock
       i_adc_clk_n   => i_adc_clk_n,     -- clock
-      i_adc_a_p     => i_adc_a_p,  -- Diff_p buffer input -- @suppress "Incorrect array size in assignment: expected (<7>) but was (<g_ADC_A_WIDTH>)"
-      i_adc_a_n     => i_adc_a_n,  -- Diff_n buffer input -- @suppress "Incorrect array size in assignment: expected (<7>) but was (<g_ADC_A_WIDTH>)"
-      i_adc_b_p     => i_adc_b_p,  -- Diff_p buffer input -- @suppress "Incorrect array size in assignment: expected (<7>) but was (<g_ADC_B_WIDTH>)"
-      i_adc_b_n     => i_adc_b_n,  -- Diff_n buffer input -- @suppress "Incorrect array size in assignment: expected (<7>) but was (<g_ADC_B_WIDTH>)"
+      i_adc_a_p     => i_adc_a_p,  -- Diff_p buffer input 
+      i_adc_a_n     => i_adc_a_n,  -- Diff_n buffer input 
+      i_adc_b_p     => i_adc_b_p,  -- Diff_p buffer input 
+      i_adc_b_n     => i_adc_b_n,  -- Diff_n buffer input 
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------

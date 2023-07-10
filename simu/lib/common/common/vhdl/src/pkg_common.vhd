@@ -270,7 +270,7 @@ package body pkg_common is
 
           v_fsm_state := E_RUN;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
       o_overflow <= v_overflow;
@@ -344,7 +344,7 @@ package body pkg_common is
 
           v_fsm_state := E_RUN;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
       o_overflow <= v_overflow;
@@ -404,14 +404,14 @@ package body pkg_common is
             v_csv_file.readline(void);
 
             v_finish := '0';
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
             else
               -- read the first data
               v_csv_file.readline(void);
               v_cnt_max := v_csv_file.read_integer(void);
-              if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+              if v_csv_file.end_of_file(void) = true then 
                 -- check if only one value in the file => stop all further reading with the v_first flag
                 v_csv_file.dispose(void);
                 v_first := 0;
@@ -447,7 +447,7 @@ package body pkg_common is
                 -- file is not empty, read a new value
                 v_csv_file.readline(void);
                 v_cnt_max := v_csv_file.read_integer(void);
-                if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+                if v_csv_file.end_of_file(void) = true then 
                   --- stop all further reading because the file is finished
                   v_csv_file.dispose(void);
                   v_first := 0;
@@ -470,7 +470,7 @@ package body pkg_common is
           v_finish    := '1';
           v_fsm_state := E_END;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
 
@@ -569,7 +569,7 @@ package body pkg_common is
           v_finish    := '1';
           v_fsm_state := E_END;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
 

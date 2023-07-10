@@ -110,7 +110,7 @@ begin
           sm_state_next   <= E_DATA1;
         end if;
 
-      when others => -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others => 
         sm_state_next <= E_RST;
 
     end case;

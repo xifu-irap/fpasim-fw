@@ -83,10 +83,10 @@ architecture simulate of tb_fpga_system_fpasim_top is
   ---------------------------------------------------------------------
   -- command
   ---------------------------------------------------------------------
-  signal i_make_pulse_valid : std_logic                     := '0';  -- @suppress "signal i_make_pulse_valid is never written"
-  signal i_make_pulse       : std_logic_vector(31 downto 0) := (others => '0');  -- @suppress "signal i_make_pulse is never written"
-  signal o_auto_conf_busy   : std_logic;  -- @suppress "signal o_auto_conf_busy is never read"
-  signal o_ready            : std_logic;  -- @suppress "signal o_ready is never read"
+  signal i_make_pulse_valid : std_logic                     := '0';  
+  signal i_make_pulse       : std_logic_vector(31 downto 0) := (others => '0');  
+  signal o_auto_conf_busy   : std_logic;  
+  signal o_ready            : std_logic;  
   ---------------------------------------------------------------------
   -- ADC
   ---------------------------------------------------------------------
@@ -97,13 +97,13 @@ architecture simulate of tb_fpga_system_fpasim_top is
   ---------------------------------------------------------------------
   -- to sync
   ---------------------------------------------------------------------
-  signal o_ref_clk          : std_logic;  -- @suppress "signal o_ref_clk is never read"
-  signal o_sync             : std_logic;  -- @suppress "signal o_sync is never read"
+  signal o_ref_clk          : std_logic;  
+  signal o_sync             : std_logic;  
   ---------------------------------------------------------------------
   -- to DAC
   ---------------------------------------------------------------------
-  signal o_dac_real_valid   : std_logic;  -- @suppress "signal o_dac_real_valid is never read"
-  signal o_dac_real         : real;  -- @suppress "signal o_dac_real is never read"
+  signal o_dac_real_valid   : std_logic;  
+  signal o_dac_real         : real;  
 
   ---------------------------------------------------------------------
   -- additional signals
@@ -126,14 +126,14 @@ architecture simulate of tb_fpga_system_fpasim_top is
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers 
-  --constant c_LOGGER_SUMMARY               : logger_t  := get_logger("log:summary");  -- @suppress "Expression does not result in a constant"
+  --constant c_LOGGER_SUMMARY               : logger_t  := get_logger("log:summary");  
   ---- checkers
-  --constant c_CHECKER_REG                  : checker_t := new_checker("check:reg:data");  -- @suppress "Expression does not result in a constant"
-  --constant c_CHECKER_RAM_TES_PULSE_SHAPE  : checker_t := new_checker("check:ram:tes_pulse_shape");  -- @suppress "Expression does not result in a constant"
-  --constant c_CHECKER_RAM_AMP_SQUID_TF     : checker_t := new_checker("check:ram:amp_squid_tf");  -- @suppress "Expression does not result in a constant"
-  --constant c_CHECKER_RAM_MUX_SQUID_TF     : checker_t := new_checker("check:ram:mux_squid_tf");  -- @suppress "Expression does not result in a constant"
-  --constant c_CHECKER_RAM_TES_STEADY_STATE : checker_t := new_checker("check:ram:tes_steady_state");  -- @suppress "Expression does not result in a constant"
-  --constant c_CHECKER_RAM_MUX_SQUID_OFFSET : checker_t := new_checker("check:ram:mux_squid_offset");  -- @suppress "Expression does not result in a constant"
+  --constant c_CHECKER_REG                  : checker_t := new_checker("check:reg:data");  
+  --constant c_CHECKER_RAM_TES_PULSE_SHAPE  : checker_t := new_checker("check:ram:tes_pulse_shape");  
+  --constant c_CHECKER_RAM_AMP_SQUID_TF     : checker_t := new_checker("check:ram:amp_squid_tf");  
+  --constant c_CHECKER_RAM_MUX_SQUID_TF     : checker_t := new_checker("check:ram:mux_squid_tf");  
+  --constant c_CHECKER_RAM_TES_STEADY_STATE : checker_t := new_checker("check:ram:tes_steady_state");  
+  --constant c_CHECKER_RAM_MUX_SQUID_OFFSET : checker_t := new_checker("check:ram:mux_squid_offset");  
 
 
 
@@ -184,7 +184,7 @@ begin
     ---------------------------------------------------------------------
     -- VUNIT - Scoreboard object : Visibility definition
     ---------------------------------------------------------------------
-    if g_VUNIT_DEBUG = true then  -- @suppress "Redundant boolean equality check with true"
+    if g_VUNIT_DEBUG = true then  
       -- the simulator doesn't stop on errors => stop on failure
       set_stop_level(failure);
     end if;

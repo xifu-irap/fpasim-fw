@@ -570,7 +570,7 @@ begin
   -- xilinx template
   ---------------------------------------------------------------------
   inst_xpm_memory_sdpram : xpm_memory_sdpram
-    generic map(                        -- @suppress "Generic map uses default values. Missing optional actuals: ECC_TYPE, ECC_BIT_RANGE"
+    generic map(                        
       ADDR_WIDTH_A            => g_ADDR_WIDTH_A, -- DECIMAL
       ADDR_WIDTH_B            => g_ADDR_WIDTH_B, -- DECIMAL
       AUTO_SLEEP_TIME         => 0,     -- DECIMAL

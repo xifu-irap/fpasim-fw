@@ -141,7 +141,7 @@ begin
         data1_next       <= i_dac;
         sm_state_next    <= E_RUN0;
 
-      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;

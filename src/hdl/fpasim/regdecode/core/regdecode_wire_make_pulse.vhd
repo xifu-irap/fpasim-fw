@@ -171,7 +171,7 @@ architecture RTL of regdecode_wire_make_pulse is
 begin
   -- extract fields 
   pixel_all_tmp <= i_make_pulse(pkg_MAKE_PULSE_PIXEL_ALL_IDX_H);
-  pixel_id_tmp  <= i_make_pulse(pkg_MAKE_PULSE_PIXEL_ID_IDX_H downto pkg_MAKE_PULSE_PIXEL_ID_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>) but was (<6>)"
+  pixel_id_tmp  <= i_make_pulse(pkg_MAKE_PULSE_PIXEL_ID_IDX_H downto pkg_MAKE_PULSE_PIXEL_ID_IDX_L);  
 
   ---------------------------------------------------------------------
   -- fsm
@@ -192,7 +192,7 @@ begin
       when E_WAIT =>
         if i_make_pulse_valid = '1' then
           data_valid_next   <= '1';
-          pixel_id_max_next <= unsigned(i_pixel_nb) - 1;  -- 1 start @0  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<g_PIXEL_NB_WIDTH>)"
+          pixel_id_max_next <= unsigned(i_pixel_nb) - 1;  -- 1 start @0  
 
           if pixel_all_tmp = '1' then
             sof_next      <= '1';
@@ -234,7 +234,7 @@ begin
         else
           sm_state_next <= E_GEN_PIXEL_ID;
         end if;
-      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;
@@ -275,7 +275,7 @@ begin
   -- keep the input data fields (above the pixel id field)
   tmp(data_r1'high downto pkg_MAKE_PULSE_PIXEL_ID_IDX_H + 1) <= data_r1(data_r1'high downto pkg_MAKE_PULSE_PIXEL_ID_IDX_H + 1);
   -- replace the pixed id field
-  tmp(pkg_MAKE_PULSE_PIXEL_ID_IDX_H downto pkg_MAKE_PULSE_PIXEL_ID_IDX_L) <= std_logic_vector(pixel_id_r1);  -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_MAKE_PULSE_PIXEL_ID_WIDTH>)"
+  tmp(pkg_MAKE_PULSE_PIXEL_ID_IDX_H downto pkg_MAKE_PULSE_PIXEL_ID_IDX_L) <= std_logic_vector(pixel_id_r1);  
   -- keep the input data field (below the pixel id field)
   tmp(pkg_MAKE_PULSE_PIXEL_ID_IDX_L - 1 downto 0)            <= data_r1(pkg_MAKE_PULSE_PIXEL_ID_IDX_L - 1 downto 0);
 

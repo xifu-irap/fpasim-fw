@@ -186,7 +186,7 @@ package body pkg_ram_check is
             -- skip the header
             v_csv_file.readline(void);
 
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_wr_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_WAIT_RD;
@@ -206,7 +206,7 @@ package body pkg_ram_check is
             v_wr_rd_addr    := v_csv_file.read_data_typ_as_std_vec(i_length => v_wr_rd_addr'length, i_data_typ => i_WR_RD_ADDR_TYP);
             v_wr_data       := v_csv_file.read_data_typ_as_std_vec(i_length => v_wr_data'length, i_data_typ => i_WR_DATA_TYP);
 
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_wr_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_WAIT_RD;
@@ -231,7 +231,7 @@ package body pkg_ram_check is
             v_csv_file.readline(void);
 
             v_rd_data_valid := '0';
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_rd_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
@@ -268,7 +268,7 @@ package body pkg_ram_check is
             end if;
             check_equal(i_data_sb, v_rd_data, i_rd_data_vect, result(i_RD_NAME1 & ", index:" & to_string(v_cnt) & ", (file) : " & to_string(v_rd_data) & ", " & i_RD_NAME1 & " (VHDL) : " & to_string(i_rd_data_vect)));
             v_cnt := v_cnt + 1;
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_rd_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
@@ -288,7 +288,7 @@ package body pkg_ram_check is
           v_rd_finish     := '1';
           v_fsm_state     := E_END;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
 
       end case;

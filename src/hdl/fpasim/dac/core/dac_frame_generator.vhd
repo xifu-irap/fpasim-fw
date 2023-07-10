@@ -170,7 +170,7 @@ begin
           sm_state_next <= E_WAIT;
         end if;
 
-      when E_RUN =>  -- @suppress "Dead state 'E_RUN': state does not have outgoing transitions"
+      when E_RUN =>  
         if i_data_valid = '1' then
           data_valid_next <= i_data_valid;
           -- duplicate the input data on the 2 outputs
@@ -196,7 +196,7 @@ begin
           sm_state_next <= E_PATTERN;
         end if;
 
-      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;

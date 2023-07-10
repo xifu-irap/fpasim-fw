@@ -103,7 +103,7 @@ architecture RTL of reset_top is
   -- io_adc
   ---------------------------------------------------------------------
   signal adc_rst_tmp1       : std_logic;
-  signal adc_io_clk_rst     : std_logic;  -- @suppress "signal adc_io_clk_rst is never read"
+  signal adc_io_clk_rst     : std_logic;  
   signal adc_io_rst         : std_logic;
   signal adc_io_rst_phase90 : std_logic;
 

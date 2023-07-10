@@ -419,9 +419,9 @@ package body pkg_front_panel is
         variable WireOuts  : STD_ARRAY(0 to 31); -- 32x32 array storing WireOut values 
         variable Triggered : STD_ARRAY(0 to 31); -- 32x32 array storing IsTriggered values
 
-        variable u32Address : REGISTER_ARRAY(0 to registerSetSize - 1); -- @suppress "variable u32Address is never written"
+        variable u32Address : REGISTER_ARRAY(0 to registerSetSize - 1); 
         variable u32Data    : REGISTER_ARRAY(0 to registerSetSize - 1);
-        variable u32Count   : std_logic_vector(31 downto 0); -- @suppress "variable u32Count is never written"
+        variable u32Count   : std_logic_vector(31 downto 0); 
         --ReadRegisterData : std_logic_vector(31 downto 0);
 
         procedure set_WireIns(i_index : in integer; i_value : in std_logic_vector) is

@@ -149,7 +149,7 @@ begin
          INIT_SYNC_FF   => 1,           -- DECIMAL; 0=disable simulation init values, 1=enable simulation init values
          SIM_ASSERT_CHK => 1            -- DECIMAL; 0=disable simulation messages, 1=enable simulation messages
       )
-      port map(                         -- @suppress "The order of the associations is different from the declaration order"
+      port map(                         
          dest_rst => dest_rst,          -- 1-bit output: src_rst synchronized to the destination clock domain. This output
                                         -- is registered.
 

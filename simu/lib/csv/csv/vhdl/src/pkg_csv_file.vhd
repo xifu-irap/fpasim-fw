@@ -146,7 +146,7 @@ package body pkg_csv_file is
         variable v_csv_sep : character;
 
         -- True when the end of the CSV file was reached
-        impure function end_of_file(i_dummy : in t_void := VOID) return boolean is -- @suppress "Unused declaration"
+        impure function end_of_file(i_dummy : in t_void := VOID) return boolean is 
         begin
             return v_end_of_file_reached;
         end;
@@ -161,20 +161,20 @@ package body pkg_csv_file is
         end;
 
         -- Release (close) the associated CSV file
-        procedure dispose(i_dummy : in t_void := VOID) is -- @suppress "Unused declaration"
+        procedure dispose(i_dummy : in t_void := VOID) is 
         begin
             file_close(my_csv_file);
         end;
 
         -- Read one line from the csv file, and keep it in the cache
-        procedure readline(i_dummy : in t_void := VOID) is -- @suppress "Unused declaration"
+        procedure readline(i_dummy : in t_void := VOID) is 
         begin
             readline(my_csv_file, v_current_line);
             v_end_of_file_reached := endfile(my_csv_file);
         end;
 
         -- Read a string from the csv file, until a separator character ',' is found
-        impure function read_string(i_dummy : in t_void := VOID) return string is -- @suppress "Unused declaration"
+        impure function read_string(i_dummy : in t_void := VOID) return string is 
             variable v_return_string : string(1 to c_LINE_LENGTH_MAX);
             variable v_read_char     : character;
             variable v_read_ok       : boolean := true;
@@ -197,13 +197,13 @@ package body pkg_csv_file is
 
         -- Skip a separator (comma character) in the current line
         procedure skip_separator is
-            variable v_dummy_string: string(1 to c_LINE_LENGTH_MAX); -- @suppress "variable v_dummy_string is never read"
+            variable v_dummy_string: string(1 to c_LINE_LENGTH_MAX); 
         begin
             v_dummy_string := read_string(VOID);
         end;
 
         -- Read a string from the csv file and convert it to integer
-        impure function read_integer(i_dummy : in t_void := VOID) return integer is -- @suppress "Unused declaration"
+        impure function read_integer(i_dummy : in t_void := VOID) return integer is 
             variable read_value : integer;
         begin
             read(v_current_line, read_value);
@@ -212,7 +212,7 @@ package body pkg_csv_file is
         end;
 
         -- Read a string from the csv file and convert it to real
-        impure function read_real(i_dummy : in t_void := VOID) return real is -- @suppress "Unused declaration"
+        impure function read_real(i_dummy : in t_void := VOID) return real is 
             variable read_value : real;
         begin
             read(v_current_line, read_value);
@@ -221,12 +221,12 @@ package body pkg_csv_file is
         end;
 
         -- Read a string from the csv file and convert it to boolean
-        impure function read_boolean(i_dummy : in t_void := VOID) return boolean is -- @suppress "Unused declaration"
+        impure function read_boolean(i_dummy : in t_void := VOID) return boolean is 
         begin
             return boolean'value(read_string(VOID));
         end;
 
-        impure function read_integer_as_boolean(i_dummy : in t_void := VOID) return boolean is -- @suppress "Unused declaration"
+        impure function read_integer_as_boolean(i_dummy : in t_void := VOID) return boolean is 
         begin
             return (read_integer(VOID) /= 0);
         end;
@@ -261,7 +261,7 @@ package body pkg_csv_file is
         end;
 
         -- Read a string (ex: 0 or 1) from the csv file and convert it to std_logic
-        impure function read_integer_as_std(i_dummy : in t_void := VOID) return std_logic is -- @suppress "Unused declaration"
+        impure function read_integer_as_std(i_dummy : in t_void := VOID) return std_logic is 
             variable read_value : integer;
             variable val_v      : std_logic;
         begin
@@ -278,7 +278,7 @@ package body pkg_csv_file is
         begin
             read(v_current_line, read_value);
             skip_separator;
-            if i_unsigned_value = true then -- @suppress "Redundant boolean equality check with true"
+            if i_unsigned_value = true then 
                 val_v := std_logic_vector(to_unsigned(read_value, i_length));
             else
                 val_v := std_logic_vector(to_signed(read_value, i_length));
@@ -331,7 +331,7 @@ package body pkg_csv_file is
         end;
 
         -- Read a string (ex: 10010) from the csv file and convert it to std_logic_vector
-        impure function read_std(i_dummy : in t_void := VOID) return std_logic is -- @suppress "Unused declaration"
+        impure function read_std(i_dummy : in t_void := VOID) return std_logic is 
             variable val_v : std_ulogic;
         begin
             READ(v_current_line, val_v);
@@ -460,7 +460,7 @@ package body pkg_csv_file is
         end;
 
         -- write line into a csv file
-        procedure writeline(i_dummy : in t_void := VOID) is -- @suppress "Unused declaration"
+        procedure writeline(i_dummy : in t_void := VOID) is 
         begin
             writeline(my_csv_file, v_current_line);
         end;

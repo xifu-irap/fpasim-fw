@@ -144,7 +144,7 @@ architecture RTL of recording_adc is
   signal wr_tmp0      : std_logic;
   signal data_tmp0    : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
   --signal full0        : std_logic;
-  signal wr_rst_busy0 : std_logic; -- @suppress "signal wr_rst_busy0 is never read"
+  signal wr_rst_busy0 : std_logic; 
 
   signal rd1          : std_logic;
   signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);

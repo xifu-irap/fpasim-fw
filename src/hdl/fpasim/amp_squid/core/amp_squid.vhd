@@ -230,7 +230,7 @@ begin
       --------------------------------------------------------------
       -- input
       --------------------------------------------------------------
-      i_a   => pixel_result_tmp,  -- @suppress "Incorrect array size in assignment: expected (<18>) but was (<g_PIXEL_RESULT_INPUT_WIDTH>)"
+      i_a   => pixel_result_tmp,  
       i_b   => amp_squid_offset_correction_tmp,
       --------------------------------------------------------------
       -- output : S = A - B
@@ -322,7 +322,7 @@ begin
   amp_squid_tf_web    <= '0';
   amp_squid_tf_dinb   <= (others => '0');
   amp_squid_tf_enb    <= pixel_valid_rx;
-  amp_squid_tf_addrb  <= result_sub_rx;  -- @suppress "Incorrect array size in assignment: expected (<g_AMP_SQUID_TF_RAM_ADDR_WIDTH>) but was (<14>)"
+  amp_squid_tf_addrb  <= result_sub_rx;  
   amp_squid_tf_regceb <= '1';
 
   -------------------------------------------------------------------
@@ -448,7 +448,7 @@ begin
       --------------------------------------------------------------
       -- output : S = a * B
       --------------------------------------------------------------
-      o_s   => result_rz  -- @suppress "Incorrect array size in assignment: expected (<16>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
+      o_s   => result_rz  
       );
 
   -----------------------------------------------------------------

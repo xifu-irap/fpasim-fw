@@ -84,42 +84,42 @@ architecture simulate of tb_spi_top is
   signal o_spi_rd_data_valid  : std_logic;  --  read data valid
   signal o_spi_rd_data        : std_logic_vector(31 downto 0);  --  read data
   signal o_spi_ready          : std_logic;  --  1: all spi links are ready,0: one of the spi link is busy
-  signal o_reg_spi_status     : std_logic_vector(31 downto 0); -- @suppress "signal o_reg_spi_status is never read"
+  signal o_reg_spi_status     : std_logic_vector(31 downto 0); 
   ---------------------------------------------------------------------
   -- errors/status
   ---------------------------------------------------------------------
   signal o_errors             : std_logic_vector(15 downto 0); 
-  signal o_status             : std_logic_vector(7 downto 0); -- @suppress "signal o_status is never read"
+  signal o_status             : std_logic_vector(7 downto 0); 
   ---------------------------------------------------------------------
   -- from/to the IOs
   ---------------------------------------------------------------------
   -- common: shared link between the spi
-  signal o_spi_sclk           : std_logic;  --  Shared SPI clock line -- @suppress "signal o_spi_sclk is never read"
+  signal o_spi_sclk           : std_logic;  --  Shared SPI clock line 
   signal o_spi_sdata          : std_logic;  --  Shared SPI MOSI
   -- CDCE: SPI
   signal i_cdce_sdo           : std_logic;  --  SPI MISO
-  signal o_cdce_n_en          : std_logic;  --  SPI chip select -- @suppress "signal o_cdce_n_en is never read"
+  signal o_cdce_n_en          : std_logic;  --  SPI chip select 
   -- CDCE: specific signals
-  signal i_cdce_pll_status    : std_logic;  --  pll_status : This pin is set high if the PLL is in lock. -- @suppress "signal i_cdce_pll_status is never written"
-  signal o_cdce_n_reset       : std_logic;  --  reset_n or hold_n -- @suppress "signal o_cdce_n_reset is never read"
-  signal o_cdce_n_pd          : std_logic;  --  power_down_n -- @suppress "signal o_cdce_n_pd is never read"
-  signal o_ref_en             : std_logic;  --  enable the primary reference clock -- @suppress "signal o_ref_en is never read"
+  signal i_cdce_pll_status    : std_logic;  --  pll_status : This pin is set high if the PLL is in lock. 
+  signal o_cdce_n_reset       : std_logic;  --  reset_n or hold_n 
+  signal o_cdce_n_pd          : std_logic;  --  power_down_n 
+  signal o_ref_en             : std_logic;  --  enable the primary reference clock 
   -- ADC: SPI
   signal i_adc_sdo            : std_logic;  --  SPI MISO
-  signal o_adc_n_en           : std_logic;  --  SPI chip select -- @suppress "signal o_adc_n_en is never read"
+  signal o_adc_n_en           : std_logic;  --  SPI chip select 
   -- ADC: specific signals
-  signal o_adc_reset          : std_logic;  --  adc hardware reset -- @suppress "signal o_adc_reset is never read"
+  signal o_adc_reset          : std_logic;  --  adc hardware reset 
   -- DAC: SPI
   signal i_dac_sdo            : std_logic;  --  SPI MISO
-  signal o_dac_n_en           : std_logic;  --  SPI chip select -- @suppress "signal o_dac_n_en is never read"
+  signal o_dac_n_en           : std_logic;  --  SPI chip select 
   -- DAC: specific signal
-  signal o_dac_tx_present     : std_logic;  --  enable tx acquisition -- @suppress "signal o_dac_tx_present is never read"
+  signal o_dac_tx_present     : std_logic;  --  enable tx acquisition 
   -- AMC: SPI (monitoring)
   signal i_mon_sdo            : std_logic;  --  SPI data out
-  signal o_mon_n_en           : std_logic;  --  SPI chip select -- @suppress "signal o_mon_n_en is never read"
+  signal o_mon_n_en           : std_logic;  --  SPI chip select 
   -- AMC : specific signals
-  signal i_mon_n_int          : std_logic;  --  galr_n: Global analog input out-of-range alarm. -- @suppress "signal i_mon_n_int is never written"
-  signal o_mon_n_reset        : std_logic;  --  reset_n: hardware reset -- @suppress "signal o_mon_n_reset is never read"
+  signal i_mon_n_int          : std_logic;  --  galr_n: Global analog input out-of-range alarm. 
+  signal o_mon_n_reset        : std_logic;  --  reset_n: hardware reset 
 
   ---------------------------------------------------------------------
   -- Clock definition
@@ -130,13 +130,13 @@ architecture simulate of tb_spi_top is
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers 
-  constant c_LOGGER_SUMMARY      : logger_t  := get_logger("log:summary");  -- @suppress "Expression does not result in a constant"
+  constant c_LOGGER_SUMMARY      : logger_t  := get_logger("log:summary");  
   -- checkers
-  constant c_CHECKER_ERRORS      : checker_t := new_checker("check:errors");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_ERRORS_CDCE : checker_t := new_checker("check:errors:cdce");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_ERRORS_ADC  : checker_t := new_checker("check:errors:adc");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_ERRORS_DAC  : checker_t := new_checker("check:errors:dac");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_ERRORS_AMC  : checker_t := new_checker("check:errors:amc");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_ERRORS      : checker_t := new_checker("check:errors");  
+  constant c_CHECKER_ERRORS_CDCE : checker_t := new_checker("check:errors:cdce");  
+  constant c_CHECKER_ERRORS_ADC  : checker_t := new_checker("check:errors:adc");  
+  constant c_CHECKER_ERRORS_DAC  : checker_t := new_checker("check:errors:dac");  
+  constant c_CHECKER_ERRORS_AMC  : checker_t := new_checker("check:errors:amc");  
 
 begin
 
@@ -166,7 +166,7 @@ begin
     ---------------------------------------------------------------------
     -- VUNIT - Scoreboard object : Visibility definition
     ---------------------------------------------------------------------
-    if g_VUNIT_DEBUG = true then  -- @suppress "Redundant boolean equality check with true"
+    if g_VUNIT_DEBUG = true then  
       -- the simulator doesn't stop on errors => stop on failure
       set_stop_level(failure);
     end if;

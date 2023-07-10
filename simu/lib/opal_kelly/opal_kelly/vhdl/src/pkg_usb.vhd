@@ -253,7 +253,7 @@ package body pkg_usb is
 
   begin
 
-    while c_TEST = true loop  -- @suppress "Redundant boolean equality check with true"
+    while c_TEST = true loop  
       v_valid_out := '0';
       case v_fsm_state is
 
@@ -276,7 +276,7 @@ package body pkg_usb is
             -- skip the header
             v_csv_file.readline(void);
 
-            if v_csv_file.end_of_file(void) = true then  -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then  
               v_wr_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
@@ -732,7 +732,7 @@ package body pkg_usb is
             if v_error(0) = '1' then
               info("[pkg_usb_wr]: error: v_file_reg_id(" & to_string(v_file_reg_id) & ") is out of range");
             end if;
-            if v_csv_file.end_of_file(void) = true then  -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then  
               v_wr_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
@@ -805,7 +805,7 @@ package body pkg_usb is
           v_wr_finish := '1';
           v_fsm_state := E_END;
 
-        when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>  
           v_fsm_state := E_RST;
 
       end case;

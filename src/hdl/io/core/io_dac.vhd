@@ -132,7 +132,7 @@ architecture RTL of io_dac is
   signal data_pipe_tmp0 : std_logic_vector(c_IDX2_H downto 0);
   signal data_pipe_tmp1 : std_logic_vector(c_IDX2_H downto 0);
 
-  signal dac_valid_tmp1 : std_logic;  -- @suppress "signal dac_valid_tmp1 is never read"
+  signal dac_valid_tmp1 : std_logic;  
   signal dac_frame_tmp1 : std_logic_vector(7 downto 0);
   signal dac_tmp1       : std_logic_vector(63 downto 0);
 

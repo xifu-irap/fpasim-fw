@@ -323,7 +323,7 @@ package body pkg_sequence is
             v_fsm_state := E_TEMPO_POS;
           end if;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
 
@@ -536,7 +536,7 @@ package body pkg_sequence is
             v_fsm_state := E_TEMPO_POS;
           end if;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
 

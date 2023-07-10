@@ -120,7 +120,7 @@ begin
         IS_D2_INVERTED => '0',
         SRTYPE         => "ASYNC"
         )
-      port map (  -- @suppress "The order of the associations is different from the declaration order"
+      port map (  
         C  => i_clk_phase,
         CE => '1',
         D1 => '1',
@@ -131,7 +131,7 @@ begin
         );
 
     inst_OBUFDS : OBUFDS
-      generic map (  -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
+      generic map (  
         IOSTANDARD => "DEFAULT",        -- Specify the output I/O standard
         SLEW       => "SLOW")           -- Specify the output slew rate
       port map (
@@ -174,7 +174,7 @@ begin
     gen_io : for i in data_in_even'range generate
 
       inst_ODDR : ODDR
-        generic map( -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
+        generic map( 
           DDR_CLK_EDGE => "OPPOSITE_EDGE",  -- "OPPOSITE_EDGE" or "SAME_EDGE" 
           INIT         => '0',  -- Initial value for Q port ('1' or '0')
           SRTYPE       => "SYNC")       -- Reset Type ("ASYNC" or "SYNC")
@@ -191,7 +191,7 @@ begin
           );
 
       inst_OBUFDS : OBUFDS
-        generic map (  -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
+        generic map (  
           IOSTANDARD => "DEFAULT",      -- Specify the output I/O standard
           SLEW       => "SLOW")         -- Specify the output slew rate
         port map (
@@ -256,7 +256,7 @@ begin
     gen_io : for i in data_in_even'range generate
 
       inst_ODDR : ODDR
-        generic map( -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D1_INVERTED, IS_D2_INVERTED"
+        generic map( 
           DDR_CLK_EDGE => "OPPOSITE_EDGE",  -- "OPPOSITE_EDGE" or "SAME_EDGE" 
           INIT         => '0',  -- Initial value for Q port ('1' or '0')
           SRTYPE       => "SYNC")       -- Reset Type ("ASYNC" or "SYNC")
@@ -273,7 +273,7 @@ begin
           );
 
       inst_OBUFDS : OBUFDS
-        generic map (  -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE"
+        generic map (  
           IOSTANDARD => "DEFAULT",      -- Specify the output I/O standard
           SLEW       => "SLOW")         -- Specify the output slew rate
         port map (

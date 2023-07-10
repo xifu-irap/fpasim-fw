@@ -78,7 +78,7 @@ architecture simulate of tb_system_fpasim_top is
   signal b_okAA  : std_logic                    := '0';
 
   -- FMC: from the card
-  signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');   -- @suppress "Unused declaration"
+  signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');   
   ---------------------------------------------------------------------
   -- FMC: from the adc
   ---------------------------------------------------------------------
@@ -118,64 +118,64 @@ architecture simulate of tb_system_fpasim_top is
 
   -- FMC: to sync
   ---------------------------------------------------------------------
-  signal o_ref_clk : std_logic;  -- @suppress "signal o_ref_clk is never read"
-  signal o_sync    : std_logic;  -- @suppress "signal o_sync is never read"
+  signal o_ref_clk : std_logic;  
+  signal o_sync    : std_logic;  
 
   -- FMC: to dac
   ---------------------------------------------------------------------
-  signal o_dac_clk_p   : std_logic;  -- @suppress "signal o_dac_clk_p is never read"
-  signal o_dac_clk_n   : std_logic;  -- @suppress "signal o_dac_clk_n is never read"
-  signal o_dac_frame_p : std_logic;  -- @suppress "signal o_dac_frame_p is never read"
-  signal o_dac_frame_n : std_logic;  -- @suppress "signal o_dac_frame_n is never read"
-  signal o_dac0_p      : std_logic;  -- @suppress "signal o_dac0_p is never read"
-  signal o_dac0_n      : std_logic;  -- @suppress "signal o_dac0_n is never read"
-  signal o_dac1_p      : std_logic;  -- @suppress "signal o_dac1_p is never read"
-  signal o_dac1_n      : std_logic;  -- @suppress "signal o_dac1_n is never read"
-  signal o_dac2_p      : std_logic;  -- @suppress "signal o_dac2_p is never read"
-  signal o_dac2_n      : std_logic;  -- @suppress "signal o_dac2_n is never read"
-  signal o_dac3_p      : std_logic;  -- @suppress "signal o_dac3_p is never read"
-  signal o_dac3_n      : std_logic;  -- @suppress "signal o_dac3_n is never read"
-  signal o_dac4_p      : std_logic;  -- @suppress "signal o_dac4_p is never read"
-  signal o_dac4_n      : std_logic;  -- @suppress "signal o_dac4_n is never read"
-  signal o_dac5_p      : std_logic;  -- @suppress "signal o_dac5_p is never read"
-  signal o_dac5_n      : std_logic;  -- @suppress "signal o_dac5_n is never read"
-  signal o_dac6_p      : std_logic;  -- @suppress "signal o_dac6_p is never read"
-  signal o_dac6_n      : std_logic;  -- @suppress "signal o_dac6_n is never read"
-  signal o_dac7_p      : std_logic;  -- @suppress "signal o_dac7_p is never read"
-  signal o_dac7_n      : std_logic;  -- @suppress "signal o_dac7_n is never read"
+  signal o_dac_clk_p   : std_logic;  
+  signal o_dac_clk_n   : std_logic;  
+  signal o_dac_frame_p : std_logic;  
+  signal o_dac_frame_n : std_logic;  
+  signal o_dac0_p      : std_logic;  
+  signal o_dac0_n      : std_logic;  
+  signal o_dac1_p      : std_logic;  
+  signal o_dac1_n      : std_logic;  
+  signal o_dac2_p      : std_logic;  
+  signal o_dac2_n      : std_logic;  
+  signal o_dac3_p      : std_logic;  
+  signal o_dac3_n      : std_logic;  
+  signal o_dac4_p      : std_logic;  
+  signal o_dac4_n      : std_logic;  
+  signal o_dac5_p      : std_logic;  
+  signal o_dac5_n      : std_logic;  
+  signal o_dac6_p      : std_logic;  
+  signal o_dac6_n      : std_logic;  
+  signal o_dac7_p      : std_logic;  
+  signal o_dac7_n      : std_logic;  
 
   ---------------------------------------------------------------------
   -- devices: spi links + specific signals
   ---------------------------------------------------------------------
   -- common: shared link between the spi
-  signal o_spi_sclk        : std_logic;  -- @suppress "signal o_spi_sclk is never read"
-  signal o_spi_sdata       : std_logic;  -- @suppress "signal o_spi_sdata is never read"
+  signal o_spi_sclk        : std_logic;  
+  signal o_spi_sdata       : std_logic;  
   -- CDCE: SPI
-  signal i_cdce_sdo        : std_logic := '0';  -- @suppress "signal i_cdce_sdo is never written"
-  signal o_cdce_n_en       : std_logic;  -- @suppress "signal o_cdce_n_en is never read"
+  signal i_cdce_sdo        : std_logic := '0';  
+  signal o_cdce_n_en       : std_logic;  
   -- CDCE: specific signals
-  signal i_cdce_pll_status : std_logic := '1';  -- @suppress "signal i_cdce_pll_status is never written"
-  signal o_cdce_n_reset    : std_logic;  -- @suppress "signal o_cdce_n_reset is never read"
-  signal o_cdce_n_pd       : std_logic;  -- @suppress "signal o_cdce_n_pd is never read"
-  signal o_ref_en          : std_logic;  -- @suppress "signal o_ref_en is never read"
+  signal i_cdce_pll_status : std_logic := '1';  
+  signal o_cdce_n_reset    : std_logic;  
+  signal o_cdce_n_pd       : std_logic;  
+  signal o_ref_en          : std_logic;  
   -- ADC: SPI
-  signal i_adc_sdo         : std_logic := '0';  -- @suppress "signal i_adc_sdo is never written"
-  signal o_adc_n_en        : std_logic;  -- @suppress "signal o_adc_n_en is never read"
+  signal i_adc_sdo         : std_logic := '0';  
+  signal o_adc_n_en        : std_logic;  
   -- ADC: specific signals
-  signal o_adc_reset       : std_logic;  -- @suppress "signal o_adc_reset is never read"
+  signal o_adc_reset       : std_logic;  
   -- DAC: SPI
-  signal i_dac_sdo         : std_logic := '0';  -- @suppress "signal i_dac_sdo is never written"
-  signal o_dac_n_en        : std_logic;  -- @suppress "signal o_dac_n_en is never read"
+  signal i_dac_sdo         : std_logic := '0';  
+  signal o_dac_n_en        : std_logic;  
   -- DAC: specific signal
-  signal o_dac_tx_present  : std_logic;  -- @suppress "signal o_dac_tx_present is never read"
+  signal o_dac_tx_present  : std_logic;  
   -- AMC: SPI (monitoring)
-  signal i_mon_sdo         : std_logic := '0';  -- @suppress "signal i_mon_sdo is never written"
-  signal o_mon_n_en        : std_logic;  -- @suppress "signal o_mon_n_en is never read"
+  signal i_mon_sdo         : std_logic := '0';  
+  signal o_mon_n_en        : std_logic;  
   -- AMC : specific signals
-  signal i_mon_n_int       : std_logic := '0';  -- @suppress "signal i_mon_n_int is never written"
-  signal o_mon_n_reset     : std_logic;  -- @suppress "signal o_mon_n_reset is never read"
+  signal i_mon_n_int       : std_logic := '0';  
+  signal o_mon_n_reset     : std_logic;  
 
-  signal o_leds : std_logic_vector(3 downto 2);  -- @suppress "signal o_leds is never read"
+  signal o_leds : std_logic_vector(3 downto 2);  
 
   ---------------------------------------------------------------------
   -- additional signals
@@ -200,7 +200,7 @@ architecture simulate of tb_system_fpasim_top is
   signal data_start         : std_logic                    := '0';
   signal data_rd_valid      : std_logic                    := '0';
   signal data_wr_gen_finish : std_logic                    := '0';
-  signal data_wr_error      : std_logic_vector(0 downto 0) := (others => '0');  -- @suppress "signal data_wr_error is never read"
+  signal data_wr_error      : std_logic_vector(0 downto 0) := (others => '0');  
   signal data_stop          : std_logic                    := '0';
 
   signal o_reg_id     : integer                       := 0;
@@ -235,21 +235,21 @@ architecture simulate of tb_system_fpasim_top is
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers 
-  constant c_LOGGER_SUMMARY               : logger_t  := get_logger("log:summary");  -- @suppress "Expression does not result in a constant"
+  constant c_LOGGER_SUMMARY               : logger_t  := get_logger("log:summary");  
   -- checkers
-  constant c_CHECKER_REG                  : checker_t := new_checker("check:reg:data");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM_TES_PULSE_SHAPE  : checker_t := new_checker("check:ram:tes_pulse_shape");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM_AMP_SQUID_TF     : checker_t := new_checker("check:ram:amp_squid_tf");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM_MUX_SQUID_TF     : checker_t := new_checker("check:ram:mux_squid_tf");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM_TES_STEADY_STATE : checker_t := new_checker("check:ram:tes_steady_state");  -- @suppress "Expression does not result in a constant"
-  constant c_CHECKER_RAM_MUX_SQUID_OFFSET : checker_t := new_checker("check:ram:mux_squid_offset");  -- @suppress "Expression does not result in a constant"
+  constant c_CHECKER_REG                  : checker_t := new_checker("check:reg:data");  
+  constant c_CHECKER_RAM_TES_PULSE_SHAPE  : checker_t := new_checker("check:ram:tes_pulse_shape");  
+  constant c_CHECKER_RAM_AMP_SQUID_TF     : checker_t := new_checker("check:ram:amp_squid_tf");  
+  constant c_CHECKER_RAM_MUX_SQUID_TF     : checker_t := new_checker("check:ram:mux_squid_tf");  
+  constant c_CHECKER_RAM_TES_STEADY_STATE : checker_t := new_checker("check:ram:tes_steady_state");  
+  constant c_CHECKER_RAM_MUX_SQUID_OFFSET : checker_t := new_checker("check:ram:mux_squid_offset");  
 
-  -- constant c_CHECKER_REG_CTRL            : checker_t := new_checker("check:reg:ctrl");  -- @suppress "Expression does not result in a constant"
-  -- constant c_CHECKER_REG_FPASIM_GAIN     : checker_t := new_checker("check:reg:fpasim_gain");  -- @suppress "Expression does not result in a constant"
-  -- constant c_CHECKER_REG_MUX_SQ_FB_DELAY : checker_t := new_checker("check:reg:mux_sq_fb_delay");  -- @suppress "Expression does not result in a constant"
-  -- constant c_CHECKER_REG_AMP_SQ_OF_DELAY : checker_t := new_checker("check:reg:amp_sq_of_delay");  -- @suppress "Expression does not result in a constant"
-  -- constant c_CHECKER_REG_ERROR_DELAY     : checker_t := new_checker("check:reg:error_delay");  -- @suppress "Expression does not result in a constant"
-  -- constant c_CHECKER_REG_RA_DELAY        : checker_t := new_checker("check:reg:ra_delay");  -- @suppress "Expression does not result in a constant"
+  -- constant c_CHECKER_REG_CTRL            : checker_t := new_checker("check:reg:ctrl");  
+  -- constant c_CHECKER_REG_FPASIM_GAIN     : checker_t := new_checker("check:reg:fpasim_gain");  
+  -- constant c_CHECKER_REG_MUX_SQ_FB_DELAY : checker_t := new_checker("check:reg:mux_sq_fb_delay");  
+  -- constant c_CHECKER_REG_AMP_SQ_OF_DELAY : checker_t := new_checker("check:reg:amp_sq_of_delay");  
+  -- constant c_CHECKER_REG_ERROR_DELAY     : checker_t := new_checker("check:reg:error_delay");  
+  -- constant c_CHECKER_REG_RA_DELAY        : checker_t := new_checker("check:reg:ra_delay");  
 
   signal usb_wr_if0 : opal_kelly_lib.pkg_front_panel.t_internal_wr_if := (
     hi_drive   => '0',
@@ -325,7 +325,7 @@ begin
     ---------------------------------------------------------------------
     -- VUNIT - Scoreboard object : Visibility definition
     ---------------------------------------------------------------------
-    if g_VUNIT_DEBUG = true then  -- @suppress "Redundant boolean equality check with true"
+    if g_VUNIT_DEBUG = true then  
       -- the simulator doesn't stop on errors => stop on failure
       set_stop_level(failure);
     end if;
@@ -575,7 +575,7 @@ begin
     generic map (
       g_DEBUG => false
       )
-    port map(  -- @suppress "Port map uses default values. Missing optional actuals: o_leds"
+    port map(  
       --  Opal Kelly inouts --
       i_okUH            => i_okUH,
       o_okHU            => o_okHU,
@@ -716,7 +716,7 @@ begin
   ---------------------------------------------------------------------
   -- log: data out
   ---------------------------------------------------------------------
-  gen_log_ram_pulse_shape : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
+  gen_log_ram_pulse_shape : if g_ENABLE_LOG = true generate  
     signal addr       : std_logic_vector(15 downto 0);
     signal data       : std_logic_vector(15 downto 0);
     signal data_valid : std_logic;
@@ -753,7 +753,7 @@ begin
 
   end generate gen_log_ram_pulse_shape;
 
-  gen_log_ram_amp_squid_tf : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
+  gen_log_ram_amp_squid_tf : if g_ENABLE_LOG = true generate  
     signal addr       : std_logic_vector(15 downto 0);
     signal data       : std_logic_vector(15 downto 0);
     signal data_valid : std_logic;
@@ -790,7 +790,7 @@ begin
 
   end generate gen_log_ram_amp_squid_tf;
 
-  gen_log_ram_mux_squid_tf : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
+  gen_log_ram_mux_squid_tf : if g_ENABLE_LOG = true generate  
     signal addr       : std_logic_vector(15 downto 0);
     signal data       : std_logic_vector(15 downto 0);
     signal data_valid : std_logic;
@@ -827,7 +827,7 @@ begin
 
   end generate gen_log_ram_mux_squid_tf;
 
-  gen_log_ram_tes_steady_state : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
+  gen_log_ram_tes_steady_state : if g_ENABLE_LOG = true generate  
     signal addr       : std_logic_vector(15 downto 0);
     signal data       : std_logic_vector(15 downto 0);
     signal data_valid : std_logic;
@@ -864,7 +864,7 @@ begin
 
   end generate gen_log_ram_tes_steady_state;
 
-  gen_log_ram_mux_squid_offset : if g_ENABLE_LOG = true generate  -- @suppress "Redundant boolean equality check with true"
+  gen_log_ram_mux_squid_offset : if g_ENABLE_LOG = true generate  
     signal addr       : std_logic_vector(15 downto 0);
     signal data       : std_logic_vector(15 downto 0);
     signal data_valid : std_logic;

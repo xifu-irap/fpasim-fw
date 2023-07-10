@@ -251,7 +251,7 @@ package body pkg_data_generator is
             v_csv_file.readline(void);
             v_data_valid := '0';
             v_finish     := '0';
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
             else
@@ -267,7 +267,7 @@ package body pkg_data_generator is
             v_csv_file.readline(void);
             v_data_valid := '1';
             v_data0      := v_csv_file.read_data_typ_as_std_vec(i_length => v_data0'length, i_data_typ => i_DATA0_TYP);
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
             else
@@ -285,7 +285,7 @@ package body pkg_data_generator is
           v_finish     := '1';
           v_fsm_state  := E_END;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
 
@@ -364,7 +364,7 @@ package body pkg_data_generator is
             v_csv_file.readline(void);
             v_data_valid := '0';
             v_finish     := '0';
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
             else
@@ -384,7 +384,7 @@ package body pkg_data_generator is
             v_data1 := v_csv_file.read_data_typ_as_std_vec(i_length => v_data1'length, i_data_typ => i_DATA1_TYP);
             v_data2 := v_csv_file.read_data_typ_as_std_vec(i_length => v_data2'length, i_data_typ => i_DATA2_TYP);
 
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
             else
@@ -401,7 +401,7 @@ package body pkg_data_generator is
           v_finish     := '1';
           v_fsm_state  := E_END;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
 
@@ -483,7 +483,7 @@ package body pkg_data_generator is
             v_csv_file.readline(void);
             v_data_valid := '0';
             v_finish     := '0';
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
             else
@@ -504,7 +504,7 @@ package body pkg_data_generator is
             v_data2 := v_csv_file.read_data_typ_as_std_vec(i_length => v_data2'length, i_data_typ => i_DATA2_TYP);
             v_data3 := v_csv_file.read_data_typ_as_std_vec(i_length => v_data3'length, i_data_typ => i_DATA3_TYP);
 
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
             else
@@ -521,7 +521,7 @@ package body pkg_data_generator is
           v_finish     := '1';
           v_fsm_state  := E_END;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
 
@@ -617,7 +617,7 @@ package body pkg_data_generator is
             v_csv_file.readline(void);
             v_data_valid := '0';
             v_finish     := '0';
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
             else
@@ -641,7 +641,7 @@ package body pkg_data_generator is
             v_data5 := v_csv_file.read_data_typ_as_std_vec(i_length => v_data5'length, i_data_typ => i_DATA5_TYP);
             v_data6 := v_csv_file.read_data_typ_as_std_vec(i_length => v_data6'length, i_data_typ => i_DATA6_TYP);
             v_data7 := v_csv_file.read_data_typ_as_std_vec(i_length => v_data7'length, i_data_typ => i_DATA7_TYP);
-            if v_csv_file.end_of_file(void) = true then -- @suppress "Redundant boolean equality check with true"
+            if v_csv_file.end_of_file(void) = true then 
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
             else
@@ -659,7 +659,7 @@ package body pkg_data_generator is
           v_finish     := '1';
           v_fsm_state  := E_END;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
 

@@ -187,7 +187,7 @@ begin
         IS_D2_INVERTED => '0',
         SRTYPE         => "ASYNC"
         )
-      port map (  -- @suppress "The order of the associations is different from the declaration order"
+      port map (  
         C  => i_clk,
         CE => '1',
         D1 => i_spi_sclk,
@@ -197,8 +197,8 @@ begin
         S  => '0'
         );
 
-    inst_obuf : unisim.vcomponents.OBUF  -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE, DRIVE, IOSTANDARD, SLEW"
-      port map (  -- @suppress "The order of the associations is different from the declaration order"
+    inst_obuf : unisim.vcomponents.OBUF  
+      port map (  
         I => clk_fwd_out,
         O => clk_to_pins
         );

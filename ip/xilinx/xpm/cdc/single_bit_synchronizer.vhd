@@ -138,7 +138,7 @@ begin
          SIM_ASSERT_CHK => 1,           -- DECIMAL; 0=disable simulation messages, 1=enable simulation messages
          SRC_INPUT_REG  => g_SRC_INPUT_REG -- DECIMAL; 0=do not register input, 1=register input
       )
-      port map(                         -- @suppress "The order of the associations is different from the declaration order"
+      port map(                         
          dest_out => dest,              -- 1-bit output: src_in synchronized to the destination clock domain. This output
          -- is registered.
 

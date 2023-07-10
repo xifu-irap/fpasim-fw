@@ -243,7 +243,7 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
 
   signal sof_sync_rx  : std_logic;
   signal eof_sync_rx  : std_logic;
-  signal rd_sync_rx   : std_logic;  -- @suppress "signal rd_sync_rx is never read"
+  signal rd_sync_rx   : std_logic;  
   signal addr_sync_rx : std_logic_vector(o_fifo_addr'range);
 
   ---------------------------------------------------------------------
@@ -354,7 +354,7 @@ begin
 
         end if;
 
-      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  
         sm_state_next <= E_RST;
     end case;
   end process p_decode_state;

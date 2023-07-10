@@ -247,7 +247,7 @@ begin
   -- requirement: FPASIM-FW-REQ-0150 (part0)
   -------------------------------------------------------------------
   -- we assume i_pixel_result is always >=0 => set the sign bit (MSB bits) to '0' 
-  pixel_result_tmp       <= '0' & i_pixel_result(i_pixel_result'high - 1 downto 0); -- @suppress "Incorrect array size in assignment: expected (<17>) but was (<g_PIXEL_RESULT_INPUT_WIDTH>)"
+  pixel_result_tmp       <= '0' & i_pixel_result(i_pixel_result'high - 1 downto 0); 
   -- we assume (mux_squid_feedback_tmp'length) >= (i_mux_squid_feedback'length) 
   --    align the MSB bits between mux_squid_feedback_tmp and i_mux_squid_feedback (<=> mux_squid_feedback_tmp <= i_mux_squid_feedback*4).
   --     => the remaining LSB bits of mux_squid_feedback_tmp are fixed to '0' 
@@ -468,7 +468,7 @@ begin
   mux_squid_tf_web    <= '0';
   mux_squid_tf_dinb   <= (others => '0');
   mux_squid_tf_enb    <= pixel_valid_rx;
-  mux_squid_tf_addrb  <= result_sub_rx;  -- @suppress "Incorrect array size in assignment: expected (<g_MUX_SQUID_TF_RAM_ADDR_WIDTH>) but was (<13>)"
+  mux_squid_tf_addrb  <= result_sub_rx;  
   mux_squid_tf_regceb <= '1';
 
   -------------------------------------------------------------------
@@ -590,7 +590,7 @@ begin
       --------------------------------------------------------------
       -- output : S = C + A*B
       --------------------------------------------------------------
-      o_s   => result_rz   -- @suppress "Incorrect array size in assignment: expected (<18>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
+      o_s   => result_rz   
       );
 
   -----------------------------------------------------------------

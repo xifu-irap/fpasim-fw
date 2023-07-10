@@ -976,7 +976,7 @@ begin
           sm_state_next <= E_RUN;
         end if;
 
-      when others =>  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+      when others =>  
         sm_state_next <= E_RST0;
     end case;
   end process p_decode_state;
@@ -1367,7 +1367,7 @@ begin
       --------------------------------------------------------------
       -- output : S = C - A*B
       --------------------------------------------------------------
-      o_s   => result_ry   -- @suppress "Incorrect array size in assignment: expected (<17>) but was (<g_PIXEL_RESULT_OUTPUT_WIDTH>)"
+      o_s   => result_ry   
       );
 
   assert not ((result_ry'length) /= (pkg_TES_MULT_SUB_Q_WIDTH_S)) report "[tes_pulse_shape_manager]: result => output result width and sfixed package definition width doesn't match." severity error;

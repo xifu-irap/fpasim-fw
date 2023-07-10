@@ -236,7 +236,7 @@ package body pkg_log is
         when E_END =>
           v_fsm_state := E_END;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
 
@@ -362,7 +362,7 @@ package body pkg_log is
         when E_END =>
           v_fsm_state := E_END;
 
-        when others =>                  -- @suppress "Case statement contains all choices explicitly. You can safely remove the redundant 'others'"
+        when others =>                  
           v_fsm_state := E_RST;
       end case;
 

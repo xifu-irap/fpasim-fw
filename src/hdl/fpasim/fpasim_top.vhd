@@ -233,7 +233,7 @@ architecture RTL of fpasim_top is
   -- Register configuration
   ---------------------------------------------------------------------
   -- common register
-  signal reg_valid               : std_logic;  -- register valid -- @suppress "signal reg_valid is never read"
+  signal reg_valid               : std_logic;  -- register valid 
   signal reg_fpasim_gain         : std_logic_vector(31 downto 0);
   signal reg_mux_sq_fb_delay     : std_logic_vector(31 downto 0);
   signal reg_amp_sq_of_delay     : std_logic_vector(31 downto 0);
@@ -242,14 +242,14 @@ architecture RTL of fpasim_top is
   signal reg_tes_conf            : std_logic_vector(31 downto 0);
   signal reg_conf0               : std_logic_vector(31 downto 0);
   -- ctrl register  
-  signal reg_ctrl_valid          : std_logic;  -- register ctrl valid -- @suppress "signal reg_ctrl_valid is never read"
+  signal reg_ctrl_valid          : std_logic;  -- register ctrl valid 
   signal reg_ctrl                : std_logic_vector(31 downto 0);
   -- debug ctrl register
-  signal reg_debug_ctrl_valid    : std_logic;  -- register debug_ctrl valid -- @suppress "signal reg_debug_ctrl_valid is never read"
+  signal reg_debug_ctrl_valid    : std_logic;  -- register debug_ctrl valid 
   signal reg_debug_ctrl          : std_logic_vector(31 downto 0);
   -- make pulse register
-  signal reg_make_sof            : std_logic;  -- first sample -- @suppress "signal reg_make_sof is never read"
-  signal reg_make_eof            : std_logic;  -- last sample -- @suppress "signal reg_make_eof is never read"
+  signal reg_make_sof            : std_logic;  -- first sample 
+  signal reg_make_eof            : std_logic;  -- last sample 
   signal reg_make_pulse_valid    : std_logic;
   signal reg_make_pulse          : std_logic_vector(31 downto 0);
   signal reg_make_pulse_ready    : std_logic;
@@ -346,14 +346,14 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- amp_squid_top
   ---------------------------------------------------------------------
-  signal pixel_sof3        : std_logic;  -- @suppress "signal pixel_sof3 is never read"
-  signal pixel_eof3        : std_logic;  -- @suppress "signal pixel_eof3 is never read"
+  signal pixel_sof3        : std_logic;  
+  signal pixel_eof3        : std_logic;  
   signal pixel_valid3      : std_logic;
-  signal pixel_id3         : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);  -- @suppress "signal pixel_id3 is never read"
+  signal pixel_id3         : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);  
   signal pixel_result3     : std_logic_vector(15 downto 0);
   signal frame_sof3        : std_logic;
-  signal frame_eof3        : std_logic;  -- @suppress "signal frame_eof3 is never read"
-  signal frame_id3         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  -- @suppress "signal frame_id3 is never read"
+  signal frame_eof3        : std_logic;  
+  signal frame_id3         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  
   signal amp_squid_errors0 : std_logic_vector(15 downto 0);
   signal amp_squid_status0 : std_logic_vector(7 downto 0);
 
@@ -377,7 +377,7 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
-  signal sync_valid5      : std_logic;  -- @suppress "signal sync_valid5 is never read"
+  signal sync_valid5      : std_logic;  
   signal sync5            : std_logic;
   signal sync_errors0_tmp : std_logic_vector(15 downto 0);
 
@@ -429,7 +429,7 @@ begin
     generic map(
       g_DEBUG => g_REGDECODE_TOP_DEBUG
       )
-    port map(  -- @suppress "The order of the associations is different from the declaration order"
+    port map(  
       ---------------------------------------------------------------------
       -- from the usb @i_clk (clock included)
       ---------------------------------------------------------------------
@@ -589,26 +589,26 @@ begin
   reg_make_pulse_ready <= cmd_ready;
 
   -- reg_fpasim_gain register: extract fields
-  fpasim_gain <= reg_fpasim_gain(pkg_FPASIM_GAIN_IDX_H downto pkg_FPASIM_GAIN_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_FPASIM_GAIN_WIDTH>) but was (<3>)"
+  fpasim_gain <= reg_fpasim_gain(pkg_FPASIM_GAIN_IDX_H downto pkg_FPASIM_GAIN_IDX_L);  
 
   -- reg_mux_sq_fb_delay register: extract fields
-  adc0_delay <= reg_mux_sq_fb_delay(pkg_MUX_SQ_FB_DELAY_IDX_H downto pkg_MUX_SQ_FB_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_AMP_SQ_OF_DELAY_WIDTH>) but was (<6>)"
+  adc0_delay <= reg_mux_sq_fb_delay(pkg_MUX_SQ_FB_DELAY_IDX_H downto pkg_MUX_SQ_FB_DELAY_IDX_L);  
   -- reg_amp_sq_of_delay register: extract fields
-  adc1_delay <= reg_amp_sq_of_delay(pkg_AMP_SQ_OF_DELAY_IDX_H downto pkg_AMP_SQ_OF_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_MUX_SQ_FB_DELAY_WIDTH>) but was (<6>)"
+  adc1_delay <= reg_amp_sq_of_delay(pkg_AMP_SQ_OF_DELAY_IDX_H downto pkg_AMP_SQ_OF_DELAY_IDX_L);  
 
   -- error_delay register: extract fields
-  dac_delay <= reg_error_delay(pkg_ERROR_DELAY_IDX_H downto pkg_ERROR_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_DELAY_WIDTH>) but was (<6>)"
+  dac_delay <= reg_error_delay(pkg_ERROR_DELAY_IDX_H downto pkg_ERROR_DELAY_IDX_L);  
 
   -- ra_delay register: extract fields
-  sync_delay <= reg_ra_delay(pkg_RA_DELAY_IDX_H downto pkg_RA_DELAY_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_RA_DELAY_WIDTH>) but was (<6>)"
+  sync_delay <= reg_ra_delay(pkg_RA_DELAY_IDX_H downto pkg_RA_DELAY_IDX_L);  
 
   -- tes_conf register: extract fields
-  nb_pixel_by_frame  <= reg_tes_conf(pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>) but was (<6>)"
-  nb_sample_by_pixel <= reg_tes_conf(pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H downto pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH>) but was (<7>)"
-  nb_sample_by_frame <= reg_tes_conf(pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH>) but was (<13>)"
+  nb_pixel_by_frame  <= reg_tes_conf(pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);  
+  nb_sample_by_pixel <= reg_tes_conf(pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H downto pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L);  
+  nb_sample_by_frame <= reg_tes_conf(pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);  
 
   -- conf0 register
-  inter_squid_gain <= reg_conf0(pkg_CONF0_INTER_SQUID_GAIN_IDX_H downto pkg_CONF0_INTER_SQUID_GAIN_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_CONF0_INTER_SQUID_GAIN_WIDTH>) but was (<8>)"
+  inter_squid_gain <= reg_conf0(pkg_CONF0_INTER_SQUID_GAIN_IDX_H downto pkg_CONF0_INTER_SQUID_GAIN_IDX_L);  
 
   -- debug_ctrl register
   dac_en_pattern       <= reg_debug_ctrl(pkg_DEBUG_CTRL_DAC_EN_PATTERN_IDX_H);
@@ -694,7 +694,7 @@ begin
     adc_amp_squid_offset_correction_tmp0 <= i_adc_amp_squid_offset_correction;
   end generate gen_not_adc_debug;
 
-  gen_adc_debug : if g_FPASIM_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
+  gen_adc_debug : if g_FPASIM_DEBUG = true generate  
   begin
     select_path : process (i_clk) is
     begin
@@ -780,7 +780,7 @@ begin
       ---------------------------------------------------------------------
       i_en                         => en,
       i_nb_sample_by_pixel         => nb_sample_by_pixel,
-      i_nb_pixel_by_frame          => nb_pixel_by_frame,  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>)"
+      i_nb_pixel_by_frame          => nb_pixel_by_frame,  
       i_nb_sample_by_frame         => nb_sample_by_frame,
       -- command
       i_cmd_valid                  => cmd_valid,
@@ -800,7 +800,7 @@ begin
       -- RAM:
       -- wr
       i_steady_state_wr_en         => tes_std_state_ram_wr_en,
-      i_steady_state_wr_rd_addr    => tes_std_state_ram_wr_rd_addr_tmp,  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+      i_steady_state_wr_rd_addr    => tes_std_state_ram_wr_rd_addr_tmp,  
       i_steady_state_wr_data       => tes_std_state_ram_wr_data,
       -- rd
       i_steady_state_rd_en         => tes_std_state_ram_rd_en,
@@ -818,7 +818,7 @@ begin
       o_pixel_sof                  => pixel_sof1,
       o_pixel_eof                  => pixel_eof1,
       o_pixel_valid                => pixel_valid1,
-      o_pixel_id                   => pixel_id1,  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+      o_pixel_id                   => pixel_id1,  
       o_pixel_result               => pixel_result1,
       o_frame_sof                  => frame_sof1,
       o_frame_eof                  => frame_eof1,
@@ -828,7 +828,7 @@ begin
       ---------------------------------------------------------------------
       o_tes_pixel_neg_out_valid    => tes_pixel_neg_out_valid1,
       o_tes_pixel_neg_out_error    => tes_pixel_neg_out_error1,
-      o_tes_pixel_neg_out_pixel_id => tes_pixel_neg_out_pixel_id1,  -- @suppress "Incorrect array size in assignment: expected (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+      o_tes_pixel_neg_out_pixel_id => tes_pixel_neg_out_pixel_id1,  
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------
@@ -984,7 +984,7 @@ begin
       o_amp_squid_tf_rd_data    => amp_squid_tf_ram_rd_data,   -- read data
 
       -- gain
-      i_fpasim_gain                 => fpasim_gain,  -- gain value -- @suppress "Incorrect array size in assignment: expected (<3>) but was (<pkg_FPASIM_GAIN_WIDTH>)"
+      i_fpasim_gain                 => fpasim_gain,  -- gain value 
       ---------------------------------------------------------------------
       -- input1
       ---------------------------------------------------------------------
@@ -1109,7 +1109,7 @@ begin
     o_dac0      <= dac0_4;
   end generate gen_not_dac_debug;
 
-  gen_dac_debug : if g_FPASIM_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
+  gen_dac_debug : if g_FPASIM_DEBUG = true generate  
   begin
     select_path : process (i_clk) is
     begin
@@ -1210,7 +1210,7 @@ begin
   ---------------------------------------------------------------------
   -- debug
   ---------------------------------------------------------------------
-  gen_debug : if g_FPASIM_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
+  gen_debug : if g_FPASIM_DEBUG = true generate  
 
     signal debug_frame_id_pulse_sof_r1 : std_logic_vector(frame_id1'range);
     signal debug_frame_id_pulse_eof_r1 : std_logic_vector(frame_id1'range);
@@ -1294,8 +1294,8 @@ begin
         probe0(19)          => pixel_valid3,
         probe0(18)          => frame_sof3,
         probe0(17)          => frame_eof3,
-        probe0(16 downto 6) => frame_id3,  -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
-        probe0(5 downto 0)  => pixel_id3,  -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+        probe0(16 downto 6) => frame_id3,  
+        probe0(5 downto 0)  => pixel_id3,  
 
         -- probe1
         probe1(56)           => dac_frame4,
@@ -1317,23 +1317,23 @@ begin
         probe3(19)          => pixel_valid1,
         probe3(18)          => frame_sof1,
         probe3(17)          => frame_eof1,
-        probe3(16 downto 6) => frame_id1,  -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
-        probe3(5 downto 0)  => pixel_id1,  -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+        probe3(16 downto 6) => frame_id1,  
+        probe3(5 downto 0)  => pixel_id1,  
 
         -- probe4
         probe4(45 downto 22) => debug_pulse_cnt_r1_tmp,
-        probe4(21 downto 11) => debug_frame_id_pulse_sof_r1,  -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
-        probe4(10 downto 0)  => debug_frame_id_pulse_eof_r1,  -- @suppress "Incorrect array size in assignment: expected (<11>) but was (<pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH>)"
+        probe4(21 downto 11) => debug_frame_id_pulse_sof_r1,  
+        probe4(10 downto 0)  => debug_frame_id_pulse_eof_r1,  
         -- probe5
         probe5(31 downto 16) => debug_sample_pixel_cnt_tmp,
         probe5(15 downto 0)  => debug_sample_frame_cnt_tmp,
 
         -- probe6
         probe6(32)           => tes_pixel_neg_out_error1,
-        probe6(31 downto 26) => tes_pixel_neg_out_pixel_id1,  -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH>)"
+        probe6(31 downto 26) => tes_pixel_neg_out_pixel_id1,  
         probe6(25 downto 10) => cmd_pulse_height,
-        probe6(9 downto 4)   => cmd_pixel_id,  -- @suppress "Incorrect array size in assignment: expected (<6>) but was (<pkg_NB_SAMPLE_BY_PIXEL_MAX_WIDTH>)"
-        probe6(3 downto 0)   => cmd_time_shift,  -- @suppress "Incorrect array size in assignment: expected (<4>) but was (<pkg_MAKE_PULSE_TIME_SHIFT_WIDTH>)"
+        probe6(9 downto 4)   => cmd_pixel_id,  
+        probe6(3 downto 0)   => cmd_time_shift,  
 
         -- probe7
         probe7(47 downto 32) => rec_adc_cmd_nb_words_by_block,
@@ -1343,7 +1343,7 @@ begin
 
     inst_fpasim_top_vio_0 : entity work.fpasim_top_vio_0
       port map (
-        clk           => i_clk,  -- @suppress "All references must have the same capitalization as their declaration: Expected 'CLK' but was 'clk'"
+        clk           => i_clk,  
         probe_out0(0) => debug_adc_sel,
         probe_out1    => debug_adc_mux_squid_feedback,
         probe_out2    => debug_adc_amp_squid_offset_correction,

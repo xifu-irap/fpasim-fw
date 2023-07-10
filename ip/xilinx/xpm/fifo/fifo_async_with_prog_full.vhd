@@ -581,7 +581,7 @@ begin
   -- xilinx template
   ---------------------------------------------------------------------
   inst_xpm_fifo_async : xpm_fifo_async
-    generic map(                        -- @suppress "The order of the associations is different from the declaration order"
+    generic map(                        
       CASCADE_HEIGHT      => 0,         -- DECIMAL
       CDC_SYNC_STAGES     => g_CDC_SYNC_STAGES, -- DECIMAL
       DOUT_RESET_VALUE    => "0",       -- String
@@ -602,7 +602,7 @@ begin
       WRITE_DATA_WIDTH    => g_WRITE_DATA_WIDTH, -- DECIMAL
       WR_DATA_COUNT_WIDTH => 1          -- DECIMAL
     )
-    port map(                           -- @suppress "The order of the associations is different from the declaration order"
+    port map(                           
       almost_empty  => open,            -- 1-bit output: Almost Empty : When asserted, this signal indicates that
       -- only one more read can be performed before the FIFO goes to empty.
 

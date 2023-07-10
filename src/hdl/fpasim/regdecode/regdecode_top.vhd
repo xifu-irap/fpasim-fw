@@ -350,12 +350,12 @@ architecture RTL of regdecode_top is
   signal pipein_data0  : std_logic_vector(15 downto 0);
 
   signal pipeout_rd         : std_logic;
-  signal pipeout_sof        : std_logic;  -- @suppress "signal pipeout_sof is never read"
-  signal pipeout_eof        : std_logic;  -- @suppress "signal pipeout_eof is never read"
-  signal pipeout_valid      : std_logic;  -- @suppress "signal pipeout_valid is never read"
+  signal pipeout_sof        : std_logic;  
+  signal pipeout_eof        : std_logic;  
+  signal pipeout_valid      : std_logic;  
   signal pipeout_addr       : std_logic_vector(15 downto 0);
   signal pipeout_data       : std_logic_vector(15 downto 0);
-  signal pipeout_empty      : std_logic;  -- @suppress "signal pipeout_empty is never read"
+  signal pipeout_empty      : std_logic;  
   signal pipeout_data_count : std_logic_vector(15 downto 0);
 
   -- tes_pulse_shape
@@ -517,7 +517,7 @@ architecture RTL of regdecode_top is
   -- wire: fpasim_status
   ---------------------------------------------------------------------
 
-  signal fpasim_status_valid  : std_logic;  -- @suppress "signal fpasim_status_valid is never read"
+  signal fpasim_status_valid  : std_logic;  
   signal fpasim_status        : std_logic_vector(i_reg_fpasim_status'range);
   signal fpasim_status_errors : std_logic_vector(15 downto 0);
   signal fpasim_status_status : std_logic_vector(7 downto 0);
@@ -538,16 +538,16 @@ architecture RTL of regdecode_top is
   signal reg_fifo_rec_adc_rd : std_logic;
 
   -- to usb: register
-  signal usb_rec_valid              : std_logic;  -- @suppress "signal usb_rec_valid is never read"
+  signal usb_rec_valid              : std_logic;  
   signal usb_rec_ctrl               : std_logic_vector(usb_wireout_rec_ctrl'range);
   signal usb_rec_conf0              : std_logic_vector(usb_wireout_rec_conf0'range);
   -- to usb: fifo
   signal usb_fifo_adc_rd            : std_logic;  -- fifo read enable
-  signal usb_fifo_adc_sof           : std_logic;  -- fifo first sample -- @suppress "signal usb_fifo_adc_sof is never read"
-  signal usb_fifo_adc_eof           : std_logic;  -- fifo last sample -- @suppress "signal usb_fifo_adc_eof is never read"
-  signal usb_fifo_adc_data_valid    : std_logic;  -- fifo data valid -- @suppress "signal usb_fifo_adc_data_valid is never read"
+  signal usb_fifo_adc_sof           : std_logic;  -- fifo first sample 
+  signal usb_fifo_adc_eof           : std_logic;  -- fifo last sample 
+  signal usb_fifo_adc_data_valid    : std_logic;  -- fifo data valid 
   signal usb_fifo_adc_data          : std_logic_vector(usb_pipeout_rec_fifo_adc_data'range);  -- fifo data
-  signal usb_fifo_adc_empty         : std_logic;  -- fifo empty flag -- @suppress "signal usb_fifo_adc_empty is never read"
+  signal usb_fifo_adc_empty         : std_logic;  -- fifo empty flag 
   signal usb_fifo_adc_wr_data_count : std_logic_vector(15 downto 0);
 
   signal rec_errors1 : std_logic_vector(15 downto 0);
@@ -1058,14 +1058,14 @@ begin
   ---------------------------------------------------------------------
   make_pulse_data_valid_tmp0 <= trig_make_pulse_valid;
   make_pulse_data_tmp0       <= usb_wirein_make_pulse;
-  pixel_nb                   <= usb_wirein_tes_conf(pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH>) but was (<6>)"
+  pixel_nb                   <= usb_wirein_tes_conf(pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);  
 
   inst_regdecode_wire_make_pulse : entity work.regdecode_wire_make_pulse
     generic map(
       g_DATA_WIDTH_OUT => make_pulse_data_tmp0'length,  -- define the RAM address width
       g_PIXEL_NB_WIDTH => pixel_nb'length
       )
-    port map(  -- @suppress "The order of the associations is different from the declaration order"
+    port map(  
       ---------------------------------------------------------------------
       -- from the regdecode: input @i_clk
       ---------------------------------------------------------------------
@@ -1309,7 +1309,7 @@ begin
   ---------------------------------------------------------------------
   -- errors register
   ---------------------------------------------------------------------
-  error_sel <= usb_wirein_sel_errors(pkg_ERROR_SEL_IDX_H downto pkg_ERROR_SEL_IDX_L);  -- @suppress "Incorrect array size in assignment: expected (<pkg_ERROR_SEL_WIDTH>) but was (<4>)"
+  error_sel <= usb_wirein_sel_errors(pkg_ERROR_SEL_IDX_H downto pkg_ERROR_SEL_IDX_L);  
   inst_regdecode_wire_errors : entity work.regdecode_wire_errors
     generic map(
       g_ERROR_SEL_WIDTH  => error_sel'length,
@@ -1379,7 +1379,7 @@ begin
   ---------------------------------------------------------------------
   -- debug
   ---------------------------------------------------------------------
-  gen_debug_ila : if g_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
+  gen_debug_ila : if g_DEBUG = true generate  
 
   begin
 

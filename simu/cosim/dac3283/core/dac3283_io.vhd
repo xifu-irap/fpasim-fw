@@ -92,7 +92,7 @@ begin
   gen_clk : if true generate
   begin
     inst_IBUFDS : IBUFDS
-      generic map (  -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE, DQS_BIAS, IBUF_DELAY_VALUE, IFD_DELAY_VALUE"
+      generic map (  
         DIFF_TERM    => false,          -- Differential Termination 
         IBUF_LOW_PWR => true,  -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
         IOSTANDARD   => "DEFAULT")
@@ -111,7 +111,7 @@ begin
     signal frame_tmp : std_logic;
   begin
     inst_IBUFDS : IBUFDS
-      generic map (  -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE, DQS_BIAS, IBUF_DELAY_VALUE, IFD_DELAY_VALUE"
+      generic map (  
         DIFF_TERM    => false,          -- Differential Termination 
         IBUF_LOW_PWR => true,  -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
         IOSTANDARD   => "DEFAULT")
@@ -165,7 +165,7 @@ begin
 
     gen_io : for i in data_tmp'range generate
       inst_IBUFDS : IBUFDS
-        generic map (  -- @suppress "Generic map uses default values. Missing optional actuals: CAPACITANCE, DQS_BIAS, IBUF_DELAY_VALUE, IFD_DELAY_VALUE"
+        generic map (  
           DIFF_TERM    => false,        -- Differential Termination 
           IBUF_LOW_PWR => true,  -- Low power (TRUE) vs. performance (FALSE) setting for referenced I/O standards
           IOSTANDARD   => "DEFAULT")
@@ -176,7 +176,7 @@ begin
           );
 
       inst_IDDR : IDDR
-        generic map (  -- @suppress "Generic map uses default values. Missing optional actuals: IS_C_INVERTED, IS_D_INVERTED"
+        generic map (  
           --DDR_CLK_EDGE => "SAME_EDGE",  -- "OPPOSITE_EDGE", "SAME_EDGE" 
           DDR_CLK_EDGE => "SAME_EDGE_PIPELINED",  -- "OPPOSITE_EDGE", "SAME_EDGE" 
           -- or "SAME_EDGE_PIPELINED" 

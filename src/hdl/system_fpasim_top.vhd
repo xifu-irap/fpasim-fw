@@ -205,7 +205,7 @@ architecture RTL of system_fpasim_top is
   signal sys_rst            : std_logic;
   signal adc_io_clk_rst     : std_logic;
   signal adc_io_rst         : std_logic;
-  signal dac_io_clk_rst     : std_logic;  -- @suppress "signal dac_io_clk_rst is never read"
+  signal dac_io_clk_rst     : std_logic;  
   signal dac_io_rst         : std_logic;
   signal dac_io_rst_phase90 : std_logic;
   signal sync_io_clk_rst    : std_logic;
@@ -382,7 +382,7 @@ begin
       g_FPASIM_DEBUG        => pkg_FPASIM_TOP_DEBUG,
       g_REGDECODE_TOP_DEBUG => pkg_REGDECODE_TOP_DEBUG
       )
-    port map(  -- @suppress "The order of the associations is different from the declaration order"
+    port map(  
       i_clk         => sys_clk,         -- system clock
       i_rst         => sys_rst,         -- reset sync @sync_clk
       ---------------------------------------------------------------------
@@ -691,7 +691,7 @@ begin
 ---------------------------------------------------------------------
 -- debug
 ---------------------------------------------------------------------
-  gen_debug : if g_DEBUG = true generate  -- @suppress "Redundant boolean equality check with true"
+  gen_debug : if g_DEBUG = true generate  
     signal count_r1 : unsigned(31 downto 0) := (others => '0');
     signal pulse_r1 : std_logic             := '0';
 
