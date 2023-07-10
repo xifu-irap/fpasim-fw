@@ -17,14 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   tb_mux_squid_top.vhd 
+--    @file                   tb_mux_squid_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details   
+--    @details
 --
---    Testbench of the mux_squid_top module.             
+--    Testbench of the mux_squid_top module.
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ entity tb_mux_squid_top is
     g_VUNIT_DEBUG                 : boolean  := true;-- true: stop simulator on failures, false: stop the simulator on errors.
     g_TEST_NAME                   : string   := ""; -- name of the test
     g_ENABLE_CHECK                : boolean  := true;-- true: compare the simulation output with the reference one, false: do nothing.
-    g_ENABLE_LOG                  : boolean  := true;-- true: save simulation data in files, false: don't save simulation data in files 
+    g_ENABLE_LOG                  : boolean  := true;-- true: save simulation data in files, false: don't save simulation data in files
     -- RAM1
     g_RAM1_NAME                   : string   := "mux_squid_offset";-- RAM1: simulation name
     g_RAM1_CHECK                  : boolean  := true;--RAM1: 1: check the memory contents, 0: don't check the memory content
@@ -142,7 +142,7 @@ architecture simulate of tb_mux_squid_top is
   -- errors/status
   ---------------------------------------------------------------------
   signal o_errors : std_logic_vector(15 downto 0);
-  signal o_status : std_logic_vector(7 downto 0); 
+  signal o_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- Clock definition
@@ -159,7 +159,7 @@ architecture simulate of tb_mux_squid_top is
   signal data_gen_finish        : std_logic := '0';
   signal data_valid             : std_logic := '0';
   signal data_count_in          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_in : std_logic; 
+  signal data_count_overflow_in : std_logic;
 
   -- ram tes pulse shape
   signal ram1_wr_start      : std_logic                    := '0';
@@ -167,7 +167,7 @@ architecture simulate of tb_mux_squid_top is
   signal ram1_rd_valid      : std_logic                    := '0';
   signal ram1_wr_gen_finish : std_logic                    := '0';
   signal ram1_rd_gen_finish : std_logic                    := '0';
-  signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0'); 
+  signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0');
 
   -- ram tes steady state
   signal ram2_wr_start      : std_logic                    := '0';
@@ -175,11 +175,11 @@ architecture simulate of tb_mux_squid_top is
   signal ram2_rd_valid      : std_logic                    := '0';
   signal ram2_wr_gen_finish : std_logic                    := '0';
   signal ram2_rd_gen_finish : std_logic                    := '0';
-  signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0'); 
+  signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0');
 
   -- check
   signal data_count_out          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_out : std_logic; 
+  signal data_count_overflow_out : std_logic;
 
   signal data_stop      : std_logic := '0';
   signal data_out_error : std_logic_vector(0 downto 0);
@@ -217,7 +217,7 @@ architecture simulate of tb_mux_squid_top is
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
-  -- loggers 
+  -- loggers
   constant c_LOGGER_SUMMARY     : logger_t  := get_logger("log:summary");
   -- checkers
   constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors");
@@ -383,7 +383,7 @@ begin
       info("wait RAM reading");
       wait until rising_edge(i_clk) and ram2_rd_gen_finish = '1';
     end if;
-    
+
     ---------------------------------------------------------------------
     -- End of simulation: wait few more clock cycles
     ---------------------------------------------------------------------
@@ -405,7 +405,7 @@ begin
     -- summary
     info(c_LOGGER_SUMMARY, "===Summary===" & LF &
          "c_CHECKER_DATA: " & to_string(get_checker_stat(c_CHECKER_DATA)) & LF &
-        "c_CHECKER_RAM1: " & to_string(get_checker_stat(c_CHECKER_RAM1)) & LF & 
+        "c_CHECKER_RAM1: " & to_string(get_checker_stat(c_CHECKER_RAM1)) & LF &
         "c_CHECKER_RAM2: " & to_string(get_checker_stat(c_CHECKER_RAM2)) & LF &
         "c_CHECKER_ERRORS: " & to_string(get_checker_stat(c_CHECKER_ERRORS)) & LF &
         "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(c_CHECKER_DATA_COUNT))
@@ -672,7 +672,7 @@ begin
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
-       i_inter_squid_gain          => i_inter_squid_gain, 
+       i_inter_squid_gain          => i_inter_squid_gain,
       -- RAM: mux_squid_offset
       -- wr
       i_mux_squid_offset_wr_en      => i_mux_squid_offset_wr_en, -- write enable
@@ -698,7 +698,7 @@ begin
       i_pixel_eof                   => i_pixel_eof, -- last pixel sample
       i_pixel_valid                 => i_pixel_valid, -- valid pixel sample
       i_pixel_id                    => i_pixel_id, -- pixel id
-      i_pixel_result                => i_pixel_result, -- pixel result 
+      i_pixel_result                => i_pixel_result, -- pixel result
       i_frame_sof                   => i_frame_sof, -- first frame sample
       i_frame_eof                   => i_frame_eof, -- last frame sample
       i_frame_id                    => i_frame_id, -- frame id
@@ -739,7 +739,7 @@ begin
   ---------------------------------------------------------------------
   -- log: data out
   ---------------------------------------------------------------------
-  gen_log : if g_ENABLE_LOG = true generate 
+  gen_log : if g_ENABLE_LOG = true generate
     signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
     signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
     signal frame_sof_vect_tmp : std_logic_vector(0 downto 0);

@@ -17,57 +17,57 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   pkg_front_panel.vhd 
+--    @file                   pkg_front_panel.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --    This VHDL package is based on the "Opal Kelly\FrontPanelUSB\Samples\Simulation\USB3\VHDL example\sim_tf.vhd" example design.
 --    It allows to control USB3 port signals.
 --    It redefines the functions/procedures in a package instead of a plain text in the VHDL testbench.
 --    The objective is to facilitate readability but also to facilitate the possibility of controlling several different USB ports.
 --
---  Use:
---    0. import this package in the vhdl testbench
---    1. In the declarative part of the vhdl testbench architecture, declare:
---       1. one signal of t_internal_wr_if type
---       2. one signal of t_internal_rd_if type
---       3. one share variable of t_front_panel_conf type
---         Example:
---           . signal usb_wr_if0 : opal_kelly_lib.pkg_front_panel.t_internal_wr_if := (
---               hi_drive   => '0',
---               hi_cmd     => (others => '0'),
---               hi_dataout => (others => '0')
---               );
---           . signal usb_rd_if0 : opal_kelly_lib.pkg_front_panel.t_internal_rd_if := (
---             i_clk     => '0',
---             hi_busy   => '0',
---             hi_datain => (others => '0')
---           );
---          . shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf; 
---    2. In the VHDL testbench architecture body,
---       1. Instanciate the okHost_driver procedure outside a process.
---    3. In an identical process, call :
---       1. FrontPanelReset procedure (mandatory)
---       2. the other functions/procedures defined in this package
---  Note:
---    1. after one or more SetWireInValue calls, the UpdateWireIns must be called
---    2. UpdateWireOuts must be called before the GetWireOutValue procedure
---    3. WriteToPipeIn must write a multiple of 16 bytes (usb3 limitation)
---    4. ReadFromPipeOut must read a multiple of 16 bytes (usb3 limitation)
+--    Use:
+--      0. import this package in the vhdl testbench
+--      1. In the declarative part of the vhdl testbench architecture, declare:
+--         1. one signal of t_internal_wr_if type
+--         2. one signal of t_internal_rd_if type
+--         3. one share variable of t_front_panel_conf type
+--           Example:
+--             . signal usb_wr_if0 : opal_kelly_lib.pkg_front_panel.t_internal_wr_if := (
+--                 hi_drive   => '0',
+--                 hi_cmd     => (others => '0'),
+--                 hi_dataout => (others => '0')
+--                 );
+--             . signal usb_rd_if0 : opal_kelly_lib.pkg_front_panel.t_internal_rd_if := (
+--               i_clk     => '0',
+--               hi_busy   => '0',
+--               hi_datain => (others => '0')
+--             );
+--            . shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
+--      2. In the VHDL testbench architecture body,
+--         1. Instanciate the okHost_driver procedure outside a process.
+--      3. In an identical process, call :
+--         1. FrontPanelReset procedure (mandatory)
+--         2. the other functions/procedures defined in this package
+--    Note:
+--      1. after one or more SetWireInValue calls, the UpdateWireIns must be called
+--      2. UpdateWireOuts must be called before the GetWireOutValue procedure
+--      3. WriteToPipeIn must write a multiple of 16 bytes (usb3 limitation)
+--      4. ReadFromPipeOut must read a multiple of 16 bytes (usb3 limitation)
 --
---  Note: 
---    . The functions/procedures are almost identical to the sim_tf.vhd file. Except, the 2 new added arguments:
---       1. variable front_panel_conf : inout t_front_panel_conf
---       2. signal internal_wr_if : inout t_internal_wr_if
---       2. signal internal_rd_if : inout t_internal_rd_if
---    . This script needs the simulation files (USB3) profided by the Opal Kelly company. In particular, the
---      parameters file needs to be compiled in the fpasim library.
---    
+--    Note:
+--      . The functions/procedures are almost identical to the sim_tf.vhd file. Except, the 2 new added arguments:
+--         1. variable front_panel_conf : inout t_front_panel_conf
+--         2. signal internal_wr_if : inout t_internal_wr_if
+--         2. signal internal_rd_if : inout t_internal_rd_if
+--      . This script needs the simulation files (USB3) profided by the Opal Kelly company. In particular, the
+--        parameters file needs to be compiled in the fpasim library.
 --
--- LIMITATION: all function/procedures must be called in the same process to avoid conflict with signal record argument
+--
+--   LIMITATION: all function/procedures must be called in the same process to avoid conflict with signal record argument
 --
 -- -------------------------------------------------------------------------------------------------------------
 
@@ -171,23 +171,23 @@ package pkg_front_panel is
     --      Create the 2 signal of type : t_internal_wr_if and t_internal_wr_if
     --      Create a share variable of type t_front_panel_conf
     --   In the VHDL testbench architecture body:
-    --      instanciate the okHost_driver procedure 
-    --   Note: in the following procedure/function call, arguments of type t_internal_wr_if, t_internal_wr_if and t_front_panel_conf aren't specified 
-    --   In a process, 
+    --      instanciate the okHost_driver procedure
+    --   Note: in the following procedure/function call, arguments of type t_internal_wr_if, t_internal_wr_if and t_front_panel_conf aren't specified
+    --   In a process,
     --      to initialize the devise (mandatory), call:
     --        FrontPanelReset;              -- Always start routine with FrontPanelReset;
     --      to write in the "wire in", call:
-    --         one or more times: 
+    --         one or more times:
     --            SetWireInValue(i_ep, i_val, i_mask); -- i_bit is an integer 0-31, i_val,i_mask are 32 bits std_logic_vector
     --         followed by:
     --            UpdateWireIns;
     --      to read a "wire out", call:
     --         one time:
     --           UpdateWireOuts;
-    --         one or more times: 
+    --         one or more times:
     --           GetWireOutValue(i_ep);          -- returns a 16 bit SLV
     --      to activate a trigger:
-    --         to set a bit, call: 
+    --         to set a bit, call:
     --              ActivateTriggerIn(i_ep, i_bit);   -- i_bit is an integer 0-31
     --         to set an bit array, call:
     --              ActivateTriggerIn_by_data(i_ep,i_data) -- i_data is std_logic_vector(31 downto 0)
@@ -206,16 +206,16 @@ package pkg_front_panel is
     --    others functions/procedure: (not tested)
     --      WriteToBlockPipeIn(i_ep, i_blockLength, i_length);   -- pass pipeIn array data; blockSize and length are integers
     --      ReadFromBlockPipeOut(i_ep, i_blockLength, i_length); -- pass data to pipeOut array; blockSize and length are integers
-    --      WriteRegister(i_address, i_data);  
+    --      WriteRegister(i_address, i_data);
     --      ReadRegister(i_address, i_data);
-    --      WriteRegisterSet();  
+    --      WriteRegisterSet();
     --      ReadRegisterSet();
     --
     -- *  Pipes operate by passing arrays of data back and forth to the user's
     --    design.  If you need multiple arrays, you can create a new procedure
     --    above and connect it to a differnet array.  More information is
     --    available in Opal Kelly documentation and online support tutorial.
-    ----------------------------------------------------------------------- 
+    -----------------------------------------------------------------------
 
     ---------------------------------------------------------------------
     -- okHost_driver: to instanciate outside a process
@@ -416,12 +416,12 @@ package body pkg_front_panel is
         variable pipeOut : PIPEOUT_ARRAY(0 to pipeOutSize - 1);
 
         variable WireIns   : STD_ARRAY(0 to 31); -- 32x32 array storing WireIn values
-        variable WireOuts  : STD_ARRAY(0 to 31); -- 32x32 array storing WireOut values 
+        variable WireOuts  : STD_ARRAY(0 to 31); -- 32x32 array storing WireOut values
         variable Triggered : STD_ARRAY(0 to 31); -- 32x32 array storing IsTriggered values
 
-        variable u32Address : REGISTER_ARRAY(0 to registerSetSize - 1); 
+        variable u32Address : REGISTER_ARRAY(0 to registerSetSize - 1);
         variable u32Data    : REGISTER_ARRAY(0 to registerSetSize - 1);
-        variable u32Count   : std_logic_vector(31 downto 0); 
+        variable u32Count   : std_logic_vector(31 downto 0);
         --ReadRegisterData : std_logic_vector(31 downto 0);
 
         procedure set_WireIns(i_index : in integer; i_value : in std_logic_vector) is

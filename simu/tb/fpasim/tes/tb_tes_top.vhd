@@ -17,15 +17,15 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   tb_tes_top.vhd 
+--    @file                   tb_tes_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --
 --     Testbench of the tes_top module.
--- 
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -49,7 +49,7 @@ entity tb_tes_top is
     ---------------------------------------------------------------------
     -- DUT generic
     ---------------------------------------------------------------------
-    -- command 
+    -- command
     g_CMD_PULSE_HEIGHT_WIDTH     : positive := pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH;  -- pulse_heigth bus width (expressed in bits). Possible values [1;max integer value[
     g_CMD_TIME_SHIFT_WIDTH       : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH;  --time_shift bus width (expressed in bits). Possible values [1;max integer value[
     g_CMD_PIXEL_ID_WIDTH         : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH;  -- pixel id bus width (expressed in bits). Possible values [1;max integer value[
@@ -74,7 +74,7 @@ entity tb_tes_top is
     g_VUNIT_DEBUG                : boolean  := true; -- true: stop simulator on failures, false: stop the simulator on errors.
     g_TEST_NAME                  : string   := ""; -- name of the test
     g_ENABLE_CHECK               : boolean  := true;-- true: compare the simulation output with the reference one, false: do nothing.
-    g_ENABLE_LOG                 : boolean  := true;-- true: save simulation data in files, false: don't save simulation data in files 
+    g_ENABLE_LOG                 : boolean  := true;-- true: save simulation data in files, false: don't save simulation data in files
     -- RAM1
     g_RAM1_NAME                  : string   := "tes_pulse_shape";-- RAM1: simulation name
     g_RAM1_CHECK                 : boolean  := true;--RAM1: 1: check the memory contents, 0: don't check the memory content
@@ -150,7 +150,7 @@ architecture simulate of tb_tes_top is
   -- errors/status
   ---------------------------------------------------------------------
   signal o_errors : std_logic_vector(15 downto 0);
-  signal o_status : std_logic_vector(7 downto 0); 
+  signal o_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- Clock definition
@@ -164,7 +164,7 @@ architecture simulate of tb_tes_top is
   signal reg_start      : std_logic := '0';
   signal reg_rd_valid   : std_logic := '0';
   signal reg_gen_finish : std_logic := '0';
-  signal reg_valid      : std_logic;  
+  signal reg_valid      : std_logic;
 
   -- Cmd
   signal cmd_start      : std_logic := '0';
@@ -177,7 +177,7 @@ architecture simulate of tb_tes_top is
   signal data_gen_finish        : std_logic := '0';
   signal data_valid             : std_logic := '0';
   signal data_count_in          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_in : std_logic; 
+  signal data_count_overflow_in : std_logic;
 
   -- ram tes pulse shape
   signal ram1_wr_start      : std_logic                    := '0';
@@ -185,7 +185,7 @@ architecture simulate of tb_tes_top is
   signal ram1_rd_valid      : std_logic                    := '0';
   signal ram1_wr_gen_finish : std_logic                    := '0';
   signal ram1_rd_gen_finish : std_logic                    := '0';
-  signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0');  
+  signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0');
 
   -- ram tes steady state
   signal ram2_wr_start      : std_logic                    := '0';
@@ -193,14 +193,14 @@ architecture simulate of tb_tes_top is
   signal ram2_rd_valid      : std_logic                    := '0';
   signal ram2_wr_gen_finish : std_logic                    := '0';
   signal ram2_rd_gen_finish : std_logic                    := '0';
-  signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0');  
+  signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0');
 
   -- check
   signal data_count_out          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_out : std_logic; 
+  signal data_count_overflow_out : std_logic;
 
   signal data_stop      : std_logic := '0';
-  signal data_out_error : std_logic_vector(0 downto 0); 
+  signal data_out_error : std_logic_vector(0 downto 0);
 
   ---------------------------------------------------------------------
   -- filepath definition
@@ -248,14 +248,14 @@ architecture simulate of tb_tes_top is
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
-  -- loggers 
-  constant c_LOGGER_SUMMARY          : logger_t  := get_logger("log:summary"); 
+  -- loggers
+  constant c_LOGGER_SUMMARY          : logger_t  := get_logger("log:summary");
   -- checkers
-  constant c_CHECKER_ERRORS          : checker_t := new_checker("check:errors"); 
-  constant c_CHECKER_DATA_COUNT      : checker_t := new_checker("check:data_count"); 
+  constant c_CHECKER_ERRORS          : checker_t := new_checker("check:errors");
+  constant c_CHECKER_DATA_COUNT      : checker_t := new_checker("check:data_count");
   constant c_CHECKER_RAM1            : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME);
   constant c_CHECKER_RAM2            : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME);
-  constant c_CHECKER_DATA            : checker_t := new_checker("check:out:data_out"); 
+  constant c_CHECKER_DATA            : checker_t := new_checker("check:out:data_out");
 
 begin
 
@@ -286,7 +286,7 @@ begin
     ---------------------------------------------------------------------
     -- VUNIT - Scoreboard object : Visibility definition
     ---------------------------------------------------------------------
-    if g_VUNIT_DEBUG = true then  
+    if g_VUNIT_DEBUG = true then
       -- the simulator doesn't stop on errors => stop on failure
       set_stop_level(failure);
     end if;
@@ -442,7 +442,7 @@ begin
     ---------------------------------------------------------------------
     -- RAM Check: RAM1
     ---------------------------------------------------------------------
-    if g_RAM1_CHECK = true then  
+    if g_RAM1_CHECK = true then
       info("Start RAM reading: " & g_RAM1_NAME);
       ram1_rd_start <= '1';
       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
@@ -761,7 +761,7 @@ begin
   -- Input: data generation
   ---------------------------------------------------------------------
   gen_data : if true generate
-    signal vect_tmp : std_logic_vector(0 downto 0); 
+    signal vect_tmp : std_logic_vector(0 downto 0);
   begin
 
     -- valid sequence generation
@@ -920,7 +920,7 @@ begin
   ---------------------------------------------------------------------
   -- log: data out
   ---------------------------------------------------------------------
-  gen_log : if g_ENABLE_LOG = true generate  
+  gen_log : if g_ENABLE_LOG = true generate
     signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
     signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
     signal frame_sof_vect_tmp : std_logic_vector(0 downto 0);
@@ -982,7 +982,7 @@ begin
 
   end generate gen_log;
 
-  gen_log_all : if g_ENABLE_LOG = true generate 
+  gen_log_all : if g_ENABLE_LOG = true generate
     constant c_FILEPATH_DATA_OUT : string := c_OUTPUT_BASEPATH & "vhdl_data_out_all.csv";
     signal pixel_sof_vect_tmp    : std_logic_vector(0 downto 0);
     signal pixel_eof_vect_tmp    : std_logic_vector(0 downto 0);
@@ -1044,7 +1044,7 @@ begin
   ---------------------------------------------------------------------
   -- check data
   ---------------------------------------------------------------------
-  gen_check_data : if g_ENABLE_CHECK = true generate  
+  gen_check_data : if g_ENABLE_CHECK = true generate
   begin
 
     inst_pkg_vunit_data_checker : pkg_vunit_data_checker_1(

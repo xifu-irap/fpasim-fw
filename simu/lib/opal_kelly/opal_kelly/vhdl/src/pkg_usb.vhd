@@ -17,25 +17,26 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   pkg_usb.vhd 
+--    @file                   pkg_usb.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details             
---    This package defines a procedure specific to the project. 
---    This procedure is designed to work in VHDL simulation with a "opal kelly"-like library 
---    This procedure processes in input command csv file (with ";" as separator) with the following structure: 
+--    @details
+--
+--    This package defines a procedure specific to the project.
+--    This procedure is designed to work in VHDL simulation with a "opal kelly"-like library
+--    This procedure processes in input command csv file (with ";" as separator) with the following structure:
 --      . column0: reg_id : integer. (the list of possible reg_id can be found in the 0136-FPAsim-D_commands_dictionnary.xlsx file)
 --           . It identifies a register in a unique manner.
 --           . It allows to select the "opal kelly" procedures (wire_in, trig_in, wire_out, ...) corresponding to the processed register
 --      . column1: opal_kelly_addr : hexadecimal value (without 0x)
 --           . It selects the register
---      . column2 : data: hexadecimal value (without 0x) 
+--      . column2 : data: hexadecimal value (without 0x)
 --           . data to write. When the reg_id select writting opal kelly functions/procedures
 --           . data to compare. When the reg_id selects reading opal kelly functions/procedures
 --      . column3: comment to understand the file command list
---    USE: 
+--    USE:
 --       0. import this package in the vhdl testbench
 --       1. In the declarative part of the vhdl testbench architecture, declare:
 --          1. one signal of t_internal_wr_if type
@@ -52,17 +53,17 @@
 --             hi_busy   => '0',
 --             hi_datain => (others => '0')
 --           );
---          . shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf; 
+--          . shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
 --      2. In the vhdl testbench architecture body:
 --          1. Instanciate the okHost_driver procedure outside a process
 --          2. Instanciate the pkg_usb_wr procedure outside a process
 --
---   Note: 
+--   Note:
 --    . this procedure output read data on its output port
 --    . 1 virtual function (Nop) was added to add latency between commands when reg_id = -1
 --    . read data are compared against file data with a vunit checker_t object
 --
---    Dependencies: 
+--    Dependencies:
 --      . csv_lib.pkg_csv_file
 --      . common_lib.pkg_common
 --      . context vunit_lib.vunit_context
@@ -253,7 +254,7 @@ package body pkg_usb is
 
   begin
 
-    while c_TEST = true loop  
+    while c_TEST = true loop
       v_valid_out := '0';
       case v_fsm_state is
 
@@ -276,7 +277,7 @@ package body pkg_usb is
             -- skip the header
             v_csv_file.readline(void);
 
-            if v_csv_file.end_of_file(void) = true then  
+            if v_csv_file.end_of_file(void) = true then
               v_wr_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
@@ -732,7 +733,7 @@ package body pkg_usb is
             if v_error(0) = '1' then
               info("[pkg_usb_wr]: error: v_file_reg_id(" & to_string(v_file_reg_id) & ") is out of range");
             end if;
-            if v_csv_file.end_of_file(void) = true then  
+            if v_csv_file.end_of_file(void) = true then
               v_wr_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
@@ -805,7 +806,7 @@ package body pkg_usb is
           v_wr_finish := '1';
           v_fsm_state := E_END;
 
-        when others =>  
+        when others =>
           v_fsm_state := E_RST;
 
       end case;

@@ -17,17 +17,17 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   pkg_log.vhd 
+--    @file                   pkg_log.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details  
+--    @details
 --    This simulation VHDL package defines VHDL functions/procedures in order to
---      . save data in an output csv file.              
+--      . save data in an output csv file.
 --
 --    Note: This package should be compiled into the common_lib
---    Dependencies: 
+--    Dependencies:
 --      . csv_lib.pkg_csv_file
 --
 -- -------------------------------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ package body pkg_log is
     return i_NAME & "_" & i_DATA_TYP & "";
   end function;
 
-  
+
   ---------------------------------------------------------------------
   -- pkg_log_data_in_file_2
   ---------------------------------------------------------------------
@@ -236,7 +236,7 @@ package body pkg_log is
         when E_END =>
           v_fsm_state := E_END;
 
-        when others =>                  
+        when others =>
           v_fsm_state := E_RST;
       end case;
 
@@ -245,7 +245,7 @@ package body pkg_log is
 
   end procedure pkg_log_data_in_file_2;
 
-  
+
 
   ---------------------------------------------------------------------
   -- pkg_log_data_in_file_7
@@ -362,7 +362,7 @@ package body pkg_log is
         when E_END =>
           v_fsm_state := E_END;
 
-        when others =>                  
+        when others =>
           v_fsm_state := E_RST;
       end case;
 
@@ -371,6 +371,6 @@ package body pkg_log is
 
   end procedure pkg_log_data_in_file_7;
 
- 
+
 
 end package body pkg_log;

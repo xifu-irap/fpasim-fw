@@ -17,14 +17,14 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   pkg_common.vhd 
+--    @file                   pkg_common.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
 --    This VHDL package defines commonly used simulaton VHDL functions/procedures.
---    
+--
 --    Dependencies:
 --      . csv_lib.pkg_csv_file
 --
@@ -80,7 +80,7 @@ package pkg_common is
 
   ---------------------------------------------------------------------
   -- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
-  -- Note: 
+  -- Note:
   --   . The last counter bit is used to detect an overflow.
   ---------------------------------------------------------------------
   procedure pkg_data_valid_counter(
@@ -96,7 +96,7 @@ package pkg_common is
   ---------------------------------------------------------------------
   -- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
   -- if the i_load is set to '1', then i_load_data is load in the counter
-  -- Note: 
+  -- Note:
   --   . The last counter bit is used to detect an overflow.
   ---------------------------------------------------------------------
   procedure pkg_data_valid_counter_with_load(
@@ -215,7 +215,7 @@ package body pkg_common is
 
   ---------------------------------------------------------------------
   -- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
-  -- Note: 
+  -- Note:
   --   . The last counter bit is used to detect an overflow.
   ---------------------------------------------------------------------
   procedure pkg_data_valid_counter(
@@ -261,7 +261,7 @@ package body pkg_common is
           if i_data_valid = '1' then
             v_cnt := v_cnt + 1;
           end if;
-          -- 
+          --
           v_MSB_bit      := v_cnt(v_cnt'high);
           if v_MSB_bit /= v_MSB_bit_last then
             v_overflow := '1';
@@ -270,7 +270,7 @@ package body pkg_common is
 
           v_fsm_state := E_RUN;
 
-        when others =>                  
+        when others =>
           v_fsm_state := E_RST;
       end case;
       o_overflow <= v_overflow;
@@ -283,7 +283,7 @@ package body pkg_common is
   ---------------------------------------------------------------------
   -- This procedure counts the i_data_valid signal duration (expressed in clock cycles)
   -- if the i_load is set to '1', then i_load_data is load in the counter
-  -- Note: 
+  -- Note:
   --   . The last counter bit is used to detect an overflow.
   ---------------------------------------------------------------------
   procedure pkg_data_valid_counter_with_load(
@@ -335,7 +335,7 @@ package body pkg_common is
               v_cnt := v_cnt + 1;
             end if;
           end if;
-          -- 
+          --
           v_MSB_bit      := v_cnt(v_cnt'high);
           if v_MSB_bit /= v_MSB_bit_last then
             v_overflow := '1';
@@ -344,7 +344,7 @@ package body pkg_common is
 
           v_fsm_state := E_RUN;
 
-        when others =>                  
+        when others =>
           v_fsm_state := E_RST;
       end case;
       o_overflow <= v_overflow;
@@ -404,14 +404,14 @@ package body pkg_common is
             v_csv_file.readline(void);
 
             v_finish := '0';
-            if v_csv_file.end_of_file(void) = true then 
+            if v_csv_file.end_of_file(void) = true then
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
             else
               -- read the first data
               v_csv_file.readline(void);
               v_cnt_max := v_csv_file.read_integer(void);
-              if v_csv_file.end_of_file(void) = true then 
+              if v_csv_file.end_of_file(void) = true then
                 -- check if only one value in the file => stop all further reading with the v_first flag
                 v_csv_file.dispose(void);
                 v_first := 0;
@@ -447,7 +447,7 @@ package body pkg_common is
                 -- file is not empty, read a new value
                 v_csv_file.readline(void);
                 v_cnt_max := v_csv_file.read_integer(void);
-                if v_csv_file.end_of_file(void) = true then 
+                if v_csv_file.end_of_file(void) = true then
                   --- stop all further reading because the file is finished
                   v_csv_file.dispose(void);
                   v_first := 0;
@@ -470,7 +470,7 @@ package body pkg_common is
           v_finish    := '1';
           v_fsm_state := E_END;
 
-        when others =>                  
+        when others =>
           v_fsm_state := E_RST;
       end case;
 
@@ -569,7 +569,7 @@ package body pkg_common is
           v_finish    := '1';
           v_fsm_state := E_END;
 
-        when others =>                  
+        when others =>
           v_fsm_state := E_RST;
       end case;
 

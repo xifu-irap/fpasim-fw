@@ -17,34 +17,36 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   pkg_csv_file.vhd 
+--    @file                   pkg_csv_file.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details                
+--    @details
+--
 --    This package uses the same principle as https://github.com/ricardo-jasinski/vhdl-csv-file-reader/blob/master/hdl/package/csv_file_reader_pkg.vhd
 --    But, new functionnalities was added
 --
--- How to use this package:
---    1. Create a csv_file_reader object:               
---         variable v_csv: t_csv_file_reader;
---    2. Open a csv file and define the csv separator:  
---         v_csv.initialize("c:\file.csv",';');
---    3. Read one line at a time:                       
---         csv.readline();
---    4. Read the first column (integer value)          
---         v_my_integer := csv.read_integer();
---    5. To read more column values in the same line, call any of the read_* functions
---    6. To move to the next line, call csv.readline() again
+--    How to use this package:
+--       1. Create a csv_file_reader object:
+--            variable v_csv: t_csv_file_reader;
+--       2. Open a csv file and define the csv separator:
+--            v_csv.initialize("c:\file.csv",';');
+--       3. Read one line at a time:
+--            csv.readline();
+--       4. Read the first column (integer value)
+--            v_my_integer := csv.read_integer();
+--       5. To read more column values in the same line, call any of the read_* functions
+--       6. To move to the next line, call csv.readline() again
 --
--- Note: this package could be compiled in the csv_lib
--- LIMITATION:
---   . the vhdl code its integer value on 32 bits. So, 2 limitations are present:
---      . write, in an output csv file, a std_logic_vector (with a width > 32 bits) as an integer value is not possible.
---        But, the binary representation can be.
---      . an integer value of 64 bits (>32 bits) from an input csv file can't be read by this library. But, the binary
---        representation can be.
+--     Note: this package could be compiled in the csv_lib
+--     LIMITATION:
+--       . the vhdl code its integer value on 32 bits. So, 2 limitations are present:
+--          . write, in an output csv file, a std_logic_vector (with a width > 32 bits) as an integer value is not possible.
+--            But, the binary representation can be.
+--          . an integer value of 64 bits (>32 bits) from an input csv file can't be read by this library. But, the binary
+--            representation can be.
+--
 -- -------------------------------------------------------------------------------------------------------------
 
 library ieee;
@@ -133,7 +135,7 @@ package body pkg_csv_file is
     type t_csv_file_reader is protected body
         -- Maximum string length for read operations
         constant c_LINE_LENGTH_MAX : integer := 256;
-        
+
         -- file object
         file my_csv_file               : text;
 
@@ -146,7 +148,7 @@ package body pkg_csv_file is
         variable v_csv_sep : character;
 
         -- True when the end of the CSV file was reached
-        impure function end_of_file(i_dummy : in t_void := VOID) return boolean is 
+        impure function end_of_file(i_dummy : in t_void := VOID) return boolean is
         begin
             return v_end_of_file_reached;
         end;
@@ -161,20 +163,20 @@ package body pkg_csv_file is
         end;
 
         -- Release (close) the associated CSV file
-        procedure dispose(i_dummy : in t_void := VOID) is 
+        procedure dispose(i_dummy : in t_void := VOID) is
         begin
             file_close(my_csv_file);
         end;
 
         -- Read one line from the csv file, and keep it in the cache
-        procedure readline(i_dummy : in t_void := VOID) is 
+        procedure readline(i_dummy : in t_void := VOID) is
         begin
             readline(my_csv_file, v_current_line);
             v_end_of_file_reached := endfile(my_csv_file);
         end;
 
         -- Read a string from the csv file, until a separator character ',' is found
-        impure function read_string(i_dummy : in t_void := VOID) return string is 
+        impure function read_string(i_dummy : in t_void := VOID) return string is
             variable v_return_string : string(1 to c_LINE_LENGTH_MAX);
             variable v_read_char     : character;
             variable v_read_ok       : boolean := true;
@@ -197,13 +199,13 @@ package body pkg_csv_file is
 
         -- Skip a separator (comma character) in the current line
         procedure skip_separator is
-            variable v_dummy_string: string(1 to c_LINE_LENGTH_MAX); 
+            variable v_dummy_string: string(1 to c_LINE_LENGTH_MAX);
         begin
             v_dummy_string := read_string(VOID);
         end;
 
         -- Read a string from the csv file and convert it to integer
-        impure function read_integer(i_dummy : in t_void := VOID) return integer is 
+        impure function read_integer(i_dummy : in t_void := VOID) return integer is
             variable read_value : integer;
         begin
             read(v_current_line, read_value);
@@ -212,7 +214,7 @@ package body pkg_csv_file is
         end;
 
         -- Read a string from the csv file and convert it to real
-        impure function read_real(i_dummy : in t_void := VOID) return real is 
+        impure function read_real(i_dummy : in t_void := VOID) return real is
             variable read_value : real;
         begin
             read(v_current_line, read_value);
@@ -221,17 +223,17 @@ package body pkg_csv_file is
         end;
 
         -- Read a string from the csv file and convert it to boolean
-        impure function read_boolean(i_dummy : in t_void := VOID) return boolean is 
+        impure function read_boolean(i_dummy : in t_void := VOID) return boolean is
         begin
             return boolean'value(read_string(VOID));
         end;
 
-        impure function read_integer_as_boolean(i_dummy : in t_void := VOID) return boolean is 
+        impure function read_integer_as_boolean(i_dummy : in t_void := VOID) return boolean is
         begin
             return (read_integer(VOID) /= 0);
         end;
 
-        
+
 
         -- Read a string from the csv file, at the column index until a separator character ',' is found
         impure function read_string_by_index(i_column_index : in integer) return string is
@@ -261,7 +263,7 @@ package body pkg_csv_file is
         end;
 
         -- Read a string (ex: 0 or 1) from the csv file and convert it to std_logic
-        impure function read_integer_as_std(i_dummy : in t_void := VOID) return std_logic is 
+        impure function read_integer_as_std(i_dummy : in t_void := VOID) return std_logic is
             variable read_value : integer;
             variable val_v      : std_logic;
         begin
@@ -278,7 +280,7 @@ package body pkg_csv_file is
         begin
             read(v_current_line, read_value);
             skip_separator;
-            if i_unsigned_value = true then 
+            if i_unsigned_value = true then
                 val_v := std_logic_vector(to_unsigned(read_value, i_length));
             else
                 val_v := std_logic_vector(to_signed(read_value, i_length));
@@ -331,7 +333,7 @@ package body pkg_csv_file is
         end;
 
         -- Read a string (ex: 10010) from the csv file and convert it to std_logic_vector
-        impure function read_std(i_dummy : in t_void := VOID) return std_logic is 
+        impure function read_std(i_dummy : in t_void := VOID) return std_logic is
             variable val_v : std_ulogic;
         begin
             READ(v_current_line, val_v);
@@ -460,7 +462,7 @@ package body pkg_csv_file is
         end;
 
         -- write line into a csv file
-        procedure writeline(i_dummy : in t_void := VOID) is 
+        procedure writeline(i_dummy : in t_void := VOID) is
         begin
             writeline(my_csv_file, v_current_line);
         end;

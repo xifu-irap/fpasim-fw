@@ -17,19 +17,19 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   pkg_ram_check.vhd 
+--    @file                   pkg_ram_check.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details             
+--    @details
 --    This simulation VHDL package defines VHDL functions/procedures in order to
 --      . write and check True dual port RAM
 --        . A first input csv file is used to write the RAM-like content
 --        . A second input csv file is used to check the RAM-like content.
 --
 --    Note: This package should be compiled into the common_lib
---    Dependencies: 
+--    Dependencies:
 --      . csv_lib.pkg_csv_file
 --      . context vunit_lib.vunit_context
 --
@@ -186,7 +186,7 @@ package body pkg_ram_check is
             -- skip the header
             v_csv_file.readline(void);
 
-            if v_csv_file.end_of_file(void) = true then 
+            if v_csv_file.end_of_file(void) = true then
               v_wr_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_WAIT_RD;
@@ -206,7 +206,7 @@ package body pkg_ram_check is
             v_wr_rd_addr    := v_csv_file.read_data_typ_as_std_vec(i_length => v_wr_rd_addr'length, i_data_typ => i_WR_RD_ADDR_TYP);
             v_wr_data       := v_csv_file.read_data_typ_as_std_vec(i_length => v_wr_data'length, i_data_typ => i_WR_DATA_TYP);
 
-            if v_csv_file.end_of_file(void) = true then 
+            if v_csv_file.end_of_file(void) = true then
               v_wr_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_WAIT_RD;
@@ -231,7 +231,7 @@ package body pkg_ram_check is
             v_csv_file.readline(void);
 
             v_rd_data_valid := '0';
-            if v_csv_file.end_of_file(void) = true then 
+            if v_csv_file.end_of_file(void) = true then
               v_rd_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
@@ -268,7 +268,7 @@ package body pkg_ram_check is
             end if;
             check_equal(i_data_sb, v_rd_data, i_rd_data_vect, result(i_RD_NAME1 & ", index:" & to_string(v_cnt) & ", (file) : " & to_string(v_rd_data) & ", " & i_RD_NAME1 & " (VHDL) : " & to_string(i_rd_data_vect)));
             v_cnt := v_cnt + 1;
-            if v_csv_file.end_of_file(void) = true then 
+            if v_csv_file.end_of_file(void) = true then
               v_rd_finish := '1';
               v_csv_file.dispose(void);
               v_fsm_state := E_END;
@@ -288,7 +288,7 @@ package body pkg_ram_check is
           v_rd_finish     := '1';
           v_fsm_state     := E_END;
 
-        when others =>                  
+        when others =>
           v_fsm_state := E_RST;
 
       end case;

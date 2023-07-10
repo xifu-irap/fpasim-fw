@@ -17,7 +17,7 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   pkg_sequence.vhd 
+--    @file                   pkg_sequence.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
@@ -27,7 +27,7 @@
 --      . generate a sequence of pulse with a configurable duty cycle.
 --
 --    Note: This package should be compiled into the common_lib
---    Dependencies: 
+--    Dependencies:
 --      . csv_lib.pkg_csv_file
 --
 -- -------------------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ use work.pkg_common.all;
 package pkg_sequence is
 
   ---------------------------------------------------------------------
-  -- this function generates an output valid signal with a configurable duty cycle. 
+  -- this function generates an output valid signal with a configurable duty cycle.
   --   .the behaviour is provived by the input csv file
   --   .the file has the following parameters
   --       :param ctrl: define the mode. Possibles values are:
@@ -79,7 +79,7 @@ package pkg_sequence is
                                );
 
   ---------------------------------------------------------------------
-  -- this function generates an output valid signal with a configurable duty cycle. 
+  -- this function generates an output valid signal with a configurable duty cycle.
   --   .the parameters are:
   --       :param ctrl: define the mode: Possibles values are:
   --               .0: continuous valid generation
@@ -118,7 +118,7 @@ end package pkg_sequence;
 package body pkg_sequence is
 
   ---------------------------------------------------------------------
-  -- this function generates an output valid signal with a configurable duty cycle. 
+  -- this function generates an output valid signal with a configurable duty cycle.
   --   .the behaviour is provived by the input csv file
   --   .the file has the following parameters
   --       :param ctrl: define the mode: Possibles values are:
@@ -245,7 +245,7 @@ package body pkg_sequence is
               v_valid     := '1';
               v_tempo_pos := v_min_value1;
               v_tempo_neg := v_min_value2;
-              
+
               if v_min_value2 <= 1 then
               -- be sure the negative pulse has a width of 1 clock period
                 v_tempo_neg := 1;
@@ -262,12 +262,12 @@ package body pkg_sequence is
               end if;
 
             when 3 =>
-              -- random short pulse : 
+              -- random short pulse :
               --   a positive pulse with a width of 1 clock cycle followed by
               --   a negative pulse with a random width between the min_value2 value and the max_value2 value
               v_valid     := '1';
               pkg_random_by_range(v_min_value2, v_max_value2, v_seed1, v_seed2, v_tempo_neg);
-              
+
               if v_tempo_neg < 1 then
                 -- be sure the negative pulse has a minimal width of 1 clock period
                 v_tempo_neg := 1;
@@ -275,7 +275,7 @@ package body pkg_sequence is
               v_fsm_state := E_TEMPO_NEG;
 
             when 4 =>
-              -- random pulse : random pulse 
+              -- random pulse : random pulse
               --   a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
               --   a negative pulse with a width defined by a random value between v_min_value2 and v_max_value2
               v_valid     := '1';
@@ -323,7 +323,7 @@ package body pkg_sequence is
             v_fsm_state := E_TEMPO_POS;
           end if;
 
-        when others =>                  
+        when others =>
           v_fsm_state := E_RST;
       end case;
 
@@ -334,7 +334,7 @@ package body pkg_sequence is
   end procedure pkg_valid_sequencer;
 
   ---------------------------------------------------------------------
-  -- this function generates an output valid signal with a configurable duty cycle. 
+  -- this function generates an output valid signal with a configurable duty cycle.
   --   .the parameters are:
   --       :param ctrl: define the mode: Possibles values are:
   --               .0: continuous valid generation
@@ -387,7 +387,7 @@ package body pkg_sequence is
     variable v_valid     : std_logic := '0';
 
     variable v_cnt_tempo : integer := 1;
-    
+
     -- random generator seed
     variable v_seed1     :  positive := 16;
     variable v_seed2     :  positive := 32;
@@ -458,7 +458,7 @@ package body pkg_sequence is
               v_valid     := '1';
               v_tempo_pos := v_min_value1;
               v_tempo_neg := v_min_value2;
-              
+
               if v_min_value2 <= 1 then
               -- be sure the negative pulse has a width of 1 clock period
                 v_tempo_neg := 1;
@@ -475,12 +475,12 @@ package body pkg_sequence is
               end if;
 
             when 3 =>
-              -- random short pulse : 
+              -- random short pulse :
               --   a positive pulse with a width of 1 clock cycle followed by
               --   a negative pulse with a random width between the min_value2 value and the max_value2 value
               v_valid     := '1';
               pkg_random_by_range(v_min_value2, v_max_value2, v_seed1, v_seed2, v_tempo_neg);
-              
+
               if v_tempo_neg < 1 then
                -- be sure the negative pulse has a minimal width of 1 clock period
                 v_tempo_neg := 1;
@@ -488,7 +488,7 @@ package body pkg_sequence is
               v_fsm_state := E_TEMPO_NEG;
 
             when 4 =>
-              -- random pulse : random pulse 
+              -- random pulse : random pulse
               --   a positive pulse with a width defined by a random value between v_min_value1 and v_max_value1 followed by
               --   a negative pulse with a width defined by a random value between v_min_value2 and v_max_value2
               v_valid     := '1';
@@ -536,7 +536,7 @@ package body pkg_sequence is
             v_fsm_state := E_TEMPO_POS;
           end if;
 
-        when others =>                  
+        when others =>
           v_fsm_state := E_RST;
       end case;
 

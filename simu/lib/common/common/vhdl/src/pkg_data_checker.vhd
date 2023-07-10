@@ -17,17 +17,17 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   pkg_data_checker.vhd 
+--    @file                   pkg_data_checker.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---    @details  
+--    @details
 --    This simulation VHDL package defines VHDL functions/procedures in order to:
 --       . compare VHDL testbench data with data from an input csv file (by using Vunit checker_t object).
---              
+--
 --    Note: This package should be compiled into the common_lib
---    Dependencies: 
+--    Dependencies:
 --      . csv_lib.pkg_csv_file
 --      . context vunit_lib.vunit_context
 --
@@ -173,7 +173,7 @@ package body pkg_data_checker is
 
           v_fsm_state := E_RUN;
 
-        when others =>                  
+        when others =>
           v_fsm_state := E_RST;
       end case;
 
@@ -184,6 +184,6 @@ package body pkg_data_checker is
 
   end procedure pkg_vunit_data_checker_1;
 
-  
+
 
 end package body pkg_data_checker;

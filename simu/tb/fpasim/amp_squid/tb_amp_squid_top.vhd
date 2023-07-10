@@ -17,12 +17,12 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --   email                   kenji.delarosa@alten.com
---   @file                   tb_amp_squid_top.vhd 
+--   @file                   tb_amp_squid_top.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---   @details                
+--   @details
 --
 --   Testbench of the amp_squid_top module.
 --
@@ -52,9 +52,9 @@ entity tb_amp_squid_top is
     g_PIXEL_ID_WIDTH              : positive := pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH; -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
     -- frame
     g_FRAME_ID_WIDTH              : positive := pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH; -- frame id bus width (expressed in bits). Possible values: [1; max integer value[
-    -- address        
+    -- address
     g_AMP_SQUID_TF_RAM_ADDR_WIDTH : positive := pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
-    -- computation 
+    -- computation
     g_PIXEL_RESULT_INPUT_WIDTH    : positive := pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S; -- pixel input result bus width (expressed in bits). Possible values [1; max integer value[
     g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_AMP_SQUID_MULT_Q_WIDTH;
     ---------------------------------------------------------------------
@@ -64,7 +64,7 @@ entity tb_amp_squid_top is
     g_VUNIT_DEBUG                 : boolean  := true;-- true: stop simulator on failures, false: stop the simulator on errors.
     g_TEST_NAME                   : string   := ""; -- name of the test
     g_ENABLE_CHECK                : boolean  := true;-- true: compare the simulation output with the reference one, false: do nothing.
-    g_ENABLE_LOG                  : boolean  := true;-- true: save simulation data in files, false: don't save simulation data in files 
+    g_ENABLE_LOG                  : boolean  := true;-- true: save simulation data in files, false: don't save simulation data in files
     -- RAM1
     g_RAM1_NAME                   : string   := "mux_squid_offset";-- RAM1: simulation name
     g_RAM1_CHECK                  : boolean  := true;--RAM1: 1: check the memory contents, 0: don't check the memory content
@@ -145,7 +145,7 @@ architecture simulate of tb_amp_squid_top is
   signal data_gen_finish        : std_logic := '0';
   signal data_valid             : std_logic := '0';
   signal data_count_in          : std_logic_vector(31 downto 0);
-  signal data_count_overflow_in : std_logic; 
+  signal data_count_overflow_in : std_logic;
 
   -- ram tes pulse shape
   signal ram1_wr_start      : std_logic                    := '0';
@@ -188,10 +188,10 @@ architecture simulate of tb_amp_squid_top is
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
-  -- loggers 
-  constant c_LOGGER_SUMMARY     : logger_t  := get_logger("log:summary"); 
+  -- loggers
+  constant c_LOGGER_SUMMARY     : logger_t  := get_logger("log:summary");
   -- checkers
-  constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors"); 
+  constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors");
   constant c_CHECKER_DATA_COUNT : checker_t := new_checker("check:data_count");
   constant c_CHECKER_RAM1       : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME);
   constant c_CHECKER_DATA       : checker_t := new_checker("check:out:data_out");
@@ -236,7 +236,7 @@ begin
       show(get_logger("check:ram1"), display_handler, pass);
     end if;
     --show(get_logger("log:out:data_out"), display_handler, pass);
-    
+
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     info("Test bench: Generic parameter values");
@@ -322,7 +322,7 @@ begin
     ---------------------------------------------------------------------
     -- RAM Check: RAM1
     ---------------------------------------------------------------------
-    if g_RAM1_CHECK = true then 
+    if g_RAM1_CHECK = true then
       info("Start RAM reading: " & g_RAM1_NAME);
       ram1_rd_start <= '1';
       pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
@@ -534,9 +534,9 @@ begin
       g_PIXEL_ID_WIDTH              => g_PIXEL_ID_WIDTH, -- pixel id bus width (expressed in bits). Possible values [1; max integer value[
       -- frame
       g_FRAME_ID_WIDTH              => g_FRAME_ID_WIDTH, -- frame id bus width (expressed in bits). Possible values [1; max integer value[
-      -- address        
+      -- address
       g_AMP_SQUID_TF_RAM_ADDR_WIDTH => g_AMP_SQUID_TF_RAM_ADDR_WIDTH, -- address bus width (expressed in bits)
-      -- computation 
+      -- computation
       g_PIXEL_RESULT_INPUT_WIDTH    => g_PIXEL_RESULT_INPUT_WIDTH, -- pixel input result bus width (expressed in bits). Possible values [1; max integer value[
       g_PIXEL_RESULT_OUTPUT_WIDTH   => g_PIXEL_RESULT_OUTPUT_WIDTH -- pixel output bus width (expressed in bits). Possible values [1; max integer value[
     )
@@ -606,7 +606,7 @@ begin
   ---------------------------------------------------------------------
   -- log: data out
   ---------------------------------------------------------------------
-  gen_log : if g_ENABLE_LOG = true generate 
+  gen_log : if g_ENABLE_LOG = true generate
     signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
     signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
     signal frame_sof_vect_tmp : std_logic_vector(0 downto 0);
@@ -671,7 +671,7 @@ begin
    ---------------------------------------------------------------------
  -- check data
  ---------------------------------------------------------------------
-  gen_check_data : if g_ENABLE_CHECK = true generate 
+  gen_check_data : if g_ENABLE_CHECK = true generate
   begin
 
     inst_pkg_vunit_data_checker : pkg_vunit_data_checker_1(
