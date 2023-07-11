@@ -876,7 +876,6 @@ procedure ReadFromPipeOut(
   variable len       : integer;
   variable i         : integer;
   variable j         : integer;
-  variable k         : integer;
   variable blockSize : integer;
   variable tmp_slv8  : std_logic_vector(7 downto 0);
   variable tmp_slv32 : std_logic_vector(31 downto 0);
