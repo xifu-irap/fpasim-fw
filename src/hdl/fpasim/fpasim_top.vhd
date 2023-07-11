@@ -360,8 +360,8 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- dac_top
   ---------------------------------------------------------------------
-  signal dac_pattern0 : std_logic_vector(7 downto 0); 
-  signal dac_pattern1 : std_logic_vector(7 downto 0); 
+  signal dac_pattern0 : std_logic_vector(7 downto 0);
+  signal dac_pattern1 : std_logic_vector(7 downto 0);
   signal dac_pattern2 : std_logic_vector(7 downto 0);
   signal dac_pattern3 : std_logic_vector(7 downto 0);
   signal dac_pattern4 : std_logic_vector(7 downto 0);
