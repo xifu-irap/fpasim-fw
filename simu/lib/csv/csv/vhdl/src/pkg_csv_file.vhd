@@ -199,7 +199,8 @@ package body pkg_csv_file is
 
         -- Skip a separator (comma character) in the current line
         procedure skip_separator is
-            variable v_dummy_string: string(1 to c_LINE_LENGTH_MAX);
+            -- string associated to the separator character.
+            variable v_dummy_string: string(1 to c_LINE_LENGTH_MAX); 
         begin
             v_dummy_string := read_string(VOID);
         end;

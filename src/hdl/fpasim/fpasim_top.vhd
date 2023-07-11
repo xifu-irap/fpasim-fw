@@ -293,23 +293,23 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- tes_top
   ---------------------------------------------------------------------
-  signal pulse_sof1    : std_logic;
-  signal pulse_eof1    : std_logic;
-  signal pixel_sof1    : std_logic;
-  signal pixel_eof1    : std_logic;
-  signal pixel_valid1  : std_logic;
-  signal pixel_id1     : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
-  signal pixel_result1 : std_logic_vector(pkg_TES_MULT_SUB_Q_WIDTH_S - 1 downto 0);
-  signal frame_sof1    : std_logic;
-  signal frame_eof1    : std_logic;
-  signal frame_id1     : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);
+  signal pulse_sof1    : std_logic; -- first processed sample of a pulse
+  signal pulse_eof1    : std_logic; -- last processed sample of a pulse
+  signal pixel_sof1    : std_logic; -- first pixel sample
+  signal pixel_eof1    : std_logic; -- last pixel sample
+  signal pixel_valid1  : std_logic; -- valid pixel sample
+  signal pixel_id1     : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0); -- pixel id
+  signal pixel_result1 : std_logic_vector(pkg_TES_MULT_SUB_Q_WIDTH_S - 1 downto 0); -- pixel result
+  signal frame_sof1    : std_logic; -- first frame sample
+  signal frame_eof1    : std_logic;  -- last frame sample
+  signal frame_id1     : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0); --  frame id
 
   signal tes_pixel_neg_out_valid1    : std_logic;
   signal tes_pixel_neg_out_error1    : std_logic;
   signal tes_pixel_neg_out_pixel_id1 : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
 
-  signal tes_errors0 : std_logic_vector(15 downto 0);
-  signal tes_status0 : std_logic_vector(7 downto 0);
+  signal tes_errors0 : std_logic_vector(15 downto 0); -- errors from the tes_top module
+  signal tes_status0 : std_logic_vector(7 downto 0); -- status from the tes_top module
 
   -- signals synchronization with tes_top output
   ---------------------------------------------------------------------
@@ -328,16 +328,16 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- mux_squid_top
   ---------------------------------------------------------------------
-  signal pixel_sof2        : std_logic;
-  signal pixel_eof2        : std_logic;
-  signal pixel_valid2      : std_logic;
-  signal pixel_id2         : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
-  signal pixel_result2     : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S - 1 downto 0);
-  signal frame_sof2        : std_logic;
-  signal frame_eof2        : std_logic;
-  signal frame_id2         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);
-  signal mux_squid_errors0 : std_logic_vector(15 downto 0);
-  signal mux_squid_status0 : std_logic_vector(7 downto 0);
+  signal pixel_sof2        : std_logic;-- first pixel sample
+  signal pixel_eof2        : std_logic;-- last pixel sample
+  signal pixel_valid2      : std_logic;-- valid pixel sample
+  signal pixel_id2         : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0); -- pixel id
+  signal pixel_result2     : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S - 1 downto 0);-- pixel result
+  signal frame_sof2        : std_logic;-- first frame sample
+  signal frame_eof2        : std_logic;-- last frame sample
+  signal frame_id2         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);--  frame id
+  signal mux_squid_errors0 : std_logic_vector(15 downto 0); -- errors from the mux_squid_top module
+  signal mux_squid_status0 : std_logic_vector(7 downto 0); -- status from the mux_squid_top module
 
   -- signals synchronization with mux_squid_top
   ---------------------------------------------------------------------
@@ -346,22 +346,22 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- amp_squid_top
   ---------------------------------------------------------------------
-  signal pixel_sof3        : std_logic;
-  signal pixel_eof3        : std_logic;
-  signal pixel_valid3      : std_logic;
-  signal pixel_id3         : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
-  signal pixel_result3     : std_logic_vector(15 downto 0);
-  signal frame_sof3        : std_logic;
-  signal frame_eof3        : std_logic;
-  signal frame_id3         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);
-  signal amp_squid_errors0 : std_logic_vector(15 downto 0);
-  signal amp_squid_status0 : std_logic_vector(7 downto 0);
+  signal pixel_sof3        : std_logic;-- first pixel sample
+  signal pixel_eof3        : std_logic;-- last pixel sample
+  signal pixel_valid3      : std_logic;-- valid pixel sample
+  signal pixel_id3         : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);-- pixel id
+  signal pixel_result3     : std_logic_vector(15 downto 0);-- pixel result
+  signal frame_sof3        : std_logic;-- first frame sample
+  signal frame_eof3        : std_logic;-- last frame sample
+  signal frame_id3         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);--  frame id
+  signal amp_squid_errors0 : std_logic_vector(15 downto 0); -- errors from the amp_squidt_top module
+  signal amp_squid_status0 : std_logic_vector(7 downto 0); -- status from the amp_squidt_top module
 
   ---------------------------------------------------------------------
   -- dac_top
   ---------------------------------------------------------------------
-  signal dac_pattern0 : std_logic_vector(7 downto 0);
-  signal dac_pattern1 : std_logic_vector(7 downto 0);
+  signal dac_pattern0 : std_logic_vector(7 downto 0); 
+  signal dac_pattern1 : std_logic_vector(7 downto 0); 
   signal dac_pattern2 : std_logic_vector(7 downto 0);
   signal dac_pattern3 : std_logic_vector(7 downto 0);
   signal dac_pattern4 : std_logic_vector(7 downto 0);
@@ -369,20 +369,20 @@ architecture RTL of fpasim_top is
   signal dac_pattern6 : std_logic_vector(7 downto 0);
   signal dac_pattern7 : std_logic_vector(7 downto 0);
 
-  signal dac_valid4 : std_logic;
-  signal dac_frame4 : std_logic;
-  signal dac1_4     : std_logic_vector(o_dac1'range);
-  signal dac0_4     : std_logic_vector(o_dac0'range);
+  signal dac_valid4 : std_logic; -- dac valid
+  signal dac_frame4 : std_logic; -- dac frame
+  signal dac1_4     : std_logic_vector(o_dac1'range); -- dac1: data
+  signal dac0_4     : std_logic_vector(o_dac0'range); -- dac0: data
 
   ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
-  signal sync_valid5      : std_logic;
-  signal sync5            : std_logic;
+  signal sync_valid5      : std_logic; -- sync valid
+  signal sync5            : std_logic; -- sync value
   signal sync_errors0_tmp : std_logic_vector(15 downto 0);
 
-  signal sync_errors0 : std_logic_vector(15 downto 0);
-  signal sync_status0 : std_logic_vector(7 downto 0);
+  signal sync_errors0 : std_logic_vector(15 downto 0); -- errors from the sync_top module
+  signal sync_status0 : std_logic_vector(7 downto 0);  -- status from the sync_top module
 
   ---------------------------------------------------------------------
   -- recording

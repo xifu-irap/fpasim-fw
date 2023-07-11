@@ -88,18 +88,18 @@ architecture RTL of dac3283_top is
 ---------------------------------------------------------------------
 -- dac3283_io
 ---------------------------------------------------------------------
-  signal dac_clk   : std_logic;
-  signal dac_frame : std_logic;
-  signal dac       : std_logic_vector(15 downto 0);
+  signal dac_clk   : std_logic; -- input dac clock
+  signal dac_frame : std_logic; -- input dac frame
+  signal dac       : std_logic_vector(15 downto 0); -- input dac value
 
 ---------------------------------------------------------------------
 -- dac3283_demux
 ---------------------------------------------------------------------
-  signal dac0_valid : std_logic;
-  signal dac0       : std_logic_vector(15 downto 0);
+  signal dac0_valid : std_logic; -- dac0: data valid
+  signal dac0       : std_logic_vector(15 downto 0); -- dac0: data
 
-  signal dac1_valid : std_logic;
-  signal dac1       : std_logic_vector(15 downto 0);
+  signal dac1_valid : std_logic; -- dac1: data valid
+  signal dac1       : std_logic_vector(15 downto 0);-- dac1: data
 
 begin
 

@@ -142,45 +142,45 @@ architecture RTL of fpga_system_fpasim is
   signal dac7_n      : std_logic;
 
 -- common: shared link between the spi
-  signal spi_sclk  : std_logic;
-  signal spi_sdata : std_logic;
+  signal spi_sclk  : std_logic; -- spi clock
+  signal spi_sdata : std_logic; -- spi data
 
   -- CDCE: SPI
-  signal cdce_sdo  : std_logic := '0';
-  signal cdce_n_en : std_logic;
+  signal cdce_sdo  : std_logic := '0'; -- spi sdo (for the cdce device)
+  signal cdce_n_en : std_logic; -- spi chip select (for the cdce device)
 
   -- CDCE: specific signals
-  signal cdce_pll_status : std_logic := '0';
-  signal cdce_n_reset    : std_logic;
-  signal cdce_n_pd       : std_logic;
-  signal ref_en          : std_logic;
+  signal cdce_pll_status : std_logic := '0';-- pll_status : This pin is set high if the PLL is in lock.
+  signal cdce_n_reset    : std_logic;-- reset_n or hold_n
+  signal cdce_n_pd       : std_logic;-- power_down_n
+  signal ref_en          : std_logic;-- enable the primary reference clock
 
   -- ADC: SPI
-  signal adc_sdo   : std_logic := '0';
-  signal adc_n_en  : std_logic;
+  signal adc_sdo   : std_logic := '0';-- SPI MISO
+  signal adc_n_en  : std_logic;-- SPI chip select
   -- ADC: specific signals
-  signal adc_reset : std_logic;
+  signal adc_reset : std_logic; -- adc hardware reset
 
   -- DAC: SPI
-  signal dac_sdo        : std_logic := '0';
-  signal dac_n_en       : std_logic;
+  signal dac_sdo        : std_logic := '0';-- SPI MISO
+  signal dac_n_en       : std_logic;-- SPI chip select
   -- DAC: specific signal
-  signal dac_tx_present : std_logic;
+  signal dac_tx_present : std_logic;-- enable tx acquisition (pin of the dac device)
 
   -- AMC: SPI (monitoring)
-  signal mon_sdo     : std_logic := '0';
-  signal mon_n_en    : std_logic;
+  signal mon_sdo     : std_logic := '0';-- SPI data out
+  signal mon_n_en    : std_logic;-- SPI chip select
   -- AMC : specific signals
-  signal mon_n_int   : std_logic := '0';
-  signal mon_n_reset : std_logic;
+  signal mon_n_int   : std_logic := '0'; -- galr_n: Global analog input out-of-range alarm.
+  signal mon_n_reset : std_logic; -- reset_n: hardware reset
   -- leds
-  signal leds        : std_logic_vector(3 downto 2);
+  signal leds        : std_logic_vector(3 downto 2); -- leds
 
   ---------------------------------------------------------------------
   -- dac3283_top
   ---------------------------------------------------------------------
-  signal dac_real_valid : std_logic;
-  signal dac_real       : real;
+  signal dac_real_valid : std_logic; -- dac data valid (real value)
+  signal dac_real       : real; -- dac data (real value)
 
 begin
 
