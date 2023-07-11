@@ -82,74 +82,81 @@ end entity spi_master;
 
 architecture RTL of spi_master is
 
+  -- counter width (expressed in bits)
   constant c_CNT_BIT_WIDTH : integer := integer(ceil(log2(real(i_tx_data'length))));
+  -- max counter value
   constant c_CNT_MAX_VALUE : integer := i_tx_data'length - 1;  -- -1 start from 0,
 
 ---------------------------------------------------------------------
 -- clock generator
 ---------------------------------------------------------------------
+  -- spi clock
   signal sclk_tmp              : std_logic;
+  -- pulse when the spi data needs to be shifted
   signal pulse_data_shift_tmp  : std_logic;
+  -- pulse when the spi data needs to be sampled
   signal pulse_data_sample_tmp : std_logic;
 
 ---------------------------------------------------------------------
 -- write state machine
 ---------------------------------------------------------------------
   type t_wr_state is (E_RST, E_WAIT, E_SET_CS0, E_SET_CS1, E_SHIFT_DATA, E_UNSET_CS);
-  signal sm_wr_state_next : t_wr_state;
-  signal sm_wr_state_r1   : t_wr_state := E_RST;
+  signal sm_wr_state_next : t_wr_state; -- state
+  signal sm_wr_state_r1   : t_wr_state := E_RST; -- state (registered)
 
-  signal tx_sclk_next : std_logic;
-  signal tx_sclk_r1   : std_logic := g_CPOL;
+  signal tx_sclk_next : std_logic; -- tx spi clock
+  signal tx_sclk_r1   : std_logic := g_CPOL; -- tx spi clock (registered)
 
-  signal tx_cs_n_next : std_logic;
-  signal tx_cs_n_r1   : std_logic := '1';
+  signal tx_cs_n_next : std_logic; -- tx spi chip select
+  signal tx_cs_n_r1   : std_logic := '1'; -- tx spi chip select (registered)
 
-  signal tx_data_valid_next : std_logic;
-  signal tx_data_valid_r1   : std_logic := '0';
+  signal tx_data_valid_next : std_logic; -- tx data_valid
+  signal tx_data_valid_r1   : std_logic := '0'; -- tx data_valid (registered)
 
-  signal tx_data_next : std_logic_vector(i_tx_data'range);
-  signal tx_data_r1   : std_logic_vector(i_tx_data'range) := (others => '0');
+  signal tx_data_next : std_logic_vector(i_tx_data'range); -- tx data
+  signal tx_data_r1   : std_logic_vector(i_tx_data'range) := (others => '0'); -- tx data (registered)
 
-  signal ready_next : std_logic;
-  signal ready_r1   : std_logic := '0';
+  signal ready_next : std_logic; -- ready
+  signal ready_r1   : std_logic := '0'; -- ready (registered)
 
-  signal finish_next : std_logic;
-  signal finish_r1   : std_logic := '0';
+  signal finish_next : std_logic; -- pulse finish
+  signal finish_r1   : std_logic := '0'; -- pulse finish (registered)
 
-  signal tx_cnt_bit_next : unsigned(c_CNT_BIT_WIDTH - 1 downto 0);
-  signal tx_cnt_bit_r1   : unsigned(c_CNT_BIT_WIDTH - 1 downto 0);
+  signal tx_cnt_bit_next : unsigned(c_CNT_BIT_WIDTH - 1 downto 0); -- data bit counter
+  signal tx_cnt_bit_r1   : unsigned(c_CNT_BIT_WIDTH - 1 downto 0); -- data bit counter (registered)
 
-  signal rx_data_valid_next : std_logic;
-  signal rx_data_valid_r1   : std_logic := '0';
+  signal rx_data_valid_next : std_logic; -- read data_valid
+  signal rx_data_valid_r1   : std_logic := '0'; -- read data_valid (registered)
 
+  -- spi mode: read enable
   signal rx_rd_en_next : std_logic;
+  -- spi mode: read enable (registered)
   signal rx_rd_en_r1   : std_logic := '0';
 
+  -- spi mode
   signal rd_en_next       : std_logic;
+  -- spi mode (registred)
   signal rd_en_r1         : std_logic := '0';
 ---------------------------------------------------------------------
 -- optional: tx pipeline
 ---------------------------------------------------------------------
-  signal rx_rd_en_rx      : std_logic;
-  signal rx_data_valid_rx : std_logic;
-  signal tx_finish_rx     : std_logic;
-  signal tx_sclk_rx       : std_logic;
-  signal tx_cs_n_rx       : std_logic;
-  signal tx_data_rx       : std_logic := '0';
+  signal rx_rd_en_rx      : std_logic; -- delayed: spi mode: read enable
+  signal rx_data_valid_rx : std_logic; -- delayed: read data valid
+  signal tx_finish_rx     : std_logic; -- delayed: tx finish
+  signal tx_sclk_rx       : std_logic; -- delayed: tx spi clock
+  signal tx_cs_n_rx       : std_logic; -- delayed: tx spi chip select
+  signal tx_data_rx       : std_logic := '0'; -- delayed: tx data
 
 ---------------------------------------------------------------------
 -- optional: rx pipeline
 ---------------------------------------------------------------------
-  --signal rx_data_tmp0 : std_logic_vector(1 downto 0);
-  --signal rx_data_tmp1 : std_logic_vector(1 downto 0);
-  signal rx_finish_ry     : std_logic;
-  signal rx_data_valid_ry : std_logic;
-  signal rx_rd_en_ry      : std_logic;
+  signal rx_finish_ry     : std_logic; -- delayed: rx finish (from tx version)
+  signal rx_data_valid_ry : std_logic; -- delayed: rx data_valid (from tx version)
+  signal rx_rd_en_ry      : std_logic; -- delayed: rx read enable (from tx version)
 
-  signal rx_finish_all_rz : std_logic                         := '0';
-  signal rx_data_valid_rz : std_logic                         := '0';
-  signal rx_data_rz       : std_logic_vector(o_rx_data'range) := (others => '0');
+  signal rx_finish_all_rz : std_logic                         := '0'; -- rx finish
+  signal rx_data_valid_rz : std_logic                         := '0'; -- rx read data_valid
+  signal rx_data_rz       : std_logic_vector(o_rx_data'range) := (others => '0'); -- rx read data
 
 begin
 

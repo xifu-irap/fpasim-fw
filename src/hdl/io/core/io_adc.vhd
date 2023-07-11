@@ -80,87 +80,128 @@ end entity io_adc;
 
 architecture RTL of io_adc is
 
+  -- Add an additional input latency (expressed in clock periods)
   constant c_INPUT_LATENCY     : natural := pkg_IO_ADC_IN_LATENCY;
+  -- FIFO: latency of the CDC mechanism (expressed in clock periods)
   constant c_FIFO_CDC_LATENCY  : natural := pkg_IO_ADC_FIFO_CDC_STAGE;
+  -- FIFO: read latency (expressed in clock periods)
   constant c_FIFO_READ_LATENCY : natural := pkg_IO_ADC_FIFO_READ_LATENCY;
+  -- FIFO: data width (write side: expressed in bits)
   constant c_ADC_A_WIDTH       : natural := 56;
+  -- FIFO: data width (write side: expressed in bits)
   constant c_ADC_B_WIDTH       : natural := 56;
   ---------------------------------------------------------------------
   -- ouput FIFO
   ---------------------------------------------------------------------
+  -- FIFO depth (expressed in number of words)
   constant c_WR_FIFO_DEPTH     : integer := 1024;
   -- adc_a
-  constant c_ADC_A_WR_IDX0_L   : integer := 0;
-  constant c_ADC_A_WR_IDX0_H   : integer := c_ADC_A_WR_IDX0_L + c_ADC_A_WIDTH - 1;
+  constant c_ADC_A_WR_IDX0_L   : integer := 0; -- index0: low
+  constant c_ADC_A_WR_IDX0_H   : integer := c_ADC_A_WR_IDX0_L + c_ADC_A_WIDTH - 1; -- index0: high
 
-  constant c_ADC_A_RD_IDX0_L : integer := 0;
-  constant c_ADC_A_RD_IDX0_H : integer := c_ADC_A_RD_IDX0_L + o_adc_a'length - 1;
+  constant c_ADC_A_RD_IDX0_L : integer := 0; -- index1: low
+  constant c_ADC_A_RD_IDX0_H : integer := c_ADC_A_RD_IDX0_L + o_adc_a'length - 1; -- index1: high
 
+  -- FIFO data width (write side: expressed in bits)
   constant c_ADC_A_WR_FIFO_WIDTH : integer := c_ADC_A_WR_IDX0_H + 1;
+  -- FIFO data width (read side: expressed in bits)
   constant c_ADC_A_RD_FIFO_WIDTH : integer := c_ADC_A_RD_IDX0_H + 1;
 
   -- adc_a
-  constant c_ADC_B_WR_IDX0_L : integer := 0;
-  constant c_ADC_B_WR_IDX0_H : integer := c_ADC_B_WR_IDX0_L + c_ADC_B_WIDTH - 1;
+  constant c_ADC_B_WR_IDX0_L : integer := 0; -- index0: low
+  constant c_ADC_B_WR_IDX0_H : integer := c_ADC_B_WR_IDX0_L + c_ADC_B_WIDTH - 1; -- index0: high
 
-  constant c_ADC_B_RD_IDX0_L : integer := 0;
-  constant c_ADC_B_RD_IDX0_H : integer := c_ADC_B_RD_IDX0_L + o_adc_b'length - 1;
+  constant c_ADC_B_RD_IDX0_L : integer := 0; -- index1: low
+  constant c_ADC_B_RD_IDX0_H : integer := c_ADC_B_RD_IDX0_L + o_adc_b'length - 1; -- index1: high
 
+  -- FIFO width (write side: expressed in bits)
   constant c_ADC_B_WR_FIFO_WIDTH : integer := c_ADC_B_WR_IDX0_H + 1;
+  -- FIFO width (read side: expressed in bits)
   constant c_ADC_B_RD_FIFO_WIDTH : integer := c_ADC_B_RD_IDX0_H + 1;
   ---------------------------------------------------------------------
   -- io_adc_single
   ---------------------------------------------------------------------
+  -- channel a: adc value
   signal adc_a                   : std_logic_vector(c_ADC_A_WR_IDX0_H downto 0);
+  -- channel b: adc value
   signal adc_b                   : std_logic_vector(c_ADC_B_WR_IDX0_H downto 0);
+  -- adc clock
   signal adc_clk_div             : std_logic;
 
   ---------------------------------------------------------------------
   -- FIFO
   ---------------------------------------------------------------------
   -- adc_a
+  -- fifo: write side
+  -- fifo: rst
   signal adc_a_wr_rst_tmp0  : std_logic;
+  -- fifo: write
   signal adc_a_wr_tmp0      : std_logic;
+  -- fifo: data_in
   signal adc_a_data_tmp0    : std_logic_vector(c_ADC_A_WR_FIFO_WIDTH - 1 downto 0);
+  -- fifo: full flag
   --signal adc_a_full0        : std_logic;
+  -- fifo: rst_busy flag
   signal adc_a_wr_rst_busy0 : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal adc_a_rd1          : std_logic;
+  -- fifo: data_in
   signal adc_a_data_tmp1    : std_logic_vector(c_ADC_A_RD_FIFO_WIDTH - 1 downto 0);
+  -- fifo: empty flag
   signal adc_a_empty1       : std_logic;
+  -- fifo: rst_busy flag
   signal adc_a_rd_rst_busy1 : std_logic;
-
+  -- fifo: data_valid flag
   signal adc_a_data_valid_tmp1 : std_logic;
 
+  -- resynchronized errors
   signal adc_a_errors_sync1 : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal adc_a_empty_sync1  : std_logic;
 
   -- adc_b
+  -- fifo: write side
+  -- fifo: rst
   signal adc_b_wr_rst_tmp0  : std_logic;
+  -- fifo: write
   signal adc_b_wr_tmp0      : std_logic;
+  -- fifo: data_in
   signal adc_b_data_tmp0    : std_logic_vector(c_ADC_B_WR_FIFO_WIDTH - 1 downto 0);
+  -- fifo: full flag
   --signal adc_b_full0        : std_logic;
+  -- fifo: rst_busy flag
   signal adc_b_wr_rst_busy0 : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal adc_b_rd1          : std_logic;
+  -- fifo: data_in
   signal adc_b_data_tmp1    : std_logic_vector(c_ADC_B_RD_FIFO_WIDTH - 1 downto 0);
+  -- fifo: empty flag
   signal adc_b_empty1       : std_logic;
+  -- fifo: rst_busy flag
   signal adc_b_rd_rst_busy1 : std_logic;
-
+  -- fifo: data_valid flag
   signal adc_b_data_valid_tmp1 : std_logic;
 
+  -- resynchronized errors
   signal adc_b_errors_sync1 : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal adc_b_empty_sync1  : std_logic;
 
+  -- channel B: temporary data
   signal adc_b_tmp1 : std_logic_vector(o_adc_b'range);
+  -- channel A: temporary data
   signal adc_a_tmp1 : std_logic_vector(o_adc_a'range);
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 6;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 6; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
 

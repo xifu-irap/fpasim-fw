@@ -58,15 +58,15 @@ entity tes_pulse_shape_manager is
     g_CMD_TIME_SHIFT_WIDTH                 : positive := pkg_MAKE_PULSE_TIME_SHIFT_WIDTH;  -- time_shift bus width (expressed in bits). Possible values [1;max integer value[
     g_CMD_PIXEL_ID_WIDTH                   : positive := pkg_MAKE_PULSE_PIXEL_ID_WIDTH;  -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[
     -- frame
-    g_NB_FRAME_BY_PULSE_SHAPE              : positive := pkg_NB_FRAME_BY_PULSE_SHAPE;
+    g_NB_FRAME_BY_PULSE_SHAPE              : positive := pkg_NB_FRAME_BY_PULSE_SHAPE; -- number of frames by pulse_shape
     g_NB_SAMPLE_BY_FRAME_WIDTH             : positive := pkg_NB_SAMPLE_BY_FRAME_WIDTH;  -- frame bus width (expressed in bits). Possible values : [1; max integer value[
     -- addr
     g_PULSE_SHAPE_RAM_ADDR_WIDTH           : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- output
     g_PIXEL_RESULT_OUTPUT_WIDTH            : positive := pkg_TES_MULT_SUB_Q_WIDTH_S;  -- pixel output result width (expressed in bits). Possible values : [1; max integer value[
     -- RAM configuration filename
-    g_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE : string   := pkg_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE;
-    g_TES_STD_STATE_RAM_MEMORY_INIT_FILE   : string   := pkg_TES_STD_STATE_RAM_MEMORY_INIT_FILE
+    g_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE : string   := pkg_TES_PULSE_SHAPE_RAM_MEMORY_INIT_FILE; -- file to use in order to initialize the tes_pulse_shape RAM
+    g_TES_STD_STATE_RAM_MEMORY_INIT_FILE   : string   := pkg_TES_STD_STATE_RAM_MEMORY_INIT_FILE -- file to use in order to initialize the tes_std_state RAM
 
     );
   port(
@@ -138,283 +138,354 @@ entity tes_pulse_shape_manager is
 end entity tes_pulse_shape_manager;
 
 architecture RTL of tes_pulse_shape_manager is
+
+  -- number of frames by pulse_shape
   constant c_NB_FRAME_BY_PULSE_SHAPE : positive := g_NB_FRAME_BY_PULSE_SHAPE;
 
+  -- max step value applied on the pulse_shape memory address
   constant c_SHIFT_MAX : positive := 2 ** (i_cmd_time_shift'length);
 
-  constant c_MEMORY_SIZE_PULSE_SHAPE                  : positive := (2 ** i_pulse_shape_wr_rd_addr'length) * i_pulse_shape_wr_data'length;  -- memory size in bits
-  constant c_MEMORY_SIZE_STEADY_STATE                 : positive := (2 ** i_steady_state_wr_rd_addr'length) * i_steady_state_wr_data'length;  -- memory size in bits
-  constant c_MEMORY_SIZE_EN_TABLE                     : positive := (2 ** i_pixel_id'length) * 1;  -- memory size in bits
-  constant c_MEMORY_SIZE_PULSE_HEIGTH_TABLE           : positive := (2 ** i_pixel_id'length) * (i_cmd_pulse_height'length);  -- memory size in bits
-  constant c_MEMORY_SIZE_TIME_SHIFT_TABLE             : positive := (2 ** i_pixel_id'length) * (i_cmd_time_shift'length);  -- memory size in bits
-  constant c_MEMORY_SIZE_CNT_SAMPLE_PULSE_SHAPE_TABLE : positive := (2 ** i_pixel_id'length) * (g_NB_SAMPLE_BY_FRAME_WIDTH);  -- memory size in bits
+  -- Memory size (expressed in bits)
+  constant c_MEMORY_SIZE_PULSE_SHAPE                  : positive := (2 ** i_pulse_shape_wr_rd_addr'length) * i_pulse_shape_wr_data'length;
+  -- Memory size (expressed in bits)
+  constant c_MEMORY_SIZE_STEADY_STATE                 : positive := (2 ** i_steady_state_wr_rd_addr'length) * i_steady_state_wr_data'length;
+  -- Memory size (expressed in bits)
+  constant c_MEMORY_SIZE_EN_TABLE                     : positive := (2 ** i_pixel_id'length) * 1;
+  -- Memory size (expressed in bits)
+  constant c_MEMORY_SIZE_PULSE_HEIGTH_TABLE           : positive := (2 ** i_pixel_id'length) * (i_cmd_pulse_height'length);
+  -- Memory size (expressed in bits)
+  constant c_MEMORY_SIZE_TIME_SHIFT_TABLE             : positive := (2 ** i_pixel_id'length) * (i_cmd_time_shift'length);
+  -- Memory size (expressed in bits)
+  constant c_MEMORY_SIZE_CNT_SAMPLE_PULSE_SHAPE_TABLE : positive := (2 ** i_pixel_id'length) * (g_NB_SAMPLE_BY_FRAME_WIDTH);
 
   -- add 1 bit to the i_cmd_time_shift length to be able to represent the c_SHIFT_MAX value
   constant c_SHIFT_MAX_VECTOR : std_logic_vector(i_cmd_time_shift'length downto 0) := std_logic_vector(to_unsigned(c_SHIFT_MAX, i_cmd_time_shift'length + 1));
 
+  -- maximal number of words in the tables
   constant c_CNT_MAX : unsigned(i_pixel_id'range) := (others => '1');
 
   ---------------------------------------------------------------------
   -- FIFO cmd
   ---------------------------------------------------------------------
-  constant c_CMD_IDX0_L : integer := 0;
-  constant c_CMD_IDX0_H : integer := c_CMD_IDX0_L + i_cmd_time_shift'length - 1;
+  constant c_CMD_IDX0_L : integer := 0; -- index0: low
+  constant c_CMD_IDX0_H : integer := c_CMD_IDX0_L + i_cmd_time_shift'length - 1; -- index0: high
 
-  constant c_CMD_IDX1_L : integer := c_CMD_IDX0_H + 1;
-  constant c_CMD_IDX1_H : integer := c_CMD_IDX1_L + i_cmd_pixel_id'length - 1;
+  constant c_CMD_IDX1_L : integer := c_CMD_IDX0_H + 1; -- index1: low
+  constant c_CMD_IDX1_H : integer := c_CMD_IDX1_L + i_cmd_pixel_id'length - 1; -- index1: high
 
-  constant c_CMD_IDX2_L : integer := c_CMD_IDX1_H + 1;
-  constant c_CMD_IDX2_H : integer := c_CMD_IDX2_L + i_cmd_pulse_height'length - 1;
+  constant c_CMD_IDX2_L : integer := c_CMD_IDX1_H + 1; -- index2: low
+  constant c_CMD_IDX2_H : integer := c_CMD_IDX2_L + i_cmd_pulse_height'length - 1; -- index2: high
 
-  -- find the power of 2 superior to the g_DELAY
-  constant c_FIFO_DEPTH0    : integer := 16;                 --see IP
-  constant c_FIFO_PROG_FULL : integer := c_FIFO_DEPTH0 - 5;  --see IP
-  constant c_FIFO_WIDTH0    : integer := c_CMD_IDX2_H + 1;   --see IP
+  -- FIFO depth (expressed in number of words)
+  constant c_FIFO_DEPTH0    : integer := 16;
+  -- FIFO prog_full threshold (expressed in words)
+  constant c_FIFO_PROG_FULL : integer := c_FIFO_DEPTH0 - 5;
+  -- FIFO width (expressed in bits)
+  constant c_FIFO_WIDTH0    : integer := c_CMD_IDX2_H + 1;
 
+  -- fifo: write side
+  -- fifo: write
   signal wr_tmp0    : std_logic;
+  -- fifo: data_in
   signal data_tmp0  : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: full flag
   -- signal full0        : std_logic;
+  -- fifo: prog_full flag
   signal prog_full0 : std_logic;
+  -- fifo: rst_busy flag
   -- signal wr_rst_busy0 : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal rd1       : std_logic;
+  -- fifo: data_out
   signal data_tmp1 : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: empty flag
   signal empty1    : std_logic;
+  -- fifo: rst_busy flag
   -- signal rd_rst_busy1 : std_logic;
 
+  -- extract pulse_height from the input command
   signal cmd_pulse_height1 : std_logic_vector(i_cmd_pulse_height'range);
+  -- extract pixel_id from the input command
   signal cmd_pixel_id1     : std_logic_vector(i_cmd_pixel_id'range);
+  -- extract time_shift from the input command
   signal cmd_time_shift1   : std_logic_vector(i_cmd_time_shift'range);
 
+  -- fifo: errors
   signal errors_sync : std_logic_vector(3 downto 0);
+  -- fifo: empty flag
   signal empty_sync  : std_logic;
 
+  -- fifo: ready
   signal cmd_ready_r1 : std_logic := '0';
 
   -------------------------------------------------------------------
   -- compute pipe indexes
   --   Note: shared by more than 1 pipeliner
   -------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_pixel_id'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + i_pixel_id'length - 1; -- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1; -- index1: high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1; -- index2: low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1; -- index2: high
 
-  constant c_IDX3_L : integer := c_IDX2_H + 1;
-  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;
+  constant c_IDX3_L : integer := c_IDX2_H + 1; -- index3: low
+  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1; -- index3: high
 
-  constant c_IDX4_L : integer := c_IDX3_H + 1;
-  constant c_IDX4_H : integer := c_IDX4_L + 1 - 1;
+  constant c_IDX4_L : integer := c_IDX3_H + 1; -- index4: low
+  constant c_IDX4_H : integer := c_IDX4_L + 1 - 1; -- index4: high
 
-  constant c_IDX5_L : integer := c_IDX4_H + 1;
-  constant c_IDX5_H : integer := c_IDX5_L + 1 - 1;
+  constant c_IDX5_L : integer := c_IDX4_H + 1; -- index5: low
+  constant c_IDX5_H : integer := c_IDX5_L + 1 - 1; -- index5: high
 
-  constant c_IDX6_L : integer := c_IDX5_H + 1;
-  constant c_IDX6_H : integer := c_IDX6_L + i_cmd_pulse_height'length - 1;
+  constant c_IDX6_L : integer := c_IDX5_H + 1; -- index6: low
+  constant c_IDX6_H : integer := c_IDX6_L + i_cmd_pulse_height'length - 1; -- index6: high
 
   ---------------------------------------------------------------------
   -- table
   ---------------------------------------------------------------------
   -- RAM: en_table
-  signal en_table_wea   : std_logic;
-  signal en_table_ena   : std_logic;
-  signal en_table_addra : std_logic_vector(i_pixel_id'range);
-  signal en_table_dina  : std_logic_vector(0 downto 0);
-  --signal en_table_regcea : std_logic;
-  --signal en_table_douta  : std_logic_vector(0 downto 0);
+  signal en_table_wea   : std_logic; -- port A: en
+  signal en_table_ena   : std_logic; -- port A: we
+  signal en_table_addra : std_logic_vector(i_pixel_id'range);  -- port A: address
+  signal en_table_dina  : std_logic_vector(0 downto 0); -- port A: data in
+  --signal en_table_regcea : std_logic;-- port A: regce
+  --signal en_table_douta  : std_logic_vector(0 downto 0); -- port A: data out
 
-  signal en_table_enb    : std_logic;
-  --signal en_table_web    : std_logic;
-  signal en_table_addrb  : std_logic_vector(i_pixel_id'range);
-  --signal en_table_dinb   : std_logic_vector(0 downto 0);
-  signal en_table_regceb : std_logic;
-  signal en_table_doutb  : std_logic_vector(0 downto 0);
+  signal en_table_enb    : std_logic; -- port B: en
+  --signal en_table_web    : std_logic; -- port B: we
+  signal en_table_addrb  : std_logic_vector(i_pixel_id'range); -- port B: address
+  --signal en_table_dinb   : std_logic_vector(0 downto 0); -- port B: data in
+  signal en_table_regceb : std_logic; -- port B: regce
+  signal en_table_doutb  : std_logic_vector(0 downto 0); -- port B: data out
 
+  -- temporary en value
   signal en_table_tmp : std_logic;
 
   -- RAM: pulse_heigth_table
-  signal pulse_heigth_table_wea   : std_logic;
-  signal pulse_heigth_table_ena   : std_logic;
-  signal pulse_heigth_table_addra : std_logic_vector(i_pixel_id'range);
-  signal pulse_heigth_table_dina  : std_logic_vector(i_cmd_pulse_height'range);
-  --signal pulse_heigth_table_regcea : std_logic;
-  --signal pulse_heigth_table_douta  : std_logic_vector(0 downto 0);
+  signal pulse_heigth_table_wea   : std_logic; -- port A: en
+  signal pulse_heigth_table_ena   : std_logic; -- port A: we
+  signal pulse_heigth_table_addra : std_logic_vector(i_pixel_id'range);  -- port A: address
+  signal pulse_heigth_table_dina  : std_logic_vector(i_cmd_pulse_height'range); -- port A: data in
+  --signal pulse_heigth_table_regcea : std_logic;-- port A: regce
+  --signal pulse_heigth_table_douta  : std_logic_vector(0 downto 0); -- port A: data out
 
-  signal pulse_heigth_table_enb    : std_logic;
-  --signal pulse_heigth_table_web    : std_logic;
-  signal pulse_heigth_table_addrb  : std_logic_vector(i_pixel_id'range);
-  --signal pulse_heigth_table_dinb   : std_logic_vector(0 downto 0);
-  signal pulse_heigth_table_regceb : std_logic;
-  signal pulse_heigth_table_doutb  : std_logic_vector(i_cmd_pulse_height'range);
+  signal pulse_heigth_table_enb    : std_logic; -- port B: en
+  --signal pulse_heigth_table_web    : std_logic; -- port B: we
+  signal pulse_heigth_table_addrb  : std_logic_vector(i_pixel_id'range); -- port B: address
+  --signal pulse_heigth_table_dinb   : std_logic_vector(0 downto 0); -- port B: data in
+  signal pulse_heigth_table_regceb : std_logic; -- port B: regce
+  signal pulse_heigth_table_doutb  : std_logic_vector(i_cmd_pulse_height'range); -- port B: data out
 
+  -- temporary pulse_heigth value
   signal pulse_heigth_table_tmp : std_logic_vector(i_cmd_pulse_height'range);
 
   -- RAM: time_shift_table
-  signal time_shift_table_wea   : std_logic;
-  signal time_shift_table_ena   : std_logic;
-  signal time_shift_table_addra : std_logic_vector(i_pixel_id'range);
-  signal time_shift_table_dina  : std_logic_vector(i_cmd_time_shift'range);
-  --signal time_shift_table_regcea : std_logic;
-  --signal time_shift_table_douta  : std_logic_vector(0 downto 0);
+  signal time_shift_table_wea   : std_logic; -- port A: en
+  signal time_shift_table_ena   : std_logic; -- port A: we
+  signal time_shift_table_addra : std_logic_vector(i_pixel_id'range);  -- port A: address
+  signal time_shift_table_dina  : std_logic_vector(i_cmd_time_shift'range); -- port A: data in
+  --signal time_shift_table_regcea : std_logic; -- port A: regce
+  --signal time_shift_table_douta  : std_logic_vector(0 downto 0); -- port A: data out
 
-  signal time_shift_table_enb    : std_logic;
-  --signal pulse_heigth_table_web    : std_logic;
-  signal time_shift_table_addrb  : std_logic_vector(i_pixel_id'range);
-  --signal time_shift_table_dinb   : std_logic_vector(0 downto 0);
-  signal time_shift_table_regceb : std_logic;
-  signal time_shift_table_doutb  : std_logic_vector(i_cmd_time_shift'range);
+  signal time_shift_table_enb    : std_logic; -- port B: en
+  --signal pulse_heigth_table_web    : std_logic; -- port B: we
+  signal time_shift_table_addrb  : std_logic_vector(i_pixel_id'range); -- port B: address
+  --signal time_shift_table_dinb   : std_logic_vector(0 downto 0); -- port B: data in
+  signal time_shift_table_regceb : std_logic; -- port B: regce
+  signal time_shift_table_doutb  : std_logic_vector(i_cmd_time_shift'range); -- port B: data out
 
+  -- temporary time_shift value
   signal time_shift_table_tmp : std_logic_vector(i_cmd_time_shift'range);
 
   -- RAM: cnt_sample_pulse_shape_table
-  signal cnt_sample_pulse_shape_table_wea   : std_logic;
-  signal cnt_sample_pulse_shape_table_ena   : std_logic;
-  signal cnt_sample_pulse_shape_table_addra : std_logic_vector(i_pixel_id'range);
-  signal cnt_sample_pulse_shape_table_dina  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
-  --signal cnt_sample_pulse_shape_table_regcea : std_logic;
-  --signal cnt_sample_pulse_shape_table_douta  : std_logic_vector(0 downto 0);
+  signal cnt_sample_pulse_shape_table_wea   : std_logic; -- port A: en
+  signal cnt_sample_pulse_shape_table_ena   : std_logic; -- port A: we
+  signal cnt_sample_pulse_shape_table_addra : std_logic_vector(i_pixel_id'range);  -- port A: address
+  signal cnt_sample_pulse_shape_table_dina  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0); -- port A: data in
+  --signal cnt_sample_pulse_shape_table_regcea : std_logic; -- port A: regce
+  --signal cnt_sample_pulse_shape_table_douta  : std_logic_vector(0 downto 0); -- port A: data out
 
-  signal cnt_sample_pulse_shape_table_enb    : std_logic;
-  --signal cnt_sample_pulse_shapeth_table_web    : std_logic;
-  signal cnt_sample_pulse_shape_table_addrb  : std_logic_vector(i_pixel_id'range);
-  --signal cnt_sample_pulse_shape_table_dinb   : std_logic_vector(0 downto 0);
-  signal cnt_sample_pulse_shape_table_regceb : std_logic;
-  signal cnt_sample_pulse_shape_table_doutb  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+  signal cnt_sample_pulse_shape_table_enb    : std_logic; -- port B: en
+  --signal cnt_sample_pulse_shapeth_table_web    : std_logic; -- port B: we
+  signal cnt_sample_pulse_shape_table_addrb  : std_logic_vector(i_pixel_id'range); -- port B: address
+  --signal cnt_sample_pulse_shape_table_dinb   : std_logic_vector(0 downto 0); -- port B: data in
+  signal cnt_sample_pulse_shape_table_regceb : std_logic; -- port B: regce
+  signal cnt_sample_pulse_shape_table_doutb  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0); -- port B: data out
 
+  -- temporary cnt_sample_pulse_shape value
   signal cnt_sample_pulse_shape_table_tmp : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
 
   ---------------------------------------------------------------------
   -- sync with the table out
   ---------------------------------------------------------------------
-  signal data_pipe_table_tmp0 : std_logic_vector(c_IDX3_H downto 0);
-  signal data_pipe_table_tmp1 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_table_tmp0 : std_logic_vector(c_IDX3_H downto 0); -- temporary input pipe
+  signal data_pipe_table_tmp1 : std_logic_vector(c_IDX3_H downto 0); -- temporary output pipe
 
-  signal pixel_valid_ra : std_logic;
-  signal pixel_sof_ra   : std_logic;
-  signal pixel_eof_ra   : std_logic;
-  signal pixel_id_ra    : std_logic_vector(i_pixel_id'range);
+  signal pixel_valid_ra : std_logic; -- data_valid
+  signal pixel_sof_ra   : std_logic; -- first pixel sample
+  signal pixel_eof_ra   : std_logic; -- last pixel sample
+  signal pixel_id_ra    : std_logic_vector(i_pixel_id'range); -- pixel_id
 
   ---------------------------------------------------------------------
   -- State machine
   ---------------------------------------------------------------------
   type t_state is (E_RST0, E_RST1, E_WAIT, E_RUN);
-  signal sm_state_next : t_state;
-  signal sm_state_r1   : t_state := E_RST0;
+  signal sm_state_next : t_state; -- state
+  signal sm_state_r1   : t_state := E_RST0; -- state (registered)
 
-  signal cmd_rd_next : std_logic;
-  signal cmd_rd_r1   : std_logic := '0';
+  signal cmd_rd_next : std_logic; -- read command
+  signal cmd_rd_r1   : std_logic := '0'; -- read command (registered)
 
+  -- flag to update the table content
   signal first_next : std_logic;
+  -- flag to update the table content (registered)
   signal first_r1   : std_logic := '0';
 
+  -- last sample of the pulse
   signal last_sample_pulse_shape_next : std_logic;
+  -- last sample of the pulse (registered)
   signal last_sample_pulse_shape_r1   : std_logic := '0';
 
+  -- pixel_valid
   signal pixel_valid_next : std_logic;
+  -- pixel_valid (registered)
   signal pixel_valid_r1   : std_logic := '0';
 
+  -- first processed sample of a pulse
   signal pulse_sof_next : std_logic;
+  -- first processed sample of a pulse (registered)
   signal pulse_sof_r1   : std_logic := '0';
 
+  ---- last processed sample of a pulse
   signal pulse_eof_next : std_logic;
+  ---- last processed sample of a pulse (registered)
   signal pulse_eof_r1   : std_logic := '0';
 
+  -- enabled pixel
   signal en_next : std_logic;
+  -- enabled pixel (registered)
   signal en_r1   : std_logic := '0';
 
   -- parameters for the computation
+  -- pulse_heigth value
   signal pulse_heigth_next : unsigned(i_cmd_pulse_height'range);
+  -- pulse_heigth value (registered)
   signal pulse_heigth_r1   : unsigned(i_cmd_pulse_height'range) := (others => '0');
 
+  -- time_shift value
   signal time_shift_next : unsigned(i_cmd_time_shift'range);
+  -- time_shift value (registered)
   signal time_shift_r1   : unsigned(i_cmd_time_shift'range) := (others => '0');
 
+  -- pulse sample counter
   signal cnt_sample_pulse_shape_next : unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+  -- pulse sample counter (register)
   signal cnt_sample_pulse_shape_r1   : unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0) := (others => '0');
 
   -- parameters to store in the tables
+  -- RAM: write enable
   signal ram_wr_en_next : std_logic;
+  -- RAM: write enable (registered)
   signal ram_wr_en_r1   : std_logic := '0';
 
+  -- RAM: write enable
   signal ram_wr_pulse_heigth_next : std_logic;
+  -- RAM: write enable (registered)
   signal ram_wr_pulse_heigth_r1   : std_logic := '0';
 
+  -- RAM: write enable
   signal ram_wr_time_shift_next : std_logic;
+  -- RAM: write enable (registered)
   signal ram_wr_time_shift_r1   : std_logic := '0';
 
+  -- RAM: write enable
   signal ram_wr_cnt_sample_pulse_shape_next : std_logic;
+  -- RAM: write enable (registered)
   signal ram_wr_cnt_sample_pulse_shape_r1   : std_logic := '0';
 
+  -- RAM: shared address (write side)
   signal ram_addr_next : unsigned(i_pixel_id'range);
+  -- RAM: shared address (write side: registered)
   signal ram_addr_r1   : unsigned(i_pixel_id'range);
 
+  -- RAM (en): data to write
   signal ram_en_next : std_logic;
+  -- RAM (en): data to write (registered)
   signal ram_en_r1   : std_logic := '0';
 
+  -- RAM (pulse_heigth): data to write
   signal ram_pulse_heigth_next : unsigned(i_cmd_pulse_height'range);
+  -- RAM (pulse_heigth): data to write (registered)
   signal ram_pulse_heigth_r1   : unsigned(i_cmd_pulse_height'range) := (others => '0');
 
+  -- RAM (time_shift): data to write
   signal ram_time_shift_next : unsigned(i_cmd_time_shift'range);
+  -- RAM (time_shift): data to write (registered)
   signal ram_time_shift_r1   : unsigned(i_cmd_time_shift'range) := (others => '0');
 
+  -- RAM (cnt_sample_pulse_shape): data to write
   signal ram_cnt_sample_pulse_shape_next : unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+  -- RAM (cnt_sample_pulse_shape): data to write (registered)
   signal ram_cnt_sample_pulse_shape_r1   : unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0) := (others => '0');
 
   ---------------------------------------------------------------------
   -- sync with the address computation output
   ---------------------------------------------------------------------
-  signal data_pipe_tmp0 : std_logic_vector(c_IDX2_H downto 0);
-  signal data_pipe_tmp1 : std_logic_vector(c_IDX2_H downto 0);
+  signal data_pipe_tmp0 : std_logic_vector(c_IDX2_H downto 0); -- temporary input pipe
+  signal data_pipe_tmp1 : std_logic_vector(c_IDX2_H downto 0); -- temporary output pipe
 
-  signal pixel_sof_rc : std_logic;
-  signal pixel_eof_rc : std_logic;
-  signal pixel_id_rc  : std_logic_vector(i_pixel_id'range);
+  signal pixel_sof_rc : std_logic; -- first pixel sample
+  signal pixel_eof_rc : std_logic; -- last pixel sample
+  signal pixel_id_rc  : std_logic_vector(i_pixel_id'range); -- pixel_id
 
-  signal pulse_heigth_rc : std_logic_vector(i_cmd_pulse_height'range);
+  signal pulse_heigth_rc : std_logic_vector(i_cmd_pulse_height'range); -- pulse_heigth value
 
   -- address computation
-  signal pulse_sof_rc        : std_logic;
-  signal pulse_eof_rc        : std_logic;
-  signal pixel_valid_rc      : std_logic;
+  signal pulse_sof_rc        : std_logic; -- first pixel sample
+  signal pulse_eof_rc        : std_logic; -- last pixel sample
+  signal pixel_valid_rc      : std_logic; -- pixel valid
+  -- address of the pulse_shape RAM
   signal addr_pulse_shape_rc : std_logic_vector(i_pulse_shape_wr_rd_addr'range);
 
-  constant c_MULT_IDX0_L : integer := 0;
-  constant c_MULT_IDX0_H : integer := c_MULT_IDX0_L + i_cmd_pulse_height'length - 1;
+  constant c_MULT_IDX0_L : integer := 0; -- index0: low
+  constant c_MULT_IDX0_H : integer := c_MULT_IDX0_L + i_cmd_pulse_height'length - 1; -- index0: high
 
-  constant c_MULT_IDX1_L : integer := c_MULT_IDX0_H + 1;
-  constant c_MULT_IDX1_H : integer := c_MULT_IDX1_L + 1 - 1;
+  constant c_MULT_IDX1_L : integer := c_MULT_IDX0_H + 1; -- index1: low
+  constant c_MULT_IDX1_H : integer := c_MULT_IDX1_L + 1 - 1; -- index1: high
 
-  constant c_MULT_IDX2_L : integer := c_MULT_IDX1_H + 1;
-  constant c_MULT_IDX2_H : integer := c_MULT_IDX2_L + 1 - 1;
+  constant c_MULT_IDX2_L : integer := c_MULT_IDX1_H + 1; -- index2: low
+  constant c_MULT_IDX2_H : integer := c_MULT_IDX2_L + 1 - 1; -- index2: high
 
-  constant c_MULT_IDX3_L : integer := c_MULT_IDX2_H + 1;
-  constant c_MULT_IDX3_H : integer := c_MULT_IDX3_L + 1 - 1;
+  constant c_MULT_IDX3_L : integer := c_MULT_IDX2_H + 1; -- index2: low
+  constant c_MULT_IDX3_H : integer := c_MULT_IDX3_L + 1 - 1; -- index2: high
 
-
+   -- temporary input pipe
   signal data_pipe_mult_tmp0 : std_logic_vector(c_MULT_IDX3_H downto 0);
+  -- temporary output pipe
   signal data_pipe_mult_tmp1 : std_logic_vector(c_MULT_IDX3_H downto 0);
 
   ---------------------------------------------------------------------
   -- tes_pulse_shape
   ---------------------------------------------------------------------
   -- RAM
-  signal pulse_shape_wea    : std_logic;
-  signal pulse_shape_ena    : std_logic;
-  signal pulse_shape_addra  : std_logic_vector(i_pulse_shape_wr_rd_addr'range);
-  signal pulse_shape_dina   : std_logic_vector(i_pulse_shape_wr_data'range);
-  signal pulse_shape_regcea : std_logic;
-  signal pulse_shape_douta  : std_logic_vector(i_pulse_shape_wr_data'range);
+  signal pulse_shape_wea    : std_logic; -- port A: en
+  signal pulse_shape_ena    : std_logic; -- port A: we
+  signal pulse_shape_addra  : std_logic_vector(i_pulse_shape_wr_rd_addr'range);  -- port A: address
+  signal pulse_shape_dina   : std_logic_vector(i_pulse_shape_wr_data'range); -- port A: data in
+  signal pulse_shape_regcea : std_logic;-- port A: regce
+  signal pulse_shape_douta  : std_logic_vector(i_pulse_shape_wr_data'range); -- port A: data out
 
-  signal pulse_shape_enb    : std_logic;
-  signal pulse_shape_web    : std_logic;
-  signal pulse_shape_addrb  : std_logic_vector(i_pulse_shape_wr_rd_addr'range);
-  signal pulse_shape_dinb   : std_logic_vector(i_pulse_shape_wr_data'range);
-  signal pulse_shape_regceb : std_logic;
-  signal pulse_shape_doutb  : std_logic_vector(i_pulse_shape_wr_data'range);
+  signal pulse_shape_enb    : std_logic; -- port B: en
+  signal pulse_shape_web    : std_logic; -- port B: we
+  signal pulse_shape_addrb  : std_logic_vector(i_pulse_shape_wr_rd_addr'range); -- port B: address
+  signal pulse_shape_dinb   : std_logic_vector(i_pulse_shape_wr_data'range); -- port B: data in
+  signal pulse_shape_regceb : std_logic; -- port B: regce
+  signal pulse_shape_doutb  : std_logic_vector(i_pulse_shape_wr_data'range); -- port B: data out
 
   -- sync with rd RAM output
   signal pulse_shape_rd_en_rz : std_logic;
@@ -425,101 +496,113 @@ architecture RTL of tes_pulse_shape_manager is
   -- tes_pulse_shape
   ---------------------------------------------------------------------
   -- RAM
-  signal steady_state_wea    : std_logic;
-  signal steady_state_ena    : std_logic;
-  signal steady_state_addra  : std_logic_vector(i_steady_state_wr_rd_addr'range);
-  signal steady_state_dina   : std_logic_vector(i_steady_state_wr_data'range);
-  signal steady_state_regcea : std_logic;
-  signal steady_state_douta  : std_logic_vector(i_steady_state_wr_data'range);
+  signal steady_state_wea    : std_logic; -- port A: en
+  signal steady_state_ena    : std_logic; -- port A: we
+  signal steady_state_addra  : std_logic_vector(i_steady_state_wr_rd_addr'range);  -- port A: address
+  signal steady_state_dina   : std_logic_vector(i_steady_state_wr_data'range); -- port A: data in
+  signal steady_state_regcea : std_logic;-- port A: regce
+  signal steady_state_douta  : std_logic_vector(i_steady_state_wr_data'range); -- port A: data out
 
-  signal steady_state_enb    : std_logic;
-  signal steady_state_web    : std_logic;
-  signal steady_state_addrb  : std_logic_vector(i_steady_state_wr_rd_addr'range);
-  signal steady_state_dinb   : std_logic_vector(i_steady_state_wr_data'range);
-  signal steady_state_regceb : std_logic;
-  signal steady_state_doutb  : std_logic_vector(i_steady_state_wr_data'range);
+  signal steady_state_enb    : std_logic; -- port B: en
+  signal steady_state_web    : std_logic; -- port B: we
+  signal steady_state_addrb  : std_logic_vector(i_steady_state_wr_rd_addr'range); -- port B: address
+  signal steady_state_dinb   : std_logic_vector(i_steady_state_wr_data'range); -- port B: data in
+  signal steady_state_regceb : std_logic; -- port B: regce
+  signal steady_state_doutb  : std_logic_vector(i_steady_state_wr_data'range); -- port B: data out
 
   -- sync with rd RAM output
   signal steady_state_rd_en_rz : std_logic;
-  -- ram check
+  -- ram check error
   signal steady_state_error    : std_logic;
 
   ---------------------------------------------------------------------
   -- sync with RAM outputs
   ---------------------------------------------------------------------
-  signal data_pipe_tmp2 : std_logic_vector(c_IDX6_H downto 0);
-  signal data_pipe_tmp3 : std_logic_vector(c_IDX6_H downto 0);
+  signal data_pipe_tmp2 : std_logic_vector(c_IDX6_H downto 0); -- temporary input pipe
+  signal data_pipe_tmp3 : std_logic_vector(c_IDX6_H downto 0); -- temporary output pipe
 
-  signal pulse_sof_rx   : std_logic;
-  signal pulse_eof_rx   : std_logic;
-  signal pixel_sof_rx   : std_logic;
-  signal pixel_eof_rx   : std_logic;
-  signal pixel_valid_rx : std_logic;
-  signal pixel_id_rx    : std_logic_vector(i_pixel_id'range);
+  signal pulse_sof_rx   : std_logic; -- first processed sample of a pulse
+  signal pulse_eof_rx   : std_logic; -- last processed sample of a pulse
+  signal pixel_sof_rx   : std_logic; -- first pixel sample
+  signal pixel_eof_rx   : std_logic; -- last pixel sample
+  signal pixel_valid_rx : std_logic; -- pixel valid
+  signal pixel_id_rx    : std_logic_vector(i_pixel_id'range); -- pixel_id
 
+  -- pulse_heigth value
   signal pulse_heigth_rx : std_logic_vector(i_cmd_pulse_height'range);
 
   ------------------------------------------------------------------
   -- mult_sub_sfixed
   ------------------------------------------------------------------
   -- add sign bit
+  -- operator: input_a
   signal pulse_shape_tmp  : std_logic_vector(pkg_TES_MULT_SUB_Q_WIDTH_A - 1 downto 0);
+  -- operator: input_b
   signal pulse_heigth_tmp : std_logic_vector(pkg_TES_MULT_SUB_Q_WIDTH_B - 1 downto 0);
+  -- operator: input_c
   signal steady_state_tmp : std_logic_vector(pkg_TES_MULT_SUB_Q_WIDTH_C - 1 downto 0);
-
+  -- operator: output
   signal result_ry : std_logic_vector(o_pixel_result'range);
 
   -------------------------------------------------------------------
   -- sync with tes_pulse_shape_manager_computation out
   -------------------------------------------------------------------
+   -- temporary input pipe
   signal data_pipe_tmp4 : std_logic_vector(c_IDX5_H downto 0);
+   -- temporary output pipe
   signal data_pipe_tmp5 : std_logic_vector(c_IDX5_H downto 0);
 
-  signal pulse_sof_ry : std_logic;
-  signal pulse_eof_ry : std_logic;
+  signal pulse_sof_ry : std_logic; -- first processed sample of a pulse
+  signal pulse_eof_ry : std_logic; -- last processed sample of a pulse
 
-  signal pixel_sof_ry   : std_logic;
-  signal pixel_eof_ry   : std_logic;
-  signal pixel_valid_ry : std_logic;
-  signal pixel_id_ry    : std_logic_vector(i_pixel_id'range);
+  signal pixel_sof_ry   : std_logic; -- first pixel sample
+  signal pixel_eof_ry   : std_logic; -- last pixel sample
+  signal pixel_valid_ry : std_logic; -- pixel valid
+  signal pixel_id_ry    : std_logic_vector(i_pixel_id'range); -- pixel_id
 
   -------------------------------------------------------------------
   -- force output value when negative
   -------------------------------------------------------------------
+  -- sign value
   signal sign_value_tmp6 : std_logic;
+  -- data
   signal result_rz       : std_logic_vector(o_pixel_result'range);
 
   -------------------------------------------------------------------
   -- sync with p_force_output_value_when_negative output
   -------------------------------------------------------------------
+   -- temporary input pipe
   signal data_pipe_tmp6 : std_logic_vector(c_IDX5_H downto 0);
+   -- temporary output pipe
   signal data_pipe_tmp7 : std_logic_vector(c_IDX5_H downto 0);
 
-  signal pulse_sof_rz : std_logic;
-  signal pulse_eof_rz : std_logic;
+  signal pulse_sof_rz : std_logic; -- first processed sample of a pulse
+  signal pulse_eof_rz : std_logic; -- last processed sample of a pulse
 
-  signal pixel_sof_rz   : std_logic;
-  signal pixel_eof_rz   : std_logic;
-  signal pixel_valid_rz : std_logic;
-  signal pixel_id_rz    : std_logic_vector(i_pixel_id'range);
+  signal pixel_sof_rz   : std_logic; -- first pixel sample
+  signal pixel_eof_rz   : std_logic; -- last pixel sample
+  signal pixel_valid_rz : std_logic; -- pixel valid
+  signal pixel_id_rz    : std_logic_vector(i_pixel_id'range); -- pixel_id
 
   ---------------------------------------------------------------------
   -- detect output negative value
   ---------------------------------------------------------------------
+  -- sign value
   signal sign_value       : std_logic;
 
+  -- detection of a negative value: valid signal
   signal pixel_neg_out_valid    : std_logic;
+  -- detection of a negative value: associated error flag
   signal pixel_neg_out_error    : std_logic;
+  -- detection of a negative value: associated pixel_id
   signal pixel_neg_out_pixel_id : std_logic_vector(i_pixel_id'range);
-
-
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 5;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 5; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 
 begin
@@ -919,7 +1002,7 @@ begin
       when E_RUN =>
         pixel_valid_next <= pixel_valid_ra;
         ---------------------------------------------------------------------
-        -- check the first_r1 bit to be able to update the table contens for the next processing as soon as possible.
+        -- check the first_r1 bit to be able to update the table contents for the next processing as soon as possible.
         -- By anticipating, that's allows to absorb the latency on the table paths.
         -- If update is needed, it will be done only one time in this state.
         ---------------------------------------------------------------------

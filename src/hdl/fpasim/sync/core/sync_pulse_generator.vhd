@@ -69,36 +69,43 @@ end entity sync_pulse_generator;
 
 architecture RTL of sync_pulse_generator is
 
+  -- width of the clock period counter (expressed in bits)
   constant c_CNT_WIDTH : integer                            := work.pkg_utils.pkg_width_from_value(g_PULSE_DURATION);
+  -- value max of the clock period counter
   constant c_CNT_MAX   : unsigned(c_CNT_WIDTH - 1 downto 0) := to_unsigned(g_PULSE_DURATION - 1, c_CNT_WIDTH);
 
+  -- trigger
   signal trig_tmp : std_logic;
 
   ---------------------------------------------------------------------
   -- fsm
   ---------------------------------------------------------------------
   type t_state is (E_RST, E_WAIT, E_RUN);
-  signal sm_state_next : t_state;
-  signal sm_state_r1  : t_state:= E_RST;
+  signal sm_state_next : t_state; -- state
+  signal sm_state_r1  : t_state:= E_RST; -- state (registered)
 
-  signal data_valid_next : std_logic;
-  signal data_valid_r1   : std_logic:= '0';
+  signal data_valid_next : std_logic; -- data_valid
+  signal data_valid_r1   : std_logic:= '0'; -- data_valid (registered)
 
-  signal data_next : std_logic;
-  signal data_r1   : std_logic:= '0';
+  signal data_next : std_logic; -- data
+  signal data_r1   : std_logic:= '0'; -- data (registered)
 
+  -- clock period counter
   signal cnt_next : unsigned(c_CNT_WIDTH - 1 downto 0);
+  -- clock period counter (registered)
   signal cnt_r1   : unsigned(c_CNT_WIDTH - 1 downto 0):= (others => '0');
 
+  -- error flag
   signal error_next : std_logic;
+  -- error flag (registered)
   signal error_r1   : std_logic := '0';
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 1;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 1; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
 

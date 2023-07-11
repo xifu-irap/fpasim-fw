@@ -123,10 +123,14 @@ begin
 -- from the pads to the user
 ---------------------------------------------------------------------
   gen_pads_to_user : if true generate
+    -- temporary input data1
     signal data_in  : std_logic_vector(5 downto 0);
+    -- temporary output data1
     signal data_out : std_logic_vector(5 downto 0);
 
+    -- temporary input data2
     signal data_in2  : std_logic_vector(5 downto 0);
+    -- temporary output data2
     signal data_out2 : std_logic_vector(5 downto 0);
   begin
 
@@ -177,7 +181,9 @@ begin
 ---------------------------------------------------------------------
 -- clock
   gen_user_to_pads_clk : if true generate
+    -- temporary clock
     signal clk_fwd_out : std_logic;
+    -- temporary clock
     signal clk_to_pins : std_logic;
   begin
     inst_oddr : unisim.vcomponents.ODDR
@@ -209,7 +215,9 @@ begin
 
 -- data
   gen_user_to_pads : if true generate
+    -- temporary input data
     signal data_in  : std_logic_vector(3 downto 0);
+    -- temporary output data
     signal data_out : std_logic_vector(3 downto 0);
   begin
     data_in(3) <= i_dac_tx_present;
@@ -237,7 +245,9 @@ begin
   end generate gen_user_to_pads;
 
   gen_user_to_pads_n : if true generate
+    -- temporary input data
     signal data_in  : std_logic_vector(6 downto 0);
+    -- temporary output data
     signal data_out : std_logic_vector(6 downto 0);
   begin
     data_in(6) <= i_mon_n_reset;

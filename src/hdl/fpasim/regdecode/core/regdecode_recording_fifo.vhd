@@ -85,74 +85,115 @@ architecture RTL of regdecode_recording_fifo is
   ---------------------------------------------------------------------
   -- fifo cross clock domain
   ---------------------------------------------------------------------
-  constant c_FIFO_IDX0_L : integer := 0;
-  constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + i_fifo_data'length - 1;
+  constant c_FIFO_IDX0_L : integer := 0; -- index0: low
+  constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + i_fifo_data'length - 1; -- index0: high
 
-  constant c_FIFO_IDX1_L : integer := c_FIFO_IDX0_H + 1;
-  constant c_FIFO_IDX1_H : integer := c_FIFO_IDX1_L + 1 - 1;
+  constant c_FIFO_IDX1_L : integer := c_FIFO_IDX0_H + 1; -- index1: low
+  constant c_FIFO_IDX1_H : integer := c_FIFO_IDX1_L + 1 - 1; -- index1: high
 
-  constant c_FIFO_IDX2_L : integer := c_FIFO_IDX1_H + 1;
-  constant c_FIFO_IDX2_H : integer := c_FIFO_IDX2_L + 1 - 1;
+  constant c_FIFO_IDX2_L : integer := c_FIFO_IDX1_H + 1; -- index2: low
+  constant c_FIFO_IDX2_H : integer := c_FIFO_IDX2_L + 1 - 1; -- index2: high
 
-  -- find the power of 2 superior to the g_DELAY
-  constant c_FIFO_DEPTH0       : integer := 16;                 --see IP
-  constant c_PROG_FULL_THRESH0 : integer := c_FIFO_DEPTH0 - 6;  --see IP
-  constant c_FIFO_WIDTH0       : integer := c_FIFO_IDX2_H + 1;  --see IP
+  -- FIFO depth (expressed in number of words)
+  constant c_FIFO_DEPTH0       : integer := 16;
+  -- FIFO prog_full threshold (expressed in words)
+  constant c_PROG_FULL_THRESH0 : integer := c_FIFO_DEPTH0 - 6;
+  -- FIFO width (expressed in bits)
+  constant c_FIFO_WIDTH0       : integer := c_FIFO_IDX2_H + 1;
 
+  -- fifo: write side
+  -- fifo: ready
   signal ready0        : std_logic;
+  -- fifo: rst
   signal wr_rst0       : std_logic;
+  -- fifo: write
   signal wr_tmp0       : std_logic;
+  -- fifo: data_in
   signal wr_data_tmp0  : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: full flag
   signal wr_full0      : std_logic;
+  -- fifo: prog_full flag
   signal wr_prog_full0 : std_logic;
+  -- fifo: rst_busy flag
   signal wr_rst_busy0  : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal rd1          : std_logic;
+  -- fifo: data_valid flag
   signal data_valid1  : std_logic;
+  -- fifo: data_out
   signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: empty flag
   signal empty1       : std_logic;
+  -- fifo: rst_busy flag
   signal rd_rst_busy1 : std_logic;
 
+  -- resynchronized errors
   signal errors_sync1 : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal empty_sync1  : std_logic;
 
   ---------------------------------------------------------------------
   -- output fifo
   ---------------------------------------------------------------------
-  -- find the power of 2 superior to the g_DELAY
-  constant c_FIFO_DEPTH2          : integer := 512;                --see IP
-  constant c_PROG_FULL_THRESH2    : integer := c_FIFO_DEPTH2 - 6;  --see IP
-  constant c_FIFO_WIDTH2          : integer := c_FIFO_IDX2_H + 1;  --see IP
+  -- FIFO depth (expressed in number of words)
+  constant c_FIFO_DEPTH2          : integer := 512;
+  -- FIFO prog_full threshold (expressed in words)
+  constant c_PROG_FULL_THRESH2    : integer := c_FIFO_DEPTH2 - 6;
+  -- FIFO width (expressed in bits)
+  constant c_FIFO_WIDTH2          : integer := c_FIFO_IDX2_H + 1;
+  -- FIFO write data count width (expressed in bits)
   constant c_WR_DATA_COUNT_WIDTH2 : integer := pkg_width_from_value(c_FIFO_DEPTH2) + 1;
 
+  -- fifo: write side
+  -- Fifo: ready
   signal ready2         : std_logic;
+  -- fifo: rst
   signal wr_rst2        : std_logic;
+  -- fifo: write
   signal wr_tmp2        : std_logic;
+  -- fifo: data_in
   signal wr_data_tmp2   : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
+  -- fifo: write data count
   signal wr_data_count2 : std_logic_vector(c_WR_DATA_COUNT_WIDTH2 - 1 downto 0);
+  -- fifo: full flag
   signal wr_full2       : std_logic;
+  -- fifo: prog_full flag
   signal wr_prog_full2  : std_logic;
+  -- fifo: rst_busy flag
   signal wr_rst_busy2   : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal rd3          : std_logic;
+  -- fifo: data_valid flag
   signal data_valid3  : std_logic;
+  -- fifo: data_out
   signal data_tmp3    : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
+  -- fifo: empty flag
   signal empty3       : std_logic;
+  -- fifo: rst_busy flag
   signal rd_rst_busy3 : std_logic;
 
+  -- first word
   signal sof3  : std_logic;
+  -- last word
   signal eof3  : std_logic;
+  -- data
   signal data3 : std_logic_vector(o_usb_fifo_data'range);
 
+  -- resynchronized errors
   signal errors_sync3 : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal empty_sync3  : std_logic;
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 6;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 6; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
 ---------------------------------------------------------------------

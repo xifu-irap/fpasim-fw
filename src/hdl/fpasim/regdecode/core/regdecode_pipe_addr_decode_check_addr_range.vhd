@@ -29,6 +29,7 @@
 --    Note:
 --
 -- -------------------------------------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -59,6 +60,7 @@ end entity regdecode_pipe_addr_decode_check_addr_range;
 
 architecture RTL of regdecode_pipe_addr_decode_check_addr_range is
 
+  -- temporary: extract address range (MSB bits)
   signal addr_tmp : std_logic_vector(i_addr_range_min'range);
 
   ---------------------------------------------------------------------
@@ -66,12 +68,15 @@ architecture RTL of regdecode_pipe_addr_decode_check_addr_range is
   --  1. i_addr_range_min <= i_addr
   --  2. i_addr <= i_addr_range_max
   ---------------------------------------------------------------------
+  -- data_valid: detect low address range
   signal data_valid_low_r1  : std_logic := '0';
+  -- data_valid: detect high address range
   signal data_valid_high_r1 : std_logic := '0';
 
   ---------------------------------------------------------------------
   -- combine address => check if i_addr_min <= i_addr <= i_addr_range_max
   ---------------------------------------------------------------------
+  -- data_valid: combined address range
   signal data_valid_r2 : std_logic := '0';
 
 begin

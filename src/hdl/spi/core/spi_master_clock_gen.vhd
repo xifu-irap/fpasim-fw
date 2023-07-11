@@ -67,26 +67,37 @@ entity spi_master_clock_gen is
 end entity spi_master_clock_gen;
 
 architecture RTL of spi_master_clock_gen is
+  -- max sample counter value. This value is linked to the spi clock frequency.
   constant c_CNT_FREQ_MAX   : integer := integer(ceil(real(g_SYSTEM_FREQUENCY_HZ)/real(2*g_SPI_FREQUENCY_MAX_HZ)));
+  -- sample counter width (expressed in bits)
   constant c_CNT_FREQ_WIDTH : integer := integer(ceil(log2(real(c_CNT_FREQ_MAX))));
 
 ---------------------------------------------------------------------
 -- pulse generator
 ---------------------------------------------------------------------
 -- step0
+  -- spi: clock
   signal sclk_r0 : std_logic;
+  -- sample counter
   signal cnt_r0  : unsigned(c_CNT_FREQ_WIDTH - 1 downto 0) := (others => '0');
 
 -- step1:
+  -- spi: clock
   signal sclk_r1 : std_logic;
 
 -- step2
+  -- spi: clock
   signal sclk_r2              : std_logic;
+  -- detect the rising_edge of the spi clock
   signal pulse_re2            : std_logic;
+  -- detect the falling_edge of the spi clock
   signal pulse_fe2            : std_logic;
   -- step3
+  -- spi: clock
   signal sclk_r3              : std_logic;
+  -- generate a pulse when the spi data needs to be shifted
   signal pulse_data_shift_r3  : std_logic;
+  -- generate a pulse when the spi data needs to be sampled
   signal pulse_data_sample_r3 : std_logic;
 
 begin

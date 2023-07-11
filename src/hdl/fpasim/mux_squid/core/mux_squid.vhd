@@ -133,17 +133,17 @@ architecture RTL of mux_squid is
   ---------------------------------------------------------------------
   -- sync with sub_sfixed_mux_squid out
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_pixel_id'length - 1;
+  constant c_IDX0_L : integer := 0; --index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + i_pixel_id'length - 1; -- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; --index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1; -- index1: high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1; --index2: low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1; -- index2: high
 
-  constant c_IDX3_L : integer := c_IDX2_H + 1;
-  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;
+  constant c_IDX3_L : integer := c_IDX2_H + 1; --index3: low
+  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1; -- index3: high
 
   signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0);-- temporary input pipe signal
   signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0);-- temporary output pipe signal
@@ -157,19 +157,19 @@ architecture RTL of mux_squid is
   -- mux_squid_offset
   ---------------------------------------------------------------------
   -- RAM
-  signal mux_squid_offset_wea    : std_logic;
-  signal mux_squid_offset_ena    : std_logic;
-  signal mux_squid_offset_addra  : std_logic_vector(i_mux_squid_offset_wr_rd_addr'range);
-  signal mux_squid_offset_dina   : std_logic_vector(i_mux_squid_offset_wr_data'range);
-  signal mux_squid_offset_regcea : std_logic;
-  signal mux_squid_offset_douta  : std_logic_vector(i_mux_squid_offset_wr_data'range);
+  signal mux_squid_offset_wea    : std_logic; -- port A: en
+  signal mux_squid_offset_ena    : std_logic; -- port A: we
+  signal mux_squid_offset_addra  : std_logic_vector(i_mux_squid_offset_wr_rd_addr'range);  -- port A: address
+  signal mux_squid_offset_dina   : std_logic_vector(i_mux_squid_offset_wr_data'range); -- port A: data in
+  signal mux_squid_offset_regcea : std_logic;-- port A: regce
+  signal mux_squid_offset_douta  : std_logic_vector(i_mux_squid_offset_wr_data'range); -- port A: data out
 
-  signal mux_squid_offset_web    : std_logic;
-  signal mux_squid_offset_enb    : std_logic;
-  signal mux_squid_offset_addrb  : std_logic_vector(i_mux_squid_offset_wr_rd_addr'range);
-  signal mux_squid_offset_dinb   : std_logic_vector(i_mux_squid_offset_wr_data'range);
-  signal mux_squid_offset_regceb : std_logic;
-  signal mux_squid_offset_doutb  : std_logic_vector(i_mux_squid_offset_wr_data'range);
+  signal mux_squid_offset_web    : std_logic; -- port B: en
+  signal mux_squid_offset_enb    : std_logic; -- port B: we
+  signal mux_squid_offset_addrb  : std_logic_vector(i_mux_squid_offset_wr_rd_addr'range); -- port B: address
+  signal mux_squid_offset_dinb   : std_logic_vector(i_mux_squid_offset_wr_data'range); -- port B: data in
+  signal mux_squid_offset_regceb : std_logic; -- port B: regce
+  signal mux_squid_offset_doutb  : std_logic_vector(i_mux_squid_offset_wr_data'range); -- port B: data out
 
   -- sync with rd RAM output
   signal mux_squid_offset_rd_en_rw : std_logic;
@@ -180,19 +180,19 @@ architecture RTL of mux_squid is
   -- mux_squid_tf
   ---------------------------------------------------------------------
   -- RAM
-  signal mux_squid_tf_wea    : std_logic;
-  signal mux_squid_tf_ena    : std_logic;
-  signal mux_squid_tf_addra  : std_logic_vector(i_mux_squid_tf_wr_rd_addr'range);
-  signal mux_squid_tf_dina   : std_logic_vector(i_mux_squid_tf_wr_data'range);
-  signal mux_squid_tf_regcea : std_logic;
-  signal mux_squid_tf_douta  : std_logic_vector(i_mux_squid_tf_wr_data'range);
+  signal mux_squid_tf_wea    : std_logic; -- port A: en
+  signal mux_squid_tf_ena    : std_logic; -- port A: we
+  signal mux_squid_tf_addra  : std_logic_vector(i_mux_squid_tf_wr_rd_addr'range);  -- port A: address
+  signal mux_squid_tf_dina   : std_logic_vector(i_mux_squid_tf_wr_data'range); -- port A: data in
+  signal mux_squid_tf_regcea : std_logic;-- port A: regce
+  signal mux_squid_tf_douta  : std_logic_vector(i_mux_squid_tf_wr_data'range); -- port A: data out
 
-  signal mux_squid_tf_web    : std_logic;
-  signal mux_squid_tf_enb    : std_logic;
-  signal mux_squid_tf_addrb  : std_logic_vector(i_mux_squid_tf_wr_rd_addr'range);
-  signal mux_squid_tf_dinb   : std_logic_vector(i_mux_squid_tf_wr_data'range);
-  signal mux_squid_tf_regceb : std_logic;
-  signal mux_squid_tf_doutb  : std_logic_vector(i_mux_squid_tf_wr_data'range);
+  signal mux_squid_tf_web    : std_logic; -- port B: en
+  signal mux_squid_tf_enb    : std_logic; -- port B: we
+  signal mux_squid_tf_addrb  : std_logic_vector(i_mux_squid_tf_wr_rd_addr'range); -- port B: address
+  signal mux_squid_tf_dinb   : std_logic_vector(i_mux_squid_tf_wr_data'range); -- port B: data in
+  signal mux_squid_tf_regceb : std_logic; -- port B: regce
+  signal mux_squid_tf_doutb  : std_logic_vector(i_mux_squid_tf_wr_data'range); -- port B: data out
 
   -- sync with rd ram output
   signal mux_squid_tf_rd_en_rw : std_logic;
@@ -211,6 +211,7 @@ architecture RTL of mux_squid is
   signal pixel_valid_ry : std_logic; -- valid pixel sample
   signal pixel_id_ry    : std_logic_vector(i_pixel_id'range); -- pixel id
 
+  -- delayed mux_squid_offset
   signal mux_squid_offset_ry : std_logic_vector(i_mux_squid_offset_wr_data'range);
 
   -------------------------------------------------------------------
@@ -240,9 +241,9 @@ architecture RTL of mux_squid is
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 2; -- define the width of the temporary errors signals
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0); -- temporary input errors
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0); -- temporary output errors
+  constant c_NB_ERRORS : integer := 2; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
 

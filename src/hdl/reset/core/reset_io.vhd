@@ -70,19 +70,25 @@ architecture RTL of reset_io is
   ---------------------------------------------------------------------
   -- synchronous_reset_synchronizer
   ---------------------------------------------------------------------
+  -- io: clock reset
   signal io_clk_rst_tmp1 : std_logic;
+  -- io: clock reset
   signal io_clk_rst_tmp2 : std_logic;
 
   ---------------------------------------------------------------------
   -- optional pipe
   ---------------------------------------------------------------------
+  -- temporary input pipe
   signal data_pipe_tmp0  : std_logic_vector(0 downto 0);
+  -- temporary output pipe
   signal data_pipe_tmp1  : std_logic_vector(0 downto 0);
+  -- io: clock reset
   signal io_clk_rst_tmp3 : std_logic;
 
   ---------------------------------------------------------------------
   -- synchronous_reset_pulse
   ---------------------------------------------------------------------
+  -- io: reset
   signal io_rst_tmp3 : std_logic;
 
 begin

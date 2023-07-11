@@ -70,7 +70,7 @@ entity spi_dac3283 is
     o_spi_sdata : out std_logic; -- SPI MOSI
 
     -- specifi signals
-    o_dac_tx_present : out std_logic    -- enable dac acquisition
+    o_dac_tx_present : out std_logic    -- enable dac acquisition (device pin)
 
     );
 end entity spi_dac3283;
@@ -80,20 +80,23 @@ architecture RTL of spi_dac3283 is
 ---------------------------------------------------------------------
 -- spi
 ---------------------------------------------------------------------
-  signal spi_ready     : std_logic;
-  signal spi_finish    : std_logic;
-  signal rx_data_valid : std_logic;
-  signal rx_data       : std_logic_vector(o_spi_rd_data'range);
+  signal spi_ready     : std_logic; -- spi bridge: ready
+  signal spi_finish    : std_logic; -- spi bridge: finish
+  signal rx_data_valid : std_logic; -- read data valid
+  signal rx_data       : std_logic_vector(o_spi_rd_data'range); -- read data
 
-  signal spi_mosi : std_logic;
-  signal spi_cs_n : std_logic;
-  signal spi_clk  : std_logic;
+  signal spi_mosi : std_logic; -- spi: mosi
+  signal spi_cs_n : std_logic; -- spi: chip select
+  signal spi_clk  : std_logic; -- spi: clock
 
   ---------------------------------------------------------------------
   -- optional: pipe
   ---------------------------------------------------------------------
+  -- temporary input pipe
   signal data_pipe_tmp0  : std_logic_vector(0 downto 0);
+  -- temporary output pipe
   signal data_pipe_tmp1  : std_logic_vector(0 downto 0);
+  -- enable dac acquisition
   signal dac_tx_present1 : std_logic;
 
 begin

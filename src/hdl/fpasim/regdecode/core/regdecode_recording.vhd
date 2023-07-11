@@ -65,12 +65,12 @@ entity regdecode_recording is
     o_rec_ctrl                   : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- register ctrl value
     o_rec_conf0                  : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- register conf0 value
     -- data
-    o_fifo_adc_rd                : out std_logic;
-    i_fifo_adc_sof               : in  std_logic;
-    i_fifo_adc_eof               : in  std_logic;
-    i_fifo_adc_data_valid        : in  std_logic;
-    i_fifo_adc_data              : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);
-    i_fifo_adc_empty             : in  std_logic;
+    o_fifo_adc_rd                : out std_logic; -- fifo read enable
+    i_fifo_adc_sof               : in  std_logic; -- fifo first sample
+    i_fifo_adc_eof               : in  std_logic; -- fifo last sample
+    i_fifo_adc_data_valid        : in  std_logic; -- fifo data valid
+    i_fifo_adc_data              : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- fifo data
+    i_fifo_adc_empty             : in  std_logic; -- fifo empty flag
     ---------------------------------------------------------------------
     -- to the regdecode/usb: @i_clk
     ---------------------------------------------------------------------
@@ -100,38 +100,42 @@ architecture RTL of regdecode_recording is
   ---------------------------------------------------------------------
   -- register management
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_rec_conf0'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + i_rec_conf0'length - 1; -- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + i_rec_ctrl'length - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + i_rec_ctrl'length - 1; -- index1: high
 
-  signal data_valid_tmp0 : std_logic;
-  signal data_tmp0       : std_logic_vector(c_IDX1_H downto 0);
+  signal data_valid_tmp0 : std_logic; -- input data valid
+  signal data_tmp0       : std_logic_vector(c_IDX1_H downto 0); -- input data
 
-  signal data_valid_tmp2 : std_logic;
-  signal data_tmp2       : std_logic_vector(c_IDX1_H downto 0);
+  signal data_valid_tmp2 : std_logic; -- temporary output data valid
+  signal data_tmp2       : std_logic_vector(c_IDX1_H downto 0); -- temporary outpu data
 
+  -- fifo: read
   signal rd_tmp1         : std_logic;
+  -- fifo: data_valid flag
   signal data_valid_tmp1 : std_logic;
+  -- fifo: data
   signal data_tmp1       : std_logic_vector(c_IDX1_H downto 0);
+  -- fifo: empty flag
   signal empty_tmp1      : std_logic;
 
-  signal errors_tmp1 : std_logic_vector(o_errors0'range);
-  signal status_tmp1 : std_logic_vector(o_status0'range);
+  signal errors_tmp1 : std_logic_vector(o_errors0'range); -- errors
+  signal status_tmp1 : std_logic_vector(o_status0'range); -- status
 
   ---------------------------------------------------------------------
   -- data management
   ---------------------------------------------------------------------
   signal fifo_rd                 : std_logic;
-  signal usb_adc_fifo_sof        : std_logic;
-  signal usb_adc_fifo_eof        : std_logic;
-  signal usb_adc_fifo_data_valid : std_logic;
-  signal usb_adc_fifo_data       : std_logic_vector(o_usb_fifo_adc_data'range);
-  signal usb_adc_fifo_empty      : std_logic;
-  signal usb_adc_wr_data_count   : std_logic_vector(15 downto 0);
-  signal usb_errors              : std_logic_vector(15 downto 0);
-  signal usb_status              : std_logic_vector(7 downto 0);
+  signal usb_adc_fifo_sof        : std_logic; -- fifo first sample
+  signal usb_adc_fifo_eof        : std_logic; -- fifo last sample
+  signal usb_adc_fifo_data_valid : std_logic; -- fifo data valid
+  signal usb_adc_fifo_data       : std_logic_vector(o_usb_fifo_adc_data'range); -- fifo data
+  signal usb_adc_fifo_empty      : std_logic; -- fifo empty flag
+  signal usb_adc_wr_data_count   : std_logic_vector(15 downto 0); -- fifo write data count
+  signal usb_errors              : std_logic_vector(15 downto 0); -- errors
+  signal usb_status              : std_logic_vector(7 downto 0); -- status
 
 begin
 

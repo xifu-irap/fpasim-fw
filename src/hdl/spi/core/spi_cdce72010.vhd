@@ -85,21 +85,24 @@ architecture RTL of spi_cdce72010 is
 ---------------------------------------------------------------------
   -- optional: pipe
   ---------------------------------------------------------------------
+  -- temporary input pipe
   signal data_pipe_tmp0   : std_logic_vector(0 downto 0);
+  -- temporary output pipe
   signal data_pipe_tmp1   : std_logic_vector(0 downto 0);
+  -- pll_status : This pin is set high if the PLL is in lock.
   signal cdce_pll_status1 : std_logic;
 
 ---------------------------------------------------------------------
 -- spi
 ---------------------------------------------------------------------
-  signal spi_ready     : std_logic;
-  signal spi_finish    : std_logic;
-  signal rx_data_valid : std_logic;
-  signal rx_data       : std_logic_vector(o_spi_rd_data'range);
+  signal spi_ready     : std_logic; -- spi bridge: ready
+  signal spi_finish    : std_logic; -- spi bridge: finish
+  signal rx_data_valid : std_logic; -- read data valid
+  signal rx_data       : std_logic_vector(o_spi_rd_data'range); -- read data
 
-  signal spi_mosi : std_logic;
-  signal spi_cs_n : std_logic:= '1';
-  signal spi_clk  : std_logic;
+  signal spi_mosi : std_logic; -- spi: mosi
+  signal spi_cs_n : std_logic:= '1'; -- spi: chip select
+  signal spi_clk  : std_logic; -- spi: clock
 
 begin
 

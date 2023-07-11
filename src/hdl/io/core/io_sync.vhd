@@ -74,52 +74,76 @@ end entity io_sync;
 
 architecture RTL of io_sync is
 
+   -- Add an additional output latency (expressed in clock periods)
   constant c_OUTPUT_LATENCY    : natural := pkg_IO_SYNC_OUT_LATENCY;
+  -- FIFO: latency of the CDC mechanism (expressed in clock periods)
   constant c_FIFO_CDC_LATENCY  : natural := pkg_IO_SYNC_FIFO_CDC_STAGE;
+  -- FIFO: read latency (expressed in clock periods)
   constant c_FIFO_READ_LATENCY : natural := pkg_IO_SYNC_FIFO_READ_LATENCY;
   ---------------------------------------------------------------------
   -- FIFO
   ---------------------------------------------------------------------
-  constant c_IDX0_L            : integer := 0;
-  constant c_IDX0_H            : integer := c_IDX0_L + 1 - 1;
+  constant c_IDX0_L            : integer := 0; -- index0: low
+  constant c_IDX0_H            : integer := c_IDX0_L + 1 - 1; -- index0: high
 
-  constant c_FIFO_DEPTH : integer := 16;            --see IP
-  constant c_FIFO_WIDTH : integer := c_IDX0_H + 1;  --see IP
+  -- FIFO depth (expressed in number of words)
+  constant c_FIFO_DEPTH : integer := 16;
+  -- FIFO: data width (write side: expressed in bits)
+  constant c_FIFO_WIDTH : integer := c_IDX0_H + 1;
 
+  -- fifo: write side
+  -- fifo: rst
   signal wr_rst_tmp0 : std_logic;
+  -- fifo: write
   signal wr_tmp0     : std_logic;
+  -- fifo: data_in
   signal data_tmp0   : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
+  -- fifo: full flag
   --signal full0        : std_logic;
+  -- fifo: rst_busy flag
   --signal wr_rst_busy0 : std_logic;
 
+  -- resynchronized errors
   signal errors_sync0 : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal empty_sync0  : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal rd1          : std_logic;
+  -- fifo: data_out
   signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH - 1 downto 0);
+  -- fifo: empty flag
   signal empty1       : std_logic;
+  -- fifo: rst_busy flag
   signal rd_rst_busy1 : std_logic;
 
+  -- sync valid
   signal sync_valid1 : std_logic;
+  -- sync value
   signal sync1       : std_logic;
 
   ---------------------------------------------------------------------
   -- optionnally add latency
   ---------------------------------------------------------------------
+  -- sync value
   signal sync_rx : std_logic;
 
   ---------------------------------------------------------------------
   -- oddr
   ---------------------------------------------------------------------
+  -- temporary sync value
   signal sync_tmp : std_logic;
+  -- temporary clock value
   signal clk_tmp  : std_logic;
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 3;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 3; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
+
 
 begin
 ---------------------------------------------------------------------

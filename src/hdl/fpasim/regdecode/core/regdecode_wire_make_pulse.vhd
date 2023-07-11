@@ -103,70 +103,92 @@ architecture RTL of regdecode_wire_make_pulse is
   ---------------------------------------------------------------------
   -- fsm
   ---------------------------------------------------------------------
+  -- extracted pixel_all bit
   signal pixel_all_tmp : std_logic;
+  -- extracted pixel_id bits
   signal pixel_id_tmp  : std_logic_vector(pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1 downto 0);
 
   type t_state is (E_RST, E_WAIT, E_GEN_PIXEL_ID);
-  signal sm_state_next : t_state := E_RST;
-  signal sm_state_r1   : t_state := E_RST;
+  signal sm_state_next : t_state := E_RST; -- state
+  signal sm_state_r1   : t_state := E_RST; -- state (registered)
 
-  signal sof_next : std_logic;
-  signal sof_r1   : std_logic;
+  signal sof_next : std_logic; -- first word
+  signal sof_r1   : std_logic; -- first word (registered)
 
-  signal eof_next : std_logic;
-  signal eof_r1   : std_logic;
+  signal eof_next : std_logic; -- last word
+  signal eof_r1   : std_logic; -- last word (registered)
 
-  signal data_valid_next : std_logic;
-  signal data_valid_r1   : std_logic;
+  signal data_valid_next : std_logic; -- data valid
+  signal data_valid_r1   : std_logic; -- data valid (registered)
 
-  signal error_next : std_logic;
-  signal error_r1   : std_logic;
+  signal error_next : std_logic; -- error flag
+  signal error_r1   : std_logic; -- error flag (registered)
 
+  -- current pixel_id
   signal pixel_id_next : unsigned(pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1 downto 0);
+  -- current pixel_id (registered)
   signal pixel_id_r1   : unsigned(pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1 downto 0);
 
+  -- pixel_id max
   signal pixel_id_max_next : unsigned(pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1 downto 0);
+  -- pixel_id max (registered)
   signal pixel_id_max_r1   : unsigned(pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1 downto 0);
 
+  -- temporary partial data
   signal tmp     : std_logic_vector(i_make_pulse'range);
+  -- data (registered)
   signal data_r1 : std_logic_vector(i_make_pulse'range);
 
   ---------------------------------------------------------------------
   -- regdecode_wire_wr_rd
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_make_pulse'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + i_make_pulse'length - 1; -- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1; -- index1: high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1; -- index2: low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1; -- index2: high
 
+  -- data_valid
   signal data_valid_tmp0    : std_logic;
+  -- data_in
   signal data_tmp0          : std_logic_vector(c_IDX2_H downto 0);
+  -- fifo: ready flag
   signal ready_tmp0         : std_logic;
+  -- fifo: write data count
   signal wr_data_count_tmp0 : std_logic_vector(o_wr_data_count'range);
 
+  -- fifo: read
   signal rd_tmp1         : std_logic;
+  -- fifo: data_valid flag
   signal data_valid_tmp1 : std_logic;
+  -- fifo: data_out
   signal data_tmp1       : std_logic_vector(c_IDX2_H downto 0);
+  -- fifo: empty flag
   signal empty_tmp1      : std_logic;
 
+  -- fifo: read
   signal rd_tmp2         : std_logic;
+  -- fifo: data_valid flag
   signal data_valid_tmp2 : std_logic;
+  -- fifo: data_out
   signal data_tmp2       : std_logic_vector(c_IDX2_H downto 0);
+  -- fifo: empty flag
   signal empty_tmp2      : std_logic;
 
+  -- errors of the regdecode_wire_make_pulse_wr_rd module.
   signal errors : std_logic_vector(o_errors'range);
+  -- status of the regdecode_wire_make_pulse_wr_rd module.
   signal status : std_logic_vector(o_status'range);
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 1;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 1; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
   -- extract fields

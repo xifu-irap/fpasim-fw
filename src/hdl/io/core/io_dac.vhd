@@ -104,48 +104,64 @@ end entity io_dac;
 
 architecture RTL of io_dac is
 
+  -- add an additional output latency (expressed in number of clock periods)
   constant c_OUTPUT_LATENCY   : natural := pkg_IO_DAC_OUT_LATENCY;
+  -- output dac width (expressed in bits)
   constant c_DAC_OUTPUT_WIDTH : integer := 8;  -- number of output differential pairs
 
   ---------------------------------------------------------------------
   -- dac_data_insert
   ---------------------------------------------------------------------
+  -- dac_valid
   signal dac_valid_tmp0 : std_logic;
+  -- dac_frame
   signal dac_frame_tmp0 : std_logic_vector(7 downto 0);
+  -- dac data
   signal dac_tmp0       : std_logic_vector(63 downto 0);
 
-  signal errors_tmp0 : std_logic_vector(o_errors'range);
-  signal status_tmp0 : std_logic_vector(o_status'range);
+  signal errors_tmp0 : std_logic_vector(o_errors'range); -- errors
+  signal status_tmp0 : std_logic_vector(o_status'range); -- status
 
   ---------------------------------------------------------------------
   -- optionnally add latency
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + dac_tmp0'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + dac_tmp0'length - 1; -- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + dac_frame_tmp0'length - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + dac_frame_tmp0'length - 1; -- index1: high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1; -- index2: low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1; -- index2: high
 
+  -- temporary input pipe
   signal data_pipe_tmp0 : std_logic_vector(c_IDX2_H downto 0);
+  -- temporary output pipe
   signal data_pipe_tmp1 : std_logic_vector(c_IDX2_H downto 0);
 
+  -- data_valid
   signal dac_valid_tmp1 : std_logic;
+  -- dac_frame
   signal dac_frame_tmp1 : std_logic_vector(7 downto 0);
+  -- dac value
   signal dac_tmp1       : std_logic_vector(63 downto 0);
 
   ---------------------------------------------------------------------
   -- oddr
   ---------------------------------------------------------------------
+  -- dac clock_p
   signal dac_clk_p : std_logic;
+  -- dac clock_n
   signal dac_clk_n : std_logic;
 
+  -- dac frame_p
   signal dac_frame_p : std_logic;
+  -- dac frame_n
   signal dac_frame_n : std_logic;
 
+  -- dac_p
   signal dac_p : std_logic_vector(c_DAC_OUTPUT_WIDTH - 1 downto 0);
+  -- dac_n
   signal dac_n : std_logic_vector(c_DAC_OUTPUT_WIDTH - 1 downto 0);
 
 begin

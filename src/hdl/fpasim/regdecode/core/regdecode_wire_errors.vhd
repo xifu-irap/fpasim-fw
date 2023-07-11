@@ -107,55 +107,70 @@ end entity regdecode_wire_errors;
 
 architecture RTL of regdecode_wire_errors is
 
+  -- fifo: latency (in reading: expressed in clock periods on the read side)
   constant c_FIFO_READ_LATENCY : integer := 2;
 
+  -- number of error vectors
   constant c_NB_ERRORS : integer := 4;
   type t_errors is array (integer range <>) of std_logic_vector(i_reg_wire_errors0'range);
+  -- temporary array of input error vectors to resynchronized
   signal errors_tmp0   : t_errors(0 to c_NB_ERRORS - 1);
+  -- temporary array of error vectors
   signal errors_tmp1   : t_errors(0 to c_NB_ERRORS - 1);
 
   type t_status is array (integer range <>) of std_logic_vector(i_reg_wire_status0'range);
+  -- temporary array of input status vectors to resynchronized
   signal status_tmp0 : t_status(0 to c_NB_ERRORS - 1);
+  -- temporary array of status vectors
   signal status_tmp1 : t_status(0 to c_NB_ERRORS - 1);
 
   ---------------------------------------------------------------------
   -- select output error and
   -- for each error word, generate an associated trig bit if the error value is different of 0
   ---------------------------------------------------------------------
+  -- total number of errors
   constant c_NB_ERRORS_ALL : integer := 11;
+  -- temporary array of error vectors
   signal errors_tmp        : t_errors(0 to c_NB_ERRORS_ALL - 1);
+  -- temporary array of status vectors
   signal status_tmp        : t_status(0 to c_NB_ERRORS_ALL - 1);
-
+  -- detect non zeros errors (one value by error vector)
   signal trig_errors_vec_r1 : std_logic_vector(c_NB_ERRORS_ALL - 1 downto 0);
+  -- selected errors
   signal errors_r1          : std_logic_vector(i_reg_wire_errors0'range);
+  -- selected status
   signal status_r1          : std_logic_vector(i_reg_wire_status0'range);
 
   ---------------------------------------------------------------------
   -- generate a common error bit for each change of trig_errors_vec
   ---------------------------------------------------------------------
+  --  detect non zeros errors (one value by error vector): delayed value
   signal trig_errors_vec_r2   : std_logic_vector(c_NB_ERRORS_ALL - 1 downto 0);
+  -- combine detected errors
   signal trig_common_error_r3 : std_logic;
 
   ---------------------------------------------------------------------
   --
   ---------------------------------------------------------------------
+  -- combine detected errors: delayed
   signal trig_error_r4           : std_logic;
+  -- error value (generated on change (rising_edge))
   signal trig_common_error_re_r5 : std_logic;
 
   ---------------------------------------------------------------------
   -- sync with pulse error generation
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + o_wire_errors'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + o_wire_errors'length - 1;-- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + o_wire_status'length - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + o_wire_status'length - 1;-- index1: high
 
-  signal data_pipe_tmp0 : std_logic_vector(c_IDX1_H downto 0);
-  signal data_pipe_tmp1 : std_logic_vector(c_IDX1_H downto 0);
+  signal data_pipe_tmp0 : std_logic_vector(c_IDX1_H downto 0); -- temporary input pipe
+  signal data_pipe_tmp1 : std_logic_vector(c_IDX1_H downto 0); -- temporary output pipe
 
-  signal errors_r5 : std_logic_vector(i_reg_wire_errors0'range);
-  signal status_r5 : std_logic_vector(i_reg_wire_status0'range);
+  signal errors_r5 : std_logic_vector(i_reg_wire_errors0'range); -- errors
+  signal status_r5 : std_logic_vector(i_reg_wire_status0'range); -- status
 
 begin
 

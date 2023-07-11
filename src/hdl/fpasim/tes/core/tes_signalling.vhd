@@ -86,23 +86,23 @@ entity tes_signalling is
 end entity tes_signalling;
 
 architecture RTL of tes_signalling is
-    -- frame
 
+    -- add an additional output latency
     constant c_NB_PIPES_OUT : integer := pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY;
     ---------------------------------------------------------------------
     -- pixel signalling
     ---------------------------------------------------------------------
-    signal pixel_sof        : std_logic;
-    signal pixel_eof        : std_logic;
-    signal pixel_valid      : std_logic;
-    signal pixel_id         : std_logic_vector(o_pixel_id'range);
+    signal pixel_sof        : std_logic; -- first pixel sample
+    signal pixel_eof        : std_logic; -- last pixel sample
+    signal pixel_valid      : std_logic; -- valid pixel
+    signal pixel_id         : std_logic_vector(o_pixel_id'range); -- pixel id
 
     ---------------------------------------------------------------------
     -- frame signalling
     ---------------------------------------------------------------------
-    signal frame_sof : std_logic;
-    signal frame_eof : std_logic;
-    signal frame_id  : std_logic_vector(o_frame_id'range);
+    signal frame_sof : std_logic; -- first frame sample
+    signal frame_eof : std_logic; -- last frame sample
+    signal frame_id  : std_logic_vector(o_frame_id'range);  -- frame id
 
 begin
 

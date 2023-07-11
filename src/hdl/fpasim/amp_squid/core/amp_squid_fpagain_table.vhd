@@ -65,8 +65,11 @@ entity amp_squid_fpagain_table is
 end entity amp_squid_fpagain_table;
 
 architecture RTL of amp_squid_fpagain_table is
+  -- gain (sfixed representation)
   signal gain_r1   : sfixed(g_Q_M_S - 1 downto -g_Q_N_S):= (others => '0');
+  -- temporary input pipe
   signal gain_tmp0 : std_logic_vector(o_fpasim_gain'range);
+  -- temporary output pipe
   signal gain_tmp1 : std_logic_vector(o_fpasim_gain'range);
 
 begin

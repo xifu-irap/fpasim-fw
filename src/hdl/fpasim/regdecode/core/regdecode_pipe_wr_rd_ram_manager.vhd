@@ -108,39 +108,51 @@ end entity regdecode_pipe_wr_rd_ram_manager;
 
 architecture RTL of regdecode_pipe_wr_rd_ram_manager is
 
+  -- RAM address width
   constant c_RAM_ADDR_WIDTH : integer := work.pkg_utils.pkg_width_from_value(g_RAM_NB_WORDS);
+  -- number max of words in the RAM
   constant c_CNT_MAX        : integer := 2 ** c_RAM_ADDR_WIDTH;
+  -- output delay
   constant c_DELAY_OUT      : integer := 1;
+  -- RAM latency (in reading)
   constant c_ADDR_DELAY_OUT : integer := c_DELAY_OUT + g_RAM_RD_LATENCY;
-
+  -- FIFO latency (in reading)
   constant c_FIFO_READ_LATENCY : integer := 2;
 
   ---------------------------------------------------------------------
   -- fsm
   ---------------------------------------------------------------------
   type t_state is (E_RST, E_WAIT, E_AUTO_RD);
-  signal sm_state_next : t_state;
-  signal sm_state_r1   : t_state;
+  signal sm_state_next : t_state; -- state
+  signal sm_state_r1   : t_state; -- state (registered)
 
-  signal sof_next : std_logic;
-  signal sof_r1   : std_logic := '0';
+  signal sof_next : std_logic; -- first word
+  signal sof_r1   : std_logic := '0'; -- first word (registered)
 
-  signal eof_next : std_logic;
-  signal eof_r1   : std_logic := '0';
+  signal eof_next : std_logic; -- last word
+  signal eof_r1   : std_logic := '0'; -- last word (registered)
 
+  -- RAM mode. If the RAM must be written or read: '1': write, '0': read
   signal sel_wr_next : std_logic;
+  -- RAM mode (registered)
   signal sel_wr_r1   : std_logic := '0';
 
-  signal data_valid_next : std_logic;
-  signal data_valid_r1   : std_logic := '0';
+  signal data_valid_next : std_logic; -- data valid
+  signal data_valid_r1   : std_logic := '0'; -- data valid (registered)
 
+  -- count the number of words (to write or read)
   signal cnt_next : unsigned(c_RAM_ADDR_WIDTH - 1 downto 0);
+  -- count the number of words (registered)
   signal cnt_r1   : unsigned(c_RAM_ADDR_WIDTH - 1 downto 0) := (others => '0');
 
+  -- full address: address_sel & address_RAM
   signal addr_next : unsigned(i_addr'range);
+  -- full address (registered)
   signal addr_r1   : unsigned(i_addr'range) := (others => '0');
 
+  -- error flag
   signal error_next : std_logic;
+  -- error flag (registered)
   signal error_r1   : std_logic := '0';
 
   -- sync with fsm out
@@ -150,128 +162,174 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   ---------------------------------------------------------------------
   -- cross clock domain: redecode to user
   ---------------------------------------------------------------------
-  constant c_FIFO_IDX0_L : integer := 0;
-  constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + i_data'length - 1;
+  constant c_FIFO_IDX0_L : integer := 0; -- index0: low
+  constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + i_data'length - 1; -- index0: high
 
-  constant c_FIFO_IDX1_L : integer := c_FIFO_IDX0_H + 1;
-  constant c_FIFO_IDX1_H : integer := c_FIFO_IDX1_L + i_addr'length - 1;
+  constant c_FIFO_IDX1_L : integer := c_FIFO_IDX0_H + 1; -- index1: low
+  constant c_FIFO_IDX1_H : integer := c_FIFO_IDX1_L + i_addr'length - 1; -- index1: high
 
-  constant c_FIFO_IDX2_L : integer := c_FIFO_IDX1_H + 1;
-  constant c_FIFO_IDX2_H : integer := c_FIFO_IDX2_L + 1 - 1;
+  constant c_FIFO_IDX2_L : integer := c_FIFO_IDX1_H + 1; -- index2: low
+  constant c_FIFO_IDX2_H : integer := c_FIFO_IDX2_L + 1 - 1; -- index2: high
 
-  constant c_FIFO_IDX3_L : integer := c_FIFO_IDX2_H + 1;
-  constant c_FIFO_IDX3_H : integer := c_FIFO_IDX3_L + 1 - 1;
+  constant c_FIFO_IDX3_L : integer := c_FIFO_IDX2_H + 1; -- index3: low
+  constant c_FIFO_IDX3_H : integer := c_FIFO_IDX3_L + 1 - 1; -- index3: high
 
-  constant c_FIFO_IDX4_L : integer := c_FIFO_IDX3_H + 1;
-  constant c_FIFO_IDX4_H : integer := c_FIFO_IDX4_L + 1 - 1;
+  constant c_FIFO_IDX4_L : integer := c_FIFO_IDX3_H + 1; -- index4: low
+  constant c_FIFO_IDX4_H : integer := c_FIFO_IDX4_L + 1 - 1; -- index4: high
 
-  constant c_FIFO_DEPTH0 : integer := 512;                 --see IP
-  constant c_FIFO_WIDTH0 : integer := c_FIFO_IDX4_H + 1;  --see IP
+  -- FIFO depth (expressed in number of words)
+  constant c_FIFO_DEPTH0 : integer := 512;
+  -- FIFO width (expressed in bits)
+  constant c_FIFO_WIDTH0 : integer := c_FIFO_IDX4_H + 1;
 
+  -- fifo: write side
+  -- fifo: rst
   signal wr_rst_tmp0 : std_logic;
+  -- fifo: write
   signal wr_tmp0     : std_logic;
+  -- fifo: data_in
   signal data_tmp0   : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: full flag
   -- signal full0        : std_logic;
+  -- fifo: rst_busy flag
   -- signal wr_rst_busy0 : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal rd1          : std_logic;
+  -- fifo: data_in
   signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: empty flag
   signal empty1       : std_logic;
+  -- fifo: data_valid flag
   signal data_valid1  : std_logic;
+  -- fifo: rst_busy flag
   signal rd_rst_busy1 : std_logic;
 
+  -- first word
   signal sof1    : std_logic;
+  -- last word
   signal eof1    : std_logic;
+  -- RAM mode
   signal sel_wr1 : std_logic;
+  -- RAM address
   signal addr1   : std_logic_vector(i_addr'range);
+  -- RAM data
   signal data1   : std_logic_vector(i_data'range);
 
-  -- synchronized errors
+  -- resynchronized errors
   signal errors_sync1 : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal empty_sync1  : std_logic;
 
   ---------------------------------------------------------------------
   -- compute flag
   ---------------------------------------------------------------------
+  -- first word
   signal sof_sync_r1  : std_logic                      := '0';
+  -- last word
   signal eof_sync_r1  : std_logic                      := '0';
+  -- write flag
   signal wr_sync_r1   : std_logic                      := '0';
+  -- read flag
   signal rd_sync_r1   : std_logic                      := '0';
+  -- address
   signal addr_sync_r1 : std_logic_vector(i_addr'range) := (others => '0');
+  -- data
   signal data_sync_r1 : std_logic_vector(i_data'range) := (others => '0');
 
   ---------------------------------------------------------------------
   -- add an optional output delay
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_data'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + i_data'length - 1; -- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + i_addr'length - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + i_addr'length - 1; -- index1: high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1; -- index2: low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1; -- index2: high
 
-  constant c_IDX3_L : integer := c_IDX2_H + 1;
-  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;
+  constant c_IDX3_L : integer := c_IDX2_H + 1; -- index3: low
+  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1; -- index3: high
 
-  signal data_pipe_tmp2 : std_logic_vector(c_IDX3_H downto 0);
-  signal data_pipe_tmp3 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp2 : std_logic_vector(c_IDX3_H downto 0); -- temporary input pipe
+  signal data_pipe_tmp3 : std_logic_vector(c_IDX3_H downto 0); -- temporary output pipe
 
-  signal wr_sync_ry   : std_logic;
-  signal rd_sync_ry   : std_logic;
-  signal addr_sync_ry : std_logic_vector(i_addr'range);
-  signal data_sync_ry : std_logic_vector(i_data'range);
+  signal wr_sync_ry   : std_logic; -- write flag
+  signal rd_sync_ry   : std_logic; -- read flag
+  signal addr_sync_ry : std_logic_vector(i_addr'range); -- address
+  signal data_sync_ry : std_logic_vector(i_data'range); -- data
 
   ---------------------------------------------------------------------
   -- sync with the rd RAM output
   ---------------------------------------------------------------------
-  constant c_PIPE_IDX0_L : integer := 0;
-  constant c_PIPE_IDX0_H : integer := c_PIPE_IDX0_L + i_addr'length - 1;
+  constant c_PIPE_IDX0_L : integer := 0; -- index0: low
+  constant c_PIPE_IDX0_H : integer := c_PIPE_IDX0_L + i_addr'length - 1; -- index0: high
 
-  constant c_PIPE_IDX1_L : integer := c_PIPE_IDX0_H + 1;
-  constant c_PIPE_IDX1_H : integer := c_PIPE_IDX1_L + 1 - 1;
+  constant c_PIPE_IDX1_L : integer := c_PIPE_IDX0_H + 1; -- index1: low
+  constant c_PIPE_IDX1_H : integer := c_PIPE_IDX1_L + 1 - 1; -- index1: high
 
-  constant c_PIPE_IDX2_L : integer := c_PIPE_IDX1_H + 1;
-  constant c_PIPE_IDX2_H : integer := c_PIPE_IDX2_L + 1 - 1;
+  constant c_PIPE_IDX2_L : integer := c_PIPE_IDX1_H + 1; -- index2: low
+  constant c_PIPE_IDX2_H : integer := c_PIPE_IDX2_L + 1 - 1; -- index2: high
 
-  constant c_PIPE_IDX3_L : integer := c_PIPE_IDX2_H + 1;
-  constant c_PIPE_IDX3_H : integer := c_PIPE_IDX3_L + 1 - 1;
+  constant c_PIPE_IDX3_L : integer := c_PIPE_IDX2_H + 1; -- index3: low
+  constant c_PIPE_IDX3_H : integer := c_PIPE_IDX3_L + 1 - 1; -- index3: high
 
-  signal data_pipe_tmp0 : std_logic_vector(c_PIPE_IDX3_H downto 0);
-  signal data_pipe_tmp1 : std_logic_vector(c_PIPE_IDX3_H downto 0);
+  signal data_pipe_tmp0 : std_logic_vector(c_PIPE_IDX3_H downto 0); -- temporary input pipe
+  signal data_pipe_tmp1 : std_logic_vector(c_PIPE_IDX3_H downto 0); -- temporary output pipe
 
-  signal sof_sync_rx  : std_logic;
-  signal eof_sync_rx  : std_logic;
-  signal rd_sync_rx   : std_logic;
-  signal addr_sync_rx : std_logic_vector(o_fifo_addr'range);
+  signal sof_sync_rx  : std_logic; -- first word
+  signal eof_sync_rx  : std_logic; -- last word
+  signal rd_sync_rx   : std_logic; -- read flag
+  signal addr_sync_rx : std_logic_vector(o_fifo_addr'range); -- address
 
   ---------------------------------------------------------------------
   -- cross clock domain: user to regdecode
   ---------------------------------------------------------------------
-  constant c_FIFO_DEPTH2     : integer := 512;                 --see IP
-  constant c_FIFO_WIDTH2     : integer := c_FIFO_IDX4_H + 1;  --see IP
+  -- FIFO depth (expressed in number of words)
+  constant c_FIFO_DEPTH2     : integer := 512;
+  -- FIFO prog_full threshold (expressed in words)
   constant c_FIFO_PROG_FULL2 : integer := c_FIFO_DEPTH2 - 16;
+  -- FIFO width (expressed in bits)
+  constant c_FIFO_WIDTH2     : integer := c_FIFO_IDX4_H + 1;
 
+  -- fifo: write side
+  -- fifo: write
   signal wr_tmp2    : std_logic;
+  -- fifo: data_in
   signal data_tmp2  : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
+  -- fifo: full flag
   -- signal full2        : std_logic;
+  -- fifo: prog_full flag
   signal prog_full2 : std_logic;
+  -- fifo: rst_busy flag
   -- signal wr_rst_busy2 : std_logic;
 
-  -- synchronized errors
+  -- resynchronized errors
   signal errors_sync2 : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal empty_sync2  : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal rd3          : std_logic;
+  -- fifo: data_out
   signal data_tmp3    : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
+  -- fifo: empty flag
   signal empty3       : std_logic;
+  -- fifo: data_valid flag
   signal data_valid3  : std_logic;
+  -- fifo: rst_busy flag
   signal rd_rst_busy3 : std_logic;
 
+  -- first word
   signal sof3  : std_logic;
+  -- last word
   signal eof3  : std_logic;
+  -- address
   signal addr3 : std_logic_vector(i_addr'range);
+  -- data
   signal data3 : std_logic_vector(i_data'range);
 
   -- cross clock domain of the prog full flag: i_out_clk -> i_clk
@@ -280,9 +338,9 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 7;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 7; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
 

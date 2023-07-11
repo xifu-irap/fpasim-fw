@@ -74,69 +74,96 @@ entity io_dac_data_insert is
 end entity io_dac_data_insert;
 
 architecture RTL of io_dac_data_insert is
+ -- FIFO: latency of the CDC mechanism (expressed in clock periods)
   constant c_FIFO_CDC_LATENCY  : natural := pkg_IO_DAC_FIFO_CDC_STAGE;
+  -- FIFO: read latency (expressed in clock periods)
   constant c_FIFO_READ_LATENCY : natural := pkg_IO_DAC_FIFO_READ_LATENCY;
 
   ---------------------------------------------------------------------
   -- FIFO
   ---------------------------------------------------------------------
-  constant c_WR_IDX0_L : integer := 0;
-  constant c_WR_IDX0_H : integer := c_WR_IDX0_L + i_dac0'length - 1;
+  constant c_WR_IDX0_L : integer := 0; -- index0: low
+  constant c_WR_IDX0_H : integer := c_WR_IDX0_L + i_dac0'length - 1; -- index0: high
 
-  constant c_WR_IDX1_L : integer := c_WR_IDX0_H + 1;
-  constant c_WR_IDX1_H : integer := c_WR_IDX1_L + i_dac1'length - 1;
+  constant c_WR_IDX1_L : integer := c_WR_IDX0_H + 1; -- index0: low
+  constant c_WR_IDX1_H : integer := c_WR_IDX1_L + i_dac1'length - 1; -- index0: high
 
-  constant c_WR_IDX2_L : integer := c_WR_IDX1_H + 1;
-  constant c_WR_IDX2_H : integer := c_WR_IDX2_L + 1 - 1;
+  constant c_WR_IDX2_L : integer := c_WR_IDX1_H + 1; -- index0: low
+  constant c_WR_IDX2_H : integer := c_WR_IDX2_L + 1 - 1; -- index0: high
 
-  -- find the power of 2 superior to the g_DELAY
-  constant c_FIFO_DEPTH    : integer := 512;  --see IP
+  -- FIFO depth (expressed in number of words)
+  constant c_FIFO_DEPTH    : integer := 512;
+  -- FIFO data width (write side: expressed in bits)
   constant c_WR_FIFO_WIDTH : integer := c_WR_IDX2_H + 1;
+  -- FIFO data width (read side: expressed in bits)
   constant c_RD_FIFO_WIDTH : integer := c_WR_FIFO_WIDTH*2;
 
+  -- fifo: write side
+  -- fifo: rst
   signal wr_rst_tmp0 : std_logic;
+  -- fifo: write
   signal wr_tmp0     : std_logic;
+  -- fifo: data_in
   signal data_tmp0   : std_logic_vector(c_WR_FIFO_WIDTH - 1 downto 0);
+  -- fifo: full flag
   --signal full0        : std_logic;
+  -- fifo: rst_busy flag
   --signal wr_rst_busy0 : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal rd1             : std_logic;
+  -- fifo: data_valid flag
   signal data_valid_tmp1 : std_logic;
+  -- fifo: data_out
   signal data_tmp1       : std_logic_vector(c_RD_FIFO_WIDTH - 1 downto 0);
+  -- fifo: empty flag
   signal empty1          : std_logic;
+  -- fifo: rst_busy flag
   signal rd_rst_busy1    : std_logic;
 
+  -- extract LSB bits of the output data FIFO
   signal word0 : std_logic_vector(32 downto 0);
+  -- extract MSB bits of the output data FIFO
   signal word1 : std_logic_vector(32 downto 0);
 
   -- signal data_valid1 : std_logic;
 
   -- word0
+  -- word0: frame bit
   signal dac_frame_word0 : std_logic;
+  -- word0: dac1 data
   signal dac1_word0      : std_logic_vector(i_dac0'range);
+  -- word0: dac0 data
   signal dac0_word0      : std_logic_vector(i_dac0'range);
 
   -- word1
+  -- word1: frame bit
   signal dac_frame_word1 : std_logic;
+  -- word0: dac1 data
   signal dac1_word1      : std_logic_vector(i_dac1'range);
+  -- word0: dac0 data
   signal dac0_word1      : std_logic_vector(i_dac1'range);
 
-  -- resynchronized errors/status
+  -- resynchronized errors
   signal errors_sync0 : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal empty_sync0  : std_logic;
 
   ---------------------------------------------------------------------
   -- bit mapping
   ---------------------------------------------------------------------
+  -- dac data (multi-words)
   signal dac_tmp       : std_logic_vector(o_dac'range);
+  -- dac frame (multi-bits)
   signal dac_frame_tmp : std_logic_vector(o_dac_frame'range);
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 3;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 3; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
 

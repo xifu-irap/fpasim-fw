@@ -104,22 +104,26 @@ end entity dac_frame_generator;
 architecture RTL of dac_frame_generator is
 
   type t_state is (E_RST, E_WAIT, E_RUN, E_PATTERN);
-  signal sm_state_r1   : t_state := E_RST;
-  signal sm_state_next : t_state;
+  signal sm_state_r1   : t_state := E_RST; -- state
+  signal sm_state_next : t_state; -- state (registered)
 
-  signal sof_next : std_logic;
-  signal sof_r1   : std_logic := '0';
+  signal sof_next : std_logic; -- first sample flag
+  signal sof_r1   : std_logic := '0'; -- first sample flag (registered)
 
-  signal first_next : std_logic;
-  signal first_r1   : std_logic := '0';
+  signal first_next : std_logic; -- first processing
+  signal first_r1   : std_logic := '0'; -- first processing (registered)
 
-  signal data_valid_next : std_logic;
-  signal data_valid_r1   : std_logic := '0';
+  signal data_valid_next : std_logic; -- data_valid
+  signal data_valid_r1   : std_logic := '0'; -- data_valid (registered)
 
+  -- data0
   signal data0_next : std_logic_vector(o_data0'range) := (others => '0');
+  -- data0 (registered)
   signal data0_r1   : std_logic_vector(o_data0'range) := (others => '0');
 
+  -- data1
   signal data1_next : std_logic_vector(o_data1'range) := (others => '0');
+  -- data1 (registered)
   signal data1_r1   : std_logic_vector(o_data1'range) := (others => '0');
 
 

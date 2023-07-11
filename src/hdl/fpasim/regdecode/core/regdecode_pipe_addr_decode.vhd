@@ -66,29 +66,39 @@ end entity regdecode_pipe_addr_decode;
 
 architecture RTL of regdecode_pipe_addr_decode is
 
+  -- latency of the regdecode_pipe_addr_decode_check_addr_range module (expressed in clock periods)
   constant c_PIPE_DELAY         : integer := pkg_REGDECODE_PIPE_ADDR_DECODE_CHECK_ADDR_RANGE_LATENCY;
   ---------------------------------------------------------------------
   -- check address range
   ---------------------------------------------------------------------
+  -- tes_pulse_shape: write enable
   signal tes_pulse_shape_wr_en  : std_logic;
+  -- amp_squid_tf: write enable
   signal amp_squid_tf_wr_en     : std_logic;
+  -- mux_squid_tf: write enable
   signal mux_squid_tf_wr_en     : std_logic;
+  -- tes_std_state: write enable
   signal tes_std_state_wr_en    : std_logic;
+  -- mux_squid_offset: write enable
   signal mux_squid_offset_wr_en : std_logic;
 
   ---------------------------------------------------------------------
   -- sync with wr en signals
   ---------------------------------------------------------------------
-  constant c_PIPE_IDX0_L : integer := 0;
-  constant c_PIPE_IDX0_H : integer := c_PIPE_IDX0_L + i_data'length - 1;
+  constant c_PIPE_IDX0_L : integer := 0; -- index0: low
+  constant c_PIPE_IDX0_H : integer := c_PIPE_IDX0_L + i_data'length - 1; -- index0: high
 
-  constant c_PIPE_IDX1_L : integer := c_PIPE_IDX0_H + 1;
-  constant c_PIPE_IDX1_H : integer := c_PIPE_IDX1_L + i_addr'length - 1;
+  constant c_PIPE_IDX1_L : integer := c_PIPE_IDX0_H + 1; -- index1: low
+  constant c_PIPE_IDX1_H : integer := c_PIPE_IDX1_L + i_addr'length - 1; -- index1: high
 
+  -- temporary input pipe
   signal data_pipe_tmp0 : std_logic_vector(c_PIPE_IDX1_H downto 0);
+  -- temporary output pipe
   signal data_pipe_tmp1 : std_logic_vector(c_PIPE_IDX1_H downto 0);
 
+  -- output address
   signal addr_rx : std_logic_vector(i_addr'range);
+  -- output data
   signal data_rx : std_logic_vector(i_data'range);
 
 begin

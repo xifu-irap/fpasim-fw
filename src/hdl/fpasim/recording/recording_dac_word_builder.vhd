@@ -62,17 +62,17 @@ architecture RTL of recording_dac_word_builder is
   -- state machine
   ---------------------------------------------------------------------
   type t_state is (E_RST, E_DATA0, E_DATA1);
-  signal sm_state_next : t_state;
-  signal sm_state_r1   : t_state := E_RST;
+  signal sm_state_next : t_state; -- state
+  signal sm_state_r1   : t_state := E_RST;  -- state (registered)
 
-  signal data_valid_next : std_logic;
-  signal data_valid_r1   : std_logic := '0';
+  signal data_valid_next : std_logic; -- data valid
+  signal data_valid_r1   : std_logic := '0'; -- data valid (registered)
 
-  signal data1_next : std_logic_vector(i_data'range);
-  signal data1_r1   : std_logic_vector(i_data'range);
+  signal data1_next : std_logic_vector(i_data'range); -- dac1 data
+  signal data1_r1   : std_logic_vector(i_data'range); -- dac1 data (registered)
 
-  signal data0_next : std_logic_vector(i_data'range);
-  signal data0_r1   : std_logic_vector(i_data'range);
+  signal data0_next : std_logic_vector(i_data'range); -- dac0 data
+  signal data0_r1   : std_logic_vector(i_data'range); -- dac0 data (registered)
 
 begin
 

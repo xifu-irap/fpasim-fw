@@ -17,18 +17,18 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---!   @file                   dac_check_dataflow.vhd
+--    @file                   dac_check_dataflow.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 -- -------------------------------------------------------------------------------------------------------------
---!   @details
+--    @details
 --
--- This module generates an error if the module detects the following pattern in the data flow:
---  data_valid -> hole -> data_valid
+--    This module generates an error if the module detects the following pattern in the data flow:
+--     data_valid -> hole -> data_valid
 --
--- Note:
---   . the error signal is valid only if it was detected when the function is enabled
+--     Note:
+--       . the error signal is valid only if it was detected when the function is enabled
 --
 --
 -- -------------------------------------------------------------------------------------------------------------
@@ -62,34 +62,36 @@ architecture RTL of dac_check_dataflow is
   -- fsm
   ---------------------------------------------------------------------
   type t_state is (E_RST, E_WAIT, E_RUN, E_ERROR);
-  signal sm_state      : t_state;
-  signal sm_state_next : t_state;
+  signal sm_state_r1   : t_state; -- state (registered)
+  signal sm_state_next : t_state; -- state
 
-  signal error_next : std_logic;
-  signal error_r1   : std_logic;
+  signal error_next : std_logic; -- error
+  signal error_r1   : std_logic; -- error (registered)
 
   -------------------------------------------------------------------
   -- sync fifo flags : @i_dac_clk -> @i_clk
   -------------------------------------------------------------------
+  -- temporary error
   signal errors_tmp0      : std_logic_vector(0 downto 0);
+  -- temporary error resynchronized
   signal errors_tmp0_sync : std_logic_vector(0 downto 0);
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 1;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 1; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
 
   ---------------------------------------------------------------------
   -- fsm
   ---------------------------------------------------------------------
-  p_decode_state : process(sm_state, i_dac_valid) is
+  p_decode_state : process(sm_state_r1, i_dac_valid) is
   begin
     error_next <= '0';
-    case sm_state is
+    case sm_state_r1 is
       when E_RST =>
         sm_state_next <= E_WAIT;
 
@@ -120,9 +122,9 @@ begin
   begin
     if rising_edge(i_dac_clk) then
       if i_dac_rst = '1' then
-        sm_state <= E_RST;
+        sm_state_r1 <= E_RST;
       else
-        sm_state <= sm_state_next;
+        sm_state_r1 <= sm_state_next;
       end if;
       error_r1 <= error_next;
 

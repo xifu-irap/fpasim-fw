@@ -87,76 +87,105 @@ architecture RTL of regdecode_wire_wr_rd is
   ---------------------------------------------------------------------
   -- cross clock domain: redecode to user
   ---------------------------------------------------------------------
-  constant c_FIFO_IDX0_L : integer := 0;
-  constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + i_data'length - 1;
+  constant c_FIFO_IDX0_L : integer := 0; -- index0: low
+  constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + i_data'length - 1; -- index0: high
 
-  constant c_FIFO_DEPTH0 : integer := g_FIFO_WRITE_DEPTH;  --see IP
-  constant c_FIFO_WIDTH0 : integer := c_FIFO_IDX0_H + 1;   --see IP
+  -- FIFO depth (expressed in number of words)
+  constant c_FIFO_DEPTH0 : integer := g_FIFO_WRITE_DEPTH;
+  -- FIFO width (expressed in bits)
+  constant c_FIFO_WIDTH0 : integer := c_FIFO_IDX0_H + 1;
 
+  -- fifo: write side
+  -- fifo: rst
   signal wr_rst_tmp0 : std_logic;
+  -- fifo: write
   signal wr_tmp0     : std_logic;
+  -- fifo: data_in
   signal data_tmp0   : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: full flag
   -- signal full0        : std_logic;
+  -- fifo: rst_busy flag
   -- signal wr_rst_busy0 : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal rd1          : std_logic;
+  -- fifo: data_out
   signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: empty flag
   signal empty1       : std_logic;
+  -- fifo: data_valid flag
   signal data_valid1  : std_logic;
+  -- fifo: rst_busy flag
   signal rd_rst_busy1 : std_logic;
 
+  -- fifo: data_out
   signal data1 : std_logic_vector(i_data'range);
 
-  -- synchronized errors
+  -- resynchronized errors
   signal errors_sync1 : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal empty_sync1  : std_logic;
 
   ---------------------------------------------------------------------
   -- sync with the rd RAM output
   ---------------------------------------------------------------------
-  constant c_PIPE_IDX0_L : integer := 0;
-  constant c_PIPE_IDX0_H : integer := c_PIPE_IDX0_L + i_data'length - 1;
+  constant c_PIPE_IDX0_L : integer := 0; -- index0: low
+  constant c_PIPE_IDX0_H : integer := c_PIPE_IDX0_L + i_data'length - 1; -- index0: high
 
-  constant c_PIPE_IDX1_L : integer := c_PIPE_IDX0_H + 1;
-  constant c_PIPE_IDX1_H : integer := c_PIPE_IDX1_L + 1 - 1;
+  constant c_PIPE_IDX1_L : integer := c_PIPE_IDX0_H + 1; -- index1: low
+  constant c_PIPE_IDX1_H : integer := c_PIPE_IDX1_L + 1 - 1; -- index1: high
 
-  signal data_pipe_tmp0 : std_logic_vector(c_PIPE_IDX1_H downto 0);
-  signal data_pipe_tmp1 : std_logic_vector(c_PIPE_IDX1_H downto 0);
+  signal data_pipe_tmp0 : std_logic_vector(c_PIPE_IDX1_H downto 0); -- temporary input pipe
+  signal data_pipe_tmp1 : std_logic_vector(c_PIPE_IDX1_H downto 0); -- temporary output pipe
 
-  signal data_valid_sync_rx : std_logic;
-  signal data_sync_rx       : std_logic_vector(o_data'range);
+  signal data_valid_sync_rx : std_logic; -- delayed data_valid
+  signal data_sync_rx       : std_logic_vector(o_data'range); -- delayed data
 
   ---------------------------------------------------------------------
   -- cross clock domain: user to regdecode
   ---------------------------------------------------------------------
-  constant c_FIFO_DEPTH2 : integer := g_FIFO_WRITE_DEPTH;  --see IP
-  constant c_FIFO_WIDTH2 : integer := c_FIFO_IDX0_H + 1;   --see IP
+  -- FIFO depth (expressed in number of words)
+  constant c_FIFO_DEPTH2 : integer := g_FIFO_WRITE_DEPTH;
+  -- FIFO width (expressed in bits)
+  constant c_FIFO_WIDTH2 : integer := c_FIFO_IDX0_H + 1;
 
-  -- wr side
+  -- fifo: write side
+  -- fifo: write
   signal wr_tmp2   : std_logic;
+  -- fifo: data_in
   signal data_tmp2 : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
+  -- fifo: full flag
   -- signal full2        : std_logic;
+  -- fifo: rst_busy flag
   -- signal wr_rst_busy2 : std_logic;
 
-  -- synchronized errors
+  -- resynchronized errors
   signal errors_sync2 : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal empty_sync2  : std_logic;
 
-  -- rd side
+  -- fifo: read side
+  -- fifo: read
   signal rd3          : std_logic;
+  -- fifo: data_out
   signal data_tmp3    : std_logic_vector(c_FIFO_WIDTH2 - 1 downto 0);
+  -- fifo: empty flag
   signal empty3       : std_logic;
+  -- fifo: data_valid flag
   signal data_valid3  : std_logic;
+  -- fifo: rst_busy flag
   signal rd_rst_busy3 : std_logic;
 
+  -- fifo: data_out
   signal data3 : std_logic_vector(i_data'range);
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 6;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 6; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
 

@@ -89,58 +89,65 @@ architecture RTL of tes_signalling_generator is
   -- state machine
   ---------------------------------------------------------------------
   type t_state is (E_RST, E_WAIT, E_START, E_RUN);
-  signal sm_state_next : t_state;
-  signal sm_state_r1   : t_state := E_RST;
+  signal sm_state_next : t_state; -- state
+  signal sm_state_r1   : t_state := E_RST; -- state (registered)
 
-  signal rst_next : std_logic;
-  signal rst_r1   : std_logic := '0';
+  signal rst_next : std_logic; -- local reset
+  signal rst_r1   : std_logic := '0'; -- local reset (registered)
 
-  signal data_valid_next : std_logic;
-  signal data_valid_r1   : std_logic := '0';
+  signal data_valid_next : std_logic; -- data_valid
+  signal data_valid_r1   : std_logic := '0'; -- data_valid (registered)
 
-  signal sof_next : std_logic;
-  signal sof_r1   : std_logic := '0';
+  signal sof_next : std_logic; -- first block sample
+  signal sof_r1   : std_logic := '0'; -- first block sample (registered)
 
-  signal eof_next : std_logic;
-  signal eof_r1   : std_logic := '0';
+  signal eof_next : std_logic; -- last block sample
+  signal eof_r1   : std_logic := '0'; -- last block sample (registered)
 
+  -- counter of number of samples
   signal cnt_frame_next : unsigned(i_nb_samples_by_block'range);
+  -- counter of number of samples (registered)
   signal cnt_frame_r1   : unsigned(i_nb_samples_by_block'range) := (others => '0');
 
+  -- number of samples max
   signal cnt_frame_max_next : unsigned(i_nb_samples_by_block'range);
+  -- number of samples max (registered)
   signal cnt_frame_max_r1   : unsigned(i_nb_samples_by_block'range) := (others => '0');
 
+  -- number max of block ( max id value)
   signal nb_block_r1   : std_logic_vector(i_nb_block'range) := (others => '0');
   ---------------------------------------------------------------------
   -- step2
   ---------------------------------------------------------------------
-  signal sof_r2        : std_logic                          := '0';
-  signal eof_r2        : std_logic                          := '0';
-  signal data_valid_r2 : std_logic                          := '0';
-  signal cnt_id_r2     : unsigned(i_nb_block'range)         := (others => '0');
+  signal sof_r2        : std_logic                          := '0'; -- first block sample
+  signal eof_r2        : std_logic                          := '0'; -- last block sample
+  signal data_valid_r2 : std_logic                          := '0'; -- data_valid
+  signal cnt_id_r2     : unsigned(i_nb_block'range)         := (others => '0'); -- id
 
   ---------------------------------------------------------------------
   -- optional pipeline
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_nb_block'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + i_nb_block'length - 1; -- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1; -- index1: high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1; -- index2: low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1; -- index2: high
 
-  constant c_IDX3_L : integer := c_IDX2_H + 1;
-  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;
+  constant c_IDX3_L : integer := c_IDX2_H + 1; -- index2: low
+  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1; -- index2: high
 
+  -- temporary input pipe
   signal data_tmp0 : std_logic_vector(c_IDX3_H downto 0);
+  -- temporary output pipe
   signal data_tmp1 : std_logic_vector(c_IDX3_H downto 0);
 
   signal data_valid1 : std_logic                          := '0';
-  signal sof1        : std_logic                          := '0';
-  signal eof1        : std_logic                          := '0';
-  signal id1         : std_logic_vector(i_nb_block'range) := (others => '0');
+  signal sof1        : std_logic                          := '0'; -- first block sample
+  signal eof1        : std_logic                          := '0'; -- last block sample
+  signal id1         : std_logic_vector(i_nb_block'range) := (others => '0'); -- id
 
 begin
 

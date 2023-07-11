@@ -114,69 +114,108 @@ architecture RTL of spi_device_select is
 -- state machine
 ---------------------------------------------------------------------
   type t_state is (E_RST, E_WAIT_READY_ALL, E_WAIT_CMD, E_WAIT_CDCE, E_WAIT_ADC, E_WAIT_DAC, E_WAIT_AMC);
-  signal sm_state_next : t_state;
-  signal sm_state_r1   : t_state := E_RST;
+  signal sm_state_next : t_state; -- state
+  signal sm_state_r1   : t_state := E_RST; -- state (registered)
 
+  -- cdce: data_valid
   signal cdce_data_valid_next : std_logic;
+  -- cdce: data_valid (registered)
   signal cdce_data_valid_r1   : std_logic;
 
+  -- adc: data_valid
   signal adc_data_valid_next : std_logic;
+  -- adc: data_valid (registered)
   signal adc_data_valid_r1   : std_logic;
 
+  -- dac: data_valid
   signal dac_data_valid_next : std_logic;
+  -- dac: data_valid (registered)
   signal dac_data_valid_r1   : std_logic;
 
+  -- amc: data_valid
   signal amc_data_valid_next : std_logic;
+  -- amc: data_valid (registered)
   signal amc_data_valid_r1   : std_logic;
 
+  -- spi: clock
   signal spi_clk_next : std_logic;
+  -- spi: clock (registered)
   signal spi_clk_r1   : std_logic := '0';
 
+  -- spi: mosi
   signal spi_mosi_next : std_logic;
+  -- spi: mosi (registered)
   signal spi_mosi_r1   : std_logic := '0';
 
+  -- read_valid
   signal rd_data_valid_next : std_logic;
+  -- read_valid (registered)
   signal rd_data_valid_r1   : std_logic := '0';
 
+  -- read data
   signal rd_data_next : std_logic_vector(o_spi_rd_data'range);
+  -- read data (registered)
   signal rd_data_r1   : std_logic_vector(o_spi_rd_data'range) := (others => '0');
 
+  -- spi mode: read/write (registered)
   signal tx_wr_rd_en_r1        : std_logic;
+
+  -- dac tx_present pin (registered)
   signal dac_spi_tx_present_r1 : std_logic;
+  -- spi: command to write (registered)
   signal tx_data_r1            : std_logic_vector(i_spi_cmd_wr_data'range);
 
+  -- error flag
   signal error_next : std_logic;
+  -- error flag (registered)
   signal error_r1   : std_logic;
 
+  -- ready flag
   signal ready_next : std_logic;
+  -- ready flag (registered)
   signal ready_r1   : std_logic := '0';
 
   ---------------------------------------------------------------------
   -- sync with fsm output
   ---------------------------------------------------------------------
-
-
+  -- cdce: chip select
   signal cdce_spi_cs_n_en1 : std_logic;
+  -- adc: chip select
   signal adc_spi_cs_n1     : std_logic;
+  -- dac: chip select
   signal dac_spi_cs_n1     : std_logic;
+  -- amc: chip select
   signal amc_spi_cs_n1     : std_logic;
+  -- cdce: reset_n
   signal cdce_n_reset1     : std_logic;
+  -- cdce: power_down_n
   signal cdce_n_pd1        : std_logic;
+  -- cdce: enable the primary reference clock
   signal cdce_ref_en1      : std_logic;
+  -- adc: hardware reset
   signal adc_reset1        : std_logic;
+  -- dac: enable tx acquisition pin
   signal dac_tx_present1   : std_logic;
+  -- amc: hardware reset
   signal amc_mon_n_reset1  : std_logic;
 
 ---------------------------------------------------------------------
 -- CDCE
 ---------------------------------------------------------------------
   -- cmd
+  -- cdce spi bridge: write data valid
   signal cdce_spi_cmd_wr_data_valid : std_logic;
+  -- cdce spi bridge: mode (write/read)
   signal cdce_spi_mode              : std_logic;
+  -- cdce spi bridge: write data
   signal cdce_spi_cmd_wr_data       : std_logic_vector(31 downto 0);
+  -- cdce spi bridge: read data valid
   signal cdce_spi_rd_data_valid     : std_logic;
+  -- cdce spi bridge: read data
   signal cdce_spi_rd_data           : std_logic_vector(31 downto 0);
+  -- cdce spi bridge: ready
   signal cdce_spi_ready             : std_logic;
+  -- cdce spi bridge: finish
   signal cdce_spi_finish            : std_logic;
   -- status
   signal cdce_status                : std_logic_vector(7 downto 0);
@@ -193,12 +232,19 @@ architecture RTL of spi_device_select is
   -- ADC
   ---------------------------------------------------------------------
   -- cmd
+  -- adc spi bridge: write data valid
   signal adc_spi_cmd_wr_data_valid : std_logic;
+  -- adc spi bridge: mode (write/read)
   signal adc_spi_mode              : std_logic;
+  -- adc spi bridge: write data
   signal adc_spi_cmd_wr_data       : std_logic_vector(15 downto 0);
+  -- adc spi bridge: read data valid
   signal adc_spi_rd_data_valid     : std_logic;
+  -- adc spi bridge: read data
   signal adc_spi_rd_data           : std_logic_vector(15 downto 0);
+  -- adc spi bridge: ready
   signal adc_spi_ready             : std_logic;
+  -- adc spi bridge: finish
   signal adc_spi_finish            : std_logic;
   -- spi
   signal adc_spi_clk               : std_logic;  -- SPI clock
@@ -211,12 +257,19 @@ architecture RTL of spi_device_select is
   -- DAC
   ---------------------------------------------------------------------
   -- dac
+  -- dac spi bridge: write data valid
   signal dac_spi_cmd_wr_data_valid : std_logic;
+  -- dac spi bridge: mode (write/read)
   signal dac_spi_mode              : std_logic;
+  -- dac spi bridge: write data
   signal dac_spi_cmd_wr_data       : std_logic_vector(15 downto 0);
+  -- dac spi bridge: read data valid
   signal dac_spi_rd_data_valid     : std_logic;
+  -- dac spi bridge: read data
   signal dac_spi_rd_data           : std_logic_vector(15 downto 0);
+  -- dac spi bridge: ready
   signal dac_spi_ready             : std_logic;
+  -- dac spi bridge: finish
   signal dac_spi_finish            : std_logic;
   -- spi
   signal dac_spi_clk               : std_logic;  -- SPI clock
@@ -229,14 +282,21 @@ architecture RTL of spi_device_select is
   -- AMC
   ---------------------------------------------------------------------
   -- cmd
+  -- amc spi bridge: write data valid
   signal amc_spi_cmd_wr_data_valid : std_logic;
+  -- amc spi bridge: mode (write/read)
   signal amc_spi_mode              : std_logic;
+  -- amc spi bridge: write data
   signal amc_spi_cmd_wr_data       : std_logic_vector(31 downto 0);
+  -- amc spi bridge: read data valid
   signal amc_spi_rd_data_valid     : std_logic;
+  -- amc spi bridge: read data
   signal amc_spi_rd_data           : std_logic_vector(31 downto 0);
+  -- amc spi bridge: ready
   signal amc_spi_ready             : std_logic;
+  -- amc spi bridge: finish
   signal amc_spi_finish            : std_logic;
-  -- status
+  -- amc spi bridge: status
   signal amc_status                : std_logic_vector(7 downto 0);
 
   -- spi
@@ -249,15 +309,18 @@ architecture RTL of spi_device_select is
 ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 1;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 1; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
   ---------------------------------------------------------------------
   -- debug
   ---------------------------------------------------------------------
+  -- debug: control signal for the cdce_n_reset pin
   signal debug_cdce_n_reset1 : std_logic;
+  -- debug: control signal for the cdce_n_pd pin
   signal debug_cdce_n_pd1    : std_logic;
+  -- debug: control signal for the cdce_ref_en pin
   signal debug_cdce_ref_en1  : std_logic;
 
 begin

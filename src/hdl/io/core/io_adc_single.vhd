@@ -90,24 +90,34 @@ architecture RTL of io_adc_single is
   ---------------------------------------------------------------------
   -- management of bitslip_r1
   ---------------------------------------------------------------------
+  -- io reset
   signal io_rst_r1  : std_logic;
   ---------------------------------------------------------------------
   -- selectio_wiz_adc
   ---------------------------------------------------------------------
+  -- channel A and B: adc_p
   signal adc_tmp_p  : std_logic_vector(13 downto 0);
+  -- channel A and B: adc_n
   signal adc_tmp_n  : std_logic_vector(13 downto 0);
+  -- IO: bitslip
   signal bitslip_r1 : std_logic_vector(13 downto 0) := (others => '0');
+  -- channel A and B: multi-words
   signal adc_tmp0   : std_logic_vector(111 downto 0);
 
+  -- clock (provided by the IO)
   signal clk_div : std_logic;
 
   ---------------------------------------------------------------------
   -- bit remapping
   ---------------------------------------------------------------------
   type t_word_by_bit is array (natural range <>) of std_logic_vector(13 downto 0);
+  -- channe A: word1
   signal adc_a_word_tmp1 : t_word_by_bit(0 to 3);
+  -- channe A: word2
   signal adc_a_word_tmp2 : t_word_by_bit(0 to 3);
+  -- channe B: word1
   signal adc_b_word_tmp1 : t_word_by_bit(0 to 3);
+  -- channe B: word2
   signal adc_b_word_tmp2 : t_word_by_bit(0 to 3);
 
 

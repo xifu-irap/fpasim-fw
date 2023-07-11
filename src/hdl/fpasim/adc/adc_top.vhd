@@ -85,9 +85,13 @@ architecture RTL of adc_top is
   ---------------------------------------------------------------------
   -- apply delay
   ---------------------------------------------------------------------
+  -- temporary: data valid
   signal data_valid1   : std_logic;
+  -- delayed: data valid
   signal data_valid_r1 : std_logic;
+  -- custom delayed: adc1 data
   signal adc1_rx       : std_logic_vector(o_adc1'range);
+  -- custom delayed: adc0 data
   signal adc0_rx       : std_logic_vector(o_adc0'range);
 
 begin

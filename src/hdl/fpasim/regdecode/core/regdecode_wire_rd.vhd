@@ -70,42 +70,58 @@ end entity regdecode_wire_rd;
 
 architecture RTL of regdecode_wire_rd is
 
+  -- FIFO: Latendy (in reading: expressed in clock periods on the read side)
   constant c_FIFO_READ_LATENCY : integer := 2;
 
   ---------------------------------------------------------------------
   -- cross clock domain: redecode to user
   ---------------------------------------------------------------------
-  constant c_FIFO_IDX0_L : integer := 0;
-  constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + i_data'length - 1;
+  constant c_FIFO_IDX0_L : integer := 0; -- index0: low
+  constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + i_data'length - 1;-- index0: high
 
-  constant c_FIFO_DEPTH0 : integer := g_FIFO_WRITE_DEPTH;  --see IP
-  constant c_FIFO_WIDTH0 : integer := c_FIFO_IDX0_H + 1;   --see IP
+  -- FIFO depth (expressed in number of words)
+  constant c_FIFO_DEPTH0 : integer := g_FIFO_WRITE_DEPTH;
+  -- FIFO width (expressed in bits)
+  constant c_FIFO_WIDTH0 : integer := c_FIFO_IDX0_H + 1;
 
+  -- fifo: write side
+  -- fifo: rst
   signal wr_rst_tmp0 : std_logic;
+  -- fifo: write
   signal wr_tmp0     : std_logic;
+  -- fifo: data_in
   signal data_tmp0   : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: full flag
   -- signal full0        : std_logic;
+  -- fifo: rst_busy flag
   -- signal wr_rst_busy0 : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal rd1          : std_logic;
+  -- fifo: data_out
   signal data_tmp1    : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: empty flag
   signal empty1       : std_logic;
+  -- fifo: data_valid flag
   signal data_valid1  : std_logic;
+  -- fifo: rst_busy flag
   signal rd_rst_busy1 : std_logic;
 
+  -- fifo: data_out
   signal data1 : std_logic_vector(i_data'range);
 
-  -- synchronized errors
+  -- resynchronized errors
   signal errors_sync1 : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal empty_sync1  : std_logic;
-
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 3;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 3; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
 

@@ -121,84 +121,112 @@ architecture RTL of regdecode_pipe_rd_all is
   -- fsm
   ---------------------------------------------------------------------
   type t_state is (E_RST, E_WAIT, E_RUN0, E_RUN1, E_RUN2, E_RUN3, E_RUN4);
-  signal sm_state_next : t_state := E_RST;
-  signal sm_state_r1   : t_state := E_RST;
+  signal sm_state_next : t_state := E_RST; -- state
+  signal sm_state_r1   : t_state := E_RST; -- state (registered)
 
+  -- fifo0: read
   signal rd0_next : std_logic;
   -- signal rd0_r1   : std_logic;
 
+  -- fifo1: read
   signal rd1_next : std_logic;
   -- signal rd1_r1   : std_logic;
 
+  -- fifo2: read
   signal rd2_next : std_logic;
   -- signal rd2_r1   : std_logic;
 
+  -- fifo3: read
   signal rd3_next : std_logic;
   -- signal rd3_r1   : std_logic;
 
+  -- fifo4: read
   signal rd4_next : std_logic;
   -- signal rd4_r1   : std_logic;
 
+  -- select FIFO
   signal sel_next : std_logic_vector(2 downto 0);
+  -- select FIFO (registered)
   signal sel_r1   : std_logic_vector(2 downto 0);
 
   ---------------------------------------------------------------------
   -- select the input path
   ---------------------------------------------------------------------
-  signal sof_rx        : std_logic;
-  signal eof_rx        : std_logic;
-  signal data_valid_rx : std_logic;
-  signal addr_rx       : std_logic_vector(o_fifo_addr'range);
-  signal data_rx       : std_logic_vector(o_fifo_data'range);
+  signal sof_rx        : std_logic; -- first word
+  signal eof_rx        : std_logic; -- last word
+  signal data_valid_rx : std_logic; -- data valid
+  signal addr_rx       : std_logic_vector(o_fifo_addr'range); -- address
+  signal data_rx       : std_logic_vector(o_fifo_data'range); -- data
 
   ---------------------------------------------------------------------
   -- output FIFO
   ---------------------------------------------------------------------
-  constant c_FIFO_IDX0_L : integer := 0;
-  constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + o_fifo_data'length - 1;
+  constant c_FIFO_IDX0_L : integer := 0; -- index0: low
+  constant c_FIFO_IDX0_H : integer := c_FIFO_IDX0_L + o_fifo_data'length - 1; -- index0: high
 
-  constant c_FIFO_IDX1_L : integer := c_FIFO_IDX0_H + 1;
-  constant c_FIFO_IDX1_H : integer := c_FIFO_IDX1_L + o_fifo_addr'length - 1;
+  constant c_FIFO_IDX1_L : integer := c_FIFO_IDX0_H + 1; -- index1: low
+  constant c_FIFO_IDX1_H : integer := c_FIFO_IDX1_L + o_fifo_addr'length - 1; -- index1: high
 
-  constant c_FIFO_IDX2_L : integer := c_FIFO_IDX1_H + 1;
-  constant c_FIFO_IDX2_H : integer := c_FIFO_IDX2_L + 1 - 1;
+  constant c_FIFO_IDX2_L : integer := c_FIFO_IDX1_H + 1; -- index2: low
+  constant c_FIFO_IDX2_H : integer := c_FIFO_IDX2_L + 1 - 1; -- index2: high
 
-  constant c_FIFO_IDX3_L : integer := c_FIFO_IDX2_H + 1;
-  constant c_FIFO_IDX3_H : integer := c_FIFO_IDX3_L + 1 - 1;
+  constant c_FIFO_IDX3_L : integer := c_FIFO_IDX2_H + 1; -- index3: low
+  constant c_FIFO_IDX3_H : integer := c_FIFO_IDX3_L + 1 - 1; -- index3: high
 
-  -- find the power of 2 superior to the g_DELAY
-  constant c_FIFO_DEPTH0          : integer := 1024;                 --see IP
-  constant c_PROG_FULL_THRESH0    : integer := c_FIFO_DEPTH0 - 6;  --see IP
-  constant c_FIFO_WIDTH0          : integer := c_FIFO_IDX3_H + 1;  --see IP
+  -- FIFO depth (expressed in number of words)
+  constant c_FIFO_DEPTH0          : integer := 1024;
+  -- FIFO prog_full threshold (expressed in words)
+  constant c_PROG_FULL_THRESH0    : integer := c_FIFO_DEPTH0 - 6;
+  -- FIFO width (expressed in bits)
+  constant c_FIFO_WIDTH0          : integer := c_FIFO_IDX3_H + 1;
+  -- FIFO write data count width (expressed in bits)
   constant c_WR_DATA_COUNT_WIDTH0 : integer := work.pkg_utils.pkg_width_from_value(c_FIFO_DEPTH0) + 1;  --see IP
 
+  -- fifo: write side
+  -- fifo: write
   signal wr_tmp0        : std_logic;
+  -- fifo: data in
   signal data_tmp0      : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: write data count
   signal wr_data_count0 : std_logic_vector(c_WR_DATA_COUNT_WIDTH0 - 1 downto 0);
+  -- fifo: full flag
   -- signal full0        : std_logic;
+  -- fifo: prog full flag
   signal prog_full0     : std_logic;
   -- signal wr_rst_busy0 : std_logic;
 
+  -- fifo: read side
+  -- fifo: read
   signal rd1         : std_logic;
+  -- fifo: data out
   signal data_tmp1   : std_logic_vector(c_FIFO_WIDTH0 - 1 downto 0);
+  -- fifo: empty flag
   signal empty1      : std_logic;
+  -- fifo: data valid
   signal data_valid1 : std_logic;
+  -- fifo: rst busy flag
   -- signal rd_rst_busy1 : std_logic;
 
+  -- first word
   signal fifo_sof1  : std_logic;
+  -- last word
   signal fifo_eof1  : std_logic;
+  -- address
   signal fifo_addr1 : std_logic_vector(o_fifo_addr'range);
+  -- data
   signal fifo_data1 : std_logic_vector(o_fifo_data'range);
 
+  -- resynchronized errors
   signal errors_sync : std_logic_vector(3 downto 0);
+  -- resynchronized empty flag
   signal empty_sync  : std_logic;
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 3;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant c_NB_ERRORS : integer := 3; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
 

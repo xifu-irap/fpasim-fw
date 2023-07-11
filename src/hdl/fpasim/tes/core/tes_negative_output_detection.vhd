@@ -76,20 +76,20 @@ end entity tes_negative_output_detection;
 architecture RTL of tes_negative_output_detection is
 
   type t_state is (E_RST, E_WAIT, E_END);
-  signal sm_state_next : t_state;
-  signal sm_state_r1   : t_state := E_RST;
+  signal sm_state_next : t_state; -- state
+  signal sm_state_r1   : t_state := E_RST; -- state (registered)
 
-  signal data_valid_next : std_logic;
-  signal data_valid_r1   : std_logic := '0';
+  signal data_valid_next : std_logic; -- data_valid
+  signal data_valid_r1   : std_logic := '0'; -- data_valid (registered)
 
-  signal rst_status_next : std_logic;
-  signal rst_status_r1 : std_logic;
+  signal rst_status_next : std_logic; -- reset_status
+  signal rst_status_r1 : std_logic; -- reset_status (registered)
 
-  signal pixel_id_next : std_logic_vector(i_pixel_id'range);
-  signal pixel_id_r1   : std_logic_vector(i_pixel_id'range) := (others => '0');
+  signal pixel_id_next : std_logic_vector(i_pixel_id'range); -- pixel_id
+  signal pixel_id_r1   : std_logic_vector(i_pixel_id'range) := (others => '0'); -- pixel_id (registered)
 
-  signal error_next : std_logic;
-  signal error_r1   : std_logic := '0';
+  signal error_next : std_logic; -- error flag
+  signal error_r1   : std_logic := '0'; -- error flag (registered)
 
 begin
 
