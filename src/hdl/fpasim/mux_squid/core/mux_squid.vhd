@@ -123,9 +123,12 @@ architecture RTL of mux_squid is
   -- compute
   --   S = i_pixel_result - i_mux_squid_feedback
   ---------------------------------------------------------------------
-  signal pixel_result_tmp       : std_logic_vector(pkg_MUX_SQUID_SUB_Q_WIDTH_A - 1 downto 0);
+  -- operator input_a
+  signal pixel_result_tmp : std_logic_vector(pkg_MUX_SQUID_SUB_Q_WIDTH_A - 1 downto 0);
+  -- operator input_b
   signal mux_squid_fb_tmp : std_logic_vector(pkg_MUX_SQUID_SUB_Q_WIDTH_B - 1 downto 0):= (others => '0');
-  signal result_sub_rx          : std_logic_vector(pkg_MUX_SQUID_SUB_Q_WIDTH_S - 1 downto 0);
+  -- operator output
+  signal result_sub_rx    : std_logic_vector(pkg_MUX_SQUID_SUB_Q_WIDTH_S - 1 downto 0);
 
   ---------------------------------------------------------------------
   -- sync with sub_sfixed_mux_squid out
@@ -142,13 +145,13 @@ architecture RTL of mux_squid is
   constant c_IDX3_L : integer := c_IDX2_H + 1;
   constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;
 
-  signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0);
-  signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0);-- temporary input pipe signal
+  signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0);-- temporary output pipe signal
 
-  signal pixel_sof_rx   : std_logic;
-  signal pixel_eof_rx   : std_logic;
-  signal pixel_valid_rx : std_logic;
-  signal pixel_id_rx    : std_logic_vector(i_pixel_id'range);
+  signal pixel_sof_rx   : std_logic; -- first pixel sample
+  signal pixel_eof_rx   : std_logic; -- last pixel sample
+  signal pixel_valid_rx : std_logic; -- valid pixel sample
+  signal pixel_id_rx    : std_logic_vector(i_pixel_id'range); -- pixel id
 
   ---------------------------------------------------------------------
   -- mux_squid_offset
@@ -200,13 +203,13 @@ architecture RTL of mux_squid is
   ---------------------------------------------------------------------
   -- sync with the mux_squid_tf out
   ---------------------------------------------------------------------
-  signal data_pipe_tmp2 : std_logic_vector(c_IDX3_H downto 0);
-  signal data_pipe_tmp3 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp2 : std_logic_vector(c_IDX3_H downto 0);-- temporary input pipe signal
+  signal data_pipe_tmp3 : std_logic_vector(c_IDX3_H downto 0);-- temporary output pipe signal
 
-  signal pixel_sof_ry   : std_logic;
-  signal pixel_eof_ry   : std_logic;
-  signal pixel_valid_ry : std_logic;
-  signal pixel_id_ry    : std_logic_vector(i_pixel_id'range);
+  signal pixel_sof_ry   : std_logic; -- first pixel sample
+  signal pixel_eof_ry   : std_logic; -- last pixel sample
+  signal pixel_valid_ry : std_logic; -- valid pixel sample
+  signal pixel_id_ry    : std_logic_vector(i_pixel_id'range); -- pixel id
 
   signal mux_squid_offset_ry : std_logic_vector(i_mux_squid_offset_wr_data'range);
 
@@ -214,34 +217,38 @@ architecture RTL of mux_squid is
   -- add: mux_squid_offset + mux_squid_tf
   -------------------------------------------------------------------
   -- add a sign bit
-  signal inter_squid_gain_tmp : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_A - 1 downto 0);
+  -- operator input a
+  signal  : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_A - 1 downto 0);
+  -- operator input b
   signal mux_squid_tf_tmp     : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_B - 1 downto 0);
+  -- operator input c
   signal mux_squid_offset_tmp : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_C - 1 downto 0);
+  -- operator output
   signal result_rz            : std_logic_vector(o_pixel_result'range);
 
   ---------------------------------------------------------------------
   -- sync with the add_sfixed_mux_squid_offset_and_tf out
   ---------------------------------------------------------------------
-  signal data_pipe_tmp4 : std_logic_vector(c_IDX3_H downto 0);
-  signal data_pipe_tmp5 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp4 : std_logic_vector(c_IDX3_H downto 0); -- temporary input pipe signal
+  signal data_pipe_tmp5 : std_logic_vector(c_IDX3_H downto 0); -- temporary output pipe signal
 
-  signal pixel_sof_rz   : std_logic;
-  signal pixel_eof_rz   : std_logic;
-  signal pixel_valid_rz : std_logic;
-  signal pixel_id_rz    : std_logic_vector(i_pixel_id'range);
+  signal pixel_sof_rz   : std_logic; -- first pixel sample
+  signal pixel_eof_rz   : std_logic; -- last pixel sample
+  signal pixel_valid_rz : std_logic; -- valid pixel sample
+  signal pixel_id_rz    : std_logic_vector(i_pixel_id'range); -- pixel id
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 2;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant NB_ERRORS_c : integer := 2; -- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0); -- temporary output errors
 
 begin
 
   assert not ((i_pixel_result'length) /= ((pixel_result_tmp'length)))
          report "[mux_squid]: pixel result => input port width and sfixed package definition width doesn't match." severity error;
-  assert not ((mux_squid_fb_tmp'length) < (i_mux_squid_feedback'length)) 
+  assert not ((mux_squid_fb_tmp'length) < (i_mux_squid_feedback'length))
          report "[mux_squid]: mux_squid_fb_tmp'length must be >= i_mux_squid_feedback'length" severity error;
 
   -------------------------------------------------------------------
@@ -557,11 +564,11 @@ begin
   -- compute: inter_squid_gain* mux_squid_tf + mux_squid_offset
   -- requirement: FPASIM-FW-REQ-0150 (part1)
   ---------------------------------------------------------------------
-  assert not ((i_inter_squid_gain'length) /= ((inter_squid_gain_tmp'length) - 1)) report "[mux_squid]: inter_squid_gain_tmp => port width and sfixed package definition width doesn't match." severity error;
+  assert not ((i_inter_squid_gain'length) /= (('length) - 1)) report "[mux_squid]:  => port width and sfixed package definition width doesn't match." severity error;
   assert not ((mux_squid_tf_doutb'length) /= ((mux_squid_tf_tmp'length) - 1)) report "[mux_squid]: mux_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
   assert not ((mux_squid_offset_tmp'length) /= (mux_squid_offset_ry'length)) report "[mux_squid]: mux_squid_offset_tmp => port width and sfixed package definition width doesn't match." severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
-  inter_squid_gain_tmp <= std_logic_vector(resize(unsigned(i_inter_squid_gain), inter_squid_gain_tmp'length));
+   <= std_logic_vector(resize(unsigned(i_inter_squid_gain), 'length));
   mux_squid_tf_tmp     <= std_logic_vector(resize(unsigned(mux_squid_tf_doutb), mux_squid_tf_tmp'length));
   -- no conversion => width unchanged
   mux_squid_offset_tmp <= mux_squid_offset_ry;
@@ -586,7 +593,7 @@ begin
       --------------------------------------------------------------
       -- input
       --------------------------------------------------------------
-      i_a   => inter_squid_gain_tmp,
+      i_a   => ,
       i_b   => mux_squid_tf_tmp,
       i_c   => mux_squid_offset_tmp,
       --------------------------------------------------------------

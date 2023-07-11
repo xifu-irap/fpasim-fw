@@ -104,9 +104,12 @@ architecture RTL of amp_squid is
   -- compute
   --   S = i_pixel_result - i_mux_squid_feedback
   ---------------------------------------------------------------------
-  signal pixel_result_tmp                : std_logic_vector(i_pixel_result'range); -- temporary input0
+  -- operator input_a
+  signal pixel_result_tmp          : std_logic_vector(i_pixel_result'range); -- temporary input0
+  -- operator input_b
   signal amp_squid_offset_corr_tmp : std_logic_vector(pkg_AMP_SQUID_SUB_Q_WIDTH_B - 1 downto 0):= (others => '0'); -- temporary input1
-  signal result_sub_rx                   : std_logic_vector(pkg_AMP_SQUID_SUB_Q_WIDTH_S - 1 downto 0); -- computation result
+  -- operator output
+  signal result_sub_rx             : std_logic_vector(pkg_AMP_SQUID_SUB_Q_WIDTH_S - 1 downto 0); -- computation result
 
   ---------------------------------------------------------------------
   -- sync with sub_sfixed_mux_squid out
@@ -123,13 +126,13 @@ architecture RTL of amp_squid is
   constant c_IDX3_L : integer := c_IDX2_H + 1;
   constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;
 
-  signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0);
-  signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0); -- temporary input pipe signal
+  signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0); -- temporary output pipe signal
 
-  signal pixel_sof_rx   : std_logic;
-  signal pixel_eof_rx   : std_logic;
-  signal pixel_valid_rx : std_logic;
-  signal pixel_id_rx    : std_logic_vector(i_pixel_id'range);
+  signal pixel_sof_rx   : std_logic; -- first pixel sample
+  signal pixel_eof_rx   : std_logic; -- last pixel samplev
+  signal pixel_valid_rx : std_logic; -- valid pixel sample
+  signal pixel_id_rx    : std_logic_vector(i_pixel_id'range); -- pixel id
 
   ---------------------------------------------------------------------
   -- mux_squid_tf
@@ -158,13 +161,13 @@ architecture RTL of amp_squid is
   ---------------------------------------------------------------------
   -- sync with the mux_squid_tf out
   ---------------------------------------------------------------------
-  signal data_pipe_tmp2 : std_logic_vector(c_IDX3_H downto 0);
-  signal data_pipe_tmp3 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp2 : std_logic_vector(c_IDX3_H downto 0); -- temporary input pipe signal
+  signal data_pipe_tmp3 : std_logic_vector(c_IDX3_H downto 0); -- temporary output pipe signal
 
-  signal pixel_sof_ry   : std_logic;
-  signal pixel_eof_ry   : std_logic;
-  signal pixel_valid_ry : std_logic;
-  signal pixel_id_ry    : std_logic_vector(i_pixel_id'range);
+  signal pixel_sof_ry   : std_logic; -- first pixel sample
+  signal pixel_eof_ry   : std_logic; -- last pixel sample
+  signal pixel_valid_ry : std_logic; -- valid pixel sample
+  signal pixel_id_ry    : std_logic_vector(i_pixel_id'range); -- pixel id
 
   ---------------------------------------------------------------------
   -- amp_squid_fpagain_table
@@ -182,20 +185,20 @@ architecture RTL of amp_squid is
   ---------------------------------------------------------------------
   -- sync with the add_sfixed_mux_squid_offset_and_tf out
   ---------------------------------------------------------------------
-  signal data_pipe_tmp4 : std_logic_vector(c_IDX3_H downto 0);
-  signal data_pipe_tmp5 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp4 : std_logic_vector(c_IDX3_H downto 0); -- temporary input pipe signal
+  signal data_pipe_tmp5 : std_logic_vector(c_IDX3_H downto 0); -- temporary output pipe signal
 
-  signal pixel_sof_rz   : std_logic;
-  signal pixel_eof_rz   : std_logic;
-  signal pixel_valid_rz : std_logic;
-  signal pixel_id_rz    : std_logic_vector(i_pixel_id'range);
+  signal pixel_sof_rz   : std_logic; -- first pixel sample
+  signal pixel_eof_rz   : std_logic; -- last pixel sample
+  signal pixel_valid_rz : std_logic; -- valid pixel sample
+  signal pixel_id_rz    : std_logic_vector(i_pixel_id'range); -- pixel id
 
   ---------------------------------------------------------------------
   -- error latching
   ---------------------------------------------------------------------
-  constant NB_ERRORS_c : integer := 1;
-  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0);
-  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0);
+  constant NB_ERRORS_c : integer := 1;-- define the width of the temporary errors signals
+  signal error_tmp     : std_logic_vector(NB_ERRORS_c - 1 downto 0); -- temporary input errors
+  signal error_tmp_bis : std_logic_vector(NB_ERRORS_c - 1 downto 0); -- temporary output errors
 
 begin
 
@@ -203,9 +206,9 @@ begin
   -- sub_sfixed_amp_squid_out : out = pixel_result_tmp - amp_squid_offset_correction_tmp
   -- requirement: FPASIM-FW-REQ-0170 (part0)
   -------------------------------------------------------------------
-  assert not ((i_pixel_result'length) /= pkg_AMP_SQUID_SUB_Q_WIDTH_A) 
+  assert not ((i_pixel_result'length) /= pkg_AMP_SQUID_SUB_Q_WIDTH_A)
          report "[amp_squid]: i_pixel_result => port width and sfixed package definition width doesn't match." severity error;
-  assert not ((amp_squid_offset_corr_tmp'length) < i_amp_squid_offset_correction'length) 
+  assert not ((amp_squid_offset_corr_tmp'length) < i_amp_squid_offset_correction'length)
          report "[amp_squid]: amp_squid_offset_corr_tmp'length must be >= i_amp_squid_offset_correction'length" severity error;
   -- no conversion: already sfixed
   pixel_result_tmp                <= i_pixel_result;
