@@ -218,7 +218,7 @@ architecture RTL of mux_squid is
   -------------------------------------------------------------------
   -- add a sign bit
   -- operator input a
-  signal  : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_A - 1 downto 0);
+  signal inter_squid_gain_tmp : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_A - 1 downto 0);
   -- operator input b
   signal mux_squid_tf_tmp     : std_logic_vector(pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_B - 1 downto 0);
   -- operator input c
@@ -564,11 +564,14 @@ begin
   -- compute: inter_squid_gain* mux_squid_tf + mux_squid_offset
   -- requirement: FPASIM-FW-REQ-0150 (part1)
   ---------------------------------------------------------------------
-  assert not ((i_inter_squid_gain'length) /= (('length) - 1)) report "[mux_squid]:  => port width and sfixed package definition width doesn't match." severity error;
-  assert not ((mux_squid_tf_doutb'length) /= ((mux_squid_tf_tmp'length) - 1)) report "[mux_squid]: mux_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
-  assert not ((mux_squid_offset_tmp'length) /= (mux_squid_offset_ry'length)) report "[mux_squid]: mux_squid_offset_tmp => port width and sfixed package definition width doesn't match." severity error;
+  assert not ((i_inter_squid_gain'length) /= ((inter_squid_gain_tmp'length) - 1))
+      report "[mux_squid]: inter_squid_gain_tmp => port width and sfixed package definition width doesn't match." severity error;
+  assert not ((mux_squid_tf_doutb'length) /= ((mux_squid_tf_tmp'length) - 1))
+     report "[mux_squid]: mux_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
+  assert not ((mux_squid_offset_tmp'length) /= (mux_squid_offset_ry'length))
+     report "[mux_squid]: mux_squid_offset_tmp => port width and sfixed package definition width doesn't match." severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
-   <= std_logic_vector(resize(unsigned(i_inter_squid_gain), 'length));
+  inter_squid_gain_tmp <= std_logic_vector(resize(unsigned(i_inter_squid_gain), inter_squid_gain_tmp'length));
   mux_squid_tf_tmp     <= std_logic_vector(resize(unsigned(mux_squid_tf_doutb), mux_squid_tf_tmp'length));
   -- no conversion => width unchanged
   mux_squid_offset_tmp <= mux_squid_offset_ry;
@@ -593,7 +596,7 @@ begin
       --------------------------------------------------------------
       -- input
       --------------------------------------------------------------
-      i_a   => ,
+      i_a   => inter_squid_gain_tmp,
       i_b   => mux_squid_tf_tmp,
       i_c   => mux_squid_offset_tmp,
       --------------------------------------------------------------
