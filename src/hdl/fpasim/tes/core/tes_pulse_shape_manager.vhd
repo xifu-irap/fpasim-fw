@@ -1543,7 +1543,7 @@ begin
   -- detect output negative value
   ---------------------------------------------------------------------
   sign_value <= sign_value_tmp6;
-  tes_negative_output_detection_INST : entity work.tes_negative_output_detection
+  inst_tes_negative_output_detection : entity work.tes_negative_output_detection
     generic map(
       -- command
       g_PIXEL_ID_WIDTH => pixel_id_ry'length  -- pixel id bus width (expressed in bits). Possible values : [1; max integer value[

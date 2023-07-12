@@ -219,7 +219,7 @@ begin
   ----------------------------------------------------
   --    Opal Kelly Host
   ----------------------------------------------------
-  Opal_Kelly_Host : okHost
+  inst_Opal_Kelly_Host : okHost
     port map(
       okUH  => i_okUH,
       okHU  => o_okHU,
@@ -232,7 +232,7 @@ begin
   ----------------------------------------------------
   --    Opal Kelly Wire OR
   ----------------------------------------------------
-  ins_wireor_opak_kelly : okWireOR
+  inst_wireor_opak_kelly : okWireOR
     generic map(N => c_WIRE_PIPE_TRIG_NUMBER_OUT)  -- N = Number of wires + pipes used
     port map(
       okEH  => okEH,
@@ -420,7 +420,7 @@ begin
   ---------------------------------------------------------------------
   -- Opal Kelly Trig In
   ---------------------------------------------------------------------
-  ep40 : okTriggerIn
+  inst_triggerIn : okTriggerIn
     port map(
       okHE       => okHE,
       ep_addr    => x"40",

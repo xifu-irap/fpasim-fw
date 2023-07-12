@@ -806,7 +806,7 @@ begin
 
   begin
 
-    fpasim_spi_device_select_vio_inst : entity work.fpasim_spi_device_select_vio
+    inst_fpasim_spi_device_select_vio : entity work.fpasim_spi_device_select_vio
       port map (
         CLK           => i_clk,
         probe_out0(0) => debug_cdce_n_reset1,

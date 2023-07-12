@@ -1164,7 +1164,7 @@ begin
   rec_ctrl_tmp0  <= usb_wirein_rec_ctrl;
   rec_conf0_tmp0 <= usb_wirein_rec_conf0;
 
-  regdecode_recording_INST : entity work.regdecode_recording
+  inst_regdecode_recording : entity work.regdecode_recording
     generic map(
       g_DATA_WIDTH => i_reg_fifo_rec_adc_data'length
       )

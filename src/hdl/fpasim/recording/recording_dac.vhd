@@ -200,7 +200,7 @@ begin
 ---------------------------------------------------------------------
 -- build output word
 ---------------------------------------------------------------------
-  recording_dac_word_builder_INST : entity work.recording_dac_word_builder
+  inst_recording_dac_word_builder : entity work.recording_dac_word_builder
     port map(
       i_rst        => i_rst,            -- input reset
       i_clk        => i_clk,            -- input clock
