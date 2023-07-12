@@ -128,7 +128,7 @@ begin
 --  At the end of the reset (falling edge), set the bitslip_r1 bit to '1' for all
 -- lanes in order to only skip the first bit in the de-serializer (one time).
 ---------------------------------------------------------------------
-  pulse_bitslip : process (clk_div) is
+  p_pulse_bitslip : process (clk_div) is
   begin
     if rising_edge(clk_div) then
       io_rst_r1 <= i_io_rst;
@@ -139,7 +139,7 @@ begin
         bitslip_r1(13 downto 0) <= (others => '0');
       end if;
     end if;
-  end process pulse_bitslip;
+  end process p_pulse_bitslip;
 
   ---------------------------------------------------------------------
   -- IOs

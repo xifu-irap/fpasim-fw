@@ -526,7 +526,7 @@ begin
   -- Data Generation
   --   .pattern generation on adc0 and adc1
   ---------------------------------------------------------------------
-  data_gen : process is
+  p_data_gen : process is
     variable v_first : integer := 0;
   begin
     -- counter
@@ -545,12 +545,12 @@ begin
 
     wait until rising_edge(adc_clk);
     wait for 12 ps;
-  end process data_gen;
+  end process p_data_gen;
 
 ---------------------------------------------------------------------
 -- Select bits according to the edge clock
 ---------------------------------------------------------------------
-  data_select_bits_by_edge_clk : process is
+  p_data_select_bits_by_edge_clk : process is
   begin
     -- on rising_edge: set the even bits
     i_da0_p  <= data0(0);
@@ -617,7 +617,7 @@ begin
     wait until falling_edge(adc_clk);
 
 
-  end process data_select_bits_by_edge_clk;
+  end process p_data_select_bits_by_edge_clk;
 
 
 

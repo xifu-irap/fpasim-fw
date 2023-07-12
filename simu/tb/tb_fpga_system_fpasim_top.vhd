@@ -240,7 +240,7 @@ begin
   -- Data Generation
   --   .pattern generation on adc0 and adc1
   ---------------------------------------------------------------------
-  data_gen : process is
+  p_data_gen : process is
     variable v_first : integer := 0;
   begin
     -- alternate values:
@@ -258,7 +258,7 @@ begin
 
     wait until rising_edge(adc_clk);
     wait for 12 ps;
-  end process data_gen;
+  end process p_data_gen;
 
 -- convert std_logic_vector to sfixed [-1;0.99[
   s_data0 <= sfixed(data0);

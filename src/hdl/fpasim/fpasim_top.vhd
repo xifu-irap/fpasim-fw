@@ -696,7 +696,7 @@ begin
 
   gen_adc_debug : if g_FPASIM_DEBUG = true generate
   begin
-    select_path : process (i_clk) is
+    p_select_path : process (i_clk) is
     begin
       if rising_edge(i_clk) then
         adc_valid_tmp0 <= i_adc_valid;
@@ -709,7 +709,7 @@ begin
           adc_amp_squid_offset_correction_tmp0 <= i_adc_amp_squid_offset_correction;
         end if;
       end if;
-    end process select_path;
+    end process p_select_path;
   end generate gen_adc_debug;
 
 
@@ -1111,7 +1111,7 @@ begin
 
   gen_dac_debug : if g_FPASIM_DEBUG = true generate
   begin
-    select_path : process (i_clk) is
+    p_select_path : process (i_clk) is
     begin
       if rising_edge(i_clk) then
         o_dac_valid <= dac_valid4;
@@ -1125,7 +1125,7 @@ begin
           o_dac0 <= dac0_4;
         end if;
       end if;
-    end process select_path;
+    end process p_select_path;
   end generate gen_dac_debug;
   ---------------------------------------------------------------------
   -- sync_top
