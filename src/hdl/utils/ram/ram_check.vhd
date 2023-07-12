@@ -164,7 +164,7 @@ begin
       end if;
     end process p_check_addr;
 
-    trig_addr <= '1' when wr_addr_r = rd_addr_r else '0';
+    trig_addr <= '1' when wr_addr_r /= rd_addr_r else '0';
     ---------------------------------------------------------------------
     -- check if write address is equal to read address.
     --   if needed, generate an error
@@ -173,9 +173,9 @@ begin
     begin
       if rising_edge(i_clk) then
         if trig_addr = '1' then
-          error_r2 <= trig_r;
-        else
           error_r2 <= '0';
+        else
+          error_r2 <= trig_r;
         end if;
       end if;
     end process p_error;
@@ -218,7 +218,7 @@ begin
       end if;
     end process p_check_addr;
 
-    trig_addr <= '1' when wr_addr_r = rd_addr_r else '0';
+    trig_addr <= '1' when wr_addr_r /= rd_addr_r else '0';
     ---------------------------------------------------------------------
     -- check if write address is equal to read address.
     --   if needed, generate an error
@@ -227,9 +227,9 @@ begin
     begin
       if rising_edge(i_clk) then
         if trig_addr = '1' then
-          error_r2 <= trig_r;
-        else
           error_r2 <= '0';
+        else
+          error_r2 <= trig_r;
         end if;
       end if;
     end process p_error;
@@ -272,7 +272,7 @@ begin
       end if;
     end process p_check_addr;
 
-    trig_addr <= '1' when wr_addr_r = rd_addr_r else '0';
+    trig_addr <= '1' when wr_addr_r /= rd_addr_r else '0';
     ---------------------------------------------------------------------
     -- check if write address is equal to read address.
     --   if needed, generate an error
@@ -281,9 +281,9 @@ begin
     begin
       if rising_edge(i_clk) then
         if trig_addr = '1' then
-          error_r2 <= trig_r;
-        else
           error_r2 <= '0';
+        else
+          error_r2 <= trig_r;
         end if;
       end if;
     end process p_error;
