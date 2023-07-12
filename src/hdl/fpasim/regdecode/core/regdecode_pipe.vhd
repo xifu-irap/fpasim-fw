@@ -77,9 +77,9 @@ entity regdecode_pipe is
     i_start_auto_rd : in std_logic;  -- enable the auto generation of memory reading address
 
     -- from the pipe in
-    i_data_valid : std_logic;           -- write enable
-    i_addr       : std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- input address
-    i_data       : std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- input data
+    i_data_valid : in std_logic;           -- write enable
+    i_addr       : in std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- input address
+    i_data       : in std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- input data
 
     ---------------------------------------------------------------------
     -- to the pipe out: @i_clk
