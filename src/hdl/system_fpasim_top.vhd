@@ -33,7 +33,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 library unisim;
-use UNISIM.vcomponents.all;
+use unisim.vcomponents.all;
 
 use work.pkg_system_fpasim_debug.all;
 

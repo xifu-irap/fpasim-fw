@@ -33,7 +33,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 
-use work.FRONTPANEL.all;
+use work.frontpanel.all;
 
 entity usb_opal_kelly is
   port(

@@ -34,7 +34,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 library unisim;
-use UNISIM.vcomponents.all;
+use unisim.vcomponents.all;
 
 
 entity dac3283_io is
