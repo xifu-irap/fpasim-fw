@@ -85,23 +85,23 @@ entity tes_pulse_shape_manager is
     o_cmd_ready              : out std_logic;
     -- RAM: pulse shape
     -- wr
-    i_pulse_shape_wr_en      : in  std_logic;  -- write enable
-    i_pulse_shape_wr_rd_addr : in  std_logic_vector(g_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0);  -- write address
-    i_pulse_shape_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
+    i_pulse_shape_wr_en      : in  std_logic;  -- ram write enable
+    i_pulse_shape_wr_rd_addr : in  std_logic_vector(g_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0);  -- ram write/read address
+    i_pulse_shape_wr_data    : in  std_logic_vector(15 downto 0);  -- ram write data
     -- rd
-    i_pulse_shape_rd_en      : in  std_logic;  -- rd enable
-    o_pulse_shape_rd_valid   : out std_logic;  -- rd data valid
-    o_pulse_shape_rd_data    : out std_logic_vector(15 downto 0);  -- rd data
+    i_pulse_shape_rd_en      : in  std_logic;  -- ram read enable
+    o_pulse_shape_rd_valid   : out std_logic;  -- ram read data valid
+    o_pulse_shape_rd_data    : out std_logic_vector(15 downto 0);  -- ram read data
 
     -- RAM:
     -- wr
-    i_steady_state_wr_en      : in  std_logic;  -- write enable
-    i_steady_state_wr_rd_addr : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- write address
-    i_steady_state_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
+    i_steady_state_wr_en      : in  std_logic;  -- ram write enable
+    i_steady_state_wr_rd_addr : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- ram write/read address
+    i_steady_state_wr_data    : in  std_logic_vector(15 downto 0);  -- ram write data
     -- rd
-    i_steady_state_rd_en      : in  std_logic;  -- rd enable
-    o_steady_state_rd_valid   : out std_logic;  -- rd data valid
-    o_steady_state_rd_data    : out std_logic_vector(15 downto 0);  -- read data
+    i_steady_state_rd_en      : in  std_logic;  -- ram read enable
+    o_steady_state_rd_valid   : out std_logic;  -- ram read data valid
+    o_steady_state_rd_data    : out std_logic_vector(15 downto 0);  -- ram read data
 
     ---------------------------------------------------------------------
     -- input data

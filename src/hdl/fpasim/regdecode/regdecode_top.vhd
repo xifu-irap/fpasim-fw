@@ -105,10 +105,10 @@ entity regdecode_top is
     -- from the usb @i_clk (clock included)
     ---------------------------------------------------------------------
     --  Opal Kelly inouts --
-    i_okUH  : in    std_logic_vector(4 downto 0);
-    o_okHU  : out   std_logic_vector(2 downto 0);
-    b_okUHU : inout std_logic_vector(31 downto 0);
-    b_okAA  : inout std_logic;
+    i_okUH  : in    std_logic_vector(4 downto 0); -- usb interface signal
+    o_okHU  : out   std_logic_vector(2 downto 0); -- usb interface signal
+    b_okUHU : inout std_logic_vector(31 downto 0); -- usb interface signal
+    b_okAA  : inout std_logic; -- usb interface signal
 
     ---------------------------------------------------------------------
     -- from/to the user @usb_clk
@@ -130,8 +130,8 @@ entity regdecode_top is
     -- spi: status
     i_reg_spi_status        : in std_logic_vector(31 downto 0);  -- spi_status register value
 
-    i_spi_errors : in  std_logic_vector(15 downto 0);
-    i_spi_status : in  std_logic_vector(7 downto 0);
+    i_spi_errors : in  std_logic_vector(15 downto 0); -- errors from the spi bridge
+    i_spi_status : in  std_logic_vector(7 downto 0); -- status from the spi bridge
     -- to/from reset_top
     i_usb_rst    : in  std_logic;                     -- reset
     o_usb_rst    : out std_logic;                     -- reset
@@ -212,14 +212,14 @@ entity regdecode_top is
     o_reg_debug_ctrl_valid            : out std_logic;  -- register debug_ctrl valid
     o_reg_debug_ctrl                  : out std_logic_vector(31 downto 0);  -- register debug_ctrl value
     -- make pulse register
-    i_reg_make_pulse_ready            : in  std_logic;
+    i_reg_make_pulse_ready            : in  std_logic; -- ready to receive a new command
     o_reg_make_sof                    : out std_logic;  -- first sample
     o_reg_make_eof                    : out std_logic;  -- last sample
     o_reg_make_pulse_valid            : out std_logic;  -- register make_pulse valid
     o_reg_make_pulse                  : out std_logic_vector(31 downto 0);  -- register make_pulse value
     -- fpasim_status
-    i_reg_fpasim_status_valid         : in  std_logic;
-    i_reg_fpasim_status               : in  std_logic_vector(31 downto 0);
+    i_reg_fpasim_status_valid         : in  std_logic; -- fpasim status valid
+    i_reg_fpasim_status               : in  std_logic_vector(31 downto 0); -- fpasim status value
 
     -- recording
     ---------------------------------------------------------------------

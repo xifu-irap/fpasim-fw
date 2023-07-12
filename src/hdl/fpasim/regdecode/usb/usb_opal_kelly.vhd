@@ -38,10 +38,10 @@ use work.frontpanel.all;
 entity usb_opal_kelly is
   port(
     --  Opal Kelly inouts --
-    i_okUH                            : in    std_logic_vector(4 downto 0);
-    o_okHU                            : out   std_logic_vector(2 downto 0);
-    b_okUHU                           : inout std_logic_vector(31 downto 0);
-    b_okAA                            : inout std_logic;
+    i_okUH                            : in    std_logic_vector(4 downto 0); -- usb interface signal
+    o_okHU                            : out   std_logic_vector(2 downto 0); -- usb interface signal
+    b_okUHU                           : inout std_logic_vector(31 downto 0); -- usb interface signal
+    b_okAA                            : inout std_logic; -- usb interface signal
     ---------------------------------------------------------------------
     -- from the user @o_usb_clk
     ---------------------------------------------------------------------

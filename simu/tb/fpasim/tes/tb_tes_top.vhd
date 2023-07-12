@@ -116,7 +116,7 @@ architecture simulate of tb_tes_top is
   -- RAM: pulse shape
   -- wr
   signal i_pulse_shape_wr_en       : std_logic; -- RAM write enable
-  signal i_pulse_shape_wr_rd_addr  : std_logic_vector(g_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0); -- RAM write address
+  signal i_pulse_shape_wr_rd_addr  : std_logic_vector(g_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0); -- RAM write/read address
   signal i_pulse_shape_wr_data     : std_logic_vector(15 downto 0); -- RAM write data
   -- rd
   signal i_pulse_shape_rd_en       : std_logic; -- RAM read enable
@@ -125,7 +125,7 @@ architecture simulate of tb_tes_top is
   -- RAM:
   -- wr
   signal i_steady_state_wr_en      : std_logic; -- RAM write enable
-  signal i_steady_state_wr_rd_addr : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- RAM write address
+  signal i_steady_state_wr_rd_addr : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- RAM write/read address
   signal i_steady_state_wr_data    : std_logic_vector(15 downto 0); -- RAM write data
   -- rd
   signal i_steady_state_rd_en      : std_logic; -- RAM read enable

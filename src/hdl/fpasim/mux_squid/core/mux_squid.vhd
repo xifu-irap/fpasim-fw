@@ -69,23 +69,23 @@ entity mux_squid is
 
     -- RAM: mux_squid_offset
     -- wr
-    i_mux_squid_offset_wr_en      : in  std_logic;  -- write enable
-    i_mux_squid_offset_wr_rd_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- write address
-    i_mux_squid_offset_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
+    i_mux_squid_offset_wr_en      : in  std_logic;  -- ram write enable
+    i_mux_squid_offset_wr_rd_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- ram write/read address
+    i_mux_squid_offset_wr_data    : in  std_logic_vector(15 downto 0);  -- ram write data
     -- rd
-    i_mux_squid_offset_rd_en      : in  std_logic;  -- rd en
-    o_mux_squid_offset_rd_valid   : out std_logic;  -- rd data valid
-    o_mux_squid_offset_rd_data    : out std_logic_vector(15 downto 0);  -- rd data
+    i_mux_squid_offset_rd_en      : in  std_logic;  -- ram read en
+    o_mux_squid_offset_rd_valid   : out std_logic;  -- ram read data valid
+    o_mux_squid_offset_rd_data    : out std_logic_vector(15 downto 0);  -- ram rd data
 
     -- RAM: mux_squid_tf
     -- wr
-    i_mux_squid_tf_wr_en      : in  std_logic;  -- write enable
-    i_mux_squid_tf_wr_rd_addr : in  std_logic_vector(g_MUX_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);  -- write address
-    i_mux_squid_tf_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
+    i_mux_squid_tf_wr_en      : in  std_logic;  -- ram write enable
+    i_mux_squid_tf_wr_rd_addr : in  std_logic_vector(g_MUX_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);  -- ram write/read address
+    i_mux_squid_tf_wr_data    : in  std_logic_vector(15 downto 0);  -- ram write data
     --rd
-    i_mux_squid_tf_rd_en      : in  std_logic;  -- rd enable
-    o_mux_squid_tf_rd_valid   : out std_logic;  -- rd data valid
-    o_mux_squid_tf_rd_data    : out std_logic_vector(15 downto 0);  -- read data
+    i_mux_squid_tf_rd_en      : in  std_logic;  -- ram read enable
+    o_mux_squid_tf_rd_valid   : out std_logic;  -- ram read data valid
+    o_mux_squid_tf_rd_data    : out std_logic_vector(15 downto 0);  -- ram read data
     ---------------------------------------------------------------------
     -- input1
     ---------------------------------------------------------------------

@@ -100,7 +100,7 @@ architecture simulate of tb_mux_squid_top is
   -- RAM: mux_squid_offset
   -- wr
   signal i_mux_squid_offset_wr_en      : std_logic; -- ram write enable
-  signal i_mux_squid_offset_wr_rd_addr : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- ram write address
+  signal i_mux_squid_offset_wr_rd_addr : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- ram write/read address
   signal i_mux_squid_offset_wr_data    : std_logic_vector(15 downto 0); -- ram write data
   -- rd
   signal i_mux_squid_offset_rd_en      : std_logic; -- ram read enable
@@ -109,7 +109,7 @@ architecture simulate of tb_mux_squid_top is
   -- RAM: mux_squid_tf
   -- wr
   signal i_mux_squid_tf_wr_en          : std_logic; -- ram write enable
-  signal i_mux_squid_tf_wr_rd_addr     : std_logic_vector(g_MUX_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0); -- ram write address
+  signal i_mux_squid_tf_wr_rd_addr     : std_logic_vector(g_MUX_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0); -- ram write/read address
   signal i_mux_squid_tf_wr_data        : std_logic_vector(15 downto 0); -- ram write data
   --rd
   signal i_mux_squid_tf_rd_en          : std_logic; -- ram read enable

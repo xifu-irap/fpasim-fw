@@ -51,10 +51,10 @@ entity fpasim_top is
     -- from the usb @usb_clk (clock included)
     ---------------------------------------------------------------------
     --  Opal Kelly inouts --
-    i_okUH     : in    std_logic_vector(4 downto 0);
-    o_okHU     : out   std_logic_vector(2 downto 0);
-    b_okUHU    : inout std_logic_vector(31 downto 0);
-    b_okAA     : inout std_logic;
+    i_okUH     : in    std_logic_vector(4 downto 0); -- usb interface signal
+    o_okHU     : out   std_logic_vector(2 downto 0); -- usb interface signal
+    b_okUHU    : inout std_logic_vector(31 downto 0); -- usb interface signal
+    b_okAA     : inout std_logic; -- usb interface signal
     ---------------------------------------------------------------------
     -- from the board
     ---------------------------------------------------------------------
@@ -135,21 +135,24 @@ architecture RTL of fpasim_top is
   -- regdecode
   ---------------------------------------------------------------------
   -- usb clock
-  signal usb_clk         : std_logic;
-  signal usb_rst_status  : std_logic;
-  signal usb_debug_pulse : std_logic;
-  signal usb_rst         : std_logic;
+  signal usb_clk         : std_logic; -- from the usb interface: clock
+  signal usb_rst_status  : std_logic; -- from the usb interface: reset error flag(s)
+  signal usb_debug_pulse : std_logic; -- from the usb interface: error mode (transparent vs capture).
+  signal usb_rst         : std_logic; -- from the usb interface: reset
 
   -- ctrl register
   --signal rst : std_logic;
+  -- eanble the adc dataflow
   signal en : std_logic;
 
   -- make_pulse register
-  signal cmd_valid        : std_logic;
-  signal cmd_pixel_id     : std_logic_vector(pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1 downto 0);
-  signal cmd_time_shift   : std_logic_vector(pkg_MAKE_PULSE_TIME_SHIFT_WIDTH - 1 downto 0);
-  signal cmd_pulse_height : std_logic_vector(pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH - 1 downto 0);
-  signal cmd_ready        : std_logic;
+  signal cmd_valid        : std_logic; -- -- valid command
+  signal cmd_pixel_id     : std_logic_vector(pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id command
+  signal cmd_time_shift   : std_logic_vector(pkg_MAKE_PULSE_TIME_SHIFT_WIDTH - 1 downto 0);  -- time shift command
+  signal cmd_pulse_height : std_logic_vector(pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH - 1 downto 0); -- pulse height command
+  signal cmd_ready        : std_logic; -- ready to receive a new command
+
+  -- fpasim_gain value
   signal fpasim_gain      : std_logic_vector(pkg_FPASIM_GAIN_WIDTH - 1 downto 0);
 
   -- mux_sq_fb_delay register
@@ -164,130 +167,182 @@ architecture RTL of fpasim_top is
   signal sync_delay : std_logic_vector(pkg_RA_DELAY_WIDTH - 1 downto 0);
 
   -- tes_conf register
+  -- Number of pixels by frame
   signal nb_pixel_by_frame  : std_logic_vector(pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH - 1 downto 0);
+  -- Number of samples by pixel
   signal nb_sample_by_pixel : std_logic_vector(pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH - 1 downto 0);
+  -- Number of samples by frame
   signal nb_sample_by_frame : std_logic_vector(pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
 
   -- conf0 register
   signal inter_squid_gain : std_logic_vector(pkg_CONF0_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
   -- debug_ctrl register
+  -- reset error flag(s)
   signal rst_status           : std_logic;
+  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
   signal debug_pulse          : std_logic;
+  -- enable the dac pattern generation
   signal dac_en_pattern : std_logic;
 
   -- RAM configuration
   ---------------------------------------------------------------------
   -- tes_pulse_shape
   -- ram: wr
-  signal tes_pulse_shape_ram_wr_en          : std_logic;
-  signal tes_pulse_shape_ram_wr_rd_addr     : std_logic_vector(15 downto 0);
-  signal tes_pulse_shape_ram_wr_data        : std_logic_vector(15 downto 0);
+  signal tes_pulse_shape_ram_wr_en          : std_logic; -- ram write enable
+  signal tes_pulse_shape_ram_wr_rd_addr     : std_logic_vector(15 downto 0); -- ram write/read address
+  signal tes_pulse_shape_ram_wr_data        : std_logic_vector(15 downto 0); -- ram write data
+  -- truncated ram write/read address (LSB bits)
   signal tes_pulse_shape_ram_wr_rd_addr_tmp : std_logic_vector(pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0);
   -- ram: rd
-  signal tes_pulse_shape_ram_rd_en          : std_logic;
-  signal tes_pulse_shape_ram_rd_valid       : std_logic;
-  signal tes_pulse_shape_ram_rd_data        : std_logic_vector(15 downto 0);
+  signal tes_pulse_shape_ram_rd_en          : std_logic; -- ram read enable
+  signal tes_pulse_shape_ram_rd_valid       : std_logic; -- ram read data valid
+  signal tes_pulse_shape_ram_rd_data        : std_logic_vector(15 downto 0);  -- ram read data
 
   -- amp_squid_tf
   -- ram: wr
-  signal amp_squid_tf_ram_wr_en              : std_logic;
-  signal amp_squid_tf_ram_wr_rd_addr         : std_logic_vector(15 downto 0);
-  signal amp_squid_tf_ram_wr_data            : std_logic_vector(15 downto 0);
+  signal amp_squid_tf_ram_wr_en              : std_logic; -- ram write enable
+  signal amp_squid_tf_ram_wr_rd_addr         : std_logic_vector(15 downto 0); -- ram write/read address
+  signal amp_squid_tf_ram_wr_data            : std_logic_vector(15 downto 0); -- ram write data
+  -- truncated ram write/read address (LSB bits)
   signal amp_squid_tf_ram_wr_rd_addr_tmp     : std_logic_vector(pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);
   -- ram: rd
-  signal amp_squid_tf_ram_rd_en              : std_logic;
-  signal amp_squid_tf_ram_rd_valid           : std_logic;
-  signal amp_squid_tf_ram_rd_data            : std_logic_vector(15 downto 0);
+  signal amp_squid_tf_ram_rd_en              : std_logic; -- ram read enable
+  signal amp_squid_tf_ram_rd_valid           : std_logic; -- ram read data valid
+  signal amp_squid_tf_ram_rd_data            : std_logic_vector(15 downto 0);  -- ram read data
   -- mux_squid_tf
   -- ram: wr
-  signal mux_squid_tf_ram_wr_en              : std_logic;
-  signal mux_squid_tf_ram_wr_rd_addr         : std_logic_vector(15 downto 0);
-  signal mux_squid_tf_ram_wr_data            : std_logic_vector(15 downto 0);
+  signal mux_squid_tf_ram_wr_en              : std_logic; -- ram write enable
+  signal mux_squid_tf_ram_wr_rd_addr         : std_logic_vector(15 downto 0); -- ram write/read address
+  signal mux_squid_tf_ram_wr_data            : std_logic_vector(15 downto 0); -- ram write data
+  -- truncated ram write/read address (LSB bits)
   signal mux_squid_tf_ram_wr_rd_addr_tmp     : std_logic_vector(pkg_MUX_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);
   -- ram: rd
-  signal mux_squid_tf_ram_rd_en              : std_logic;
-  signal mux_squid_tf_ram_rd_valid           : std_logic;
-  signal mux_squid_tf_ram_rd_data            : std_logic_vector(15 downto 0);
+  signal mux_squid_tf_ram_rd_en              : std_logic; -- ram read enable
+  signal mux_squid_tf_ram_rd_valid           : std_logic; -- ram read data valid
+  signal mux_squid_tf_ram_rd_data            : std_logic_vector(15 downto 0);  -- ram read data
   -- tes_std_state
   -- ram: wr
-  signal tes_std_state_ram_wr_en             : std_logic;
-  signal tes_std_state_ram_wr_rd_addr        : std_logic_vector(15 downto 0);
-  signal tes_std_state_ram_wr_data           : std_logic_vector(15 downto 0);
+  signal tes_std_state_ram_wr_en             : std_logic; -- ram write enable
+  signal tes_std_state_ram_wr_rd_addr        : std_logic_vector(15 downto 0); -- ram write/read address
+  signal tes_std_state_ram_wr_data           : std_logic_vector(15 downto 0); -- ram write data
+  -- truncated ram write/read address (LSB bits)
   signal tes_std_state_ram_wr_rd_addr_tmp    : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
   -- ram: rd
-  signal tes_std_state_ram_rd_en             : std_logic;
-  signal tes_std_state_ram_rd_valid          : std_logic;
-  signal tes_std_state_ram_rd_data           : std_logic_vector(15 downto 0);
+  signal tes_std_state_ram_rd_en             : std_logic; -- ram read enable
+  signal tes_std_state_ram_rd_valid          : std_logic; -- ram read data valid
+  signal tes_std_state_ram_rd_data           : std_logic_vector(15 downto 0);  -- ram read data
   -- mux_squid_offset
   -- ram: wr
-  signal mux_squid_offset_ram_wr_en          : std_logic;
-  signal mux_squid_offset_ram_wr_rd_addr     : std_logic_vector(15 downto 0);
-  signal mux_squid_offset_ram_wr_data        : std_logic_vector(15 downto 0);
+  signal mux_squid_offset_ram_wr_en          : std_logic; -- ram write enable
+  signal mux_squid_offset_ram_wr_rd_addr     : std_logic_vector(15 downto 0); -- ram write/read address
+  signal mux_squid_offset_ram_wr_data        : std_logic_vector(15 downto 0); -- ram write data
+  -- truncated ram write/read address (LSB bits)
   signal mux_squid_offset_ram_wr_rd_addr_tmp : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
   -- ram: rd
-  signal mux_squid_offset_ram_rd_en          : std_logic;
-  signal mux_squid_offset_ram_rd_valid       : std_logic;
-  signal mux_squid_offset_ram_rd_data        : std_logic_vector(15 downto 0);
+  signal mux_squid_offset_ram_rd_en          : std_logic; -- ram read enable
+  signal mux_squid_offset_ram_rd_valid       : std_logic; -- ram read data valid
+  signal mux_squid_offset_ram_rd_data        : std_logic_vector(15 downto 0);  -- ram read data
 
-  -- Register configuration
+  -- Common Register configuration
   ---------------------------------------------------------------------
-  -- common register
   signal reg_valid               : std_logic;  -- register valid
+  -- fpasim_gain register value
   signal reg_fpasim_gain         : std_logic_vector(31 downto 0);
+  -- mux_sq_fb_delay register value
   signal reg_mux_sq_fb_delay     : std_logic_vector(31 downto 0);
+  -- amp_sq_of_delay register value
   signal reg_amp_sq_of_delay     : std_logic_vector(31 downto 0);
+  -- error_delay register value
   signal reg_error_delay         : std_logic_vector(31 downto 0);
+  -- ra_delay register value
   signal reg_ra_delay            : std_logic_vector(31 downto 0);
+  -- tes_conf register value
   signal reg_tes_conf            : std_logic_vector(31 downto 0);
+  -- conf0 register value
   signal reg_conf0               : std_logic_vector(31 downto 0);
-  -- ctrl register
+  -- ctrl register valid
   signal reg_ctrl_valid          : std_logic;  -- register ctrl valid
+  -- ctrl register value
   signal reg_ctrl                : std_logic_vector(31 downto 0);
-  -- debug ctrl register
+  -- debug_ctrl register valid
   signal reg_debug_ctrl_valid    : std_logic;  -- register debug_ctrl valid
+  -- debug_ctrl register value
   signal reg_debug_ctrl          : std_logic_vector(31 downto 0);
+
+  -- Make_pulse Register (command)
+  ---------------------------------------------------------------------
   -- make pulse register
-  signal reg_make_sof            : std_logic;  -- first sample
-  signal reg_make_eof            : std_logic;  -- last sample
+  signal reg_make_sof            : std_logic;  -- first words
+  signal reg_make_eof            : std_logic;  -- last word
+  -- make_pulse register valid
   signal reg_make_pulse_valid    : std_logic;
+  -- make_pulse register value
   signal reg_make_pulse          : std_logic_vector(31 downto 0);
+  -- ready to receive a new make_pulse command
   signal reg_make_pulse_ready    : std_logic;
-  -- fpasim_status register
+
+  -- fpasim_status Register (command)
+  ---------------------------------------------------------------------
+  -- fpasim_status register valid
   signal reg_fpasim_status_valid : std_logic;
+  -- fpasim_status register value
   signal reg_fpasim_status       : std_logic_vector(31 downto 0);
 
-  -- recording register
+  -- recording Register (command)
+  ---------------------------------------------------------------------
+  -- rec_ctrl register valid
   signal reg_rec_valid : std_logic;
+  -- rec_ctrl control register value
   signal reg_rec_ctrl  : std_logic_vector(31 downto 0);
+  -- rec_conf0 register value
   signal reg_rec_conf0 : std_logic_vector(31 downto 0);
 
   -- to the user @usb_clk
+  -- spi_wr_data register valid
   signal reg_spi_valid   : std_logic;
+  -- spi_ctrl register value
   signal reg_spi_ctrl    : std_logic_vector(31 downto 0);
+  -- spi_conf0 register value
   signal reg_spi_conf0   : std_logic_vector(31 downto 0);
+  -- spi_conf1 register value
   signal reg_spi_conf1   : std_logic_vector(31 downto 0);
+  -- spi_wr_data register value
   signal reg_spi_wr_data : std_logic_vector(31 downto 0);
 
+  -- fpasim error register3
   signal reg_wire_errors3 : std_logic_vector(31 downto 0);
+  -- fpasim error register2
   signal reg_wire_errors2 : std_logic_vector(31 downto 0);
+  -- fpasim error register1
   signal reg_wire_errors1 : std_logic_vector(31 downto 0);
+  -- fpasim error register0
   signal reg_wire_errors0 : std_logic_vector(31 downto 0);
 
+  -- fpasim status register3
   signal reg_wire_status3 : std_logic_vector(31 downto 0);
+  -- fpasim status register2
   signal reg_wire_status2 : std_logic_vector(31 downto 0);
+  -- fpasim status register1
   signal reg_wire_status1 : std_logic_vector(31 downto 0);
+  -- fpasim status register0
   signal reg_wire_status0 : std_logic_vector(31 downto 0);
 
   ---------------------------------------------------------------------
   -- adc_top
   ---------------------------------------------------------------------
+  -- selected adc_valid
   signal adc_valid_tmp0                       : std_logic;
+  -- selected adc_mux_squid_feedback value
   signal adc_mux_squid_feedback_tmp0          : std_logic_vector(i_adc_mux_squid_feedback'range);
+  -- selected amp_squid_offset_correction value
   signal adc_amp_squid_offset_correction_tmp0 : std_logic_vector(i_adc_amp_squid_offset_correction'range);
 
+  -- delayed adc_valid
   signal adc_valid0                       : std_logic;
+  -- custom delayed ddc_mux_squid_feedback value
   signal adc_mux_squid_feedback0          : std_logic_vector(i_adc_mux_squid_feedback'range);
+  -- custom delayed amp_squid_offset_correction value
   signal adc_amp_squid_offset_correction0 : std_logic_vector(i_adc_amp_squid_offset_correction'range);
 
   ---------------------------------------------------------------------
@@ -304,8 +359,9 @@ architecture RTL of fpasim_top is
   signal frame_eof1    : std_logic;  -- last frame sample
   signal frame_id1     : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0); --  frame id
 
-  signal tes_pixel_neg_out_valid1    : std_logic;
-  signal tes_pixel_neg_out_error1    : std_logic;
+  signal tes_pixel_neg_out_valid1    : std_logic; -- tes valid negative output
+  signal tes_pixel_neg_out_error1    : std_logic; -- tes negative output detection
+  -- tes pixel id when a negative output is detected
   signal tes_pixel_neg_out_pixel_id1 : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);
 
   signal tes_errors0 : std_logic_vector(15 downto 0); -- errors from the tes_top module
@@ -313,16 +369,20 @@ architecture RTL of fpasim_top is
 
   -- signals synchronization with tes_top output
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_adc_amp_squid_offset_correction'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + i_adc_amp_squid_offset_correction'length - 1; -- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + i_adc_mux_squid_feedback'length - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + i_adc_mux_squid_feedback'length - 1; -- index1: high
 
+  -- temporary input pipe
   signal data_pipe_tmp0 : std_logic_vector(c_IDX1_H downto 0);
+  -- temporary output pipe
   signal data_pipe_tmp1 : std_logic_vector(c_IDX1_H downto 0);
 
+  -- delayed mux_squid_feedback value
   signal mux_squid_feedback1          : std_logic_vector(i_adc_mux_squid_feedback'range);
+  -- delayed amp_squid_offset_correction value
   signal amp_squid_offset_correction1 : std_logic_vector(i_adc_amp_squid_offset_correction'range);
 
   ---------------------------------------------------------------------
@@ -360,26 +420,26 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- dac_top
   ---------------------------------------------------------------------
-  signal dac_pattern0 : std_logic_vector(7 downto 0);
-  signal dac_pattern1 : std_logic_vector(7 downto 0);
-  signal dac_pattern2 : std_logic_vector(7 downto 0);
-  signal dac_pattern3 : std_logic_vector(7 downto 0);
-  signal dac_pattern4 : std_logic_vector(7 downto 0);
-  signal dac_pattern5 : std_logic_vector(7 downto 0);
-  signal dac_pattern6 : std_logic_vector(7 downto 0);
-  signal dac_pattern7 : std_logic_vector(7 downto 0);
+  signal dac_pattern0 : std_logic_vector(7 downto 0); -- selected dac pattern0
+  signal dac_pattern1 : std_logic_vector(7 downto 0); -- selected dac pattern1
+  signal dac_pattern2 : std_logic_vector(7 downto 0); -- selected dac pattern2
+  signal dac_pattern3 : std_logic_vector(7 downto 0); -- selected dac pattern3
+  signal dac_pattern4 : std_logic_vector(7 downto 0); -- selected dac pattern4
+  signal dac_pattern5 : std_logic_vector(7 downto 0); -- selected dac pattern5
+  signal dac_pattern6 : std_logic_vector(7 downto 0); -- selected dac pattern6
+  signal dac_pattern7 : std_logic_vector(7 downto 0); -- selected dac pattern6
 
   signal dac_valid4 : std_logic; -- dac valid
   signal dac_frame4 : std_logic; -- dac frame
-  signal dac1_4     : std_logic_vector(o_dac1'range); -- dac1: data
-  signal dac0_4     : std_logic_vector(o_dac0'range); -- dac0: data
+  signal dac1_4     : std_logic_vector(o_dac1'range); -- dac1 data
+  signal dac0_4     : std_logic_vector(o_dac0'range); -- dac0 data
 
   ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
   signal sync_valid5      : std_logic; -- sync valid
   signal sync5            : std_logic; -- sync value
-  signal sync_errors0_tmp : std_logic_vector(15 downto 0);
+  signal sync_errors0_tmp : std_logic_vector(15 downto 0); -- sync error
 
   signal sync_errors0 : std_logic_vector(15 downto 0); -- errors from the sync_top module
   signal sync_status0 : std_logic_vector(7 downto 0);  -- status from the sync_top module
@@ -390,34 +450,42 @@ architecture RTL of fpasim_top is
   signal rec_adc_cmd_valid             : std_logic;
   signal rec_adc_cmd_nb_words_by_block : std_logic_vector(15 downto 0);
 
-  signal fifo_rec_adc_rd         : std_logic;
-  signal fifo_rec_adc_sof        : std_logic;
-  signal fifo_rec_adc_eof        : std_logic;
-  signal fifo_rec_adc_data_valid : std_logic;
-  signal fifo_rec_adc_data       : std_logic_vector(31 downto 0);
-  signal fifo_rec_adc_empty      : std_logic;
+  signal fifo_rec_adc_rd         : std_logic; -- recording fifo: read enable
+  signal fifo_rec_adc_sof        : std_logic; -- recording fifo: first word
+  signal fifo_rec_adc_eof        : std_logic; -- recording fifo: last word
+  signal fifo_rec_adc_data_valid : std_logic; -- recording fifo: data valid flag
+  signal fifo_rec_adc_data       : std_logic_vector(31 downto 0); -- recording fifo: data
+  signal fifo_rec_adc_empty      : std_logic; -- recording fifo: empty flag
 
-  signal rec_adc_errors0 : std_logic_vector(15 downto 0);
-  signal rec_adc_status0 : std_logic_vector(7 downto 0);
+  signal rec_adc_errors0 : std_logic_vector(15 downto 0); -- recording: errors
+  signal rec_adc_status0 : std_logic_vector(7 downto 0); -- recording: status
 
   ---------------------------------------------------------------------
   -- debug
   ---------------------------------------------------------------------
+  -- Select the dac pattern source: '1': custom debug pattern, '0': hardcoded pattern
   signal debug_dac_pattern_sel : std_logic:= '0';
-  signal debug_dac_pattern0    : std_logic_vector(7 downto 0);
-  signal debug_dac_pattern1    : std_logic_vector(7 downto 0);
-  signal debug_dac_pattern2    : std_logic_vector(7 downto 0);
-  signal debug_dac_pattern3    : std_logic_vector(7 downto 0);
-  signal debug_dac_pattern4    : std_logic_vector(7 downto 0);
-  signal debug_dac_pattern5    : std_logic_vector(7 downto 0);
-  signal debug_dac_pattern6    : std_logic_vector(7 downto 0);
-  signal debug_dac_pattern7    : std_logic_vector(7 downto 0);
+  signal debug_dac_pattern0    : std_logic_vector(7 downto 0); -- custom dac pattern0
+  signal debug_dac_pattern1    : std_logic_vector(7 downto 0); -- custom dac pattern1
+  signal debug_dac_pattern2    : std_logic_vector(7 downto 0); -- custom dac pattern2
+  signal debug_dac_pattern3    : std_logic_vector(7 downto 0); -- custom dac pattern3
+  signal debug_dac_pattern4    : std_logic_vector(7 downto 0); -- custom dac pattern4
+  signal debug_dac_pattern5    : std_logic_vector(7 downto 0); -- custom dac pattern5
+  signal debug_dac_pattern6    : std_logic_vector(7 downto 0); -- custom dac pattern6
+  signal debug_dac_pattern7    : std_logic_vector(7 downto 0); -- custom dac pattern7
 
+  -- select the adc source: '1': custom debug adc values, '0': adc values
   signal debug_adc_sel                         : std_logic := '0';
+  -- custom debug adc value
   signal debug_adc_mux_squid_feedback          : std_logic_vector(i_adc_mux_squid_feedback'range);
+  -- custom debug adc value
   signal debug_adc_amp_squid_offset_correction : std_logic_vector(i_adc_amp_squid_offset_correction'range);
+
+  -- select the dac source: '1': custom dabug dac values, '0': adc values
   signal debug_dac_sel                         : std_logic;
+  -- custom debug dac1 source
   signal debug_dac1                            : std_logic_vector(15 downto 0);
+  -- custom debug dac0 source
   signal debug_dac0                            : std_logic_vector(15 downto 0);
 
 begin

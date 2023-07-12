@@ -93,7 +93,7 @@ architecture simulate of tb_amp_squid_top is
   -- RAM: amp_squid_tf
   -- wr
   signal i_amp_squid_tf_wr_en      : std_logic;  -- RAM write enable
-  signal i_amp_squid_tf_wr_rd_addr : std_logic_vector(g_AMP_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0); -- RAM write address
+  signal i_amp_squid_tf_wr_rd_addr : std_logic_vector(g_AMP_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0); -- RAM write/read address
   signal i_amp_squid_tf_wr_data    : std_logic_vector(15 downto 0); -- RAM write data
   -- rd
   signal i_amp_squid_tf_rd_en      : std_logic; -- RAM read enable

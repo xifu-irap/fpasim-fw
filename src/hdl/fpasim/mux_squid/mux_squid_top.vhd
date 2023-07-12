@@ -61,7 +61,7 @@ entity mux_squid_top is
     -- RAM: mux_squid_offset
     -- wr
     i_mux_squid_offset_wr_en      : in  std_logic;  -- ram write enable
-    i_mux_squid_offset_wr_rd_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- ram write address
+    i_mux_squid_offset_wr_rd_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- ram write/read address
     i_mux_squid_offset_wr_data    : in  std_logic_vector(15 downto 0);  -- ram write data
     -- rd
     i_mux_squid_offset_rd_en      : in  std_logic;  -- ram read en
@@ -71,7 +71,7 @@ entity mux_squid_top is
     -- RAM: mux_squid_tf
     -- wr
     i_mux_squid_tf_wr_en      : in  std_logic;  -- ram write enable
-    i_mux_squid_tf_wr_rd_addr : in  std_logic_vector(g_MUX_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);  -- ram write address
+    i_mux_squid_tf_wr_rd_addr : in  std_logic_vector(g_MUX_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);  -- ram write/read address
     i_mux_squid_tf_wr_data    : in  std_logic_vector(15 downto 0);  -- ram write data
     --rd
     i_mux_squid_tf_rd_en      : in  std_logic;  -- ram read enable

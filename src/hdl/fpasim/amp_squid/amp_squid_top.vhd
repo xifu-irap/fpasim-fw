@@ -56,11 +56,11 @@ entity amp_squid_top is
     -- RAM: amp_squid_tf
     -- wr
     i_amp_squid_tf_wr_en      : in  std_logic;  -- write enable
-    i_amp_squid_tf_wr_rd_addr : in  std_logic_vector(g_AMP_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);  -- write address
+    i_amp_squid_tf_wr_rd_addr : in  std_logic_vector(g_AMP_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);  -- write/read address
     i_amp_squid_tf_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
     -- rd
-    i_amp_squid_tf_rd_en      : in  std_logic;  -- rd enable
-    o_amp_squid_tf_rd_valid   : out std_logic;  -- rd data valid
+    i_amp_squid_tf_rd_en      : in  std_logic;  -- read enable
+    o_amp_squid_tf_rd_valid   : out std_logic;  -- read data valid
     o_amp_squid_tf_rd_data    : out std_logic_vector(15 downto 0);  -- read data
 
     -- gain

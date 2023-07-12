@@ -50,12 +50,12 @@ entity spi_top is
     -- command
     ---------------------------------------------------------------------
     -- input
-    i_spi_en             : in  std_logic;  -- enable the spi
+    i_spi_en             : in  std_logic;  -- enable the spi bridge
     i_spi_dac_tx_present : in  std_logic;  -- 1:enable dac data tx, 0: otherwise
     i_spi_mode           : in  std_logic;  -- 1:wr, 0:rd
     i_spi_id             : in  std_logic_vector(1 downto 0);  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
     i_spi_cmd_valid      : in  std_logic;  -- command valid
-    i_spi_cmd_wr_data    : in  std_logic_vector(31 downto 0);  -- data to write
+    i_spi_cmd_wr_data    : in  std_logic_vector(31 downto 0);  -- data to write towards the spi device
     -- output
     o_spi_rd_data_valid  : out std_logic;  -- read data valid
     o_spi_rd_data        : out std_logic_vector(31 downto 0);  -- read data (device spi register value)
