@@ -217,7 +217,7 @@ begin
     ---------------------------------------------------------------------
     info("Configuration0: CDCE (reading)");
     i_spi_mode        <= '0';           -- 1:wr, 0:rd
-    i_spi_id          <= "00";  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
+    i_spi_id          <= (others => '0');  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
     i_spi_cmd_valid   <= '1';
     v_val             := x"9876_4321";
     i_spi_cmd_wr_data <= v_val;
@@ -278,7 +278,7 @@ begin
     ---------------------------------------------------------------------
     info("Configuration3: AMC (reading)");
     i_spi_mode        <= '0';           -- 1:wr, 0:rd
-    i_spi_id          <= "11";  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
+    i_spi_id          <= (others => '1');  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
     i_spi_cmd_valid   <= '1';
     v_val             := x"9321_4321";
     i_spi_cmd_wr_data <= v_val;
@@ -299,7 +299,7 @@ begin
     ---------------------------------------------------------------------
     info("Configuration4: CDCE (reading)");
     i_spi_mode        <= '0';           -- 1:wr, 0:rd
-    i_spi_id          <= "00";  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
+    i_spi_id          <= (others => '0');  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
     i_spi_cmd_valid   <= '1';
     v_val             := x"ABCD_EF01";
     i_spi_cmd_wr_data <= v_val;
@@ -319,7 +319,7 @@ begin
     ---------------------------------------------------------------------
     info("Configuration5: CDCE (reading)");
     i_spi_mode        <= '0';           -- 1:wr, 0:rd
-    i_spi_id          <= "00";  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
+    i_spi_id          <= (others => '0');  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
     i_spi_cmd_valid   <= '1';
     v_val             := x"9BCD_EF01";
     i_spi_cmd_wr_data <= v_val;
@@ -420,7 +420,7 @@ begin
     ---------------------------------------------------------------------
     info("Configuration10: AMC (reading)");
     i_spi_mode        <= '0';           -- 1:wr, 0:rd
-    i_spi_id          <= "11";  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
+    i_spi_id          <= (others => '1');  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
     i_spi_cmd_valid   <= '1';
     v_val             := x"9BCD_EF01";
     i_spi_cmd_wr_data <= v_val;
@@ -440,7 +440,7 @@ begin
     ---------------------------------------------------------------------
     info("Configuration11: AMC (reading)");
     i_spi_mode        <= '0';           -- 1:wr, 0:rd
-    i_spi_id          <= "11";  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
+    i_spi_id          <= (others => '1');  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
     i_spi_cmd_valid   <= '1';
     v_val             := x"ABCD_4321";
     i_spi_cmd_wr_data <= v_val;
