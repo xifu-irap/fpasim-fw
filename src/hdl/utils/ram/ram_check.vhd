@@ -99,6 +99,9 @@ architecture RTL of ram_check is
   -- read address
   signal rd_addr1 : std_logic_vector(i_rd_addr'range);
 
+  -- trig on the same address
+  signal trig_addr: std_logic;
+
   ---------------------------------------------------------------------
   -- p_error
   ---------------------------------------------------------------------
@@ -161,6 +164,7 @@ begin
       end if;
     end process p_check_addr;
 
+    trig_addr <= '1' when wr_addr_r = rd_addr_r else '0';
     ---------------------------------------------------------------------
     -- check if write address is equal to read address.
     --   if needed, generate an error
@@ -168,7 +172,7 @@ begin
     p_error : process(i_clk) is
     begin
       if rising_edge(i_clk) then
-        if wr_addr_r = rd_addr_r then
+        if trig_addr = '1' then
           error_r2 <= trig_r;
         else
           error_r2 <= '0';
@@ -214,6 +218,7 @@ begin
       end if;
     end process p_check_addr;
 
+    trig_addr <= '1' when wr_addr_r = rd_addr_r else '0';
     ---------------------------------------------------------------------
     -- check if write address is equal to read address.
     --   if needed, generate an error
@@ -221,7 +226,7 @@ begin
     p_error : process(i_clk) is
     begin
       if rising_edge(i_clk) then
-        if wr_addr_r = rd_addr_r then
+        if trig_addr = '1' then
           error_r2 <= trig_r;
         else
           error_r2 <= '0';
@@ -267,6 +272,7 @@ begin
       end if;
     end process p_check_addr;
 
+    trig_addr <= '1' when wr_addr_r = rd_addr_r else '0';
     ---------------------------------------------------------------------
     -- check if write address is equal to read address.
     --   if needed, generate an error
@@ -274,7 +280,7 @@ begin
     p_error : process(i_clk) is
     begin
       if rising_edge(i_clk) then
-        if wr_addr_r = rd_addr_r then
+        if trig_addr = '1' then
           error_r2 <= trig_r;
         else
           error_r2 <= '0';
