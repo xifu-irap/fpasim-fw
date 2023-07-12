@@ -50,18 +50,18 @@ entity tb_spi_top is
     ---------------------------------------------------------------------
     -- simulation parameter
     ---------------------------------------------------------------------
-    g_RD_DELAY_CDCE : positive := 2;
-    g_RD_DELAY_ADC  : positive := 2;
-    g_RD_DELAY_DAC  : positive := 2;
-    g_RD_DELAY_AMC  : positive := 2;
+    g_RD_DELAY_CDCE : positive := 2; -- CDCE: delay on the spi bridge read path
+    g_RD_DELAY_ADC  : positive := 2; -- ADC: delay on the spi bridge read path
+    g_RD_DELAY_DAC  : positive := 2; -- DAC: delay on the spi bridge read path
+    g_RD_DELAY_AMC  : positive := 2; -- AMC: delay on the spi bridge read path
 
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
-    g_VUNIT_DEBUG  : boolean := true;
-    g_TEST_NAME    : string  := "";
-    g_ENABLE_CHECK : boolean := true;
-    g_ENABLE_LOG   : boolean := true
+    g_VUNIT_DEBUG  : boolean := true; -- set the simulation stop level
+    g_TEST_NAME    : string  := ""; -- name of the test
+    g_ENABLE_CHECK : boolean := true; -- not used
+    g_ENABLE_LOG   : boolean := true -- not used
     );
 end tb_spi_top;
 
@@ -85,12 +85,12 @@ architecture simulate of tb_spi_top is
   signal o_spi_rd_data_valid  : std_logic;  --  read data valid
   signal o_spi_rd_data        : std_logic_vector(31 downto 0);  --  read data
   signal o_spi_ready          : std_logic;  --  1: all spi links are ready,0: one of the spi link is busy
-  signal o_reg_spi_status     : std_logic_vector(31 downto 0);
+  signal o_reg_spi_status     : std_logic_vector(31 downto 0); -- spi status (register format)
   ---------------------------------------------------------------------
   -- errors/status
   ---------------------------------------------------------------------
-  signal o_errors             : std_logic_vector(15 downto 0);
-  signal o_status             : std_logic_vector(7 downto 0);
+  signal o_errors             : std_logic_vector(15 downto 0); -- errors
+  signal o_status             : std_logic_vector(7 downto 0); -- status
   ---------------------------------------------------------------------
   -- from/to the IOs
   ---------------------------------------------------------------------
@@ -125,19 +125,20 @@ architecture simulate of tb_spi_top is
   ---------------------------------------------------------------------
   -- Clock definition
   ---------------------------------------------------------------------
+  -- clock period duration
   constant c_CLK_PERIOD0 : time := 5 ns;  -- 200M
 
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers
-  constant c_LOGGER_SUMMARY      : logger_t  := get_logger("log:summary");
+  constant c_LOGGER_SUMMARY      : logger_t  := get_logger("log:summary"); -- Vunit: checker for the summary
   -- checkers
-  constant c_CHECKER_ERRORS      : checker_t := new_checker("check:errors");
-  constant c_CHECKER_ERRORS_CDCE : checker_t := new_checker("check:errors:cdce");
-  constant c_CHECKER_ERRORS_ADC  : checker_t := new_checker("check:errors:adc");
-  constant c_CHECKER_ERRORS_DAC  : checker_t := new_checker("check:errors:dac");
-  constant c_CHECKER_ERRORS_AMC  : checker_t := new_checker("check:errors:amc");
+  constant c_CHECKER_ERRORS      : checker_t := new_checker("check:errors"); -- vunit: checker on the errors (spi_top module)
+  constant c_CHECKER_ERRORS_CDCE : checker_t := new_checker("check:errors:cdce"); -- vunit: checker of the cdce spi bridge
+  constant c_CHECKER_ERRORS_ADC  : checker_t := new_checker("check:errors:adc");-- vunit: checker of the adc spi bridge
+  constant c_CHECKER_ERRORS_DAC  : checker_t := new_checker("check:errors:dac");-- vunit: checker of the dac spi bridge
+  constant c_CHECKER_ERRORS_AMC  : checker_t := new_checker("check:errors:amc");-- vunit: checker of the amc spi bridge
 
 begin
 

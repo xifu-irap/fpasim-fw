@@ -55,28 +55,28 @@ entity mux_squid_top is
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
-    --
+    -- inter_squid_gain value
     i_inter_squid_gain : in std_logic_vector(g_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
     -- RAM: mux_squid_offset
     -- wr
-    i_mux_squid_offset_wr_en      : in  std_logic;  -- write enable
-    i_mux_squid_offset_wr_rd_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- write address
-    i_mux_squid_offset_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
+    i_mux_squid_offset_wr_en      : in  std_logic;  -- ram write enable
+    i_mux_squid_offset_wr_rd_addr : in  std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);  -- ram write address
+    i_mux_squid_offset_wr_data    : in  std_logic_vector(15 downto 0);  -- ram write data
     -- rd
-    i_mux_squid_offset_rd_en      : in  std_logic;  -- rd en
-    o_mux_squid_offset_rd_valid   : out std_logic;  -- rd data valid
-    o_mux_squid_offset_rd_data    : out std_logic_vector(15 downto 0);  -- rd data
+    i_mux_squid_offset_rd_en      : in  std_logic;  -- ram read en
+    o_mux_squid_offset_rd_valid   : out std_logic;  -- ram read data valid
+    o_mux_squid_offset_rd_data    : out std_logic_vector(15 downto 0);  -- ram read data
 
     -- RAM: mux_squid_tf
     -- wr
-    i_mux_squid_tf_wr_en      : in  std_logic;  -- write enable
-    i_mux_squid_tf_wr_rd_addr : in  std_logic_vector(g_MUX_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);  -- write address
-    i_mux_squid_tf_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
+    i_mux_squid_tf_wr_en      : in  std_logic;  -- ram write enable
+    i_mux_squid_tf_wr_rd_addr : in  std_logic_vector(g_MUX_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);  -- ram write address
+    i_mux_squid_tf_wr_data    : in  std_logic_vector(15 downto 0);  -- ram write data
     --rd
-    i_mux_squid_tf_rd_en      : in  std_logic;  -- rd enable
-    o_mux_squid_tf_rd_valid   : out std_logic;  -- rd data valid
-    o_mux_squid_tf_rd_data    : out std_logic_vector(15 downto 0);  -- read data
+    i_mux_squid_tf_rd_en      : in  std_logic;  -- ram read enable
+    o_mux_squid_tf_rd_valid   : out std_logic;  -- ram read data valid
+    o_mux_squid_tf_rd_data    : out std_logic_vector(15 downto 0);  -- ram read data
 
     ---------------------------------------------------------------------
     -- input1
@@ -89,10 +89,12 @@ entity mux_squid_top is
     i_frame_sof          : in  std_logic;  -- first frame sample
     i_frame_eof          : in  std_logic;  -- last frame sample
     i_frame_id           : in  std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0);  -- frame id
+
     ---------------------------------------------------------------------
     -- input2
     ---------------------------------------------------------------------
     i_mux_squid_feedback : in  std_logic_vector(13 downto 0);  -- mux squid feedback value
+
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
@@ -117,39 +119,41 @@ architecture RTL of mux_squid_top is
   ---------------------------------------------------------------------
   -- mux_squid
   ---------------------------------------------------------------------
-  signal mux_squid_offset_rd_valid : std_logic;  -- rd data valid
-  signal mux_squid_offset_rd_data  : std_logic_vector(o_mux_squid_offset_rd_data'range);  -- rd data
+  signal mux_squid_offset_rd_valid : std_logic;  -- ram read data valid
+  signal mux_squid_offset_rd_data  : std_logic_vector(o_mux_squid_offset_rd_data'range);  -- ram read data
 
-  signal mux_squid_tf_rd_valid : std_logic;  -- rd data valid
-  signal mux_squid_tf_rd_data  : std_logic_vector(o_mux_squid_tf_rd_data'range);  -- read data
+  signal mux_squid_tf_rd_valid : std_logic;  -- ram read data valid
+  signal mux_squid_tf_rd_data  : std_logic_vector(o_mux_squid_tf_rd_data'range);  -- ram read data
 
-  signal pixel_sof    : std_logic;
-  signal pixel_eof    : std_logic;
-  signal pixel_valid  : std_logic;
-  signal pixel_id     : std_logic_vector(o_pixel_id'range);
-  signal pixel_result : std_logic_vector(o_pixel_result'range);
+  signal pixel_sof    : std_logic; -- first pixel sample
+  signal pixel_eof    : std_logic; -- last pixel sample
+  signal pixel_valid  : std_logic; -- valid pixel sample
+  signal pixel_id     : std_logic_vector(o_pixel_id'range); -- pixel id
+  signal pixel_result : std_logic_vector(o_pixel_result'range); -- pixel result value
 
-  signal errors : std_logic_vector(o_errors'range);
-  signal status : std_logic_vector(o_status'range);
+  signal errors : std_logic_vector(o_errors'range); -- errors
+  signal status : std_logic_vector(o_status'range); -- status
 
   ---------------------------------------------------------------------
   -- sync with sub_sfixed_mux_squid out
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_frame_id'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0; low
+  constant c_IDX0_H : integer := c_IDX0_L + i_frame_id'length - 1; -- index0; high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index0; low
+  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1; -- index0; high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1; -- index0; low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1; -- index0; high
 
+  -- temporary input pipe
   signal data_pipe_tmp0 : std_logic_vector(c_IDX2_H downto 0);
+  -- temporary output pipe
   signal data_pipe_tmp1 : std_logic_vector(c_IDX2_H downto 0);
 
-  signal frame_sof : std_logic;
-  signal frame_eof : std_logic;
-  signal frame_id  : std_logic_vector(i_frame_id'range);
+  signal frame_sof : std_logic; -- first frame sample
+  signal frame_eof : std_logic; -- last frame sample
+  signal frame_id  : std_logic_vector(i_frame_id'range);  -- frame id
 
 begin
 

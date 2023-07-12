@@ -76,125 +76,160 @@ end tb_amp_squid_top;
 
 architecture simulate of tb_amp_squid_top is
 
+  -- simulation output path for the testbench input files
   constant c_INPUT_BASEPATH  : string := output_path & "inputs/";
+  -- simulation output path for the testbench output files
   constant c_OUTPUT_BASEPATH : string := output_path & "outputs/";
 
   ---------------------------------------------------------------------
   -- module input signals
   ---------------------------------------------------------------------
-  signal i_clk         : std_logic := '0';
-  signal i_rst_status  : std_logic := '0';
-  signal i_debug_pulse : std_logic := '0';
+  signal i_clk         : std_logic := '0'; -- clock signal
+  signal i_rst_status  : std_logic := '0';  -- reset error flag(s)
+  signal i_debug_pulse : std_logic := '0'; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
   -- input command: from the regdecode
   ---------------------------------------------------------------------
   -- RAM: amp_squid_tf
   -- wr
-  signal i_amp_squid_tf_wr_en      : std_logic;
-  signal i_amp_squid_tf_wr_rd_addr : std_logic_vector(g_AMP_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0);
-  signal i_amp_squid_tf_wr_data    : std_logic_vector(15 downto 0);
+  signal i_amp_squid_tf_wr_en      : std_logic;  -- RAM write enable
+  signal i_amp_squid_tf_wr_rd_addr : std_logic_vector(g_AMP_SQUID_TF_RAM_ADDR_WIDTH - 1 downto 0); -- RAM write address
+  signal i_amp_squid_tf_wr_data    : std_logic_vector(15 downto 0); -- RAM write data
   -- rd
-  signal i_amp_squid_tf_rd_en      : std_logic;
-  signal o_amp_squid_tf_rd_valid   : std_logic;
-  signal o_amp_squid_tf_rd_data    : std_logic_vector(15 downto 0);
+  signal i_amp_squid_tf_rd_en      : std_logic; -- RAM read enable
+  signal o_amp_squid_tf_rd_valid   : std_logic; -- RAM read data valid
+  signal o_amp_squid_tf_rd_data    : std_logic_vector(15 downto 0);  -- RAM read data
   -- gain
   signal i_fpasim_gain             : std_logic_vector(2 downto 0);
 
   -- input1
   ---------------------------------------------------------------------
-  signal i_pixel_sof    : std_logic;
-  signal i_pixel_eof    : std_logic;
-  signal i_pixel_valid  : std_logic;
-  signal i_pixel_id     : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);
-  signal i_pixel_result : std_logic_vector(g_PIXEL_RESULT_INPUT_WIDTH - 1 downto 0);
-  signal i_frame_sof    : std_logic;
-  signal i_frame_eof    : std_logic;
-  signal i_frame_id     : std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0);
+  signal i_pixel_sof    : std_logic; -- first pixel sample
+  signal i_pixel_eof    : std_logic; -- last pixel sample
+  signal i_pixel_valid  : std_logic; -- valid pixel sample
+  signal i_pixel_id     : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id
+  signal i_pixel_result : std_logic_vector(g_PIXEL_RESULT_INPUT_WIDTH - 1 downto 0); -- pixel result value
+  signal i_frame_sof    : std_logic; -- first frame sample
+  signal i_frame_eof    : std_logic; -- last frame sample
+  signal i_frame_id     : std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0); -- frame id
 
   -- input2
   ---------------------------------------------------------------------
-  signal i_amp_squid_offset_correction : std_logic_vector(13 downto 0);
+  signal i_amp_squid_offset_correction : std_logic_vector(13 downto 0); -- amp squid offset value (from adc)
 
   -- output
   ---------------------------------------------------------------------
-  signal o_pixel_sof    : std_logic;
-  signal o_pixel_eof    : std_logic;
-  signal o_pixel_valid  : std_logic;
-  signal o_pixel_id     : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0);
-  signal o_pixel_result : std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0);
-  signal o_frame_sof    : std_logic;
-  signal o_frame_eof    : std_logic;
-  signal o_frame_id     : std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0);
+  signal o_pixel_sof    : std_logic; -- first pixel sample
+  signal o_pixel_eof    : std_logic; -- last pixel sample
+  signal o_pixel_valid  : std_logic; -- valid pixel sample
+  signal o_pixel_id     : std_logic_vector(g_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id
+  signal o_pixel_result : std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0); -- pixel result value
+  signal o_frame_sof    : std_logic; -- first frame sample
+  signal o_frame_eof    : std_logic; -- last frame sample
+  signal o_frame_id     : std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0); -- frame id
 
   -- errors/status
   ---------------------------------------------------------------------
-  signal o_errors : std_logic_vector(15 downto 0);
-  signal o_status : std_logic_vector(7 downto 0);
+  signal o_errors : std_logic_vector(15 downto 0); -- output errors
+  signal o_status : std_logic_vector(7 downto 0); -- output status
 
   ---------------------------------------------------------------------
   -- Clock definition
   ---------------------------------------------------------------------
+  -- clock period duration
   constant c_CLK_PERIOD0 : time := 4 ns;
 
   ---------------------------------------------------------------------
   -- Generate reading sequence
   ---------------------------------------------------------------------
   -- data
+  -- start the data generation
   signal data_start             : std_logic := '0';
+  -- read valid in order to modulate the file reading speed
   signal data_rd_valid          : std_logic := '0';
+  -- end of the data generation
   signal data_gen_finish        : std_logic := '0';
+  -- data valid
   signal data_valid             : std_logic := '0';
+  -- input data counter
   signal data_count_in          : std_logic_vector(31 downto 0);
+  -- input data counter overflow
   signal data_count_overflow_in : std_logic;
 
   -- ram tes pulse shape
+  -- start the ram1 writting
   signal ram1_wr_start      : std_logic                    := '0';
+  -- start the ram1 reading
   signal ram1_rd_start      : std_logic                    := '0';
+  -- read valid in order to modulate the file writting/reading speed
   signal ram1_rd_valid      : std_logic                    := '0';
+  -- end of the ram writting
   signal ram1_wr_gen_finish : std_logic                    := '0';
+  -- end of the ram reading
   signal ram1_rd_gen_finish : std_logic                    := '0';
+  -- detect error on the file
   signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0');
 
   -- check
+  -- output data counter
   signal data_count_out          : std_logic_vector(31 downto 0);
+  -- output data counter overflow
   signal data_count_overflow_out : std_logic;
 
-  signal data_stop : std_logic := '0';
+  -- stop logging
+  signal data_stop      : std_logic := '0';
+  -- auto-check error (output data vs reference data)
   signal data_out_error : std_logic_vector(0 downto 0);
 
   ---------------------------------------------------------------------
   -- filepath definition
   ---------------------------------------------------------------------
+  -- csv file separator
   constant c_CSV_SEPARATOR : character := ';';
 
   -- input data generation
+  -- filename associated to the reading speed for the data generation
   constant c_FILENAME_DATA_VALID_IN : string := "py_data_valid_sequencer_in.csv";
+  -- filepath associated to the reading speed for the data generation
   constant c_FILEPATH_DATA_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_VALID_IN;
 
+  -- filename associated to the data generation
   constant c_FILENAME_DATA_IN : string := "py_data_in.csv";
+  -- filepath associated to the data generation
   constant c_FILEPATH_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_IN;
 
   -- input ram tes pulse shape
+  -- filename associated to the reading speed for the RAM configuration
   constant c_FILENAME_RAM1_VALID_IN : string := "py_ram_amp_squid_tf_valid_sequencer_in.csv";
+  -- filepath associated to the reading speed for the RAM configuration
   constant c_FILEPATH_RAM1_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM1_VALID_IN;
 
+  -- filename associated to the RAM configuration
   constant c_FILENAME_RAM1_IN  : string := "py_ram_amp_squid_tf.csv";
+  -- filepath associated to the RAM configuration
   constant c_FILEPATH_RAM1_IN  : string := c_INPUT_BASEPATH & c_FILENAME_RAM1_IN;
 
-  -- output check data
-  constant c_FILENAME_CHECK_DATA_OUT : string := "py_check_data_out.csv";
-  constant c_FILEPATH_CHECK_DATA_OUT : string := c_INPUT_BASEPATH & c_FILENAME_CHECK_DATA_OUT;
+
+  -- filename associated to the reference file (output data verification)
+  constant c_FILENAME_CHECK_DATA_OUT : string    := "py_check_data_out.csv";
+  -- filepath associated to the reference file (output data verification)
+  constant c_FILEPATH_CHECK_DATA_OUT : string    := c_INPUT_BASEPATH & c_FILENAME_CHECK_DATA_OUT;
 
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers
-  constant c_LOGGER_SUMMARY     : logger_t  := get_logger("log:summary");
+  -- Vunit: logger for the summary
+  constant c_LOGGER_SUMMARY          : logger_t  := get_logger("log:summary");
   -- checkers
-  constant c_CHECKER_ERRORS     : checker_t := new_checker("check:errors");
-  constant c_CHECKER_DATA_COUNT : checker_t := new_checker("check:data_count");
-  constant c_CHECKER_RAM1       : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME);
-  constant c_CHECKER_DATA       : checker_t := new_checker("check:out:data_out");
+  -- vunit: checker associated to the errors
+  constant c_CHECKER_ERRORS          : checker_t := new_checker("check:errors");
+  -- vunit: checker associated to the data count between the input and the output
+  constant c_CHECKER_DATA_COUNT      : checker_t := new_checker("check:data_count");
+  -- vunit: checker associated to the RAM1 configuration
+  constant c_CHECKER_RAM1            : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME);
+  -- vunit: checker associated to the output data
+  constant c_CHECKER_DATA            : checker_t := new_checker("check:out:data_out");
 
 begin
 
@@ -213,7 +248,7 @@ begin
   -- master fsm
   ---------------------------------------------------------------------
   p_master_fsm : process is
-    variable val_v : integer := 0;
+    variable v_val  : integer := 0;
     variable v_test : integer := 0;
 
   begin
@@ -343,9 +378,9 @@ begin
     ---------------------------------------------------------------------
     -- errors checking
     info("Check results:");
-    val_v := to_integer(unsigned(o_errors));
+    v_val := to_integer(unsigned(o_errors));
 
-    check_equal(c_CHECKER_ERRORS, 0, val_v, result("checker output errors"));
+    check_equal(c_CHECKER_ERRORS, 0, v_val, result("checker output errors"));
     check_equal(c_CHECKER_DATA_COUNT, data_count_in, data_count_out, result("checker input/output data count"));
 
     -- summary

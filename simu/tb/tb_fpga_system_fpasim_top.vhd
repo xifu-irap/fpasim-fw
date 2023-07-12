@@ -64,8 +64,8 @@ entity tb_fpga_system_fpasim_top is
     g_ERROR_DELAY        : natural := 4;  -- [0;(2**6) - 1]
     g_RA_DELAY           : natural := 4;  -- [0;(2**6) - 1]
     g_INTER_SQUID_GAIN   : natural := 255;  -- inter squid gain. The range is: [0;(2**8) - 1]
-    g_NB_PIXEL_BY_FRAME  : natural := 34;
-    g_NB_SAMPLE_BY_PIXEL : natural := 40;
+    g_NB_PIXEL_BY_FRAME  : natural := 34; -- number of pixel by frame. The range is : [1;pkg_MUX_FACT_MAX(64)]
+    g_NB_SAMPLE_BY_PIXEL : natural := 40; -- number of sample by pixel. The range is [1;pkg_NB_SAMPLE_BY_PIXEL_MAX(64)]
 
     ---------------------------------------------------------------------
     -- simulation parameters
@@ -83,42 +83,58 @@ architecture simulate of tb_fpga_system_fpasim_top is
   ---------------------------------------------------------------------
   -- command
   ---------------------------------------------------------------------
+  -- valid make_pulse command
   signal i_make_pulse_valid : std_logic                     := '0';
+  -- make_pulse command value
   signal i_make_pulse       : std_logic_vector(31 downto 0) := (others => '0');
+  -- busy: '1' processing in progress, '0': otherwise
   signal o_auto_conf_busy   : std_logic;
+  -- ready
   signal o_ready            : std_logic;
   ---------------------------------------------------------------------
   -- ADC
   ---------------------------------------------------------------------
+  -- adc clock associated to the data
   signal adc_clk            : std_logic;
+  -- adc clock
   signal adc_clk_phase      : std_logic;
+  -- adc0 data (real value)
   signal i_adc0_real        : real;
+  -- adc1 data (real value)
   signal i_adc1_real        : real;
   ---------------------------------------------------------------------
   -- to sync
   ---------------------------------------------------------------------
+  -- ref clock
   signal o_ref_clk          : std_logic;
+  -- clk_frame (sync signal)
   signal o_sync             : std_logic;
   ---------------------------------------------------------------------
   -- to DAC
   ---------------------------------------------------------------------
+  -- dac valid
   signal o_dac_real_valid   : std_logic;
+  -- dac data (real value)
   signal o_dac_real         : real;
 
   ---------------------------------------------------------------------
   -- additional signals
   ---------------------------------------------------------------------
   -- Clocks
-
+  -- data0 to generate
   signal data0 : unsigned(13 downto 0) := (others => '0');
+  -- data1 to generate
   signal data1 : unsigned(13 downto 0) := (others => '0');
 
+  -- data0 (sfixed representation)
   signal s_data0 : sfixed(0 downto -13) := (others => '0');
+  -- data1 (sfixed representation)
   signal s_data1 : sfixed(0 downto -13) := (others => '0');
 
   ---------------------------------------------------------------------
   -- Clock definition
   ---------------------------------------------------------------------
+  -- clock period duration.
   constant c_CLK_PERIOD0 : time := 4 ns;
 
 

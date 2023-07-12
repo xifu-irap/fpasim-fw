@@ -125,9 +125,9 @@ entity tes_pulse_shape_manager is
     ---------------------------------------------------------------------
     -- output: detect negative output value
     ---------------------------------------------------------------------
-    o_tes_pixel_neg_out_valid    : out std_logic;
-    o_tes_pixel_neg_out_error    : out std_logic;
-    o_tes_pixel_neg_out_pixel_id : out std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
+    o_tes_pixel_neg_out_valid    : out std_logic; -- valid negative output
+    o_tes_pixel_neg_out_error    : out std_logic; -- negative output detection
+    o_tes_pixel_neg_out_pixel_id : out std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id when a negative output is detected
 
     -----------------------------------------------------------------
     -- errors/status

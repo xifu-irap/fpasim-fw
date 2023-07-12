@@ -69,7 +69,7 @@ entity spi_master is
       o_finish        : out std_logic;  -- pulse on finish (end of spi transaction: wr or rd)
       -- rd side
       o_rx_data_valid : out std_logic;  -- received data valid
-      o_rx_data       : out std_logic_vector(g_DATA_WIDTH -1 downto 0);  -- received data
+      o_rx_data       : out std_logic_vector(g_DATA_WIDTH -1 downto 0);  -- received data (device spi register value)
       ---------------------------------------------------------------------
       -- spi interface
       ---------------------------------------------------------------------

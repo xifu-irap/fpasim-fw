@@ -88,173 +88,240 @@ end tb_tes_top;
 
 architecture simulate of tb_tes_top is
 
+  -- simulation output path for the testbench input files
   constant c_INPUT_BASEPATH  : string := output_path & "inputs/";
+  -- simulation output path for the testbench output files
   constant c_OUTPUT_BASEPATH : string := output_path & "outputs/";
 
   ---------------------------------------------------------------------
   -- module input signals
   ---------------------------------------------------------------------
-  signal i_clk         : std_logic := '0';
-  signal i_rst         : std_logic := '0';
-  signal i_rst_status  : std_logic := '0';
-  signal i_debug_pulse : std_logic := '0';
+  signal i_clk         : std_logic := '0'; -- clock signal
+  signal i_rst         : std_logic := '0'; -- reset signal
+  signal i_rst_status  : std_logic := '0';  -- reset error flag(s)
+  signal i_debug_pulse : std_logic := '0'; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
   -- input command: from the regdecode
   ---------------------------------------------------------------------
-  signal i_en                      : std_logic := '0';
-  signal i_nb_sample_by_pixel      : std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);
-  signal i_nb_pixel_by_frame       : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
-  signal i_nb_sample_by_frame      : std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0);
+  signal i_en                      : std_logic := '0'; -- enable
+  signal i_nb_sample_by_pixel      : std_logic_vector(g_PIXEL_LENGTH_WIDTH - 1 downto 0);  -- number of samples by pixel
+  signal i_nb_pixel_by_frame       : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- number of pixel by frame (column)
+  signal i_nb_sample_by_frame      : std_logic_vector(g_FRAME_LENGTH_WIDTH - 1 downto 0); -- number of samples by frame (column)
   -- command
-  signal i_cmd_valid               : std_logic;
-  signal i_cmd_pulse_height        : std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0);
-  signal i_cmd_pixel_id            : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
-  signal i_cmd_time_shift          : std_logic_vector(g_CMD_TIME_SHIFT_WIDTH - 1 downto 0);
-  signal o_cmd_ready               : std_logic;
+  signal i_cmd_valid               : std_logic; -- valid command
+  signal i_cmd_pulse_height        : std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0); -- pulse height command
+  signal i_cmd_pixel_id            : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id command
+  signal i_cmd_time_shift          : std_logic_vector(g_CMD_TIME_SHIFT_WIDTH - 1 downto 0); -- time shift command
+  signal o_cmd_ready               : std_logic;-- ready to receive a new command
   -- RAM: pulse shape
   -- wr
-  signal i_pulse_shape_wr_en       : std_logic;
-  signal i_pulse_shape_wr_rd_addr  : std_logic_vector(g_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0);
-  signal i_pulse_shape_wr_data     : std_logic_vector(15 downto 0);
+  signal i_pulse_shape_wr_en       : std_logic; -- RAM write enable
+  signal i_pulse_shape_wr_rd_addr  : std_logic_vector(g_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0); -- RAM write address
+  signal i_pulse_shape_wr_data     : std_logic_vector(15 downto 0); -- RAM write data
   -- rd
-  signal i_pulse_shape_rd_en       : std_logic;
-  signal o_pulse_shape_rd_valid    : std_logic;
-  signal o_pulse_shape_rd_data     : std_logic_vector(15 downto 0);
+  signal i_pulse_shape_rd_en       : std_logic; -- RAM read enable
+  signal o_pulse_shape_rd_valid    : std_logic; -- RAM read data valid
+  signal o_pulse_shape_rd_data     : std_logic_vector(15 downto 0); -- RAM read data
   -- RAM:
   -- wr
-  signal i_steady_state_wr_en      : std_logic;
-  signal i_steady_state_wr_rd_addr : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
-  signal i_steady_state_wr_data    : std_logic_vector(15 downto 0);
+  signal i_steady_state_wr_en      : std_logic; -- RAM write enable
+  signal i_steady_state_wr_rd_addr : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- RAM write address
+  signal i_steady_state_wr_data    : std_logic_vector(15 downto 0); -- RAM write data
   -- rd
-  signal i_steady_state_rd_en      : std_logic;
-  signal o_steady_state_rd_valid   : std_logic;
-  signal o_steady_state_rd_data    : std_logic_vector(15 downto 0);
+  signal i_steady_state_rd_en      : std_logic; -- RAM read enable
+  signal o_steady_state_rd_valid   : std_logic; -- RAM read data valid
+  signal o_steady_state_rd_data    : std_logic_vector(15 downto 0); -- RAM read data
 
   -- from the adc
   ---------------------------------------------------------------------
-  signal i_data_valid : std_logic;
+  signal i_data_valid : std_logic; --  input valid data
 
   -- output
   ---------------------------------------------------------------------
-  signal o_pulse_sof    : std_logic;
-  signal o_pulse_eof    : std_logic;
-  signal o_pixel_sof    : std_logic;
-  signal o_pixel_eof    : std_logic;
-  signal o_pixel_valid  : std_logic;
-  signal o_pixel_id     : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
-  signal o_pixel_result : std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0);
-  signal o_frame_sof    : std_logic;
-  signal o_frame_eof    : std_logic;
-  signal o_frame_id     : std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0);
+  signal o_pulse_sof    : std_logic; -- first processed sample of a pulse
+  signal o_pulse_eof    : std_logic; -- last processed sample of a pulse
+  signal o_pixel_sof    : std_logic; -- first pixel sample
+  signal o_pixel_eof    : std_logic; -- last pixel sample
+  signal o_pixel_valid  : std_logic; -- valid pixel sample
+  signal o_pixel_id     : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- output pixel id
+  signal o_pixel_result : std_logic_vector(g_PIXEL_RESULT_OUTPUT_WIDTH - 1 downto 0);  -- output pixel result
+  signal o_frame_sof    : std_logic; -- first frame sample
+  signal o_frame_eof    : std_logic; -- last frame sample
+  signal o_frame_id     : std_logic_vector(g_FRAME_ID_WIDTH - 1 downto 0); -- output frame id
+
+  ---------------------------------------------------------------------
+  -- output: detect negative output value
+   ---------------------------------------------------------------------
+  signal o_tes_pixel_neg_out_valid    : std_logic; -- valid negative output
+  signal o_tes_pixel_neg_out_error    : std_logic; -- negative output detection
+  signal o_tes_pixel_neg_out_pixel_id : std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id when a negative output is detected
 
   -- errors/status
   ---------------------------------------------------------------------
-  signal o_errors : std_logic_vector(15 downto 0);
-  signal o_status : std_logic_vector(7 downto 0);
+  signal o_errors : std_logic_vector(15 downto 0); -- output errors
+  signal o_status : std_logic_vector(7 downto 0); -- output status
 
   ---------------------------------------------------------------------
   -- Clock definition
   ---------------------------------------------------------------------
+  -- clock period duration
   constant c_CLK_PERIOD0 : time := 4 ns;
 
   ---------------------------------------------------------------------
   -- Generate reading sequence
   ---------------------------------------------------------------------
   -- reg
+  -- start the register configuration
   signal reg_start      : std_logic := '0';
   signal reg_rd_valid   : std_logic := '0';
+  -- end of the register configuration
   signal reg_gen_finish : std_logic := '0';
+  -- valid register value
   signal reg_valid      : std_logic;
 
   -- Cmd
+  -- start the command generation
   signal cmd_start      : std_logic := '0';
+  -- read valid in order to modulate the file reading speed
   signal cmd_rd_valid   : std_logic := '0';
+  -- end of the command generation
   signal cmd_gen_finish : std_logic := '0';
 
   -- data
+  -- start the data generation
   signal data_start             : std_logic := '0';
+  -- read valid in order to modulate the file reading speed
   signal data_rd_valid          : std_logic := '0';
+  -- end of the data generation
   signal data_gen_finish        : std_logic := '0';
+  -- data valid
   signal data_valid             : std_logic := '0';
+  -- input data counter
   signal data_count_in          : std_logic_vector(31 downto 0);
+  -- input data counter overflow
   signal data_count_overflow_in : std_logic;
 
   -- ram tes pulse shape
+  -- start the ram1 writting
   signal ram1_wr_start      : std_logic                    := '0';
+  -- start the ram1 reading
   signal ram1_rd_start      : std_logic                    := '0';
+  -- read valid in order to modulate the file writting/reading speed
   signal ram1_rd_valid      : std_logic                    := '0';
+  -- end of the ram writting
   signal ram1_wr_gen_finish : std_logic                    := '0';
+  -- end of the ram reading
   signal ram1_rd_gen_finish : std_logic                    := '0';
+  -- detect error on the file
   signal ram1_error         : std_logic_vector(0 downto 0) := (others => '0');
 
   -- ram tes steady state
+  -- start the ram2 writting
   signal ram2_wr_start      : std_logic                    := '0';
+  -- start the ram2 reading
   signal ram2_rd_start      : std_logic                    := '0';
+  -- read valid in order to modulate the file writting/reading speed
   signal ram2_rd_valid      : std_logic                    := '0';
+  -- end of the ram writting
   signal ram2_wr_gen_finish : std_logic                    := '0';
+  -- end of the ram reading
   signal ram2_rd_gen_finish : std_logic                    := '0';
+  -- detect error on the file
   signal ram2_error         : std_logic_vector(0 downto 0) := (others => '0');
 
   -- check
+  -- output data counter
   signal data_count_out          : std_logic_vector(31 downto 0);
+  -- output data counter overflow
   signal data_count_overflow_out : std_logic;
 
+  -- stop logging
   signal data_stop      : std_logic := '0';
+  -- auto-check error (output data vs reference data)
   signal data_out_error : std_logic_vector(0 downto 0);
 
   ---------------------------------------------------------------------
   -- filepath definition
   ---------------------------------------------------------------------
+  -- csv file separator
   constant c_CSV_SEPARATOR : character := ';';
 
   -- input register generation
+  -- filename associated to the reading speed for the register configuration
   constant c_FILENAME_REG_VALID_IN : string := "py_reg_valid_sequencer_in.csv";
+  -- filepath associated to the reading speed for the register configuration
   constant c_FILEPATH_REG_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_REG_VALID_IN;
 
+  -- filename associated to the register configuration
   constant c_FILENAME_REG_IN : string := "py_reg_in.csv";
+  -- filepath associated to the register configuration
   constant c_FILEPATH_REG_IN : string := c_INPUT_BASEPATH & c_FILENAME_REG_IN;
 
   -- input cmd generation
+  -- filename associated to the reading speed for the command generation
   constant c_FILENAME_CMD_VALID_IN : string := "py_cmd_valid_sequencer_in.csv";
+  -- filepath associated to the reading speed for the command generation
   constant c_FILEPATH_CMD_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_CMD_VALID_IN;
 
+  -- filename associated to the command generation
   constant c_FILENAME_CMD_IN : string := "py_cmd_in.csv";
+  -- filepath associated to the command generation
   constant c_FILEPATH_CMD_IN : string := c_INPUT_BASEPATH & c_FILENAME_CMD_IN;
 
   -- input data generation
+  -- filename associated to the reading speed for the data generation
   constant c_FILENAME_DATA_VALID_IN : string := "py_data_valid_sequencer_in.csv";
+  -- filepath associated to the reading speed for the data generation
   constant c_FILEPATH_DATA_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_VALID_IN;
 
+  -- filename associated to the data generation
   constant c_FILENAME_DATA_IN : string := "py_data_in.csv";
+  -- filepath associated to the data generation
   constant c_FILEPATH_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_IN;
 
   -- input ram tes pulse shape
+  -- filename associated to the reading speed for the RAM configuration
   constant c_FILENAME_RAM1_VALID_IN : string := "py_ram_tes_shape_valid_sequencer_in.csv";
+  -- filepath associated to the reading speed for the RAM configuration
   constant c_FILEPATH_RAM1_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM1_VALID_IN;
 
+  -- filename associated to the RAM configuration
   constant c_FILENAME_RAM1_IN : string := "py_ram_tes_shape.csv";
+  -- filepath associated to the RAM configuration
   constant c_FILEPATH_RAM1_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM1_IN;
 
   -- input ram tes steady state
+  -- filename associated to the reading speed for the RAM configuration
   constant c_FILENAME_RAM2_VALID_IN : string := "py_ram_tes_steady_state_valid_sequencer_in.csv";
+  -- filepath associated to the reading speed for the RAM configuration
   constant c_FILEPATH_RAM2_VALID_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM2_VALID_IN;
 
+  -- filename associated to the RAM configuration
   constant c_FILENAME_RAM2_IN : string := "py_ram_tes_steady_state.csv";
+  -- filepath associated to the RAM configuration
   constant c_FILEPATH_RAM2_IN : string := c_INPUT_BASEPATH & c_FILENAME_RAM2_IN;
 
-  -- output check data
+  -- filename associated to the reference file (output data verification)
   constant c_FILENAME_CHECK_DATA_OUT : string    := "py_check_data_out.csv";
+  -- filepath associated to the reference file (output data verification)
   constant c_FILEPATH_CHECK_DATA_OUT : string    := c_INPUT_BASEPATH & c_FILENAME_CHECK_DATA_OUT;
+
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers
+  -- Vunit: logger for the summary
   constant c_LOGGER_SUMMARY          : logger_t  := get_logger("log:summary");
   -- checkers
+  -- vunit: checker associated to the errors
   constant c_CHECKER_ERRORS          : checker_t := new_checker("check:errors");
+  -- vunit: checker associated to the data count between the input and the output
   constant c_CHECKER_DATA_COUNT      : checker_t := new_checker("check:data_count");
+  -- vunit: checker associated to the RAM1 configuration
   constant c_CHECKER_RAM1            : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME);
+  -- vunit: checker associated to the RAM2 configuration
   constant c_CHECKER_RAM2            : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME);
+  -- vunit: checker associated to the output data
   constant c_CHECKER_DATA            : checker_t := new_checker("check:out:data_out");
 
 begin
@@ -392,6 +459,7 @@ begin
     info("Start data Generation");
     data_start <= '1';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
+
     ---------------------------------------------------------------------
     -- Wait end of input data generation
     ---------------------------------------------------------------------
@@ -486,7 +554,6 @@ begin
          "c_CHECKER_ERRORS: " & to_string(get_checker_stat(c_CHECKER_ERRORS)) & LF &
          "CHECKER_DATA_COUNT_c: " & to_string(get_checker_stat(c_CHECKER_DATA_COUNT))
          );
-
 
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
@@ -623,7 +690,7 @@ begin
 
   begin
 
-    -- valid sequence
+    -- valid sequence generation
     ---------------------------------------------------------------------
     inst_pkg_valid_sequencer : pkg_valid_sequencer(
       i_clk           => i_clk,
@@ -896,6 +963,13 @@ begin
       o_frame_sof               => o_frame_sof,  -- first frame sample
       o_frame_eof               => o_frame_eof,  -- last frame sample
       o_frame_id                => o_frame_id,   --  frame id
+
+      ---------------------------------------------------------------------
+      -- output: detect negative output value
+      ---------------------------------------------------------------------
+      o_tes_pixel_neg_out_valid    => o_tes_pixel_neg_out_valid,
+      o_tes_pixel_neg_out_error    => o_tes_pixel_neg_out_error,
+      o_tes_pixel_neg_out_pixel_id => o_tes_pixel_neg_out_pixel_id,
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------

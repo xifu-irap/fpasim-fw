@@ -81,7 +81,7 @@ entity amp_squid_top is
     ---------------------------------------------------------------------
     -- input2
     ---------------------------------------------------------------------
-    i_amp_squid_offset_correction : in  std_logic_vector(13 downto 0);  -- amp squid offset value
+    i_amp_squid_offset_correction : in  std_logic_vector(13 downto 0);  -- amp squid offset value (from adc)
     ---------------------------------------------------------------------
     -- output
     ---------------------------------------------------------------------
@@ -106,36 +106,38 @@ architecture RTL of amp_squid_top is
   ---------------------------------------------------------------------
   -- mux_squid
   ---------------------------------------------------------------------
-  signal amp_squid_tf_rd_valid : std_logic;
-  signal amp_squid_tf_rd_data  : std_logic_vector(o_amp_squid_tf_rd_data'range);
+  signal amp_squid_tf_rd_valid : std_logic; -- ram read data valid
+  signal amp_squid_tf_rd_data  : std_logic_vector(o_amp_squid_tf_rd_data'range); -- ram read data
 
-  signal pixel_sof    : std_logic;
-  signal pixel_eof    : std_logic;
-  signal pixel_valid  : std_logic;
-  signal pixel_id     : std_logic_vector(o_pixel_id'range);
-  signal pixel_result : std_logic_vector(o_pixel_result'range);
+  signal pixel_sof    : std_logic; -- first pixel sample
+  signal pixel_eof    : std_logic; -- last pixel sample
+  signal pixel_valid  : std_logic; -- valid pixel sample
+  signal pixel_id     : std_logic_vector(o_pixel_id'range); -- pixel id
+  signal pixel_result : std_logic_vector(o_pixel_result'range); -- pixel result value
 
-  signal errors : std_logic_vector(o_errors'range);
-  signal status : std_logic_vector(o_status'range);
+  signal errors : std_logic_vector(o_errors'range); -- errors
+  signal status : std_logic_vector(o_status'range); -- status
 
   ---------------------------------------------------------------------
   -- sync with sub_sfixed_mux_squid out
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_frame_id'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + i_frame_id'length - 1; -- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1; -- index1: high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1; -- index2: low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1; -- index2: high
 
+  -- temporary input pipe
   signal data_pipe_tmp0 : std_logic_vector(c_IDX2_H downto 0);
+  -- temporary output pipe
   signal data_pipe_tmp1 : std_logic_vector(c_IDX2_H downto 0);
 
-  signal frame_sof : std_logic;
-  signal frame_eof : std_logic;
-  signal frame_id  : std_logic_vector(i_frame_id'range);
+  signal frame_sof : std_logic; -- first frame sample
+  signal frame_eof : std_logic; -- last frame sample
+  signal frame_id  : std_logic_vector(i_frame_id'range); -- frame id
 
 begin
 

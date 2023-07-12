@@ -58,15 +58,15 @@ entity spi_top is
     i_spi_cmd_wr_data    : in  std_logic_vector(31 downto 0);  -- data to write
     -- output
     o_spi_rd_data_valid  : out std_logic;  -- read data valid
-    o_spi_rd_data        : out std_logic_vector(31 downto 0);  -- read data
+    o_spi_rd_data        : out std_logic_vector(31 downto 0);  -- read data (device spi register value)
     o_spi_ready          : out std_logic;  -- 1: all spi links are ready,0: one of the spi link is busy
 
-    o_reg_spi_status : out std_logic_vector(31 downto 0);
+    o_reg_spi_status : out std_logic_vector(31 downto 0); -- spi status (register format)
     ---------------------------------------------------------------------
     -- errors/status
     ---------------------------------------------------------------------
-    o_errors         : out std_logic_vector(15 downto 0);
-    o_status         : out std_logic_vector(7 downto 0);
+    o_errors         : out std_logic_vector(15 downto 0); -- errors
+    o_status         : out std_logic_vector(7 downto 0); -- status
 
     ---------------------------------------------------------------------
     -- from/to the IOs
@@ -81,9 +81,9 @@ entity spi_top is
 
     -- CDCE: specific signals
     i_cdce_pll_status : in  std_logic;  -- pll_status : This pin is set high if the PLL is in lock.
-    o_cdce_n_reset    : out std_logic;  -- reset_n or hold_n
-    o_cdce_n_pd       : out std_logic;  -- power_down_n
-    o_ref_en          : out std_logic;  -- enable the primary reference clock
+    o_cdce_n_reset    : out std_logic;  -- reset_n or hold_n (device pin)
+    o_cdce_n_pd       : out std_logic;  -- power_down_n (device pin)
+    o_ref_en          : out std_logic;  -- enable the primary reference clock (device pin)
 
     -- ADC: SPI
     i_adc_sdo   : in  std_logic;        -- SPI MISO
@@ -95,14 +95,14 @@ entity spi_top is
     i_dac_sdo        : in  std_logic;   -- SPI MISO
     o_dac_n_en       : out std_logic;   -- SPI chip select
     -- DAC: specific signal
-    o_dac_tx_present : out std_logic;   -- enable tx acquisition
+    o_dac_tx_present : out std_logic;   -- enable tx acquisition (device pin)
 
     -- AMC: SPI (monitoring)
     i_mon_sdo     : in  std_logic;      -- SPI data out
     o_mon_n_en    : out std_logic;      -- SPI chip select
     -- AMC : specific signals
     i_mon_n_int   : in  std_logic;  -- galr_n: Global analog input out-of-range alarm.
-    o_mon_n_reset : out std_logic       -- reset_n: hardware reset
+    o_mon_n_reset : out std_logic   -- reset_n: hardware reset
 
     );
 end entity spi_top;
@@ -113,66 +113,66 @@ architecture RTL of spi_top is
 -- spi_io
 ---------------------------------------------------------------------
 -- spi:common
-  signal io_spi_sclk       : std_logic;
-  signal io_spi_sdata      : std_logic;
+  signal io_spi_sclk       : std_logic; -- Shared SPI clock line
+  signal io_spi_sdata      : std_logic; -- Shared SPI MOSI
 -- cdce
-  signal io_cdce_n_en      : std_logic;
+  signal io_cdce_n_en      : std_logic; -- SPI chip select
 -- cdce: specific
-  signal io_cdce_n_reset   : std_logic;
-  signal io_cdce_n_pd      : std_logic;
-  signal io_ref_en         : std_logic;
+  signal io_cdce_n_reset   : std_logic; -- reset_n or hold_n (device pin)
+  signal io_cdce_n_pd      : std_logic; -- power_down_n (device pin)
+  signal io_ref_en         : std_logic; -- enable the primary reference clock (device pin)
 -- adc
-  signal io_adc_n_en       : std_logic;
+  signal io_adc_n_en       : std_logic; -- SPI chip select
 -- adc: specific
-  signal io_adc_reset      : std_logic;
+  signal io_adc_reset      : std_logic; -- adc hardware reset
 -- dac
-  signal io_dac_n_en       : std_logic;
+  signal io_dac_n_en       : std_logic; -- SPI chip select
 -- dac: specific
-  signal io_dac_tx_present : std_logic;
+  signal io_dac_tx_present : std_logic; -- enable tx acquisition (device pin)
 -- amc
-  signal io_mon_n_en       : std_logic;
+  signal io_mon_n_en       : std_logic; -- SPI chip select
 -- amc: specific
-  signal io_mon_n_reset    : std_logic;
+  signal io_mon_n_reset    : std_logic; -- reset_n: hardware reset
 
 ---------------------------------------------------------------------
 -- spi_device_select
 ---------------------------------------------------------------------
 -- command
-  signal spi_rd_data_valid : std_logic;
-  signal spi_rd_data       : std_logic_vector(o_spi_rd_data'range);
-  signal spi_ready         : std_logic;
+  signal spi_rd_data_valid : std_logic; -- read data valid
+  signal spi_rd_data       : std_logic_vector(o_spi_rd_data'range); -- read data (device spi register value)
+  signal spi_ready         : std_logic; -- 1: all spi links are ready,0: one of the spi link is busy
 -- status
-  signal reg_spi_status    : std_logic_vector(o_reg_spi_status'range);
-  signal errors            : std_logic_vector(o_errors'range);
-  signal status            : std_logic_vector(o_status'range);
+  signal reg_spi_status    : std_logic_vector(o_reg_spi_status'range); -- spi status (register format)
+  signal errors            : std_logic_vector(o_errors'range); -- errors
+  signal status            : std_logic_vector(o_status'range); -- status
 
 -- spi:common
-  signal spi_sclk        : std_logic;
-  signal spi_sdata       : std_logic;
+  signal spi_sclk        : std_logic; -- Shared SPI clock line
+  signal spi_sdata       : std_logic; -- Shared SPI MOSI
 -- cdce
-  signal cdce_n_en       : std_logic;
-  signal cdce_sdo        : std_logic;
+  signal cdce_n_en       : std_logic; -- SPI chip select
+  signal cdce_sdo        : std_logic; -- SPI MISO
 -- cdce: specific
-  signal cdce_pll_status : std_logic;
-  signal cdce_n_reset    : std_logic;
-  signal cdce_n_pd       : std_logic;
-  signal ref_en          : std_logic;
+  signal cdce_pll_status : std_logic; -- pll_status : This pin is set high if the PLL is in lock.
+  signal cdce_n_reset    : std_logic; -- reset_n or hold_n (device pin)
+  signal cdce_n_pd       : std_logic; -- power_down_n (device pin)
+  signal ref_en          : std_logic; -- enable the primary reference clock (device pin)
 -- adc
-  signal adc_sdo         : std_logic;
-  signal adc_n_en        : std_logic;
+  signal adc_sdo         : std_logic; -- SPI MISO
+  signal adc_n_en        : std_logic; -- SPI chip select
 -- adc: specific
-  signal adc_reset       : std_logic;
+  signal adc_reset       : std_logic; -- adc hardware reset
 -- dac
-  signal dac_sdo         : std_logic;
-  signal dac_n_en        : std_logic;
+  signal dac_sdo         : std_logic; -- SPI MISO
+  signal dac_n_en        : std_logic; -- SPI chip select
 -- dac: specific
-  signal dac_tx_present  : std_logic;
+  signal dac_tx_present  : std_logic; -- enable tx acquisition (device pin)
 -- amc
-  signal mon_sdo         : std_logic;
-  signal mon_n_en        : std_logic;
+  signal mon_sdo         : std_logic; -- SPI data out
+  signal mon_n_en        : std_logic; -- SPI chip select
 -- amc: specific
-  signal mon_n_int       : std_logic;
-  signal mon_n_reset     : std_logic;
+  signal mon_n_int       : std_logic; -- galr_n: Global analog input out-of-range alarm.
+  signal mon_n_reset     : std_logic; -- reset_n: hardware reset
 
 
 

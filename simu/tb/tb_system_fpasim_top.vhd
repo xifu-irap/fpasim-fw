@@ -65,19 +65,22 @@ end tb_system_fpasim_top;
 
 architecture simulate of tb_system_fpasim_top is
 
+  -- simulation output path for the testbench input files
   constant c_INPUT_BASEPATH  : string := output_path & "inputs/";
+  -- simulation output path for the testbench output files
   constant c_OUTPUT_BASEPATH : string := output_path & "outputs/";
 
   ---------------------------------------------------------------------
   -- module input signals
   ---------------------------------------------------------------------
   --  Opal Kelly inouts --
-  signal i_okUH  : std_logic_vector(4 downto 0) := (others => '0');
-  signal o_okHU  : std_logic_vector(2 downto 0) := (others => '0');
-  signal b_okUHU : std_logic_vector(31 downto 0);
-  signal b_okAA  : std_logic                    := '0';
+  signal i_okUH  : std_logic_vector(4 downto 0) := (others => '0'); -- usb signals
+  signal o_okHU  : std_logic_vector(2 downto 0) := (others => '0'); -- usb signals
+  signal b_okUHU : std_logic_vector(31 downto 0); -- usb signals
+  signal b_okAA  : std_logic                    := '0'; -- usb signals
 
   -- FMC: from the card
+  -- board_id
   signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');
   ---------------------------------------------------------------------
   -- FMC: from the adc
@@ -86,183 +89,234 @@ architecture simulate of tb_system_fpasim_top is
   signal i_adc_clk_n : std_logic                    := '1';  --  differential clock n @250MHZ
   -- adc_a
   -- bit P/N: 0-1
-  signal i_da0_p     : std_logic;
-  signal i_da0_n     : std_logic;
-  signal i_da2_p     : std_logic;
-  signal i_da2_n     : std_logic;
-  signal i_da4_p     : std_logic;
-  signal i_da4_n     : std_logic;
-  signal i_da6_p     : std_logic;
-  signal i_da6_n     : std_logic;
-  signal i_da8_p     : std_logic;
-  signal i_da8_n     : std_logic;
-  signal i_da10_p    : std_logic;
-  signal i_da10_n    : std_logic;
-  signal i_da12_p    : std_logic;
-  signal i_da12_n    : std_logic;
+  signal i_da0_p     : std_logic; -- adc bit0_p: channel A
+  signal i_da0_n     : std_logic; -- adc bit0_n: channel A
+
+  signal i_da2_p     : std_logic; -- adc bit2_p: channel A
+  signal i_da2_n     : std_logic; -- adc bit2_n: channel A
+
+  signal i_da4_p     : std_logic; -- adc bit4_p: channel A
+  signal i_da4_n     : std_logic; -- adc bit4_n: channel A
+
+  signal i_da6_p     : std_logic; -- adc bit6_p: channel A
+  signal i_da6_n     : std_logic; -- adc bit6_n: channel A
+
+  signal i_da8_p     : std_logic; -- adc bit8_p: channel A
+  signal i_da8_n     : std_logic; -- adc bit8_n: channel A
+
+  signal i_da10_p    : std_logic; -- adc bit10_p: channel A
+  signal i_da10_n    : std_logic; -- adc bit10_n: channel A
+
+  signal i_da12_p    : std_logic; -- adc bit12_p: channel A
+  signal i_da12_n    : std_logic; -- adc bit12_n: channel A
   -- adc_b
-  signal i_db0_p     : std_logic;
-  signal i_db0_n     : std_logic;
-  signal i_db2_p     : std_logic;
-  signal i_db2_n     : std_logic;
-  signal i_db4_p     : std_logic;
-  signal i_db4_n     : std_logic;
-  signal i_db6_p     : std_logic;
-  signal i_db6_n     : std_logic;
-  signal i_db8_p     : std_logic;
-  signal i_db8_n     : std_logic;
-  signal i_db10_p    : std_logic;
-  signal i_db10_n    : std_logic;
-  signal i_db12_p    : std_logic;
-  signal i_db12_n    : std_logic;
+  signal i_db0_p     : std_logic; -- adc bit0_p: channel B
+  signal i_db0_n     : std_logic; -- adc bit0_n: channel B
+
+  signal i_db2_p     : std_logic; -- adc bit2_p: channel B
+  signal i_db2_n     : std_logic; -- adc bit2_n: channel B
+
+  signal i_db4_p     : std_logic; -- adc bit4_p: channel B
+  signal i_db4_n     : std_logic; -- adc bit4_n: channel B
+
+  signal i_db6_p     : std_logic; -- adc bit6_p: channel B
+  signal i_db6_n     : std_logic; -- adc bit6_n: channel B
+
+  signal i_db8_p     : std_logic; -- adc bit8_p: channel B
+  signal i_db8_n     : std_logic; -- adc bit8_n: channel B
+
+  signal i_db10_p    : std_logic; -- adc bit10_p: channel B
+  signal i_db10_n    : std_logic; -- adc bit10_n: channel B
+
+  signal i_db12_p    : std_logic; -- adc bit12_p: channel B
+  signal i_db12_n    : std_logic; -- adc bit12_n: channel B
 
   -- FMC: to sync
   ---------------------------------------------------------------------
-  signal o_ref_clk : std_logic;
-  signal o_sync    : std_logic;
+  signal o_ref_clk : std_logic; -- clock reference
+  signal o_sync    : std_logic; -- clock frame
 
   -- FMC: to dac
   ---------------------------------------------------------------------
-  signal o_dac_clk_p   : std_logic;
-  signal o_dac_clk_n   : std_logic;
-  signal o_dac_frame_p : std_logic;
-  signal o_dac_frame_n : std_logic;
-  signal o_dac0_p      : std_logic;
-  signal o_dac0_n      : std_logic;
-  signal o_dac1_p      : std_logic;
-  signal o_dac1_n      : std_logic;
-  signal o_dac2_p      : std_logic;
-  signal o_dac2_n      : std_logic;
-  signal o_dac3_p      : std_logic;
-  signal o_dac3_n      : std_logic;
-  signal o_dac4_p      : std_logic;
-  signal o_dac4_n      : std_logic;
-  signal o_dac5_p      : std_logic;
-  signal o_dac5_n      : std_logic;
-  signal o_dac6_p      : std_logic;
-  signal o_dac6_n      : std_logic;
-  signal o_dac7_p      : std_logic;
-  signal o_dac7_n      : std_logic;
+  signal o_dac_clk_p   : std_logic; -- dac clock_p
+  signal o_dac_clk_n   : std_logic; -- dac clock_n
+
+  signal o_dac_frame_p : std_logic; -- dac frame_p
+  signal o_dac_frame_n : std_logic; -- dac frame_n
+
+  signal o_dac0_p      : std_logic; -- dac bit0_p
+  signal o_dac0_n      : std_logic; -- dac bit0_n
+
+  signal o_dac1_p      : std_logic; -- dac bit1_p
+  signal o_dac1_n      : std_logic; -- dac bit1_n
+
+  signal o_dac2_p      : std_logic; -- dac bit2_p
+  signal o_dac2_n      : std_logic; -- dac bit2_n
+
+  signal o_dac3_p      : std_logic; -- dac bit3_p
+  signal o_dac3_n      : std_logic; -- dac bit3_n
+
+  signal o_dac4_p      : std_logic; -- dac bit4_p
+  signal o_dac4_n      : std_logic; -- dac bit4_n
+
+  signal o_dac5_p      : std_logic; -- dac bit5_p
+  signal o_dac5_n      : std_logic; -- dac bit5_n
+
+  signal o_dac6_p      : std_logic; -- dac bit6_p
+  signal o_dac6_n      : std_logic; -- dac bit6_n
+
+  signal o_dac7_p      : std_logic; -- dac bit7_p
+  signal o_dac7_n      : std_logic; -- dac bit7_n
 
   ---------------------------------------------------------------------
   -- devices: spi links + specific signals
   ---------------------------------------------------------------------
   -- common: shared link between the spi
-  signal o_spi_sclk        : std_logic;
-  signal o_spi_sdata       : std_logic;
+  signal o_spi_sclk        : std_logic; --  Shared SPI clock line
+  signal o_spi_sdata       : std_logic; --  Shared SPI MOSI
   -- CDCE: SPI
-  signal i_cdce_sdo        : std_logic := '0';
-  signal o_cdce_n_en       : std_logic;
+  signal i_cdce_sdo        : std_logic := '0'; --  SPI MISO
+  signal o_cdce_n_en       : std_logic; --  SPI chip select
   -- CDCE: specific signals
-  signal i_cdce_pll_status : std_logic := '1';
-  signal o_cdce_n_reset    : std_logic;
-  signal o_cdce_n_pd       : std_logic;
-  signal o_ref_en          : std_logic;
+  signal i_cdce_pll_status : std_logic := '1'; --  pll_status : This pin is set high if the PLL is in lock.
+  signal o_cdce_n_reset    : std_logic; --  reset_n or hold_n
+  signal o_cdce_n_pd       : std_logic; --  power_down_n
+  signal o_ref_en          : std_logic; --  enable the primary reference clock
   -- ADC: SPI
-  signal i_adc_sdo         : std_logic := '0';
-  signal o_adc_n_en        : std_logic;
+  signal i_adc_sdo         : std_logic := '0'; --  SPI MISO
+  signal o_adc_n_en        : std_logic; --  SPI chip select
   -- ADC: specific signals
-  signal o_adc_reset       : std_logic;
+  signal o_adc_reset       : std_logic; --  adc hardware reset
   -- DAC: SPI
-  signal i_dac_sdo         : std_logic := '0';
-  signal o_dac_n_en        : std_logic;
+  signal i_dac_sdo         : std_logic := '0'; --  SPI MISO
+  signal o_dac_n_en        : std_logic; --  SPI chip select
   -- DAC: specific signal
-  signal o_dac_tx_present  : std_logic;
+  signal o_dac_tx_present  : std_logic; --  enable tx acquisition
   -- AMC: SPI (monitoring)
-  signal i_mon_sdo         : std_logic := '0';
-  signal o_mon_n_en        : std_logic;
+  signal i_mon_sdo         : std_logic := '0'; --  SPI data out
+  signal o_mon_n_en        : std_logic; --  SPI chip select
   -- AMC : specific signals
-  signal i_mon_n_int       : std_logic := '0';
-  signal o_mon_n_reset     : std_logic;
+  signal i_mon_n_int       : std_logic := '0'; --  galr_n: Global analog input out-of-range alarm.
+  signal o_mon_n_reset     : std_logic; --  reset_n: hardware reset
 
+  -- leds
   signal o_leds : std_logic_vector(3 downto 2);
 
   ---------------------------------------------------------------------
   -- additional signals
   ---------------------------------------------------------------------
   -- Clocks
+  -- usb clock
   signal usb_clk : std_logic := '0';
+  -- adc clock
   signal adc_clk : std_logic := '0';
 
+  -- channel A: adc0
   signal data0 : unsigned(13 downto 0) := (others => '0');
+  -- channel B: adc0
   signal data1 : unsigned(13 downto 0) := (others => '0');
-
 
   ---------------------------------------------------------------------
   -- Clock definition
   ---------------------------------------------------------------------
+  -- clock period duration (@usb_clk)
   constant c_CLK_PERIOD0    : time                         := 9.99206 ns;  -- @100.8MHz (usb3 opal kelly speed)
+  -- clock period duration (@adc_clk)
   constant c_CLK_PERIOD1    : time                         := 4 ns;
   ---------------------------------------------------------------------
   -- Generate reading sequence
   ---------------------------------------------------------------------
   -- data
+  -- start the usb configuration
   signal data_start         : std_logic                    := '0';
+  -- read valid for the usb configuration (modulate the file reading speed)
   signal data_rd_valid      : std_logic                    := '0';
+  -- end of the usb configuration
   signal data_wr_gen_finish : std_logic                    := '0';
+  -- detect error on the usb confiuration (bad file)
   signal data_wr_error      : std_logic_vector(0 downto 0) := (others => '0');
+  -- stop the logging.
   signal data_stop          : std_logic                    := '0';
 
+  -- register id read from a file (for simulation purpose only)
   signal o_reg_id     : integer                       := 0;
+  -- register/ram value to write
   signal o_data       : std_logic_vector(31 downto 0) := (others => '0');
+  -- regsiter/ram data valid
   signal o_data_valid : std_logic                     := '0';
 
   ---------------------------------------------------------------------
   -- filepath definition
   ---------------------------------------------------------------------
+  -- csv file separator
   constant c_CSV_SEPARATOR : character := ';';
 
   -- input data generation
+  -- filename associated to the usb access
   constant c_FILENAME_DATA_IN : string := "py_usb_data.csv";
+  -- filepath associated to the usb access
   constant c_FILEPATH_DATA_IN : string := c_INPUT_BASEPATH & c_FILENAME_DATA_IN;
 
+  -- filename: store the tes_pulse_shape RAM content to write
   constant c_FILENAME_DATA_OUT0 : string := "vhdl_tes_pulse_shape_out.csv";
+  -- filepath: store the tes_pulse_shape RAM content to write
   constant c_FILEPATH_DATA_OUT0 : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT0;
 
+  -- filename: store the amp_squid_tf RAM content to write
   constant c_FILENAME_DATA_OUT1 : string := "vhdl_amp_squid_tf.csv";
+  -- filepath: store the amp_squid_tf RAM content to write
   constant c_FILEPATH_DATA_OUT1 : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT1;
 
+  -- filename: store the mux_squid_tf RAM content to write
   constant c_FILENAME_DATA_OUT2 : string := "vhdl_mux_squid_tf.csv";
+  -- filepath: store the mux_squid_tf RAM content to write
   constant c_FILEPATH_DATA_OUT2 : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT2;
 
+  -- filename: store the tes_steady_state RAM content to write
   constant c_FILENAME_DATA_OUT3 : string := "vhdl_tes_steady_state.csv";
+  -- filepath: store the tes_steady_state RAM content to write
   constant c_FILEPATH_DATA_OUT3 : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT3;
 
+  -- filename: store the mux_squid_offset RAM content to write
   constant c_FILENAME_DATA_OUT4 : string := "vhdl_mux_squid_offset.csv";
+  -- filepath: store the mux_squid_offset RAM content to write
   constant c_FILEPATH_DATA_OUT4 : string := c_OUTPUT_BASEPATH & c_FILENAME_DATA_OUT4;
 
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers
+  -- Vunit: logger for the summary
   constant c_LOGGER_SUMMARY               : logger_t  := get_logger("log:summary");
   -- checkers
+  -- vunit: checker associated to the registers
   constant c_CHECKER_REG                  : checker_t := new_checker("check:reg:data");
+  -- vunit: checker associated to the tes_pulse_shape RAM
   constant c_CHECKER_RAM_TES_PULSE_SHAPE  : checker_t := new_checker("check:ram:tes_pulse_shape");
+  -- vunit: checker associated to the amp_squid_tf RAM
   constant c_CHECKER_RAM_AMP_SQUID_TF     : checker_t := new_checker("check:ram:amp_squid_tf");
+  -- vunit: checker associated to the mux_squid_tf RAM
   constant c_CHECKER_RAM_MUX_SQUID_TF     : checker_t := new_checker("check:ram:mux_squid_tf");
+  -- vunit: checker associated to the tes_steady_state RAM
   constant c_CHECKER_RAM_TES_STEADY_STATE : checker_t := new_checker("check:ram:tes_steady_state");
+  -- vunit: checker associated to the mux_squid_offset RAM
   constant c_CHECKER_RAM_MUX_SQUID_OFFSET : checker_t := new_checker("check:ram:mux_squid_offset");
 
-  -- constant c_CHECKER_REG_CTRL            : checker_t := new_checker("check:reg:ctrl");
-  -- constant c_CHECKER_REG_FPASIM_GAIN     : checker_t := new_checker("check:reg:fpasim_gain");
-  -- constant c_CHECKER_REG_MUX_SQ_FB_DELAY : checker_t := new_checker("check:reg:mux_sq_fb_delay");
-  -- constant c_CHECKER_REG_AMP_SQ_OF_DELAY : checker_t := new_checker("check:reg:amp_sq_of_delay");
-  -- constant c_CHECKER_REG_ERROR_DELAY     : checker_t := new_checker("check:reg:error_delay");
-  -- constant c_CHECKER_REG_RA_DELAY        : checker_t := new_checker("check:reg:ra_delay");
-
+  -- opal kelly: write interface
   signal usb_wr_if0 : opal_kelly_lib.pkg_front_panel.t_internal_wr_if := (
     hi_drive   => '0',
     hi_cmd     => (others => '0'),
     hi_dataout => (others => '0')
     );
 
+  -- opal kelly: read interface
   signal usb_rd_if0 : opal_kelly_lib.pkg_front_panel.t_internal_rd_if := (
     i_clk     => '0',
     hi_busy   => '0',
     hi_datain => (others => '0')
     );
 
+  -- opal kelly: shared variable interface
   shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
 
 begin

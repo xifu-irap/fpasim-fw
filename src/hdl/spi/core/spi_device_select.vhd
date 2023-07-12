@@ -59,15 +59,15 @@ entity spi_device_select is
     i_spi_cmd_wr_data    : in  std_logic_vector(31 downto 0);  -- data to write
     -- output
     o_spi_rd_data_valid  : out std_logic;  -- read data valid
-    o_spi_rd_data        : out std_logic_vector(31 downto 0);  -- read data
+    o_spi_rd_data        : out std_logic_vector(31 downto 0);  -- read data (device spi register value).
     o_spi_ready          : out std_logic;  -- 1: all spi links are ready,0: one of the spi link is busy
 
-    o_reg_spi_status : out std_logic_vector(31 downto 0);
+    o_reg_spi_status : out std_logic_vector(31 downto 0);  -- spi status (register format)
     ---------------------------------------------------------------------
     -- errors/status
     ---------------------------------------------------------------------
-    o_errors         : out std_logic_vector(15 downto 0);
-    o_status         : out std_logic_vector(7 downto 0);
+    o_errors         : out std_logic_vector(15 downto 0); -- errors
+    o_status         : out std_logic_vector(7 downto 0); -- status
 
     ---------------------------------------------------------------------
     -- from/to the IOs

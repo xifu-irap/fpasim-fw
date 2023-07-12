@@ -46,7 +46,7 @@ entity tes_top is
     -- frame
     g_NB_SAMPLE_BY_FRAME_WIDTH      : positive := 11;  -- bus width in order to define the number of samples by frame
     g_NB_FRAME_BY_PULSE_SHAPE_WIDTH : positive := pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH;  -- frame id bus width (expressed in bits). Possible values [1;max integer value[
-    g_NB_FRAME_BY_PULSE_SHAPE       : positive := pkg_NB_FRAME_BY_PULSE_SHAPE;  -- number of frame
+    g_NB_FRAME_BY_PULSE_SHAPE       : positive := pkg_NB_FRAME_BY_PULSE_SHAPE;  -- number of frame by pulse shape
     -- addr
     g_PULSE_SHAPE_RAM_ADDR_WIDTH    : positive := pkg_TES_PULSE_SHAPE_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- output
@@ -72,26 +72,26 @@ entity tes_top is
     i_cmd_pulse_height       : in  std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0);  -- pulse height command
     i_cmd_pixel_id           : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id command
     i_cmd_time_shift         : in  std_logic_vector(g_CMD_TIME_SHIFT_WIDTH - 1 downto 0);  -- time shift command
-    o_cmd_ready              : out std_logic;
+    o_cmd_ready              : out std_logic; -- ready to receive a new command
     -- RAM: pulse shape
     -- wr
-    i_pulse_shape_wr_en      : in  std_logic;  -- write enable
-    i_pulse_shape_wr_rd_addr : in  std_logic_vector(g_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0);  -- write address
-    i_pulse_shape_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
+    i_pulse_shape_wr_en      : in  std_logic;  -- RAM write enable
+    i_pulse_shape_wr_rd_addr : in  std_logic_vector(g_PULSE_SHAPE_RAM_ADDR_WIDTH - 1 downto 0);  -- RAM write address
+    i_pulse_shape_wr_data    : in  std_logic_vector(15 downto 0);  -- RAM write data
     -- rd
-    i_pulse_shape_rd_en      : in  std_logic;  -- rd enable
-    o_pulse_shape_rd_valid   : out std_logic;  -- rd data valid
-    o_pulse_shape_rd_data    : out std_logic_vector(15 downto 0);  -- rd data
+    i_pulse_shape_rd_en      : in  std_logic;  -- RAM read enable
+    o_pulse_shape_rd_valid   : out std_logic;  -- RAM read data valid
+    o_pulse_shape_rd_data    : out std_logic_vector(15 downto 0);  -- RAM read data
 
     -- RAM:
     -- wr
-    i_steady_state_wr_en      : in  std_logic;  -- write enable
-    i_steady_state_wr_rd_addr : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- write address
-    i_steady_state_wr_data    : in  std_logic_vector(15 downto 0);  -- write data
+    i_steady_state_wr_en      : in  std_logic;  -- RAM write enable
+    i_steady_state_wr_rd_addr : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- RAM write address
+    i_steady_state_wr_data    : in  std_logic_vector(15 downto 0);  -- RAM write data
     -- rd
-    i_steady_state_rd_en      : in  std_logic;  -- rd enable
-    o_steady_state_rd_valid   : out std_logic;  -- rd data valid
-    o_steady_state_rd_data    : out std_logic_vector(15 downto 0);  -- read data
+    i_steady_state_rd_en      : in  std_logic;  -- RAM read enable
+    o_steady_state_rd_valid   : out std_logic;  -- RAM read data valid
+    o_steady_state_rd_data    : out std_logic_vector(15 downto 0);  -- RAM read data
 
     ---------------------------------------------------------------------
     -- from the adc
@@ -115,9 +115,9 @@ entity tes_top is
     ---------------------------------------------------------------------
     -- output: detect negative output value
     ---------------------------------------------------------------------
-    o_tes_pixel_neg_out_valid    : out std_logic;
-    o_tes_pixel_neg_out_error    : out std_logic;
-    o_tes_pixel_neg_out_pixel_id : out std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);
+    o_tes_pixel_neg_out_valid    : out std_logic; -- valid negative output
+    o_tes_pixel_neg_out_error    : out std_logic; -- negative output detection
+    o_tes_pixel_neg_out_pixel_id : out std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0); -- pixel id when a negative output is detected
 
     ---------------------------------------------------------------------
     -- errors/status
@@ -129,63 +129,67 @@ end entity tes_top;
 
 architecture RTL of tes_top is
 
+  -- number of frame by pulse shape
   constant c_NB_FRAME_BY_PULSE_SHAPE : positive                           := g_NB_FRAME_BY_PULSE_SHAPE;
+  -- Number of frame max by pulse_shape (start @0)
   constant c_FRAME_ID_SIZE           : std_logic_vector(o_frame_id'range) := std_logic_vector(to_unsigned(g_NB_FRAME_BY_PULSE_SHAPE - 1, o_frame_id'length));
   ---------------------------------------------------------------------
   -- tes_signalling
   ---------------------------------------------------------------------
-  signal pixel_sof0                  : std_logic;
-  signal pixel_eof0                  : std_logic;
-  signal pixel_id0                   : std_logic_vector(o_pixel_id'range);
-  signal pixel_valid0                : std_logic;
+  signal pixel_sof0                  : std_logic; -- first pixel sample
+  signal pixel_eof0                  : std_logic; -- last pixel sample
+  signal pixel_id0                   : std_logic_vector(o_pixel_id'range); -- pixel id
+  signal pixel_valid0                : std_logic; -- valid pixel sample
 
-  signal frame_sof0 : std_logic;
-  signal frame_eof0 : std_logic;
-  signal frame_id0  : std_logic_vector(o_frame_id'range);
+  signal frame_sof0 : std_logic; -- first frame sample
+  signal frame_eof0 : std_logic; -- last frame sample
+  signal frame_id0  : std_logic_vector(o_frame_id'range); -- frame id
 
   ---------------------------------------------------------------------
   -- tes_pulse_shape_manager
   ---------------------------------------------------------------------
-  signal cmd_ready             : std_logic;
-  signal pulse_shape_rd_valid1 : std_logic;
-  signal pulse_shape_rd_data1  : std_logic_vector(o_pulse_shape_rd_data'range);
+  signal cmd_ready             : std_logic;  -- ready to receive a new command
+  signal pulse_shape_rd_valid1 : std_logic;  -- ram read valid
+  signal pulse_shape_rd_data1  : std_logic_vector(o_pulse_shape_rd_data'range); -- ram read value
 
-  signal steady_state_rd_valid1 : std_logic;
-  signal steady_state_rd_data1  : std_logic_vector(o_steady_state_rd_data'range);
+  signal steady_state_rd_valid1 : std_logic; -- ram read valid
+  signal steady_state_rd_data1  : std_logic_vector(o_steady_state_rd_data'range); -- ram read value
 
-  signal pulse_sof1    : std_logic;
-  signal pulse_eof1    : std_logic;
-  signal pixel_sof1    : std_logic;
-  signal pixel_eof1    : std_logic;
-  signal pixel_id1     : std_logic_vector(o_pixel_id'range);
-  signal pixel_valid1  : std_logic;
-  signal pixel_result1 : std_logic_vector(o_pixel_result'range);
+  signal pulse_sof1    : std_logic;-- first processed sample of a pulse
+  signal pulse_eof1    : std_logic;-- last processed sample of a pulse
+  signal pixel_sof1    : std_logic; -- first pixel sample
+  signal pixel_eof1    : std_logic; -- last pixel sample
+  signal pixel_id1     : std_logic_vector(o_pixel_id'range); -- pixel_id
+  signal pixel_valid1  : std_logic; -- valid pixel sample
+  signal pixel_result1 : std_logic_vector(o_pixel_result'range);-- pixel result
 
-  signal tes_pixel_neg_out_valid1    : std_logic;
-  signal tes_pixel_neg_out_error1    : std_logic;
-  signal tes_pixel_neg_out_pixel_id1 : std_logic_vector(o_tes_pixel_neg_out_pixel_id'range);
+  signal tes_pixel_neg_out_valid1    : std_logic; -- valid negative output
+  signal tes_pixel_neg_out_error1    : std_logic; -- negative output detection
+  signal tes_pixel_neg_out_pixel_id1 : std_logic_vector(o_tes_pixel_neg_out_pixel_id'range); -- pixel id when a negative output is detected
 
-  signal status1 : std_logic_vector(o_status'range);
-  signal errors1 : std_logic_vector(o_errors'range);
+  signal status1 : std_logic_vector(o_status'range); -- status
+  signal errors1 : std_logic_vector(o_errors'range); -- errors
 
   ---------------------------------------------------------------------
   -- sync with the tes_pulse_shape_manager out
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + o_frame_id'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + o_frame_id'length - 1; -- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1; -- index1: high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1; -- index2: low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1; -- index2: high
 
+  -- temporary input pipe
   signal data_pipe_tmp0 : std_logic_vector(c_IDX2_H downto 0);
+  -- temporary output pipe
   signal data_pipe_tmp1 : std_logic_vector(c_IDX2_H downto 0);
 
-  signal frame_sof1 : std_logic;
-  signal frame_eof1 : std_logic;
-  signal frame_id1  : std_logic_vector(o_frame_id'range);
+  signal frame_sof1 : std_logic; -- first frame sample
+  signal frame_eof1 : std_logic; -- last frame sample
+  signal frame_id1  : std_logic_vector(o_frame_id'range);-- frame_id
 
 begin
 
