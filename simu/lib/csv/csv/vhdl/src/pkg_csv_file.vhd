@@ -207,20 +207,20 @@ package body pkg_csv_file is
 
         -- Read a string from the csv file and convert it to integer
         impure function read_integer(i_dummy : in t_void := VOID) return integer is
-            variable read_value : integer;
+            variable v_read_value : integer;
         begin
-            read(v_current_line, read_value);
+            read(v_current_line, v_read_value);
             skip_separator;
-            return read_value;
+            return v_read_value;
         end;
 
         -- Read a string from the csv file and convert it to real
         impure function read_real(i_dummy : in t_void := VOID) return real is
-            variable read_value : real;
+            variable v_read_value : real;
         begin
-            read(v_current_line, read_value);
+            read(v_current_line, v_read_value);
             skip_separator;
-            return read_value;
+            return v_read_value;
         end;
 
         -- Read a string from the csv file and convert it to boolean
@@ -265,40 +265,40 @@ package body pkg_csv_file is
 
         -- Read a string (ex: 0 or 1) from the csv file and convert it to std_logic
         impure function read_integer_as_std(i_dummy : in t_void := VOID) return std_logic is
-            variable read_value : integer;
-            variable val_v      : std_logic;
+            variable v_read_value : integer;
+            variable v_val      : std_logic;
         begin
-            read(v_current_line, read_value);
+            read(v_current_line, v_read_value);
             skip_separator;
-            val_v := std_logic(to_unsigned(read_value, 1)(0));
-            return val_v;
+            v_val := std_logic(to_unsigned(v_read_value, 1)(0));
+            return v_val;
         end;
 
         -- Read a string (ex:255) from the csv file and convert it to std_logic_vector
         impure function read_integer_as_std_vec(i_length : in integer; i_unsigned_value : boolean := true) return std_logic_vector is
-            variable read_value : integer;
-            variable val_v      : std_logic_vector(i_length - 1 downto 0);
+            variable v_read_value : integer;
+            variable v_val      : std_logic_vector(i_length - 1 downto 0);
         begin
-            read(v_current_line, read_value);
+            read(v_current_line, v_read_value);
             skip_separator;
             if i_unsigned_value = true then
-                val_v := std_logic_vector(to_unsigned(read_value, i_length));
+                v_val := std_logic_vector(to_unsigned(v_read_value, i_length));
             else
-                val_v := std_logic_vector(to_signed(read_value, i_length));
+                v_val := std_logic_vector(to_signed(v_read_value, i_length));
             end if;
-            return val_v;
+            return v_val;
         end;
 
         -- Read a string (ex: AB0) from the csv file and convert it to std_logic_vector
         impure function read_hex_as_std_vec(i_length : in integer) return std_logic_vector is
-            variable val_tmp_v : std_logic_vector(2 ** integer(ceil(log2(real(i_length)))) - 1 downto 0);
-            variable val_v     : std_logic_vector(i_length - 1 downto 0);
+            variable v_val_tmp : std_logic_vector(2 ** integer(ceil(log2(real(i_length)))) - 1 downto 0);
+            variable v_val     : std_logic_vector(i_length - 1 downto 0);
         begin
-            HREAD(v_current_line, val_tmp_v);
+            HREAD(v_current_line, v_val_tmp);
             -- get the LSB bits
-            val_v := val_tmp_v(val_v'range);
+            v_val := v_val_tmp(v_val'range);
             skip_separator;
-            return val_v;
+            return v_val;
         end;
 
         -- read a data typ as std_logic_vector
@@ -308,38 +308,38 @@ package body pkg_csv_file is
         --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
         --  data type = "STD_VEC" => no data convertion before writing in the output file
         impure function read_data_typ_as_std_vec(i_length : in integer; i_data_typ : in string := "UINT") return std_logic_vector is
-            variable val_v : std_logic_vector(i_length - 1 downto 0) := (others => '0');
+            variable v_val : std_logic_vector(i_length - 1 downto 0) := (others => '0');
         begin
 
             if i_data_typ = "UINT" then
-                val_v := read_integer_as_std_vec(i_length => val_v'length, i_unsigned_value => true);
+                v_val := read_integer_as_std_vec(i_length => v_val'length, i_unsigned_value => true);
             elsif i_data_typ = "INT" then
-                val_v := read_integer_as_std_vec(i_length => val_v'length, i_unsigned_value => false);
+                v_val := read_integer_as_std_vec(i_length => v_val'length, i_unsigned_value => false);
             elsif i_data_typ = "HEX" then
-                val_v := read_hex_as_std_vec(i_length => val_v'length);
+                v_val := read_hex_as_std_vec(i_length => v_val'length);
             else
-                val_v := read_std_vec(i_length => val_v'length);
+                v_val := read_std_vec(i_length => v_val'length);
             end if;
 
-            return val_v;
+            return v_val;
         end;
 
         -- Read a string (ex: 10010) from the csv file and convert it to std_logic_vector
         impure function read_std_vec(i_length : in integer) return std_logic_vector is
-            variable val_v : std_logic_vector(i_length - 1 downto 0);
+            variable v_val : std_logic_vector(i_length - 1 downto 0);
         begin
-            READ(v_current_line, val_v);
+            READ(v_current_line, v_val);
             skip_separator;
-            return val_v;
+            return v_val;
         end;
 
         -- Read a string (ex: 10010) from the csv file and convert it to std_logic_vector
         impure function read_std(i_dummy : in t_void := VOID) return std_logic is
-            variable val_v : std_ulogic;
+            variable v_val : std_ulogic;
         begin
-            READ(v_current_line, val_v);
+            READ(v_current_line, v_val);
             skip_separator;
-            return std_logic(val_v);
+            return std_logic(v_val);
         end;
 
         -- write a std_logic_vector into line
@@ -352,10 +352,10 @@ package body pkg_csv_file is
         end;
         -- write a std_logic into line
         procedure write_std(i_value : in std_logic; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1) is
-            variable val_v : std_ulogic;
+            variable v_val : std_ulogic;
         begin
-            val_v := std_ulogic(i_value);
-            WRITE(v_current_line, val_v);
+            v_val := std_ulogic(i_value);
+            WRITE(v_current_line, v_val);
             if i_use_csv_separator = 1 then
                 WRITE(v_current_line, i_csv_separator);
             end if;
@@ -416,20 +416,20 @@ package body pkg_csv_file is
             -- This function write in a file the hexadecimal value of an input "value" std_logic_vector with a minimal number of hexadecimal character.
             -- The user can define if the input std_logic_vector must be processed as a signed vector or a unsigned vector
             -- TO do that:
-            -- we build a "val0_v" variable of std_logic_vector type with the following properties:
+            -- we build a "v_val0" variable of std_logic_vector type with the following properties:
             --   . the length is a multiple of 4 bits (1 hexadécimal character = 4 bits)
             --   . The length >= length(value)
-            variable val0_v : std_logic_vector(integer(ceil(real(i_value'length) / real(4))) * 4 - 1 downto 0);
+            variable v_val0 : std_logic_vector(integer(ceil(real(i_value'length) / real(4))) * 4 - 1 downto 0);
 
         begin
 
             if i_unsigned_value = false then
-                val0_v := std_logic_vector(resize(signed(i_value), val0_v'length));
+                v_val0 := std_logic_vector(resize(signed(i_value), v_val0'length));
             else
-                val0_v := std_logic_vector(resize(unsigned(i_value), val0_v'length));
+                v_val0 := std_logic_vector(resize(unsigned(i_value), v_val0'length));
             end if;
 
-            HWRITE(v_current_line, val0_v);
+            HWRITE(v_current_line, v_val0);
             if i_use_csv_separator = 1 then
                 WRITE(v_current_line, i_csv_separator);
             end if;
@@ -442,16 +442,16 @@ package body pkg_csv_file is
         --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
         --  data type = "STD_VEC" => no data convertion before writing in the output file
         procedure write_std_vec_as_data_typ(i_value : in std_logic_vector; i_csv_separator : in character := ';'; i_data_typ : in string := "UINT"; constant i_use_csv_separator : in integer := 1) is
-            variable val_v : integer := 0;
+            variable v_val : integer := 0;
         begin
             if i_data_typ = "UINT" then
                 assert not (i_value'length > 32) report "pkg_csv_file.write_std_vec_as_common_typ: std_logic_vector (length = " & to_string(i_value'length) & " can't be represented by an unsigned integer" severity warning;
-                val_v := to_integer(unsigned(i_value));
-                write_integer(i_value => val_v, i_csv_separator => i_csv_separator, i_use_csv_separator => i_use_csv_separator);
+                v_val := to_integer(unsigned(i_value));
+                write_integer(i_value => v_val, i_csv_separator => i_csv_separator, i_use_csv_separator => i_use_csv_separator);
             elsif i_data_typ = "INT" then
                 assert not (i_value'length > 32) report "pkg_csv_file.write_std_vec_as_common_typ: std_logic_vector (length = " & to_string(i_value'length) & " can't be represented by an signed integer" severity warning;
-                val_v := to_integer(signed(i_value));
-                write_integer(i_value => val_v, i_csv_separator => i_csv_separator, i_use_csv_separator => i_use_csv_separator);
+                v_val := to_integer(signed(i_value));
+                write_integer(i_value => v_val, i_csv_separator => i_csv_separator, i_use_csv_separator => i_use_csv_separator);
             elsif i_data_typ = "HEX" then
                 write_std_vec_as_hex(i_value => i_value, i_csv_separator => i_csv_separator, i_use_csv_separator => i_use_csv_separator, i_unsigned_value => false);
             elsif i_data_typ = "UHEX" then
