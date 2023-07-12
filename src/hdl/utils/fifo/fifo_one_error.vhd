@@ -55,11 +55,16 @@ end entity fifo_one_error;
 
 architecture RTL of fifo_one_error is
 
-  signal error_pulse_r1 : std_logic := '0';
-  signal error_r2       : std_logic := '0';
+  signal error_pulse_r1 : std_logic := '0'; -- error
+  signal error_r2       : std_logic := '0'; -- error pulse or latched error.
 
 begin
 
+  ---------------------------------------------------------------------
+  -- This process is constitued by 2 steps:
+  --   1. Generate an error on an input condition.
+  --   2. latch or not the error (user-defined).
+  ---------------------------------------------------------------------
   p_detect_error : process (i_clk) is
   begin
     if rising_edge(i_clk) then
@@ -82,6 +87,10 @@ begin
       end if;
     end if;
   end process p_detect_error;
+
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
   o_error <= error_r2;
 
 end architecture RTL;

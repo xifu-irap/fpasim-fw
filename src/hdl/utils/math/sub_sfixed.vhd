@@ -53,18 +53,18 @@ entity sub_sfixed is
     g_Q_N_S  : in natural := 0 -- number of fraction bits. Possible values [0;integer_max_value[
   );
   port (
-       i_clk : in std_logic;
+       i_clk : in std_logic; -- input clock
 
        --------------------------------------------------------------
         -- input
         --------------------------------------------------------------
-        i_a   : in  std_logic_vector(g_Q_M_A + g_Q_N_A - 1 downto 0);
-        i_b   : in  std_logic_vector(g_Q_M_B + g_Q_N_B - 1 downto 0);
+        i_a   : in  std_logic_vector(g_Q_M_A + g_Q_N_A - 1 downto 0);  -- operator input port A
+        i_b   : in  std_logic_vector(g_Q_M_B + g_Q_N_B - 1 downto 0);  -- operator input port B
 
         --------------------------------------------------------------
         -- output : S = a - B
         --------------------------------------------------------------
-        o_s   : out std_logic_vector(g_Q_M_S + g_Q_N_S - 1 downto 0)
+        o_s   : out std_logic_vector(g_Q_M_S + g_Q_N_S - 1 downto 0) -- operator output
 
      ) ;
 end entity sub_sfixed;
@@ -74,13 +74,17 @@ architecture RTL of sub_sfixed is
     -----------------------------------------------------------------
     -- step0:
     -----------------------------------------------------------------
+    -- temporary input port A
     signal a_tmp : sfixed(g_Q_M_A - 1 downto -g_Q_N_A);
+    -- temporary input port B
     signal b_tmp : sfixed(g_Q_M_B - 1 downto -g_Q_N_B);
 
     -----------------------------------------------------------------
     -- step1:
     -----------------------------------------------------------------
+    -- delayed data: port A
     signal a_r1    : sfixed(a_tmp'high downto a_tmp'low):= (others => '0');
+    -- delayed data: port B
     signal b_r1    : sfixed(b_tmp'high downto b_tmp'low):= (others => '0');
 
     ---------------------------------------------------------------------

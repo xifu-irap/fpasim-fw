@@ -43,28 +43,28 @@ use ieee.fixed_float_types.all;
 entity add_sfixed is
   generic(
     -- port A: ARM Q notation (fixed point)
-    g_Q_M_A : in positive := 15; -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
-    g_Q_N_A : in natural := 0; -- number of fraction bits. Possible values [0;integer_max_value[
+    g_Q_M_A : in positive := 15; -- operator input port A: number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
+    g_Q_N_A : in natural := 0; -- operator input port A: number of fraction bits. Possible values [0;integer_max_value[
     -- port B: ARM Q notation (fixed point)
-    g_Q_M_B : in positive := 15; -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
-    g_Q_N_B : in natural := 0; -- number of fraction bits. Possible values [0;integer_max_value[
+    g_Q_M_B : in positive := 15; -- operator input port B: number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
+    g_Q_N_B : in natural := 0; -- operator input port B: number of fraction bits. Possible values [0;integer_max_value[
     -- port S: ARM Q notation (fixed point)
-    g_Q_M_S  : in positive := 16; -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
-    g_Q_N_S  : in natural := 0 -- number of fraction bits. Possible values [0;integer_max_value[
+    g_Q_M_S  : in positive := 16; -- operator output: number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
+    g_Q_N_S  : in natural := 0 -- operator output: number of fraction bits. Possible values [0;integer_max_value[
   );
   port (
-       i_clk : in std_logic;
+       i_clk : in std_logic; -- input clock
 
        --------------------------------------------------------------
         -- input
         --------------------------------------------------------------
-        i_a   : in  std_logic_vector(g_Q_M_A + g_Q_N_A - 1 downto 0);
-        i_b   : in  std_logic_vector(g_Q_M_B + g_Q_N_B - 1 downto 0);
+        i_a   : in  std_logic_vector(g_Q_M_A + g_Q_N_A - 1 downto 0); -- operator input port A
+        i_b   : in  std_logic_vector(g_Q_M_B + g_Q_N_B - 1 downto 0); -- operator input port B
 
         --------------------------------------------------------------
         -- output : S = a + B
         --------------------------------------------------------------
-        o_s   : out std_logic_vector(g_Q_M_S + g_Q_N_S - 1 downto 0)
+        o_s   : out std_logic_vector(g_Q_M_S + g_Q_N_S - 1 downto 0) -- operator output
 
      ) ;
 end entity add_sfixed;
@@ -74,13 +74,17 @@ architecture RTL of add_sfixed is
     -----------------------------------------------------------------
     -- step0:
     -----------------------------------------------------------------
+    -- temporary input port A
     signal a_tmp : sfixed(g_Q_M_A - 1 downto -g_Q_N_A);
+    -- temporary input port B
     signal b_tmp : sfixed(g_Q_M_B - 1 downto -g_Q_N_B);
 
     -----------------------------------------------------------------
     -- step1: pipe
     -----------------------------------------------------------------
+    -- delayed data: port A
     signal a_r1    : sfixed(a_tmp'high downto a_tmp'low):= (others => '0');
+    -- delayed data: port B
     signal b_r1    : sfixed(b_tmp'high downto b_tmp'low):= (others => '0');
 
     ---------------------------------------------------------------------

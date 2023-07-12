@@ -43,30 +43,30 @@ use ieee.fixed_float_types.all;
 entity mult_sub_sfixed is
     generic(
         -- port A: ARM Q notation (fixed point)
-        g_Q_M_A : in positive := 15;
-        g_Q_N_A : in natural := 0;
+        g_Q_M_A : in positive := 15; -- operator input port A: number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
+        g_Q_N_A : in natural := 0; -- operator input port A: number of fraction bits. Possible values [0;integer_max_value[
         -- port B: ARM Q notation (fixed point)
-        g_Q_M_B : in positive := 15;
-        g_Q_N_B : in natural := 0;
+        g_Q_M_B : in positive := 15;-- operator input port B: number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
+        g_Q_N_B : in natural := 0; -- operator input port B: number of fraction bits. Possible values [0;integer_max_value[
         -- port C: AMC Q notation (fixed point)
-        g_Q_M_C : in positive := 15;
-        g_Q_N_C : in natural := 0;
+        g_Q_M_C : in positive := 15;-- operator input port B: number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
+        g_Q_N_C : in natural := 0; -- operator input port C: number of fraction bits. Possible values [0;integer_max_value[
         -- port S: ARM Q notation (fixed point)
-        g_Q_M_S  : in positive := 15;
-        g_Q_N_S  : in natural := 0
+        g_Q_M_S  : in positive := 15; -- operator output: number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
+        g_Q_N_S  : in natural := 0  -- operator output: number of fraction bits. Possible values [0;integer_max_value[
     );
     port(
-        i_clk : in  std_logic;
+        i_clk : in  std_logic; -- input clock
         --------------------------------------------------------------
         -- input
         --------------------------------------------------------------
-        i_a   : in  std_logic_vector(g_Q_M_A + g_Q_N_A - 1 downto 0);
-        i_b   : in  std_logic_vector(g_Q_M_B + g_Q_N_B - 1 downto 0);
-        i_c   : in  std_logic_vector(g_Q_M_C + g_Q_N_C - 1 downto 0);
+        i_a   : in  std_logic_vector(g_Q_M_A + g_Q_N_A - 1 downto 0);  -- operator input port A
+        i_b   : in  std_logic_vector(g_Q_M_B + g_Q_N_B - 1 downto 0);  -- operator input port B
+        i_c   : in  std_logic_vector(g_Q_M_C + g_Q_N_C - 1 downto 0);  -- operator input port C
         --------------------------------------------------------------
         -- output : S = C - A*B
         --------------------------------------------------------------
-        o_s   : out std_logic_vector(g_Q_M_S + g_Q_N_S - 1 downto 0)
+        o_s   : out std_logic_vector(g_Q_M_S + g_Q_N_S - 1 downto 0) -- operator output
     );
 end entity mult_sub_sfixed;
 
@@ -74,15 +74,21 @@ architecture RTL of mult_sub_sfixed is
     -----------------------------------------------------------------
     -- step0:
     -----------------------------------------------------------------
+    -- temporary input port A
     signal a_tmp : sfixed(g_Q_M_A - 1 downto -g_Q_N_A);
+    -- temporary input port B
     signal b_tmp : sfixed(g_Q_M_B - 1 downto -g_Q_N_B);
+    -- temporary input port C
     signal c_tmp : sfixed(g_Q_M_C - 1 downto -g_Q_N_C);
 
     -----------------------------------------------------------------
     -- step1:
     -----------------------------------------------------------------
+    -- delayed data: port A
     signal a_r1    : sfixed(a_tmp'range):= (others => '0');
+    -- delayed data: port B
     signal b_r1    : sfixed(b_tmp'range):= (others => '0');
+    -- delayed data: port C
     signal c_r1    : sfixed(c_tmp'range):= (others => '0');
 
     ---------------------------------------------------------------------
@@ -91,6 +97,7 @@ architecture RTL of mult_sub_sfixed is
     --    c_r2 = c_r1
     ---------------------------------------------------------------------
     signal mult_r2 : sfixed(sfixed_high(a_r1, '*', b_r1) downto sfixed_low(a_r1, '*', b_r1)):= (others => '0');
+    -- delayed data: port C
     signal c_r2    : sfixed(c_r1'range):= (others => '0');
 
     ---------------------------------------------------------------------

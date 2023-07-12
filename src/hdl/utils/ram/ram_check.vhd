@@ -44,51 +44,59 @@ use ieee.numeric_std.all;
 
 entity ram_check is
   generic(
-    g_WR_ADDR_WIDTH : positive := 16;
-    g_RD_ADDR_WIDTH : positive := 16
+    g_WR_ADDR_WIDTH : positive := 16; -- address width on the write side (expressed in bits)
+    g_RD_ADDR_WIDTH : positive := 16  -- address width on the read side (expressed in bits)
   );
   port(
-    i_clk         : in  std_logic;
+    i_clk         : in  std_logic; -- input clock
     ---------------------------------------------------------------------
     -- input
     ---------------------------------------------------------------------
-    i_wr          : in  std_logic;
-    i_wr_addr     : in  std_logic_vector(g_WR_ADDR_WIDTH - 1 downto 0);
-    i_rd          : in  std_logic;
-    i_rd_addr     : in  std_logic_vector(g_RD_ADDR_WIDTH - 1 downto 0);
+    i_wr          : in  std_logic; -- write enable
+    i_wr_addr     : in  std_logic_vector(g_WR_ADDR_WIDTH - 1 downto 0); -- write address
+    i_rd          : in  std_logic; -- read enable
+    i_rd_addr     : in  std_logic_vector(g_RD_ADDR_WIDTH - 1 downto 0); -- read address
     ---------------------------------------------------------------------
     -- Errors
     ---------------------------------------------------------------------
-    o_error_pulse : out std_logic
+    o_error_pulse : out std_logic -- output error
   );
 end entity ram_check;
 
 architecture RTL of ram_check is
+  -- compute the number of shift to apply on the rd_address when g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH
   constant c_SHIFT_ADDR0 : integer := g_WR_ADDR_WIDTH - g_RD_ADDR_WIDTH;
+  -- compute the number of shift to apply on the wr_address when g_WR_ADDR_WIDTH > g_RD_ADDR_WIDTH
   constant c_SHIFT_ADDR1 : integer := g_RD_ADDR_WIDTH - g_WR_ADDR_WIDTH;
 
   ---------------------------------------------------------------------
   -- pipeline
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_wr_addr'length - 1;
+  constant c_IDX0_L : integer := 0; -- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + i_wr_addr'length - 1; -- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + i_rd_addr'length - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + i_rd_addr'length - 1; -- index1: high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1; -- index2: low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1; -- index2: high
 
-  constant c_IDX3_L : integer := c_IDX2_H + 1;
-  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;
+  constant c_IDX3_L : integer := c_IDX2_H + 1; -- index3: low
+  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1; -- index3: high
 
+  -- temporary input pipe
   signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0);
+  -- temporary output pipe
   signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0);
 
+  -- write enable
   signal wr1      : std_logic;
+  -- write address
   signal wr_addr1 : std_logic_vector(i_wr_addr'range);
 
+  -- read enable
   signal rd1      : std_logic;
+  -- read address
   signal rd_addr1 : std_logic_vector(i_rd_addr'range);
 
   ---------------------------------------------------------------------
@@ -122,17 +130,24 @@ begin
   -- RAM: symetric address on the write and read side
   ---------------------------------------------------------------------
   gen_sym_addr_width : if g_WR_ADDR_WIDTH = g_RD_ADDR_WIDTH generate
-    signal wr_addr_tmp : unsigned(i_wr_addr'range);
-    signal rd_addr_tmp : unsigned(i_rd_addr'range);
+    signal wr_addr_tmp : unsigned(i_wr_addr'range); -- write address
+    signal rd_addr_tmp : unsigned(i_rd_addr'range); -- read address
 
+    -- latched write address
     signal wr_addr_r : unsigned(i_wr_addr'range):= (others => '0');
+    -- latched read address
     signal rd_addr_r : unsigned(i_rd_addr'range):= (others => '0');
 
+    -- trigger on write and read at the same time
     signal trig_r : std_logic := '0';
+
   begin
     wr_addr_tmp <= unsigned(wr_addr1);
     rd_addr_tmp <= unsigned(rd_addr1);
 
+    ---------------------------------------------------------------------
+    -- detect a writting and a reading at the same time
+    ---------------------------------------------------------------------
     p_check_addr : process(i_clk) is
     begin
       if rising_edge(i_clk) then
@@ -146,6 +161,10 @@ begin
       end if;
     end process p_check_addr;
 
+    ---------------------------------------------------------------------
+    -- check if write address is equal to read address.
+    --   if needed, generate an error
+    ---------------------------------------------------------------------
     p_error : process(i_clk) is
     begin
       if rising_edge(i_clk) then
@@ -164,18 +183,24 @@ begin
   --       g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH
   ---------------------------------------------------------------------
   gen_asym_wr_addr_inf_rd_addr_width_g : if g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH generate
-    signal wr_addr_tmp : unsigned(i_wr_addr'range);
-    signal rd_addr_tmp : unsigned(i_wr_addr'range);
+    signal wr_addr_tmp : unsigned(i_wr_addr'range); -- write address
+    signal rd_addr_tmp : unsigned(i_wr_addr'range); -- read address
 
+    -- latched write address
     signal wr_addr_r : unsigned(i_wr_addr'range):= (others => '0');
+    -- latched read address
     signal rd_addr_r : unsigned(i_wr_addr'range):= (others => '0');
 
+     -- trigger on write and read at the same time
     signal trig_r : std_logic := '0';
 
   begin
     wr_addr_tmp <= unsigned(wr_addr1);
     rd_addr_tmp <= resize(unsigned(rd_addr1) srl c_SHIFT_ADDR1, wr_addr_tmp'length);
 
+    ---------------------------------------------------------------------
+    -- detect a writting and a reading at the same time
+    ---------------------------------------------------------------------
     p_check_addr : process(i_clk) is
     begin
       if rising_edge(i_clk) then
@@ -189,6 +214,10 @@ begin
       end if;
     end process p_check_addr;
 
+    ---------------------------------------------------------------------
+    -- check if write address is equal to read address.
+    --   if needed, generate an error
+    ---------------------------------------------------------------------
     p_error : process(i_clk) is
     begin
       if rising_edge(i_clk) then
@@ -207,17 +236,24 @@ begin
   --       g_WR_ADDR_WIDTH < g_RD_ADDR_WIDTH
   ---------------------------------------------------------------------
   gen_asym_wr_addr_sup_rd_addr_width : if g_WR_ADDR_WIDTH > g_RD_ADDR_WIDTH generate
-    signal wr_addr_tmp : unsigned(i_rd_addr'range);
-    signal rd_addr_tmp : unsigned(i_rd_addr'range);
+    signal wr_addr_tmp : unsigned(i_rd_addr'range);  -- write address
+    signal rd_addr_tmp : unsigned(i_rd_addr'range);  -- read address
 
+    -- latched write address
     signal wr_addr_r : unsigned(i_rd_addr'range):= (others => '0');
+    -- latched read address
     signal rd_addr_r : unsigned(i_rd_addr'range):= (others => '0');
 
+     -- trigger on write and read at the same time
     signal trig_r : std_logic := '0';
+
   begin
     wr_addr_tmp <= resize(unsigned(wr_addr1) srl c_SHIFT_ADDR0, rd_addr_tmp'length);
     rd_addr_tmp <= unsigned(rd_addr1);
 
+    ---------------------------------------------------------------------
+    -- detect a writting and a reading at the same time
+    ---------------------------------------------------------------------
     p_check_addr : process(i_clk) is
     begin
       if rising_edge(i_clk) then
@@ -231,6 +267,10 @@ begin
       end if;
     end process p_check_addr;
 
+    ---------------------------------------------------------------------
+    -- check if write address is equal to read address.
+    --   if needed, generate an error
+    ---------------------------------------------------------------------
     p_error : process(i_clk) is
     begin
       if rising_edge(i_clk) then

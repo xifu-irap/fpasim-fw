@@ -60,8 +60,8 @@ end entity fifo_two_errors;
 
 architecture RTL of fifo_two_errors is
 
-  signal error0 : std_logic:= '0';
-  signal error1 : std_logic:= '0';
+  signal error0 : std_logic:= '0'; -- output error0
+  signal error1 : std_logic:= '0'; -- output error1
 
 begin
 
@@ -87,6 +87,9 @@ begin
       o_error      => error1
       );
 
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
   o_error(1) <= error1;
   o_error(0) <= error0;
 

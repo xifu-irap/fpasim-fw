@@ -26,7 +26,7 @@
 --
 --    This module dynamically adds 1 or several consecutive registers on the data path.
 --    It has the following characteristics:
---       . The pipeline depth is defined by (2**i_addr)
+--       . The pipeline depth is defined by 2**(i_addr'length)
 --       . if i_data_valid = '1' then
 --             . the input data is shifted (to the left)
 --             . the number of registers (delay) between the input data port and the output data port is defined by (i_addr + 1)
@@ -74,12 +74,17 @@ end entity dynamic_shift_register_with_valid;
 
 architecture RTL of dynamic_shift_register_with_valid is
 
+  -- delayed address
   signal addr_r : std_logic_vector(i_addr'range) := (others => '0');
-  signal srl_tmp : std_logic_vector(g_DATA_WIDTH-1 downto 0):= (others => '0');  -- intermediate signal between srl and register
 
   type t_array_slv is array (g_DATA_WIDTH-1 downto 0) of std_logic_vector(2**i_addr'length-1 downto 0);
+  -- shift registers
   signal shift_r : t_array_slv:= (others => (others => '0'));
 
+  -- selected register
+  signal srl_tmp : std_logic_vector(g_DATA_WIDTH-1 downto 0):= (others => '0');  -- intermediate signal between srl and register
+
+  -- delayed data
   signal srl_r2 : std_logic_vector(o_data'range):= (others => '0');
 
   -- fpga specific attribute
@@ -116,6 +121,9 @@ begin
     end if;
   end process p_output_delay;
 
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
   o_data <= srl_r2;
 
 end architecture RTL;

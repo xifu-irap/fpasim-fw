@@ -71,11 +71,18 @@ end entity synchronous_reset_pulse;
 
 architecture RTL of synchronous_reset_pulse is
 
+  -- register value on reset signal
   constant c_RST_INIT : std_logic := to_unsigned(g_INIT, 1)(0);
+
+  -- shift register
   signal rst_pipe     : std_logic_vector(g_DEST_FF - 1 downto 0):= (others => c_RST_INIT);
 
 begin
 
+  ---------------------------------------------------------------------
+  -- shift registers
+  --   On reset signal, all registers are set to the c_RST_INIT value
+  ---------------------------------------------------------------------
   p_rst_ff : process (i_clk) is
   begin
     if rising_edge(i_clk) then

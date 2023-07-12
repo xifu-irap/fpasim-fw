@@ -42,31 +42,31 @@ use ieee.fixed_float_types.all;
 
 entity mult_add_ufixed is
     generic(
-        -- port A: ARM Q notation (fixed point)
-        g_UQ_M_A : in positive := 15;
-        g_UQ_N_A : in natural := 0;
-        -- port B: ARM Q notation (fixed point)
-        g_UQ_M_B : in positive := 15;
-        g_UQ_N_B : in natural := 0;
-        -- port C: AMC Q notation (fixed point)
-        g_UQ_M_C : in positive := 15;
-        g_UQ_N_C : in natural := 0;
-        -- port S: ARM Q notation (fixed point)
-        g_UQ_M_S  : in positive := 15;
-        g_UQ_N_S  : in natural := 0
+        -- port A: ARM Q notation (unsigned fixed point)
+        g_UQ_M_A : in positive := 15; -- operator input port A: number of bits used for the integer part of the value. Possible values [0;integer_max_value[
+        g_UQ_N_A : in natural := 0; -- operator input port A: number of fraction bits. Possible values [0;integer_max_value[
+        -- port B: ARM Q notation (unsigned fixed point)
+        g_UQ_M_B : in positive := 15; -- operator input port B: number of bits used for the integer part of the value. Possible values [0;integer_max_value[
+        g_UQ_N_B : in natural := 0; -- operator input port B: number of fraction bits. Possible values [0;integer_max_value[
+        -- port C: AMC Q notation (unsigned fixed point)
+        g_UQ_M_C : in positive := 15; -- operator input port C: number of bits used for the integer part of the value. Possible values [0;integer_max_value[
+        g_UQ_N_C : in natural := 0; -- operator input port C: number of fraction bits. Possible values [0;integer_max_value[
+        -- port S: ARM Q notation (unsigned fixed point)
+        g_UQ_M_S  : in positive := 15; -- operator output: number of bits used for the integer part of the value. Possible values [0;integer_max_value[
+        g_UQ_N_S  : in natural := 0  -- operator output: number of fraction bits. Possible values [0;integer_max_value[
     );
     port(
-        i_clk : in  std_logic;
+        i_clk : in  std_logic;  -- input clock
         --------------------------------------------------------------
         -- input
         --------------------------------------------------------------
-        i_a   : in  std_logic_vector(g_UQ_M_A + g_UQ_N_A - 1 downto 0);
-        i_b   : in  std_logic_vector(g_UQ_M_B + g_UQ_N_B - 1 downto 0);
-        i_c   : in  std_logic_vector(g_UQ_M_C + g_UQ_N_C - 1 downto 0);
+        i_a   : in  std_logic_vector(g_UQ_M_A + g_UQ_N_A - 1 downto 0); -- operator input port A
+        i_b   : in  std_logic_vector(g_UQ_M_B + g_UQ_N_B - 1 downto 0); -- operator input port B
+        i_c   : in  std_logic_vector(g_UQ_M_C + g_UQ_N_C - 1 downto 0); -- operator input port C
         --------------------------------------------------------------
         -- output : S = C + A*B
         --------------------------------------------------------------
-        o_s   : out std_logic_vector(g_UQ_M_S + g_UQ_N_S - 1 downto 0)
+        o_s   : out std_logic_vector(g_UQ_M_S + g_UQ_N_S - 1 downto 0) -- operator output
     );
 end entity mult_add_ufixed;
 
@@ -74,15 +74,21 @@ architecture RTL of mult_add_ufixed is
     -----------------------------------------------------------------
     -- step0:
     -----------------------------------------------------------------
+    -- temporary input port A
     signal a_tmp : ufixed(g_UQ_M_A - 1 downto -g_UQ_N_A);
+    -- temporary input port B
     signal b_tmp : ufixed(g_UQ_M_B - 1 downto -g_UQ_N_B);
+    -- temporary input port C
     signal c_tmp : ufixed(g_UQ_M_C - 1 downto -g_UQ_N_C);
 
     -----------------------------------------------------------------
     -- step1: pipe
     -----------------------------------------------------------------
+    -- delayed data: port A
     signal a_r1    : ufixed(a_tmp'range):= (others => '0');
+    -- delayed data: port B
     signal b_r1    : ufixed(b_tmp'range):= (others => '0');
+    -- delayed data: port C
     signal c_r1    : ufixed(c_tmp'range):= (others => '0');
     ---------------------------------------------------------------------
     -- step2:
@@ -90,6 +96,7 @@ architecture RTL of mult_add_ufixed is
     --    c_r2 = c_r1
     ---------------------------------------------------------------------
     signal mult_r2 : ufixed(ufixed_high(a_r1, '*', b_r1) downto ufixed_low(a_r1, '*', b_r1)):= (others => '0');
+    -- delayed data: port C
     signal c_r2    : ufixed(c_r1'range):= (others => '0');
 
     ---------------------------------------------------------------------

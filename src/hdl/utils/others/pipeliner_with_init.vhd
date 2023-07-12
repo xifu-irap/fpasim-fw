@@ -48,8 +48,9 @@ end entity pipeliner_with_init;
 
 architecture RTL of pipeliner_with_init is
 
-
+  -- delayed data
   signal data_r   : std_logic_vector(i_data'range) := (others => g_INIT);
+  -- output data
   signal sync_tmp : std_logic_vector(i_data'range) := (others => g_INIT);
 
 begin
@@ -58,7 +59,7 @@ begin
   gen_no_pipeline : if g_NB_PIPES = 0 generate
   begin
     sync_tmp <= i_data;
-  end generate;
+  end generate gen_no_pipeline;
 
   -- add 1 register on the data path
   gen_one_pipeline : if g_NB_PIPES = 1 generate
@@ -70,7 +71,7 @@ begin
       end if;
     end process;
     sync_tmp <= data_r;
-  end generate;
+  end generate gen_one_pipeline;
 
   -- add 2 or more registers on the data path
   gen_multiple_pipeline : if g_NB_PIPES > 1 generate
@@ -85,8 +86,11 @@ begin
     end process;
 
     sync_tmp <= data_pipe_r(data_pipe_r'high);
-  end generate;
+  end generate gen_multiple_pipeline;
 
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
   o_data <= sync_tmp;
 
 end architecture RTL;

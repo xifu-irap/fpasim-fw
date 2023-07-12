@@ -48,10 +48,13 @@ entity one_error_latch is
 end entity one_error_latch;
 
 architecture RTL of one_error_latch is
-  signal error_r : std_logic := '0';
+  signal error_r : std_logic := '0'; -- output error
 
 begin
 
+  ---------------------------------------------------------------------
+  -- This process pass or latch an input error (user-defined)
+  ---------------------------------------------------------------------
   p_detect_error : process (i_clk) is
   begin
     if rising_edge(i_clk) then
@@ -66,6 +69,10 @@ begin
       end if;
     end if;
   end process p_detect_error;
+
+  ---------------------------------------------------------------------
+  -- output
+  ---------------------------------------------------------------------
   o_error <= error_r;
 
 end architecture RTL;
