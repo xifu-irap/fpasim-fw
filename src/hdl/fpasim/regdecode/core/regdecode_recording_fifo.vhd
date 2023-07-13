@@ -49,7 +49,7 @@ entity regdecode_recording_fifo is
     ---------------------------------------------------------------------
     i_out_clk             : in  std_logic;  -- output clock
     i_out_rst             : in  std_logic;  -- reset @i_out_clk
-    -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    
     -- data
     o_fifo_rd             : out std_logic;  -- read fifo
     i_fifo_sof            : in  std_logic;  -- first packet sample
@@ -63,7 +63,7 @@ entity regdecode_recording_fifo is
     i_clk                 : in  std_logic;  -- clock
     i_rst                 : in  std_logic;  -- reset
     i_rst_status          : in  std_logic;  -- reset error flag(s)
-    i_debug_pulse         : in  std_logic;
+    i_debug_pulse         : in  std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     -- data
     i_usb_fifo_rd         : in  std_logic;  -- read fifo
     o_usb_fifo_sof        : out std_logic;  -- first packet sample
@@ -71,7 +71,7 @@ entity regdecode_recording_fifo is
     o_usb_fifo_data_valid : out std_logic;  -- data valid
     o_usb_fifo_data       : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- fifo data
     o_usb_fifo_empty      : out std_logic;  -- fifo empty flag
-    o_usb_wr_data_count   : out std_logic_vector(15 downto 0);
+    o_usb_wr_data_count   : out std_logic_vector(15 downto 0); -- fifo write data count
     ---------------------------------------------------------------------
     -- errors/status @ i_clk
     ---------------------------------------------------------------------

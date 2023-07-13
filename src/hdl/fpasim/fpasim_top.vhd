@@ -74,7 +74,7 @@ entity fpasim_top is
     o_spi_rst            : out std_logic;  -- reset the spi module
     o_spi_en             : out std_logic;  -- enable the spi module
     o_spi_dac_tx_present : out std_logic;  -- enable the dac
-    o_spi_mode           : out std_logic;  --
+    o_spi_mode           : out std_logic;  -- mode of the spi bridge (write/read)
     o_spi_id             : out std_logic_vector(1 downto 0);  -- select the spi module
     o_spi_cmd_valid      : out std_logic;  -- spi command valid
     o_spi_cmd_wr_data    : out std_logic_vector(31 downto 0);  -- spi command value

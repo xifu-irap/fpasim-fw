@@ -82,7 +82,7 @@ entity tes_pulse_shape_manager is
     i_cmd_pulse_height       : in  std_logic_vector(g_CMD_PULSE_HEIGHT_WIDTH - 1 downto 0);  -- pulse height command
     i_cmd_pixel_id           : in  std_logic_vector(g_CMD_PIXEL_ID_WIDTH - 1 downto 0);  -- pixel id command
     i_cmd_time_shift         : in  std_logic_vector(g_CMD_TIME_SHIFT_WIDTH - 1 downto 0);  -- time shift command
-    o_cmd_ready              : out std_logic;
+    o_cmd_ready              : out std_logic; -- fifo ready
     -- RAM: pulse shape
     -- wr
     i_pulse_shape_wr_en      : in  std_logic;  -- ram write enable

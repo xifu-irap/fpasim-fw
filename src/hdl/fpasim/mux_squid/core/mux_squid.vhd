@@ -65,6 +65,7 @@ entity mux_squid is
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
+    -- inter_squid_gain value
     i_inter_squid_gain : in std_logic_vector(g_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
     -- RAM: mux_squid_offset

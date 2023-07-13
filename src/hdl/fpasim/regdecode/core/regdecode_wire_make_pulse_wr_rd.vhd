@@ -58,18 +58,18 @@ entity regdecode_wire_make_pulse_wr_rd is
     -- data
     i_data_valid      : in  std_logic;  -- data valid
     i_data            : in  std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0);  -- data value
-    o_ready           : out std_logic;
-    o_wr_data_count   : out std_logic_vector(15 downto 0);
+    o_ready           : out std_logic; -- fifo ready
+    o_wr_data_count   : out std_logic_vector(15 downto 0); -- fifo write data count
     ---------------------------------------------------------------------
     -- from/to the user:  @i_out_clk
     ---------------------------------------------------------------------
     i_out_clk         : in  std_logic;  -- output clock
     i_out_rst         : in std_logic; -- reset @i_out_clk
     -- ram: wr
-    i_data_rd         : in  std_logic;
-    o_data_valid      : out std_logic;  -- data valid
-    o_data            : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0);  -- data
-    o_empty           : out std_logic;
+    i_data_rd         : in  std_logic;  -- fifo read
+    o_data_valid      : out std_logic;  -- fifo data valid out
+    o_data            : out std_logic_vector(g_DATA_WIDTH_OUT - 1 downto 0);  -- fifo data out
+    o_empty           : out std_logic; -- fifo empty
     ---------------------------------------------------------------------
     -- to the regdecode: @i_clk
     ---------------------------------------------------------------------

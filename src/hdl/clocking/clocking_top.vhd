@@ -49,7 +49,7 @@ entity clocking_top is
     o_dac_clk_phase90     : out std_logic;  -- dac output clock @500 MHz with 90° phase
     o_dac_clk_div_phase90 : out std_logic;  -- dac output clock @125 MHz with 90° phase
 
-    o_locked : out std_logic
+    o_locked : out std_logic -- locked PLL
     );
 end entity clocking_top;
 

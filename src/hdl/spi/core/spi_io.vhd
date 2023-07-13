@@ -37,8 +37,8 @@ library unisim;
 
 entity spi_io is
   port (
-    i_clk       : in  std_logic;
-    i_io_rst    : in  std_logic;
+    i_clk       : in  std_logic; -- clock
+    i_io_rst    : in  std_logic; -- io reset
     ---------------------------------------------------------------------
     -- from/to the pads
     ---------------------------------------------------------------------
@@ -73,7 +73,7 @@ entity spi_io is
     o_mon_n_en    : out std_logic;      -- SPI chip select
     -- AMC : specific signals
     i_mon_n_int   : in  std_logic;  -- galr_n: Global analog input out-of-range alarm.
-    o_mon_n_reset : out std_logic;
+    o_mon_n_reset : out std_logic;  -- reset_n: hardware reset
 
     ---------------------------------------------------------------------
     -- from/to the user
@@ -109,7 +109,7 @@ entity spi_io is
     i_mon_n_en    : in  std_logic;      -- SPI chip select
     -- AMC : specific signals
     o_mon_n_int   : out std_logic;  -- galr_n: Global analog input out-of-range alarm.
-    i_mon_n_reset : in  std_logic
+    i_mon_n_reset : in  std_logic   -- reset_n: hardware reset
 
 
     );

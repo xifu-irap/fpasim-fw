@@ -68,10 +68,10 @@ entity regdecode_pipe is
     ---------------------------------------------------------------------
     -- input @i_clk
     ---------------------------------------------------------------------
-    i_clk         : in std_logic;       -- clock
-    i_rst         : in std_logic;       -- reset
-    i_rst_status  : in std_logic;       -- reset error flag(s)
-    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). Possib
+    i_clk         : in std_logic;  -- clock
+    i_rst         : in std_logic;  -- reset
+    i_rst_status  : in std_logic;  -- reset error flag(s)
+    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). 
 
     -- from the trig in
     i_start_auto_rd : in std_logic;  -- enable the auto generation of memory reading address
@@ -84,14 +84,14 @@ entity regdecode_pipe is
     ---------------------------------------------------------------------
     -- to the pipe out: @i_clk
     ---------------------------------------------------------------------
-    i_fifo_rd         : in  std_logic;
-    o_fifo_sof        : out std_logic;  -- first sample of one of memories
-    o_fifo_eof        : out std_logic;  -- last sample of one of memories
-    o_fifo_data_valid : out std_logic;  -- data valid
-    o_fifo_addr       : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- address
-    o_fifo_data       : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- data
+    i_fifo_rd         : in  std_logic;  -- fifo read
+    o_fifo_sof        : out std_logic;  -- fifo first sample of one of memories
+    o_fifo_eof        : out std_logic;  -- fifo last sample of one of memories
+    o_fifo_data_valid : out std_logic;  -- fifo data valid
+    o_fifo_addr       : out std_logic_vector(g_ADDR_WIDTH - 1 downto 0);  -- fifo address
+    o_fifo_data       : out std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- fifo data
     o_fifo_empty      : out std_logic;  -- fifo empty flag
-    o_fifo_data_count : out std_logic_vector(15 downto 0);
+    o_fifo_data_count : out std_logic_vector(15 downto 0); -- fifo write data count
     ---------------------------------------------------------------------
     -- to the user: @i_out_clk
     ---------------------------------------------------------------------
@@ -106,7 +106,7 @@ entity regdecode_pipe is
     -- ram: rd
     o_tes_pulse_shape_ram_rd_en      : out std_logic;  -- output read enable
     i_tes_pulse_shape_ram_rd_valid   : in  std_logic;  -- input read valid
-    i_tes_pulse_shape_ram_rd_data    : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- input data
+    i_tes_pulse_shape_ram_rd_data    : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- input read data
 
     -- amp_squid_tf
     -- ram: wr
@@ -116,7 +116,7 @@ entity regdecode_pipe is
     -- ram: rd
     o_amp_squid_tf_ram_rd_en          : out std_logic;  -- output read enable
     i_amp_squid_tf_ram_rd_valid       : in  std_logic;  -- input read valid
-    i_amp_squid_tf_ram_rd_data        : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);
+    i_amp_squid_tf_ram_rd_data        : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- input read data
     -- mux_squid_tf
     -- ram: wr
     o_mux_squid_tf_ram_wr_en          : out std_logic;  -- output write enable
@@ -125,7 +125,7 @@ entity regdecode_pipe is
     -- ram: rd
     o_mux_squid_tf_ram_rd_en          : out std_logic;  -- output read enable
     i_mux_squid_tf_ram_rd_valid       : in  std_logic;  -- input read valid
-    i_mux_squid_tf_ram_rd_data        : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);
+    i_mux_squid_tf_ram_rd_data        : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- input read data
     -- tes_std_state
     -- ram: wr
     o_tes_std_state_ram_wr_en         : out std_logic;  -- output write enable
@@ -134,7 +134,7 @@ entity regdecode_pipe is
     -- ram: rd
     o_tes_std_state_ram_rd_en         : out std_logic;  -- output read enable
     i_tes_std_state_ram_rd_valid      : in  std_logic;  -- input read valid
-    i_tes_std_state_ram_rd_data       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);
+    i_tes_std_state_ram_rd_data       : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- input read data
     -- mux_squid_offset
     -- ram: wr
     o_mux_squid_offset_ram_wr_en      : out std_logic;  -- output write enable
@@ -143,7 +143,7 @@ entity regdecode_pipe is
     -- ram: rd
     o_mux_squid_offset_ram_rd_en      : out std_logic;  -- output read enable
     i_mux_squid_offset_ram_rd_valid   : in  std_logic;  -- input read valid
-    i_mux_squid_offset_ram_rd_data    : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);
+    i_mux_squid_offset_ram_rd_data    : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- input read data
     ---------------------------------------------------------------------
     -- errors/status @i_clk
     ---------------------------------------------------------------------
