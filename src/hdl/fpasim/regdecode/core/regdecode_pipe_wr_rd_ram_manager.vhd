@@ -596,7 +596,10 @@ begin
   ---------------------------------------------------------------------
   -- check the path latency
   ---------------------------------------------------------------------
-  --assert not (rd_sync_rx = i_ram_rd_valid) report "[regdecode_pipe_wr_rd_ram_manager]: the internal pipeliner latency is not identical to the rd RAM latency. Change the g_RD_RAM_LATENCY value." severity error;
+  -- assert not (rd_sync_rx = i_ram_rd_valid)
+  -- report "[regdecode_pipe_wr_rd_ram_manager]: the internal pipeliner latency is not identical to the rd RAM latency.
+  -- Change the g_RD_RAM_LATENCY value." severity error;
+
   ---------------------------------------------------------------------
   -- cross clock domain:
   --  from the i_out_clk clock domain to the i_clk clock domain

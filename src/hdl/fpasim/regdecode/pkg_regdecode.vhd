@@ -53,7 +53,10 @@ package pkg_regdecode is
   constant pkg_FIRMWARE_ID_CHAR0 : character := 's';  -- ascii character
 
   -- auto-computed: fpga id
-  constant pkg_FIRMWARE_ID      : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR3), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR2), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR1), 8)) & std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR0), 8));
+  constant pkg_FIRMWARE_ID      : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR3), 8)) &
+                                                                   std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR2), 8)) &
+                                                                   std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR1), 8)) &
+                                                                   std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR0), 8));
   -- auto-computed: fpga version
   constant pkg_FIRMWARE_VERSION : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(pkg_FIRMWARE_VERSION_VALUE, 32));
 
@@ -227,7 +230,8 @@ package pkg_regdecode is
   -- user-defined: ra_delay (bit index low)
   constant pkg_RA_DELAY_IDX_L : integer := 0;
   -- auto-computed: ra_delay width
-  constant pkg_RA_DELAY_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_RA_DELAY_IDX_H, i_idx_low => pkg_RA_DELAY_IDX_L);
+  constant pkg_RA_DELAY_WIDTH : integer :=
+     work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_RA_DELAY_IDX_H, i_idx_low => pkg_RA_DELAY_IDX_L);
 
   -- user-defined: tes_conf
   ---------------------------------------------------------------------
@@ -238,7 +242,8 @@ package pkg_regdecode is
   -- user-defined: pixel_nb (bit index low)
   constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L : integer := 24;
   -- auto-computed: pixel_nb width
-  constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);
+  constant pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH : integer :=
+     work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_PIXEL_BY_FRAME_IDX_L);
 
   -- requirement: FPASIM-FW-REQ-0060
   -- user-defined: pixel_length (bit index high)
@@ -247,14 +252,16 @@ package pkg_regdecode is
   -- user-defined: pixel_length (bit index low)
   constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L : integer := 16;
   -- auto-computed: pixel_length width
-  constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H, i_idx_low => pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L);
+  constant pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_WIDTH : integer :=
+      work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_H, i_idx_low => pkg_TES_CONF_NB_SAMPLE_BY_PIXEL_IDX_L);
 
   -- user-defined: frame_length (bit index high)
   constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H : integer := 12;
   -- user-defined: frame_length (bit index low)
   constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L : integer := 0;
   -- auto-computed: frame_length width
-  constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);
+  constant pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH : integer :=
+      work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H, i_idx_low => pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);
 
   ---------------------------------------------------------------------
   -- user-defined: conf0

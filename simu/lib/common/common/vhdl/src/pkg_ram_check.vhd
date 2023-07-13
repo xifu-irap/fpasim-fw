@@ -266,7 +266,9 @@ package body pkg_ram_check is
             else
               v_error(0) := '0';
             end if;
-            check_equal(i_data_sb, v_rd_data, i_rd_data_vect, result(i_RD_NAME1 & ", index:" & to_string(v_cnt) & ", (file) : " & to_string(v_rd_data) & ", " & i_RD_NAME1 & " (VHDL) : " & to_string(i_rd_data_vect)));
+            check_equal(i_data_sb, v_rd_data, i_rd_data_vect,
+                        result(i_RD_NAME1 & ", index:" & to_string(v_cnt) & ", (file) : " & to_string(v_rd_data) & ", " &
+                               i_RD_NAME1 & " (VHDL) : " & to_string(i_rd_data_vect)));
             v_cnt := v_cnt + 1;
             if v_csv_file.end_of_file(void) = true then
               v_rd_finish := '1';

@@ -27,13 +27,17 @@
 --    This module is the top_level for the co-simulation.
 --    The input i_make_pulse command has the following structure:
 --        . [31]: pixel_all:
---            . '1': the FPGA will auto-generate commands by overwriting the pixel_id field from 0 to (nb_pixel_by_frame - 1) with nb_pixel_by_frame defined in the TES_CONF registers. The pulse_height and time_shift values are shared against the auto-generated commands.
+--            . '1': the FPGA will auto-generate commands by overwriting the pixel_id field from 0 to (nb_pixel_by_frame - 1)
+--                   with nb_pixel_by_frame defined in the TES_CONF registers.
+--                   The pulse_height and time_shift values are shared against the auto-generated commands.
 --            . '0': do nothing
---        . [29:24]: pixel_id: pixel_id value. The range is [0; nb_pixel_by_frame - 1] with nb_pixel_by_frame defined in the TES_CONF registers
+--        . [29:24]: pixel_id: pixel_id value. The range is [0; nb_pixel_by_frame - 1]
+--                   with nb_pixel_by_frame defined in the TES_CONF registers
 --            . This field is valid only if pixel_all bit is set to '0'.
 --        . [19:16]: time_shift: time_shift value. By design, the range is [0;15].
 --            . This value defined the address offset to apply to the tes_pulse_shape RAM.
---        . [10:0]: pulse_height: amplitude factor applied to the pulse_shape amplitude. The formula is: percentage = pulse_height/(2**16-1)
+--        . [10:0]: pulse_height: amplitude factor applied to the pulse_shape amplitude.
+--                  The formula is: percentage = pulse_height/(2**16-1)
 --           . 0x0000 => 0% of the pulse_shape amplitude in the FPGA.
 --           . 0xFFFF => 100% of the pulse_shape amplitude in the FPGA.
 --

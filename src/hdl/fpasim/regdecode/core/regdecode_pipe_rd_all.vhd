@@ -230,7 +230,10 @@ architecture RTL of regdecode_pipe_rd_all is
 
 begin
 
-  p_decode_state : process(i_fifo_data_valid0, i_fifo_data_valid1, i_fifo_data_valid2, i_fifo_data_valid3, i_fifo_data_valid4, i_fifo_empty0, i_fifo_empty1, i_fifo_empty2, i_fifo_empty3, i_fifo_empty4, i_fifo_eof0, i_fifo_eof1, i_fifo_eof2, i_fifo_eof3, i_fifo_eof4, prog_full0, sel_r1, sm_state_r1) is
+  p_decode_state : process(i_fifo_data_valid0, i_fifo_data_valid1, i_fifo_data_valid2, i_fifo_data_valid3, i_fifo_data_valid4,
+                          i_fifo_empty0, i_fifo_empty1, i_fifo_empty2, i_fifo_empty3, i_fifo_empty4,
+                           i_fifo_eof0, i_fifo_eof1, i_fifo_eof2, i_fifo_eof3, i_fifo_eof4,
+                           prog_full0, sel_r1, sm_state_r1) is
   begin
     rd0_next <= '0';
     rd1_next <= '0';

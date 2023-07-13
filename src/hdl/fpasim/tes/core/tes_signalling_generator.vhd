@@ -182,7 +182,12 @@ begin
       when E_START =>
 
         if i_data_valid = '1' then
-          assert ((pkg_TES_PULSE_MANAGER_SOF_EOF_NB_SAMPLES_MIN - 1) < (to_integer(unsigned(i_nb_samples_by_block))) ) report "[tes_signalling_generator]: (pkg_TES_PULSE_MANAGER_SOF_EOF_NB_SAMPLES_MIN - 1) <= i_nb_samples_by_block for the downstream modules. Increase the i_nb_samples_by_block value"  severity error;
+
+          assert ((pkg_TES_PULSE_MANAGER_SOF_EOF_NB_SAMPLES_MIN - 1) < (to_integer(unsigned(i_nb_samples_by_block))) )
+          report "[tes_signalling_generator]: (pkg_TES_PULSE_MANAGER_SOF_EOF_NB_SAMPLES_MIN - 1) <= i_nb_samples_by_block" &
+          "for the downstream modules. Increase the i_nb_samples_by_block value"
+          severity error;
+
           data_valid_next <= i_data_valid;
 
           sof_next       <= '1';

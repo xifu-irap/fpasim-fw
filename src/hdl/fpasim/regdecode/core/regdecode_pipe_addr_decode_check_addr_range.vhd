@@ -85,10 +85,13 @@ begin
   -- check configuration
   ---------------------------------------------------------------------
 
-  --assert not (g_ADDR_WIDTH >= g_ADDR_RANGE_WIDTH) report "[regdecode_pipe_addr_decode_check_addr_range]: address range width should be inferior to equal to the input address bus width" severity error;
+  -- assert not (g_ADDR_WIDTH >= g_ADDR_RANGE_WIDTH)
+  -- report "[regdecode_pipe_addr_decode_check_addr_range]: address range width should be inferior to equal to the input address bus width"
+  -- severity error;
 
   ---------------------------------------------------------------------
-  -- if g_ADDR_RANGE_WIDTH < g_ADDR_WIDTH then we assume the MSB bits are used to define a range which will be compared to i_addr_range_min and i_addr_range_max.
+  -- if g_ADDR_RANGE_WIDTH < g_ADDR_WIDTH then we assume the MSB bits are used to define a range
+  -- which will be compared to i_addr_range_min and i_addr_range_max.
   -- So the MSB bits of i_addr are extracted.
   -- if g_ADDR_RANGE_WIDTH = g_ADDR_WIDTH. No change are necessary.
   ---------------------------------------------------------------------

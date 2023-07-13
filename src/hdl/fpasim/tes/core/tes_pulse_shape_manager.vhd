@@ -1385,7 +1385,10 @@ begin
   -------------------------------------------------------------------
   -- sync with RAM output
   --------------------------------------------------------------------
-  assert not (pkg_TES_STD_STATE_RAM_B_RD_LATENCY /= pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY) report "[tes_pulse_shape_manager]: c_TES_STD_STATE_RD_RAM_LATENCY and c_TES_PULSE_SHAPE_RD_RAM_LATENCY must be equal. Otherwise, the user needs to update this design to equalize the output data path from each memory" severity error;
+  assert not (pkg_TES_STD_STATE_RAM_B_RD_LATENCY /= pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY)
+  report "[tes_pulse_shape_manager]: c_TES_STD_STATE_RD_RAM_LATENCY and c_TES_PULSE_SHAPE_RD_RAM_LATENCY must be equal." &
+         "Otherwise, the user needs to update this design to equalize the output data path from each memory"
+  severity error;
 
   data_pipe_tmp2(c_IDX6_H downto c_IDX6_L) <= pulse_heigth_rc;
   data_pipe_tmp2(c_IDX5_H)                 <= pulse_sof_rc;
@@ -1417,9 +1420,17 @@ begin
   -- TES computation
   -- requirement: FPASIM-FW-REQ-0120
   ---------------------------------------------------------------------
-  assert not ((pulse_shape_doutb'length) /= (pulse_shape_tmp'length - 1)) report "[tes_pulse_shape_manager]: pulse shape => register/command width and sfixed package definition width doesn't match." severity error;
-  assert not ((pulse_heigth_rx'length) /= (pulse_heigth_tmp'length - 1)) report "[tes_pulse_shape_manager]: pulse heigth => register/command width and sfixed package definition width doesn't match." severity error;
-  assert not ((steady_state_doutb'length) /= (steady_state_tmp'length - 1)) report "[tes_pulse_shape_manager]: steady state => register/command width and sfixed package definition width doesn't match." severity error;
+  assert not ((pulse_shape_doutb'length) /= (pulse_shape_tmp'length - 1))
+  report "[tes_pulse_shape_manager]: pulse shape => register/command width and sfixed package definition width doesn't match."
+  severity error;
+
+  assert not ((pulse_heigth_rx'length) /= (pulse_heigth_tmp'length - 1))
+  report "[tes_pulse_shape_manager]: pulse heigth => register/command width and sfixed package definition width doesn't match."
+  severity error;
+
+  assert not ((steady_state_doutb'length) /= (steady_state_tmp'length - 1))
+  report "[tes_pulse_shape_manager]: steady state => register/command width and sfixed package definition width doesn't match."
+  severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
   pulse_shape_tmp  <= std_logic_vector(resize(unsigned(pulse_shape_doutb), pulse_shape_tmp'length));
   pulse_heigth_tmp <= std_logic_vector(resize(unsigned(pulse_heigth_rx), pulse_heigth_tmp'length));

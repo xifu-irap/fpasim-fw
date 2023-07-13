@@ -116,7 +116,8 @@ package pkg_csv_file is
         -- write a character into line
         procedure write_char(i_value : in character);
         -- write a std_logic_vector as hexadecimal string into line
-        procedure write_std_vec_as_hex(i_value : in std_logic_vector; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1; constant i_unsigned_value : boolean := true);
+        procedure write_std_vec_as_hex(i_value : in std_logic_vector; i_csv_separator : in character := ';';
+                                        constant i_use_csv_separator : in integer := 1; constant i_unsigned_value : boolean := true);
         -- write a std_logic_vector as data type
         --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
         --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
@@ -412,8 +413,10 @@ package body pkg_csv_file is
         end;
 
         -- write a std_logic_vector as hexadecimal string into line
-        procedure write_std_vec_as_hex(i_value : in std_logic_vector; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1; constant i_unsigned_value : boolean := true) is
-            -- This function write in a file the hexadecimal value of an input "value" std_logic_vector with a minimal number of hexadecimal character.
+        procedure write_std_vec_as_hex(i_value : in std_logic_vector; i_csv_separator : in character := ';';
+                                       constant i_use_csv_separator : in integer := 1; constant i_unsigned_value : boolean := true) is
+            -- This function write in a file the hexadecimal value of an input "value" std_logic_vector
+            -- with a minimal number of hexadecimal character.
             -- The user can define if the input std_logic_vector must be processed as a signed vector or a unsigned vector
             -- TO do that:
             -- we build a "v_val0" variable of std_logic_vector type with the following properties:
@@ -445,11 +448,17 @@ package body pkg_csv_file is
             variable v_val : integer := 0;
         begin
             if i_data_typ = "UINT" then
-                assert not (i_value'length > 32) report "pkg_csv_file.write_std_vec_as_common_typ: std_logic_vector (length = " & to_string(i_value'length) & " can't be represented by an unsigned integer" severity warning;
+                assert not (i_value'length > 32)
+                report "pkg_csv_file.write_std_vec_as_common_typ: std_logic_vector (length = " & to_string(i_value'length) &
+                 " can't be represented by an unsigned integer" severity warning;
+
                 v_val := to_integer(unsigned(i_value));
                 write_integer(i_value => v_val, i_csv_separator => i_csv_separator, i_use_csv_separator => i_use_csv_separator);
             elsif i_data_typ = "INT" then
-                assert not (i_value'length > 32) report "pkg_csv_file.write_std_vec_as_common_typ: std_logic_vector (length = " & to_string(i_value'length) & " can't be represented by an signed integer" severity warning;
+                assert not (i_value'length > 32)
+                report "pkg_csv_file.write_std_vec_as_common_typ: std_logic_vector (length = " & to_string(i_value'length) &
+                " can't be represented by an signed integer" severity warning;
+
                 v_val := to_integer(signed(i_value));
                 write_integer(i_value => v_val, i_csv_separator => i_csv_separator, i_use_csv_separator => i_use_csv_separator);
             elsif i_data_typ = "HEX" then

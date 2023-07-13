@@ -167,7 +167,9 @@ package body pkg_data_checker is
             else
               v_error(0) := '0';
             end if;
-            check_equal(i_sb_data0, v_data0, i_data0_std_vect, result(i_NAME0 & ", IDX: " & to_string(v_cnt) & " (File) : " & to_string(v_data0) & ", " & i_NAME0 & " (VHDL) : " & to_string(i_data0_std_vect)));
+            check_equal(i_sb_data0, v_data0, i_data0_std_vect,
+                        result(i_NAME0 & ", IDX: " & to_string(v_cnt) & " (File) : " & to_string(v_data0) & ", " &
+                               i_NAME0 & " (VHDL) : " & to_string(i_data0_std_vect)));
             v_cnt := v_cnt + 1;
           end if;
 

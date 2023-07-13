@@ -207,7 +207,8 @@ package pkg_fpasim is
   -- user-defined : add an additionnal output latency
   constant pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY : natural := 0;
   -- auto-computed: latency of the "tes_signalling_generator" module
-  constant pkg_TES_SIGNALLING_GENERATOR_LATENCY     : natural := pkg_TES_SIGNALLING_GENERATOR_FSM_LATENCY + pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY;  -- number of pipes of the "tes_signalling_generator"
+  constant pkg_TES_SIGNALLING_GENERATOR_LATENCY     : natural := pkg_TES_SIGNALLING_GENERATOR_FSM_LATENCY +
+                                                                 pkg_TES_SIGNALLING_GENERATOR_OUT_LATENCY;
 
   -- auto-computed: latency of the "tes_signalling" module
   constant pkg_TES_SIGNALLING_LATENCY : natural := pkg_TES_SIGNALLING_GENERATOR_LATENCY;
@@ -269,10 +270,20 @@ package pkg_fpasim is
   constant pkg_TES_FORCE_OUTPUT_LATENCY : positive := 1;
 
   -- auto-computed: latency of the "tes_pulse_manager" module
-  constant pkg_TES_PULSE_MANAGER_LATENCY : natural := pkg_TES_TABLE_RAM_RD_LATENCY + pkg_TES_PULSE_MANAGER_FSM_LATENCY + pkg_TES_PULSE_MANAGER_ADDR_COMPUTE_LATENCY + pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY + pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY + pkg_TES_FORCE_OUTPUT_LATENCY;
+  constant pkg_TES_PULSE_MANAGER_LATENCY : natural := pkg_TES_TABLE_RAM_RD_LATENCY +
+                                                      pkg_TES_PULSE_MANAGER_FSM_LATENCY +
+                                                      pkg_TES_PULSE_MANAGER_ADDR_COMPUTE_LATENCY +
+                                                      pkg_TES_PULSE_SHAPE_RAM_B_RD_LATENCY +
+                                                      pkg_TES_PULSE_MANAGER_COMPUTATION_LATENCY +
+                                                      pkg_TES_FORCE_OUTPUT_LATENCY;
 
   -- auto-computed: max number of samples between pixel_sof, pixel_eof
-  constant pkg_TES_PULSE_MANAGER_SOF_EOF_NB_SAMPLES_MIN : natural := pkg_TES_TABLE_RAM_RD_LATENCY + pkg_TES_PULSE_MANAGER_FSM_LATENCY + 1 + 1 + 1; -- 1 (E_WAIT -> E_RUN), 1 (E_RUN), 1 (write memory latency)
+  -- the last one constants values are defined:
+  --    . 1 (E_WAIT -> E_RUN) : FSM
+  --    . 1 (E_RUN) : FSM
+  --    . 1 (write memory latency)
+  constant pkg_TES_PULSE_MANAGER_SOF_EOF_NB_SAMPLES_MIN : natural := pkg_TES_TABLE_RAM_RD_LATENCY +
+                                                                     pkg_TES_PULSE_MANAGER_FSM_LATENCY + 1 + 1 + 1;
   -- auto-commputed: latency of the "tes_top" module
   constant pkg_TES_TOP_LATENCY : natural := pkg_TES_SIGNALLING_LATENCY + pkg_TES_PULSE_MANAGER_LATENCY;
 

@@ -72,10 +72,15 @@ package pkg_spi is
   constant pkg_SPI_CDCE_SYSTEM_FREQUENCY_HZ  : positive  := pkg_USB_SYSTEM_FREQUENCY_HZ;
   -- user-defined : spi output clock frequency to generate (expressed in Hz)
   constant pkg_SPI_CDCE_SPI_FREQUENCY_MAX_HZ : positive  := 1_000_000; -- 20 MHz max
-  -- user-defined : Number of clock period for mosi signal between the state machine output to the output ports (spi_master) (possible values [0;max_integer_value[)
+  -- user-defined : Number of clock period for mosi signal between the state machine output to the output ports (spi_master)
+  -- (possible values [0;max_integer_value[)
   constant pkg_SPI_CDCE_MOSI_DELAY           : natural   := 0;
-  -- auto-computed : Number of clock period for miso signal by considering the FPGA loopback delay (the external device delay is not taken into account): FSM (spi_master) -> IO (out) -> IO (IN). (possible values [0;max_integer_value[)
-  constant pkg_SPI_CDCE_MISO_DELAY           : natural   := pkg_SPI_CDCE_MOSI_DELAY + pkg_SPI_DEVICE_SELECT_MOSI_DELAY + pkg_IO_MOSI_DELAY + pkg_IO_MISO_DELAY;
+  -- auto-computed : Number of clock period for miso signal by considering the FPGA loopback delay
+  -- (the external device delay is not taken into account): FSM (spi_master) -> IO (out) -> IO (IN). (possible values [0;max_integer_value[)
+  constant pkg_SPI_CDCE_MISO_DELAY           : natural   := pkg_SPI_CDCE_MOSI_DELAY +
+                                                            pkg_SPI_DEVICE_SELECT_MOSI_DELAY +
+                                                            pkg_IO_MOSI_DELAY +
+                                                            pkg_IO_MISO_DELAY;
 
   -------------------------------------------------------------------
   -- ADC (ADS62p49)
@@ -89,10 +94,15 @@ package pkg_spi is
   constant pkg_SPI_ADC_SYSTEM_FREQUENCY_HZ  : positive  := pkg_USB_SYSTEM_FREQUENCY_HZ;
   -- user-defined : spi output clock frequency to generate (expressed in Hz)
   constant pkg_SPI_ADC_SPI_FREQUENCY_MAX_HZ : positive  := 15_000_000; -- 20 MHz max
-  -- user-defined : Number of clock period for mosi signal between the state machine output to the output ports (spi_master) (possible values [0;max_integer_value[)
+  -- user-defined : Number of clock period for mosi signal between the state machine output to the output ports (spi_master)
+  -- (possible values [0;max_integer_value[)
   constant pkg_SPI_ADC_MOSI_DELAY           : natural   := 0;
-  -- auto-computed : Number of clock period for miso signal by considering the FPGA loopback delay (the external device delay is not taken into account): FSM (spi_master) -> IO (out) -> IO (IN). (possible values [0;max_integer_value[)
-  constant pkg_SPI_ADC_MISO_DELAY           : natural   := pkg_SPI_ADC_MOSI_DELAY + pkg_SPI_DEVICE_SELECT_MOSI_DELAY + pkg_IO_MOSI_DELAY + pkg_IO_MISO_DELAY;
+  -- auto-computed : Number of clock period for miso signal by considering the FPGA loopback delay
+  -- (the external device delay is not taken into account): FSM (spi_master) -> IO (out) -> IO (IN). (possible values [0;max_integer_value[)
+  constant pkg_SPI_ADC_MISO_DELAY           : natural   := pkg_SPI_ADC_MOSI_DELAY +
+                                                           pkg_SPI_DEVICE_SELECT_MOSI_DELAY +
+                                                           pkg_IO_MOSI_DELAY +
+                                                           pkg_IO_MISO_DELAY;
 
 
   -------------------------------------------------------------------
@@ -107,10 +117,15 @@ package pkg_spi is
   constant pkg_SPI_DAC_SYSTEM_FREQUENCY_HZ  : positive  := pkg_USB_SYSTEM_FREQUENCY_HZ;
   -- user-defined : spi output clock frequency to generate (expressed in Hz)
   constant pkg_SPI_DAC_SPI_FREQUENCY_MAX_HZ : positive  := 5_000_000; -- 10 MHz max
-  -- user-defined : Number of clock period for mosi signal between the state machine output to the output ports (spi_master) (possible values [0;max_integer_value[)
+  -- user-defined : Number of clock period for mosi signal between the state machine output to the output ports (spi_master)
+  -- (possible values [0;max_integer_value[)
   constant pkg_SPI_DAC_MOSI_DELAY           : natural   := 0;
-  -- auto-computed : Number of clock period for miso signal by considering the FPGA loopback delay (the external device delay is not taken into account): FSM (spi_master) -> IO (out) -> IO (IN). (possible values [0;max_integer_value[)
-  constant pkg_SPI_DAC_MISO_DELAY           : natural   := pkg_SPI_DAC_MOSI_DELAY + pkg_SPI_DEVICE_SELECT_MOSI_DELAY + pkg_IO_MOSI_DELAY + pkg_IO_MISO_DELAY;
+  -- auto-computed : Number of clock period for miso signal by considering the FPGA loopback delay
+  -- (the external device delay is not taken into account): FSM (spi_master) -> IO (out) -> IO (IN). (possible values [0;max_integer_value[)
+  constant pkg_SPI_DAC_MISO_DELAY           : natural   := pkg_SPI_DAC_MOSI_DELAY +
+                                                           pkg_SPI_DEVICE_SELECT_MOSI_DELAY +
+                                                           pkg_IO_MOSI_DELAY +
+                                                           pkg_IO_MISO_DELAY;
 
   -------------------------------------------------------------------
   -- AMC7823
@@ -124,10 +139,15 @@ package pkg_spi is
   constant pkg_SPI_AMC_SYSTEM_FREQUENCY_HZ  : positive  := pkg_USB_SYSTEM_FREQUENCY_HZ;
   -- user-defined : spi output clock frequency to generate (expressed in Hz)
   constant pkg_SPI_AMC_SPI_FREQUENCY_MAX_HZ : positive  := 6_000_000; -- 12 MHz max
-  -- user-defined : Number of clock period for mosi signal between the state machine output to the output ports (spi_master) (possible values [0;max_integer_value[)
+  -- user-defined : Number of clock period for mosi signal between the state machine output to the output ports (spi_master)
+  -- (possible values [0;max_integer_value[)
   constant pkg_SPI_AMC_MOSI_DELAY           : natural   := 0;
-  -- auto-computed : Number of clock period for miso signal by considering the FPGA loopback delay (the external device delay is not taken into account): FSM (spi_master) -> IO (out) -> IO (IN). (possible values [0;max_integer_value[)
-  constant pkg_SPI_AMC_MISO_DELAY           : natural   := pkg_SPI_AMC_MOSI_DELAY + pkg_SPI_DEVICE_SELECT_MOSI_DELAY + pkg_IO_MOSI_DELAY + pkg_IO_MISO_DELAY;
+  -- auto-computed : Number of clock period for miso signal by considering the FPGA loopback delay
+  -- (the external device delay is not taken into account): FSM (spi_master) -> IO (out) -> IO (IN). (possible values [0;max_integer_value[)
+  constant pkg_SPI_AMC_MISO_DELAY           : natural   := pkg_SPI_AMC_MOSI_DELAY +
+                                                           pkg_SPI_DEVICE_SELECT_MOSI_DELAY +
+                                                           pkg_IO_MOSI_DELAY +
+                                                           pkg_IO_MISO_DELAY;
 
 
 end pkg_spi;
