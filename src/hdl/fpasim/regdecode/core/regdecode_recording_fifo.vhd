@@ -49,7 +49,7 @@ entity regdecode_recording_fifo is
     ---------------------------------------------------------------------
     i_out_clk             : in  std_logic;  -- output clock
     i_out_rst             : in  std_logic;  -- reset @i_out_clk
-    
+
     -- data
     o_fifo_rd             : out std_logic;  -- read fifo
     i_fifo_sof            : in  std_logic;  -- first packet sample

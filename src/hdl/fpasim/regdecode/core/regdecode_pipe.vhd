@@ -71,7 +71,7 @@ entity regdecode_pipe is
     i_clk         : in std_logic;  -- clock
     i_rst         : in std_logic;  -- reset
     i_rst_status  : in std_logic;  -- reset error flag(s)
-    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture). 
+    i_debug_pulse : in std_logic;  -- error mode (transparent vs capture).
 
     -- from the trig in
     i_start_auto_rd : in std_logic;  -- enable the auto generation of memory reading address
