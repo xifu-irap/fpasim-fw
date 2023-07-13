@@ -77,7 +77,7 @@ entity tb_fpga_system_fpasim_top is
     );
 end tb_fpga_system_fpasim_top;
 
-architecture simulate of tb_fpga_system_fpasim_top is
+architecture Simulation of tb_fpga_system_fpasim_top is
 
 
   ---------------------------------------------------------------------
@@ -329,4 +329,4 @@ begin
 
 
 
-end simulate;
+end Simulation;

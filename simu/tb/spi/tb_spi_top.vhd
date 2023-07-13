@@ -65,7 +65,7 @@ entity tb_spi_top is
     );
 end tb_spi_top;
 
-architecture simulate of tb_spi_top is
+architecture Simulation of tb_spi_top is
 
   signal i_clk                : std_logic;  --  clock
   signal i_rst                : std_logic                     := '0';  --  reset
@@ -653,4 +653,4 @@ begin
     i_mon_sdo <= data_tmp1(0);
   end generate gen_rd_loopback_amc;
 
-end simulate;
+end Simulation;

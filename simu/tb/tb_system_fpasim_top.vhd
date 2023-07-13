@@ -63,7 +63,7 @@ entity tb_system_fpasim_top is
     );
 end tb_system_fpasim_top;
 
-architecture simulate of tb_system_fpasim_top is
+architecture Simulation of tb_system_fpasim_top is
 
   -- simulation output path for the testbench input files
   constant c_INPUT_BASEPATH  : string := output_path & "inputs/";
@@ -971,4 +971,4 @@ begin
 
   end generate gen_log_ram_mux_squid_offset;
 
-end simulate;
+end Simulation;

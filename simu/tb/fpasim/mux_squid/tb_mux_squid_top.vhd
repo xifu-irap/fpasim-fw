@@ -79,7 +79,7 @@ entity tb_mux_squid_top is
   );
 end tb_mux_squid_top;
 
-architecture simulate of tb_mux_squid_top is
+architecture Simulation of tb_mux_squid_top is
 
   -- simulation output path for the testbench input files
   constant c_INPUT_BASEPATH  : string := output_path & "inputs/";
@@ -897,4 +897,4 @@ begin
 
   end generate gen_check_data;
 
-end simulate;
+end Simulation;
