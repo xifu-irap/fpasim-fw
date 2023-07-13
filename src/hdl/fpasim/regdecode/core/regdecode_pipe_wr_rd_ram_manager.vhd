@@ -346,9 +346,13 @@ begin
 
   ---------------------------------------------------------------------
   -- FSM
+  --  It has 2 modes:
+  --    . RAM writting by outputting the input data
+  --    . RAM reading by generating RAM addresses
   ---------------------------------------------------------------------
 
-  p_decode_state : process(addr_r1, cnt_r1, sm_state_r1, i_addr, i_addr_range_min, i_data_valid, i_start_auto_rd, prog_full_fsm) is
+  p_decode_state : process(addr_r1, cnt_r1, sm_state_r1, i_addr,
+                           i_addr_range_min, i_data_valid, i_start_auto_rd, prog_full_fsm) is
   begin
     sof_next        <= '0';
     eof_next        <= '0';
@@ -417,6 +421,9 @@ begin
     end case;
   end process p_decode_state;
 
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state : process(i_clk) is
   begin
     if rising_edge(i_clk) then

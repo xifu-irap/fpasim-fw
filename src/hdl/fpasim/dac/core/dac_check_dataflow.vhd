@@ -118,6 +118,9 @@ begin
     end case;
   end process p_decode_state;
 
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state : process(i_dac_clk) is
   begin
     if rising_edge(i_dac_clk) then

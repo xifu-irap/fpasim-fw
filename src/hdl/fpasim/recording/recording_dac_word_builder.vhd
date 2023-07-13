@@ -78,6 +78,9 @@ begin
 
 ---------------------------------------------------------------------
 -- state machine
+--  it demux the input data into 2 output data:
+--    . data0
+--    . data1
 ---------------------------------------------------------------------
   p_decode_state : process(data0_r1, data1_r1, i_data, i_data_valid, sm_state_r1) is
   begin
@@ -117,6 +120,9 @@ begin
     end case;
   end process p_decode_state;
 
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state_proc : process(i_clk) is
   begin
     if rising_edge(i_clk) then

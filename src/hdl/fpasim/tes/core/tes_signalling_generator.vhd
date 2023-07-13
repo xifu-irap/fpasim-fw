@@ -154,6 +154,10 @@ begin
 
 ---------------------------------------------------------------------
 -- state machine
+--  it divided the input dataflow into data blocks.
+--  Each data block are delimited by 2 tags
+--   . sof: first sample of the block
+--   . eof: last sample of the block
 ---------------------------------------------------------------------
   p_decode_state : process(cnt_frame_max_r1, cnt_frame_r1, i_data_valid,
                            i_nb_samples_by_block, i_start, sm_state_r1) is
@@ -226,6 +230,10 @@ begin
     end case;
   end process p_decode_state;
 
+
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state_proc : process(i_clk) is
   begin
     if rising_edge(i_clk) then

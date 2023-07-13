@@ -230,6 +230,14 @@ architecture RTL of regdecode_pipe_rd_all is
 
 begin
 
+  ---------------------------------------------------------------------
+  -- This process multiplexes the input FIFOs into an output FIFO in the following order:
+  --   . fifo0
+  --   . fifo1
+  --   . fifo2
+  --   . fifo3
+  --   . fifo4
+  ---------------------------------------------------------------------
   p_decode_state : process(i_fifo_data_valid0, i_fifo_data_valid1, i_fifo_data_valid2, i_fifo_data_valid3, i_fifo_data_valid4,
                           i_fifo_empty0, i_fifo_empty1, i_fifo_empty2, i_fifo_empty3, i_fifo_empty4,
                            i_fifo_eof0, i_fifo_eof1, i_fifo_eof2, i_fifo_eof3, i_fifo_eof4,
@@ -329,6 +337,9 @@ begin
     end case;
   end process p_decode_state;
 
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state : process(i_clk) is
   begin
     if rising_edge(i_clk) then

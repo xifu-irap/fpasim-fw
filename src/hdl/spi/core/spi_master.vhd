@@ -180,6 +180,8 @@ begin
 
 ---------------------------------------------------------------------
 -- Tx: write data
+--   According the different SPI mode defined by the (g_CPOL,g_CPHA)
+--   it generates the SPI protocol (chip select, data serialization,...)
 ---------------------------------------------------------------------
   p_wr_decode_state : process (i_tx_data, i_tx_data_valid, i_tx_msb_first,
                                i_wr_rd, pulse_data_sample_tmp,
@@ -288,6 +290,10 @@ begin
     end case;
   end process p_wr_decode_state;
 
+
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_wr_state : process (i_clk) is
   begin
     if rising_edge(i_clk) then

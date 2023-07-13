@@ -109,6 +109,11 @@ architecture RTL of dac3283_demux is
 
 begin
 
+  ---------------------------------------------------------------------
+  -- This state machine allows to demux the input data into 2 channel:
+  --   . dac0
+  --   . dac1
+  ---------------------------------------------------------------------
   p_decode_state : process (data0_r1, data1_r1, i_dac, i_dac_frame,
                             sm_state_r1) is
   begin
@@ -146,6 +151,9 @@ begin
     end case;
   end process p_decode_state;
 
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state : process (i_clk) is
   begin
     if rising_edge(i_clk) then

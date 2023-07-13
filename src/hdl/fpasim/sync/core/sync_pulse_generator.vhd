@@ -114,6 +114,7 @@ begin
 
   ---------------------------------------------------------------------
   -- fsm
+  --   It generate an user-defined pulse width
   ---------------------------------------------------------------------
   p_state_decode : process(cnt_r1, data_r1, sm_state_r1, trig_tmp) is
   begin
@@ -164,6 +165,9 @@ begin
     end case;
   end process p_state_decode;
 
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state : process(i_clk) is
   begin
     if rising_edge(i_clk) then

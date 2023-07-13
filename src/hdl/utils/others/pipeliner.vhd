@@ -61,6 +61,9 @@ begin
   -- add 1 register on the data path
   gen_one_pipeline : if g_NB_PIPES = 1 generate
   begin
+    ---------------------------------------------------------------------
+    -- delayed the input data
+    ---------------------------------------------------------------------
     p_pipe_data:process(i_clk)
     begin
       if rising_edge(i_clk) then
@@ -75,6 +78,9 @@ begin
     type t_pipeline is array (g_NB_PIPES - 1 downto 0) of std_logic_vector(i_data'range);
     signal data_pipe_r : t_pipeline := (others => (others => '0'));
   begin
+    ---------------------------------------------------------------------
+    -- shift the input data to the left
+    ---------------------------------------------------------------------
     p_shift_data: process(i_clk)
     begin
       if rising_edge(i_clk) then

@@ -197,8 +197,13 @@ begin
 
   ---------------------------------------------------------------------
   -- fsm
+  --  It has 2 modes:
+  --    . output the input data (make_pulse on one pixel)
+  --    . output and duplicate the input data (make_pulse on all pixels)
   ---------------------------------------------------------------------
-  p_decode_state : process(i_make_pulse_valid, i_pixel_nb, pixel_all_tmp, pixel_id_tmp, pixel_id_max_r1, pixel_id_r1, sm_state_r1, ready_tmp0) is
+  p_decode_state : process(i_make_pulse_valid, i_pixel_nb, pixel_all_tmp,
+                           pixel_id_tmp, pixel_id_max_r1, pixel_id_r1,
+                           sm_state_r1, ready_tmp0) is
   begin
     sof_next          <= '0';
     eof_next          <= '0';
@@ -261,6 +266,9 @@ begin
     end case;
   end process p_decode_state;
 
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state : process(i_clk) is
   begin
     if rising_edge(i_clk) then

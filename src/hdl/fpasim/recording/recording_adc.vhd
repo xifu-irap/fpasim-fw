@@ -197,7 +197,8 @@ architecture RTL of recording_adc is
 begin
 
 ---------------------------------------------------------------------
--- state machine
+-- state machine:
+--   for each start comand, it build a bloc of ADC Samples
 ---------------------------------------------------------------------
   p_decode_state : process(cnt_sample_max_r1, cnt_sample_r1,
                            i_adc_cmd_nb_words_by_block, i_adc_cmd_start, i_adc_data_valid,
@@ -259,6 +260,9 @@ begin
     end case;
   end process p_decode_state;
 
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state_proc : process(i_clk) is
   begin
     if rising_edge(i_clk) then

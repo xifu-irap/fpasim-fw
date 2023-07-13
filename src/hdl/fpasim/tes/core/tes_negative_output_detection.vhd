@@ -95,6 +95,8 @@ begin
 
 ---------------------------------------------------------------------
 -- state machine
+--   It generates an error on a negative value.
+--   Note: The error is latched until the rst_status signal is set to '1'.
 ---------------------------------------------------------------------
   p_decode_state : process (error_r1, i_pixel_id, i_pixel_result_sign,
                             i_pixel_valid, pixel_id_r1, sm_state_r1, i_rst_status, rst_status_r1) is
@@ -138,6 +140,10 @@ begin
     end case;
   end process p_decode_state;
 
+
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state : process (i_clk) is
   begin
     if rising_edge(i_clk) then

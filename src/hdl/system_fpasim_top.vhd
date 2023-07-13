@@ -712,7 +712,9 @@ begin
 
   begin
 
-
+    ---------------------------------------------------------------------
+    -- count the number of clock peridods
+    ---------------------------------------------------------------------
     p_count : process (adc_clk_div) is
     begin
       if rising_edge(adc_clk_div) then

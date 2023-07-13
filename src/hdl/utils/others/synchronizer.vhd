@@ -96,6 +96,9 @@ begin
   -- add 1 register on the data path
   one_pipeline : if g_PIPELINE_STAGES = 1 generate
   begin
+    ---------------------------------------------------------------------
+    -- delayed the input data
+    ---------------------------------------------------------------------
     p_pipe_data: process(i_clk)
     begin
       if rising_edge(i_clk) then
@@ -107,6 +110,9 @@ begin
  -- add 2 or more registers on the data path
   multiple_pipeline : if g_PIPELINE_STAGES > 1 generate
   begin
+    ---------------------------------------------------------------------
+    -- shift the input data to the left
+    ---------------------------------------------------------------------
     p_shift_data: process(i_clk)
     begin
       if rising_edge(i_clk) then

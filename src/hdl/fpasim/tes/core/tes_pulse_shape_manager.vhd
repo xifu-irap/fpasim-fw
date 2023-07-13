@@ -874,6 +874,9 @@ begin
 
   ---------------------------------------------------------------------
   -- state machine
+  --   It simulate several FSMs (one by pixel) with table.
+  --   After a make_pulse command is received, for the associated pixel,
+  --   it manages of the pulse sample spread accross several frames.
   ---------------------------------------------------------------------
   p_decode_state : process(cmd_pixel_id1, cmd_pulse_height1, cmd_time_shift1,
                            cnt_sample_pulse_shape_r1,
@@ -1065,6 +1068,9 @@ begin
     end case;
   end process p_decode_state;
 
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state : process(i_clk) is
   begin
     if rising_edge(i_clk) then
@@ -1500,6 +1506,10 @@ begin
   -- requirement: FPASIM-FW-REQ-0120
   --------------------------------------------------------------------
   sign_value_tmp6 <= result_ry(result_ry'high);
+
+  ---------------------------------------------------------------------
+  -- This process force the output to '0' if the input data is negative
+  ---------------------------------------------------------------------
   p_force_output_value_when_negative : process (i_clk) is
   begin
     if rising_edge(i_clk) then

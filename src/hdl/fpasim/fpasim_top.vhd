@@ -766,6 +766,11 @@ begin
 
   gen_adc_debug : if g_FPASIM_DEBUG = true generate
   begin
+    ---------------------------------------------------------------------
+    -- This process select one of 2 sources of adc data
+    --   . from the ILA
+    --   . from the ADC device
+    ---------------------------------------------------------------------
     p_select_path : process (i_clk) is
     begin
       if rising_edge(i_clk) then
@@ -1103,6 +1108,11 @@ begin
   end generate not_gen_debug_pattern;
 
   gen_debug_pattern : if g_FPASIM_DEBUG = true generate
+    ---------------------------------------------------------------------
+    -- This process selects one of 2 sources for the dac pattern
+    --   . from the ILA
+    --   . hardcoded
+    ---------------------------------------------------------------------
     p_select_debug_pattern : process (i_clk) is
     begin
       if rising_edge(i_clk) then
@@ -1181,6 +1191,11 @@ begin
 
   gen_dac_debug : if g_FPASIM_DEBUG = true generate
   begin
+    ---------------------------------------------------------------------
+    -- This process select one of 2 data sources for the dac device
+    --   . from the ILA
+    --   . from the fpasim function
+    ---------------------------------------------------------------------
     p_select_path : process (i_clk) is
     begin
       if rising_edge(i_clk) then
@@ -1300,6 +1315,9 @@ begin
 
     debug_trig <= '1' when unsigned(pixel_id1) = to_unsigned(0, pixel_id1'length) else '0';
 
+    ---------------------------------------------------------------------
+    -- This process counts events.
+    ---------------------------------------------------------------------
     p_statistics : process (i_clk) is
     begin
       if rising_edge(i_clk) then

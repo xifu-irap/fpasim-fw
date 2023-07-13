@@ -197,6 +197,9 @@ begin
 
   begin
 
+    ---------------------------------------------------------------------
+    -- detect a change on the errors value
+    ---------------------------------------------------------------------
     p_detect_change : process(i_out_clk) is
     begin
       if rising_edge(i_out_clk) then
@@ -272,7 +275,9 @@ begin
     signal rd_rst_busy_flag : std_logic_vector(status_tmp0'range);
 
   begin
-
+    ---------------------------------------------------------------------
+    -- detect a change on the status value
+    ---------------------------------------------------------------------
     p_detect_change : process(i_out_clk) is
     begin
       if rising_edge(i_out_clk) then
@@ -354,6 +359,9 @@ begin
   status_tmp(1)  <= i_usb_reg_status1;
   status_tmp(0)  <= i_usb_reg_status0;
 
+  ---------------------------------------------------------------------
+  -- Select the error/status value
+  ---------------------------------------------------------------------
   p_select_error_status : process(i_clk) is
   begin
     if rising_edge(i_clk) then
