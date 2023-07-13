@@ -327,6 +327,9 @@ begin
 
 ---------------------------------------------------------------------
 -- state machine
+--  It manages 2 steps:
+--   1. It demux the input command to one of the spi engine (writting)
+--   2. wait the spi engine response (reading)
 ---------------------------------------------------------------------
   p_decode_state : process (adc_spi_finish, adc_spi_rd_data,
                             adc_spi_rd_data_valid, adc_spi_ready, adc_spi_clk,
@@ -465,6 +468,9 @@ begin
     end case;
   end process p_decode_state;
 
+  ---------------------------------------------------------------------
+  -- State process : register signals
+  ---------------------------------------------------------------------
   p_state : process (i_clk) is
   begin
     if rising_edge(i_clk) then
