@@ -83,7 +83,7 @@ def test_mux_squid_top():
     ########################################################
     nb_sample_by_frame = nb_pixel_by_frame * nb_sample_by_pixel
     nb_pts     = nb_pixel_by_frame * nb_frame_by_pulse * nb_pulse
-    overSample = nb_sample_by_pixel
+    over_sample = nb_sample_by_pixel
 
     ########################################################
     # generate data
@@ -102,7 +102,7 @@ def test_mux_squid_top():
     pts_list = obj_attr.run()
 
     obj_over = OverSample(pts_list_p=pts_list)
-    obj_over.set_oversampling(value_p=overSample)
+    obj_over.set_oversampling(value_p=over_sample)
     pts_list = obj_over.run()
 
     # tes

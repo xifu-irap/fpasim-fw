@@ -49,7 +49,7 @@ def test_oversample():
     ########################################################
 
     nb_pts = 16
-    overSample = 2
+    over_sample = 2
     obj_gen = Generator(nb_pts_p=nb_pts)
     pts_list = obj_gen.run()
 
@@ -62,7 +62,7 @@ def test_oversample():
     pts_list = obj_attr.run()
 
     obj_over = OverSample(pts_list_p=pts_list)
-    obj_over.set_oversampling(value_p=overSample)
+    obj_over.set_oversampling(value_p=over_sample)
     pts_list = obj_over.run()
 
     for pts in pts_list:

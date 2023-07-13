@@ -348,9 +348,9 @@ class SystemFpasimTopDataGen(VunitConf):
                         ref_fid.write(csv_separator)
                         ref_fid.write('data_uint')
                         ref_fid.write('\n')
-                        L_ref = len(data_ref_list)
-                        index_max = L_ref - 1
-                        for j in range(0, L_ref):
+                        len_ref = len(data_ref_list)
+                        index_max = len_ref - 1
+                        for j in range(0, len_ref):
                             addr_ref = addr_ref_list[j]
                             data_ref = data_ref_list[j]
                             ref_fid.write(addr_ref)
