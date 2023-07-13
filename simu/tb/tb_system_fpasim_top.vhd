@@ -286,20 +286,20 @@ architecture simulate of tb_system_fpasim_top is
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers
-  -- Vunit: logger for the summary
+  -- Vunit logger for the summary
   constant c_LOGGER_SUMMARY               : logger_t  := get_logger("log:summary");
   -- checkers
-  -- vunit: checker associated to the registers
+  -- vunit checker associated to the registers
   constant c_CHECKER_REG                  : checker_t := new_checker("check:reg:data");
-  -- vunit: checker associated to the tes_pulse_shape RAM
+  -- vunit checker associated to the tes_pulse_shape RAM
   constant c_CHECKER_RAM_TES_PULSE_SHAPE  : checker_t := new_checker("check:ram:tes_pulse_shape");
-  -- vunit: checker associated to the amp_squid_tf RAM
+  -- vunit checker associated to the amp_squid_tf RAM
   constant c_CHECKER_RAM_AMP_SQUID_TF     : checker_t := new_checker("check:ram:amp_squid_tf");
-  -- vunit: checker associated to the mux_squid_tf RAM
+  -- vunit checker associated to the mux_squid_tf RAM
   constant c_CHECKER_RAM_MUX_SQUID_TF     : checker_t := new_checker("check:ram:mux_squid_tf");
-  -- vunit: checker associated to the tes_steady_state RAM
+  -- vunit checker associated to the tes_steady_state RAM
   constant c_CHECKER_RAM_TES_STEADY_STATE : checker_t := new_checker("check:ram:tes_steady_state");
-  -- vunit: checker associated to the mux_squid_offset RAM
+  -- vunit checker associated to the mux_squid_offset RAM
   constant c_CHECKER_RAM_MUX_SQUID_OFFSET : checker_t := new_checker("check:ram:mux_squid_offset");
 
   -- opal kelly: write interface
@@ -347,6 +347,7 @@ begin
 -- ADC sampling clock generation
 ---------------------------------------------------------------------
   p_adc_clk_phase : process is
+    -- enable one time an instruction: add a phase
     variable v_first : integer := 1;
   begin
     -- add an initial: 90 degree phase
@@ -527,6 +528,7 @@ begin
   --   .pattern generation on adc0 and adc1
   ---------------------------------------------------------------------
   p_data_gen : process is
+    -- state value (to alternate 2 values)
     variable v_first : integer := 0;
   begin
     -- counter
@@ -620,12 +622,10 @@ begin
   end process p_data_select_bits_by_edge_clk;
 
 
-
-
   ---------------------------------------------------------------------
   -- DUT
   ---------------------------------------------------------------------
-  dut_system_fpasim_top : entity fpasim.system_fpasim_top
+  inst_system_fpasim_top : entity fpasim.system_fpasim_top
     generic map (
       g_DEBUG => false
       )
@@ -744,6 +744,7 @@ begin
 -- spi management
 ---------------------------------------------------------------------
   gen_SPI_READBACK : if true generate
+    -- output value
     signal data_tmp0 : std_logic;
   begin
 
@@ -771,8 +772,11 @@ begin
   -- log: data out
   ---------------------------------------------------------------------
   gen_log_ram_pulse_shape : if g_ENABLE_LOG = true generate
+    -- ram address
     signal addr       : std_logic_vector(15 downto 0);
+    -- ram data
     signal data       : std_logic_vector(15 downto 0);
+    -- ram data valid
     signal data_valid : std_logic;
   begin
     addr       <= o_data(31 downto 16);
@@ -808,8 +812,11 @@ begin
   end generate gen_log_ram_pulse_shape;
 
   gen_log_ram_amp_squid_tf : if g_ENABLE_LOG = true generate
+    -- ram address
     signal addr       : std_logic_vector(15 downto 0);
+    -- ram data
     signal data       : std_logic_vector(15 downto 0);
+    -- ram data valid
     signal data_valid : std_logic;
   begin
     addr       <= o_data(31 downto 16);
@@ -845,8 +852,11 @@ begin
   end generate gen_log_ram_amp_squid_tf;
 
   gen_log_ram_mux_squid_tf : if g_ENABLE_LOG = true generate
+    -- ram address
     signal addr       : std_logic_vector(15 downto 0);
+    -- ram data
     signal data       : std_logic_vector(15 downto 0);
+    -- ram data valid
     signal data_valid : std_logic;
   begin
     addr       <= o_data(31 downto 16);
@@ -882,8 +892,11 @@ begin
   end generate gen_log_ram_mux_squid_tf;
 
   gen_log_ram_tes_steady_state : if g_ENABLE_LOG = true generate
+    -- ram address
     signal addr       : std_logic_vector(15 downto 0);
+    -- ram data
     signal data       : std_logic_vector(15 downto 0);
+    -- ram data valid
     signal data_valid : std_logic;
   begin
     addr       <= o_data(31 downto 16);
@@ -919,8 +932,11 @@ begin
   end generate gen_log_ram_tes_steady_state;
 
   gen_log_ram_mux_squid_offset : if g_ENABLE_LOG = true generate
+    -- ram address
     signal addr       : std_logic_vector(15 downto 0);
+    -- ram data
     signal data       : std_logic_vector(15 downto 0);
+    -- ram data valid
     signal data_valid : std_logic;
   begin
     addr       <= o_data(31 downto 16);

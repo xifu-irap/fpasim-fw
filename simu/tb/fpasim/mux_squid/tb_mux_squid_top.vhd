@@ -258,18 +258,18 @@ architecture simulate of tb_mux_squid_top is
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- loggers
-  -- Vunit: logger for the summary
+  -- Vunit logger for the summary
   constant c_LOGGER_SUMMARY          : logger_t  := get_logger("log:summary");
   -- checkers
-  -- vunit: checker associated to the errors
+  -- vunit checker associated to the errors
   constant c_CHECKER_ERRORS          : checker_t := new_checker("check:errors");
-  -- vunit: checker associated to the data count between the input and the output
+  -- vunit checker associated to the data count between the input and the output
   constant c_CHECKER_DATA_COUNT      : checker_t := new_checker("check:data_count");
-  -- vunit: checker associated to the RAM1 configuration
+  -- vunit checker associated to the RAM1 configuration
   constant c_CHECKER_RAM1            : checker_t := new_checker("check:ram1:ram_" & g_RAM1_NAME);
-  -- vunit: checker associated to the RAM2 configuration
+  -- vunit checker associated to the RAM2 configuration
   constant c_CHECKER_RAM2            : checker_t := new_checker("check:ram2:ram_" & g_RAM2_NAME);
-  -- vunit: checker associated to the output data
+  -- vunit checker associated to the output data
   constant c_CHECKER_DATA            : checker_t := new_checker("check:out:data_out");
 
 begin
@@ -289,7 +289,9 @@ begin
   -- master fsm
   ---------------------------------------------------------------------
   p_master_fsm : process is
-    variable v_val : integer := 0;
+    -- errors value
+    variable v_val  : integer := 0;
+    -- loop end condition
     variable v_test : integer := 0;
 
   begin
@@ -612,9 +614,13 @@ begin
   -- Input: data generation
   ---------------------------------------------------------------------
   gen_data : if true generate
+    -- first pixel sample
     signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
+    -- last pixel sample
     signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
+    -- first frame sample
     signal frame_sof_vect_tmp : std_logic_vector(0 downto 0);
+    -- last frame sample
     signal frame_eof_vect_tmp : std_logic_vector(0 downto 0);
   begin
 
@@ -699,7 +705,7 @@ begin
   ---------------------------------------------------------------------
   -- DUT
   ---------------------------------------------------------------------
-  dut_mux_squid_top : entity fpasim.mux_squid_top
+  inst_mux_squid_top : entity fpasim.mux_squid_top
     generic map(
       -- pixel
       g_PIXEL_ID_WIDTH              => g_PIXEL_ID_WIDTH, -- pixel id bus width (expressed in bits). Possible values: [1; max integer value[
@@ -786,9 +792,13 @@ begin
   -- log: data out
   ---------------------------------------------------------------------
   gen_log : if g_ENABLE_LOG = true generate
+    -- first pixel sample
     signal pixel_sof_vect_tmp : std_logic_vector(0 downto 0);
+    -- last pixel sample
     signal pixel_eof_vect_tmp : std_logic_vector(0 downto 0);
+    -- first frame sample
     signal frame_sof_vect_tmp : std_logic_vector(0 downto 0);
+    -- last frame sample
     signal frame_eof_vect_tmp : std_logic_vector(0 downto 0);
   begin
     pixel_sof_vect_tmp(0) <= o_pixel_sof;
@@ -797,7 +807,9 @@ begin
     frame_eof_vect_tmp(0) <= o_frame_eof;
 
     gen_log_by_id : for i in 0 to g_NB_PIXEL_BY_FRAME - 1 generate
+      -- output filepath (one by pixel)
       constant c_FILEPATH_CHECK_DATA_OUT : string := c_OUTPUT_BASEPATH & "vhdl_data_out" & to_string(i) & ".csv";
+      -- data valid
       signal data_valid                  : std_logic;
     begin
       data_valid <= o_pixel_valid when to_integer(unsigned(o_pixel_id)) = i else '0';

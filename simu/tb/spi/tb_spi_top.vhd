@@ -131,13 +131,18 @@ architecture simulate of tb_spi_top is
   ---------------------------------------------------------------------
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
-  -- loggers
+  -- Vunit logger for the summary
   constant c_LOGGER_SUMMARY      : logger_t  := get_logger("log:summary"); -- Vunit: checker for the summary
   -- checkers
+  -- vunit checker associated to the errors
   constant c_CHECKER_ERRORS      : checker_t := new_checker("check:errors"); -- vunit: checker on the errors (spi_top module)
+  -- vunit checker associated to the errors for the cdce spi link
   constant c_CHECKER_ERRORS_CDCE : checker_t := new_checker("check:errors:cdce"); -- vunit: checker of the cdce spi bridge
+  -- vunit checker associated to the errors for the adc spi link
   constant c_CHECKER_ERRORS_ADC  : checker_t := new_checker("check:errors:adc");-- vunit: checker of the adc spi bridge
+  -- vunit checker associated to the errors for the dac spi link
   constant c_CHECKER_ERRORS_DAC  : checker_t := new_checker("check:errors:dac");-- vunit: checker of the dac spi bridge
+  -- vunit checker associated to the errors for the amc spi link
   constant c_CHECKER_ERRORS_AMC  : checker_t := new_checker("check:errors:amc");-- vunit: checker of the amc spi bridge
 
 begin
@@ -157,7 +162,7 @@ begin
   -- master fsm
   ---------------------------------------------------------------------
   p_master_fsm : process is
-
+    -- data value
     variable v_val : std_logic_vector(31 downto 0);
 
   begin
@@ -491,14 +496,10 @@ begin
     end if;
   end process;
 
-
-
-
-
 ---------------------------------------------------------------------
 -- DUT
 ---------------------------------------------------------------------
-  dut_spi_top : entity fpasim.spi_top
+  inst_spi_top : entity fpasim.spi_top
     generic map(
       g_DEBUG => false
     )
@@ -567,7 +568,9 @@ begin
 -- CDCE
 ---------------------------------------------------------------------
   gen_rd_loopback_cdce : if true generate
+    -- input data
     signal data_tmp0 : std_logic_vector(0 downto 0);
+    -- output data
     signal data_tmp1 : std_logic_vector(0 downto 0);
   begin
     data_tmp0(0) <= o_spi_sdata;
@@ -587,7 +590,9 @@ begin
 -- ADC
 ---------------------------------------------------------------------
   gen_rd_loopback_adc : if true generate
+    -- input data
     signal data_tmp0 : std_logic_vector(0 downto 0);
+    -- output data
     signal data_tmp1 : std_logic_vector(0 downto 0);
   begin
     data_tmp0(0) <= o_spi_sdata;
@@ -607,7 +612,9 @@ begin
 -- DAC
 ---------------------------------------------------------------------
   gen_rd_loopback_dac : if true generate
+    -- input data
     signal data_tmp0 : std_logic_vector(0 downto 0);
+    -- output data
     signal data_tmp1 : std_logic_vector(0 downto 0);
   begin
     data_tmp0(0) <= o_spi_sdata;
@@ -627,7 +634,9 @@ begin
 -- AMC
 ---------------------------------------------------------------------
   gen_rd_loopback_amc : if true generate
+    -- input data
     signal data_tmp0 : std_logic_vector(0 downto 0);
+    -- output data
     signal data_tmp1 : std_logic_vector(0 downto 0);
   begin
     data_tmp0(0) <= o_spi_sdata;
@@ -643,10 +652,5 @@ begin
         );
     i_mon_sdo <= data_tmp1(0);
   end generate gen_rd_loopback_amc;
-
-
-
-
-
 
 end simulate;

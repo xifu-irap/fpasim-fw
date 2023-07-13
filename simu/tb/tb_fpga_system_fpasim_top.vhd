@@ -155,6 +155,7 @@ begin
   -- ADC sampling clock generation
   ---------------------------------------------------------------------
   p_adc_clk_phase : process is
+    -- enable one time an instruction: add a phase
     variable v_first : integer := 1;
   begin
     -- add an initial: 90 degree phase
@@ -241,6 +242,7 @@ begin
   --   .pattern generation on adc0 and adc1
   ---------------------------------------------------------------------
   p_data_gen : process is
+    -- state value (to alternate 2 values)
     variable v_first : integer := 0;
   begin
     -- alternate values:
@@ -266,6 +268,7 @@ begin
 
 -- convert to float with upscale
   gen_convert : if true generate
+    -- multiplicator factor
     constant c_FACTOR : real := real(g_ADC_VPP)/2.0;
   begin
     i_adc0_real <= c_FACTOR * To_real(s_data0);
