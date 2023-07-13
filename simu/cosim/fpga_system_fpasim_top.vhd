@@ -498,7 +498,7 @@ begin
 
 
 
-  end process;
+  end process p_master_fsm;
 
   o_auto_conf_busy <= auto_conf_busy_r1;
   o_ready          <= ready_r1;

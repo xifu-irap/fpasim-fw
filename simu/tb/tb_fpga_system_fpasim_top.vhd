@@ -235,7 +235,7 @@ begin
     else
       std.env.stop;
     end if;
-  end process;
+  end process p_master_fsm;
 
   ---------------------------------------------------------------------
   -- Data Generation
