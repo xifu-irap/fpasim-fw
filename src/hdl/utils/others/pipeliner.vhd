@@ -61,12 +61,12 @@ begin
   -- add 1 register on the data path
   gen_one_pipeline : if g_NB_PIPES = 1 generate
   begin
-    process(i_clk)
+    p_pipe_data:process(i_clk)
     begin
       if rising_edge(i_clk) then
         data_r <= i_data;
       end if;
-    end process;
+    end process p_pipe_data;
     sync_tmp <= data_r;
   end generate gen_one_pipeline;
 
@@ -75,12 +75,12 @@ begin
     type t_pipeline is array (g_NB_PIPES - 1 downto 0) of std_logic_vector(i_data'range);
     signal data_pipe_r : t_pipeline := (others => (others => '0'));
   begin
-    process(i_clk)
+    p_shift_data: process(i_clk)
     begin
       if rising_edge(i_clk) then
         data_pipe_r <= data_pipe_r(data_pipe_r'high - 1 downto 0) & i_data;
       end if;
-    end process;
+    end process p_shift_data;
 
     sync_tmp <= data_pipe_r(data_pipe_r'high);
   end generate gen_multiple_pipeline;

@@ -80,12 +80,12 @@ begin
   ---------------------------------------------------------------------
   -- shift the input data
   ---------------------------------------------------------------------
-  process(i_clk)
+  p_shift_data: process(i_clk)
   begin
     if rising_edge(i_clk) then
       s_r1 <= s_r1(s_r1'high - 1 downto 0) & i_async_data;  -- Async Input <async_in>
     end if;
-  end process;
+  end process p_shift_data;
 
   -- add no register on the data path (<=> wire)
   no_pipeline : if g_PIPELINE_STAGES = 0 generate
@@ -96,23 +96,23 @@ begin
   -- add 1 register on the data path
   one_pipeline : if g_PIPELINE_STAGES = 1 generate
   begin
-    process(i_clk)
+    p_pipe_data: process(i_clk)
     begin
       if rising_edge(i_clk) then
         data_tmp <= s_r1(s_r1'high);
       end if;
-    end process;
+    end process p_pipe_data;
   end generate one_pipeline;
 
  -- add 2 or more registers on the data path
   multiple_pipeline : if g_PIPELINE_STAGES > 1 generate
   begin
-    process(i_clk)
+    p_shift_data: process(i_clk)
     begin
       if rising_edge(i_clk) then
         sreg_pipe_r1 <= sreg_pipe_r1(sreg_pipe_r1'high - 1 downto 0) & s_r1(s_r1'high);
       end if;
-    end process;
+    end process p_shift_data;
     data_tmp <= sreg_pipe_r1(sreg_pipe_r1'high);
   end generate multiple_pipeline;
 
