@@ -289,7 +289,7 @@ architecture RTL of fpasim_top is
   -- fpasim_status register value
   signal reg_fpasim_status       : std_logic_vector(31 downto 0);
 
-  -- recording Register (command)
+  -- recording Registers (command)
   ---------------------------------------------------------------------
   -- rec_ctrl register valid
   signal reg_rec_valid : std_logic;
@@ -298,6 +298,8 @@ architecture RTL of fpasim_top is
   -- rec_conf0 register value
   signal reg_rec_conf0 : std_logic_vector(31 downto 0);
 
+  -- SPI Registers
+  ---------------------------------------------------------------------
   -- to the user @usb_clk
   -- spi_wr_data register valid
   signal reg_spi_valid   : std_logic;

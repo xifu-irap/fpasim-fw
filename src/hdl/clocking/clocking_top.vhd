@@ -58,13 +58,13 @@ architecture RTL of clocking_top is
   ---------------------------------------------------------------------
   -- inst_fpasim_clk_wiz_0
   ---------------------------------------------------------------------
-  signal ref_clk             : std_logic;
-  signal dac_clk             : std_logic;
-  signal dac_clk_div         : std_logic;
-  signal dac_clk_phase90     : std_logic;
-  signal dac_clk_div_phase90 : std_logic;
-  signal sys_clk             : std_logic;
-  signal locked              : std_logic;
+  signal ref_clk             : std_logic; -- clock reference
+  signal dac_clk             : std_logic; -- dac clock (data part)
+  signal dac_clk_div         : std_logic; -- divided dac clock (data part)
+  signal dac_clk_phase90     : std_logic; -- dac clock with 90° phase (clock part)
+  signal dac_clk_div_phase90 : std_logic; -- divided dac clock with 90° phase (clock part)
+  signal sys_clk             : std_logic; -- system clock
+  signal locked              : std_logic; -- PLL locked
 
 begin
 

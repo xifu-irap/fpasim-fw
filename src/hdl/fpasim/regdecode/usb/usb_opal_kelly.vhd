@@ -124,10 +124,10 @@ architecture RTL of usb_opal_kelly is
   constant c_WIRE_PIPE_TRIG_NUMBER_OUT : integer := 31;
 
   ---- Opal Kelly signals ----
-  signal okClk : std_logic;             -- Opal Kelly Clock
-  signal okHE  : std_logic_vector(112 downto 0);
-  signal okEH  : std_logic_vector(64 downto 0);
-  signal okEHx : std_logic_vector(c_WIRE_PIPE_TRIG_NUMBER_OUT * 65 - 1 downto 0);
+  signal okClk : std_logic;   -- usb interface signal
+  signal okHE  : std_logic_vector(112 downto 0);-- usb interface signal
+  signal okEH  : std_logic_vector(64 downto 0);-- usb interface signal
+  signal okEHx : std_logic_vector(c_WIRE_PIPE_TRIG_NUMBER_OUT * 65 - 1 downto 0);-- usb interface signal
 
   -- trig in
   signal ep40_trig : std_logic_vector(31 downto 0);
@@ -136,83 +136,83 @@ architecture RTL of usb_opal_kelly is
   signal ep60_trig : std_logic_vector(31 downto 0);
 
   -- wires in
-  signal ep00_wire : std_logic_vector(31 downto 0);
-  signal ep01_wire : std_logic_vector(31 downto 0);
-  signal ep02_wire : std_logic_vector(31 downto 0);
-  signal ep03_wire : std_logic_vector(31 downto 0);
-  signal ep04_wire : std_logic_vector(31 downto 0);
-  signal ep05_wire : std_logic_vector(31 downto 0);
-  signal ep06_wire : std_logic_vector(31 downto 0);
-  signal ep07_wire : std_logic_vector(31 downto 0);
-  signal ep08_wire : std_logic_vector(31 downto 0);
-  --signal ep09_wire : std_logic_vector(31 downto 0);
-  --signal ep0A_wire : std_logic_vector(31 downto 0);
-  --signal ep0B_wire : std_logic_vector(31 downto 0);
-  signal ep0C_wire : std_logic_vector(31 downto 0);
-  signal ep0D_wire : std_logic_vector(31 downto 0);
-  --signal ep0E_wire : std_logic_vector(31 downto 0);
-  --signal ep0F_wire : std_logic_vector(31 downto 0);
-  --signal ep10_wire : std_logic_vector(31 downto 0);
-  --signal ep11_wire : std_logic_vector(31 downto 0);
-  signal ep12_wire : std_logic_vector(31 downto 0);
-  signal ep13_wire : std_logic_vector(31 downto 0);
-  signal ep14_wire : std_logic_vector(31 downto 0);
-  signal ep15_wire : std_logic_vector(31 downto 0);
-  --signal ep16_wire : std_logic_vector(31 downto 0);
-  --signal ep17_wire : std_logic_vector(31 downto 0);
-  signal ep18_wire : std_logic_vector(31 downto 0);
-  signal ep19_wire : std_logic_vector(31 downto 0);
-  --signal ep1A_wire : std_logic_vector(31 downto 0);
-  --signal ep1B_wire : std_logic_vector(31 downto 0);
-  --signal ep1C_wire : std_logic_vector(31 downto 0);
-  --signal ep1D_wire : std_logic_vector(31 downto 0);
-  --signal ep1E_wire : std_logic_vector(31 downto 0);
-  --signal ep1F_wire : std_logic_vector(31 downto 0);
+  signal ep00_wire : std_logic_vector(31 downto 0);-- wire in00
+  signal ep01_wire : std_logic_vector(31 downto 0);-- wire in01
+  signal ep02_wire : std_logic_vector(31 downto 0);-- wire in02
+  signal ep03_wire : std_logic_vector(31 downto 0);-- wire in03
+  signal ep04_wire : std_logic_vector(31 downto 0);-- wire in04
+  signal ep05_wire : std_logic_vector(31 downto 0);-- wire in05
+  signal ep06_wire : std_logic_vector(31 downto 0);-- wire in06
+  signal ep07_wire : std_logic_vector(31 downto 0);-- wire in07
+  signal ep08_wire : std_logic_vector(31 downto 0);-- wire in08
+  --signal ep09_wire : std_logic_vector(31 downto 0);-- wire in09
+  --signal ep0A_wire : std_logic_vector(31 downto 0);-- wire in10
+  --signal ep0B_wire : std_logic_vector(31 downto 0);-- wire in11
+  signal ep0C_wire : std_logic_vector(31 downto 0);-- wire in12
+  signal ep0D_wire : std_logic_vector(31 downto 0);-- wire in13
+  --signal ep0E_wire : std_logic_vector(31 downto 0);-- wire in14
+  --signal ep0F_wire : std_logic_vector(31 downto 0);-- wire in15
+  --signal ep10_wire : std_logic_vector(31 downto 0);-- wire in16
+  --signal ep11_wire : std_logic_vector(31 downto 0);-- wire in17
+  signal ep12_wire : std_logic_vector(31 downto 0);-- wire in18
+  signal ep13_wire : std_logic_vector(31 downto 0);-- wire in19
+  signal ep14_wire : std_logic_vector(31 downto 0);-- wire in20
+  signal ep15_wire : std_logic_vector(31 downto 0);-- wire in21
+  --signal ep16_wire : std_logic_vector(31 downto 0);-- wire in22
+  --signal ep17_wire : std_logic_vector(31 downto 0);-- wire in23
+  signal ep18_wire : std_logic_vector(31 downto 0);-- wire in24
+  signal ep19_wire : std_logic_vector(31 downto 0);-- wire in25
+  --signal ep1A_wire : std_logic_vector(31 downto 0);-- wire in26
+  --signal ep1B_wire : std_logic_vector(31 downto 0);-- wire in27
+  --signal ep1C_wire : std_logic_vector(31 downto 0);-- wire in28
+  --signal ep1D_wire : std_logic_vector(31 downto 0);-- wire in29
+  --signal ep1E_wire : std_logic_vector(31 downto 0);-- wire in30
+  --signal ep1F_wire : std_logic_vector(31 downto 0);-- wire in31
 
   -- wires out
-  signal ep20_wire : std_logic_vector(31 downto 0);
-  signal ep21_wire : std_logic_vector(31 downto 0);
-  signal ep22_wire : std_logic_vector(31 downto 0);
-  signal ep23_wire : std_logic_vector(31 downto 0);
-  signal ep24_wire : std_logic_vector(31 downto 0);
-  signal ep25_wire : std_logic_vector(31 downto 0);
-  signal ep26_wire : std_logic_vector(31 downto 0);
-  signal ep27_wire : std_logic_vector(31 downto 0);
-  signal ep28_wire : std_logic_vector(31 downto 0);
-  --signal ep29_wire : std_logic_vector(31 downto 0);
-  signal ep2A_wire : std_logic_vector(31 downto 0);
-  signal ep2B_wire : std_logic_vector(31 downto 0);
-  signal ep2C_wire : std_logic_vector(31 downto 0);
-  signal ep2D_wire : std_logic_vector(31 downto 0);
-  --signal ep2E_wire : std_logic_vector(31 downto 0);
-  --signal ep2F_wire : std_logic_vector(31 downto 0);
-  --signal ep30_wire : std_logic_vector(31 downto 0);
-  signal ep31_wire : std_logic_vector(31 downto 0);
-  signal ep32_wire : std_logic_vector(31 downto 0);
-  signal ep33_wire : std_logic_vector(31 downto 0);
-  signal ep34_wire : std_logic_vector(31 downto 0);
-  signal ep35_wire : std_logic_vector(31 downto 0);
-  signal ep36_wire : std_logic_vector(31 downto 0);
-  signal ep37_wire : std_logic_vector(31 downto 0);
-  signal ep38_wire : std_logic_vector(31 downto 0);
-  signal ep39_wire : std_logic_vector(31 downto 0);
-  signal ep3A_wire : std_logic_vector(31 downto 0);
-  signal ep3B_wire : std_logic_vector(31 downto 0);
-  --signal ep3C_wire : std_logic_vector(31 downto 0);
-  signal ep3D_wire : std_logic_vector(31 downto 0);
-  signal ep3E_wire : std_logic_vector(31 downto 0);
-  signal ep3F_wire : std_logic_vector(31 downto 0);
+  signal ep20_wire : std_logic_vector(31 downto 0); -- wire out00
+  signal ep21_wire : std_logic_vector(31 downto 0); -- wire out01
+  signal ep22_wire : std_logic_vector(31 downto 0); -- wire out02
+  signal ep23_wire : std_logic_vector(31 downto 0); -- wire out03
+  signal ep24_wire : std_logic_vector(31 downto 0); -- wire out04
+  signal ep25_wire : std_logic_vector(31 downto 0); -- wire out05
+  signal ep26_wire : std_logic_vector(31 downto 0); -- wire out06
+  signal ep27_wire : std_logic_vector(31 downto 0); -- wire out07
+  signal ep28_wire : std_logic_vector(31 downto 0); -- wire out08
+  --signal ep29_wire : std_logic_vector(31 downto 0); -- wire out09
+  signal ep2A_wire : std_logic_vector(31 downto 0); -- wire out10
+  signal ep2B_wire : std_logic_vector(31 downto 0); -- wire out11
+  signal ep2C_wire : std_logic_vector(31 downto 0); -- wire out12
+  signal ep2D_wire : std_logic_vector(31 downto 0); -- wire out13
+  --signal ep2E_wire : std_logic_vector(31 downto 0); -- wire out14
+  --signal ep2F_wire : std_logic_vector(31 downto 0); -- wire out15
+  --signal ep30_wire : std_logic_vector(31 downto 0); -- wire out16
+  signal ep31_wire : std_logic_vector(31 downto 0); -- wire out17
+  signal ep32_wire : std_logic_vector(31 downto 0); -- wire out18
+  signal ep33_wire : std_logic_vector(31 downto 0); -- wire out19
+  signal ep34_wire : std_logic_vector(31 downto 0); -- wire out20
+  signal ep35_wire : std_logic_vector(31 downto 0); -- wire out21
+  signal ep36_wire : std_logic_vector(31 downto 0); -- wire out22
+  signal ep37_wire : std_logic_vector(31 downto 0); -- wire out23
+  signal ep38_wire : std_logic_vector(31 downto 0); -- wire out24
+  signal ep39_wire : std_logic_vector(31 downto 0); -- wire out25
+  signal ep3A_wire : std_logic_vector(31 downto 0); -- wire out26
+  signal ep3B_wire : std_logic_vector(31 downto 0); -- wire out27
+  --signal ep3C_wire : std_logic_vector(31 downto 0); -- wire out28
+  signal ep3D_wire : std_logic_vector(31 downto 0); -- wire out29
+  signal ep3E_wire : std_logic_vector(31 downto 0); -- wire out30
+  signal ep3F_wire : std_logic_vector(31 downto 0); -- wire out31
 
   -- pipe in
-  signal ep80_pipe_valid : std_logic;
-  signal ep80_pipe       : std_logic_vector(31 downto 0);
+  signal ep80_pipe_valid : std_logic; -- pipe in valid
+  signal ep80_pipe       : std_logic_vector(31 downto 0); -- pipe in data
 
   -- pipe out
-  signal epA0_pipe_rd : std_logic;
-  signal epA0_pipe    : std_logic_vector(31 downto 0);
+  signal epA0_pipe_rd : std_logic; -- pipe out read
+  signal epA0_pipe    : std_logic_vector(31 downto 0); -- pipe out data to read
 
-  signal epA1_pipe_rd : std_logic;
-  signal epA1_pipe    : std_logic_vector(31 downto 0);
+  signal epA1_pipe_rd : std_logic; -- pipe out read
+  signal epA1_pipe    : std_logic_vector(31 downto 0); -- pipe out data to read
 
 begin
 

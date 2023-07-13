@@ -260,321 +260,490 @@ architecture RTL of regdecode_top is
   -- from the user
   ---------------------------------------------------------------------
   -- pipe
-  signal usb_pipeout_fifo_rd             : std_logic;  --  read fifo
+  signal usb_pipeout_fifo_rd             : std_logic;  --  fifo read
+  -- fifo data
   signal usb_pipeout_fifo_data           : std_logic_vector(31 downto 0);
+  -- fifo write data count
   signal usb_wireout_fifo_data_count     : std_logic_vector(31 downto 0);
+
   -- trig
   signal usb_trigout_data                : std_logic_vector(31 downto 0);
-  -- ctrl: register
+  -- ctrl register value
   signal usb_wireout_ctrl                : std_logic_vector(31 downto 0);
-  -- make_pulse: register
+  -- make_pulse register value
   signal usb_wireout_make_pulse          : std_logic_vector(31 downto 0);
-  -- common: register
+
+  -- Common Register configuration
+  ---------------------------------------------------------------------
+  -- fpasim_gain register value
   signal usb_wireout_fpasim_gain         : std_logic_vector(31 downto 0);
+  -- mux_sq_fb_delay register value
   signal usb_wireout_mux_sq_fb_delay     : std_logic_vector(31 downto 0);
+  -- amp_sq_of_delay register value
   signal usb_wireout_amp_sq_of_delay     : std_logic_vector(31 downto 0);
+  -- error_delay register value
   signal usb_wireout_error_delay         : std_logic_vector(31 downto 0);
+  -- ra_delay register value
   signal usb_wireout_ra_delay            : std_logic_vector(31 downto 0);
+  -- tes_conf register value
   signal usb_wireout_tes_conf            : std_logic_vector(31 downto 0);
+  -- conf0 register value
   signal usb_wireout_conf0               : std_logic_vector(31 downto 0);
+  -- fpasim_status register value
   signal usb_wireout_fpasim_status       : std_logic_vector(31 downto 0);
+  -- debug_ctrl register value
   signal usb_wireout_debug_ctrl          : std_logic_vector(31 downto 0);
+  -- firmware_id register value
   signal usb_wireout_firmware_id         : std_logic_vector(31 downto 0);
+  -- firmware_version register value
   signal usb_wireout_firmware_version    : std_logic_vector(31 downto 0);
+  -- board_id register value
   signal usb_wireout_board_id            : std_logic_vector(31 downto 0);
-  -- recording: register
+
+  -- recording Registers
+  ---------------------------------------------------------------------
+  -- rec_ctrl register value
   signal usb_wireout_rec_ctrl            : std_logic_vector(31 downto 0);
+  -- rec_conf0 register value
   signal usb_wireout_rec_conf0           : std_logic_vector(31 downto 0);
+
   -- recording: pipe
   signal usb_pipeout_rec_fifo_adc_rd     : std_logic;  --  read fifo
+   -- rec read data
   signal usb_pipeout_rec_fifo_adc_data   : std_logic_vector(31 downto 0);
+  -- rec write data count
   signal usb_wireout_rec_fifo_data_count : std_logic_vector(31 downto 0);
-  -- spi: register
+
+  -- SPI Registers
+  ---------------------------------------------------------------------
+  -- spi_ctrl register value
   signal usb_wireout_spi_ctrl            : std_logic_vector(31 downto 0);
+  -- spi_conf0 register value
   signal usb_wireout_spi_conf0           : std_logic_vector(31 downto 0);
+  -- spi_conf1 register value
   signal usb_wireout_spi_conf1           : std_logic_vector(31 downto 0);
+  -- spi_wr_data register value
   signal usb_wireout_spi_wr_data         : std_logic_vector(31 downto 0);
 
   -- errors/status
+  -- sel_errors register value
   signal usb_wireout_sel_errors : std_logic_vector(31 downto 0);
+  -- errors register value
   signal usb_wireout_errors     : std_logic_vector(31 downto 0);
+  -- status register value
   signal usb_wireout_status     : std_logic_vector(31 downto 0);
 
   -- to the user
   ---------------------------------------------------------------------
+  -- usb clock
   signal usb_clk                    : std_logic;
-  -- pipe
+  -- pipe_in valid
   signal usb_pipein_fifo_valid      : std_logic;
+  -- pipe_in data
   signal usb_pipein_fifo            : std_logic_vector(31 downto 0);
   -- trig
   signal usb_trigin_data            : std_logic_vector(31 downto 0);
-  -- ctrl: register
+
+  -- ctrl register value
   signal usb_wirein_ctrl            : std_logic_vector(31 downto 0);
-  -- make_pulse: register
+  -- make_pulse register value
   signal usb_wirein_make_pulse      : std_logic_vector(31 downto 0);
-  -- common: register
+
+  -- Common Register configuration
+  ---------------------------------------------------------------------
+  -- fpasim_gain register value
   signal usb_wirein_fpasim_gain     : std_logic_vector(31 downto 0);
+  -- mux_sq_fb_delay register value
   signal usb_wirein_mux_sq_fb_delay : std_logic_vector(31 downto 0);
+  -- amp_sq_of_delay register value
   signal usb_wirein_amp_sq_of_delay : std_logic_vector(31 downto 0);
+  -- error_delay register value
   signal usb_wirein_error_delay     : std_logic_vector(31 downto 0);
+  -- ra_delay register value
   signal usb_wirein_ra_delay        : std_logic_vector(31 downto 0);
+  -- tes_conf register value
   signal usb_wirein_tes_conf        : std_logic_vector(31 downto 0);
+  -- conf0 register value
   signal usb_wirein_conf0           : std_logic_vector(31 downto 0);
-  -- recording: register
+
+  -- recording Registers
+  ---------------------------------------------------------------------
+  -- rec_ctrl register value
   signal usb_wirein_rec_ctrl        : std_logic_vector(31 downto 0);
+  -- rec_conf0 register value
   signal usb_wirein_rec_conf0       : std_logic_vector(31 downto 0);
 
-  -- spi:register
+  -- SPI Registers
+  ---------------------------------------------------------------------
+  -- spi_ctrl register value
   signal usb_wirein_spi_ctrl    : std_logic_vector(31 downto 0);
+  -- spi_conf0 register value
   signal usb_wirein_spi_conf0   : std_logic_vector(31 downto 0);
+  -- spi_conf1 register value
   signal usb_wirein_spi_conf1   : std_logic_vector(31 downto 0);
+  -- spi_wr_data register value
   signal usb_wirein_spi_wr_data : std_logic_vector(31 downto 0);
 
-  -- debug: register
+  -- Debug Registers
+  ---------------------------------------------------------------------
+  -- debug_ctrl register value
   signal usb_wirein_debug_ctrl : std_logic_vector(31 downto 0);
+  -- sel_errors register value
   signal usb_wirein_sel_errors : std_logic_vector(31 downto 0);
 
   ---------------------------------------------------------------------
   -- regdecode_pipe
   ---------------------------------------------------------------------
+  -- write common registers
   signal trig_reg_valid        : std_logic;
+  -- write make_pulse register
   signal trig_make_pulse_valid : std_logic;
+  -- read all RAM contents
   signal trig_rd_all_valid     : std_logic;
+  -- write ctrl register
   signal trig_ctrl_valid       : std_logic;
+  -- write debug_ctrl register
   signal trig_debug_valid      : std_logic;
+  -- write rec_ctrl register
   signal trig_rec_valid        : std_logic;
+  -- write spi_wr_data register
   signal trig_spi_valid        : std_logic;
 
+  -- pipein valid
   signal pipein_valid0 : std_logic;
+  -- pipein address
   signal pipein_addr0  : std_logic_vector(15 downto 0);
+  -- pipein data
   signal pipein_data0  : std_logic_vector(15 downto 0);
 
+  -- fifo read (RAM)
   signal pipeout_rd         : std_logic;
+  -- fifo first word (RAM)
   signal pipeout_sof        : std_logic;
+  -- fifo last word (RAM)
   signal pipeout_eof        : std_logic;
+  -- fifo data valid (RAM)
   signal pipeout_valid      : std_logic;
+  -- fifo address (RAM)
   signal pipeout_addr       : std_logic_vector(15 downto 0);
+  -- fifo data (RAM)
   signal pipeout_data       : std_logic_vector(15 downto 0);
+  -- fifo empty (RAM)
   signal pipeout_empty      : std_logic;
+  -- fifo write data count (RAM)
   signal pipeout_data_count : std_logic_vector(15 downto 0);
 
   -- tes_pulse_shape
   -- ram: wr
+  -- ram write enable
   signal tes_pulse_shape_ram_wr_en      : std_logic;
+  -- ram write/read address
   signal tes_pulse_shape_ram_wr_rd_addr : std_logic_vector(o_tes_pulse_shape_ram_wr_rd_addr'range);
+  -- ram write data
   signal tes_pulse_shape_ram_wr_data    : std_logic_vector(o_tes_pulse_shape_ram_wr_data'range);
-  -- ram: rd
+  -- ram read enable
   signal tes_pulse_shape_ram_rd_en      : std_logic;
 
   -- amp_squid_tf
   -- ram: wr
+  -- ram write enable
   signal amp_squid_tf_ram_wr_en      : std_logic;
+  -- ram write/read address
   signal amp_squid_tf_ram_wr_rd_addr : std_logic_vector(o_amp_squid_tf_ram_wr_rd_addr'range);
+  -- ram write data
   signal amp_squid_tf_ram_wr_data    : std_logic_vector(o_amp_squid_tf_ram_wr_data'range);
-  -- ram: rd
+  -- ram read enable
   signal amp_squid_tf_ram_rd_en      : std_logic;
 
   -- mux_squid_tf
   -- ram: wr
+  -- ram write enable
   signal mux_squid_tf_ram_wr_en      : std_logic;
+  -- ram write/read address
   signal mux_squid_tf_ram_wr_rd_addr : std_logic_vector(o_mux_squid_tf_ram_wr_rd_addr'range);
+  -- ram write data
   signal mux_squid_tf_ram_wr_data    : std_logic_vector(o_mux_squid_tf_ram_wr_data'range);
-  -- ram: rd
+  -- ram read enable
   signal mux_squid_tf_ram_rd_en      : std_logic;
 
   -- tes_std_state
   -- ram: wr
+  -- ram write enable
   signal tes_std_state_ram_wr_en      : std_logic;
+  -- ram write/read address
   signal tes_std_state_ram_wr_rd_addr : std_logic_vector(o_tes_std_state_ram_wr_rd_addr'range);
+  -- ram write data
   signal tes_std_state_ram_wr_data    : std_logic_vector(o_tes_std_state_ram_wr_data'range);
-  -- ram: rd
+  -- ram read enable
   signal tes_std_state_ram_rd_en      : std_logic;
 
   -- mux_squid_offset
   -- ram: wr
+  -- ram write enable
   signal mux_squid_offset_ram_wr_en      : std_logic;
+  -- ram write/read address
   signal mux_squid_offset_ram_wr_rd_addr : std_logic_vector(o_mux_squid_offset_ram_wr_rd_addr'range);
+  -- ram write data
   signal mux_squid_offset_ram_wr_data    : std_logic_vector(o_mux_squid_offset_ram_wr_data'range);
-  -- ram: rd
+  -- ram read enable
   signal mux_squid_offset_ram_rd_en      : std_logic;
 
   -- errors
-  signal regdecode_pipe_errors5 : std_logic_vector(15 downto 0);
-  signal regdecode_pipe_errors4 : std_logic_vector(15 downto 0);
-  signal regdecode_pipe_errors3 : std_logic_vector(15 downto 0);
-  signal regdecode_pipe_errors2 : std_logic_vector(15 downto 0);
-  signal regdecode_pipe_errors1 : std_logic_vector(15 downto 0);
-  signal regdecode_pipe_errors0 : std_logic_vector(15 downto 0);
+  signal regdecode_pipe_errors5 : std_logic_vector(15 downto 0); -- RAM pipe errors5
+  signal regdecode_pipe_errors4 : std_logic_vector(15 downto 0); -- RAM pipe errors4
+  signal regdecode_pipe_errors3 : std_logic_vector(15 downto 0); -- RAM pipe errors3
+  signal regdecode_pipe_errors2 : std_logic_vector(15 downto 0); -- RAM pipe errors2
+  signal regdecode_pipe_errors1 : std_logic_vector(15 downto 0); -- RAM pipe errors1
+  signal regdecode_pipe_errors0 : std_logic_vector(15 downto 0); -- RAM pipe errors0
   -- status
-  signal regdecode_pipe_status5 : std_logic_vector(7 downto 0);
-  signal regdecode_pipe_status4 : std_logic_vector(7 downto 0);
-  signal regdecode_pipe_status3 : std_logic_vector(7 downto 0);
-  signal regdecode_pipe_status2 : std_logic_vector(7 downto 0);
-  signal regdecode_pipe_status1 : std_logic_vector(7 downto 0);
-  signal regdecode_pipe_status0 : std_logic_vector(7 downto 0);
+  signal regdecode_pipe_status5 : std_logic_vector(7 downto 0);  -- RAM pipe status5
+  signal regdecode_pipe_status4 : std_logic_vector(7 downto 0);  -- RAM pipe status4
+  signal regdecode_pipe_status3 : std_logic_vector(7 downto 0);  -- RAM pipe status3
+  signal regdecode_pipe_status2 : std_logic_vector(7 downto 0);  -- RAM pipe status2
+  signal regdecode_pipe_status1 : std_logic_vector(7 downto 0);  -- RAM pipe status1
+  signal regdecode_pipe_status0 : std_logic_vector(7 downto 0);  -- RAM pipe status0
 
   ---------------------------------------------------------------------
   -- wire: common registers
   ---------------------------------------------------------------------
-  constant c_REG_IDX0_L : integer := 0;
-  constant c_REG_IDX0_H : integer := c_REG_IDX0_L + usb_wirein_fpasim_gain'length - 1;
+  constant c_REG_IDX0_L : integer := 0; -- index0: low
+  constant c_REG_IDX0_H : integer := c_REG_IDX0_L + usb_wirein_fpasim_gain'length - 1; -- index0: high
 
-  constant c_REG_IDX1_L : integer := c_REG_IDX0_H + 1;
-  constant c_REG_IDX1_H : integer := c_REG_IDX1_L + usb_wirein_mux_sq_fb_delay'length - 1;
+  constant c_REG_IDX1_L : integer := c_REG_IDX0_H + 1; -- index1: low
+  constant c_REG_IDX1_H : integer := c_REG_IDX1_L + usb_wirein_mux_sq_fb_delay'length - 1; -- index1: high
 
-  constant c_REG_IDX2_L : integer := c_REG_IDX1_H + 1;
-  constant c_REG_IDX2_H : integer := c_REG_IDX2_L + usb_wirein_amp_sq_of_delay'length - 1;
+  constant c_REG_IDX2_L : integer := c_REG_IDX1_H + 1; -- index2: low
+  constant c_REG_IDX2_H : integer := c_REG_IDX2_L + usb_wirein_amp_sq_of_delay'length - 1; -- index2: high
 
-  constant c_REG_IDX3_L : integer := c_REG_IDX2_H + 1;
-  constant c_REG_IDX3_H : integer := c_REG_IDX3_L + usb_wirein_error_delay'length - 1;
+  constant c_REG_IDX3_L : integer := c_REG_IDX2_H + 1; -- index3: low
+  constant c_REG_IDX3_H : integer := c_REG_IDX3_L + usb_wirein_error_delay'length - 1; -- index3: high
 
-  constant c_REG_IDX4_L : integer := c_REG_IDX3_H + 1;
-  constant c_REG_IDX4_H : integer := c_REG_IDX4_L + usb_wirein_ra_delay'length - 1;
+  constant c_REG_IDX4_L : integer := c_REG_IDX3_H + 1; -- index4: low
+  constant c_REG_IDX4_H : integer := c_REG_IDX4_L + usb_wirein_ra_delay'length - 1; -- index4: high
 
-  constant c_REG_IDX5_L : integer := c_REG_IDX4_H + 1;
-  constant c_REG_IDX5_H : integer := c_REG_IDX5_L + usb_wirein_tes_conf'length - 1;
+  constant c_REG_IDX5_L : integer := c_REG_IDX4_H + 1; -- index5: low
+  constant c_REG_IDX5_H : integer := c_REG_IDX5_L + usb_wirein_tes_conf'length - 1; -- index5: high
 
-  constant c_REG_IDX6_L : integer := c_REG_IDX5_H + 1;
-  constant c_REG_IDX6_H : integer := c_REG_IDX6_L + usb_wirein_conf0'length - 1;
+  constant c_REG_IDX6_L : integer := c_REG_IDX5_H + 1; -- index6: low
+  constant c_REG_IDX6_H : integer := c_REG_IDX6_L + usb_wirein_conf0'length - 1; -- index6: high
 
+  -- common register: data valid in
   signal reg_data_valid_tmp0 : std_logic;
+  -- common register: data  in
   signal reg_data_tmp0       : std_logic_vector(c_REG_IDX6_H downto 0);
 
+  -- common register: fifo read
   signal reg_rd_tmp1    : std_logic;
-  -- signal reg_data_valid_tmp1 : std_logic;
+  -- common register: fifo data out
   signal reg_data_tmp1  : std_logic_vector(c_REG_IDX6_H downto 0);
+  -- common register: fifo empty flag
   signal reg_empty_tmp1 : std_logic;
 
+  -- common register: fifo data valid
   signal reg_data_valid_tmp2 : std_logic;
+  -- common register: fifo data
   signal reg_data_tmp2       : std_logic_vector(c_REG_IDX6_H downto 0);
 
+  -- common register: errors
   signal reg_errors : std_logic_vector(15 downto 0);
+  -- common register: status
   signal reg_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- wire: control register
   ---------------------------------------------------------------------
+  -- ctrl register: data valid in
   signal ctrl_data_valid_tmp0 : std_logic;
+  -- ctrl register: data in
   signal ctrl_data_tmp0       : std_logic_vector(usb_wirein_ctrl'range);
 
+  -- ctrl register: fifo read
   signal ctrl_rd_tmp1    : std_logic;
-  -- signal ctrl_data_valid_tmp1 : std_logic;
+  -- ctrl register: fifo data out
   signal ctrl_data_tmp1  : std_logic_vector(usb_wirein_ctrl'range);
+  -- ctrl register: fifo empty flag
   signal ctrl_empty_tmp1 : std_logic;
 
+  -- ctrl register: fifo data valid
   signal ctrl_data_valid_tmp2 : std_logic;
+  -- ctrl register: fifo data out
   signal ctrl_data_tmp2       : std_logic_vector(usb_wirein_ctrl'range);
 
+  -- ctrl register: errors
   signal ctrl_errors : std_logic_vector(15 downto 0);
+  -- ctrl register: status
   signal ctrl_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- wire: debug control register
   ---------------------------------------------------------------------
+  -- reset_status @usb_clk
   signal usb_rst_status  : std_logic;
+  -- debug_pulse @usb_clk
   signal usb_debug_pulse : std_logic;
 
+
+  -- debug_ctrl register: data_valid in
   signal debug_ctrl_data_valid_tmp0 : std_logic;
+  -- debug_ctrl register: data in
   signal debug_ctrl_data_tmp0       : std_logic_vector(usb_wirein_debug_ctrl'range);
 
+  -- debug_ctrl register: fifo read
   signal debug_ctrl_rd_tmp1    : std_logic;
-  -- signal debug_ctrl_data_valid_tmp1 : std_logic;
+  -- debug_ctrl register: fifo data out
   signal debug_ctrl_data_tmp1  : std_logic_vector(usb_wirein_debug_ctrl'range);
+  -- debug_ctrl register: fifo empty flag
   signal debug_ctrl_empty_tmp1 : std_logic;
 
+  -- debug_ctrl register: fifo data valid
   signal debug_ctrl_data_valid_tmp2 : std_logic;
+  -- debug_ctrl register: fifo data out
   signal debug_ctrl_data_tmp2       : std_logic_vector(usb_wirein_debug_ctrl'range);
 
+  -- debug_ctrl register: errors
   signal debug_ctrl_errors : std_logic_vector(15 downto 0);
+  -- debug_ctrl register: status
   signal debug_ctrl_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- wire: make pulse register
   ---------------------------------------------------------------------
+  -- Number of pixels by frame
   signal pixel_nb                      : std_logic_vector(pkg_TES_CONF_NB_PIXEL_BY_FRAME_WIDTH - 1 downto 0);
+  -- make_pulse register: data valid in
   signal make_pulse_data_valid_tmp0    : std_logic;
+  -- make_pulse register: data in
   signal make_pulse_data_tmp0          : std_logic_vector(usb_wirein_make_pulse'range);
+  -- make_pulse register: fifo wr data count
   signal make_pulse_wr_data_count_tmp0 : std_logic_vector(15 downto 0);
 
+  -- make_pulse register: fifo read
   signal make_pulse_rd_tmp1    : std_logic;
+  -- make_pulse register: fifo data out
   signal make_pulse_data_tmp1  : std_logic_vector(usb_wirein_make_pulse'range);
+  -- make_pulse register: fifo empty flag
   signal make_pulse_empty_tmp1 : std_logic;
 
+  -- make_pulse register: fifo read
   signal make_pulse_rd_tmp2         : std_logic;
+  -- make_pulse register: first word
   signal make_pulse_sof_tmp2        : std_logic;
+  -- make_pulse register: last word
   signal make_pulse_eof_tmp2        : std_logic;
+  -- make_pulse register: fifo data valid
   signal make_pulse_data_valid_tmp2 : std_logic;
+  -- make_pulse register: fifo data out
   signal make_pulse_data_tmp2       : std_logic_vector(usb_wirein_make_pulse'range);
+  -- make_pulse register: fifo empty flag
   signal make_pulse_empty_tmp2      : std_logic;
 
+  -- make_pulse register: errors
   signal make_pulse_errors : std_logic_vector(15 downto 0);
+  -- make_pulse register: status
   signal make_pulse_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- wire: fpasim_status
   ---------------------------------------------------------------------
-
+  -- fpasim_status register: data valid out
   signal fpasim_status_valid  : std_logic;
+  -- fpasim_status register: data out
   signal fpasim_status        : std_logic_vector(i_reg_fpasim_status'range);
-  signal fpasim_status_errors : std_logic_vector(15 downto 0);
-  signal fpasim_status_status : std_logic_vector(7 downto 0);
 
+  -- fpasim_status register: errors
+  signal fpasim_status_errors : std_logic_vector(15 downto 0);
+  -- fpasim_status register: status
+  signal fpasim_status_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- wire/pipe: recording register
   ---------------------------------------------------------------------
+  -- rec register: data valid in
   signal rec_valid_tmp0 : std_logic;
+  -- rec_ctrl register: data
   signal rec_ctrl_tmp0  : std_logic_vector(usb_wirein_rec_ctrl'range);
+  -- rec_conf0 register: data
   signal rec_conf0_tmp0 : std_logic_vector(usb_wirein_rec_conf0'range);
 
+  -- rec register: data valid
   signal rec_valid_tmp2 : std_logic;
+  -- rec_ctrl register: data
   signal rec_ctrl_tmp2  : std_logic_vector(usb_wirein_rec_ctrl'range);
+  -- rec_conf0 register: data
   signal rec_conf0_tmp2 : std_logic_vector(usb_wirein_rec_conf0'range);
 
   -- from user: fifo
   signal reg_fifo_rec_adc_rd : std_logic;
 
   -- to usb: register
+  ---------------------------------------------------------------------
+  -- rec register: data valid
   signal usb_rec_valid              : std_logic;
+  -- rec_ctrl register: data
   signal usb_rec_ctrl               : std_logic_vector(usb_wireout_rec_ctrl'range);
+  -- rec_conf0 register: data
   signal usb_rec_conf0              : std_logic_vector(usb_wireout_rec_conf0'range);
+
   -- to usb: fifo
+  ---------------------------------------------------------------------
   signal usb_fifo_adc_rd            : std_logic;  -- fifo read enable
   signal usb_fifo_adc_sof           : std_logic;  -- fifo first sample
   signal usb_fifo_adc_eof           : std_logic;  -- fifo last sample
   signal usb_fifo_adc_data_valid    : std_logic;  -- fifo data valid
   signal usb_fifo_adc_data          : std_logic_vector(usb_pipeout_rec_fifo_adc_data'range);  -- fifo data
   signal usb_fifo_adc_empty         : std_logic;  -- fifo empty flag
-  signal usb_fifo_adc_wr_data_count : std_logic_vector(15 downto 0);
+  signal usb_fifo_adc_wr_data_count : std_logic_vector(15 downto 0); -- fifo write data count
 
+  -- regdecode_recording errors1
   signal rec_errors1 : std_logic_vector(15 downto 0);
+  -- regdecode_recording errors0
   signal rec_errors0 : std_logic_vector(15 downto 0);
+  -- regdecode_recording status1
   signal rec_status1 : std_logic_vector(7 downto 0);
+  -- regdecode_recording status0
   signal rec_status0 : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- wire: errors registers
   ---------------------------------------------------------------------
+  -- selected errors
   signal error_sel : std_logic_vector(pkg_ERROR_SEL_WIDTH - 1 downto 0);
 
+  -- errors register: data valid
   signal wire_errors_valid : std_logic;
+  -- errors register: data
   signal wire_errors       : std_logic_vector(i_reg_wire_errors0'range);
+  -- status register: data
   signal wire_status       : std_logic_vector(i_reg_wire_status0'range);
 
+  -- regdecode errors6
   signal regdecode_errors6 : std_logic_vector(i_reg_wire_errors0'range);
+  -- regdecode errors5
   signal regdecode_errors5 : std_logic_vector(i_reg_wire_errors0'range);
+  -- regdecode errors4
   signal regdecode_errors4 : std_logic_vector(i_reg_wire_errors0'range);
+  -- regdecode errors3
   signal regdecode_errors3 : std_logic_vector(i_reg_wire_errors0'range);
+  -- regdecode errors2
   signal regdecode_errors2 : std_logic_vector(i_reg_wire_errors0'range);
+  -- regdecode errors1
   signal regdecode_errors1 : std_logic_vector(i_reg_wire_errors0'range);
+  -- regdecode errors0
   signal regdecode_errors0 : std_logic_vector(i_reg_wire_errors0'range);
 
+  -- regdecode status6
   signal regdecode_status6 : std_logic_vector(i_reg_wire_status0'range);
+  -- regdecode status5
   signal regdecode_status5 : std_logic_vector(i_reg_wire_status0'range);
+  -- regdecode status4
   signal regdecode_status4 : std_logic_vector(i_reg_wire_status0'range);
+  -- regdecode status3
   signal regdecode_status3 : std_logic_vector(i_reg_wire_status0'range);
+  -- regdecode status2
   signal regdecode_status2 : std_logic_vector(i_reg_wire_status0'range);
+  -- regdecode status1
   signal regdecode_status1 : std_logic_vector(i_reg_wire_status0'range);
+  -- regdecode status0
   signal regdecode_status0 : std_logic_vector(i_reg_wire_status0'range);
 
 begin
@@ -1174,8 +1343,8 @@ begin
       ---------------------------------------------------------------------
       i_clk                        => usb_clk,         -- clock
       i_rst                        => i_usb_rst,       -- reset
-      i_rst_status                 => usb_rst_status,  -- not connected
-      i_debug_pulse                => usb_debug_pulse,     -- not connected
+      i_rst_status                 => usb_rst_status,
+      i_debug_pulse                => usb_debug_pulse,
       -- data
       i_rec_valid                  => rec_valid_tmp0,  -- register data valid
       i_rec_ctrl                   => rec_ctrl_tmp0,   -- register ctrl value
