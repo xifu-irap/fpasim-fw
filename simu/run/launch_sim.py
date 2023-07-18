@@ -96,7 +96,7 @@ if __name__ == '__main__':
                         help='define a test name or  list of test names (separated by space) to simulate. The test_section_dic of the launch_sim_processed.json file defines the available test name')
     # add an optional argument 
     parser.add_argument('--gui_mode', default='False', choices=['True', 'False'],
-                        help='Specify if the simulator is in gui mode or not. Possible values: true or false')
+                        help='Specify if the simulator is in gui mode or not. Possible values: True or False')
     # add an optional argument
     parser.add_argument('--verbosity','-v', default=0, choices=[0, 1, 2], type=int,
                         help='Specify the verbosity level. Possible values (uint): 0 to 2')
