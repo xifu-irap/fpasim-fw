@@ -198,7 +198,6 @@ entity regdecode_top is
     ---------------------------------------------------------------------
     -- common register
     o_reg_valid                       : out std_logic;  -- register valid
-    o_reg_fpasim_gain                 : out std_logic_vector(31 downto 0);  -- register fpasim_gain value
     o_reg_mux_sq_fb_delay             : out std_logic_vector(31 downto 0);  -- register mux_sq_fb_delay value
     o_reg_amp_sq_of_delay             : out std_logic_vector(31 downto 0);  -- register amp_sq_of_delay value
     o_reg_error_delay                 : out std_logic_vector(31 downto 0);  -- register error_delay value
@@ -275,8 +274,6 @@ architecture RTL of regdecode_top is
 
   -- Common Register configuration
   ---------------------------------------------------------------------
-  -- fpasim_gain register value
-  signal usb_wireout_fpasim_gain         : std_logic_vector(31 downto 0);
   -- mux_sq_fb_delay register value
   signal usb_wireout_mux_sq_fb_delay     : std_logic_vector(31 downto 0);
   -- amp_sq_of_delay register value
@@ -351,8 +348,6 @@ architecture RTL of regdecode_top is
 
   -- Common Register configuration
   ---------------------------------------------------------------------
-  -- fpasim_gain register value
-  signal usb_wirein_fpasim_gain     : std_logic_vector(31 downto 0);
   -- mux_sq_fb_delay register value
   signal usb_wirein_mux_sq_fb_delay : std_logic_vector(31 downto 0);
   -- amp_sq_of_delay register value
@@ -506,43 +501,40 @@ architecture RTL of regdecode_top is
   ---------------------------------------------------------------------
   -- wire: common registers
   ---------------------------------------------------------------------
-  constant c_REG_IDX0_L : integer := 0; -- index0: low
-  constant c_REG_IDX0_H : integer := c_REG_IDX0_L + usb_wirein_fpasim_gain'length - 1; -- index0: high
+  constant c_REG_IDX0_L : integer := 0; -- index1: low
+  constant c_REG_IDX0_H : integer := c_REG_IDX0_L + usb_wirein_mux_sq_fb_delay'length - 1; -- index1: high
 
-  constant c_REG_IDX1_L : integer := c_REG_IDX0_H + 1; -- index1: low
-  constant c_REG_IDX1_H : integer := c_REG_IDX1_L + usb_wirein_mux_sq_fb_delay'length - 1; -- index1: high
+  constant c_REG_IDX1_L : integer := c_REG_IDX0_H + 1; -- index2: low
+  constant c_REG_IDX1_H : integer := c_REG_IDX1_L + usb_wirein_amp_sq_of_delay'length - 1; -- index2: high
 
-  constant c_REG_IDX2_L : integer := c_REG_IDX1_H + 1; -- index2: low
-  constant c_REG_IDX2_H : integer := c_REG_IDX2_L + usb_wirein_amp_sq_of_delay'length - 1; -- index2: high
+  constant c_REG_IDX2_L : integer := c_REG_IDX1_H + 1; -- index3: low
+  constant c_REG_IDX2_H : integer := c_REG_IDX2_L + usb_wirein_error_delay'length - 1; -- index3: high
 
-  constant c_REG_IDX3_L : integer := c_REG_IDX2_H + 1; -- index3: low
-  constant c_REG_IDX3_H : integer := c_REG_IDX3_L + usb_wirein_error_delay'length - 1; -- index3: high
+  constant c_REG_IDX3_L : integer := c_REG_IDX2_H + 1; -- index4: low
+  constant c_REG_IDX3_H : integer := c_REG_IDX3_L + usb_wirein_ra_delay'length - 1; -- index4: high
 
-  constant c_REG_IDX4_L : integer := c_REG_IDX3_H + 1; -- index4: low
-  constant c_REG_IDX4_H : integer := c_REG_IDX4_L + usb_wirein_ra_delay'length - 1; -- index4: high
+  constant c_REG_IDX4_L : integer := c_REG_IDX3_H + 1; -- index5: low
+  constant c_REG_IDX4_H : integer := c_REG_IDX4_L + usb_wirein_tes_conf'length - 1; -- index5: high
 
-  constant c_REG_IDX5_L : integer := c_REG_IDX4_H + 1; -- index5: low
-  constant c_REG_IDX5_H : integer := c_REG_IDX5_L + usb_wirein_tes_conf'length - 1; -- index5: high
-
-  constant c_REG_IDX6_L : integer := c_REG_IDX5_H + 1; -- index6: low
-  constant c_REG_IDX6_H : integer := c_REG_IDX6_L + usb_wirein_conf0'length - 1; -- index6: high
+  constant c_REG_IDX5_L : integer := c_REG_IDX4_H + 1; -- index6: low
+  constant c_REG_IDX5_H : integer := c_REG_IDX5_L + usb_wirein_conf0'length - 1; -- index6: high
 
   -- common register: data valid in
   signal reg_data_valid_tmp0 : std_logic;
   -- common register: data  in
-  signal reg_data_tmp0       : std_logic_vector(c_REG_IDX6_H downto 0);
+  signal reg_data_tmp0       : std_logic_vector(c_REG_IDX5_H downto 0);
 
   -- common register: fifo read
   signal reg_rd_tmp1    : std_logic;
   -- common register: fifo data out
-  signal reg_data_tmp1  : std_logic_vector(c_REG_IDX6_H downto 0);
+  signal reg_data_tmp1  : std_logic_vector(c_REG_IDX5_H downto 0);
   -- common register: fifo empty flag
   signal reg_empty_tmp1 : std_logic;
 
   -- common register: fifo data valid
   signal reg_data_valid_tmp2 : std_logic;
   -- common register: fifo data
-  signal reg_data_tmp2       : std_logic_vector(c_REG_IDX6_H downto 0);
+  signal reg_data_tmp2       : std_logic_vector(c_REG_IDX5_H downto 0);
 
   -- common register: errors
   signal reg_errors : std_logic_vector(15 downto 0);
@@ -767,7 +759,6 @@ begin
       -- wire
       i_usb_wireout_ctrl            => usb_wireout_ctrl,
       i_usb_wireout_make_pulse      => usb_wireout_make_pulse,
-      i_usb_wireout_fpasim_gain     => usb_wireout_fpasim_gain,
       i_usb_wireout_mux_sq_fb_delay => usb_wireout_mux_sq_fb_delay,
       i_usb_wireout_amp_sq_of_delay => usb_wireout_amp_sq_of_delay,
       i_usb_wireout_error_delay     => usb_wireout_error_delay,
@@ -811,7 +802,6 @@ begin
       -- wire
       o_usb_wirein_ctrl            => usb_wirein_ctrl,
       o_usb_wirein_make_pulse      => usb_wirein_make_pulse,
-      o_usb_wirein_fpasim_gain     => usb_wirein_fpasim_gain,
       o_usb_wirein_mux_sq_fb_delay => usb_wirein_mux_sq_fb_delay,
       o_usb_wirein_amp_sq_of_delay => usb_wirein_amp_sq_of_delay,
       o_usb_wirein_error_delay     => usb_wirein_error_delay,
@@ -1037,13 +1027,12 @@ begin
   -- common register
   ---------------------------------------------------------------------
   reg_data_valid_tmp0                             <= trig_reg_valid;
-  reg_data_tmp0(c_REG_IDX6_H downto c_REG_IDX6_L) <= usb_wirein_conf0;
-  reg_data_tmp0(c_REG_IDX5_H downto c_REG_IDX5_L) <= usb_wirein_tes_conf;
-  reg_data_tmp0(c_REG_IDX4_H downto c_REG_IDX4_L) <= usb_wirein_ra_delay;
-  reg_data_tmp0(c_REG_IDX3_H downto c_REG_IDX3_L) <= usb_wirein_error_delay;
-  reg_data_tmp0(c_REG_IDX2_H downto c_REG_IDX2_L) <= usb_wirein_amp_sq_of_delay;
-  reg_data_tmp0(c_REG_IDX1_H downto c_REG_IDX1_L) <= usb_wirein_mux_sq_fb_delay;
-  reg_data_tmp0(c_REG_IDX0_H downto c_REG_IDX0_L) <= usb_wirein_fpasim_gain;
+  reg_data_tmp0(c_REG_IDX5_H downto c_REG_IDX5_L) <= usb_wirein_conf0;
+  reg_data_tmp0(c_REG_IDX4_H downto c_REG_IDX4_L) <= usb_wirein_tes_conf;
+  reg_data_tmp0(c_REG_IDX3_H downto c_REG_IDX3_L) <= usb_wirein_ra_delay;
+  reg_data_tmp0(c_REG_IDX2_H downto c_REG_IDX2_L) <= usb_wirein_error_delay;
+  reg_data_tmp0(c_REG_IDX1_H downto c_REG_IDX1_L) <= usb_wirein_amp_sq_of_delay;
+  reg_data_tmp0(c_REG_IDX0_H downto c_REG_IDX0_L) <= usb_wirein_mux_sq_fb_delay;
   inst_regdecode_wire_wr_rd_common_register : entity work.regdecode_wire_wr_rd
     generic map(
       g_DATA_WIDTH_OUT   => reg_data_tmp0'length,  -- define the RAM address width
@@ -1086,24 +1075,24 @@ begin
 
   -- output: to USB
   ---------------------------------------------------------------------
-  usb_wireout_conf0           <= reg_data_tmp1(c_REG_IDX6_H downto c_REG_IDX6_L);
-  usb_wireout_tes_conf        <= reg_data_tmp1(c_REG_IDX5_H downto c_REG_IDX5_L);
-  usb_wireout_ra_delay        <= reg_data_tmp1(c_REG_IDX4_H downto c_REG_IDX4_L);
-  usb_wireout_error_delay     <= reg_data_tmp1(c_REG_IDX3_H downto c_REG_IDX3_L);
-  usb_wireout_amp_sq_of_delay <= reg_data_tmp1(c_REG_IDX2_H downto c_REG_IDX2_L);
-  usb_wireout_mux_sq_fb_delay <= reg_data_tmp1(c_REG_IDX1_H downto c_REG_IDX1_L);
-  usb_wireout_fpasim_gain     <= reg_data_tmp1(c_REG_IDX0_H downto c_REG_IDX0_L);
+  usb_wireout_conf0           <= reg_data_tmp1(c_REG_IDX5_H downto c_REG_IDX5_L);
+  usb_wireout_tes_conf        <= reg_data_tmp1(c_REG_IDX4_H downto c_REG_IDX4_L);
+  usb_wireout_ra_delay        <= reg_data_tmp1(c_REG_IDX3_H downto c_REG_IDX3_L);
+  usb_wireout_error_delay     <= reg_data_tmp1(c_REG_IDX2_H downto c_REG_IDX2_L);
+  usb_wireout_amp_sq_of_delay <= reg_data_tmp1(c_REG_IDX1_H downto c_REG_IDX1_L);
+  usb_wireout_mux_sq_fb_delay <= reg_data_tmp1(c_REG_IDX0_H downto c_REG_IDX0_L);
+
 
   -- output: to the user
   ---------------------------------------------------------------------
   o_reg_valid           <= reg_data_valid_tmp2;
-  o_reg_conf0           <= reg_data_tmp2(c_REG_IDX6_H downto c_REG_IDX6_L);
-  o_reg_tes_conf        <= reg_data_tmp2(c_REG_IDX5_H downto c_REG_IDX5_L);
-  o_reg_ra_delay        <= reg_data_tmp2(c_REG_IDX4_H downto c_REG_IDX4_L);
-  o_reg_error_delay     <= reg_data_tmp2(c_REG_IDX3_H downto c_REG_IDX3_L);
-  o_reg_amp_sq_of_delay <= reg_data_tmp2(c_REG_IDX2_H downto c_REG_IDX2_L);
-  o_reg_mux_sq_fb_delay <= reg_data_tmp2(c_REG_IDX1_H downto c_REG_IDX1_L);
-  o_reg_fpasim_gain     <= reg_data_tmp2(c_REG_IDX0_H downto c_REG_IDX0_L);
+  o_reg_conf0           <= reg_data_tmp2(c_REG_IDX5_H downto c_REG_IDX5_L);
+  o_reg_tes_conf        <= reg_data_tmp2(c_REG_IDX4_H downto c_REG_IDX4_L);
+  o_reg_ra_delay        <= reg_data_tmp2(c_REG_IDX3_H downto c_REG_IDX3_L);
+  o_reg_error_delay     <= reg_data_tmp2(c_REG_IDX2_H downto c_REG_IDX2_L);
+  o_reg_amp_sq_of_delay <= reg_data_tmp2(c_REG_IDX1_H downto c_REG_IDX1_L);
+  o_reg_mux_sq_fb_delay <= reg_data_tmp2(c_REG_IDX0_H downto c_REG_IDX0_L);
+
 
   ---------------------------------------------------------------------
   -- control register

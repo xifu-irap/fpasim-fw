@@ -80,8 +80,7 @@ class SystemFpasimTopDataGen(VunitConf):
         # register field
         # ctrl register
         self.en = 0
-        # fpasim_gain register
-        self.fpasim_gain = 0
+
         # tes_conf register
         self.nb_pixel_by_frame = 0
         self.nb_sample_by_pixel = 0
@@ -362,9 +361,6 @@ class SystemFpasimTopDataGen(VunitConf):
             elif key == '@usb_ctrl':
                 result, dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
                 self.en = dic_field['en']['value']
-            elif key == '@usb_fpgasim_gain':
-                result, dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
-                self.fpasim_gain = dic_field['gain']['value']
 
             elif key == '@usb_tes_conf':
                 result, dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)

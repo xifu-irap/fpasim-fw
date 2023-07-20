@@ -56,7 +56,7 @@ entity tb_amp_squid_top is
     g_AMP_SQUID_TF_RAM_ADDR_WIDTH : positive := pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH; -- address bus width (expressed in bits)
     -- computation
     g_PIXEL_RESULT_INPUT_WIDTH    : positive := pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S; -- pixel input result bus width (expressed in bits). Possible values [1; max integer value[
-    g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_AMP_SQUID_MULT_Q_WIDTH;
+    g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_AMP_SQUID_Q_WIDTH;
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
@@ -68,9 +68,7 @@ entity tb_amp_squid_top is
     -- RAM1
     g_RAM1_NAME                   : string   := "mux_squid_offset";-- RAM1: simulation name
     g_RAM1_CHECK                  : boolean  := true;--RAM1: 1: check the memory contents, 0: don't check the memory content
-    g_RAM1_VERBOSITY              : integer  := 0;-- RAM1: 0: don't print each memory content check, 1: 0: print each memory content check
-    -- FPAGAIN Register
-    g_FPAGAIN                     : integer  := 0 -- FPASIM gain value
+    g_RAM1_VERBOSITY              : integer  := 0-- RAM1: 0: don't print each memory content check, 1: 0: print each memory content check
   );
 end tb_amp_squid_top;
 
@@ -99,8 +97,6 @@ architecture Simulation of tb_amp_squid_top is
   signal i_amp_squid_tf_rd_en      : std_logic; -- RAM read enable
   signal o_amp_squid_tf_rd_valid   : std_logic; -- RAM read data valid
   signal o_amp_squid_tf_rd_data    : std_logic_vector(15 downto 0);  -- RAM read data
-  -- gain
-  signal i_fpasim_gain             : std_logic_vector(2 downto 0);
 
   -- input1
   ---------------------------------------------------------------------
@@ -296,7 +292,6 @@ begin
     info("    g_RAM1_NAME = " & g_RAM1_NAME);
     info("    g_RAM1_CHECK = " & to_string(g_RAM1_CHECK));
     info("    g_RAM1_VERBOSITY = " & to_string(g_RAM1_VERBOSITY));
-    info("    g_FPAGAIN = " & to_string(g_FPAGAIN));
 
     info("Test bench: input files");
     info("    c_FILEPATH_DATA_VALID_IN = " & c_FILEPATH_DATA_VALID_IN);
@@ -307,7 +302,6 @@ begin
     ---------------------------------------------------------------------
     -- reset
     ---------------------------------------------------------------------
-    i_fpasim_gain <= (others => '0');
     info("Enable the reset");
     i_rst_status  <= '1';
     i_debug_pulse <= '0';
@@ -322,7 +316,6 @@ begin
     -- Register configuration
     ---------------------------------------------------------------------
     info("Start Register configuration: FPAGAIN");
-    i_fpasim_gain <= std_logic_vector(to_unsigned(g_FPAGAIN, i_fpasim_gain'length));
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
 
@@ -597,8 +590,7 @@ begin
       i_amp_squid_tf_rd_en          => i_amp_squid_tf_rd_en, -- rd enable
       o_amp_squid_tf_rd_valid       => o_amp_squid_tf_rd_valid, -- rd data valid
       o_amp_squid_tf_rd_data        => o_amp_squid_tf_rd_data, -- read data
-      -- gain
-      i_fpasim_gain                 => i_fpasim_gain, -- gain value
+
       ---------------------------------------------------------------------
       -- input1
       ---------------------------------------------------------------------

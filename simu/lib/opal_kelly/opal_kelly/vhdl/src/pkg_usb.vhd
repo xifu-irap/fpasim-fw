@@ -398,7 +398,7 @@ package body pkg_usb is
                   i_internal_rd_if => i_internal_rd_if
                   );
 
-              when 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 208 | 212 | 213 | 218 | 219 | 220 | 221 | 224 | 225 =>
+              when 200 | 201 | 203 | 204 | 205 | 206 | 207 | 208 | 212 | 213 | 218 | 219 | 220 | 221 | 224 | 225 =>
                 ---------------------------------------------------------------------
                 -- wire in
                 ---------------------------------------------------------------------
@@ -409,9 +409,8 @@ package body pkg_usb is
                   if v_file_reg_id = 201 then
                     info("[pkg_usb_wr] : Set MAKE_PULSE Register: " & to_string(v_file_data));
                   end if;
-                  if v_file_reg_id = 202 then
-                    info("[pkg_usb_wr] : Set FPASIM_GAIN Register: " & to_string(v_file_data));
-                  end if;
+
+
                   if v_file_reg_id = 203 then
                     info("[pkg_usb_wr] : Set MUX_SQ_FB_DELAY Register: " & to_string(v_file_data));
                   end if;
@@ -521,7 +520,7 @@ package body pkg_usb is
                   v_pipe_rd_cnt_word := v_pipe_rd_cnt_word + 1;
                 end if;
 
-              when 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 508 | 510 | 511 | 512 | 513 | 517 | 518 | 519 | 520 | 521 | 522 | 523 | 524 | 525 | 526 | 527 | 529 | 530 | 531 =>
+              when 500 | 501 | 503 | 504 | 505 | 506 | 507 | 508 | 510 | 511 | 512 | 513 | 517 | 518 | 519 | 520 | 521 | 522 | 523 | 524 | 525 | 526 | 527 | 529 | 530 | 531 =>
                 ---------------------------------------------------------------------
                 -- wire out
                 ---------------------------------------------------------------------
@@ -532,9 +531,8 @@ package body pkg_usb is
                   if v_file_reg_id = 501 then
                     info("[pkg_usb_wr] : Get MAKE_PULSE Register");
                   end if;
-                  if v_file_reg_id = 502 then
-                    info("[pkg_usb_wr] : Get FPASIM_GAIN Register");
-                  end if;
+
+
                   if v_file_reg_id = 503 then
                     info("[pkg_usb_wr] : Get MUX_SQ_FB_DELAY Register");
                   end if;
@@ -634,9 +632,8 @@ package body pkg_usb is
                 if v_file_reg_id = 501 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get MAKE_PULSE Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
-                if v_file_reg_id = 502 then
-                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FPASIM_GAIN Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
-                end if;
+                
+
                 if v_file_reg_id = 503 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get MUX_SQ_FB_DELAY Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;

@@ -152,9 +152,6 @@ architecture RTL of fpasim_top is
   signal cmd_pulse_height : std_logic_vector(pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH - 1 downto 0); -- pulse height command
   signal cmd_ready        : std_logic; -- ready to receive a new command
 
-  -- fpasim_gain value
-  signal fpasim_gain      : std_logic_vector(pkg_FPASIM_GAIN_WIDTH - 1 downto 0);
-
   -- mux_sq_fb_delay register
   signal adc1_delay : std_logic_vector(pkg_MUX_SQ_FB_DELAY_WIDTH - 1 downto 0);
   -- amp_sq_of_delay register
@@ -247,8 +244,6 @@ architecture RTL of fpasim_top is
   -- Common Register configuration
   ---------------------------------------------------------------------
   signal reg_valid               : std_logic;  -- register valid
-  -- fpasim_gain register value
-  signal reg_fpasim_gain         : std_logic_vector(31 downto 0);
   -- mux_sq_fb_delay register value
   signal reg_mux_sq_fb_delay     : std_logic_vector(31 downto 0);
   -- amp_sq_of_delay register value
@@ -595,7 +590,6 @@ begin
       ---------------------------------------------------------------------
       -- common register
       o_reg_valid                       => reg_valid,
-      o_reg_fpasim_gain                 => reg_fpasim_gain,
       o_reg_mux_sq_fb_delay             => reg_mux_sq_fb_delay,
       o_reg_amp_sq_of_delay             => reg_amp_sq_of_delay,
       o_reg_error_delay                 => reg_error_delay,
@@ -657,9 +651,6 @@ begin
   cmd_time_shift       <= reg_make_pulse(pkg_MAKE_PULSE_TIME_SHIFT_IDX_H downto pkg_MAKE_PULSE_TIME_SHIFT_IDX_L);
   cmd_pulse_height     <= reg_make_pulse(pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_H downto pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_L);
   reg_make_pulse_ready <= cmd_ready;
-
-  -- reg_fpasim_gain register: extract fields
-  fpasim_gain <= reg_fpasim_gain(pkg_FPASIM_GAIN_IDX_H downto pkg_FPASIM_GAIN_IDX_L);
 
   -- reg_mux_sq_fb_delay register: extract fields
   adc0_delay <= reg_mux_sq_fb_delay(pkg_MUX_SQ_FB_DELAY_IDX_H downto pkg_MUX_SQ_FB_DELAY_IDX_L);
@@ -1058,8 +1049,6 @@ begin
       o_amp_squid_tf_rd_valid   => amp_squid_tf_ram_rd_valid,  -- read valid
       o_amp_squid_tf_rd_data    => amp_squid_tf_ram_rd_data,   -- read data
 
-      -- gain
-      i_fpasim_gain                 => fpasim_gain,  -- gain value
       ---------------------------------------------------------------------
       -- input1
       ---------------------------------------------------------------------

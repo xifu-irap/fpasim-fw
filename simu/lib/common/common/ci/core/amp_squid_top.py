@@ -104,42 +104,6 @@ class AmpSquidTop(Points):
         self.amp_squid_tf_list = obj_file.run()
         return None
 
-    def set_fpasim_gain(self, fpasim_gain_p):
-        """
-        set the fpasim_gain (from the register) in order to compute the corresponding gain.
-   
-        Parameters
-        ----------
-        fpasim_gain_p: int
-            define the fpasim_gain value (from the register)
-
-        Returns
-        -------
-        None
-
-        """
-
-        if fpasim_gain_p == 0:
-            data = 0.25
-        elif fpasim_gain_p == 1:
-            data = 0.5
-        elif fpasim_gain_p == 2:
-            data = 0.75
-        elif fpasim_gain_p == 3:
-            data = 1
-        elif fpasim_gain_p == 4:
-            data = 1.5
-        elif fpasim_gain_p == 5:
-            data = 2
-        elif fpasim_gain_p == 6:
-            data = 3
-        else:
-            # 7
-            data = 4
-        self._vhdl_fpasim_gain = data
-
-        return None
-
     def _compute(self, mux_out_p, adc_amp_squid_offset_correction_p):
         """
         Compute an expected output value.
@@ -172,19 +136,7 @@ class AmpSquidTop(Points):
 
         amp_squid_tf = self.amp_squid_tf_list[addr]
 
-        mult = math.floor(self._vhdl_fpasim_gain * amp_squid_tf)
-
-        # mult is an uint value
-        # we constraints mult in the range [0,2**self.pkg_amp_squid_mult_q_width-1]
-        res0 = mult % self.max_uint_value
-
-        # res1 is an interpretation of res0 as an int value
-        if res0 >= self.max_int_value:
-            res1 = res0 - self.max_uint_value
-        else:
-            res1 = res0
-
-        return res1
+        return amp_squid_tf
 
     def run(self, output_attribute_name_p="amp_squid_out"):
         """

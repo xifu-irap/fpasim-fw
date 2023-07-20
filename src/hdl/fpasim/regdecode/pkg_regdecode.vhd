@@ -174,18 +174,6 @@ package pkg_regdecode is
   -- auto-computed: pulse height (bit index high)
   constant pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_H : integer := pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_L + pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH - 1;
 
-  -- user-defined: fpasim_gain
-  ---------------------------------------------------------------------
-  -- requirement: FPASIM-FW-REQ-0190
-  -- user-defined: fpasim_gain (bit index high)
-  constant pkg_FPASIM_GAIN_IDX_H : integer := 2;
-  -- requirement: FPASIM-FW-REQ-0190
-  -- user-defined: fpasim_gain (bit index low)
-  constant pkg_FPASIM_GAIN_IDX_L : integer := 0;
-  -- auto-computed: fpasim_gain width
-  constant pkg_FPASIM_GAIN_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_FPASIM_GAIN_IDX_H, i_idx_low => pkg_FPASIM_GAIN_IDX_L);
-
-
   -- user-defined: mux_sq_fb_delay
   ---------------------------------------------------------------------
   -- requirement: FPASIM-FW-REQ-0210
