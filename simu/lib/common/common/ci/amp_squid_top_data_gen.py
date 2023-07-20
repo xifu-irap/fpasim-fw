@@ -210,18 +210,24 @@ class AmpSquidTopDataGen(VunitConf):
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
         # process Memory files for the datapath computation
         for dic in dic_sequence:
-            input_filename = dic["value"]['input_filename_datapath']
             name = dic["generic"]['name']
-            input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
+            # defaut ram content
+            input_data_filename = dic["value"]['input_filename_datapath']
+            input_data_filepath = self.get_data_filepath(filename_p=input_data_filename, level_p=level1)
+
 
             if self.verbosity > 0:
-                msg0 = 'used files for the datapath computation: ' + input_filepath
+                msg0 = 'used files for the datapath computation: ' + input_data_filepath
                 display_obj.display(msg_p=msg0, level_p=level2)
 
+
+            # RAM data to write/read
+            input_filename = dic["value"]['input_filename']
+            input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
             shutil.copyfile(input_filepath, output_filepath)
 
             # save the ram content
-            ram_filepath_dic[name] = input_filepath
+            ram_filepath_dic[name] = input_data_filepath
 
         ########################################################
         # Get the testbench parameters
