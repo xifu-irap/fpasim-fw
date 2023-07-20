@@ -2417,14 +2417,14 @@ if __name__ == '__main__':
     #   No description <=> [""]
     unit_test_description_list = [""]
     # name of the unitary test
-    unit_test_name = 'tb_amp_squid_top_test_variant_debug10'
+    unit_test_name = 'tb_amp_squid_top_test_variant_debug03'
     # name of the testbench entity
     tb_name = 'tb_amp_squid_top'
     # name of the testbench file
     tb_filename = 'tb_amp_squid_top.vhd'
     # list of test_variant_filename
     #  No filename <=> []
-    test_variant_filename_list = ["tb_amp_squid_top_test_variant_debug10.json"]
+    test_variant_filename_list = ["tb_amp_squid_top_test_variant_debug03.json"]
     # base path where to find the run_tb_XXXX script python
     run_basepath = str(Path(root_path, 'simu/vunit'))
     # filename of the run_XXXX python script
@@ -2466,7 +2466,7 @@ if __name__ == '__main__':
     # list of test_variant_filename
     #  No filename <=> []
     test_variant_filename_list = []
-    for i in range(11):
+    for i in range(4):
         str_index = '{0:02d}'.format(i)
         test_variant_filename_list.append("tb_amp_squid_top_test_variant_debug"+str_index+".json")
     # base path where to find the run_tb_XXXX script python
@@ -2815,7 +2815,7 @@ if __name__ == '__main__':
     json_test_dic["tb_amp_squid_top_test_variant_debug00"] = [solo_test_dic['tb_amp_squid_top_test_variant_debug00']]
     json_test_dic["tb_amp_squid_top_test_variant_debug01"] = [solo_test_dic['tb_amp_squid_top_test_variant_debug01']]
     json_test_dic["tb_amp_squid_top_test_variant_debug02"] = [solo_test_dic['tb_amp_squid_top_test_variant_debug02']]
-    json_test_dic["tb_amp_squid_top_test_variant_debug10"] = [solo_test_dic['tb_amp_squid_top_test_variant_debug10']]
+    json_test_dic["tb_amp_squid_top_test_variant_debug03"] = [solo_test_dic['tb_amp_squid_top_test_variant_debug03']]
     json_test_dic["tb_amp_squid_top_test_variant_debug_all"] = [solo_test_dic['tb_amp_squid_top_test_variant_debug_all']]
     # functional tests
     json_test_dic["tb_amp_squid_top_test_variant_func00"] = [solo_test_dic['tb_amp_squid_top_test_variant_func00']]
