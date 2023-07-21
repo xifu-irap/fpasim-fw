@@ -602,13 +602,13 @@ package body pkg_usb is
                   end if;
 
                   if v_file_reg_id = 529 then
-                    info("[pkg_usb_wr] : Get BOARD_ID Register");
+                    info("[pkg_usb_wr] : Get HARDWARE_ID Register");
                   end if;
                   if v_file_reg_id = 530 then
-                    info("[pkg_usb_wr] : Get FPGA_ID Register");
+                    info("[pkg_usb_wr] : Get FIRMWARE_NAME Register");
                   end if;
                   if v_file_reg_id = 531 then
-                    info("[pkg_usb_wr] : Get FPGA_VERSION Register");
+                    info("[pkg_usb_wr] : Get FIRMWARE_ID Register");
                   end if;
                 end if;
 
@@ -702,13 +702,13 @@ package body pkg_usb is
                 end if;
 
                 if v_file_reg_id = 529 then
-                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get BOARD_ID Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get HARDWARE_ID Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 530 then
-                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FPGA_ID Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FIRMWARE_NAME Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 if v_file_reg_id = 531 then
-                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FPGA_VERSION Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
+                  check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get FIRMWARE_ID Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
                 v_wire_cnt := v_wire_cnt + 1;
 

@@ -1071,12 +1071,12 @@
             }
         },
 
-        "@usb_board_id": {
+        "@usb_hardware_id": {
             "description_list": [
-                "This command is used to access to the BOARD_ID register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+                "This command is used to access to the HARDWARE_ID register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
                 "The parameters are:",
-                "    :param field/board_id: board_id value",
-                "     :param value (integer): board_id value",
+                "    :param field/hardware_id: hardware_id value",
+                "     :param value (integer): hardware_id value",
                 "     :param bit_pos_min (integer >=0): define the position of the LSB bit",
                 "     :param width (integer >=1): define the field width (expressed in bit)",
                 "",
@@ -1092,7 +1092,7 @@
                 "reg_id": 529
             },
             "field": {
-                "baord_id": {
+                "hardware_id": {
                     "value": 0,
                     "bit_pos_min": 0,
                     "width": 16
@@ -1100,12 +1100,12 @@
             }
         },
 
-        "@usb_firmware_id": {
+        "@usb_firmware_name": {
             "description_list": [
-                "This command is used to access to the FPGA_ID register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+                "This command is used to access to the FIRMWARE_NAME register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
                 "The parameters are:",
-                "    :param field/fpga_id: fpga_id value (hexadecimal ASCII value)",
-                "         :param value (integer): fpga_id value ",
+                "    :param field/firmware_name: firmware_name value (hexadecimal ASCII value)",
+                "         :param value (integer): firmware_name value ",
                 "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
                 "         :param width (integer >=1): define the field width (expressed in bit)",
                 "",
@@ -1121,7 +1121,7 @@
                 "reg_id": 530
             },
             "field": {
-                "firmware_id": {
+                "firmware_name": {
                     "value": 0,
                     "bit_pos_min": 0,
                     "width": 16
@@ -1129,12 +1129,12 @@
             }
         },
 
-        "@usb_firware_version": {
+        "@usb_firmware_id": {
             "description_list": [
-                "This command is used to access to the FPGA_VERSION register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
+                "This command is used to access to the FIRMWARE_ID register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
                 "The parameters are:",
-                "    :param field/fpga_version: fpga_version value",
-                "         :param value (integer): fpga_version value",
+                "    :param field/firmware_id: firmware_id value",
+                "         :param value (integer): firmware_id value",
                 "         :param bit_pos_min (integer >=0): define the position of the LSB bit",
                 "         :param width (integer >=1): define the field width (expressed in bit)",
                 "",
@@ -1150,7 +1150,7 @@
                 "reg_id": 531
             },
             "field": {
-                "firware_version": {
+                "firmware_id": {
                     "value": 0,
                     "bit_pos_min": 0,
                     "width": 16

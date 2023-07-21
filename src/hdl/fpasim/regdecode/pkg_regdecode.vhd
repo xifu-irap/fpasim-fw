@@ -41,24 +41,24 @@ package pkg_regdecode is
   ---------------------------------------------------------------------
   --
   ---------------------------------------------------------------------
-  -- user-defined: Firmware version
+  -- user-defined: Firmware ID Value
   -- requirement: FPASIM-FW-REQ-0290
-  constant pkg_FIRMWARE_VERSION_VALUE : integer := 9;
+  constant pkg_FIRMWARE_ID_VALUE : integer := 9;
 
-  -- user-defined: FIRMWARE ID (name)
+  -- user-defined: FIRMWARE name
   -- requirement: FPASIM-FW-REQ-0280
-  constant pkg_FIRMWARE_ID_CHAR3 : character := 'F';  -- ascii character
-  constant pkg_FIRMWARE_ID_CHAR2 : character := 'P';  -- ascii character
-  constant pkg_FIRMWARE_ID_CHAR1 : character := 'A';  -- ascii character
-  constant pkg_FIRMWARE_ID_CHAR0 : character := 's';  -- ascii character
+  constant pkg_FIRMWARE_NAME_CHAR3 : character := 'F';  -- ascii character
+  constant pkg_FIRMWARE_NAME_CHAR2 : character := 'P';  -- ascii character
+  constant pkg_FIRMWARE_NAME_CHAR1 : character := 'A';  -- ascii character
+  constant pkg_FIRMWARE_NAME_CHAR0 : character := 's';  -- ascii character
 
-  -- auto-computed: fpga id
-  constant pkg_FIRMWARE_ID      : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR3), 8)) &
-                                                                   std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR2), 8)) &
-                                                                   std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR1), 8)) &
-                                                                   std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_ID_CHAR0), 8));
-  -- auto-computed: fpga version
-  constant pkg_FIRMWARE_VERSION : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(pkg_FIRMWARE_VERSION_VALUE, 32));
+  -- auto-computed: firmware name
+  constant pkg_FIRMWARE_NAME      : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_NAME_CHAR3), 8)) &
+                                                                   std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_NAME_CHAR2), 8)) &
+                                                                   std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_NAME_CHAR1), 8)) &
+                                                                   std_logic_vector(to_unsigned(character'pos(pkg_FIRMWARE_NAME_CHAR0), 8));
+  -- auto-computed: firmware id
+  constant pkg_FIRMWARE_ID : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(pkg_FIRMWARE_ID_VALUE, 32));
 
   -------------------------------------------------------------------
   -- pipe

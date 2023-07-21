@@ -51,8 +51,9 @@ entity system_fpasim_top is
     b_okAA  : inout std_logic; -- usb interface signal
     ---------------------------------------------------------------------
     -- FMC: from the card
+    -- requirement: FPASIM-FW-REQ-0270
     ---------------------------------------------------------------------
-    --i_board_id : in    std_logic_vector(7 downto 0);  -- card board id
+    --i_hardware_id : in    std_logic_vector(7 downto 0);  -- card hardware id
 
     ---------------------------------------------------------------------
     -- FMC: from the adc @i_adc_clk_p
@@ -186,9 +187,9 @@ end entity system_fpasim_top;
 
 architecture RTL of system_fpasim_top is
 
-  --signal board_id : std_logic_vector(i_board_id'range);
-  -- board id
-  signal board_id : std_logic_vector(7 downto 0);
+  --signal hardware_id : std_logic_vector(i_board_id'range);
+  -- hardware id
+  signal hardware_id : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- clock generation
@@ -386,8 +387,8 @@ begin
       );
 
   -- TODO: connect to input port
-  --board_id <= i_board_id;
-  board_id <= (others => '0');
+  --hardware_id <= i_hardware_id;
+  hardware_id <= (others => '0');
   ---------------------------------------------------------------------
   -- top_fpasim
   ---------------------------------------------------------------------
@@ -409,7 +410,7 @@ begin
       ---------------------------------------------------------------------
       -- from the board
       ---------------------------------------------------------------------
-      i_board_id    => board_id,
+      i_hardware_id    => hardware_id,
       ---------------------------------------------------------------------
       -- to the IOs: @i_clk
       ---------------------------------------------------------------------
