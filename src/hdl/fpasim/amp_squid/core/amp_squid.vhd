@@ -46,7 +46,7 @@ entity amp_squid is
     g_AMP_SQUID_TF_RAM_ADDR_WIDTH       : positive := pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- computation
     g_PIXEL_RESULT_INPUT_WIDTH          : positive := pkg_AMP_SQUID_SUB_Q_WIDTH_A;  -- pixel input result bus width (expressed in bits). Possible values [1; max integer value[
-    g_PIXEL_RESULT_OUTPUT_WIDTH         : positive := pkg_AMP_SQUID_MULT_Q_WIDTH;  -- pixel output result bus width (expressed in bits). Possible values [1; max integer value[
+    g_PIXEL_RESULT_OUTPUT_WIDTH         : positive := pkg_AMP_SQUID_Q_WIDTH;  -- pixel output result bus width (expressed in bits). Possible values [1; max integer value[
     -- RAM configuration filename
     g_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE : string   := pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE
     );
@@ -67,7 +67,6 @@ entity amp_squid is
     o_amp_squid_tf_rd_valid   : out std_logic;  -- ram read data valid
     o_amp_squid_tf_rd_data    : out std_logic_vector(15 downto 0);  -- ram read data
 
-    i_fpasim_gain                 : in  std_logic_vector(2 downto 0);  -- fpasim gain value
     ---------------------------------------------------------------------
     -- input1
     ---------------------------------------------------------------------
@@ -126,6 +125,9 @@ architecture RTL of amp_squid is
   constant c_IDX3_L : integer := c_IDX2_H + 1; -- index3: low
   constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;-- index3: high
 
+  constant c_IDX4_L : integer := c_IDX3_H + 1; -- index4: low
+  constant c_IDX4_H : integer := c_IDX4_L + o_pixel_result'length - 1;-- index4: high
+
   signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0); -- temporary input pipe signal
   signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0); -- temporary output pipe signal
 
@@ -170,31 +172,16 @@ architecture RTL of amp_squid is
   signal pixel_id_ry    : std_logic_vector(i_pixel_id'range); -- pixel id
 
   ---------------------------------------------------------------------
-  -- amp_squid_fpagain_table
-  ---------------------------------------------------------------------
-  signal fpasim_gain : std_logic_vector(pkg_AMP_SQUID_MULT_Q_WIDTH_B - 1 downto 0);
-
-  -------------------------------------------------------------------
-  -- mult: fpasim_gain * amp_squid_tf
-  -------------------------------------------------------------------
-  -- add a sign bit
-  -- operator input_a
-  signal amp_squid_tf_tmp : std_logic_vector(pkg_AMP_SQUID_MULT_Q_WIDTH_A - 1 downto 0);
-  -- operator input_b
-  signal fpasim_gain_tmp  : std_logic_vector(pkg_AMP_SQUID_MULT_Q_WIDTH_B - 1 downto 0);
-  -- operator output
-  signal result_rz        : std_logic_vector(o_pixel_result'range);
-
-  ---------------------------------------------------------------------
   -- sync with the add_sfixed_mux_squid_offset_and_tf out
   ---------------------------------------------------------------------
-  signal data_pipe_tmp4 : std_logic_vector(c_IDX3_H downto 0); -- temporary input pipe signal
-  signal data_pipe_tmp5 : std_logic_vector(c_IDX3_H downto 0); -- temporary output pipe signal
+  signal data_pipe_tmp4 : std_logic_vector(c_IDX4_H downto 0); -- temporary input pipe signal
+  signal data_pipe_tmp5 : std_logic_vector(c_IDX4_H downto 0); -- temporary output pipe signal
 
   signal pixel_sof_rz   : std_logic; -- first pixel sample
   signal pixel_eof_rz   : std_logic; -- last pixel sample
   signal pixel_valid_rz : std_logic; -- valid pixel sample
   signal pixel_id_rz    : std_logic_vector(i_pixel_id'range); -- pixel id
+  signal result_rz        : std_logic_vector(o_pixel_result'range); -- result
 
   ---------------------------------------------------------------------
   -- error latching
@@ -398,77 +385,18 @@ begin
   pixel_eof_ry   <= data_pipe_tmp3(c_IDX1_H);
   pixel_id_ry    <= data_pipe_tmp3(c_IDX0_H downto c_IDX0_L);
 
-  ---------------------------------------------------------------------
-  -- get fpagain from a table
-  ---------------------------------------------------------------------
-  inst_amp_squid_fpagain_table : entity work.amp_squid_fpagain_table
-    generic map(
-      -- port S: AMD Q notation (fixed point)
-      g_Q_M_S       => pkg_AMP_SQUID_MULT_Q_M_B,  -- number of bits used for the integer part of the value ( sign bit included). Possible values [0;integer_max_value[
-      g_Q_N_S       => pkg_AMP_SQUID_MULT_Q_N_B,  -- number of fraction bits. Possible values [0;integer_max_value[
-      g_LATENCY_OUT => pkg_AMP_SQUID_FPAGAIN_TABLE_OUT_LATENCY
-      )
-    port map(
-      i_clk         => i_clk,
-      ---------------------------------------------------------------------
-      -- from regdecode
-      ---------------------------------------------------------------------
-      i_fpasim_gain => i_fpasim_gain,
-      ---------------------------------------------------------------------
-      -- input
-      ---------------------------------------------------------------------
-      i_pixel_sof   => i_pixel_sof,
-      i_pixel_valid => i_pixel_valid,
-      ---------------------------------------------------------------------
-      -- output
-      ---------------------------------------------------------------------
-      o_fpasim_gain => fpasim_gain
-      );
-
-  ---------------------------------------------------------------------
-  -- add mux_squid_offset + mux_squid_tf
-  ---------------------------------------------------------------------
-  assert not ((amp_squid_tf_doutb'length) /= (amp_squid_tf_tmp'length - 1)) report "[amp_squid]: amp_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
-  -- unsigned to signed conversion: sign bit extension (add a sign bit)
-  amp_squid_tf_tmp <= std_logic_vector(resize(unsigned(amp_squid_tf_doutb), amp_squid_tf_tmp'length));
-  -- no change: already sfixed
-  fpasim_gain_tmp  <= fpasim_gain;
-
-  inst_mult_sfixed_amp_squid_correction_and_tf : entity work.mult_sfixed
-    generic map(
-      -- port A: AMD Q notation (fixed point)
-      g_Q_M_A => pkg_AMP_SQUID_MULT_Q_M_A,
-      g_Q_N_A => pkg_AMP_SQUID_MULT_Q_N_A,
-      -- port B: AMD Q notation (fixed point)
-      g_Q_M_B => pkg_AMP_SQUID_MULT_Q_M_B,
-      g_Q_N_B => pkg_AMP_SQUID_MULT_Q_N_B,
-      -- port S: AMD Q notation (fixed point)
-      g_Q_M_S => pkg_AMP_SQUID_MULT_Q_M_S,
-      g_Q_N_S => pkg_AMP_SQUID_MULT_Q_N_S
-      )
-    port map(
-      i_clk => i_clk,
-      --------------------------------------------------------------
-      -- input
-      --------------------------------------------------------------
-      i_a   => amp_squid_tf_tmp,
-      i_b   => fpasim_gain_tmp,
-      --------------------------------------------------------------
-      -- output : S = a * B
-      --------------------------------------------------------------
-      o_s   => result_rz
-      );
 
   -----------------------------------------------------------------
   -- sync with inst_add_sfixed_mux_squid_offset_and_tf out
   -----------------------------------------------------------------
+  data_pipe_tmp4(c_IDX4_H downto c_IDX4_L) <= amp_squid_tf_doutb;
   data_pipe_tmp4(c_IDX3_H)                 <= pixel_valid_ry;
   data_pipe_tmp4(c_IDX2_H)                 <= pixel_sof_ry;
   data_pipe_tmp4(c_IDX1_H)                 <= pixel_eof_ry;
   data_pipe_tmp4(c_IDX0_H downto c_IDX0_L) <= pixel_id_ry;
-  inst_pipeliner_sync_with_mult_sfixed_amp_squid_correction_and_tf_out : entity work.pipeliner
+  inst_pipeliner_optionnal_output_pipe : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => work.pkg_fpasim.pkg_AMP_SQUID_MULT_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_AMP_SQUID_OUT_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp4'length  -- width of the input/output data.  Possibles values: [1, integer max value[
       )
     port map(
@@ -477,6 +405,7 @@ begin
       o_data => data_pipe_tmp5          -- output data with/without delay
       );
 
+  result_rz      <= data_pipe_tmp5(c_IDX4_H downto c_IDX4_L);
   pixel_valid_rz <= data_pipe_tmp5(c_IDX3_H);
   pixel_sof_rz   <= data_pipe_tmp5(c_IDX2_H);
   pixel_eof_rz   <= data_pipe_tmp5(c_IDX1_H);

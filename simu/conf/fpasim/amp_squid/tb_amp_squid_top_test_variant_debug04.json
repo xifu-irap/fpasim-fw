@@ -3,34 +3,6 @@
         "This file was manually generated"
     ],
 
-    "register": {
-        "description_list": [
-            "This section defines:",
-            "  . The parameter associated to the FPASIM_GAIN register (see value section).",
-            "    . The value will be passed as generic value to the VHDL testbench."
-        ],
-        "value":
-
-        {
-            "description_list": [
-                "The parameter is:",
-                "      :param fpagain (integer) : gain of the interface between the MUX SQUID and the AMP SQUID with the command",
-                "         The range is [0;7] with :",
-                "            0:0.25",
-                "            1:0.5",
-                "            2:0.75",
-                "            3:1",
-                "            4:1.5",
-                "            5:2",
-                "            6:3",
-                "            7:4",
-                "       Note:",
-                "         The data width must match the pkg_regdecode/pkg_FPASIM_GAIN_WIDTH"
-            ],
-            "fpagain": 2
-        }
-    },
-
     "data": {
         "description_list": [
             "This section defines:",
@@ -84,17 +56,17 @@
                 "         Note: This file is a *.csv file"
             ],
             "nb_sample_by_pixel": 8,
-            "nb_pixel_by_frame": 34,
+            "nb_pixel_by_frame": 1,
             "nb_frame_by_pulse": 2048,
-            "nb_pulse": 1,
+            "nb_pulse": 8,
             "amp_squid_offset_correction": {
-                "mode": 1,
-                "min_value": -8192,
-                "max_value": 8191
+                "mode": 0,
+                "min_value": 0,
+                "max_value": 0
             },
             "pixel_result": {
-                "mode": 1,
-                "min_value": -131072,
+                "mode": 0,
+                "min_value": 0,
                 "max_value": 131071
             },
             "filename": "py_data_in.csv"

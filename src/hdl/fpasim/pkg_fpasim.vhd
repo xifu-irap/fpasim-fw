@@ -401,41 +401,19 @@ package pkg_fpasim is
 
   constant pkg_AMP_SQUID_SUB_LATENCY : natural := pkg_SUB_SFIXED_LATENCY;
 
-  -- mult
-  -- result
-  -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_AMP_SQUID_MULT_Q_M_A     : positive := 17;  -- user defined: number of bits used for the integer part of the value ( sign bit included)
-  -- user-defined: number of fraction bits
-  constant pkg_AMP_SQUID_MULT_Q_N_A     : natural  := 0;  -- user defined: number of fraction bits
-  -- auto-computed: bus width
-  constant pkg_AMP_SQUID_MULT_Q_WIDTH_A : positive := pkg_AMP_SQUID_MULT_Q_M_A + pkg_AMP_SQUID_MULT_Q_N_A;
+  -- user-defined: add an additional output latency
+  constant pkg_AMP_SQUID_OUT_LATENCY              : natural := 0;
 
-  -- fpasim_gain
+  -- result: output
   -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_AMP_SQUID_MULT_Q_M_B     : positive := 4;
+  constant pkg_AMP_SQUID_Q_M_S   : positive := 16;
   -- user-defined: number of fraction bits
-  constant pkg_AMP_SQUID_MULT_Q_N_B     : natural  := 2;
+  constant pkg_AMP_SQUID_Q_N_S   : natural  := 0;
   -- auto-computed: bus width
-  constant pkg_AMP_SQUID_MULT_Q_WIDTH_B : positive := pkg_AMP_SQUID_MULT_Q_M_B + pkg_AMP_SQUID_MULT_Q_N_B;
+  constant pkg_AMP_SQUID_Q_WIDTH : positive := pkg_AMP_SQUID_Q_M_S + pkg_AMP_SQUID_Q_N_S;
 
-  -- result
-  -- user-defined: number of bits used for the integer part of the value ( sign bit included)
-  constant pkg_AMP_SQUID_MULT_Q_M_S   : positive := 16;
-  -- user-defined: number of fraction bits
-  constant pkg_AMP_SQUID_MULT_Q_N_S   : natural  := 0;
-  -- auto-computed: bus width
-  constant pkg_AMP_SQUID_MULT_Q_WIDTH : positive := pkg_AMP_SQUID_MULT_Q_M_S + pkg_AMP_SQUID_MULT_Q_N_S;
-
-  -- auto-computed: latency of the mult_sfixed
-  constant pkg_AMP_SQUID_MULT_LATENCY              : natural := pkg_MULT_SFIXED_LATENCY;
-  -- user-defined: FSM latency of the "amp_squid_fpagain_table" moduble
-  constant pkg_AMP_SQUID_FPAGAIN_TABLE_FSM_LATENCY : natural := 1;
-  -- user-defined: optionnal: add output latency to the "amp_squid_fpagain_table" moduble
-  constant pkg_AMP_SQUID_FPAGAIN_TABLE_OUT_LATENCY : natural := pkg_AMP_SQUID_SUB_LATENCY + pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY - pkg_AMP_SQUID_FPAGAIN_TABLE_FSM_LATENCY;
-  -- auto-computed: latency of the "amp_squid_fpagain_table" module
-  constant pkg_AMP_SQUID_FPAGAIN_TABLE_LATENCY     : natural := pkg_AMP_SQUID_FPAGAIN_TABLE_FSM_LATENCY + pkg_AMP_SQUID_FPAGAIN_TABLE_OUT_LATENCY;
   -- auto-computed: latency of the "amp_squid" module
-  constant pkg_AMP_SQUID_LATENCY                   : natural := pkg_AMP_SQUID_SUB_LATENCY + pkg_AMP_SQUID_TF_RAM_B_RD_LATENCY + pkg_AMP_SQUID_MULT_LATENCY;
+  constant pkg_AMP_SQUID_LATENCY                   : natural := pkg_AMP_SQUID_SUB_LATENCY + pkg_AMP_SQUID_TF_RAM_B_RD_LATENCY + pkg_AMP_SQUID_OUT_LATENCY;
   -- auto-computed: latency of the "amp_squid_top" module
   constant pkg_AMP_SQUID_TOP_LATENCY               : natural := pkg_AMP_SQUID_LATENCY;
 

@@ -98,14 +98,11 @@ class AmpSquidTopDataGen(VunitConf):
         ram1_check = json_variant['ram1']['generic']['check']
         ram1_verbosity = json_variant['ram1']['generic']['verbosity']
 
-        fpagain = json_variant['register']['value']['fpagain']
-
         dic = {}
         dic['g_TEST_NAME'] = self.vhdl_test_name
         dic['g_NB_PIXEL_BY_FRAME'] = int(nb_pixel_by_frame)
         dic['g_RAM1_CHECK'] = bool(ram1_check)
         dic['g_RAM1_VERBOSITY'] = ram1_verbosity
-        dic['g_FPAGAIN'] = fpagain
 
         return dic
 
@@ -213,18 +210,24 @@ class AmpSquidTopDataGen(VunitConf):
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
         # process Memory files for the datapath computation
         for dic in dic_sequence:
-            input_filename = dic["value"]['input_filename_datapath']
             name = dic["generic"]['name']
-            input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
+            # defaut ram content
+            input_data_filename = dic["value"]['input_filename_datapath']
+            input_data_filepath = self.get_data_filepath(filename_p=input_data_filename, level_p=level1)
+
 
             if self.verbosity > 0:
-                msg0 = 'used files for the datapath computation: ' + input_filepath
+                msg0 = 'used files for the datapath computation: ' + input_data_filepath
                 display_obj.display(msg_p=msg0, level_p=level2)
 
+
+            # RAM data to write/read
+            input_filename = dic["value"]['input_filename']
+            input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
             shutil.copyfile(input_filepath, output_filepath)
 
             # save the ram content
-            ram_filepath_dic[name] = input_filepath
+            ram_filepath_dic[name] = input_data_filepath
 
         ########################################################
         # Get the testbench parameters
@@ -249,8 +252,6 @@ class AmpSquidTopDataGen(VunitConf):
         adc_amp_squid_offset_correction_mode = adc_amp_squid_offset_correction_dic["mode"]
         adc_amp_squid_offset_correction_min_val = adc_amp_squid_offset_correction_dic["min_value"]
         adc_amp_squid_offset_correction_max_val = adc_amp_squid_offset_correction_dic["max_value"]
-
-        fpasim_gain = json_variant["register"]["value"]["fpagain"]
 
         amp_squid_tf_name = json_variant["ram1"]["generic"]["name"]
         amp_squid_tf_filepath = ram_filepath_dic[amp_squid_tf_name]
@@ -312,7 +313,6 @@ class AmpSquidTopDataGen(VunitConf):
         # amp_squid
         obj_amp = AmpSquidTop(pts_list_p=pts_list)
         obj_amp.set_ram_amp_squid_tf(filepath_p=amp_squid_tf_filepath)
-        obj_amp.set_fpasim_gain(fpasim_gain_p=fpasim_gain)
         pts_list = obj_amp.run(output_attribute_name_p="amp_squid_out")
 
         # Generate the vhdl testbench reference output file

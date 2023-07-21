@@ -43,7 +43,7 @@ entity amp_squid_top is
     g_AMP_SQUID_TF_RAM_ADDR_WIDTH : positive := pkg_AMP_SQUID_TF_RAM_ADDR_WIDTH;  -- address bus width (expressed in bits)
     -- computation
     g_PIXEL_RESULT_INPUT_WIDTH    : positive := pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S;  -- pixel input result bus width (expressed in bits). Possible values [1; max integer value[
-    g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_AMP_SQUID_MULT_Q_WIDTH  -- pixel output bus width (expressed in bits). Possible values [1; max integer value[
+    g_PIXEL_RESULT_OUTPUT_WIDTH   : positive := pkg_AMP_SQUID_Q_WIDTH  -- pixel output bus width (expressed in bits). Possible values [1; max integer value[
     );
   port(
     i_clk         : in std_logic;       -- clock
@@ -62,9 +62,6 @@ entity amp_squid_top is
     i_amp_squid_tf_rd_en      : in  std_logic;  -- read enable
     o_amp_squid_tf_rd_valid   : out std_logic;  -- read data valid
     o_amp_squid_tf_rd_data    : out std_logic_vector(15 downto 0);  -- read data
-
-    -- gain
-    i_fpasim_gain : in std_logic_vector(2 downto 0);  -- gain value
 
     ---------------------------------------------------------------------
     -- input1
@@ -169,7 +166,6 @@ begin
       i_amp_squid_tf_rd_en          => i_amp_squid_tf_rd_en,
       o_amp_squid_tf_rd_valid       => amp_squid_tf_rd_valid,
       o_amp_squid_tf_rd_data        => amp_squid_tf_rd_data,
-      i_fpasim_gain                 => i_fpasim_gain,
       ---------------------------------------------------------------------
       -- input1
       ---------------------------------------------------------------------

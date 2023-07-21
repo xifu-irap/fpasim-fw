@@ -146,12 +146,16 @@ if __name__ == '__main__':
         index_max = len(lines) - 1
         for index,str_line in enumerate(lines):
             str_line = str_line.replace('\n','')
-            str_line = str(int(str_line,16))
+            value = int(str_line,16)
+            if value >= 2**15:
+                value = -(2**16 - value)
+            str_line = str(value)
             if index == 0:
                 fid.write('offset_addr_uint15_t')
                 fid.write(csv_separator)
-                fid.write('data_uint16_t')
+                fid.write('data_int16_t')
                 fid.write('\n')
+                
             fid.write(str(index))
             fid.write(csv_separator)
             fid.write(str_line)

@@ -297,41 +297,7 @@
                 }
             }
         },
-        "@usb_fpgasim_gain": {
-            "description_list": [
-                "This command is used to access to the FPASIM_GAIN register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
-                "The parameters are:",
-                "    :param field/gain: index table of fpasim gain value (multiplicatif factor)",
-                "        :param value (integer: [0,7]): 0: 0.25, 1:0.5, 2:0.75, 3:1, 4:1.5, 5:2, 6:3, 7:4",
-                "        :param bit_pos_min (integer >=0): define the position of the LSB bit",
-                "        :param width (integer >=1): define the field width (expressed in bit)",
-                "",
-                "    :param wr/usb_addr (hexadecimal string): define the Opal kelly address value (wire_in)",
-                "    :param wr/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
-                "",
-                "    :param rd/usb_addr (hexadecimal string): define the Opal kelly address value (wire_out)",
-                "    :param rd/reg_id (integer): unique value used by the VHDL functions to uniquely identify the commands (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",
-                "",
-                "Note: ",
-                "    This section defines the parameter default values.",
-                "    The reg_id value is used by the VHDL functions to uniquely identify the commands"
-            ],
-            "wr": {
-                "usb_addr": "0x02",
-                "reg_id": 202
-            },
-            "rd": {
-                "usb_addr": "0x22",
-                "reg_id": 502
-            },
-            "field": {
-                "gain": {
-                    "value": 0,
-                    "bit_pos_min": 0,
-                    "width": 3
-                }
-            }
-        },
+
         "@usb_mux_sq_fb_delay": {
             "description_list": [
                 "This command is used to access to the MUX_SQ_FB_DELAY register (see 0136-FPAsim_commands_dictionnary_vx.y.xlsx)",

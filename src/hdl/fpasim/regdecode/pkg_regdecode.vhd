@@ -43,7 +43,7 @@ package pkg_regdecode is
   ---------------------------------------------------------------------
   -- user-defined: Firmware version
   -- requirement: FPASIM-FW-REQ-0290
-  constant pkg_FIRMWARE_VERSION_VALUE : integer := 8;
+  constant pkg_FIRMWARE_VERSION_VALUE : integer := 9;
 
   -- user-defined: FIRMWARE ID (name)
   -- requirement: FPASIM-FW-REQ-0280
@@ -173,18 +173,6 @@ package pkg_regdecode is
   constant pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH : integer := pkg_TES_MULT_SUB_Q_WIDTH_B - 1;  -- we substract 1 because one bit was added to pass from unsigned -> signed value
   -- auto-computed: pulse height (bit index high)
   constant pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_H : integer := pkg_MAKE_PULSE_PULSE_HEIGHT_IDX_L + pkg_MAKE_PULSE_PULSE_HEIGHT_WIDTH - 1;
-
-  -- user-defined: fpasim_gain
-  ---------------------------------------------------------------------
-  -- requirement: FPASIM-FW-REQ-0190
-  -- user-defined: fpasim_gain (bit index high)
-  constant pkg_FPASIM_GAIN_IDX_H : integer := 2;
-  -- requirement: FPASIM-FW-REQ-0190
-  -- user-defined: fpasim_gain (bit index low)
-  constant pkg_FPASIM_GAIN_IDX_L : integer := 0;
-  -- auto-computed: fpasim_gain width
-  constant pkg_FPASIM_GAIN_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_FPASIM_GAIN_IDX_H, i_idx_low => pkg_FPASIM_GAIN_IDX_L);
-
 
   -- user-defined: mux_sq_fb_delay
   ---------------------------------------------------------------------

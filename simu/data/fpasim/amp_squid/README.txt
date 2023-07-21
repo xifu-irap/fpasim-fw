@@ -1,4 +1,3 @@
-If the amp_squid_tf.mem is changed then run the "convert_mem_to_csv.py" script in order to update the simulation file:
-    . amp_squid_tf.csv
+The convert_mem_to_csv.py python script converts src/hdl/fpasim/amp_squid/core/amp_squid_tf.mem file into a amp_squid_tf.csv file. The hex values are converted into int16_t valus
 
-The random_amp_squid_tf.csv is manually generated.
+The gen_random_amp_squid_tf.py python script generates the random_amp_squid_tf.csv file. The generated values are random int16_t values.
