@@ -35,11 +35,12 @@
 # -------------------------------------------------------------------------------------------------------------
 
 import pandas as pd
-
+from pathlib import Path
 
 if __name__ == "__main__":
     # define the base address where to find the *.csv input files
-    base_address = './'
+    # base_address = './'
+    base_address = str(Path(__file__).parents[0]) # base path of this script
     input_filename_list = []
     # list of the csv files associated to each column of the FMC
     input_filename_list.append('fmc_pinout_col_a.csv')
@@ -54,7 +55,7 @@ if __name__ == "__main__":
     input_filename_list.append('fmc_pinout_col_k.csv')
 
     # define the output xdc file associated to the processing of the input files
-    output_filepath = base_address + 'fmc_pinout_pandas_tmp.xdc'
+    output_filepath = str(Path(base_address,'fmc_pinout_pandas_tmp.xdc'))
     fid_out = open(output_filepath, 'w')
 
     #######################################################
@@ -63,7 +64,7 @@ if __name__ == "__main__":
     df_list = []
     # read csv files
     for filename in input_filename_list:
-        filepath = base_address + filename
+        filepath = str(Path(base_address, filename))
         df = pd.read_csv(filepath, sep=';')
         df_list.append(df)
 
