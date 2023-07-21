@@ -222,8 +222,9 @@ package body pkg_ram_check is
 
         when E_WAIT_RD =>
 
-          v_wr_data_valid := '0';
+          v_wr_data := (others => '0');
 
+          v_wr_data_valid := '0';
           if i_start_rd = '1' then
 
             v_csv_file.initialize(i_filepath_rd, i_csv_separator => i_csv_separator);
