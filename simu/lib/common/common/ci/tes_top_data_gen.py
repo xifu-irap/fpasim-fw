@@ -267,7 +267,7 @@ class TesTopDataGen(VunitConf):
             display_obj.display(msg_p=msg0, level_p=level1)
 
         ########################################################
-        # Copy the vhdl testbench input RAM configuration files
+        # Copy the testbench input RAM configuration files
         ########################################################
         if self.verbosity > 0:
             msg0 = 'TesTopDataGen._run: Copy the testbench input RAM configuration files'
@@ -277,8 +277,7 @@ class TesTopDataGen(VunitConf):
         dic_sequence.append(json_variant["ram1"])
         dic_sequence.append(json_variant["ram2"])
 
-        ram_filepath_dic = {}
-
+        # files to use in order to write/read/check the memory with the testbench
         for dic in dic_sequence:
             input_filename = dic["value"]['input_filename']
             output_filename = dic["value"]['output_filename']
@@ -296,20 +295,22 @@ class TesTopDataGen(VunitConf):
         if self.verbosity > 0:
             msg0 = 'TesTopDataGen._run: Process RAM configuration files for the computation on the datapath'
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
-        # process Memory files for the datapath computation
+
+        # process the Memory files to used for the datapath computation
+        ram_filepath_dic = {}
         for dic in dic_sequence:
-            input_filename = dic["value"]['input_filename_datapath']
             name = dic["generic"]['name']
-            input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
+            # defaut ram content
+            input_data_filename = dic["value"]['input_filename_datapath']
+            input_data_filepath = self.get_data_filepath(filename_p=input_data_filename, level_p=level1)
+
 
             if self.verbosity > 0:
-                msg0 = 'used files for the datapath computation: ' + input_filepath
+                msg0 = 'used files for the datapath computation: ' + input_data_filepath
                 display_obj.display(msg_p=msg0, level_p=level2)
 
-            shutil.copyfile(input_filepath, output_filepath)
-
             # save the ram content
-            ram_filepath_dic[name] = input_filepath
+            ram_filepath_dic[name] = input_data_filepath
 
 
         ########################################################
