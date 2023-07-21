@@ -24,7 +24,7 @@
 #    Code Rules Reference    N/A
 # -------------------------------------------------------------------------------------------------------------
 #    @details  
-#              
+#
 #    This script search the *.mem files in the src directory in order to generate the corresponding output csv files.
 #       . The line number will be copied in the address column
 #       . The line values will be copied in the data column
@@ -38,6 +38,7 @@ import sys
 import argparse
 import os
 from pathlib import Path
+import math
 
 # retrieve all python library path in order to import them
 def find_file_in_hierarchy(filename_p='DONT_DELETE.txt', depth_level_p=10):
@@ -93,9 +94,65 @@ from common import Display
 from common import FilepathListBuilder
 
 
+def convert_hex_to_uint(input_filepath_p,output_filepath_p,ram_data_width_p=16):
+    """
+        This function convert hex string value into uint value
+
+        Parameters
+        ----------
+        input_filepath_p: str
+            input *.mem filepath with hex string value
+        output_filepath_p: str
+            output *.csv file
+        ram_data_width_p: int
+            data width of the ram (expressed in bits)
+
+        Returns
+        -------
+            None
+
+        """
+
+    # read the *.mem file
+    with open(input_filepath_p,'r') as fid:
+        lines = fid.readlines()
+
+    # skip first line (address line)
+    lines = lines[1:]
+    # compute address_width
+    addr_width = str(math.ceil(math.log2(len(lines))))
+
+    # write the *.csv output file
+    with open(output_filepath_p,'w') as fid:
+        index_max = len(lines) - 1
+        for index,str_line in enumerate(lines):
+            # delete end of line
+            str_line = str_line.replace('\n','')
+            # convert string hex into integer
+            value = int(str_line,16)
+
+            # convert integer into string
+            str_line = str(value)
+
+            # write the *.csv file header
+            if index == 0:
+                fid.write('offset_addr_uint'+str(addr_width)+'_t')
+                fid.write(csv_separator)
+                fid.write('data_uint'+str(ram_data_width_p)+'_t')
+                fid.write('\n')
+            # write data string to file
+            fid.write(str(index))
+            fid.write(csv_separator)
+            fid.write(str_line)
+            if index != index_max:
+                fid.write('\n')
+
+
 if __name__ == '__main__':
 
+    # default csv file separator
     csv_separator = ';'
+    
 
     ################################################
     # build the display object
@@ -108,25 +165,28 @@ if __name__ == '__main__':
     obj_display.display_title(msg_p=msg0,level_p=level0)
 
     ##############################################
-    # process the provided file to fill the tes RAM
+    # compute base path
+    #   script
+    #   *.mem file
     ##############################################
     script_base_path = str(Path(__file__).parents[0])
     src_base_path = str(Path(root_path,'src'))
 
     ##############################################
-    # search *.mem file
+    # search tes_pulse_shape.mem file
     ##############################################
     search_obj = FilepathListBuilder()
     search_obj.set_file_extension(file_extension_list_p=['.mem'])
 
+    # input file to search
     input_filename_list = []
     input_filename_list.append('tes_pulse_shape')
-    input_filename_list.append('tes_std_state')
 
     for filename in input_filename_list:
 
-  
+        # get the path to the *.mem file
         input_filepath = search_obj.get_filepath_by_filename(basepath_p=src_base_path,filename_p=filename+'.mem')
+        # compute the output filepath
         output_filepath = str(Path(script_base_path,filename+'.csv'))
 
         msg0 = 'Read input filepath: '+input_filepath
@@ -135,30 +195,31 @@ if __name__ == '__main__':
         msg0 = 'Write output filepath: '+output_filepath
         obj_display.display(msg_p=msg0,level_p=level1)
 
-
-        fid = open(input_filepath,'r')
-        lines = fid.readlines()
-        fid.close()
-
-        # skip first line (address line)
-        lines = lines[1:]
-
-        fid = open(output_filepath,'w')
-        index_max = len(lines) - 1
-        for index,str_line in enumerate(lines):
-            str_line = str_line.replace('\n','')
-            str_line = str(int(str_line,16))
-            if index == 0:
-                fid.write('offset_addr_uint15_t')
-                fid.write(csv_separator)
-                fid.write('data_uint16_t')
-                fid.write('\n')
-            fid.write(str(index))
-            fid.write(csv_separator)
-            fid.write(str_line)
-            if index != index_max:
-                fid.write('\n')
-        fid.close()
+        convert_hex_to_uint(input_filepath_p=input_filepath,output_filepath_p=output_filepath,ram_data_width_p=16)
 
 
 
+    ##############################################
+    # search mux_squid_offset.mem file
+    ##############################################
+    search_obj = FilepathListBuilder()
+    search_obj.set_file_extension(file_extension_list_p=['.mem'])
+
+    # input file to search
+    input_filename_list = []
+    input_filename_list.append('tes_std_state')
+
+    for filename in input_filename_list:
+
+        # get the path to the *.mem file
+        input_filepath = search_obj.get_filepath_by_filename(basepath_p=src_base_path,filename_p=filename+'.mem')
+        # compute the output filepath
+        output_filepath = str(Path(script_base_path,filename+'.csv'))
+
+        msg0 = 'Read input filepath: '+input_filepath
+        obj_display.display(msg_p=msg0,level_p=level1)
+
+        msg0 = 'Write output filepath: '+output_filepath
+        obj_display.display(msg_p=msg0,level_p=level1)
+
+        convert_hex_to_uint(input_filepath_p=input_filepath,output_filepath_p=output_filepath,ram_data_width_p=16)
