@@ -189,8 +189,8 @@ class AmpSquidTopDataGen(VunitConf):
         dic_sequence = []
         dic_sequence.append(json_variant["ram1"])
 
-        ram_filepath_dic = {}
 
+        # files to use in order to write/read/check the memory with the testbench
         for dic in dic_sequence:
             input_filename = dic["value"]['input_filename']
             output_filename = dic["value"]['output_filename']
@@ -208,7 +208,8 @@ class AmpSquidTopDataGen(VunitConf):
         if self.verbosity > 0:
             msg0 = 'AmpSquidTopDataGen._run: Process RAM configuration files for the computation on the datapath'
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
-        # process Memory files for the datapath computation
+        # process the Memory files to used for the datapath computation
+        ram_filepath_dic = {}
         for dic in dic_sequence:
             name = dic["generic"]['name']
             # defaut ram content
@@ -219,12 +220,6 @@ class AmpSquidTopDataGen(VunitConf):
             if self.verbosity > 0:
                 msg0 = 'used files for the datapath computation: ' + input_data_filepath
                 display_obj.display(msg_p=msg0, level_p=level2)
-
-
-            # RAM data to write/read
-            input_filename = dic["value"]['input_filename']
-            input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
-            shutil.copyfile(input_filepath, output_filepath)
 
             # save the ram content
             ram_filepath_dic[name] = input_data_filepath
