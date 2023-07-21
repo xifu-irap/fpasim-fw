@@ -1,4 +1,4 @@
-offset_addr_uint15_t;data_uint16_t
+offset_addr_uint6_t;data_int16_t
 0;0
 1;0
 2;0
