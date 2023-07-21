@@ -1,5 +1,10 @@
-If the mux_squid_offset.mem and mux_squid_tf.mem was changed then run the "convert_mem_to_csv.py" script in order to update the simulation files:
-    . mux_squid_offset.csv
-    . mux_squid_tf.csv
+The convert_mem_to_csv.py python script converts src/hdl/fpasim/amp_squid/core/mux_squid_tf.mem into a mux_squid_tf.csv file.
+The hex values are converted into uint16_t values.
 
-The random_mux_squid_offset.csv and random_mux_squid_tf.csv are manually generated.
+The convert_mem_to_csv.py python script converts src/hdl/fpasim/amp_squid/core/mux_squid_tf.mem into a mux_squid_offset.csv file
+The hex values are converted into int16_t values.
+
+
+The gen_random_mux_squid_files.py python script generates 2 output files with random values:
+   . random_mux_squid_tf.csv
+   . random_mux_squid_offset.csv
