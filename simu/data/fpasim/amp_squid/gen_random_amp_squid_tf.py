@@ -18,7 +18,7 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   gen_radom_amp_squid_tf.py
+#    @file                   gen_random_amp_squid_tf.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
@@ -54,6 +54,7 @@ if __name__ == "__main__":
     index_max = nb_data - 1
     with open(filepath_out,'w') as fid:
         for index in range(nb_data):
+            # write the csv file header
             if index == 0:
                 fid.write('offset_addr_uint14_t')
                 fid.write(csv_separator)
@@ -62,7 +63,7 @@ if __name__ == "__main__":
             # compute a random integer N such that min_value <= N <= max_value
             data = random.randint(min_value, max_value)
             str_line = str(data)
-
+            # write data
             fid.write(str(index))
             fid.write(csv_separator)
             fid.write(str_line)
