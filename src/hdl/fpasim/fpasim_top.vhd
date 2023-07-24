@@ -485,8 +485,8 @@ architecture RTL of fpasim_top is
   constant c_DAC_IDX5_L : integer := c_DAC_IDX4_H + 1;
   constant c_DAC_IDX5_H : integer := c_DAC_IDX5_L + 1 - 1;
 
-  signal data_pipe_tmp2 : std_logic_vector(c_IDX5_H downto 0);
-  signal data_pipe_tmp3 : std_logic_vector(c_IDX5_H downto 0);
+  signal data_pipe_tmp2 : std_logic_vector(c_DAC_IDX5_H downto 0);
+  signal data_pipe_tmp3 : std_logic_vector(c_DAC_IDX5_H downto 0);
 
   signal pixel_sof4        : std_logic;  -- @suppress "signal pixel_sof3 is never read"
   signal pixel_eof4        : std_logic;  -- @suppress "signal pixel_eof3 is never read"
