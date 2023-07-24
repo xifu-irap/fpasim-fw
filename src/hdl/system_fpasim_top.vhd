@@ -51,7 +51,7 @@ entity system_fpasim_top is
     -- FMC: from the card
     -- requirement: FPASIM-FW-REQ-0270
     ---------------------------------------------------------------------
-    --i_hardware_id : in    std_logic_vector(7 downto 0);  -- card hardware id
+    i_hardware_id : in    std_logic_vector(7 downto 0);  -- card hardware id
 
     ---------------------------------------------------------------------
     -- FMC: from the adc @i_adc_clk_p
@@ -392,9 +392,8 @@ begin
       o_sync_io_rst         => sync_io_rst
       );
 
-  -- TODO: connect to input port
-  --hardware_id <= i_hardware_id;
-  hardware_id <= (others => '0');
+  hardware_id <= i_hardware_id;
+
   ---------------------------------------------------------------------
   -- top_fpasim
   ---------------------------------------------------------------------
