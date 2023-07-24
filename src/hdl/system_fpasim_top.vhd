@@ -107,8 +107,8 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     -- FMC: to sync
     ---------------------------------------------------------------------
-    o_ref_clk   : out std_logic;        -- reference clock
-    o_sync      : out std_logic;  -- pulse at the beginning of the first pixel of a column (@o_ref_clk)
+    o_clk_ref   : out std_logic;  -- reference clock
+    o_clk_frame : out std_logic;  -- sync pulse at the beginning of the first pixel of a column/frame (@o_ref_clk)
     ---------------------------------------------------------------------
     -- FMC: to dac
     ---------------------------------------------------------------------
@@ -554,8 +554,8 @@ begin
       o_sync_status => sync_status,
 
       -- to the fpga pads: @sync_clk
-      o_sync_clk   => o_ref_clk,
-      o_sync       => o_sync,
+      o_sync_clk   => o_clk_ref,
+      o_sync       => o_clk_frame,
       ---------------------------------------------------------------------
       -- dac
       ---------------------------------------------------------------------
