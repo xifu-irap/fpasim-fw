@@ -6,7 +6,6 @@ add wave -noupdate -divider reg_decode
 add wave -noupdate -expand -group usb_opal_kelly -group trig_in /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/o_usb_trigin_data
 add wave -noupdate -expand -group usb_opal_kelly -group wirein /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/o_usb_wirein_ctrl
 add wave -noupdate -expand -group usb_opal_kelly -group wirein /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/o_usb_wirein_make_pulse
-add wave -noupdate -expand -group usb_opal_kelly -group wirein /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/o_usb_wirein_fpasim_gain
 add wave -noupdate -expand -group usb_opal_kelly -group wirein /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/o_usb_wirein_mux_sq_fb_delay
 add wave -noupdate -expand -group usb_opal_kelly -group wirein /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/o_usb_wirein_amp_sq_of_delay
 add wave -noupdate -expand -group usb_opal_kelly -group wirein /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/o_usb_wirein_error_delay
@@ -22,7 +21,6 @@ add wave -noupdate -expand -group usb_opal_kelly -group wirein /tb_system_fpasim
 add wave -noupdate -expand -group usb_opal_kelly -group wirein /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/o_usb_wirein_sel_errors
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_ctrl
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_make_pulse
-add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_fpasim_gain
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_mux_sq_fb_delay
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_amp_sq_of_delay
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_error_delay
@@ -30,9 +28,9 @@ add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasi
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_tes_conf
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_fpasim_status
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_debug_ctrl
+add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_firmware_name
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_firmware_id
-add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_firmware_version
-add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_board_id
+add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_hardware_id
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_rec_ctrl
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_rec_conf0
 add wave -noupdate -expand -group usb_opal_kelly -group wireout /tb_system_fpasim_top/inst_system_fpasim_top/inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/i_usb_wireout_spi_ctrl

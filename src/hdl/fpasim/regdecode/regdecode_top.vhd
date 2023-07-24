@@ -138,7 +138,7 @@ entity regdecode_top is
     ---------------------------------------------------------------------
     -- from the board
     ---------------------------------------------------------------------
-    i_board_id   : in  std_logic_vector(7 downto 0);  -- board id
+    i_hardware_id   : in  std_logic_vector(7 downto 0);  -- hardware id
 
     ---------------------------------------------------------------------
     -- from/to the user: @i_out_clk
@@ -290,12 +290,12 @@ architecture RTL of regdecode_top is
   signal usb_wireout_fpasim_status       : std_logic_vector(31 downto 0);
   -- debug_ctrl register value
   signal usb_wireout_debug_ctrl          : std_logic_vector(31 downto 0);
+  -- firmware_name register value
+  signal usb_wireout_firmware_name       : std_logic_vector(31 downto 0);
   -- firmware_id register value
   signal usb_wireout_firmware_id         : std_logic_vector(31 downto 0);
-  -- firmware_version register value
-  signal usb_wireout_firmware_version    : std_logic_vector(31 downto 0);
-  -- board_id register value
-  signal usb_wireout_board_id            : std_logic_vector(31 downto 0);
+  -- hardware_id register value
+  signal usb_wireout_hardware_id         : std_logic_vector(31 downto 0);
 
   -- recording Registers
   ---------------------------------------------------------------------
@@ -768,9 +768,9 @@ begin
       i_usb_wireout_fpasim_status   => usb_wireout_fpasim_status,
 
       i_usb_wireout_debug_ctrl          => usb_wireout_debug_ctrl,
+      i_usb_wireout_firmware_name       => usb_wireout_firmware_name,
       i_usb_wireout_firmware_id         => usb_wireout_firmware_id,
-      i_usb_wireout_firmware_version    => usb_wireout_firmware_version,
-      i_usb_wireout_board_id            => usb_wireout_board_id,
+      i_usb_wireout_hardware_id         => usb_wireout_hardware_id,
       -- recording: register
       i_usb_wireout_rec_ctrl            => usb_wireout_rec_ctrl,
       i_usb_wireout_rec_conf0           => usb_wireout_rec_conf0,
@@ -844,12 +844,12 @@ begin
   ---------------------------------------------------------------------
   -- get the firmware id
   ---------------------------------------------------------------------
+  usb_wireout_firmware_name    <= pkg_FIRMWARE_NAME;
   usb_wireout_firmware_id      <= pkg_FIRMWARE_ID;
-  usb_wireout_firmware_version <= pkg_FIRMWARE_VERSION;
 
   -- board_id
   -- requirement: FPASIM-FW-REQ-0270
-  usb_wireout_board_id         <= std_logic_vector(resize(unsigned(i_board_id), usb_wireout_board_id'length));
+  usb_wireout_hardware_id  <= std_logic_vector(resize(unsigned(i_hardware_id), usb_wireout_hardware_id'length));
 
   -- from trigin: extract bits signal
   trig_spi_valid        <= usb_trigin_data(pkg_TRIGIN_SPI_VALID_IDX_H);

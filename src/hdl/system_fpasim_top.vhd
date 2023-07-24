@@ -51,57 +51,58 @@ entity system_fpasim_top is
     b_okAA  : inout std_logic; -- usb interface signal
     ---------------------------------------------------------------------
     -- FMC: from the card
+    -- requirement: FPASIM-FW-REQ-0270
     ---------------------------------------------------------------------
-    --i_board_id : in    std_logic_vector(7 downto 0);  -- card board id
+    --i_hardware_id : in    std_logic_vector(7 downto 0);  -- card hardware id
 
     ---------------------------------------------------------------------
     -- FMC: from the adc @i_adc_clk_p
     ---------------------------------------------------------------------
-    i_adc_clk_p : in std_logic;         -- differential_p clock adc @250MHz
-    i_adc_clk_n : in std_logic;         -- differential_n clock adc @250MHZ
+    i_clk_ab_p : in std_logic;         -- differential_p clock adc @250MHz
+    i_clk_ab_n : in std_logic;         -- differential_n clock adc @250MHZ
     -- adc_a
     -- bit P/N: 0-1
-    i_da0_p     : in std_logic;         --  differential_p adc_a (lane0)
-    i_da0_n     : in std_logic;         --  differential_n adc_a (lane0)
+    i_cha_00_p     : in std_logic;         --  differential_p adc_a (lane0)
+    i_cha_00_n     : in std_logic;         --  differential_n adc_a (lane0)
 
-    i_da2_p : in std_logic;             --  differential_p adc_a (lane1)
-    i_da2_n : in std_logic;             --  differential_n adc_a (lane1)
+    i_cha_02_p : in std_logic;             --  differential_p adc_a (lane1)
+    i_cha_02_n : in std_logic;             --  differential_n adc_a (lane1)
 
-    i_da4_p : in std_logic;             --  differential_p adc_a (lane2)
-    i_da4_n : in std_logic;             --  differential_n adc_a (lane2)
+    i_cha_04_p : in std_logic;             --  differential_p adc_a (lane2)
+    i_cha_04_n : in std_logic;             --  differential_n adc_a (lane2)
 
-    i_da6_p : in std_logic;             --  differential_p adc_a (lane3)
-    i_da6_n : in std_logic;             --  differential_n adc_a (lane3)
+    i_cha_06_p : in std_logic;             --  differential_p adc_a (lane3)
+    i_cha_06_n : in std_logic;             --  differential_n adc_a (lane3)
 
-    i_da8_p : in std_logic;             --  differential_p adc_a (lane4)
-    i_da8_n : in std_logic;             --  differential_n adc_a (lane4)
+    i_cha_08_p : in std_logic;             --  differential_p adc_a (lane4)
+    i_cha_08_n : in std_logic;             --  differential_n adc_a (lane4)
 
-    i_da10_p : in std_logic;            --  differential_p adc_a (lane5)
-    i_da10_n : in std_logic;            --  differential_n adc_a (lane5)
+    i_cha_10_p : in std_logic;            --  differential_p adc_a (lane5)
+    i_cha_10_n : in std_logic;            --  differential_n adc_a (lane5)
 
-    i_da12_p : in std_logic;            --  differential_p adc_a (lane6)
-    i_da12_n : in std_logic;            --  differential_n adc_a (lane6)
+    i_cha_12_p : in std_logic;            --  differential_p adc_a (lane6)
+    i_cha_12_n : in std_logic;            --  differential_n adc_a (lane6)
     -- adc_b
-    i_db0_p  : in std_logic;            --  differential_p adc_b (lane0)
-    i_db0_n  : in std_logic;            --  differential_n adc_b (lane0)
+    i_chb_00_p  : in std_logic;            --  differential_p adc_b (lane0)
+    i_chb_00_n  : in std_logic;            --  differential_n adc_b (lane0)
 
-    i_db2_p : in std_logic;             --  differential_p adc_b (lane1)
-    i_db2_n : in std_logic;             --  differential_n adc_b (lane1)
+    i_chb_02_p : in std_logic;             --  differential_p adc_b (lane1)
+    i_chb_02_n : in std_logic;             --  differential_n adc_b (lane1)
 
-    i_db4_p : in std_logic;             --  differential_p adc_b (lane2)
-    i_db4_n : in std_logic;             --  differential_n adc_b (lane2)
+    i_chb_04_p : in std_logic;             --  differential_p adc_b (lane2)
+    i_chb_04_n : in std_logic;             --  differential_n adc_b (lane2)
 
-    i_db6_p : in std_logic;             --  differential_p adc_b (lane3)
-    i_db6_n : in std_logic;             --  differential_n adc_b (lane3)
+    i_chb_06_p : in std_logic;             --  differential_p adc_b (lane3)
+    i_chb_06_n : in std_logic;             --  differential_n adc_b (lane3)
 
-    i_db8_p : in std_logic;             --  differential_p adc_b (lane4)
-    i_db8_n : in std_logic;             --  differential_n adc_b (lane4)
+    i_chb_08_p : in std_logic;             --  differential_p adc_b (lane4)
+    i_chb_08_n : in std_logic;             --  differential_n adc_b (lane4)
 
-    i_db10_p : in std_logic;            --  differential_p adc_b (lane5)
-    i_db10_n : in std_logic;            --  differential_n adc_b (lane5)
+    i_chb_10_p : in std_logic;            --  differential_p adc_b (lane5)
+    i_chb_10_n : in std_logic;            --  differential_n adc_b (lane5)
 
-    i_db12_p : in std_logic;            --  differential_p adc_b (lane6)
-    i_db12_n : in std_logic;            --  differential_n adc_b (lane6)
+    i_chb_12_p : in std_logic;            --  differential_p adc_b (lane6)
+    i_chb_12_n : in std_logic;            --  differential_n adc_b (lane6)
 
     ---------------------------------------------------------------------
     -- FMC: to sync
@@ -111,35 +112,35 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     -- FMC: to dac
     ---------------------------------------------------------------------
-    o_dac_clk_p : out std_logic;        -- differential_p dac clock
-    o_dac_clk_n : out std_logic;        -- differential_n dac clock
+    o_dac_dclk_p : out std_logic;        -- differential_p dac clock
+    o_dac_dclk_n : out std_logic;        -- differential_n dac clock
 
-    o_dac_frame_p : out std_logic;      -- differential_p dac frame
-    o_dac_frame_n : out std_logic;      -- differential_n dac frame
+    o_frame_p : out std_logic;      -- differential_p dac frame
+    o_frame_n : out std_logic;      -- differential_n dac frame
 
-    o_dac0_p : out std_logic;           -- differential_p dac data (lane0)
-    o_dac0_n : out std_logic;           -- differential_n dac data (lane0)
+    o_dac_d0_p : out std_logic;           -- differential_p dac data (lane0)
+    o_dac_d0_n : out std_logic;           -- differential_n dac data (lane0)
 
-    o_dac1_p : out std_logic;           -- differential_p dac data (lane1)
-    o_dac1_n : out std_logic;           -- differential_n dac data (lane1)
+    o_dac_d1_p : out std_logic;           -- differential_p dac data (lane1)
+    o_dac_d1_n : out std_logic;           -- differential_n dac data (lane1)
 
-    o_dac2_p : out std_logic;           -- differential_p dac data (lane2)
-    o_dac2_n : out std_logic;           -- differential_n dac data (lane2)
+    o_dac_d2_p : out std_logic;           -- differential_p dac data (lane2)
+    o_dac_d2_n : out std_logic;           -- differential_n dac data (lane2)
 
-    o_dac3_p : out std_logic;           -- differential_p dac data (lane3)
-    o_dac3_n : out std_logic;           -- differential_n dac data (lane3)
+    o_dac_d3_p : out std_logic;           -- differential_p dac data (lane3)
+    o_dac_d3_n : out std_logic;           -- differential_n dac data (lane3)
 
-    o_dac4_p : out std_logic;           -- differential_p dac data (lane4)
-    o_dac4_n : out std_logic;           -- differential_n dac data (lane4)
+    o_dac_d4_p : out std_logic;           -- differential_p dac data (lane4)
+    o_dac_d4_n : out std_logic;           -- differential_n dac data (lane4)
 
-    o_dac5_p : out std_logic;           -- differential_p dac data (lane5)
-    o_dac5_n : out std_logic;           -- differential_n dac data (lane5)
+    o_dac_d5_p : out std_logic;           -- differential_p dac data (lane5)
+    o_dac_d5_n : out std_logic;           -- differential_n dac data (lane5)
 
-    o_dac6_p : out std_logic;           -- differential_p dac data (lane6)
-    o_dac6_n : out std_logic;           -- differential_n dac data (lane6)
+    o_dac_d6_p : out std_logic;           -- differential_p dac data (lane6)
+    o_dac_d6_n : out std_logic;           -- differential_n dac data (lane6)
 
-    o_dac7_p : out std_logic;           -- differential_p dac data (lane7)
-    o_dac7_n : out std_logic;           -- differential_n dac data (lane7)
+    o_dac_d7_p : out std_logic;           -- differential_p dac data (lane7)
+    o_dac_d7_n : out std_logic;           -- differential_n dac data (lane7)
 
     ---------------------------------------------------------------------
     -- devices: spi links + specific signals
@@ -153,7 +154,7 @@ entity system_fpasim_top is
     o_cdce_n_en : out std_logic;        -- SPI chip select
 
     -- CDCE: specific signals
-    i_cdce_pll_status : in  std_logic;  -- pll_status : This pin is set high if the PLL is in lock.
+    i_pll_status : in  std_logic;  -- pll_status : This pin is set high if the PLL is in lock.
     o_cdce_n_reset    : out std_logic;  -- reset_n or hold_n
     o_cdce_n_pd       : out std_logic;  -- power_down_n
     o_ref_en          : out std_logic;  -- enable the primary reference clock
@@ -168,7 +169,7 @@ entity system_fpasim_top is
     i_dac_sdo        : in  std_logic;   -- SPI MISO
     o_dac_n_en       : out std_logic;   -- SPI chip select
     -- DAC: specific signal
-    o_dac_tx_present : out std_logic;   -- enable tx acquisition
+    o_tx_enable : out std_logic;   -- enable tx acquisition
 
     -- AMC: SPI (monitoring)
     i_mon_sdo     : in  std_logic;      -- SPI data out
@@ -186,9 +187,9 @@ end entity system_fpasim_top;
 
 architecture RTL of system_fpasim_top is
 
-  --signal board_id : std_logic_vector(i_board_id'range);
-  -- board id
-  signal board_id : std_logic_vector(7 downto 0);
+  --signal hardware_id : std_logic_vector(i_board_id'range);
+  -- hardware id
+  signal hardware_id : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- clock generation
@@ -386,8 +387,8 @@ begin
       );
 
   -- TODO: connect to input port
-  --board_id <= i_board_id;
-  board_id <= (others => '0');
+  --hardware_id <= i_hardware_id;
+  hardware_id <= (others => '0');
   ---------------------------------------------------------------------
   -- top_fpasim
   ---------------------------------------------------------------------
@@ -409,7 +410,7 @@ begin
       ---------------------------------------------------------------------
       -- from the board
       ---------------------------------------------------------------------
-      i_board_id    => board_id,
+      i_hardware_id    => hardware_id,
       ---------------------------------------------------------------------
       -- to the IOs: @i_clk
       ---------------------------------------------------------------------
@@ -499,38 +500,38 @@ begin
       i_adc_io_clk_rst => adc_io_clk_rst,
       i_adc_io_rst     => adc_io_rst,
       -- from the fpga pads
-      i_adc_clk_p      => i_adc_clk_p,
-      i_adc_clk_n      => i_adc_clk_n,
+      i_adc_clk_p      => i_clk_ab_p,
+      i_adc_clk_n      => i_clk_ab_n,
       -- from fpga pads: adc_a  @i_adc_clk_p/n
-      i_da0_p          => i_da0_p,
-      i_da0_n          => i_da0_n,
-      i_da2_p          => i_da2_p,
-      i_da2_n          => i_da2_n,
-      i_da4_p          => i_da4_p,
-      i_da4_n          => i_da4_n,
-      i_da6_p          => i_da6_p,
-      i_da6_n          => i_da6_n,
-      i_da8_p          => i_da8_p,
-      i_da8_n          => i_da8_n,
-      i_da10_p         => i_da10_p,
-      i_da10_n         => i_da10_n,
-      i_da12_p         => i_da12_p,
-      i_da12_n         => i_da12_n,
+      i_da0_p          => i_cha_00_p,
+      i_da0_n          => i_cha_00_n,
+      i_da2_p          => i_cha_02_p,
+      i_da2_n          => i_cha_02_n,
+      i_da4_p          => i_cha_04_p,
+      i_da4_n          => i_cha_04_n,
+      i_da6_p          => i_cha_06_p,
+      i_da6_n          => i_cha_06_n,
+      i_da8_p          => i_cha_08_p,
+      i_da8_n          => i_cha_08_n,
+      i_da10_p         => i_cha_10_p,
+      i_da10_n         => i_cha_10_n,
+      i_da12_p         => i_cha_12_p,
+      i_da12_n         => i_cha_12_n,
       -- from fpga pads: adc_b @i_adc_clk_p/n
-      i_db0_p          => i_db0_p,
-      i_db0_n          => i_db0_n,
-      i_db2_p          => i_db2_p,
-      i_db2_n          => i_db2_n,
-      i_db4_p          => i_db4_p,
-      i_db4_n          => i_db4_n,
-      i_db6_p          => i_db6_p,
-      i_db6_n          => i_db6_n,
-      i_db8_p          => i_db8_p,
-      i_db8_n          => i_db8_n,
-      i_db10_p         => i_db10_p,
-      i_db10_n         => i_db10_n,
-      i_db12_p         => i_db12_p,
-      i_db12_n         => i_db12_n,
+      i_db0_p          => i_chb_00_p,
+      i_db0_n          => i_chb_00_n,
+      i_db2_p          => i_chb_02_p,
+      i_db2_n          => i_chb_02_n,
+      i_db4_p          => i_chb_04_p,
+      i_db4_n          => i_chb_04_n,
+      i_db6_p          => i_chb_06_p,
+      i_db6_n          => i_chb_06_n,
+      i_db8_p          => i_chb_08_p,
+      i_db8_n          => i_chb_08_n,
+      i_db10_p         => i_chb_10_p,
+      i_db10_n         => i_chb_10_n,
+      i_db12_p         => i_chb_12_p,
+      i_db12_n         => i_chb_12_n,
 
       -- to user: @i_sys_clk
       o_adc_valid       => adc_valid,
@@ -574,28 +575,28 @@ begin
 
       -- to the fpga pads: @i_dac_clk
       -- dac clock @i_dac_clk
-      o_dac_clk_p   => o_dac_clk_p,
-      o_dac_clk_n   => o_dac_clk_n,
+      o_dac_clk_p   => o_dac_dclk_p,
+      o_dac_clk_n   => o_dac_dclk_n,
       -- dac frame flag @i_dac_clk
-      o_dac_frame_p => o_dac_frame_p,
-      o_dac_frame_n => o_dac_frame_n,
+      o_dac_frame_p => o_frame_p,
+      o_dac_frame_n => o_frame_n,
       -- dac data @i_dac_clk
-      o_dac0_p      => o_dac0_p,
-      o_dac0_n      => o_dac0_n,
-      o_dac1_p      => o_dac1_p,
-      o_dac1_n      => o_dac1_n,
-      o_dac2_p      => o_dac2_p,
-      o_dac2_n      => o_dac2_n,
-      o_dac3_p      => o_dac3_p,
-      o_dac3_n      => o_dac3_n,
-      o_dac4_p      => o_dac4_p,
-      o_dac4_n      => o_dac4_n,
-      o_dac5_p      => o_dac5_p,
-      o_dac5_n      => o_dac5_n,
-      o_dac6_p      => o_dac6_p,
-      o_dac6_n      => o_dac6_n,
-      o_dac7_p      => o_dac7_p,
-      o_dac7_n      => o_dac7_n
+      o_dac0_p      => o_dac_d0_p,
+      o_dac0_n      => o_dac_d0_n,
+      o_dac1_p      => o_dac_d1_p,
+      o_dac1_n      => o_dac_d1_n,
+      o_dac2_p      => o_dac_d2_p,
+      o_dac2_n      => o_dac_d2_n,
+      o_dac3_p      => o_dac_d3_p,
+      o_dac3_n      => o_dac_d3_n,
+      o_dac4_p      => o_dac_d4_p,
+      o_dac4_n      => o_dac_d4_n,
+      o_dac5_p      => o_dac_d5_p,
+      o_dac5_n      => o_dac_d5_n,
+      o_dac6_p      => o_dac_d6_p,
+      o_dac6_n      => o_dac_d6_n,
+      o_dac7_p      => o_dac_d7_p,
+      o_dac7_n      => o_dac_d7_n
       );
 
   ---------------------------------------------------------------------
@@ -640,7 +641,7 @@ begin
       i_cdce_sdo           => i_cdce_sdo,   -- SPI MISO
       o_cdce_n_en          => cdce_n_en,    -- SPI chip select
       -- CDCE: specific signals
-      i_cdce_pll_status    => i_cdce_pll_status,  -- pll_status : This pin is set high if the PLL is in lock.
+      i_cdce_pll_status    => i_pll_status,  -- pll_status : This pin is set high if the PLL is in lock.
       o_cdce_n_reset       => cdce_n_reset,    -- reset_n or hold_n
       o_cdce_n_pd          => cdce_n_pd,    -- power_down_n
       o_ref_en             => ref_en,   -- enable the primary reference clock
@@ -680,7 +681,7 @@ begin
 
 --dac
   o_dac_n_en       <= dac_n_en;         -- SPI chip select
-  o_dac_tx_present <= dac_tx_present;   -- enable tx acquisition
+  o_tx_enable <= dac_tx_present;   -- enable tx acquisition
 
 --amc
   o_mon_n_en    <= mon_n_en;            -- SPI chip select

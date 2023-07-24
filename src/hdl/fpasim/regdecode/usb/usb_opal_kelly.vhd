@@ -62,9 +62,9 @@ entity usb_opal_kelly is
     i_usb_wireout_conf0               : in    std_logic_vector(31 downto 0);  -- conf0 register (reading)
     i_usb_wireout_fpasim_status       : in    std_logic_vector(31 downto 0);  -- fpasim register (reading)
     i_usb_wireout_debug_ctrl          : in    std_logic_vector(31 downto 0);  -- debug_ctrl register (reading)
+    i_usb_wireout_firmware_name       : in    std_logic_vector(31 downto 0);  -- firmware name register (reading)
     i_usb_wireout_firmware_id         : in    std_logic_vector(31 downto 0);  -- firmware id register (reading)
-    i_usb_wireout_firmware_version    : in    std_logic_vector(31 downto 0);  -- firmware version register (reading)
-    i_usb_wireout_board_id            : in    std_logic_vector(31 downto 0);  -- board id register (reading)
+    i_usb_wireout_hardware_id         : in    std_logic_vector(31 downto 0);  -- hardware id register (reading)
     -- recording: register
     i_usb_wireout_rec_ctrl            : in    std_logic_vector(31 downto 0);  -- rec_ctrl register (reading)
     i_usb_wireout_rec_conf0           : in    std_logic_vector(31 downto 0);  -- rec_conf0 register (reading)
@@ -276,9 +276,9 @@ begin
   ep3B_wire <= i_usb_wireout_status;
 
   -- to wire_out: others
-  ep3D_wire <= i_usb_wireout_board_id;
-  ep3E_wire <= i_usb_wireout_firmware_id;
-  ep3F_wire <= i_usb_wireout_firmware_version;
+  ep3D_wire <= i_usb_wireout_hardware_id;
+  ep3E_wire <= i_usb_wireout_firmware_name;
+  ep3F_wire <= i_usb_wireout_firmware_id;
 
   -- from/to pipe out
   o_usb_pipeout_fifo_rd <= epA0_pipe_rd;
