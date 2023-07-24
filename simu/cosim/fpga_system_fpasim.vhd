@@ -258,39 +258,39 @@ begin
       ---------------------------------------------------------------------
       -- FMC: from the adc
       ---------------------------------------------------------------------
-      i_adc_clk_p       => adc_clk_p,
-      i_adc_clk_n       => adc_clk_n,
+      i_clk_ab_p       => adc_clk_p,
+      i_clk_ab_n       => adc_clk_n,
       -- adc_a
       -- bit P/N: 0-1
-      i_da0_p           => da0_p,
-      i_da0_n           => da0_n,
-      i_da2_p           => da2_p,
-      i_da2_n           => da2_n,
-      i_da4_p           => da4_p,
-      i_da4_n           => da4_n,
-      i_da6_p           => da6_p,
-      i_da6_n           => da6_n,
-      i_da8_p           => da8_p,
-      i_da8_n           => da8_n,
-      i_da10_p          => da10_p,
-      i_da10_n          => da10_n,
-      i_da12_p          => da12_p,
-      i_da12_n          => da12_n,
+      i_cha_00_p           => da0_p,
+      i_cha_00_n           => da0_n,
+      i_cha_02_p           => da2_p,
+      i_cha_02_n           => da2_n,
+      i_cha_04_p           => da4_p,
+      i_cha_04_n           => da4_n,
+      i_cha_06_p           => da6_p,
+      i_cha_06_n           => da6_n,
+      i_cha_08_p           => da8_p,
+      i_cha_08_n           => da8_n,
+      i_cha_10_p          => da10_p,
+      i_cha_10_n          => da10_n,
+      i_cha_12_p          => da12_p,
+      i_cha_12_n          => da12_n,
       -- adc_b
-      i_db0_p           => db0_p,
-      i_db0_n           => db0_n,
-      i_db2_p           => db2_p,
-      i_db2_n           => db2_n,
-      i_db4_p           => db4_p,
-      i_db4_n           => db4_n,
-      i_db6_p           => db6_p,
-      i_db6_n           => db6_n,
-      i_db8_p           => db8_p,
-      i_db8_n           => db8_n,
-      i_db10_p          => db10_p,
-      i_db10_n          => db10_n,
-      i_db12_p          => db12_p,
-      i_db12_n          => db12_n,
+      i_chb_00_p           => db0_p,
+      i_chb_00_n           => db0_n,
+      i_chb_02_p           => db2_p,
+      i_chb_02_n           => db2_n,
+      i_chb_04_p           => db4_p,
+      i_chb_04_n           => db4_n,
+      i_chb_06_p           => db6_p,
+      i_chb_06_n           => db6_n,
+      i_chb_08_p           => db8_p,
+      i_chb_08_n           => db8_n,
+      i_chb_10_p           => db10_p,
+      i_chb_10_n           => db10_n,
+      i_chb_12_p           => db12_p,
+      i_chb_12_n           => db12_n,
       ---------------------------------------------------------------------
       -- FMC: to sync
       ---------------------------------------------------------------------
@@ -299,26 +299,26 @@ begin
       ---------------------------------------------------------------------
       -- FMC: to dac
       ---------------------------------------------------------------------
-      o_dac_clk_p       => dac_clk_p,
-      o_dac_clk_n       => dac_clk_n,
-      o_dac_frame_p     => dac_frame_p,
-      o_dac_frame_n     => dac_frame_n,
-      o_dac0_p          => dac0_p,
-      o_dac0_n          => dac0_n,
-      o_dac1_p          => dac1_p,
-      o_dac1_n          => dac1_n,
-      o_dac2_p          => dac2_p,
-      o_dac2_n          => dac2_n,
-      o_dac3_p          => dac3_p,
-      o_dac3_n          => dac3_n,
-      o_dac4_p          => dac4_p,
-      o_dac4_n          => dac4_n,
-      o_dac5_p          => dac5_p,
-      o_dac5_n          => dac5_n,
-      o_dac6_p          => dac6_p,
-      o_dac6_n          => dac6_n,
-      o_dac7_p          => dac7_p,
-      o_dac7_n          => dac7_n,
+      o_dac_dclk_p        => dac_clk_p,
+      o_dac_dclk_n        => dac_clk_n,
+      o_frame_p           => dac_frame_p,
+      o_frame_n           => dac_frame_n,
+      o_dac_d0_p          => dac0_p,
+      o_dac_d0_n          => dac0_n,
+      o_dac_d1_p          => dac1_p,
+      o_dac_d1_n          => dac1_n,
+      o_dac_d2_p          => dac2_p,
+      o_dac_d2_n          => dac2_n,
+      o_dac_d3_p          => dac3_p,
+      o_dac_d3_n          => dac3_n,
+      o_dac_d4_p          => dac4_p,
+      o_dac_d4_n          => dac4_n,
+      o_dac_d5_p          => dac5_p,
+      o_dac_d5_n          => dac5_n,
+      o_dac_d6_p          => dac6_p,
+      o_dac_d6_n          => dac6_n,
+      o_dac_d7_p          => dac7_p,
+      o_dac_d7_n          => dac7_n,
       ---------------------------------------------------------------------
       -- devices: spi links + specific signals
       ---------------------------------------------------------------------
@@ -329,7 +329,7 @@ begin
       i_cdce_sdo        => cdce_sdo,         -- not connected
       o_cdce_n_en       => cdce_n_en,        -- not connected
       -- CDCE: specific signals
-      i_cdce_pll_status => cdce_pll_status,  -- not connected
+      i_pll_status      => cdce_pll_status,  -- not connected
       o_cdce_n_reset    => cdce_n_reset,     -- not connected
       o_cdce_n_pd       => cdce_n_pd,        -- not connected
       o_ref_en          => ref_en,           -- not connected
@@ -342,7 +342,7 @@ begin
       i_dac_sdo         => dac_sdo,          -- not connected
       o_dac_n_en        => dac_n_en,         -- not connected
       -- DAC: specific signal
-      o_dac_tx_present  => dac_tx_present,   -- not connected
+      o_tx_enable       => dac_tx_present,   -- not connected
       -- AMC: SPI (monitoring)
       i_mon_sdo         => mon_sdo,          -- not connected
       o_mon_n_en        => mon_n_en,         -- not connected
