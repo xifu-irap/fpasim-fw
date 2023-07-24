@@ -1272,10 +1272,10 @@ set_property PACKAGE_PIN P26 [get_ports {o_leds[3]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {o_leds[*]}]
 
 # TODO: temporary
-set_property PACKAGE_PIN T24 [get_ports {o_ref_clk}]
-set_property IOSTANDARD LVCMOS33 [get_ports o_ref_clk];
-set_property PACKAGE_PIN T25 [get_ports {o_sync}]
-set_property IOSTANDARD LVCMOS33 [get_ports o_sync];
+set_property PACKAGE_PIN T24 [get_ports {o_clk_ref}]
+set_property IOSTANDARD LVCMOS33 [get_ports o_clk_ref];
+set_property PACKAGE_PIN T25 [get_ports {o_clk_frame}]
+set_property IOSTANDARD LVCMOS33 [get_ports o_clk_frame];
 
 # Flash ####################################################################
 # set_property PACKAGE_PIN N17 [get_ports {spi_dq0}]
