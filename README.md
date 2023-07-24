@@ -33,4 +33,3 @@ The software, the library and the boards **are not provided** (see the [`Prerequ
 
 Only, the **vhdl source files** as well as the **VHDL simulation files** are **provided**.
 
-
