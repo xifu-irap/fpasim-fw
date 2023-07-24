@@ -26,11 +26,14 @@
 #
 #   This scrips processes few input csv files which describes the relationship
 #   between fpga and fmc parameters (name, pin location,..) in order to generate
-#   an output xdc file.
+#   a temporary output xdc file.
 #
 #   Note:
 #      . Each input csv files are associated to a FMC connector column.
 #      . Tested with python : 3.10.7
+#
+#   Dependency:
+#      . pandas library needs to be installed. tested with pandas 1.5.3
 #
 # -------------------------------------------------------------------------------------------------------------
 
