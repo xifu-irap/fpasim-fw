@@ -105,7 +105,10 @@
 # Untracked output simulation directory
 /vunit_out
 # Untracked vendor Opal Kelly Source file directory
-/ip/opal_kelly
+/ip/opal_kelly/simu/*.vhd
+/ip/opal_kelly/simu/*.txt
+/ip/opal_kelly/syn/*.v
+/ip/opal_kelly/syn/*.vhd
 # Untracked temporary vhdl source files
 /src/hdl/fmc
 # Untracked documentation
