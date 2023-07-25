@@ -44,9 +44,9 @@ create_clock -name virt_okUH0 -period 9.920
 ###############################################################################################################
 # rename auto-derived clock
 ###############################################################################################################
-set usb_clk_in_pin [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/mmcm0/CLKIN1]
-set usb_clk_out_pin  [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/mmcm0/CLKOUT0]
-# set usb_clk [get_clocks -of_objects [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/mmcm0/CLKOUT0]]
+set usb_clk_in_pin [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/inst_Opal_Kelly_Host/mmcm0/CLKIN1]
+set usb_clk_out_pin  [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/inst_Opal_Kelly_Host/mmcm0/CLKOUT0]
+# set usb_clk [get_clocks -of_objects [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/inst_Opal_Kelly_Host/mmcm0/CLKOUT0]]
 set mmcm_clk_in_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKIN1]
 set mmcm_clk_ref_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT0]
 set mmcm_clk_sys_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_0/inst/mmcm_adv_inst/CLKOUT1]
@@ -102,8 +102,8 @@ set_false_path -hold -fall_from [get_clocks dac_clk] -fall_to [get_clocks gen_da
 ###############################################################################################################
 # usb: constraints register/Q on register/clk
 ###############################################################################################################
-set usb_src [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/core0/core0/a0/d0/lc4da648cb12eeeb24e4d199c1195ed93_reg[4]/C]
-set usb_dest [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/Opal_Kelly_Host/core0/core0/a0/d0/lc4da648cb12eeeb24e4d199c1195ed93_reg[4]/Q]
+set usb_src [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/inst_Opal_Kelly_Host/core0/core0/a0/d0/lc4da648cb12eeeb24e4d199c1195ed93_reg[4]/C]
+set usb_dest [get_pins inst_fpasim_top/inst_regdecode_top/inst_usb_opal_kelly/inst_Opal_Kelly_Host/core0/core0/a0/d0/lc4da648cb12eeeb24e4d199c1195ed93_reg[4]/Q]
 create_generated_clock -name usb_clk_regQ_on_clk_pin -source $usb_src -divide_by 2 $usb_dest;
 
 ###############################################################################################################
