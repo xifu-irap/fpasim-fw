@@ -1,14 +1,14 @@
 -- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2022.1 (win64) Build 3526262 Mon Apr 18 15:48:16 MDT 2022
--- Date        : Mon Jan  9 12:03:51 2023
+-- Date        : Tue Jul 25 09:45:35 2023
 -- Host        : PC-PAUL running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim -rename_top selectio_wiz_adc -prefix
 --               selectio_wiz_adc_ selectio_wiz_adc_sim_netlist.vhdl
 -- Design      : selectio_wiz_adc
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
--- Device      : xc7k160tffg676-1
+-- Device      : xc7k410tffg676-1
 -- --------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;

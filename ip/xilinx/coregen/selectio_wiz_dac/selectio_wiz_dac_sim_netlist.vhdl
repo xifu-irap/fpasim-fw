@@ -1,20 +1,20 @@
 -- Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2022.1 (win64) Build 3526262 Mon Apr 18 15:48:16 MDT 2022
--- Date        : Mon Jan  9 12:03:51 2023
+-- Date        : Tue Jul 25 09:54:10 2023
 -- Host        : PC-PAUL running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode funcsim -rename_top selectio_wiz_dac -prefix
---               selectio_wiz_dac_ selectio_wiz_dac_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim
+--               d:/fpasim-fw-hardware/ip/xilinx/coregen/selectio_wiz_dac/selectio_wiz_dac_sim_netlist.vhdl
 -- Design      : selectio_wiz_dac
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
--- Device      : xc7k160tffg676-1
+-- Device      : xc7k410tffg676-1
 -- --------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity selectio_wiz_dac_selectio_wiz_dac_selectio_wiz is
+entity selectio_wiz_dac_selectio_wiz is
   port (
     data_out_from_device : in STD_LOGIC_VECTOR ( 63 downto 0 );
     data_out_to_pins_p : out STD_LOGIC_VECTOR ( 7 downto 0 );
@@ -24,14 +24,14 @@ entity selectio_wiz_dac_selectio_wiz_dac_selectio_wiz is
     io_reset : in STD_LOGIC
   );
   attribute DEV_W : integer;
-  attribute DEV_W of selectio_wiz_dac_selectio_wiz_dac_selectio_wiz : entity is 64;
+  attribute DEV_W of selectio_wiz_dac_selectio_wiz : entity is 64;
   attribute SYS_W : integer;
-  attribute SYS_W of selectio_wiz_dac_selectio_wiz_dac_selectio_wiz : entity is 8;
+  attribute SYS_W of selectio_wiz_dac_selectio_wiz : entity is 8;
   attribute num_serial_bits : integer;
-  attribute num_serial_bits of selectio_wiz_dac_selectio_wiz_dac_selectio_wiz : entity is 8;
-end selectio_wiz_dac_selectio_wiz_dac_selectio_wiz;
+  attribute num_serial_bits of selectio_wiz_dac_selectio_wiz : entity is 8;
+end selectio_wiz_dac_selectio_wiz;
 
-architecture STRUCTURE of selectio_wiz_dac_selectio_wiz_dac_selectio_wiz is
+architecture STRUCTURE of selectio_wiz_dac_selectio_wiz is
   signal data_out_to_pins_int : STD_LOGIC_VECTOR ( 7 downto 0 );
   signal \NLW_pins[0].oserdese2_master_OFB_UNCONNECTED\ : STD_LOGIC;
   signal \NLW_pins[0].oserdese2_master_SHIFTOUT1_UNCONNECTED\ : STD_LOGIC;
@@ -640,7 +640,7 @@ architecture STRUCTURE of selectio_wiz_dac is
   attribute num_serial_bits : integer;
   attribute num_serial_bits of inst : label is 8;
 begin
-inst: entity work.selectio_wiz_dac_selectio_wiz_dac_selectio_wiz
+inst: entity work.selectio_wiz_dac_selectio_wiz
      port map (
       clk_div_in => clk_div_in,
       clk_in => clk_in,
