@@ -8,7 +8,6 @@ verific -vhdl ./src/hdl/utils/math/sub_sfixed.vhd
 verific -vhdl ./src/hdl/utils/others/pipeliner.vhd
 verific -vhdl ./ip/xilinx/xpm/ram/tdpram.vhd
 verific -vhdl ./src/hdl/utils/ram/ram_check.vhd
-verific -vhdl ./src/hdl/fpasim/amp_squid/core/amp_squid_fpagain_table.vhd
 verific -vhdl ./src/hdl/utils/math/mult_sfixed.vhd
 verific -vhdl ./src/hdl/utils/error/one_error_latch.vhd
 verific -vhdl ./src/hdl/fpasim/amp_squid/core/amp_squid.vhd
