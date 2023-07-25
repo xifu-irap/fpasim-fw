@@ -181,7 +181,7 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     -- debug
     ---------------------------------------------------------------------
-    o_spy : out std_logic_vector(15 downto 0);
+    o_spy  : out std_logic_vector(15 downto 0);
     ---------------------------------------------------------------------
     -- leds
     ---------------------------------------------------------------------
@@ -495,7 +495,7 @@ begin
       ---------------------------------------------------------------------
       -- debug
       ---------------------------------------------------------------------
-      o_spy => spy
+      o_spy                             => spy
       );
 
   adc_amp_squid_offset_correction <= adc_b;
@@ -583,11 +583,11 @@ begin
       o_sync_errors => sync_errors,
       o_sync_status => sync_status,
 
-      -- to the fpga pads: @sync_clk 
-      o_sync_clk_p   => o_clk_ref_p,
-      o_sync_clk_n   => o_clk_ref_n,
-      o_sync_p       => o_clk_frame_p,
-      o_sync_n       => o_clk_frame_n,
+      -- to the fpga pads: @sync_clk
+      o_sync_clk_p => o_clk_ref_p,
+      o_sync_clk_n => o_clk_ref_n,
+      o_sync_p     => o_clk_frame_p,
+      o_sync_n     => o_clk_frame_n,
       ---------------------------------------------------------------------
       -- dac
       ---------------------------------------------------------------------
