@@ -795,13 +795,7 @@
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../constraints/constrs_1/placement_xc7k410t_1ffg676c.xdc">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="implementation"/>
-        </FileInfo>
-      </File>
       <Config>
-        <Option Name="TargetConstrsFile" Val="$PPRDIR/../../constraints/constrs_1/placement_xc7k410t_1ffg676c.xdc"/>
         <Option Name="ConstrsType" Val="XDC"/>
       </Config>
     </FileSet>
