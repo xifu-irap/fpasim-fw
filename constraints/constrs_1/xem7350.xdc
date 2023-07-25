@@ -1388,18 +1388,8 @@ set_property IOSTANDARD LVCMOS33 [get_ports o_clk_frame];
 ############################################################################
 # add diff_term
 ############################################################################
-set_property DIFF_TERM TRUE [get_ports i_adc_clk_p]
-set_property DIFF_TERM TRUE [get_ports i_adc_clk_n]
-set_property DIFF_TERM TRUE [get_ports i_da*_p]
-set_property DIFF_TERM TRUE [get_ports i_db*_p]
-set_property DIFF_TERM TRUE [get_ports i_clk_to_fpga_p]
-
-
-
-
-
-
-
-
-
+set_property DIFF_TERM TRUE [get_ports i_clk_ab_p]
+set_property DIFF_TERM TRUE [get_ports i_clk_ab_n]
+set_property DIFF_TERM TRUE [get_ports i_cha*_p]
+set_property DIFF_TERM TRUE [get_ports i_chb*_p]
 

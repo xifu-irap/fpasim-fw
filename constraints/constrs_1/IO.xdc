@@ -423,7 +423,7 @@ set_input_delay -clock $input_clock -min $dv_are                              [g
 # others (input ports): asynchronuous ports
 ##################################################################################
 
-set_false_path -from [get_ports "i_hardware_id*"]
+# set_false_path -from [get_ports "i_hardware_id*"]
 # set_false_path -from [get_ports "i_reset"]
 set_false_path -to   [get_ports "o_leds*"]
 set_false_path  -from [get_clocks sys_clk] -to [get_cells inst_fpasim_top/inst_regdecode_top/gen_debug_ila.count_r1*]
