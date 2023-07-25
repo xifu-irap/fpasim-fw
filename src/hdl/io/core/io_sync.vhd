@@ -252,8 +252,8 @@ begin
   ---------------------------------------------------------------------
   o_sync_clk_p   <= clk_p_tmp;
   o_sync_clk_n   <= clk_n_tmp;
-  o_sync_p       <= sync_n_tmp;
-  o_sync_n       <= sync_p_tmp;
+  o_sync_p       <= sync_p_tmp;
+  o_sync_n       <= sync_n_tmp;
 
 
   ---------------------------------------------------------------------
