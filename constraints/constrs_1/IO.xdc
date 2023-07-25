@@ -482,12 +482,12 @@ set_property IOB true [get_ports o_clk_frame]
 # adc: IO
 ##################################################################################
 # set_property IOB true [get_ports i_clk_ab_p]
-# set_property IOB true [get_ports i_da*_p]
-# set_property IOB true [get_ports i_db*_p]
+# set_property IOB true [get_ports i_cha*_p]
+# set_property IOB true [get_ports i_chb*_p]
 
 ##################################################################################
 # dac: IO
 ##################################################################################
 # set_property IOB true [get_ports o_dac_dclk_p]
 # set_property IOB true [get_ports o_frame_p]
-# set_property IOB true [get_ports o_dac*_p]
+# set_property IOB true [get_ports o_dac_d*_p]
