@@ -13,7 +13,7 @@ jobs:
       EXT_LIB_PATH: xifu-irap/third-party-libraries-for-linty
       DEST_EXT_LIB_PATH: third-party-libraries/ip/
       PROJECT_NAME: fpasim-fw
-      LINTY_SCANNER: latest
+      LINTY_SCANNER: beta
 
     steps:
       - name: Git Checkout
