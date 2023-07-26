@@ -7,8 +7,8 @@
 verific -work xpm -vhdl -lib ./third-party-libraries/ip/vivado/2022.1/data/ip/xpm/xpm_VCOMP.vhd
 
 # UNISIM library: partial
-verific -work unisim -vhdl ./third-party-libraries/ip/vivado/2022.2/data/vhdl/src/unisims/unisim_VCOMP.vhd
-verific -work unisim -vhdl ./third-party-libraries/ip/vivado/2022.2/data/vhdl/src/unisims/unisim_VPKG.vhd
+verific -work unisim -vhdl ./third-party-libraries/ip/vivado/2022.1/data/vhdl/src/unisims/unisim_VCOMP.vhd
+verific -work unisim -vhdl ./third-party-libraries/ip/vivado/2022.1/data/vhdl/src/unisims/unisim_VPKG.vhd
 
 ##############################################################################
 # The list of source files was generated from Vivado by a TCL command
