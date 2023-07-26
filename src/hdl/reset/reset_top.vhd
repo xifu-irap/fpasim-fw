@@ -91,34 +91,47 @@ architecture RTL of reset_top is
   ---------------------------------------------------------------------
   -- usb_reset
   ---------------------------------------------------------------------
+  -- synchronized reset @usb_clk
   signal usb_rst_tmp2 : std_logic;
 
   ---------------------------------------------------------------------
   -- user reset
   ---------------------------------------------------------------------
+  -- combined reset: usb_rst and mmcm_locked
   signal mmcm_rst_tmp1 : std_logic;
+  -- synchronized reset @sys_clk
   signal sys_rst_tmp2  : std_logic;
 
   ---------------------------------------------------------------------
   -- io_adc
   ---------------------------------------------------------------------
+  -- synchronized reset @usb_clk
   signal adc_rst_tmp1       : std_logic;
+  -- adc io reset for the clock part @i_adc_clk_div
   signal adc_io_clk_rst     : std_logic;
+  -- adc io reset for the data part @i_adc_clk_div
   signal adc_io_rst         : std_logic;
-  signal adc_io_rst_phase90 : std_logic;
 
   ---------------------------------------------------------------------
   -- io_dac
   ---------------------------------------------------------------------
+  -- synchronized reset @usb_clk
   signal dac_rst_tmp1   : std_logic;
+  -- dac io reset for the clock part @i_dac_clk_div
   signal dac_io_clk_rst : std_logic;
+  -- dac io reset for the data part @i_dac_clk_div
   signal dac_io_rst     : std_logic;
+  -- dac io reset for the data part @i_dac_clk_div_phase90
+  signal dac_io_rst_phase90 : std_logic;
 
   ---------------------------------------------------------------------
   -- io_sync
   ---------------------------------------------------------------------
+  -- synchronized reset @usb_clk
   signal sync_rst_tmp1   : std_logic;
+  -- sync io reset for the clock part @i_sync_clk
   signal sync_io_clk_rst : std_logic;
+  -- sync io reset for the data part @i_sync_clk
   signal sync_io_rst     : std_logic;
 
 
@@ -272,10 +285,10 @@ begin
       i_clk        => i_dac_clk_div_phase90,
       i_pll_status => i_mmcm_locked,
       o_io_clk_rst => open,
-      o_io_rst     => adc_io_rst_phase90
+      o_io_rst     => dac_io_rst_phase90
       );
   -- output
-  o_dac_io_rst_phase90 <= adc_io_rst_phase90;
+  o_dac_io_rst_phase90 <= dac_io_rst_phase90;
 
 
   ---------------------------------------------------------------------
