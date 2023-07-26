@@ -42,8 +42,6 @@ entity system_fpasim_top is
     g_DEBUG : boolean := pkg_SYSTEM_FPASIM_TOP_DEBUG
     );
   port(
-    --i_clk_to_fpga_p : in std_logic;
-    --i_clk_to_fpga_n : in std_logic;
     --  Opal Kelly inouts --
     i_okUH  : in    std_logic_vector(4 downto 0); -- usb interface signal
     o_okHU  : out   std_logic_vector(2 downto 0); -- usb interface signal
