@@ -91,17 +91,20 @@ architecture RTL of mult_sfixed is
     -- step2:
     --   mult_r2 = a_r1 * b_r1
     ---------------------------------------------------------------------
+    -- multiplication result
     signal mult_r2 : sfixed(sfixed_high(a_r1, '*', b_r1) downto sfixed_low(a_r1, '*', b_r1)):= (others => '0');
 
     ---------------------------------------------------------------------
     -- step3
     -- p_r3 = mult_r2
     ---------------------------------------------------------------------
+    -- delayed result (not truncated)
     signal p_r3 : sfixed(mult_r2'range):= (others => '0');
 
     -----------------------------------------------------------------
     -- step4
     -----------------------------------------------------------------
+    -- delayed result (not truncated)
     signal p_r4 : sfixed(mult_r2'range):= (others => '0');
 
     -----------------------------------------------------------------
@@ -109,6 +112,7 @@ architecture RTL of mult_sfixed is
     --   extract sfixed range
     --   sfixed -> std_logic_vector conversion
     -----------------------------------------------------------------
+    -- output result (truncated/not truncated: depends on the output data port width Vs computation width)
     signal p_tmp5 : sfixed(g_Q_M_S - 1 downto -g_Q_N_S);
 
 begin

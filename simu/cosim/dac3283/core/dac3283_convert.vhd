@@ -62,12 +62,14 @@ architecture RTL of dac3283_convert is
 -- convert: i_data -> fixed between : [-1,0.99[
 --  S0 = sfixed(i_data) : real between
 ---------------------------------------------------------------------
+ -- convert data into sfixed
   signal data_tmp : sfixed(0 downto -15);
 
 ---------------------------------------------------------------------
 -- rescaling:
 -- s1 = DAC_VPP * real(data_tmp)
 ---------------------------------------------------------------------
+  -- real scaled data
   signal s1 : real;
 
 begin

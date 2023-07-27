@@ -66,45 +66,57 @@ architecture RTL of dac3283_demux is
 ---------------------------------------------------------------------
 -- state machine
 ---------------------------------------------------------------------
-
+  -- fsm type declaration
   type t_state is (E_RST, E_WAIT, E_RUN0, E_RUN1);
-  signal sm_state_next : t_state := E_RST;
-  signal sm_state_r1   : t_state := E_RST;
-
+  signal sm_state_next : t_state := E_RST; -- state
+  signal sm_state_r1   : t_state := E_RST; -- state (registered)
+  
+   -- dac0 data valid
   signal data_valid0_next : std_logic;
+   -- dac0 data valid (registered)
   signal data_valid0_r1   : std_logic := '0';
 
+   -- dac0 data
   signal data0_next : std_logic_vector(o_dac0'range);
+   -- dac0 data (registered)
   signal data0_r1   : std_logic_vector(o_dac0'range) := (others => '0');
 
+  -- dac1 data valid
   signal data_valid1_next : std_logic;
+   -- dac1 data valid (registered)
   signal data_valid1_r1   : std_logic := '0';
 
+   -- dac1 data
   signal data1_next : std_logic_vector(o_dac1'range);
+   -- dac0 data (registered)
   signal data1_r1   : std_logic_vector(o_dac1'range) := (others => '0');
 
 ---------------------------------------------------------------------
 -- optional output delay
 ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + o_dac0'length -1;
+  constant c_IDX0_L : integer := 0;-- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + o_dac0'length -1;-- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + o_dac1'length -1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1;-- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + o_dac1'length -1;-- index1: high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 -1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1;-- index2: low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 -1;-- index2: high
 
-  constant c_IDX3_L : integer := c_IDX2_H + 1;
-  constant c_IDX3_H : integer := c_IDX3_L + 1 -1;
+  constant c_IDX3_L : integer := c_IDX2_H + 1;-- index3: low
+  constant c_IDX3_H : integer := c_IDX3_L + 1 -1;-- index3: high
 
-  signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0);
-  signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0);-- temporary input pipe
+  signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0);-- temporary output pipe
 
+   -- delayed dac0 data valid
   signal data_valid0_tmp1 : std_logic;
+ -- delayed dac0 data (registered)
   signal data0_tmp1       : std_logic_vector(o_dac0'range);
 
+   -- delayed dac1 data valid
   signal data_valid1_tmp1 : std_logic;
+   -- delayed dac1 data (registered)
   signal data1_tmp1       : std_logic_vector(o_dac0'range);
 
 begin

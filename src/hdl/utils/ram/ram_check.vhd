@@ -105,6 +105,7 @@ architecture RTL of ram_check is
   ---------------------------------------------------------------------
   -- p_error
   ---------------------------------------------------------------------
+  -- detect if read and write on the same address
   signal error_r2 : std_logic := '0';
 
 begin

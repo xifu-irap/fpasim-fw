@@ -123,7 +123,9 @@ architecture RTL of recording_dac is
   ---------------------------------------------------------------------
   -- state machine
   ---------------------------------------------------------------------
+  -- fsm type declaration
   type t_state is (E_RST, E_WAIT, E_START, E_RUN);
+
   signal sm_state_next : t_state; -- state (registered)
   signal sm_state_r1   : t_state := E_RST; -- state
 

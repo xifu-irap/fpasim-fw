@@ -61,7 +61,9 @@ end entity synchronizer;
 
 architecture RTL of synchronizer is
 
-   type t_array_data is array (natural range <>) of std_logic_vector(i_async_data'range);
+   -- define an array of registers
+  type t_array_data is array (natural range <>) of std_logic_vector(i_async_data'range);
+
    -- shift registers
   signal s_r1                 : t_array_data(g_SYNC_STAGES-1 downto 0) := (others => (others => g_INIT));
   attribute async_reg         : string;
@@ -69,7 +71,9 @@ architecture RTL of synchronizer is
 
   -- additionnal output registers
   signal sreg_pipe_r1     : t_array_data(g_PIPELINE_STAGES-1 downto 0) := (others => (others => g_INIT));
+  -- fpga specific attribute: force to use registers (no shift_register)
   attribute shreg_extract : string;
+  -- apply attribute on signal
   attribute shreg_extract of sreg_pipe_r1 : signal is "false";
 
   -- output data

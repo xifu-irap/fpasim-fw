@@ -82,6 +82,7 @@ entity dac3283_io is
 end entity dac3283_io;
 
 architecture RTL of dac3283_io is
+  -- clock
   signal clk_tmp : std_logic;
 
 begin
@@ -108,6 +109,7 @@ begin
 -- frame
 ---------------------------------------------------------------------
   gen_frame : if true generate
+    -- dac frame
     signal frame_tmp : std_logic;
   begin
     inst_IBUFDS : IBUFDS
@@ -129,12 +131,17 @@ begin
 ---------------------------------------------------------------------
 
   gen_data : if true generate
+    -- differential dac input_p
     signal data_tmp_p : std_logic_vector(7 downto 0);
+    -- differential dac input_n
     signal data_tmp_n : std_logic_vector(7 downto 0);
 
+    -- dac data
     signal data_tmp : std_logic_vector(7 downto 0);
 
+    -- dac data (MSB)
     signal data_tmp1 : std_logic_vector(7 downto 0);
+    -- dac data (LSB)
     signal data_tmp2 : std_logic_vector(7 downto 0);
   begin
     data_tmp_p(7) <= i_dac7_p;

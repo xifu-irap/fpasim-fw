@@ -95,6 +95,7 @@ architecture RTL of mult_add_ufixed is
     --    mult_r2 = a*b
     --    c_r2 = c_r1
     ---------------------------------------------------------------------
+    -- multiplication result
     signal mult_r2 : ufixed(ufixed_high(a_r1, '*', b_r1) downto ufixed_low(a_r1, '*', b_r1)):= (others => '0');
     -- delayed data: port C
     signal c_r2    : ufixed(c_r1'range):= (others => '0');
@@ -103,6 +104,7 @@ architecture RTL of mult_add_ufixed is
     -- step3:
     --   res_r3 = c_r2 + mult_r2
     ---------------------------------------------------------------------
+    -- addition result
     signal res_r3 : ufixed(ufixed_high(c_r2, '+', mult_r2) downto ufixed_low(c_r2, '+', mult_r2)):= (others => '0');
 
     -----------------------------------------------------------------
@@ -110,6 +112,7 @@ architecture RTL of mult_add_ufixed is
     --   extract sfixed range
     --   sfixed -> std_logic_vector conversion
     -----------------------------------------------------------------
+    -- output result (truncated/not truncated: depends on the output data port width Vs computation width)
     signal res_tmp4 : ufixed(g_UQ_M_S - 1 downto -g_UQ_N_S);
 
 begin

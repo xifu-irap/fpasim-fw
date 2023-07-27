@@ -71,7 +71,9 @@ architecture RTL of dynamic_shift_register is
   -- delayed address
   signal addr_r : std_logic_vector(i_addr'range) := (others => '0');
 
+  -- define an array of registers
   type t_array_slv is array (g_DATA_WIDTH-1 downto 0) of std_logic_vector(2**i_addr'length-1 downto 0);
+
   -- shift registers
   signal shift_r : t_array_slv:= (others => (others => '0'));
 
@@ -81,8 +83,9 @@ architecture RTL of dynamic_shift_register is
   -- delayed data
   signal srl_r2 : std_logic_vector(o_data'range):= (others => '0');
 
-  -- fpga specific attribute
+  -- fpga specific attribute: force to use registers (no shift_register)
   attribute shreg_extract : string;
+  -- apply attribute on signal
   attribute shreg_extract of srl_r2 : signal is "no";
 
 begin

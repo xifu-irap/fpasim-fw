@@ -78,7 +78,9 @@ begin
 
   -- add 2 or more registers on the data path
   gen_multiple_pipeline : if g_NB_PIPES > 1 generate
+    -- define an array of registers
     type t_pipeline is array (g_NB_PIPES - 1 downto 0) of std_logic_vector(i_data'range);
+    -- pipe of registers
     signal data_pipe_r : t_pipeline := (others => (others => '0'));
   begin
 

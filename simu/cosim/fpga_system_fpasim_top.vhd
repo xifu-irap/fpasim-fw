@@ -155,6 +155,7 @@ architecture RTL of fpga_system_fpasim_top is
     constant value_p : integer; width_p : integer
     )
     return std_logic_vector is
+     -- result of the convertion : uint -> std_logic_vector
     variable v_value_vect : std_logic_vector(width_p - 1 downto 0);
   begin
     v_value_vect := std_logic_vector(to_unsigned(value_p, width_p));

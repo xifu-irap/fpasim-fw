@@ -91,6 +91,7 @@ architecture RTL of sub_sfixed is
     -- step3:
     --   res_r2 = a_r1 - b_r1
     ---------------------------------------------------------------------
+    -- substraction result
     signal res_r2 : sfixed(sfixed_high(a_r1, '-', b_r1) downto sfixed_low(a_r1, '-', b_r1)):= (others => '0');
 
     -----------------------------------------------------------------
@@ -98,6 +99,7 @@ architecture RTL of sub_sfixed is
     --   extract sfixed range
     --   sfixed -> std_logic_vector conversion
     -----------------------------------------------------------------
+    -- output result (truncated/not truncated: depends on the output data port width Vs computation width)
     signal res_tmp3 : sfixed(g_Q_M_S - 1 downto -g_Q_N_S);
 
 begin

@@ -96,6 +96,7 @@ architecture RTL of mult_sub_sfixed is
     --    mult_r2 = a*b
     --    c_r2 = c_r1
     ---------------------------------------------------------------------
+    -- multiplication result
     signal mult_r2 : sfixed(sfixed_high(a_r1, '*', b_r1) downto sfixed_low(a_r1, '*', b_r1)):= (others => '0');
     -- delayed data: port C
     signal c_r2    : sfixed(c_r1'range):= (others => '0');
@@ -104,6 +105,7 @@ architecture RTL of mult_sub_sfixed is
     -- step3:
     --   res_r3 = c_r2 - mult_r2
     ---------------------------------------------------------------------
+    -- substraction result
     signal res_r3 : sfixed(sfixed_high(c_r2, '-', mult_r2) downto sfixed_low(c_r2, '-', mult_r2)):= (others => '0');
 
     -----------------------------------------------------------------
@@ -111,6 +113,7 @@ architecture RTL of mult_sub_sfixed is
     --   extract sfixed range
     --   sfixed -> std_logic_vector conversion
     -----------------------------------------------------------------
+    -- output result (truncated/not truncated: depends on the output data port width Vs computation width)
     signal res_tmp4 : sfixed(g_Q_M_S - 1 downto -g_Q_N_S);
 
 begin

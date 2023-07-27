@@ -198,152 +198,223 @@ architecture RTL of regdecode_pipe is
   ---------------------------------------------------------------------
   -- addr decode
   ---------------------------------------------------------------------
+  -- ram: write enable (tes_pulse_shame)
   signal tes_pulse_shape_wr_en0  : std_logic;
+  -- ram: write enable (amp_squid_tf)
   signal amp_squid_tf_wr_en0     : std_logic;
+  -- ram: write enable (mux_squid_tf)
   signal mux_squid_tf_wr_en0     : std_logic;
+  -- ram: write enable (tes_std_state)
   signal tes_std_state_wr_en0    : std_logic;
+  -- ram: write enable (mux_squid_offset)
   signal mux_squid_offset_wr_en0 : std_logic;
 
+  -- ram address (full range: ram selection + ram block selection)
   signal addr0 : std_logic_vector(i_addr'range);
+  -- ram data
   signal data0 : std_logic_vector(i_data'range);
 
   ---------------------------------------------------------------------
   -- tes pulse shape
   ---------------------------------------------------------------------
-  -- ram: wr
+  -- ram: write enable
   signal tes_pulse_shape_ram_wr_en      : std_logic;
+  -- ram write/read address
   signal tes_pulse_shape_ram_wr_rd_addr : std_logic_vector(o_tes_pulse_shape_ram_wr_rd_addr'range);
+  -- ram wr data
   signal tes_pulse_shape_ram_wr_data    : std_logic_vector(o_tes_pulse_shape_ram_wr_data'range);
-  -- ram: rd
+  -- ram: read enable
   signal tes_pulse_shape_ram_rd_en      : std_logic;
 
   -- to the regdecode: @i_clk
   ---------------------------------------------------------------------
+  -- fifo read
   signal tes_pulse_shape_fifo_rd         : std_logic;
+  -- fifo first word flag
   signal tes_pulse_shape_fifo_sof        : std_logic;
+  -- fifo last word flag
   signal tes_pulse_shape_fifo_eof        : std_logic;
+  -- fifo data valid
   signal tes_pulse_shape_fifo_data_valid : std_logic;
+  -- fifo output data (address)
   signal tes_pulse_shape_fifo_addr       : std_logic_vector(i_addr'range);
+  -- fifo output data (data)
   signal tes_pulse_shape_fifo_data       : std_logic_vector(i_data'range);
+  -- fifo empty flag
   signal tes_pulse_shape_fifo_empty      : std_logic;
 
   -- errors/status @ i_clk
   ---------------------------------------------------------------------
+  -- errors
   signal tes_pulse_shape_errors : std_logic_vector(15 downto 0);
+  -- status
   signal tes_pulse_shape_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- amp_squid_tf
   ---------------------------------------------------------------------
-  -- ram: wr
+  -- ram: write enable
   signal amp_squid_tf_ram_wr_en      : std_logic;
+  -- ram write/read address
   signal amp_squid_tf_ram_wr_rd_addr : std_logic_vector(o_amp_squid_tf_ram_wr_rd_addr'range);
+  -- ram wr data
   signal amp_squid_tf_ram_wr_data    : std_logic_vector(o_amp_squid_tf_ram_wr_data'range);
-  -- ram: rd
+  -- ram: read enable
   signal amp_squid_tf_ram_rd_en      : std_logic;
 
   -- to the regdecode: @i_clk
   ---------------------------------------------------------------------
+  -- fifo read
   signal amp_squid_tf_fifo_rd         : std_logic;
+  -- fifo first word flag
   signal amp_squid_tf_fifo_sof        : std_logic;
+  -- fifo last word flag
   signal amp_squid_tf_fifo_eof        : std_logic;
+  -- fifo data valid
   signal amp_squid_tf_fifo_data_valid : std_logic;
+  -- fifo output data (address)
   signal amp_squid_tf_fifo_addr       : std_logic_vector(i_addr'range);
+  -- fifo output data (data)
   signal amp_squid_tf_fifo_data       : std_logic_vector(i_data'range);
+  -- fifo empty flag
   signal amp_squid_tf_fifo_empty      : std_logic;
 
   -- errors/status @ i_clk
   ---------------------------------------------------------------------
+  -- errors
   signal amp_squid_tf_errors : std_logic_vector(15 downto 0);
+  -- status
   signal amp_squid_tf_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- mux_squid_tf
   ---------------------------------------------------------------------
-  -- ram: wr
+  -- ram: write enable
   signal mux_squid_tf_ram_wr_en      : std_logic;
+  -- ram write/read address
   signal mux_squid_tf_ram_wr_rd_addr : std_logic_vector(o_mux_squid_tf_ram_wr_rd_addr'range);
+  -- ram wr data
   signal mux_squid_tf_ram_wr_data    : std_logic_vector(o_mux_squid_tf_ram_wr_data'range);
-  -- ram: rd
+  -- ram: read enable
   signal mux_squid_tf_ram_rd_en      : std_logic;
 
   -- to the regdecode: @i_clk
   ---------------------------------------------------------------------
+  -- fifo read
   signal mux_squid_tf_fifo_rd         : std_logic;
+  -- fifo first word flag
   signal mux_squid_tf_fifo_sof        : std_logic;
+  -- fifo last word flag
   signal mux_squid_tf_fifo_eof        : std_logic;
+  -- fifo data valid
   signal mux_squid_tf_fifo_data_valid : std_logic;
+  -- fifo output data (address)
   signal mux_squid_tf_fifo_addr       : std_logic_vector(i_addr'range);
+  -- fifo output data (data)
   signal mux_squid_tf_fifo_data       : std_logic_vector(i_data'range);
+  -- fifo empty flag
   signal mux_squid_tf_fifo_empty      : std_logic;
 
   -- errors/status @ i_clk
   ---------------------------------------------------------------------
+  -- errors
   signal mux_squid_tf_errors : std_logic_vector(15 downto 0);
+  -- status
   signal mux_squid_tf_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- tes_std_state
   ---------------------------------------------------------------------
-  -- ram: wr
+  -- ram: write enable
   signal tes_std_state_ram_wr_en      : std_logic;
+  -- ram write/read address
   signal tes_std_state_ram_wr_rd_addr : std_logic_vector(o_tes_std_state_ram_wr_rd_addr'range);
+  -- ram wr data
   signal tes_std_state_ram_wr_data    : std_logic_vector(o_tes_std_state_ram_wr_data'range);
-  -- ram: rd
+  -- ram: read enable
   signal tes_std_state_ram_rd_en      : std_logic;
 
   -- to the regdecode: @i_clk
   ---------------------------------------------------------------------
+  -- fifo read
   signal tes_std_state_fifo_rd         : std_logic;
+  -- fifo first word flag
   signal tes_std_state_fifo_sof        : std_logic;
+  -- fifo last word flag
   signal tes_std_state_fifo_eof        : std_logic;
+  -- fifo data valid
   signal tes_std_state_fifo_data_valid : std_logic;
+  -- fifo output data (address)
   signal tes_std_state_fifo_addr       : std_logic_vector(i_addr'range);
+  -- fifo output data (data)
   signal tes_std_state_fifo_data       : std_logic_vector(i_data'range);
+  -- fifo empty flag
   signal tes_std_state_fifo_empty      : std_logic;
 
   -- errors/status @ i_clk
   ---------------------------------------------------------------------
+  -- errors
   signal tes_std_state_errors : std_logic_vector(15 downto 0);
+  -- status
   signal tes_std_state_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- mux_squid_offset
   ---------------------------------------------------------------------
-  -- ram: wr
+  -- ram: write enable
   signal mux_squid_offset_ram_wr_en      : std_logic;
+  -- ram write/read address
   signal mux_squid_offset_ram_wr_rd_addr : std_logic_vector(o_mux_squid_offset_ram_wr_rd_addr'range);
+  -- ram wr data
   signal mux_squid_offset_ram_wr_data    : std_logic_vector(o_mux_squid_offset_ram_wr_data'range);
-  -- ram: rd
+  -- ram: read enable
   signal mux_squid_offset_ram_rd_en      : std_logic;
 
   -- to the regdecode: @i_clk
   ---------------------------------------------------------------------
+  -- fifo read
   signal mux_squid_offset_fifo_rd         : std_logic;
+  -- fifo first word flag
   signal mux_squid_offset_fifo_sof        : std_logic;
+  -- fifo last word flag
   signal mux_squid_offset_fifo_eof        : std_logic;
+  -- fifo data valid
   signal mux_squid_offset_fifo_data_valid : std_logic;
+  -- fifo output data (address)
   signal mux_squid_offset_fifo_addr       : std_logic_vector(i_addr'range);
+  -- fifo output data (data)
   signal mux_squid_offset_fifo_data       : std_logic_vector(i_data'range);
+  -- fifo empty flag
   signal mux_squid_offset_fifo_empty      : std_logic;
 
   -- errors/status @ i_clk
   ---------------------------------------------------------------------
+  -- errors
   signal mux_squid_offset_errors : std_logic_vector(15 downto 0);
+  -- status
   signal mux_squid_offset_status : std_logic_vector(7 downto 0);
 
   ---------------------------------------------------------------------
   -- regdecode_pipe_rd_all
   ---------------------------------------------------------------------
+   -- fifo first word flag
   signal fifo_sof        : std_logic;
+   -- fifo last word flag
   signal fifo_eof        : std_logic;
+  -- fifo data valid
   signal fifo_data_valid : std_logic;
+  -- fifo data out (address)
   signal fifo_addr       : std_logic_vector(o_fifo_addr'range);
+  -- fifo data out (data)
   signal fifo_data       : std_logic_vector(o_fifo_data'range);
+  -- fifo write data count
   signal fifo_data_count : std_logic_vector(15 downto 0);
+  -- fifo empty flag
   signal fifo_empty      : std_logic;
 
+   -- errors
   signal pipe_rd_all_errors : std_logic_vector(15 downto 0);
+   -- status
   signal pipe_rd_all_status : std_logic_vector(7 downto 0);
 
 begin
