@@ -112,12 +112,15 @@ architecture RTL of regdecode_wire_errors is
 
   -- number of error vectors
   constant c_NB_ERRORS : integer := 4;
+
+  -- error type declaration
   type t_errors is array (integer range <>) of std_logic_vector(i_reg_wire_errors0'range);
   -- temporary array of input error vectors to resynchronized
   signal errors_tmp0   : t_errors(0 to c_NB_ERRORS - 1);
   -- temporary array of error vectors
   signal errors_tmp1   : t_errors(0 to c_NB_ERRORS - 1);
 
+  -- status type declaration
   type t_status is array (integer range <>) of std_logic_vector(i_reg_wire_status0'range);
   -- temporary array of input status vectors to resynchronized
   signal status_tmp0 : t_status(0 to c_NB_ERRORS - 1);
@@ -183,17 +186,26 @@ begin
   errors_tmp0(0) <= i_reg_wire_errors0;
 
   gen_synchronisateur_error : for i in errors_tmp0'range generate
+    -- delayed error
     signal data_r : t_errors(errors_tmp0'range)         := (others => (others => '0'));
+    -- generate a write enable on error change
     signal wr_r   : std_logic_vector(errors_tmp0'range) := (others => '0');
 
-    signal wr_en_flag       : std_logic_vector(errors_tmp0'range);
-    signal wr_din_flag      : t_errors(errors_tmp0'range);
+    -- fifo write enable (only if the fifo has the good status)
+    signal fifo_wr_en       : std_logic_vector(errors_tmp0'range);
+    -- fifo data in
+    signal fifo_din      : t_errors(errors_tmp0'range);
     -- signal wr_full_flag     : std_logic_vector(errors_tmp0'range);
-    signal wr_rst_busy_flag : std_logic_vector(errors_tmp0'range);
-    signal rd_en_flag       : std_logic_vector(errors_tmp0'range);
-    signal rd_dout_flag     : t_errors(errors_tmp0'range);
-    signal rd_empty_flag    : std_logic_vector(errors_tmp0'range);
-    signal rd_rst_busy_flag : std_logic_vector(errors_tmp0'range);
+    -- fifo rst busy (write side)
+    signal fifo_wr_rst_busy : std_logic_vector(errors_tmp0'range);
+    -- fifo read enable
+    signal fifo_rd_en       : std_logic_vector(errors_tmp0'range);
+    -- fifo data out
+    signal fifo_dout     : t_errors(errors_tmp0'range);
+    -- fifo empty flag
+    signal fifo_empty    : std_logic_vector(errors_tmp0'range);
+    -- fifo rst busy (read side)
+    signal fifo_rd_rst_busy : std_logic_vector(errors_tmp0'range);
 
   begin
 
@@ -212,8 +224,8 @@ begin
       end if;
     end process p_detect_change;
 
-    wr_en_flag(i)  <= '1' when wr_r(i) = '1' and wr_rst_busy_flag(i) = '0' else '0';
-    wr_din_flag(i) <= data_r(i);
+    fifo_wr_en(i)  <= '1' when wr_r(i) = '1' and fifo_wr_rst_busy(i) = '0' else '0';
+    fifo_din(i) <= data_r(i);
 
     inst_fifo_async_flag : entity work.fifo_async
       generic map(
@@ -221,10 +233,10 @@ begin
         g_FIFO_MEMORY_TYPE  => "auto",
         g_FIFO_READ_LATENCY => c_FIFO_READ_LATENCY,
         g_FIFO_WRITE_DEPTH  => g_FIFO_WRITE_DEPTH,
-        g_READ_DATA_WIDTH   => wr_din_flag(i)'length,
+        g_READ_DATA_WIDTH   => fifo_din(i)'length,
         g_READ_MODE         => "std",
         g_RELATED_CLOCKS    => 0,
-        g_WRITE_DATA_WIDTH  => wr_din_flag(i)'length
+        g_WRITE_DATA_WIDTH  => fifo_din(i)'length
         )
       port map(
         ---------------------------------------------------------------------
@@ -232,24 +244,24 @@ begin
         ---------------------------------------------------------------------
         i_wr_clk        => i_out_clk,
         i_wr_rst        => '0',
-        i_wr_en         => wr_en_flag(i),
-        i_wr_din        => wr_din_flag(i),
+        i_wr_en         => fifo_wr_en(i),
+        i_wr_din        => fifo_din(i),
         o_wr_full       => open,
-        o_wr_rst_busy   => wr_rst_busy_flag(i),
+        o_wr_rst_busy   => fifo_wr_rst_busy(i),
         ---------------------------------------------------------------------
         -- read side
         ---------------------------------------------------------------------
         i_rd_clk        => i_clk,
-        i_rd_en         => rd_en_flag(i),
+        i_rd_en         => fifo_rd_en(i),
         o_rd_dout_valid => open,
-        o_rd_dout       => rd_dout_flag(i),
-        o_rd_empty      => rd_empty_flag(i),
-        o_rd_rst_busy   => rd_rst_busy_flag(i)
+        o_rd_dout       => fifo_dout(i),
+        o_rd_empty      => fifo_empty(i),
+        o_rd_rst_busy   => fifo_rd_rst_busy(i)
         );
 
-    rd_en_flag(i) <= '1' when rd_empty_flag(i) = '0' and rd_rst_busy_flag(i) = '0' else '0';
+    fifo_rd_en(i) <= '1' when fifo_empty(i) = '0' and fifo_rd_rst_busy(i) = '0' else '0';
 
-    errors_tmp1(i) <= rd_dout_flag(i);
+    errors_tmp1(i) <= fifo_dout(i);
 
   end generate gen_synchronisateur_error;
 
@@ -261,18 +273,26 @@ begin
   status_tmp0(0) <= i_reg_wire_status0;
 
   gen_synchronisateur_status : for i in status_tmp0'range generate
-
+     -- delayed error
     signal data_r : t_status(status_tmp0'range)         := (others => (others => '0'));
+    -- generate a write enable on status change
     signal wr_r   : std_logic_vector(status_tmp0'range) := (others => '0');
 
-    signal wr_en_flag       : std_logic_vector(status_tmp0'range);
-    signal wr_din_flag      : t_status(status_tmp0'range);
+     -- fifo write enable (only if the fifo has the good status)
+    signal fifo_wr_en       : std_logic_vector(status_tmp0'range);
+    -- fifo data in
+    signal fifo_din      : t_status(status_tmp0'range);
     -- signal wr_full_flag     : std_logic_vector(status_tmp0'range);
-    signal wr_rst_busy_flag : std_logic_vector(status_tmp0'range);
-    signal rd_en_flag       : std_logic_vector(status_tmp0'range);
-    signal rd_dout_flag     : t_status(status_tmp0'range);
-    signal rd_empty_flag    : std_logic_vector(status_tmp0'range);
-    signal rd_rst_busy_flag : std_logic_vector(status_tmp0'range);
+    -- fifo rst busy (write side)
+    signal fifo_wr_rst_busy : std_logic_vector(status_tmp0'range);
+    -- fifo read enable
+    signal fifo_rd_en       : std_logic_vector(status_tmp0'range);
+    -- fifo data out
+    signal fifo_dout     : t_status(status_tmp0'range);
+    -- fifo empty flag
+    signal fifo_empty    : std_logic_vector(status_tmp0'range);
+    -- fifo rst busy (read side)
+    signal fifo_rd_rst_busy : std_logic_vector(status_tmp0'range);
 
   begin
     ---------------------------------------------------------------------
@@ -290,8 +310,8 @@ begin
       end if;
     end process p_detect_change;
 
-    wr_en_flag(i)  <= '1' when wr_r(i) = '1' and wr_rst_busy_flag(i) = '0' else '0';
-    wr_din_flag(i) <= data_r(i);
+    fifo_wr_en(i)  <= '1' when wr_r(i) = '1' and fifo_wr_rst_busy(i) = '0' else '0';
+    fifo_din(i) <= data_r(i);
 
     inst_fifo_async_flag : entity work.fifo_async
       generic map(
@@ -299,10 +319,10 @@ begin
         g_FIFO_MEMORY_TYPE  => "auto",
         g_FIFO_READ_LATENCY => c_FIFO_READ_LATENCY,
         g_FIFO_WRITE_DEPTH  => g_FIFO_WRITE_DEPTH,
-        g_READ_DATA_WIDTH   => wr_din_flag(i)'length,
+        g_READ_DATA_WIDTH   => fifo_din(i)'length,
         g_READ_MODE         => "std",
         g_RELATED_CLOCKS    => 0,
-        g_WRITE_DATA_WIDTH  => wr_din_flag(i)'length
+        g_WRITE_DATA_WIDTH  => fifo_din(i)'length
         )
       port map(
         ---------------------------------------------------------------------
@@ -310,24 +330,24 @@ begin
         ---------------------------------------------------------------------
         i_wr_clk        => i_out_clk,
         i_wr_rst        => '0',
-        i_wr_en         => wr_en_flag(i),
-        i_wr_din        => wr_din_flag(i),
+        i_wr_en         => fifo_wr_en(i),
+        i_wr_din        => fifo_din(i),
         o_wr_full       => open,
-        o_wr_rst_busy   => wr_rst_busy_flag(i),
+        o_wr_rst_busy   => fifo_wr_rst_busy(i),
         ---------------------------------------------------------------------
         -- read side
         ---------------------------------------------------------------------
         i_rd_clk        => i_clk,
-        i_rd_en         => rd_en_flag(i),
+        i_rd_en         => fifo_rd_en(i),
         o_rd_dout_valid => open,
-        o_rd_dout       => rd_dout_flag(i),
-        o_rd_empty      => rd_empty_flag(i),
-        o_rd_rst_busy   => rd_rst_busy_flag(i)
+        o_rd_dout       => fifo_dout(i),
+        o_rd_empty      => fifo_empty(i),
+        o_rd_rst_busy   => fifo_rd_rst_busy(i)
         );
 
-    rd_en_flag(i) <= '1' when rd_empty_flag(i) = '0' and rd_rst_busy_flag(i) = '0' else '0';
+    fifo_rd_en(i) <= '1' when fifo_empty(i) = '0' and fifo_rd_rst_busy(i) = '0' else '0';
 
-    status_tmp1(i) <= rd_dout_flag(i);
+    status_tmp1(i) <= fifo_dout(i);
 
   end generate gen_synchronisateur_status;
 
