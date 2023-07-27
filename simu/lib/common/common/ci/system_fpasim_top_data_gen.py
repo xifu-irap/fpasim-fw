@@ -27,7 +27,7 @@
 #
 #    This SystemFpasimTopDataGen class provides methods for the run_tb_tes_top.py.
 #    By processing the tb_tes_top_XXXX.json file, it can generate the input/output files expected by the VHDL tb_tes_top testbench.
-#    
+#
 #    Note:
 #       . This script was tested with python 3.10
 #
@@ -202,6 +202,28 @@ class SystemFpasimTopDataGen(VunitConf):
 
         return result, dic_field
 
+    def conv_int_to_uint(self,value_p,data_width_p):
+        """
+        Convert an int value into an uint value
+
+        Parameters
+        ----------
+        value_p: int
+            int value to convert
+        data_width_p: int
+            data width of the value to convert
+
+        Returns
+        -------
+            uint
+
+        """
+        if value_p < 0:
+            value = (2**data_width_p) + value_p
+        else:
+            value = value_p
+        return value
+
     def _run(self,test_variant_filepath_p, tb_input_base_path_p, tb_output_base_path_p):
         """
         Generate the VHDL testbench output files.
@@ -312,17 +334,38 @@ class SystemFpasimTopDataGen(VunitConf):
                     for line in lines:
                         line_tmp = line.rstrip()
                         if line_tmp == "":
-                            # skip empty line. 
+                            # skip empty line.
                             # In particular, at the end of the file
                             continue
                         str_addr, str_value = line.split(csv_separator)
                         str_addr = str_addr.replace('\n', '')
                         str_value = str_value.replace('\n', '')
+                        value = int(str_value)
+
+
 
                         # add the address offset
                         new_addr = int(str_addr) + int(offset_addr, 16)
                         str_addr = '{0:04x}'.format(new_addr)
-                        str_data = '{0:04x}'.format(int(str_value))
+                        if name == 'tes_shape_pulse':
+                            # we assume uint data value => no conversion
+                            pass
+                        elif name == 'amp_squid_tf':
+                            # we assume int data value => conversion
+                            d_width = 16 # width of the data
+                            value = self.conv_int_to_uint(value_p=value,data_width_p=d_width)
+                        elif name == 'mux_squid_tf':
+                            # we assume uint data value => no conversion
+                            pass
+                        elif name == 'tes_steady_state':
+                            # we assume uint data value => no conversion
+                            pass
+                        else: # 'mux_squid_offset'
+                            # we assume int value => conversion
+                            value = self.conv_int_to_uint(value_p=value,data_width_p=d_width)
+                            d_width = 16 # width of the data
+
+                        str_data = '{0:04x}'.format(value)
                         str_result = str_addr + str_data
 
                         #####################################
@@ -443,7 +486,7 @@ class SystemFpasimTopDataGen(VunitConf):
             test_variant_filepath = self.new_test_variant_filepath_list[self.index]
         self.index += 1
 
-   
+
         level0 = self.level
         level1 = level0 + 1
 
@@ -469,13 +512,13 @@ class SystemFpasimTopDataGen(VunitConf):
         ##########################################################
         # generate files
         ##########################################################
-        if self.new_test_variant_filepath_list != []:   
+        if self.new_test_variant_filepath_list != []:
             self._run(test_variant_filepath_p=test_variant_filepath, tb_input_base_path_p=tb_input_base_path, tb_output_base_path_p=tb_output_base_path)
-    
+
         if self.verbosity > 0:
             str0 = "SystemFpasimTopDataGen.pre_config: Simulation transcript"
             display_obj.display_title(msg_p=str0, level_p=level0)
-            str0 = test_variant_filepath 
+            str0 = test_variant_filepath
             display_obj.display(msg_p=str0, level_p=level1)
 
             str0 = ""

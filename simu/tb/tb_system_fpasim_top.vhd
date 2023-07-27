@@ -840,7 +840,7 @@ begin
       --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
       --  data type = "STD_VEC" => no data convertion before writing in the output file
       i_DATA0_TYP      => "UINT",
-      i_DATA1_TYP      => "UINT",
+      i_DATA1_TYP      => "INT",
       ---------------------------------------------------------------------
       -- signals to log
       ---------------------------------------------------------------------
@@ -960,7 +960,7 @@ begin
       --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
       --  data type = "STD_VEC" => no data convertion before writing in the output file
       i_DATA0_TYP      => "UINT",
-      i_DATA1_TYP      => "UINT",
+      i_DATA1_TYP      => "INT",
       ---------------------------------------------------------------------
       -- signals to log
       ---------------------------------------------------------------------
