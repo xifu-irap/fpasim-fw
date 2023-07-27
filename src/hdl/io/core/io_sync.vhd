@@ -218,7 +218,9 @@ begin
   -- I/O interface
   ---------------------------------------------------------------------
   gen_io_sync : if true generate
+    -- sync pulse
     signal data_tmp0 : std_logic_vector(0 downto 0);
+    -- sync pulse
     signal data_tmp1 : std_logic_vector(0 downto 0);
   begin
     data_tmp0(0) <= sync_rx;

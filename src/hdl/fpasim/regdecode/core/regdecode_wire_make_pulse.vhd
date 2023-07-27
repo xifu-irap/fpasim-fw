@@ -108,6 +108,7 @@ architecture RTL of regdecode_wire_make_pulse is
   -- extracted pixel_id bits
   signal pixel_id_tmp  : std_logic_vector(pkg_MAKE_PULSE_PIXEL_ID_WIDTH - 1 downto 0);
 
+  -- fsm type declaration
   type t_state is (E_RST, E_WAIT, E_GEN_PIXEL_ID);
   signal sm_state_next : t_state := E_RST; -- state
   signal sm_state_r1   : t_state := E_RST; -- state (registered)

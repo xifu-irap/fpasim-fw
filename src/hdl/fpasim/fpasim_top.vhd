@@ -398,6 +398,7 @@ architecture RTL of fpasim_top is
 
   -- signals synchronization with mux_squid_top
   ---------------------------------------------------------------------
+  -- adc amp_squid_offset_correction value
   signal amp_squid_offset_correction2 : std_logic_vector(i_adc_amp_squid_offset_correction'range);
 
   ---------------------------------------------------------------------
@@ -444,7 +445,9 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- recording
   ---------------------------------------------------------------------
+  -- recording command valid
   signal rec_adc_cmd_valid             : std_logic;
+  -- recording command value
   signal rec_adc_cmd_nb_words_by_block : std_logic_vector(15 downto 0);
 
   signal fifo_rec_adc_rd         : std_logic; -- recording fifo: read enable
@@ -1201,6 +1204,7 @@ begin
       end if;
     end process p_select_path;
   end generate gen_dac_debug;
+
   ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
@@ -1285,19 +1289,27 @@ begin
   -- debug
   ---------------------------------------------------------------------
   gen_debug : if g_FPASIM_DEBUG = true generate
-
+    -- frame id when pulse_sof is detected (pixel 0)
     signal debug_frame_id_pulse_sof_r1 : std_logic_vector(frame_id1'range);
+    -- frame id when pulse_eof is detected (pixel 0)
     signal debug_frame_id_pulse_eof_r1 : std_logic_vector(frame_id1'range);
 
+    -- count the number of samples of a pulse (pixel 0)
     signal debug_pulse_cnt_r1     : unsigned(23 downto 0)         := (others => '0');
+    -- count the number of samples of a pulse (pixel 0)
     signal debug_pulse_cnt_r1_tmp : std_logic_vector(23 downto 0) := (others => '0');
 
-    signal debug_trig  : std_logic;
+    signal debug_trig  : std_logic; -- detect the pixel 0
+    -- enable the counter of number of samples for a pulse (pixel 0)
     signal debug_en_r1 : std_logic := '0';
 
+    -- count the number of samples by pixels (all pixels)
     signal debug_sample_pixel_cnt_r1  : unsigned(15 downto 0);
+    -- count the number of samples by pixels (all pixels)
     signal debug_sample_pixel_cnt_tmp : std_logic_vector(15 downto 0);
+    -- count the number of samples by frame (all pixels)
     signal debug_sample_frame_cnt_r1  : unsigned(15 downto 0);
+    -- count the number of samples by frame (all pixels)
     signal debug_sample_frame_cnt_tmp : std_logic_vector(15 downto 0);
 
   begin

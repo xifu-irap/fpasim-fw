@@ -127,7 +127,7 @@ architecture RTL of regdecode_recording is
   ---------------------------------------------------------------------
   -- data management
   ---------------------------------------------------------------------
-  signal fifo_rd                 : std_logic;
+  signal fifo_rd                 : std_logic; -- fifo read
   signal usb_adc_fifo_sof        : std_logic; -- fifo first sample
   signal usb_adc_fifo_eof        : std_logic; -- fifo last sample
   signal usb_adc_fifo_data_valid : std_logic; -- fifo data valid

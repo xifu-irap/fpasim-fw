@@ -111,49 +111,50 @@ end entity dac_top;
 
 architecture RTL of dac_top is
 
+  -- optional output latency
   constant c_LATENCY_OUT : natural := pkg_DAC_OUT_LATENCY;
 
   ---------------------------------------------------------------------
   -- dac_frame_generator
   ---------------------------------------------------------------------
-  signal dac_frame_r1 : std_logic;
-  signal dac_valid_r1 : std_logic;
-  signal dac0_r1      : std_logic_vector(i_dac'range);
-  signal dac1_r1      : std_logic_vector(i_dac'range);
+  signal dac_frame_r1 : std_logic; -- dac frame valid
+  signal dac_valid_r1 : std_logic; -- dac data valid
+  signal dac0_r1      : std_logic_vector(i_dac'range); -- dac0 value
+  signal dac1_r1      : std_logic_vector(i_dac'range); -- dac1 value
 
   ---------------------------------------------------------------------
   -- dynamic_shift_register
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + i_dac'length - 1;
+  constant c_IDX0_L : integer := 0;-- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + i_dac'length - 1;-- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + i_dac'length - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1;-- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + i_dac'length - 1;-- index1: high
 
-  constant c_IDX2_L : integer := c_IDX1_H + 1;
-  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;
+  constant c_IDX2_L : integer := c_IDX1_H + 1;-- index2: low
+  constant c_IDX2_H : integer := c_IDX2_L + 1 - 1;-- index2: high
 
-  constant c_IDX3_L : integer := c_IDX2_H + 1;
-  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;
+  constant c_IDX3_L : integer := c_IDX2_H + 1;-- index3: low
+  constant c_IDX3_H : integer := c_IDX3_L + 1 - 1;-- index3: high
 
-  signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0);
-  signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp0 : std_logic_vector(c_IDX3_H downto 0);-- temporary input pipe
+  signal data_pipe_tmp1 : std_logic_vector(c_IDX3_H downto 0);-- temporary output pipe
 
-  signal dac_valid_rx : std_logic;
-  signal dac_frame_rx : std_logic;
-  signal dac0_rx      : std_logic_vector(i_dac'range);
-  signal dac1_rx      : std_logic_vector(i_dac'range);
+  signal dac_valid_rx : std_logic; -- dac data value
+  signal dac_frame_rx : std_logic; -- dac frame
+  signal dac0_rx      : std_logic_vector(i_dac'range); -- dac0 value
+  signal dac1_rx      : std_logic_vector(i_dac'range); -- dac1 value
 
   ---------------------------------------------------------------------
   -- output pipe
   ---------------------------------------------------------------------
-  signal data_pipe_tmp2 : std_logic_vector(c_IDX3_H downto 0);
-  signal data_pipe_tmp3 : std_logic_vector(c_IDX3_H downto 0);
+  signal data_pipe_tmp2 : std_logic_vector(c_IDX3_H downto 0); -- temporary input pipe
+  signal data_pipe_tmp3 : std_logic_vector(c_IDX3_H downto 0); -- temporary output pipe
 
-  signal dac_valid_ry : std_logic;
-  signal dac_frame_ry : std_logic;
-  signal dac0_ry      : std_logic_vector(i_dac'range);
-  signal dac1_ry      : std_logic_vector(i_dac'range);
+  signal dac_valid_ry : std_logic; -- dac data value
+  signal dac_frame_ry : std_logic; -- dac frame
+  signal dac0_ry      : std_logic_vector(i_dac'range); -- dac0 value
+  signal dac1_ry      : std_logic_vector(i_dac'range); -- dac1 value
 
 
 begin

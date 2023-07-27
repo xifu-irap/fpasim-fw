@@ -88,6 +88,7 @@ architecture RTL of tes_signalling_generator is
   ---------------------------------------------------------------------
   -- state machine
   ---------------------------------------------------------------------
+  -- fsm type declaration
   type t_state is (E_RST, E_WAIT, E_START, E_RUN);
   signal sm_state_next : t_state; -- state
   signal sm_state_r1   : t_state := E_RST; -- state (registered)
@@ -144,7 +145,7 @@ architecture RTL of tes_signalling_generator is
   -- temporary output pipe
   signal data_tmp1 : std_logic_vector(c_IDX3_H downto 0);
 
-  signal data_valid1 : std_logic                          := '0';
+  signal data_valid1 : std_logic                          := '0'; -- data valid
   signal sof1        : std_logic                          := '0'; -- first block sample
   signal eof1        : std_logic                          := '0'; -- last block sample
   signal id1         : std_logic_vector(i_nb_block'range) := (others => '0'); -- id

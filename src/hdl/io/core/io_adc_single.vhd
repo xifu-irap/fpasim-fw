@@ -110,6 +110,7 @@ architecture RTL of io_adc_single is
   ---------------------------------------------------------------------
   -- bit remapping
   ---------------------------------------------------------------------
+  -- define an array of data words
   type t_word_by_bit is array (natural range <>) of std_logic_vector(13 downto 0);
   -- channe A: word1
   signal adc_a_word_tmp1 : t_word_by_bit(0 to 3);

@@ -79,15 +79,25 @@ architecture RTL of recording_top is
 ---------------------------------------------------------------------
 -- recording_adc
 ---------------------------------------------------------------------
+  -- adc0 data
   signal adc_data0 : std_logic_vector(15 downto 0);
+  -- adc1 data
   signal adc_data1 : std_logic_vector(15 downto 0);
 
+  -- fifo data valid out
   signal fifo_adc_data_valid : std_logic;
+  -- fifo first word of the acquisition block
   signal fifo_adc_sof        : std_logic;
+  -- fifo last word of the acquisition block
   signal fifo_adc_eof        : std_logic;
+  -- fifo data out
   signal fifo_adc_data       : std_logic_vector(o_fifo_adc_data'range);
+  -- fifo empty flag
   signal fifo_adc_empty      : std_logic;
+
+   -- adc errors
   signal adc_errors          : std_logic_vector(o_adc_errors'range);
+   -- adc status
   signal adc_status          : std_logic_vector(o_adc_status'range);
 
 begin

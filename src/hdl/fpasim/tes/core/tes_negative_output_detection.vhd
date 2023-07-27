@@ -75,6 +75,7 @@ end entity tes_negative_output_detection;
 
 architecture RTL of tes_negative_output_detection is
 
+  -- fsm type declaration
   type t_state is (E_RST, E_WAIT, E_END);
   signal sm_state_next : t_state; -- state
   signal sm_state_r1   : t_state := E_RST; -- state (registered)

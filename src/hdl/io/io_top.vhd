@@ -194,30 +194,45 @@ architecture RTL of io_top is
   -- io_adc_top
   ---------------------------------------------------------------------
   -- input
+  -- differential adc data_p (channel A)
   signal adc_a_tmp0_p : std_logic_vector(6 downto 0);
+  -- differential adc data_n (channel A)
   signal adc_a_tmp0_n : std_logic_vector(6 downto 0);
+
+  -- differential adc data_p (channel B)
   signal adc_b_tmp0_p : std_logic_vector(6 downto 0);
+  -- differential adc data_n (channel B)
   signal adc_b_tmp0_n : std_logic_vector(6 downto 0);
 
   -- output
+  -- divided adc clock
   signal adc_clk_div : std_logic;
+  -- adc data valid
   signal adc_valid   : std_logic;
+  -- adc data (channel A)
   signal adc_a       : std_logic_vector(o_adc_a'range);
+  -- adc data (channel B)
   signal adc_b       : std_logic_vector(o_adc_b'range);
 
+  -- io adc errors
   signal adc_errors : std_logic_vector(o_adc_errors'range);
+  -- io adc status
   signal adc_status : std_logic_vector(o_adc_status'range);
 
   ---------------------------------------------------------------------
   -- io_sync_top
   ---------------------------------------------------------------------
+  -- io sync errors
   signal sync_errors : std_logic_vector(o_sync_errors'range);
+  -- io sync status
   signal sync_status : std_logic_vector(o_sync_status'range);
 
   ---------------------------------------------------------------------
   -- io_dac_top
   ---------------------------------------------------------------------
+  -- io dac errors
   signal dac_errors : std_logic_vector(o_dac_errors'range);
+  -- io dac status
   signal dac_status : std_logic_vector(o_dac_status'range);
 
 begin

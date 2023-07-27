@@ -100,7 +100,9 @@ architecture RTL of spi_master is
 ---------------------------------------------------------------------
 -- write state machine
 ---------------------------------------------------------------------
+  -- fsm type declaration
   type t_wr_state is (E_RST, E_WAIT, E_SET_CS0, E_SET_CS1, E_SHIFT_DATA, E_UNSET_CS);
+
   signal sm_wr_state_next : t_wr_state; -- state
   signal sm_wr_state_r1   : t_wr_state := E_RST; -- state (registered)
 
@@ -324,7 +326,9 @@ begin
   -- optional tx pipeline
   ---------------------------------------------------------------------
   gen_pipe_tx_no_init : if true generate
+    -- temporary input pipe
     signal data_tmp0 : std_logic_vector(4 downto 0);
+    -- temporary output pipe
     signal data_tmp1 : std_logic_vector(4 downto 0);
   begin
     data_tmp0(4) <= rx_rd_en_r1;
@@ -352,7 +356,9 @@ begin
 
   -- pipe with special init value
   gen_pipe_tx : if true generate
+    -- temporary input pipe
     signal data_tmp0 : std_logic_vector(0 downto 0);
+    -- temporary output pipe
     signal data_tmp1 : std_logic_vector(0 downto 0);
   begin
     data_tmp0(0) <= tx_cs_n_r1;
@@ -386,7 +392,9 @@ begin
   --  Note: the delay depends on the IO management
   ---------------------------------------------------------------------
   gen_pipe_rx : if true generate
+    -- temporary input pipe
     signal data_tmp0 : std_logic_vector(2 downto 0);
+    -- temporary output pipe
     signal data_tmp1 : std_logic_vector(2 downto 0);
   begin
     data_tmp0(2) <= rx_rd_en_rx;

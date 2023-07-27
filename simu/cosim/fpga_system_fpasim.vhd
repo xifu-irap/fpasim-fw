@@ -83,63 +83,87 @@ architecture RTL of fpga_system_fpasim is
 ---------------------------------------------------------------------
 -- ads62p49_top
 ---------------------------------------------------------------------
-  signal adc_clk_p : std_logic;
-  signal adc_clk_n : std_logic;
-  -- adc0
-  signal da0_p     : std_logic;
-  signal da0_n     : std_logic;
-  signal da2_p     : std_logic;
-  signal da2_n     : std_logic;
-  signal da4_p     : std_logic;
-  signal da4_n     : std_logic;
-  signal da6_p     : std_logic;
-  signal da6_n     : std_logic;
-  signal da8_p     : std_logic;
-  signal da8_n     : std_logic;
-  signal da10_p    : std_logic;
-  signal da10_n    : std_logic;
-  signal da12_p    : std_logic;
-  signal da12_n    : std_logic;
+  signal adc_clk_p : std_logic; -- differential_p adc clock
+  signal adc_clk_n : std_logic; -- differential_n adc clock
 
-  -- adc1
-  signal db0_p  : std_logic;
-  signal db0_n  : std_logic;
-  signal db2_p  : std_logic;
-  signal db2_n  : std_logic;
-  signal db4_p  : std_logic;
-  signal db4_n  : std_logic;
-  signal db6_p  : std_logic;
-  signal db6_n  : std_logic;
-  signal db8_p  : std_logic;
-  signal db8_n  : std_logic;
-  signal db10_p : std_logic;
-  signal db10_n : std_logic;
-  signal db12_p : std_logic;
-  signal db12_n : std_logic;
+  -- adc0 (channel A)
+  ---------------------------------------------------------------------
+  signal da0_p     : std_logic;--  differential_p adc0 (lane0)
+  signal da0_n     : std_logic;--  differential_n adc0 (lane0)
+
+  signal da2_p     : std_logic;--  differential_p adc0 (lane1)
+  signal da2_n     : std_logic;--  differential_n adc0 (lane1)
+
+  signal da4_p     : std_logic;--  differential_p adc0 (lane2)
+  signal da4_n     : std_logic;--  differential_n adc0 (lane2)
+
+  signal da6_p     : std_logic;--  differential_p adc0 (lane3)
+  signal da6_n     : std_logic;--  differential_n adc0 (lane3)
+
+  signal da8_p     : std_logic;--  differential_p adc0 (lane4)
+  signal da8_n     : std_logic;--  differential_n adc0 (lane4)
+
+  signal da10_p    : std_logic;--  differential_p adc0 (lane5)
+  signal da10_n    : std_logic;--  differential_n adc0 (lane5)
+
+  signal da12_p    : std_logic;--  differential_p adc0 (lane6)
+  signal da12_n    : std_logic;--  differential_n adc0 (lane6)
+
+  -- adc1 (channel B)
+  ---------------------------------------------------------------------
+  signal db0_p  : std_logic;--  differential_p adc1 (lane0)
+  signal db0_n  : std_logic;--  differential_n adc1 (lane0)
+
+  signal db2_p  : std_logic;--  differential_p adc1 (lane1)
+  signal db2_n  : std_logic;--  differential_n adc1 (lane1)
+
+  signal db4_p  : std_logic;--  differential_p adc1 (lane2)
+  signal db4_n  : std_logic;--  differential_n adc1 (lane2)
+
+  signal db6_p  : std_logic;--  differential_p adc1 (lane3)
+  signal db6_n  : std_logic;--  differential_n adc1 (lane3)
+
+  signal db8_p  : std_logic;--  differential_p adc1 (lane4)
+  signal db8_n  : std_logic;--  differential_n adc1 (lane4)
+
+  signal db10_p : std_logic;--  differential_p adc1 (lane5)
+  signal db10_n : std_logic;--  differential_n adc1 (lane5)
+
+  signal db12_p : std_logic;--  differential_p adc1 (lane6)
+  signal db12_n : std_logic;--  differential_n adc1 (lane6)
 
 ---------------------------------------------------------------------
 -- system_fpasim_top
 ---------------------------------------------------------------------
-  signal dac_clk_p   : std_logic;
-  signal dac_clk_n   : std_logic;
-  signal dac_frame_p : std_logic;
-  signal dac_frame_n : std_logic;
-  signal dac0_p      : std_logic;
-  signal dac0_n      : std_logic;
-  signal dac1_p      : std_logic;
-  signal dac1_n      : std_logic;
-  signal dac2_p      : std_logic;
-  signal dac2_n      : std_logic;
-  signal dac3_p      : std_logic;
-  signal dac3_n      : std_logic;
-  signal dac4_p      : std_logic;
-  signal dac4_n      : std_logic;
-  signal dac5_p      : std_logic;
-  signal dac5_n      : std_logic;
-  signal dac6_p      : std_logic;
-  signal dac6_n      : std_logic;
-  signal dac7_p      : std_logic;
-  signal dac7_n      : std_logic;
+  signal dac_clk_p   : std_logic;-- differential_p dac clock
+  signal dac_clk_n   : std_logic;-- differential_n dac clock
+
+  signal dac_frame_p : std_logic; -- differential_p dac frame
+  signal dac_frame_n : std_logic; -- differential_n dac frame
+
+  signal dac0_p      : std_logic; -- differential_p dac data (lane0)
+  signal dac0_n      : std_logic; -- differential_n dac data (lane0)
+
+  signal dac1_p      : std_logic; -- differential_p dac data (lane1)
+  signal dac1_n      : std_logic; -- differential_n dac data (lane1)
+
+  signal dac2_p      : std_logic; -- differential_p dac data (lane2)
+  signal dac2_n      : std_logic; -- differential_n dac data (lane2)
+
+  signal dac3_p      : std_logic; -- differential_p dac data (lane3)
+  signal dac3_n      : std_logic; -- differential_n dac data (lane3)
+
+  signal dac4_p      : std_logic; -- differential_p dac data (lane4)
+  signal dac4_n      : std_logic; -- differential_n dac data (lane4)
+
+  signal dac5_p      : std_logic; -- differential_p dac data (lane5)
+  signal dac5_n      : std_logic; -- differential_n dac data (lane5)
+
+  signal dac6_p      : std_logic; -- differential_p dac data (lane6)
+  signal dac6_n      : std_logic; -- differential_n dac data (lane6)
+
+  signal dac7_p      : std_logic; -- differential_p dac data (lane7)
+  signal dac7_n      : std_logic; -- differential_n dac data (lane7)
 
 -- common: shared link between the spi
   signal spi_sclk  : std_logic; -- spi clock

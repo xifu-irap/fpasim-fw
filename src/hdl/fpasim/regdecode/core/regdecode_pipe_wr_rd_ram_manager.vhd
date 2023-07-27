@@ -122,6 +122,7 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
   ---------------------------------------------------------------------
   -- fsm
   ---------------------------------------------------------------------
+  -- fsm type declaration
   type t_state is (E_RST, E_WAIT, E_AUTO_RD);
   signal sm_state_next : t_state; -- state
   signal sm_state_r1   : t_state; -- state (registered)
@@ -157,6 +158,7 @@ architecture RTL of regdecode_pipe_wr_rd_ram_manager is
 
   -- sync with fsm out
   ---------------------------------------------------------------------
+  -- delayed data
   signal data_r1 : std_logic_vector(i_data'range) := (others => '0');
 
   ---------------------------------------------------------------------

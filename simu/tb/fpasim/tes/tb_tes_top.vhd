@@ -173,6 +173,7 @@ architecture Simulation of tb_tes_top is
   -- reg
   -- start the register configuration
   signal reg_start      : std_logic := '0';
+  -- read valid in order to modulate the file reading speed
   signal reg_rd_valid   : std_logic := '0';
   -- end of the register configuration
   signal reg_gen_finish : std_logic := '0';

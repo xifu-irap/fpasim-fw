@@ -279,8 +279,9 @@ package pkg_regdecode is
 
   -- user-defined: spi_ctrl
   ---------------------------------------------------------------------
-  -- user-defined: spi_mode (bit index high)
+  -- user-defined: spi ctrl enable (bit index high)
   constant pkg_SPI_CTRL_EN_IDX_H  : integer := 0;
+  -- user-defined: spi ctrl rst (bit index high)
   constant pkg_SPI_CTRL_RST_IDX_H : integer := 1;
 
   -- user-defined: spi_conf0

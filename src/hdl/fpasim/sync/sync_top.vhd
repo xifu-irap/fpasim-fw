@@ -75,41 +75,40 @@ end entity sync_top;
 
 architecture RTL of sync_top is
 
+  -- add an optional output latency
   constant c_LATENCY_OUT       : natural := pkg_SYNC_OUT_LATENCY;
 
   ---------------------------------------------------------------------
   -- sync_pulse_generator
   ---------------------------------------------------------------------
-  signal sync_valid_r1            : std_logic;
-  signal sync_r1                  : std_logic;
-  signal error_pulse_generator_r1 : std_logic;
+  signal sync_valid_r1            : std_logic; -- sync data valid
+  signal sync_r1                  : std_logic; -- sync pulse
+  signal error_pulse_generator_r1 : std_logic; -- sync error
 
   ---------------------------------------------------------------------
   -- dynamic_shift_register
   ---------------------------------------------------------------------
-  constant c_IDX0_L : integer := 0;
-  constant c_IDX0_H : integer := c_IDX0_L + 1 - 1;
+  constant c_IDX0_L : integer := 0;-- index0: low
+  constant c_IDX0_H : integer := c_IDX0_L + 1 - 1;-- index0: high
 
-  constant c_IDX1_L : integer := c_IDX0_H + 1;
-  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1;
+  constant c_IDX1_L : integer := c_IDX0_H + 1;-- index1: low
+  constant c_IDX1_H : integer := c_IDX1_L + 1 - 1;-- index1: high
 
 
-  signal data_pipe_tmp0 : std_logic_vector(c_IDX1_H downto 0);
-  signal data_pipe_tmp1 : std_logic_vector(c_IDX1_H downto 0);
+  signal data_pipe_tmp0 : std_logic_vector(c_IDX1_H downto 0);-- temporary input pipe signal
+  signal data_pipe_tmp1 : std_logic_vector(c_IDX1_H downto 0);-- temporary output pipe signal
 
-  signal sync_valid_rx : std_logic;
-  signal sync_rx       : std_logic;
+  signal sync_valid_rx : std_logic; -- delayed sync data valid
+  signal sync_rx       : std_logic; -- delayed sync pulse
 
   ---------------------------------------------------------------------
   -- output pipe
   ---------------------------------------------------------------------
-  signal data_pipe_tmp2 : std_logic_vector(c_IDX1_H downto 0);
-  signal data_pipe_tmp3 : std_logic_vector(c_IDX1_H downto 0);
+  signal data_pipe_tmp2 : std_logic_vector(c_IDX1_H downto 0);-- temporary input pipe signal
+  signal data_pipe_tmp3 : std_logic_vector(c_IDX1_H downto 0);-- temporary output pipe signal
 
-  signal sync_valid_ry : std_logic;
-  signal sync_ry       : std_logic;
-
-
+  signal sync_valid_ry : std_logic; -- delayed sync data valid
+  signal sync_ry       : std_logic; -- delayed sync pulse
 
 begin
 

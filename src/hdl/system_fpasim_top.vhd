@@ -43,10 +43,10 @@ entity system_fpasim_top is
     );
   port(
     --  Opal Kelly inouts --
-    i_okUH  : in    std_logic_vector(4 downto 0); -- usb interface signal
-    o_okHU  : out   std_logic_vector(2 downto 0); -- usb interface signal
-    b_okUHU : inout std_logic_vector(31 downto 0); -- usb interface signal
-    b_okAA  : inout std_logic; -- usb interface signal
+    i_okUH        : in    std_logic_vector(4 downto 0);  -- usb interface signal
+    o_okHU        : out   std_logic_vector(2 downto 0);  -- usb interface signal
+    b_okUHU       : inout std_logic_vector(31 downto 0);  -- usb interface signal
+    b_okAA        : inout std_logic;    -- usb interface signal
     ---------------------------------------------------------------------
     -- FMC: from the card
     -- requirement: FPASIM-FW-REQ-0270
@@ -56,51 +56,51 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     -- FMC: from the adc @i_adc_clk_p
     ---------------------------------------------------------------------
-    i_clk_ab_p : in std_logic;         -- differential_p clock adc @250MHz
-    i_clk_ab_n : in std_logic;         -- differential_n clock adc @250MHZ
+    i_clk_ab_p : in std_logic;          -- differential_p clock adc @250MHz
+    i_clk_ab_n : in std_logic;          -- differential_n clock adc @250MHZ
     -- adc_a
     -- bit P/N: 0-1
-    i_cha_00_p     : in std_logic;         --  differential_p adc_a (lane0)
-    i_cha_00_n     : in std_logic;         --  differential_n adc_a (lane0)
+    i_cha_00_p : in std_logic;          --  differential_p adc_a (lane0)
+    i_cha_00_n : in std_logic;          --  differential_n adc_a (lane0)
 
-    i_cha_02_p : in std_logic;             --  differential_p adc_a (lane1)
-    i_cha_02_n : in std_logic;             --  differential_n adc_a (lane1)
+    i_cha_02_p : in std_logic;          --  differential_p adc_a (lane1)
+    i_cha_02_n : in std_logic;          --  differential_n adc_a (lane1)
 
-    i_cha_04_p : in std_logic;             --  differential_p adc_a (lane2)
-    i_cha_04_n : in std_logic;             --  differential_n adc_a (lane2)
+    i_cha_04_p : in std_logic;          --  differential_p adc_a (lane2)
+    i_cha_04_n : in std_logic;          --  differential_n adc_a (lane2)
 
-    i_cha_06_p : in std_logic;             --  differential_p adc_a (lane3)
-    i_cha_06_n : in std_logic;             --  differential_n adc_a (lane3)
+    i_cha_06_p : in std_logic;          --  differential_p adc_a (lane3)
+    i_cha_06_n : in std_logic;          --  differential_n adc_a (lane3)
 
-    i_cha_08_p : in std_logic;             --  differential_p adc_a (lane4)
-    i_cha_08_n : in std_logic;             --  differential_n adc_a (lane4)
+    i_cha_08_p : in std_logic;          --  differential_p adc_a (lane4)
+    i_cha_08_n : in std_logic;          --  differential_n adc_a (lane4)
 
-    i_cha_10_p : in std_logic;            --  differential_p adc_a (lane5)
-    i_cha_10_n : in std_logic;            --  differential_n adc_a (lane5)
+    i_cha_10_p : in std_logic;          --  differential_p adc_a (lane5)
+    i_cha_10_n : in std_logic;          --  differential_n adc_a (lane5)
 
-    i_cha_12_p : in std_logic;            --  differential_p adc_a (lane6)
-    i_cha_12_n : in std_logic;            --  differential_n adc_a (lane6)
+    i_cha_12_p : in std_logic;          --  differential_p adc_a (lane6)
+    i_cha_12_n : in std_logic;          --  differential_n adc_a (lane6)
     -- adc_b
-    i_chb_00_p  : in std_logic;            --  differential_p adc_b (lane0)
-    i_chb_00_n  : in std_logic;            --  differential_n adc_b (lane0)
+    i_chb_00_p : in std_logic;          --  differential_p adc_b (lane0)
+    i_chb_00_n : in std_logic;          --  differential_n adc_b (lane0)
 
-    i_chb_02_p : in std_logic;             --  differential_p adc_b (lane1)
-    i_chb_02_n : in std_logic;             --  differential_n adc_b (lane1)
+    i_chb_02_p : in std_logic;          --  differential_p adc_b (lane1)
+    i_chb_02_n : in std_logic;          --  differential_n adc_b (lane1)
 
-    i_chb_04_p : in std_logic;             --  differential_p adc_b (lane2)
-    i_chb_04_n : in std_logic;             --  differential_n adc_b (lane2)
+    i_chb_04_p : in std_logic;          --  differential_p adc_b (lane2)
+    i_chb_04_n : in std_logic;          --  differential_n adc_b (lane2)
 
-    i_chb_06_p : in std_logic;             --  differential_p adc_b (lane3)
-    i_chb_06_n : in std_logic;             --  differential_n adc_b (lane3)
+    i_chb_06_p : in std_logic;          --  differential_p adc_b (lane3)
+    i_chb_06_n : in std_logic;          --  differential_n adc_b (lane3)
 
-    i_chb_08_p : in std_logic;             --  differential_p adc_b (lane4)
-    i_chb_08_n : in std_logic;             --  differential_n adc_b (lane4)
+    i_chb_08_p : in std_logic;          --  differential_p adc_b (lane4)
+    i_chb_08_n : in std_logic;          --  differential_n adc_b (lane4)
 
-    i_chb_10_p : in std_logic;            --  differential_p adc_b (lane5)
-    i_chb_10_n : in std_logic;            --  differential_n adc_b (lane5)
+    i_chb_10_p : in std_logic;          --  differential_p adc_b (lane5)
+    i_chb_10_n : in std_logic;          --  differential_n adc_b (lane5)
 
-    i_chb_12_p : in std_logic;            --  differential_p adc_b (lane6)
-    i_chb_12_n : in std_logic;            --  differential_n adc_b (lane6)
+    i_chb_12_p : in std_logic;          --  differential_p adc_b (lane6)
+    i_chb_12_n : in std_logic;          --  differential_n adc_b (lane6)
 
     ---------------------------------------------------------------------
     -- FMC: to sync
@@ -110,35 +110,35 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     -- FMC: to dac
     ---------------------------------------------------------------------
-    o_dac_dclk_p : out std_logic;        -- differential_p dac clock
-    o_dac_dclk_n : out std_logic;        -- differential_n dac clock
+    o_dac_dclk_p  : out std_logic;      -- differential_p dac clock
+    o_dac_dclk_n  : out std_logic;      -- differential_n dac clock
 
-    o_frame_p : out std_logic;      -- differential_p dac frame
-    o_frame_n : out std_logic;      -- differential_n dac frame
+    o_frame_p : out std_logic;          -- differential_p dac frame
+    o_frame_n : out std_logic;          -- differential_n dac frame
 
-    o_dac_d0_p : out std_logic;           -- differential_p dac data (lane0)
-    o_dac_d0_n : out std_logic;           -- differential_n dac data (lane0)
+    o_dac_d0_p : out std_logic;         -- differential_p dac data (lane0)
+    o_dac_d0_n : out std_logic;         -- differential_n dac data (lane0)
 
-    o_dac_d1_p : out std_logic;           -- differential_p dac data (lane1)
-    o_dac_d1_n : out std_logic;           -- differential_n dac data (lane1)
+    o_dac_d1_p : out std_logic;         -- differential_p dac data (lane1)
+    o_dac_d1_n : out std_logic;         -- differential_n dac data (lane1)
 
-    o_dac_d2_p : out std_logic;           -- differential_p dac data (lane2)
-    o_dac_d2_n : out std_logic;           -- differential_n dac data (lane2)
+    o_dac_d2_p : out std_logic;         -- differential_p dac data (lane2)
+    o_dac_d2_n : out std_logic;         -- differential_n dac data (lane2)
 
-    o_dac_d3_p : out std_logic;           -- differential_p dac data (lane3)
-    o_dac_d3_n : out std_logic;           -- differential_n dac data (lane3)
+    o_dac_d3_p : out std_logic;         -- differential_p dac data (lane3)
+    o_dac_d3_n : out std_logic;         -- differential_n dac data (lane3)
 
-    o_dac_d4_p : out std_logic;           -- differential_p dac data (lane4)
-    o_dac_d4_n : out std_logic;           -- differential_n dac data (lane4)
+    o_dac_d4_p : out std_logic;         -- differential_p dac data (lane4)
+    o_dac_d4_n : out std_logic;         -- differential_n dac data (lane4)
 
-    o_dac_d5_p : out std_logic;           -- differential_p dac data (lane5)
-    o_dac_d5_n : out std_logic;           -- differential_n dac data (lane5)
+    o_dac_d5_p : out std_logic;         -- differential_p dac data (lane5)
+    o_dac_d5_n : out std_logic;         -- differential_n dac data (lane5)
 
-    o_dac_d6_p : out std_logic;           -- differential_p dac data (lane6)
-    o_dac_d6_n : out std_logic;           -- differential_n dac data (lane6)
+    o_dac_d6_p : out std_logic;         -- differential_p dac data (lane6)
+    o_dac_d6_n : out std_logic;         -- differential_n dac data (lane6)
 
-    o_dac_d7_p : out std_logic;           -- differential_p dac data (lane7)
-    o_dac_d7_n : out std_logic;           -- differential_n dac data (lane7)
+    o_dac_d7_p : out std_logic;         -- differential_p dac data (lane7)
+    o_dac_d7_n : out std_logic;         -- differential_n dac data (lane7)
 
     ---------------------------------------------------------------------
     -- devices: spi links + specific signals
@@ -152,10 +152,10 @@ entity system_fpasim_top is
     o_cdce_n_en : out std_logic;        -- SPI chip select
 
     -- CDCE: specific signals
-    i_pll_status : in  std_logic;  -- pll_status : This pin is set high if the PLL is in lock.
-    o_cdce_n_reset    : out std_logic;  -- reset_n or hold_n
-    o_cdce_n_pd       : out std_logic;  -- power_down_n
-    o_ref_en          : out std_logic;  -- enable the primary reference clock
+    i_pll_status   : in  std_logic;  -- pll_status : This pin is set high if the PLL is in lock.
+    o_cdce_n_reset : out std_logic;     -- reset_n or hold_n
+    o_cdce_n_pd    : out std_logic;     -- power_down_n
+    o_ref_en       : out std_logic;     -- enable the primary reference clock
 
     -- ADC: SPI
     i_adc_sdo   : in  std_logic;        -- SPI MISO
@@ -164,10 +164,10 @@ entity system_fpasim_top is
     o_adc_reset : out std_logic;        -- adc hardware reset
 
     -- DAC: SPI
-    i_dac_sdo        : in  std_logic;   -- SPI MISO
-    o_dac_n_en       : out std_logic;   -- SPI chip select
+    i_dac_sdo   : in  std_logic;        -- SPI MISO
+    o_dac_n_en  : out std_logic;        -- SPI chip select
     -- DAC: specific signal
-    o_tx_enable : out std_logic;   -- enable tx acquisition
+    o_tx_enable : out std_logic;        -- enable tx acquisition
 
     -- AMC: SPI (monitoring)
     i_mon_sdo     : in  std_logic;      -- SPI data out
@@ -192,83 +192,83 @@ architecture RTL of system_fpasim_top is
   ---------------------------------------------------------------------
   -- clock generation
   ---------------------------------------------------------------------
-  signal adc_clk_div         : std_logic; -- divided adc clock
-  signal sync_clk            : std_logic; -- sync clock (clk frame)
-  signal dac_clk             : std_logic; -- dac clock with a 0° phase
-  signal dac_clk_div         : std_logic; -- divided dac clock with a 0° phase
-  signal dac_clk_phase90     : std_logic; -- dac clock with a 90° phase
-  signal dac_clk_div_phase90 : std_logic; -- divided dac clock with a 90° phase
-  signal sys_clk             : std_logic; -- system clock
-  signal mmcm_locked         : std_logic; --  MMCM PLL locked flag
+  signal adc_clk_div         : std_logic;  -- divided adc clock
+  signal sync_clk            : std_logic;  -- sync clock (clk frame)
+  signal dac_clk             : std_logic;  -- dac clock with a 0° phase
+  signal dac_clk_div         : std_logic;  -- divided dac clock with a 0° phase
+  signal dac_clk_phase90     : std_logic;  -- dac clock with a 90° phase
+  signal dac_clk_div_phase90 : std_logic;  -- divided dac clock with a 90° phase
+  signal sys_clk             : std_logic;  -- system clock
+  signal mmcm_locked         : std_logic;  --  MMCM PLL locked flag
 
   ---------------------------------------------------------------------
   -- reset generation
   ---------------------------------------------------------------------
-  signal sys_rst            : std_logic; -- software reset synchronized @sys_clk
+  signal sys_rst : std_logic;           -- software reset synchronized @sys_clk
 
-  signal adc_io_clk_rst     : std_logic; -- adc clock reset for the adc_io module
-  signal adc_io_rst         : std_logic; -- adc io reset for the adc_io module
+  signal adc_io_clk_rst : std_logic;  -- adc clock reset for the adc_io module
+  signal adc_io_rst     : std_logic;    -- adc io reset for the adc_io module
 
-  signal dac_io_clk_rst     : std_logic; -- dac clock reset for the dac_io module (data part)
-  signal dac_io_rst         : std_logic; -- dac io reset for the dac_io module (data part)
+  signal dac_io_clk_rst : std_logic;  -- dac clock reset for the dac_io module (data part)
+  signal dac_io_rst     : std_logic;  -- dac io reset for the dac_io module (data part)
 
-  signal dac_io_rst_phase90 : std_logic; -- dac io reset for the dac_io module (clock part)
+  signal dac_io_rst_phase90 : std_logic;  -- dac io reset for the dac_io module (clock part)
 
-  signal sync_io_clk_rst    : std_logic; -- sync clock reset for the adc_io module
-  signal sync_io_rst        : std_logic; -- sync io reset for the adc_io module
+  signal sync_io_clk_rst : std_logic;  -- sync clock reset for the adc_io module
+  signal sync_io_rst     : std_logic;   -- sync io reset for the adc_io module
 
   ---------------------------------------------------------------------
   -- fpasim_top
   ---------------------------------------------------------------------
   -- common
-  signal rst_status                      : std_logic;-- reset error flag(s) (usb_rst_out synchronized @sys_clk)
+  signal rst_status                      : std_logic;  -- reset error flag(s) (usb_rst_out synchronized @sys_clk)
   -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s) (usb_rst_out synchronized @sys_clk)
   signal debug_pulse                     : std_logic;
   -- spi
-  signal usb_clk                         : std_logic; -- from the usb interface: clock
-  signal usb_rst                         : std_logic; -- from the usb interface: reset
-  signal usb_rst_out                     : std_logic; -- to the usb interface: reset
-  signal usb_rst_status                  : std_logic; -- from the usb interface: reset error flag(s)
+  signal usb_clk                         : std_logic;  -- from the usb interface: clock
+  signal usb_rst                         : std_logic;  -- from the usb interface: reset
+  signal usb_rst_out                     : std_logic;  -- to the usb interface: reset
+  signal usb_rst_status                  : std_logic;  -- from the usb interface: reset error flag(s)
   -- from the usb interface: error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
   signal usb_debug_pulse                 : std_logic;
   -- tx
-  signal spi_rst                         : std_logic; -- reset the spi bridge
-  signal spi_en                          : std_logic; -- enable the spi bridge
-  signal spi_cmd_valid                   : std_logic; -- spi command valid
-  signal spi_dac_tx_present              : std_logic; -- enable dac tx acquisition (spi device pin)
-  signal spi_mode                        : std_logic; -- spi mode: 1:wr, 0:rd
-  signal spi_id                          : std_logic_vector(1 downto 0); -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
-  signal spi_cmd_wr_data                 : std_logic_vector(31 downto 0); -- spi command to write on the spi device
+  signal spi_rst                         : std_logic;  -- reset the spi bridge
+  signal spi_en                          : std_logic;  -- enable the spi bridge
+  signal spi_cmd_valid                   : std_logic;  -- spi command valid
+  signal spi_dac_tx_present              : std_logic;  -- enable dac tx acquisition (spi device pin)
+  signal spi_mode                        : std_logic;  -- spi mode: 1:wr, 0:rd
+  signal spi_id                          : std_logic_vector(1 downto 0);  -- spi identifier: "00":cdece,"01": adc,"10":dac,"11":amc
+  signal spi_cmd_wr_data                 : std_logic_vector(31 downto 0);  -- spi command to write on the spi device
   -- rx
-  signal spi_rd_data_valid               : std_logic; -- spi read data valid
+  signal spi_rd_data_valid               : std_logic;  -- spi read data valid
   signal spi_rd_data                     : std_logic_vector(31 downto 0);  -- spi read data (device spi register value)
   --signal spi_ready                       : std_logic;
   -- status: register
-  signal reg_spi_status                  : std_logic_vector(31 downto 0); -- spi status (register format)
+  signal reg_spi_status                  : std_logic_vector(31 downto 0);  -- spi status (register format)
   -- errors/status
-  signal spi_errors                      : std_logic_vector(15 downto 0); -- spi errors
-  signal spi_status                      : std_logic_vector(7 downto 0); -- spi status
+  signal spi_errors                      : std_logic_vector(15 downto 0);  -- spi errors
+  signal spi_status                      : std_logic_vector(7 downto 0);  -- spi status
   -- adc
-   -- common data_valid for adc_amp_squid_offset_correction/adc_mux_squid_feedback
+  -- common data_valid for adc_amp_squid_offset_correction/adc_mux_squid_feedback
   signal adc_valid                       : std_logic;
-  signal adc_amp_squid_offset_correction : std_logic_vector(13 downto 0); -- adc amp_squid offset correction
-  signal adc_mux_squid_feedback          : std_logic_vector(13 downto 0); -- adc mux_squid feedback
-  signal adc_errors                      : std_logic_vector(15 downto 0); -- adc errors
-  signal adc_status                      : std_logic_vector(7 downto 0); -- adc status
+  signal adc_amp_squid_offset_correction : std_logic_vector(13 downto 0);  -- adc amp_squid offset correction
+  signal adc_mux_squid_feedback          : std_logic_vector(13 downto 0);  -- adc mux_squid feedback
+  signal adc_errors                      : std_logic_vector(15 downto 0);  -- adc errors
+  signal adc_status                      : std_logic_vector(7 downto 0);  -- adc status
 
   -- sync
-  signal sync_valid  : std_logic; -- sync valid
-  signal sync        : std_logic; -- sync/clk frame
-  signal sync_errors : std_logic_vector(15 downto 0); -- sync errors
-  signal sync_status : std_logic_vector(7 downto 0); -- sync status
+  signal sync_valid  : std_logic;                      -- sync valid
+  signal sync        : std_logic;                      -- sync/clk frame
+  signal sync_errors : std_logic_vector(15 downto 0);  -- sync errors
+  signal sync_status : std_logic_vector(7 downto 0);   -- sync status
 
   -- dac
-  signal dac_valid  : std_logic; -- dac data valid
-  signal dac_frame  : std_logic; -- dac frame
-  signal dac1       : std_logic_vector(15 downto 0); -- data for the dac1
-  signal dac0       : std_logic_vector(15 downto 0); -- data for the dac0
-  signal dac_errors : std_logic_vector(15 downto 0); -- dac errors
-  signal dac_status : std_logic_vector(7 downto 0); -- dac status
+  signal dac_valid  : std_logic;                      -- dac data valid
+  signal dac_frame  : std_logic;                      -- dac frame
+  signal dac1       : std_logic_vector(15 downto 0);  -- data for the dac1
+  signal dac0       : std_logic_vector(15 downto 0);  -- data for the dac0
+  signal dac_errors : std_logic_vector(15 downto 0);  -- dac errors
+  signal dac_status : std_logic_vector(7 downto 0);   -- dac status
 
   ---------------------------------------------------------------------
   -- ios
@@ -408,7 +408,7 @@ begin
       ---------------------------------------------------------------------
       -- from the board
       ---------------------------------------------------------------------
-      i_hardware_id    => hardware_id,
+      i_hardware_id => hardware_id,
       ---------------------------------------------------------------------
       -- to the IOs: @i_clk
       ---------------------------------------------------------------------
@@ -620,7 +620,7 @@ begin
       i_spi_cmd_valid      => spi_cmd_valid,   -- command valid
       i_spi_cmd_wr_data    => spi_cmd_wr_data,  -- data to write
       -- output
-      o_spi_rd_data_valid  => spi_rd_data_valid,  -- read data valid
+      o_spi_rd_data_valid  => spi_rd_data_valid,   -- read data valid
       o_spi_rd_data        => spi_rd_data,  -- read data
       o_spi_ready          => open,  -- 1: all spi links are ready,0: one of the spi link is busy
       o_reg_spi_status     => reg_spi_status,  -- 1: all spi links are ready,0: one of the spi link is busy
@@ -640,7 +640,7 @@ begin
       o_cdce_n_en          => cdce_n_en,    -- SPI chip select
       -- CDCE: specific signals
       i_cdce_pll_status    => i_pll_status,  -- pll_status : This pin is set high if the PLL is in lock.
-      o_cdce_n_reset       => cdce_n_reset,    -- reset_n or hold_n
+      o_cdce_n_reset       => cdce_n_reset,  -- reset_n or hold_n
       o_cdce_n_pd          => cdce_n_pd,    -- power_down_n
       o_ref_en             => ref_en,   -- enable the primary reference clock
       -- ADC: SPI
@@ -678,8 +678,8 @@ begin
   o_adc_reset <= adc_reset;             -- adc hardware reset
 
 --dac
-  o_dac_n_en       <= dac_n_en;         -- SPI chip select
-  o_tx_enable <= dac_tx_present;   -- enable tx acquisition
+  o_dac_n_en  <= dac_n_en;              -- SPI chip select
+  o_tx_enable <= dac_tx_present;        -- enable tx acquisition
 
 --amc
   o_mon_n_en    <= mon_n_en;            -- SPI chip select
@@ -705,9 +705,10 @@ begin
 -- debug
 ---------------------------------------------------------------------
   gen_debug : if g_DEBUG = true generate
+    -- count number of clock period
     signal count_r1 : unsigned(31 downto 0) := (others => '0');
+    -- pulse (frequency = input clock divided by 2)
     signal pulse_r1 : std_logic             := '0';
-
 
   begin
 

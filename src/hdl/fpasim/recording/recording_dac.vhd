@@ -97,7 +97,7 @@ architecture RTL of recording_dac is
   -- FIFO
   ---------------------------------------------------------------------
   constant c_IDX0_L : integer := 0; -- index0: low
-  constant c_IDX0_H : integer := c_IDX0_L + o_data'length - 1;
+  constant c_IDX0_H : integer := c_IDX0_L + o_data'length - 1;--index0: high
 
   constant c_IDX1_L : integer := c_IDX0_H + 1; -- index1: low
   constant c_IDX1_H : integer := c_IDX1_L + 1 - 1; --index1: high

@@ -399,6 +399,7 @@ package pkg_fpasim is
   -- auto-computed: bus width
   constant pkg_AMP_SQUID_SUB_Q_WIDTH_S : positive := pkg_AMP_SQUID_SUB_Q_M_S + pkg_AMP_SQUID_SUB_Q_N_S;
 
+  -- auto-computed: latency of the amp_squid sub function.
   constant pkg_AMP_SQUID_SUB_LATENCY : natural := pkg_SUB_SFIXED_LATENCY;
 
   -- user-defined: add an additional output latency

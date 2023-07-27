@@ -113,7 +113,9 @@ architecture RTL of spi_device_select is
 ---------------------------------------------------------------------
 -- state machine
 ---------------------------------------------------------------------
+  -- fsm type declaration
   type t_state is (E_RST, E_WAIT_READY_ALL, E_WAIT_CMD, E_WAIT_CDCE, E_WAIT_ADC, E_WAIT_DAC, E_WAIT_AMC);
+
   signal sm_state_next : t_state; -- state
   signal sm_state_r1   : t_state := E_RST; -- state (registered)
 
@@ -514,7 +516,9 @@ begin
   ---------------------------------------------------------------------
   -- init path with zeros (according the signal see the corresponding spi_xxx module)
   gen_tx_pipe_with_init_0 : if true generate
+    -- temporary input pipe
     signal tx_data_tmp0 : std_logic_vector(1 downto 0);
+    -- temporary output pipe
     signal tx_data_tmp1 : std_logic_vector(1 downto 0);
   begin
     tx_data_tmp0(1) <= dac_tx_present;
@@ -535,7 +539,9 @@ begin
 
   -- init path with ones  (according the signal see the corresponding spi_xxx module)
   gen_tx_pipe_with_init_1 : if true generate
+    -- temporary input pipe
     signal tx_data_tmp0 : std_logic_vector(7 downto 0);
+    -- temporary output pipe
     signal tx_data_tmp1 : std_logic_vector(7 downto 0);
   begin
     tx_data_tmp0(7) <= amc_mon_n_reset;

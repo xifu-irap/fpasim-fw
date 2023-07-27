@@ -81,7 +81,10 @@ entity regdecode_wire_wr_rd is
 end entity regdecode_wire_wr_rd;
 
 architecture RTL of regdecode_wire_wr_rd is
+
+  -- latency to add between the 2 fifos to readback the register value
   constant c_WR_TO_RD_DELAY    : integer := 0;
+  -- fifo read latency
   constant c_FIFO_READ_LATENCY : integer := 2;
 
   ---------------------------------------------------------------------

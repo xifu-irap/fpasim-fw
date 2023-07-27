@@ -334,6 +334,7 @@ architecture RTL of tes_pulse_shape_manager is
   ---------------------------------------------------------------------
   -- State machine
   ---------------------------------------------------------------------
+  -- fsm type declaration
   type t_state is (E_RST0, E_RST1, E_WAIT, E_RUN);
   signal sm_state_next : t_state; -- state
   signal sm_state_r1   : t_state := E_RST0; -- state (registered)

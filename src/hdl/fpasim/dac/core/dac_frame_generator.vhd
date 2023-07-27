@@ -103,6 +103,7 @@ end entity dac_frame_generator;
 
 architecture RTL of dac_frame_generator is
 
+  -- fsm type declaration
   type t_state is (E_RST, E_WAIT, E_RUN, E_PATTERN);
   signal sm_state_r1   : t_state := E_RST; -- state
   signal sm_state_next : t_state; -- state (registered)

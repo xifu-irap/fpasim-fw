@@ -109,43 +109,48 @@ end entity fpga_system_fpasim_top;
 architecture RTL of fpga_system_fpasim_top is
 
   --  Opal Kelly inouts --
-  signal i_okUH  : std_logic_vector(4 downto 0);
-  signal o_okHU  : std_logic_vector(2 downto 0);
-  signal b_okUHU : std_logic_vector(31 downto 0);
-  signal b_okAA  : std_logic;
-
+  signal i_okUH  : std_logic_vector(4 downto 0); -- usb interface signal
+  signal o_okHU  : std_logic_vector(2 downto 0); -- usb interface signal
+  signal b_okUHU : std_logic_vector(31 downto 0); -- usb interface signal
+  signal b_okAA  : std_logic; -- usb interface signal
 
   ---------------------------------------------------------------------
   -- additional signals
   ---------------------------------------------------------------------
-  -- Clocks
+  -- usb clock
   signal usb_clk           : std_logic := '0';
+   -- busy: 1: auto-conf in progress, 0: end of the auto-conf
   signal auto_conf_busy_r1 : std_logic := '1';
+  -- ready, 1: command can be received, 0: otherwise
   signal ready_r1          : std_logic := '0';
   ---------------------------------------------------------------------
   -- Clock definition
   ---------------------------------------------------------------------
+  -- clock period
   constant c_CLK_PERIOD0   : time      := 9.99206 ns;  -- @100.8MHz (usb3 opal kelly speed)
 
   ---------------------------------------------------------------------
   -- USB signal definition
   ---------------------------------------------------------------------
-
+  -- usb interface: write usb record (mandatory)
   signal usb_wr_if0 : opal_kelly_lib.pkg_front_panel.t_internal_wr_if := (
     hi_drive   => '0',
     hi_cmd     => (others => '0'),
     hi_dataout => (others => '0')
     );
 
+  -- usb interface: read usb record (mandatory)
   signal usb_rd_if0 : opal_kelly_lib.pkg_front_panel.t_internal_rd_if := (
     i_clk     => '0',
     hi_busy   => '0',
     hi_datain => (others => '0')
     );
-
+  -- usb interface: shared variable (mandatory)
   shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
-  constant c_WIRE_NO_MASK            : std_logic_vector(31 downto 0) := x"ffff_ffff";  -- wire mask value
 
+  -- mask to apply on the wire
+  constant c_WIRE_NO_MASK            : std_logic_vector(31 downto 0) := x"ffff_ffff";  -- wire mask value
+  -- convert an uint to std_logic_vector
   function uint_to_stdv (
     constant value_p : integer; width_p : integer
     )

@@ -61,6 +61,7 @@ architecture RTL of recording_dac_word_builder is
   ---------------------------------------------------------------------
   -- state machine
   ---------------------------------------------------------------------
+  -- fsm type declaration
   type t_state is (E_RST, E_DATA0, E_DATA1);
   signal sm_state_next : t_state; -- state
   signal sm_state_r1   : t_state := E_RST;  -- state (registered)
