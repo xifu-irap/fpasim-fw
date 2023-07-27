@@ -165,35 +165,6 @@ entity regdecode_pipe is
 end entity regdecode_pipe;
 
 architecture RTL of regdecode_pipe is
-  -- tes_pulse_shape
-  constant c_TES_PULSE_SHAPE_RAM_NB_WORDS     : integer := pkg_TES_PULSE_SHAPE_RAM_NB_WORDS;
-  constant c_TES_PULSE_SHAPE_RAM_A_RD_LATENCY : integer := pkg_TES_PULSE_SHAPE_RAM_A_RD_LATENCY;
-
-  constant c_TES_PULSE_SHAPE_ADDR_RANGE_MIN : std_logic_vector(pkg_TES_PULSE_SHAPE_ADDR_RANGE_MIN'range) := pkg_TES_PULSE_SHAPE_ADDR_RANGE_MIN;
-
-  -- amp_squid_tf
-  constant c_AMP_SQUID_TF_RAM_NB_WORDS     : integer := pkg_AMP_SQUID_TF_RAM_NB_WORDS;
-  constant c_AMP_SQUID_TF_RAM_A_RD_LATENCY : integer := pkg_AMP_SQUID_TF_RAM_A_RD_LATENCY;
-
-  constant c_AMP_SQUID_TF_ADDR_RANGE_MIN : std_logic_vector(pkg_AMP_SQUID_TF_ADDR_RANGE_MIN'range) := pkg_AMP_SQUID_TF_ADDR_RANGE_MIN;
-
-  -- mux_squid_tf
-  constant c_MUX_SQUID_TF_RAM_NB_WORDS     : integer := pkg_MUX_SQUID_TF_RAM_NB_WORDS;
-  constant c_MUX_SQUID_TF_RAM_A_RD_LATENCY : integer := pkg_MUX_SQUID_TF_RAM_A_RD_LATENCY;
-
-  constant c_MUX_SQUID_TF_ADDR_RANGE_MIN : std_logic_vector(pkg_MUX_SQUID_TF_ADDR_RANGE_MIN'range) := pkg_MUX_SQUID_TF_ADDR_RANGE_MIN;
-
-  -- tes_std_state
-  constant c_TES_STD_STATE_RAM_NB_WORDS     : integer := pkg_TES_STD_STATE_RAM_NB_WORDS;
-  constant c_TES_STD_STATE_RAM_A_RD_LATENCY : integer := pkg_TES_STD_STATE_RAM_A_RD_LATENCY;
-
-  constant c_TES_STD_STATE_ADDR_RANGE_MIN : std_logic_vector(pkg_TES_STD_STATE_ADDR_RANGE_MIN'range) := pkg_TES_STD_STATE_ADDR_RANGE_MIN;
-
-  -- mux_squid_offset
-  constant c_MUX_SQUID_OFFSET_RAM_NB_WORDS     : integer := pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS;
-  constant c_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY : integer := pkg_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY;
-
-  constant c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN : std_logic_vector(pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN'range) := pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN;
 
   ---------------------------------------------------------------------
   -- addr decode
@@ -453,8 +424,8 @@ begin
   inst_regdecode_pipe_wr_rd_ram_manager_tes_pulse_shape : entity work.regdecode_pipe_wr_rd_ram_manager
     generic map(
       -- RAM
-      g_RAM_NB_WORDS   => c_TES_PULSE_SHAPE_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_TES_PULSE_SHAPE_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
+      g_RAM_NB_WORDS   => pkg_TES_PULSE_SHAPE_RAM_NB_WORDS,
+      g_RAM_RD_LATENCY => pkg_TES_PULSE_SHAPE_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
       -- input
       g_ADDR_WIDTH     => addr0'length,  -- define the input address bus width
       g_DATA_WIDTH     => data0'length  -- define the input data bus width
@@ -469,7 +440,7 @@ begin
       i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
       i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_TES_PULSE_SHAPE_ADDR_RANGE_MIN,  -- minimal address range
+      i_addr_range_min  => pkg_TES_PULSE_SHAPE_ADDR_RANGE_MIN,  -- minimal address range
       -- data
       i_data_valid      => tes_pulse_shape_wr_en0,     -- input data valid
       i_addr            => addr0,       -- input address
@@ -521,8 +492,8 @@ begin
   inst_regdecode_pipe_wr_rd_ram_manager_amp_squid_tf : entity work.regdecode_pipe_wr_rd_ram_manager
     generic map(
       -- RAM
-      g_RAM_NB_WORDS   => c_AMP_SQUID_TF_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_AMP_SQUID_TF_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
+      g_RAM_NB_WORDS   => pkg_AMP_SQUID_TF_RAM_NB_WORDS,
+      g_RAM_RD_LATENCY => pkg_AMP_SQUID_TF_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
       -- input
       g_ADDR_WIDTH     => addr0'length,  -- define the input address bus width
       g_DATA_WIDTH     => data0'length  -- define the input data bus width
@@ -537,7 +508,7 @@ begin
       i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
       i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_AMP_SQUID_TF_ADDR_RANGE_MIN,  -- minimal address range
+      i_addr_range_min  => pkg_AMP_SQUID_TF_ADDR_RANGE_MIN,  -- minimal address range
       -- data
       i_data_valid      => amp_squid_tf_wr_en0,          -- input data valid
       i_addr            => addr0,       -- input address
@@ -589,8 +560,8 @@ begin
   inst_regdecode_pipe_wr_rd_ram_manager_mux_squid_tf : entity work.regdecode_pipe_wr_rd_ram_manager
     generic map(
       -- RAM
-      g_RAM_NB_WORDS   => c_MUX_SQUID_TF_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_MUX_SQUID_TF_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
+      g_RAM_NB_WORDS   => pkg_MUX_SQUID_TF_RAM_NB_WORDS,
+      g_RAM_RD_LATENCY => pkg_MUX_SQUID_TF_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
       -- input
       g_ADDR_WIDTH     => addr0'length,  -- define the input address bus width
       g_DATA_WIDTH     => data0'length
@@ -605,7 +576,7 @@ begin
       i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
       i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_MUX_SQUID_TF_ADDR_RANGE_MIN,  -- minimal address range
+      i_addr_range_min  => pkg_MUX_SQUID_TF_ADDR_RANGE_MIN,  -- minimal address range
       -- data
       i_data_valid      => mux_squid_tf_wr_en0,          -- input data valid
       i_addr            => addr0,       -- input address
@@ -657,8 +628,8 @@ begin
   inst_regdecode_pipe_wr_rd_ram_manager_tes_std_state : entity work.regdecode_pipe_wr_rd_ram_manager
     generic map(
       -- RAM
-      g_RAM_NB_WORDS   => c_TES_STD_STATE_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_TES_STD_STATE_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
+      g_RAM_NB_WORDS   => pkg_TES_STD_STATE_RAM_NB_WORDS,
+      g_RAM_RD_LATENCY => pkg_TES_STD_STATE_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
       -- input
       g_ADDR_WIDTH     => addr0'length,  -- define the input address bus width
       g_DATA_WIDTH     => data0'length
@@ -673,7 +644,7 @@ begin
       i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
       i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_TES_STD_STATE_ADDR_RANGE_MIN,  -- minimal address range
+      i_addr_range_min  => pkg_TES_STD_STATE_ADDR_RANGE_MIN,  -- minimal address range
       -- data
       i_data_valid      => tes_std_state_wr_en0,     -- input data valid
       i_addr            => addr0,       -- input address
@@ -725,8 +696,8 @@ begin
   inst_regdecode_pipe_wr_rd_ram_manager_mux_squid_offset : entity work.regdecode_pipe_wr_rd_ram_manager
     generic map(
       -- RAM
-      g_RAM_NB_WORDS   => c_MUX_SQUID_OFFSET_RAM_NB_WORDS,
-      g_RAM_RD_LATENCY => c_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
+      g_RAM_NB_WORDS   => pkg_MUX_SQUID_OFFSET_RAM_NB_WORDS,
+      g_RAM_RD_LATENCY => pkg_MUX_SQUID_OFFSET_RAM_A_RD_LATENCY,  -- define the RAM latency during the reading
       -- input
       g_ADDR_WIDTH     => addr0'length,  -- define the input address bus width
       g_DATA_WIDTH     => data0'length
@@ -741,7 +712,7 @@ begin
       i_debug_pulse     => i_debug_pulse,  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       -- command
       i_start_auto_rd   => i_start_auto_rd,  -- start the auto address generation for the reading of the RAM
-      i_addr_range_min  => c_MUX_SQUID_OFFSET_ADDR_RANGE_MIN,  -- minimal address range
+      i_addr_range_min  => pkg_MUX_SQUID_OFFSET_ADDR_RANGE_MIN,  -- minimal address range
       -- data
       i_data_valid      => mux_squid_offset_wr_en0,     -- input data valid
       i_addr            => addr0,       -- input address
