@@ -220,24 +220,27 @@ begin
 -- generate io_dac_clk
 ---------------------------------------------------------------------
   gen_io_dac_clk : if true generate
-    signal dac_tmp2   : std_logic_vector(7 downto 0);
+    -- clock pattern
+    signal clk_tmp2   : std_logic_vector(7 downto 0);
+    -- differential clock_p
     signal clk_p_tmp2 : std_logic_vector(0 downto 0);
+    -- differential clock_n
     signal clk_n_tmp2 : std_logic_vector(0 downto 0);
   begin
 
-    dac_tmp2(7) <= '0';                 -- clock value at the 4th neg edge
-    dac_tmp2(6) <= '1';                 -- clock value at the 4th pos edge
-    dac_tmp2(5) <= '0';                 -- clock value at the 3rd neg edge
-    dac_tmp2(4) <= '1';                 -- clock value at the 3rd pos edge
-    dac_tmp2(3) <= '0';                 -- clock value at the 2nd neg edge
-    dac_tmp2(2) <= '1';                 -- clock value at the 2nd pos edge
-    dac_tmp2(1) <= '0';                 -- clock value at the 1st neg edge
-    dac_tmp2(0) <= '1';                 -- clock value at the 1st pos edge
+    clk_tmp2(7) <= '0';                 -- clock value at the 4th neg edge
+    clk_tmp2(6) <= '1';                 -- clock value at the 4th pos edge
+    clk_tmp2(5) <= '0';                 -- clock value at the 3rd neg edge
+    clk_tmp2(4) <= '1';                 -- clock value at the 3rd pos edge
+    clk_tmp2(3) <= '0';                 -- clock value at the 2nd neg edge
+    clk_tmp2(2) <= '1';                 -- clock value at the 2nd pos edge
+    clk_tmp2(1) <= '0';                 -- clock value at the 1st neg edge
+    clk_tmp2(0) <= '1';                 -- clock value at the 1st pos edge
 
     inst_selectio_wiz_dac_clk : entity work.selectio_wiz_dac_clk
       port map
       (
-        data_out_from_device => dac_tmp2,
+        data_out_from_device => clk_tmp2,
         data_out_to_pins_p   => clk_p_tmp2,
         data_out_to_pins_n   => clk_n_tmp2,
         clk_in               => i_out_clk_phase90,
@@ -253,6 +256,7 @@ begin
 -- generate io_dac
 ---------------------------------------------------------------------
   gen_io_dac : if true generate
+    -- dac data
     signal dac_tmp2 : std_logic_vector(dac_tmp1'range);
   begin
     dac_tmp2 <= dac_tmp1;
@@ -273,15 +277,18 @@ begin
 -- generate io_dac_frame
 ---------------------------------------------------------------------
   gen_io_dac_frame : if true generate
-    signal dac_tmp2         : std_logic_vector(7 downto 0);
+    -- dac frame
+    signal dac_frame_tmp2   : std_logic_vector(7 downto 0);
+    -- differential dac_frame_p
     signal dac_frame_p_tmp2 : std_logic_vector(0 downto 0);
+    -- differential dac_frame_n
     signal dac_frame_n_tmp2 : std_logic_vector(0 downto 0);
   begin
-    dac_tmp2 <= dac_frame_tmp1;
+    dac_frame_tmp2 <= dac_frame_tmp1;
 
     inst_selectio_wiz_dac_frame : entity work.selectio_wiz_dac_frame
       port map(
-        data_out_from_device => dac_tmp2,
+        data_out_from_device => dac_frame_tmp2,
         data_out_to_pins_p   => dac_frame_p_tmp2,
         data_out_to_pins_n   => dac_frame_n_tmp2,
         clk_in               => i_out_clk,
