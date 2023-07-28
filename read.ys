@@ -88,7 +88,7 @@ verific -vhdl ./src/hdl/fpasim/regdecode/core/regdecode_pipe.vhd
 verific -vhdl ./src/hdl/fpasim/regdecode/core/regdecode_wire_wr_rd.vhd
 verific -vhdl ./src/hdl/fpasim/regdecode/core/regdecode_recording_fifo.vhd
 verific -vhdl ./src/hdl/fpasim/regdecode/core/regdecode_recording.vhd
-verific -vhdl -lib ./src/hdl/fpasim/regdecode/usb/usb_opal_kelly.vhd
+verific -vhdl ./src/hdl/fpasim/regdecode/usb/usb_opal_kelly.vhd
 verific -vhdl ./ip/xilinx/xpm/fifo/fifo_async_with_prog_full_wr_count.vhd
 verific -vhdl ./ip/xilinx/xpm/fifo/fifo_async_with_error_prog_full_wr_count.vhd
 verific -vhdl ./src/hdl/fpasim/regdecode/core/regdecode_wire_make_pulse_wr_rd.vhd
