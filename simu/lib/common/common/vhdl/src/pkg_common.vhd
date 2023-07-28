@@ -232,7 +232,7 @@ package body pkg_common is
     type t_state is (E_RST, E_WAIT, E_RUN);
     -- state
     variable v_fsm_state : t_state := E_RST;
-    -- conditionnal test for the infinite loop
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
     -- count the number of valid samples
@@ -309,7 +309,7 @@ package body pkg_common is
     type t_state is (E_RST, E_WAIT, E_RUN);
     -- state
     variable v_fsm_state : t_state := E_RST;
-    -- conditionnal test for the infinite loop
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
     -- count the number of valid samples
@@ -391,7 +391,7 @@ package body pkg_common is
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     -- state
     variable v_fsm_state : t_state := E_RST;
-    -- conditionnal test for the infinite loop
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
     -- count the number of valid samples
@@ -529,7 +529,7 @@ package body pkg_common is
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
     -- state
     variable v_fsm_state : t_state := E_RST;
-    -- conditionnal test for the infinite loop
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
     -- count the number of valid samples
