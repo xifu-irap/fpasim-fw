@@ -696,8 +696,30 @@ begin
   end process p_clock;
   pulse <= count_pulse_r1(count_pulse_r1'high);
 
-  o_leds(3) <= pulse;
-  o_leds(2) <= mmcm_locked;
+  gen_leds_3_2 : if true generate
+    -- temporary input data
+    signal data_tmp0 : std_logic_vector(1 downto 0);
+    -- temporary output data
+    signal data_tmp1 : std_logic_vector(1 downto 0);
+  begin
+
+    data_tmp0(1) <= mmcm_locked;
+    data_tmp0(0) <= pulse;
+
+    inst_pipeliner : entity work.pipeliner
+      generic map(
+        g_NB_PIPES   => 1,
+        g_DATA_WIDTH => data_tmp0'length
+        )
+      port map(
+        i_clk  => adc_clk_div,
+        i_data => data_tmp0,
+        o_data => data_tmp1
+        );
+    o_leds(3) <= data_tmp1(1);
+    o_leds(2) <= data_tmp1(0);
+  end generate gen_leds_3_2;
+
 --o_leds(1) <= '0'; -- TODO: temporary used by o_sync
 --o_leds(0) <= '0'; -- TODO: temporary used by o_ref_clk
 
