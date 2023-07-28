@@ -70,7 +70,7 @@ architecture RTL of dac3283_demux is
   type t_state is (E_RST, E_WAIT, E_RUN0, E_RUN1);
   signal sm_state_next : t_state := E_RST; -- state
   signal sm_state_r1   : t_state := E_RST; -- state (registered)
-  
+
    -- dac0 data valid
   signal data_valid0_next : std_logic;
    -- dac0 data valid (registered)
