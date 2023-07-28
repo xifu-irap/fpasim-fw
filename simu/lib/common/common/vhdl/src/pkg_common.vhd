@@ -205,6 +205,7 @@ package body pkg_common is
     variable v_seed2     : inout positive;
     variable v_result    : out integer
   ) is
+    -- random value
     variable v_rand : real;
   begin
     -- generate a uniform real random_uniform_by_range value between [0;1.0]
@@ -227,13 +228,20 @@ package body pkg_common is
     signal o_count      : out std_logic_vector;
     signal o_overflow   : out std_logic
   ) is
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN);
+    -- state
     variable v_fsm_state : t_state := E_RST;
+    -- conditionnal test for the infinite loop
     constant c_TEST      : boolean := true;
 
+    -- count the number of valid samples
     variable v_cnt          : unsigned(o_count'high + 1 downto 0) := (others => '0'); -- add 1 to detect an overflow
+    -- Last MSB bit value of the counter
     variable v_MSB_bit_last : std_logic                           := '0';
+    -- Current MSB bit value of the counter
     variable v_MSB_bit      : std_logic                           := '0';
+    -- overflow flag, 1: if the counter reach its max value
     variable v_overflow     : std_logic                           := '0';
   begin
     while c_TEST loop
@@ -297,13 +305,20 @@ package body pkg_common is
     signal o_count      : out std_logic_vector;
     signal o_overflow   : out std_logic
   ) is
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN);
+    -- state
     variable v_fsm_state : t_state := E_RST;
+    -- conditionnal test for the infinite loop
     constant c_TEST      : boolean := true;
 
+    -- count the number of valid samples
     variable v_cnt          : unsigned(o_count'high + 1 downto 0) := (others => '0'); -- add 1 to detect an overflow
+    -- Last MSB bit value of the counter
     variable v_MSB_bit_last : std_logic                           := '0';
+    -- Current MSB bit value of the counter
     variable v_MSB_bit      : std_logic                           := '0';
+    -- overflow flag, 1: if the counter reach its max value
     variable v_overflow     : std_logic                           := '0';
   begin
     while c_TEST loop
@@ -369,18 +384,29 @@ package body pkg_common is
     signal o_index      : out integer;
     signal o_finish     : out std_logic
   ) is
+    -- csv object
     variable v_csv_file : t_csv_file_reader;
 
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
+    -- state
     variable v_fsm_state : t_state := E_RST;
+    -- conditionnal test for the infinite loop
     constant c_TEST      : boolean := true;
 
+    -- count the number of valid samples
     variable v_cnt     : integer   := 0;
+    -- max value of the counter
     variable v_cnt_max : integer   := 0;
+    -- flag for the first counter value
     variable v_sof     : std_logic := '0';
+    -- flag for the last counter value
     variable v_eof     : std_logic := '0';
+    -- finish: end of the processing
     variable v_finish  : std_logic := '0';
+    -- first iteration flag
     variable v_first   : integer   := 1;
+    -- index value (start @0)
     variable v_index   : integer   := 0;
 
   begin
@@ -499,15 +525,24 @@ package body pkg_common is
     signal   o_finish     : out std_logic
   ) is
 
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
+    -- state
     variable v_fsm_state : t_state := E_RST;
+    -- conditionnal test for the infinite loop
     constant c_TEST      : boolean := true;
 
+    -- count the number of valid samples
     variable v_cnt     : integer   := 0;
+    -- max value of the counter
     variable v_cnt_max : integer   := 0;
+    -- flag for the first counter value
     variable v_sof     : std_logic := '0';
+    -- flag for the last counter value
     variable v_eof     : std_logic := '0';
+    -- finish: end of the processing
     variable v_finish  : std_logic := '0';
+    -- index value (start @0)
     variable v_index   : integer   := 0;
 
   begin
