@@ -45,9 +45,9 @@ package pkg_common is
   -- then a margin is applied, if any
   ------------------------------------------------------
   procedure pkg_wait_nb_rising_edge_plus_margin(
-    signal   i_clk            : in std_logic;
-    constant i_nb_rising_edge : in natural;
-    constant i_margin         : in time
+    signal   i_clk            : in std_logic; -- clock
+    constant i_nb_rising_edge : in natural; -- number of clock rising edge to skip
+    constant i_margin         : in time -- additional time
   );
 
   ---------------------------------------------------------------------
@@ -60,22 +60,22 @@ package pkg_common is
   --  between i_min_value and i_max_value
   ---------------------------------------------------------------------
   procedure pkg_random_by_range(
-    constant i_min_value : in integer;
-    constant i_max_value : in integer;
-    variable v_seed1     : inout positive;
-    variable v_seed2     : inout positive;
-    variable v_result    : out integer
+    constant i_min_value : in integer; -- random min value
+    constant i_max_value : in integer; -- random max value
+    variable v_seed1     : inout positive; -- random generator: seed1
+    variable v_seed2     : inout positive; -- random generator: seed1
+    variable v_result    : out integer -- output random value
   );
 
   ---------------------------------------------------------------------
   -- this function generates an uniform random value between min_value and max_value
   ---------------------------------------------------------------------
   procedure pkg_random_uniform_by_range(
-    constant i_min_value : in integer;
-    constant i_max_value : in integer;
-    variable v_seed1     : inout positive;
-    variable v_seed2     : inout positive;
-    variable v_result    : out integer
+    constant i_min_value : in integer; -- random min value
+    constant i_max_value : in integer; -- random max value
+    variable v_seed1     : inout positive; -- random generator: seed1
+    variable v_seed2     : inout positive; -- random generator: seed1
+    variable v_result    : out integer -- output random value
   );
 
   ---------------------------------------------------------------------
@@ -84,13 +84,13 @@ package pkg_common is
   --   . The last counter bit is used to detect an overflow.
   ---------------------------------------------------------------------
   procedure pkg_data_valid_counter(
-    signal i_clk        : in std_logic;
+    signal i_clk        : in std_logic; -- clock
     -- input
-    signal i_start      : in std_logic;
-    signal i_data_valid : in std_logic;
+    signal i_start      : in std_logic; -- start the procedure
+    signal i_data_valid : in std_logic; -- input data valid
     -- output
-    signal o_count      : out std_logic_vector;
-    signal o_overflow   : out std_logic
+    signal o_count      : out std_logic_vector; -- count the number of data valid samples
+    signal o_overflow   : out std_logic -- detect if the counter roll back
   );
 
   ---------------------------------------------------------------------
@@ -100,15 +100,15 @@ package pkg_common is
   --   . The last counter bit is used to detect an overflow.
   ---------------------------------------------------------------------
   procedure pkg_data_valid_counter_with_load(
-    signal i_clk        : in std_logic;
+    signal i_clk        : in std_logic; -- clock
     -- input
-    signal i_start      : in std_logic;
-    signal i_data_valid : in std_logic;
-    signal i_load       : in std_logic;
-    signal i_load_data  : in std_logic_vector;
+    signal i_start      : in std_logic; -- start the procedure
+    signal i_data_valid : in std_logic; -- input data valid
+    signal i_load       : in std_logic; -- load valid
+    signal i_load_data  : in std_logic_vector; -- data to load in the counter
     -- output
-    signal o_count      : out std_logic_vector;
-    signal o_overflow   : out std_logic
+    signal o_count      : out std_logic_vector;  -- count the number of data valid samples
+    signal o_overflow   : out std_logic -- detect if the counter roll back
   );
 
   ---------------------------------------------------------------------
@@ -116,15 +116,15 @@ package pkg_common is
   -- This function allows allows to generate (sof, eof) flags
   ---------------------------------------------------------------------
   procedure pkg_frame_flags_builder(
-    signal i_clk        : in std_logic;
-    signal i_start      : in std_logic;
-    signal i_data_valid : in std_logic;
-    i_filepath          : in string;
-    i_csv_separator     : in character;
-    signal o_sof        : out std_logic;
-    signal o_eof        : out std_logic;
-    signal o_index      : out integer;
-    signal o_finish     : out std_logic
+    signal i_clk        : in std_logic; -- clock
+    signal i_start      : in std_logic; -- start the procedure
+    signal i_data_valid : in std_logic; -- input data valid
+    i_filepath          : in string; -- input *.csv file
+    i_csv_separator     : in character; -- *.csv file separator
+    signal o_sof        : out std_logic; -- first data
+    signal o_eof        : out std_logic; -- last data
+    signal o_index      : out integer;   -- data index
+    signal o_finish     : out std_logic -- end of processing: file reading
   );
 
   ---------------------------------------------------------------------
@@ -132,14 +132,14 @@ package pkg_common is
   -- This function allows allows to generate (sof, eof) flags
   ---------------------------------------------------------------------
   procedure pkg_frame_flags_builder(
-    signal   i_clk        : in std_logic;
-    signal   i_start      : in std_logic;
-    signal   i_data_valid : in std_logic;
-    constant i_frame_size : in integer;
-    signal   o_sof        : out std_logic;
-    signal   o_eof        : out std_logic;
-    signal   o_index      : out integer;
-    signal   o_finish     : out std_logic
+    signal i_clk        : in std_logic; -- clock
+    signal i_start      : in std_logic; -- start the procedure
+    signal i_data_valid : in std_logic; -- input data valid
+    constant i_frame_size : in integer; -- maximum number of samples to count before roll back.
+    signal o_sof        : out std_logic; -- first data
+    signal o_eof        : out std_logic; -- last data
+    signal o_index      : out integer;   -- data index
+    signal o_finish     : out std_logic -- end of processing
   );
 
 end package pkg_common;
@@ -151,9 +151,9 @@ package body pkg_common is
   -- then a margin is applied, if any
   ------------------------------------------------------
   procedure pkg_wait_nb_rising_edge_plus_margin(
-    signal   i_clk            : in std_logic;
-    constant i_nb_rising_edge : in natural;
-    constant i_margin         : in time
+    signal   i_clk            : in std_logic; -- clock
+    constant i_nb_rising_edge : in natural; -- number of clock rising edge to skip
+    constant i_margin         : in time -- additional time
   ) is
   begin
     -- Wait for number of rising edges
@@ -184,11 +184,11 @@ package body pkg_common is
   --  between i_min_value and i_max_value
   ---------------------------------------------------------------------
   procedure pkg_random_by_range(
-    constant i_min_value : in integer;
-    constant i_max_value : in integer;
-    variable v_seed1     : inout positive;
-    variable v_seed2     : inout positive;
-    variable v_result    : out integer
+    constant i_min_value : in integer; -- random min value
+    constant i_max_value : in integer; -- random max value
+    variable v_seed1     : inout positive; -- random generator: seed1
+    variable v_seed2     : inout positive; -- random generator: seed1
+    variable v_result    : out integer -- output random value
 
   ) is
   begin
@@ -199,11 +199,11 @@ package body pkg_common is
   -- this function generates an uniform random value between min_value and max_value
   ---------------------------------------------------------------------
   procedure pkg_random_uniform_by_range(
-    constant i_min_value : in integer;
-    constant i_max_value : in integer;
-    variable v_seed1     : inout positive;
-    variable v_seed2     : inout positive;
-    variable v_result    : out integer
+    constant i_min_value : in integer; -- random min value
+    constant i_max_value : in integer; -- random max value
+    variable v_seed1     : inout positive; -- random generator: seed1
+    variable v_seed2     : inout positive; -- random generator: seed1
+    variable v_result    : out integer -- output random value
   ) is
     -- random value
     variable v_rand : real;
@@ -220,13 +220,13 @@ package body pkg_common is
   --   . The last counter bit is used to detect an overflow.
   ---------------------------------------------------------------------
   procedure pkg_data_valid_counter(
-    signal i_clk        : in std_logic;
+    signal i_clk        : in std_logic; -- clock
     -- input
-    signal i_start      : in std_logic;
-    signal i_data_valid : in std_logic;
+    signal i_start      : in std_logic; -- start the procedure
+    signal i_data_valid : in std_logic; -- input data valid
     -- output
-    signal o_count      : out std_logic_vector;
-    signal o_overflow   : out std_logic
+    signal o_count      : out std_logic_vector; -- count the number of data valid samples
+    signal o_overflow   : out std_logic -- detect if the counter roll back
   ) is
     -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN);
@@ -295,15 +295,15 @@ package body pkg_common is
   --   . The last counter bit is used to detect an overflow.
   ---------------------------------------------------------------------
   procedure pkg_data_valid_counter_with_load(
-    signal i_clk        : in std_logic;
+    signal i_clk        : in std_logic; -- clock
     -- input
-    signal i_start      : in std_logic;
-    signal i_data_valid : in std_logic;
-    signal i_load       : in std_logic;
-    signal i_load_data  : in std_logic_vector;
+    signal i_start      : in std_logic; -- start the procedure
+    signal i_data_valid : in std_logic; -- input data valid
+    signal i_load       : in std_logic; -- load valid
+    signal i_load_data  : in std_logic_vector; -- data to load in the counter
     -- output
-    signal o_count      : out std_logic_vector;
-    signal o_overflow   : out std_logic
+    signal o_count      : out std_logic_vector;  -- count the number of data valid samples
+    signal o_overflow   : out std_logic -- detect if the counter roll back
   ) is
     -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN);
@@ -374,15 +374,15 @@ package body pkg_common is
   -- This function allows allows to generate (sof, eof) flags
   ---------------------------------------------------------------------
   procedure pkg_frame_flags_builder(
-    signal i_clk        : in std_logic;
-    signal i_start      : in std_logic;
-    signal i_data_valid : in std_logic;
-    i_filepath          : in string;
-    i_csv_separator     : in character;
-    signal o_sof        : out std_logic;
-    signal o_eof        : out std_logic;
-    signal o_index      : out integer;
-    signal o_finish     : out std_logic
+    signal i_clk        : in std_logic; -- clock
+    signal i_start      : in std_logic; -- start the procedure
+    signal i_data_valid : in std_logic; -- input data valid
+    i_filepath          : in string; -- input *.csv file
+    i_csv_separator     : in character; -- *.csv file separator
+    signal o_sof        : out std_logic; -- first data
+    signal o_eof        : out std_logic; -- last data
+    signal o_index      : out integer;   -- data index
+    signal o_finish     : out std_logic -- end of processing: file reading
   ) is
     -- csv object
     variable v_csv_file : t_csv_file_reader;
@@ -515,14 +515,14 @@ package body pkg_common is
   -- This function allows allows to generate (sof, eof) flags
   ---------------------------------------------------------------------
   procedure pkg_frame_flags_builder(
-    signal   i_clk        : in std_logic;
-    signal   i_start      : in std_logic;
-    signal   i_data_valid : in std_logic;
-    constant i_frame_size : in integer;
-    signal   o_sof        : out std_logic;
-    signal   o_eof        : out std_logic;
-    signal   o_index      : out integer;
-    signal   o_finish     : out std_logic
+    signal i_clk        : in std_logic; -- clock
+    signal i_start      : in std_logic; -- start the procedure
+    signal i_data_valid : in std_logic; -- input data valid
+    constant i_frame_size : in integer; -- maximum number of samples to count before roll back.
+    signal o_sof        : out std_logic; -- first data
+    signal o_eof        : out std_logic; -- last data
+    signal o_index      : out integer;   -- data index
+    signal o_finish     : out std_logic -- end of processing
   ) is
 
     -- fsm type declaration

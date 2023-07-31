@@ -47,29 +47,29 @@ package pkg_data_generator is
   -- pkg_data_generator_1
   ---------------------------------------------------------------------
   procedure pkg_data_generator_1(
-    signal   i_clk            : in std_logic;
-    signal   i_start          : in std_logic;
+    signal   i_clk            : in std_logic; -- clock
+    signal   i_start          : in std_logic; -- start file processing
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath              : in string;
-    i_csv_separator         : in character;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_DATA0_TYP      : in string := "HEX";
+    i_filepath              : in string; -- input *.csv filepath
+    i_csv_separator         : in character; -- *.csv file separator
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_DATA0_TYP      : in string := "HEX"; -- data format of the input csv file: column0
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   i_ready          : in std_logic;
-    signal   o_data_valid     : out std_logic;
-    signal   o_data0_std_vect : out std_logic_vector;
+    signal   i_ready          : in std_logic; -- read a new data from file
+    signal   o_data_valid     : out std_logic; -- output data valid
+    signal   o_data0_std_vect : out std_logic_vector; -- output data0
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_finish         : out std_logic
+    signal   o_finish         : out std_logic -- end of the file processing
   );
 
 
@@ -77,68 +77,68 @@ package pkg_data_generator is
   -- pkg_data_generator_3
   ---------------------------------------------------------------------
   procedure pkg_data_generator_3(
-    signal   i_clk            : in std_logic;
-    signal   i_start          : in std_logic;
+    signal   i_clk            : in std_logic; -- clock
+    signal   i_start          : in std_logic; -- start file processing
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath              : in string;
-    i_csv_separator         : in character;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_DATA0_TYP      : in string := "HEX";
-    constant i_DATA1_TYP      : in string := "HEX";
-    constant i_DATA2_TYP      : in string := "HEX";
+    i_filepath              : in string; -- input *.csv filepath
+    i_csv_separator         : in character; -- *.csv file separator
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_DATA0_TYP      : in string := "HEX"; -- data format of the input csv file: column0
+    constant i_DATA1_TYP      : in string := "HEX"; -- data format of the input csv file: column1
+    constant i_DATA2_TYP      : in string := "HEX"; -- data format of the input csv file: column2
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   i_ready          : in std_logic;
-    signal   o_data_valid     : out std_logic;
-    signal   o_data0_std_vect : out std_logic_vector;
-    signal   o_data1_std_vect : out std_logic_vector;
-    signal   o_data2_std_vect : out std_logic_vector;
+    signal   i_ready          : in std_logic; -- read a new data from file
+    signal   o_data_valid     : out std_logic; -- output data valid
+    signal   o_data0_std_vect : out std_logic_vector; -- output data0
+    signal   o_data1_std_vect : out std_logic_vector; -- output data1
+    signal   o_data2_std_vect : out std_logic_vector; -- output data2
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_finish         : out std_logic
+    signal   o_finish         : out std_logic -- end of the file processing
   );
 
   ---------------------------------------------------------------------
   -- pkg_data_generator_4
   ---------------------------------------------------------------------
   procedure pkg_data_generator_4(
-    signal   i_clk            : in std_logic;
-    signal   i_start          : in std_logic;
+    signal   i_clk            : in std_logic; -- clock
+    signal   i_start          : in std_logic; -- start file processing
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath              : in string;
-    i_csv_separator         : in character;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_DATA0_TYP      : in string := "HEX";
-    constant i_DATA1_TYP      : in string := "HEX";
-    constant i_DATA2_TYP      : in string := "HEX";
-    constant i_DATA3_TYP      : in string := "HEX";
+    i_filepath              : in string; -- input *.csv filepath
+    i_csv_separator         : in character; -- *.csv file separator
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_DATA0_TYP      : in string := "HEX"; -- data format of the input csv file: column0
+    constant i_DATA1_TYP      : in string := "HEX"; -- data format of the input csv file: column1
+    constant i_DATA2_TYP      : in string := "HEX"; -- data format of the input csv file: column2
+    constant i_DATA3_TYP      : in string := "HEX"; -- data format of the input csv file: column3
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   i_ready          : in std_logic;
-    signal   o_data_valid     : out std_logic;
-    signal   o_data0_std_vect : out std_logic_vector;
-    signal   o_data1_std_vect : out std_logic_vector;
-    signal   o_data2_std_vect : out std_logic_vector;
-    signal   o_data3_std_vect : out std_logic_vector;
+    signal   i_ready          : in std_logic; -- read a new data from file
+    signal   o_data_valid     : out std_logic; -- output data valid
+    signal   o_data0_std_vect : out std_logic_vector;  -- output data0
+    signal   o_data1_std_vect : out std_logic_vector;  -- output data1
+    signal   o_data2_std_vect : out std_logic_vector;  -- output data2
+    signal   o_data3_std_vect : out std_logic_vector;  -- output data3
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_finish         : out std_logic
+    signal   o_finish         : out std_logic  -- end of the file processing
   );
 
 
@@ -147,43 +147,43 @@ package pkg_data_generator is
   ---------------------------------------------------------------------
 
   procedure pkg_data_generator_8(
-    signal   i_clk            : in std_logic;
-    signal   i_start          : in std_logic;
+    signal   i_clk            : in std_logic; -- clock
+    signal   i_start          : in std_logic; -- start file processing
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath              : in string;
-    i_csv_separator         : in character;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_DATA0_TYP      : in string := "HEX";
-    constant i_DATA1_TYP      : in string := "HEX";
-    constant i_DATA2_TYP      : in string := "HEX";
-    constant i_DATA3_TYP      : in string := "HEX";
-    constant i_DATA4_TYP      : in string := "HEX";
-    constant i_DATA5_TYP      : in string := "HEX";
-    constant i_DATA6_TYP      : in string := "HEX";
-    constant i_DATA7_TYP      : in string := "HEX";
+    i_filepath              : in string; -- input *.csv filepath
+    i_csv_separator         : in character; -- *.csv file separator
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_DATA0_TYP      : in string := "HEX";  -- data format of the input csv file: column0
+    constant i_DATA1_TYP      : in string := "HEX";  -- data format of the input csv file: column1
+    constant i_DATA2_TYP      : in string := "HEX";  -- data format of the input csv file: column2
+    constant i_DATA3_TYP      : in string := "HEX";  -- data format of the input csv file: column3
+    constant i_DATA4_TYP      : in string := "HEX";  -- data format of the input csv file: column4
+    constant i_DATA5_TYP      : in string := "HEX";  -- data format of the input csv file: column5
+    constant i_DATA6_TYP      : in string := "HEX";  -- data format of the input csv file: column6
+    constant i_DATA7_TYP      : in string := "HEX";  -- data format of the input csv file: column7
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   i_ready          : in std_logic;
-    signal   o_data_valid     : out std_logic;
-    signal   o_data0_std_vect : out std_logic_vector;
-    signal   o_data1_std_vect : out std_logic_vector;
-    signal   o_data2_std_vect : out std_logic_vector;
-    signal   o_data3_std_vect : out std_logic_vector;
-    signal   o_data4_std_vect : out std_logic_vector;
-    signal   o_data5_std_vect : out std_logic_vector;
-    signal   o_data6_std_vect : out std_logic_vector;
-    signal   o_data7_std_vect : out std_logic_vector;
+    signal   i_ready          : in std_logic; -- read a new data from file
+    signal   o_data_valid     : out std_logic; -- output data valid
+    signal   o_data0_std_vect : out std_logic_vector;  -- output data0
+    signal   o_data1_std_vect : out std_logic_vector;  -- output data1
+    signal   o_data2_std_vect : out std_logic_vector;  -- output data2
+    signal   o_data3_std_vect : out std_logic_vector;  -- output data3
+    signal   o_data4_std_vect : out std_logic_vector;  -- output data4
+    signal   o_data5_std_vect : out std_logic_vector;  -- output data5
+    signal   o_data6_std_vect : out std_logic_vector;  -- output data6
+    signal   o_data7_std_vect : out std_logic_vector;  -- output data7
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_finish         : out std_logic
+    signal   o_finish         : out std_logic -- end of the file processing
   );
 
 
@@ -196,38 +196,45 @@ package body pkg_data_generator is
   -- this function allows retrieving from file (*.csv) an input data I and Q
   ---------------------------------------------------------------------
   procedure pkg_data_generator_1(
-    signal   i_clk            : in std_logic;
-    signal   i_start          : in std_logic;
+    signal   i_clk            : in std_logic; -- clock
+    signal   i_start          : in std_logic; -- start file processing
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath              : in string;
-    i_csv_separator         : in character;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_DATA0_TYP      : in string := "HEX";
+    i_filepath              : in string; -- input *.csv filepath
+    i_csv_separator         : in character; -- *.csv file separator
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_DATA0_TYP      : in string := "HEX"; -- data format of the input csv file: column0
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   i_ready          : in std_logic;
-    signal   o_data_valid     : out std_logic;
-    signal   o_data0_std_vect : out std_logic_vector;
+    signal   i_ready          : in std_logic; -- read a new data from file
+    signal   o_data_valid     : out std_logic; -- output data valid
+    signal   o_data0_std_vect : out std_logic_vector; -- output data0
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_finish         : out std_logic
+    signal   o_finish         : out std_logic -- end of the file processing
   ) is
+    -- csv object
     variable v_csv_file : t_csv_file_reader;
 
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
+    -- state
     variable v_fsm_state : t_state := E_RST;
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
+    -- output data valid
     variable v_data_valid : std_logic                                := '0';
+    -- output data: read data from the input file
     variable v_data0      : std_logic_vector(o_data0_std_vect'range) := (others => '0');
+    -- end of the processing: end of the file reading
     variable v_finish     : std_logic                                := '0';
 
   begin
@@ -304,46 +311,56 @@ package body pkg_data_generator is
   -- pkg_data_generator_3
   ---------------------------------------------------------------------
   procedure pkg_data_generator_3(
-    signal   i_clk            : in std_logic;
-    signal   i_start          : in std_logic;
+    signal   i_clk            : in std_logic; -- clock
+    signal   i_start          : in std_logic; -- start file processing
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath              : in string;
-    i_csv_separator         : in character;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_DATA0_TYP      : in string := "HEX";
-    constant i_DATA1_TYP      : in string := "HEX";
-    constant i_DATA2_TYP      : in string := "HEX";
+    i_filepath              : in string; -- input *.csv filepath
+    i_csv_separator         : in character; -- *.csv file separator
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_DATA0_TYP      : in string := "HEX"; -- data format of the input csv file: column0
+    constant i_DATA1_TYP      : in string := "HEX"; -- data format of the input csv file: column1
+    constant i_DATA2_TYP      : in string := "HEX"; -- data format of the input csv file: column2
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   i_ready          : in std_logic;
-    signal   o_data_valid     : out std_logic;
-    signal   o_data0_std_vect : out std_logic_vector;
-    signal   o_data1_std_vect : out std_logic_vector;
-    signal   o_data2_std_vect : out std_logic_vector;
+    signal   i_ready          : in std_logic; -- read a new data from file
+    signal   o_data_valid     : out std_logic; -- output data valid
+    signal   o_data0_std_vect : out std_logic_vector; -- output data0
+    signal   o_data1_std_vect : out std_logic_vector; -- output data1
+    signal   o_data2_std_vect : out std_logic_vector; -- output data2
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_finish         : out std_logic
+    signal   o_finish         : out std_logic -- end of the file processing
   ) is
+
+    -- csv object
     variable v_csv_file : t_csv_file_reader;
 
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
+    -- state
     variable v_fsm_state : t_state := E_RST;
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
+    -- output data valid
     variable v_data_valid : std_logic                                := '0';
+    -- output data0: read data from the input file
     variable v_data0      : std_logic_vector(o_data0_std_vect'range) := (others => '0');
+    -- output data1: read data from the input file
     variable v_data1      : std_logic_vector(o_data1_std_vect'range) := (others => '0');
+    -- output data2: read data from the input file
     variable v_data2      : std_logic_vector(o_data2_std_vect'range) := (others => '0');
+    -- end of the processing: end of the file reading
+    variable v_finish     : std_logic                                := '0';
 
-    variable v_finish : std_logic := '0';
 
   begin
 
@@ -420,49 +437,60 @@ package body pkg_data_generator is
   -- pkg_data_generator_4
   ---------------------------------------------------------------------
   procedure pkg_data_generator_4(
-    signal   i_clk            : in std_logic;
-    signal   i_start          : in std_logic;
+    signal   i_clk            : in std_logic; -- clock
+    signal   i_start          : in std_logic; -- start file processing
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath              : in string;
-    i_csv_separator         : in character;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_DATA0_TYP      : in string := "HEX";
-    constant i_DATA1_TYP      : in string := "HEX";
-    constant i_DATA2_TYP      : in string := "HEX";
-    constant i_DATA3_TYP      : in string := "HEX";
+    i_filepath              : in string; -- input *.csv filepath
+    i_csv_separator         : in character; -- *.csv file separator
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_DATA0_TYP      : in string := "HEX"; -- data format of the input csv file: column0
+    constant i_DATA1_TYP      : in string := "HEX"; -- data format of the input csv file: column1
+    constant i_DATA2_TYP      : in string := "HEX"; -- data format of the input csv file: column2
+    constant i_DATA3_TYP      : in string := "HEX"; -- data format of the input csv file: column3
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   i_ready          : in std_logic;
-    signal   o_data_valid     : out std_logic;
-    signal   o_data0_std_vect : out std_logic_vector;
-    signal   o_data1_std_vect : out std_logic_vector;
-    signal   o_data2_std_vect : out std_logic_vector;
-    signal   o_data3_std_vect : out std_logic_vector;
+    signal   i_ready          : in std_logic; -- read a new data from file
+    signal   o_data_valid     : out std_logic; -- output data valid
+    signal   o_data0_std_vect : out std_logic_vector;  -- output data0
+    signal   o_data1_std_vect : out std_logic_vector;  -- output data1
+    signal   o_data2_std_vect : out std_logic_vector;  -- output data2
+    signal   o_data3_std_vect : out std_logic_vector;  -- output data3
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_finish         : out std_logic
+    signal   o_finish         : out std_logic  -- end of the file processing
   ) is
+
+    -- csv object
     variable v_csv_file : t_csv_file_reader;
 
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
+    -- state
     variable v_fsm_state : t_state := E_RST;
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
+    -- output data valid
     variable v_data_valid : std_logic                                := '0';
+    -- output data0: read data from the input file
     variable v_data0      : std_logic_vector(o_data0_std_vect'range) := (others => '0');
+    -- output data1: read data from the input file
     variable v_data1      : std_logic_vector(o_data1_std_vect'range) := (others => '0');
+    -- output data2: read data from the input file
     variable v_data2      : std_logic_vector(o_data2_std_vect'range) := (others => '0');
+    -- output data3: read data from the input file
     variable v_data3      : std_logic_vector(o_data3_std_vect'range) := (others => '0');
+    -- end of the processing: end of the file reading
+    variable v_finish     : std_logic                                := '0';
 
-    variable v_finish : std_logic := '0';
 
   begin
 
@@ -543,59 +571,74 @@ package body pkg_data_generator is
   -- pkg_data_generator_8
   ---------------------------------------------------------------------
   procedure pkg_data_generator_8(
-    signal   i_clk            : in std_logic;
-    signal   i_start          : in std_logic;
+    signal   i_clk            : in std_logic; -- clock
+    signal   i_start          : in std_logic; -- start file processing
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath              : in string;
-    i_csv_separator         : in character;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_DATA0_TYP      : in string := "HEX";
-    constant i_DATA1_TYP      : in string := "HEX";
-    constant i_DATA2_TYP      : in string := "HEX";
-    constant i_DATA3_TYP      : in string := "HEX";
-    constant i_DATA4_TYP      : in string := "HEX";
-    constant i_DATA5_TYP      : in string := "HEX";
-    constant i_DATA6_TYP      : in string := "HEX";
-    constant i_DATA7_TYP      : in string := "HEX";
+    i_filepath              : in string; -- input *.csv filepath
+    i_csv_separator         : in character; -- *.csv file separator
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_DATA0_TYP      : in string := "HEX";  -- data format of the input csv file: column0
+    constant i_DATA1_TYP      : in string := "HEX";  -- data format of the input csv file: column1
+    constant i_DATA2_TYP      : in string := "HEX";  -- data format of the input csv file: column2
+    constant i_DATA3_TYP      : in string := "HEX";  -- data format of the input csv file: column3
+    constant i_DATA4_TYP      : in string := "HEX";  -- data format of the input csv file: column4
+    constant i_DATA5_TYP      : in string := "HEX";  -- data format of the input csv file: column5
+    constant i_DATA6_TYP      : in string := "HEX";  -- data format of the input csv file: column6
+    constant i_DATA7_TYP      : in string := "HEX";  -- data format of the input csv file: column7
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   i_ready          : in std_logic;
-    signal   o_data_valid     : out std_logic;
-    signal   o_data0_std_vect : out std_logic_vector;
-    signal   o_data1_std_vect : out std_logic_vector;
-    signal   o_data2_std_vect : out std_logic_vector;
-    signal   o_data3_std_vect : out std_logic_vector;
-    signal   o_data4_std_vect : out std_logic_vector;
-    signal   o_data5_std_vect : out std_logic_vector;
-    signal   o_data6_std_vect : out std_logic_vector;
-    signal   o_data7_std_vect : out std_logic_vector;
+    signal   i_ready          : in std_logic; -- read a new data from file
+    signal   o_data_valid     : out std_logic; -- output data valid
+    signal   o_data0_std_vect : out std_logic_vector;  -- output data0
+    signal   o_data1_std_vect : out std_logic_vector;  -- output data1
+    signal   o_data2_std_vect : out std_logic_vector;  -- output data2
+    signal   o_data3_std_vect : out std_logic_vector;  -- output data3
+    signal   o_data4_std_vect : out std_logic_vector;  -- output data4
+    signal   o_data5_std_vect : out std_logic_vector;  -- output data5
+    signal   o_data6_std_vect : out std_logic_vector;  -- output data6
+    signal   o_data7_std_vect : out std_logic_vector;  -- output data7
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_finish         : out std_logic
+    signal   o_finish         : out std_logic -- end of the file processing
   ) is
+
+    -- csv object
     variable v_csv_file : t_csv_file_reader;
 
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN, E_END);
+    -- state
     variable v_fsm_state : t_state := E_RST;
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
+    -- output data valid
     variable v_data_valid : std_logic                                := '0';
+    -- output data0: read data from the input file
     variable v_data0      : std_logic_vector(o_data0_std_vect'range) := (others => '0');
+    -- output data1: read data from the input file
     variable v_data1      : std_logic_vector(o_data1_std_vect'range) := (others => '0');
+    -- output data2: read data from the input file
     variable v_data2      : std_logic_vector(o_data2_std_vect'range) := (others => '0');
+    -- output data3: read data from the input file
     variable v_data3      : std_logic_vector(o_data3_std_vect'range) := (others => '0');
+    -- output data4: read data from the input file
     variable v_data4      : std_logic_vector(o_data4_std_vect'range) := (others => '0');
+    -- output data5: read data from the input file
     variable v_data5      : std_logic_vector(o_data5_std_vect'range) := (others => '0');
+    -- output data6: read data from the input file
     variable v_data6      : std_logic_vector(o_data6_std_vect'range) := (others => '0');
+    -- output data7: read data from the input file
     variable v_data7      : std_logic_vector(o_data7_std_vect'range) := (others => '0');
+    -- end of the processing: end of the file reading
     variable v_finish     : std_logic                                := '0';
 
   begin

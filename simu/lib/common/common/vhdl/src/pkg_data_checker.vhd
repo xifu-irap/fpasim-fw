@@ -51,33 +51,33 @@ package pkg_data_checker is
   -- pkg_vunit_data_checker_1
   ---------------------------------------------------------------------
   procedure pkg_vunit_data_checker_1(
-    signal   i_clk              : in std_logic;
-    signal   i_start            : in std_logic;
+    signal   i_clk              : in std_logic; -- clock
+    signal   i_start            : in std_logic; -- start data checking
     ---------------------------------------------------------------------
     -- reference file
     ---------------------------------------------------------------------
-    i_filepath                  : in string;
-    i_csv_separator             : in character;
+    i_filepath              : in string; -- input *.csv filepath
+    i_csv_separator         : in character; -- *.csv file separator
     constant i_NAME0            : in string;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_DATA0_TYP : in string := "UINT";
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_DATA0_TYP : in string := "UINT"; -- data format of the input csv file: column0
     ---------------------------------------------------------------------
     -- Vunit Scoreboard objects
     ---------------------------------------------------------------------
-    constant i_sb_data0         : in checker_t;
+    constant i_sb_data0         : in checker_t; -- vunit checker object
     ---------------------------------------------------------------------
     -- experimental signals
     ---------------------------------------------------------------------
-    signal   i_data_valid       : in std_logic;
-    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data_valid       : in std_logic; -- input data valid
+    signal   i_data0_std_vect   : in std_logic_vector; -- input data
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_error_std_vect   : out std_logic_vector(0 downto 0)
+    signal   o_error_std_vect   : out std_logic_vector(0 downto 0) -- error, 1: read data (file) /= input data, 0: otherwise
   );
 
 
@@ -89,44 +89,51 @@ package body pkg_data_checker is
   -- pkg_vunit_data_checker_1
   ---------------------------------------------------------------------
   procedure pkg_vunit_data_checker_1(
-    signal   i_clk              : in std_logic;
-    signal   i_start            : in std_logic;
+    signal   i_clk              : in std_logic; -- clock
+    signal   i_start            : in std_logic; -- start data checking
     ---------------------------------------------------------------------
     -- reference file
     ---------------------------------------------------------------------
-    i_filepath                  : in string;
-    i_csv_separator             : in character;
+    i_filepath              : in string; -- input *.csv filepath
+    i_csv_separator         : in character; -- *.csv file separator
     constant i_NAME0            : in string;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_DATA0_TYP : in string := "UINT";
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_DATA0_TYP : in string := "UINT"; -- data format of the input csv file: column0
     ---------------------------------------------------------------------
     -- Vunit Scoreboard objects
     ---------------------------------------------------------------------
-    constant i_sb_data0         : in checker_t;
+    constant i_sb_data0         : in checker_t; -- vunit checker object
     ---------------------------------------------------------------------
     -- experimental signals
     ---------------------------------------------------------------------
-    signal   i_data_valid       : in std_logic;
-    signal   i_data0_std_vect   : in std_logic_vector;
+    signal   i_data_valid       : in std_logic; -- input data valid
+    signal   i_data0_std_vect   : in std_logic_vector; -- input data
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_error_std_vect   : out std_logic_vector(0 downto 0)
+    signal   o_error_std_vect   : out std_logic_vector(0 downto 0) -- error, 1: read data (file) /= input data, 0: otherwise
   ) is
 
+    -- csv object
     variable v_csv_file : t_csv_file_reader;
 
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN);
+    -- state
     variable v_fsm_state : t_state := E_RST;
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
+    -- read data from file
     variable v_data0 : std_logic_vector(i_data0_std_vect'range) := (others => '0');
 
+    -- error if the read value from file is different of the input data.
     variable v_error : std_logic_vector(o_error_std_vect'range) := (others => '0');
+    -- count number of data valid
     variable v_cnt   : integer                                  := 0;
 
   begin

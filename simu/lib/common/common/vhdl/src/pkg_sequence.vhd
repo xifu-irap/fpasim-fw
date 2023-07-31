@@ -71,11 +71,11 @@ package pkg_sequence is
   --       :param max_value2: define a min value for the negative pulse
   --       :param num_rising_edge_before_pulse: define a starting offset before generating pulses
   ---------------------------------------------------------------------
-  procedure pkg_valid_sequencer(signal i_clk   : in std_logic;
-                                signal i_en    : in std_logic;
-                                i_filepath      : in string;
-                                i_csv_separator : in character;
-                                signal o_valid : out std_logic
+  procedure pkg_valid_sequencer(signal i_clk   : in std_logic; -- clock
+                                signal i_en    : in std_logic; -- start processing
+                                i_filepath      : in string; -- input *.csv filepath
+                                i_csv_separator : in character; -- *.csv file separator
+                                signal o_valid : out std_logic -- output data valid
                                );
 
   ---------------------------------------------------------------------
@@ -102,15 +102,15 @@ package pkg_sequence is
   --       :param min_value2: define a min value for the negative pulse
   --       :param max_value2: define a min value for the negative pulse
   --       :param num_rising_edge_before_pulse: define a starting offset before generating pulses
-  procedure pkg_valid_sequencer(signal   i_clk                              : in std_logic;
-                                signal   i_en                               : in std_logic;
-                                constant i_ctrl                             : in integer := 0;
-                                constant i_min_value1                       : in integer := 0;
-                                constant i_max_value1                       : in integer := 0;
-                                constant i_min_value2                       : in integer := 0;
-                                constant i_max_value2                       : in integer := 0;
-                                constant i_num_rising_edge_before_pulse     : in integer := 0;
-                                signal   o_valid                            : out std_logic
+  procedure pkg_valid_sequencer(signal   i_clk                              : in std_logic; -- clock
+                                signal   i_en                               : in std_logic; -- start processing
+                                constant i_ctrl                             : in integer := 0; -- generation mode
+                                constant i_min_value1                       : in integer := 0; -- positive pulse width min value
+                                constant i_max_value1                       : in integer := 0; -- positive pulse width max value
+                                constant i_min_value2                       : in integer := 0; -- negative pulse width min value
+                                constant i_max_value2                       : in integer := 0; -- negative pulse width max value
+                                constant i_num_rising_edge_before_pulse     : in integer := 0; -- number of clock period to skip before generating the output data valid
+                                signal   o_valid                            : out std_logic -- output data valid
                                );
 
 end package pkg_sequence;
@@ -143,35 +143,49 @@ package body pkg_sequence is
   --       :param max_value2: define a min value for the negative pulse
   --       :param num_rising_edge_before_pulse_gen: define a starting offset before generating pulses
   ---------------------------------------------------------------------
-  procedure pkg_valid_sequencer(signal i_clk   : in std_logic;
-                                signal i_en    : in std_logic;
-                                i_filepath      : in string;
-                                i_csv_separator : in character;
-                                signal o_valid : out std_logic
+  procedure pkg_valid_sequencer(signal i_clk   : in std_logic; -- clock
+                                signal i_en    : in std_logic; -- start processing
+                                i_filepath      : in string; -- input *.csv filepath
+                                i_csv_separator : in character; -- *.csv file separator
+                                signal o_valid : out std_logic -- output data valid
                                ) is
-    type t_state is (E_RST, E_WAIT, E_RUN, E_TEMPO_NEG, E_TEMPO_POS);
-    variable v_fsm_state : t_state := E_RST;
-    constant c_TEST      : boolean := true;
+     -- csv object
     variable v_csv_file  : t_csv_file_reader;
+    -- fsm type declaration
+    type t_state is (E_RST, E_WAIT, E_RUN, E_TEMPO_NEG, E_TEMPO_POS);
+     -- state
+    variable v_fsm_state : t_state := E_RST;
+    -- test condition for the infinite loop
+    constant c_TEST      : boolean := true;
 
+    -- read data: generation mode
     variable v_ctrl : integer := 0;
 
+    -- read data: positive pulse width min value
     variable v_min_value1 : integer := 0;
+    -- read data: positive pulse width max value
     variable v_max_value1 : integer := 0;
 
+    -- read data: negative pulse width min value
     variable v_min_value2 : integer := 0;
+    -- read data: negative pulse width max value
     variable v_max_value2 : integer := 0;
 
+    -- number of clock period to skip (after the "start processing") before generating the output data valid
     variable v_num_rising_edge_before_pulse : integer := 0;
 
+    -- number of clock period of the pulse width (high value)
     variable v_tempo_pos : integer   := 0;
+    -- number of clock period of the pulse width (low value)
     variable v_tempo_neg : integer   := 0;
+    -- output data valid
     variable v_valid     : std_logic := '0';
-
+    -- counter the number of clock periods
     variable v_cnt_tempo : integer := 1;
 
-    -- random generator seed
+    -- random generator: seed1
     variable v_seed1     :  positive := 16;
+    -- random generator: seed2
     variable v_seed2     :  positive := 32;
 
   begin
@@ -358,38 +372,51 @@ package body pkg_sequence is
   --       :param max_value2: define a min value for the negative pulse
   --       :param num_rising_edge_before_pulse: define a starting offset before generating pulses
   ---------------------------------------------------------------------
-  procedure pkg_valid_sequencer(signal   i_clk                              : in std_logic;
-                                signal   i_en                               : in std_logic;
-                                constant i_ctrl                             : in integer := 0;
-                                constant i_min_value1                       : in integer := 0;
-                                constant i_max_value1                       : in integer := 0;
-                                constant i_min_value2                       : in integer := 0;
-                                constant i_max_value2                       : in integer := 0;
-                                constant i_num_rising_edge_before_pulse     : in integer := 0;
-                                signal   o_valid                            : out std_logic
+  procedure pkg_valid_sequencer(signal   i_clk                              : in std_logic; -- clock
+                                signal   i_en                               : in std_logic; -- start processing
+                                constant i_ctrl                             : in integer := 0; -- generation mode
+                                constant i_min_value1                       : in integer := 0; -- positive pulse width min value
+                                constant i_max_value1                       : in integer := 0; -- positive pulse width max value
+                                constant i_min_value2                       : in integer := 0; -- negative pulse width min value
+                                constant i_max_value2                       : in integer := 0; -- negative pulse width max value
+                                constant i_num_rising_edge_before_pulse     : in integer := 0; -- number of clock period to skip before generating the output data valid
+                                signal   o_valid                            : out std_logic -- output data valid                          : out std_logic
                                ) is
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT, E_RUN, E_TEMPO_NEG, E_TEMPO_POS);
+     -- state
     variable v_fsm_state : t_state := E_RST;
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
+    -- read data: generation mode
     variable v_ctrl : integer := 0;
 
+    -- read data: positive pulse width min value
     variable v_min_value1 : integer := 0;
+    -- read data: positive pulse width max value
     variable v_max_value1 : integer := 0;
 
+    -- read data: negative pulse width min value
     variable v_min_value2 : integer := 0;
+    -- read data: negative pulse width max value
     variable v_max_value2 : integer := 0;
 
+    -- number of clock period to skip (after the "start processing") before generating the output data valid
     variable v_num_rising_edge_before_pulse : integer := 0;
 
+    -- number of clock period of the pulse width (high value)
     variable v_tempo_pos : integer   := 0;
+    -- number of clock period of the pulse width (low value)
     variable v_tempo_neg : integer   := 0;
+    -- output data valid
     variable v_valid     : std_logic := '0';
-
+    -- counter the number of clock periods
     variable v_cnt_tempo : integer := 1;
 
-    -- random generator seed
+    -- random generator: seed1
     variable v_seed1     :  positive := 16;
+    -- random generator: seed2
     variable v_seed2     :  positive := 32;
 
   begin

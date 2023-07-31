@@ -53,46 +53,46 @@ package pkg_ram_check is
   -- pkg_memory_wr_tdpram_and_check
   ---------------------------------------------------------------------
   procedure pkg_memory_wr_tdpram_and_check(
-    signal   i_clk             : in std_logic;
-    signal   i_start_wr        : in std_logic;
-    signal   i_start_rd        : in std_logic;
+    signal   i_clk             : in std_logic; -- clock
+    signal   i_start_wr        : in std_logic; -- start procedure: read and output data from file
+    signal   i_start_rd        : in std_logic; -- start procedure: read data from file and check input data
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath_wr             : in string;
-    i_filepath_rd             : in string;
-    i_csv_separator           : in character;
-    constant i_RD_NAME1        : in string;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_WR_RD_ADDR_TYP  : in string := "HEX";
-    constant i_WR_DATA_TYP     : in string := "HEX";
-    constant i_RD_DATA_TYP     : in string := "HEX";
+    i_filepath_wr             : in string; -- input *.csv filepath (data to read and to output)
+    i_filepath_rd             : in string; -- input *.csv filepath (data to read and to check with the input)
+    i_csv_separator           : in character; -- *.csv file separator
+    constant i_RD_NAME1        : in string; -- read message
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_WR_RD_ADDR_TYP  : in string := "HEX"; -- data format of the input csv file: column0 (data to output)
+    constant i_WR_DATA_TYP     : in string := "HEX"; -- data format of the input csv file: column1 (data to output)
+    constant i_RD_DATA_TYP     : in string := "HEX"; -- data format of the input csv file: column0 (data checking)
     ---------------------------------------------------------------------
     -- Vunit Scoreboard objects
     ---------------------------------------------------------------------
-    constant i_data_sb         : in checker_t;
-    signal   i_rd_ready        : in std_logic;
-    signal   i_wr_ready        : in std_logic;
+    constant i_data_sb         : in checker_t; -- vunit checker object
+    signal   i_rd_ready        : in std_logic; -- read a new data from file (data checking)
+    signal   i_wr_ready        : in std_logic; -- read a new data from file (data to output)
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   o_wr_data_valid   : out std_logic;
-    signal   o_rd_data_valid   : out std_logic;
-    signal   o_wr_rd_addr_vect : out std_logic_vector;
-    signal   o_wr_data_vect    : out std_logic_vector;
+    signal   o_wr_data_valid   : out std_logic; -- output data valid (data to output)
+    signal   o_rd_data_valid   : out std_logic; -- output data valid (data checking)
+    signal   o_wr_rd_addr_vect : out std_logic_vector; -- output address (data to output)
+    signal   o_wr_data_vect    : out std_logic_vector; -- output data (data to output)
     -- read value
-    signal   i_rd_data_valid   : in std_logic;
-    signal   i_rd_data_vect    : in std_logic_vector;
+    signal   i_rd_data_valid   : in std_logic; -- input data valid (data checking)
+    signal   i_rd_data_vect    : in std_logic_vector; -- input data (data checking)
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_wr_finish       : out std_logic;
-    signal   o_rd_finish       : out std_logic;
-    signal   o_error           : out std_logic_vector(0 downto 0)
+    signal   o_wr_finish       : out std_logic; -- end of the file processing (data to output)
+    signal   o_rd_finish       : out std_logic; -- end of the file processing (data checking)
+    signal   o_error           : out std_logic_vector(0 downto 0) -- error during the data checking (data file /= data input?)
   );
 
 end package pkg_ram_check;
@@ -103,64 +103,78 @@ package body pkg_ram_check is
   -- pkg_memory_wr_tdpram_and_check
   ---------------------------------------------------------------------
   procedure pkg_memory_wr_tdpram_and_check(
-    signal   i_clk             : in std_logic;
-    signal   i_start_wr        : in std_logic;
-    signal   i_start_rd        : in std_logic;
+    signal   i_clk             : in std_logic; -- clock
+    signal   i_start_wr        : in std_logic; -- start procedure: read and output data from file
+    signal   i_start_rd        : in std_logic; -- start procedure: read data from file and check input data
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath_wr             : in string;
-    i_filepath_rd             : in string;
-    i_csv_separator           : in character;
-    constant i_RD_NAME1        : in string;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_WR_RD_ADDR_TYP  : in string := "HEX";
-    constant i_WR_DATA_TYP     : in string := "HEX";
-    constant i_RD_DATA_TYP     : in string := "HEX";
+    i_filepath_wr             : in string; -- input *.csv filepath (data to read and to output)
+    i_filepath_rd             : in string; -- input *.csv filepath (data to read and to check with the input)
+    i_csv_separator           : in character; -- *.csv file separator
+    constant i_RD_NAME1        : in string; -- read message
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_WR_RD_ADDR_TYP  : in string := "HEX"; -- data format of the input csv file: column0 (data to output)
+    constant i_WR_DATA_TYP     : in string := "HEX"; -- data format of the input csv file: column1 (data to output)
+    constant i_RD_DATA_TYP     : in string := "HEX"; -- data format of the input csv file: column0 (data checking)
     ---------------------------------------------------------------------
     -- Vunit Scoreboard objects
     ---------------------------------------------------------------------
-    constant i_data_sb         : in checker_t;
-    signal   i_rd_ready        : in std_logic;
-    signal   i_wr_ready        : in std_logic;
+    constant i_data_sb         : in checker_t; -- vunit checker object
+    signal   i_rd_ready        : in std_logic; -- read a new data from file (data checking)
+    signal   i_wr_ready        : in std_logic; -- read a new data from file (data to output)
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal   o_wr_data_valid   : out std_logic;
-    signal   o_rd_data_valid   : out std_logic;
-    signal   o_wr_rd_addr_vect : out std_logic_vector;
-    signal   o_wr_data_vect    : out std_logic_vector;
+    signal   o_wr_data_valid   : out std_logic; -- output data valid (data to output)
+    signal   o_rd_data_valid   : out std_logic; -- output data valid (data checking)
+    signal   o_wr_rd_addr_vect : out std_logic_vector; -- output address (data to output)
+    signal   o_wr_data_vect    : out std_logic_vector; -- output data (data to output)
     -- read value
-    signal   i_rd_data_valid   : in std_logic;
-    signal   i_rd_data_vect    : in std_logic_vector;
+    signal   i_rd_data_valid   : in std_logic; -- input data valid (data checking)
+    signal   i_rd_data_vect    : in std_logic_vector; -- input data (data checking)
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal   o_wr_finish       : out std_logic;
-    signal   o_rd_finish       : out std_logic;
-    signal   o_error           : out std_logic_vector(0 downto 0)
+    signal   o_wr_finish       : out std_logic; -- end of the file processing (data to output)
+    signal   o_rd_finish       : out std_logic; -- end of the file processing (data checking)
+    signal   o_error           : out std_logic_vector(0 downto 0) -- error during the data checking (data file /= data input?)
   ) is
+
+    -- csv object
     variable v_csv_file : t_csv_file_reader;
 
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT_WR, E_RUN_WR, E_WAIT_RD, E_RUN_RD0, E_RUN_RD1, E_END);
+    -- state
     variable v_fsm_state : t_state := E_RST;
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
+    -- output data valid (data to output)
     variable v_wr_data_valid : std_logic                                 := '0';
+    -- output address (data to output)
     variable v_wr_rd_addr    : std_logic_vector(o_wr_rd_addr_vect'range) := (others => '0');
+    -- output data (data to output)
     variable v_wr_data       : std_logic_vector(o_wr_data_vect'range)    := (others => '0');
+    -- end of the file processing (data to output)
     variable v_wr_finish     : std_logic                                 := '0';
 
+    -- output data valid (data checking)
     variable v_rd_data_valid : std_logic                              := '0';
+    -- read data from file (data checking)
     variable v_rd_data       : std_logic_vector(i_rd_data_vect'range) := (others => '0');
+    -- end of the file processing (data checking)
     variable v_rd_finish     : std_logic                              := '0';
 
+    -- count the number of checked values.
     variable v_cnt : integer := 0;
 
+     -- error during the data checking (data file /= data input?)
     variable v_error : std_logic_vector(o_error'range) := (others => '0');
 
   begin
