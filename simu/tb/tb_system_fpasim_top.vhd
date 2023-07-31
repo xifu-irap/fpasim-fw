@@ -81,7 +81,7 @@ architecture Simulation of tb_system_fpasim_top is
 
   -- FMC: from the card
   -- board_id
-  signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');
+  --signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');
   ---------------------------------------------------------------------
   -- FMC: from the adc
   ---------------------------------------------------------------------
