@@ -51,7 +51,12 @@ package pkg_log is
   --  data type = "HEX"
   --  data type = "UHEX"
   --  data type = "STD_VEC"
-  function pkg_get_column_name(constant i_NAME : in string; constant i_DATA_TYP : in string := "INT") return string;
+  function pkg_get_column_name(
+            -- column name
+           constant i_NAME : in string;
+           -- data type of the column
+           constant i_DATA_TYP : in string := "INT"
+           ) return string;
 
 
   ---------------------------------------------------------------------
@@ -143,7 +148,12 @@ package body pkg_log is
   --  data type = "HEX"
   --  data type = "UHEX"
   --  data type = "STD_VEC"
-  function pkg_get_column_name(constant i_NAME : in string; constant i_DATA_TYP : in string := "INT") return string is
+  function pkg_get_column_name(
+    -- column name
+    constant i_NAME : in string;
+    -- data type of the column
+    constant i_DATA_TYP : in string := "INT"
+    ) return string is
   begin
     return i_NAME & "_" & i_DATA_TYP & "";
   end function;
