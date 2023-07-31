@@ -29,7 +29,7 @@
 #       address_name; data_name
 #         addr0     ; data0
 #         addr1     ; data1
-#    
+#
 #    Note:
 #       . Used for the VHDL simulation.
 #       . This script was tested with python 3.10
@@ -75,7 +75,7 @@ class File:
 
             for i in range(nb_lines):
                 line = lines[i]
-                str_addr, str_data = line.split(self.csv_separator)
+                _, str_data = line.split(self.csv_separator)
                 # skip the header
                 if i != 0:
                     self._data_list.append(int(str_data))

@@ -118,7 +118,6 @@ class SystemFpasimTopDataGen(VunitConf):
         -------
             dictionnary of testbench VHDL generic values.
         """
-        json_variant = self.json_variant
 
         dic = {}
         dic['g_TEST_NAME'] = self.vhdl_test_name
@@ -224,7 +223,7 @@ class SystemFpasimTopDataGen(VunitConf):
             value = value_p
         return value
 
-    def _run(self,test_variant_filepath_p, tb_input_base_path_p, tb_output_base_path_p):
+    def _run(self,test_variant_filepath_p, tb_input_base_path_p):
         """
         Generate the VHDL testbench output files.
 
@@ -234,8 +233,6 @@ class SystemFpasimTopDataGen(VunitConf):
             filepath to the test_variant json file.
         tb_input_base_path_p: str
             base path of the testbench VHDL input files
-        tb_output_base_path_p: str
-            base path of the testbench VHDL output files
 
         Returns
         -------
@@ -243,13 +240,11 @@ class SystemFpasimTopDataGen(VunitConf):
 
         """
         tb_input_base_path = tb_input_base_path_p
-        tb_output_base_path = tb_output_base_path_p
         test_variant_filepath = test_variant_filepath_p
         display_obj = self.display_obj
         level0 = self.level
         level1 = level0 + 1
         level2 = level0 + 2
-        verbosity = self.verbosity
         csv_separator = self.csv_separator
 
         ################################################
@@ -402,33 +397,34 @@ class SystemFpasimTopDataGen(VunitConf):
                                 ref_fid.write('\n')
 
             elif key == '@usb_ctrl':
-                result, dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
+                _, dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
                 self.en = dic_field['en']['value']
 
             elif key == '@usb_tes_conf':
-                result, dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
+                _, dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
                 self.nb_pixel_by_frame = dic_field['nb_pixel_by_frame']['value']
                 self.nb_sample_by_pixel = dic_field['nb_sample_by_pixel']['value']
                 self.nb_sample_by_frame = dic_field['nb_sample_by_frame']['value']
 
             elif key == '@usb_conf0':
-                result, dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
+                _, dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
                 self.inter_squid_gain = dic_field['inter_squid_gain']['value']
 
             elif key == '@usb_make_pulse':
 
-                result, dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
+                _, dic_field = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
                 pixel_all = dic_field['pixel_all']['value']
                 pixel_id = dic_field['pixel_id']['value']
                 time_shift = dic_field['time_shift']['value']
                 pulse_heigth = dic_field['pulse_heigth']['value']
+                self.pixel_all_list.append(pixel_all)
                 self.pixel_id_list.append(pixel_id)
                 self.time_shift_list.append(time_shift)
                 self.pulse_heigth_list.append(pulse_heigth)
 
             else:
                 # manage trig/wire
-                result, _ = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
+                _, _ = self._compute_reg_from_field(reg_def_section_dic_p=reg_def_section_dic, cmd_p=cmd)
 
         with open(output_tb_filepath, 'w') as fid:
             fid.write("reg_id")
@@ -481,7 +477,6 @@ class SystemFpasimTopDataGen(VunitConf):
 
         """
         display_obj = self.display_obj
-        verbosity = self.verbosity
         if self.new_test_variant_filepath_list != []:
             test_variant_filepath = self.new_test_variant_filepath_list[self.index]
         self.index += 1
@@ -513,7 +508,7 @@ class SystemFpasimTopDataGen(VunitConf):
         # generate files
         ##########################################################
         if self.new_test_variant_filepath_list != []:
-            self._run(test_variant_filepath_p=test_variant_filepath, tb_input_base_path_p=tb_input_base_path, tb_output_base_path_p=tb_output_base_path)
+            self._run(test_variant_filepath_p=test_variant_filepath, tb_input_base_path_p=tb_input_base_path)
 
         if self.verbosity > 0:
             str0 = "SystemFpasimTopDataGen.pre_config: Simulation transcript"

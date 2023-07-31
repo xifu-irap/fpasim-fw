@@ -26,8 +26,8 @@
 #    @details
 #
 #    This MuxSquidTopDataGen class provides methods for the run_tb_mux_squid_top.py.
-#    By processing the tb_mux_squid_top_XXXX.json file, it can generate the input/output files expected by the VHDL tb_mux_squid_top testbench.    
-#    
+#    By processing the tb_mux_squid_top_XXXX.json file, it can generate the input/output files expected by the VHDL tb_mux_squid_top testbench.
+#
 #    Note:
 #       . This script was tested with python 3.10
 #
@@ -56,7 +56,7 @@ from .vunit_conf import VunitConf
 class MuxSquidTopDataGen(VunitConf):
     """
     This MuxSquidTopDataGen class provides methods for the run_tb_mux_squid_top.py.
-    By processing the tb_mux_squid_top_XXXX.json file, it can generate the input/output files expected by the VHDL tb_mux_squid_top testbench.   
+    By processing the tb_mux_squid_top_XXXX.json file, it can generate the input/output files expected by the VHDL tb_mux_squid_top testbench.
     """
 
     def __init__(self, json_filepath_p, json_key_path_p):
@@ -112,7 +112,7 @@ class MuxSquidTopDataGen(VunitConf):
         dic['g_RAM2_VERBOSITY'] = ram2_verbosity
         return dic
 
-    def _run(self,test_variant_filepath_p, tb_input_base_path_p, tb_output_base_path_p):
+    def _run(self,test_variant_filepath_p, tb_input_base_path_p):
         """
         Generate the VHDL testbench output files.
 
@@ -122,8 +122,6 @@ class MuxSquidTopDataGen(VunitConf):
             filepath to the test_variant json file.
         tb_input_base_path_p: str
             base path of the testbench VHDL input files
-        tb_output_base_path_p: str
-            base path of the testbench VHDL output files
 
         Returns
         -------
@@ -131,7 +129,6 @@ class MuxSquidTopDataGen(VunitConf):
 
         """
         tb_input_base_path = tb_input_base_path_p
-        tb_output_base_path = tb_output_base_path_p
         test_variant_filepath = test_variant_filepath_p
         display_obj = self.display_obj
         level0 = self.level
@@ -429,11 +426,10 @@ class MuxSquidTopDataGen(VunitConf):
 
         """
         display_obj = self.display_obj
-        verbosity = self.verbosity
         test_variant_filepath = self.new_test_variant_filepath_list[self.index]
         self.index += 1
 
-      
+
         level0 = self.level
         level1 = level0 + 1
 
@@ -459,12 +455,12 @@ class MuxSquidTopDataGen(VunitConf):
         ##########################################################
         # generate files
         ##########################################################
-        self._run(test_variant_filepath_p=test_variant_filepath, tb_input_base_path_p=tb_input_base_path, tb_output_base_path_p=tb_output_base_path)
-    
+        self._run(test_variant_filepath_p=test_variant_filepath, tb_input_base_path_p=tb_input_base_path)
+
         if self.verbosity > 0:
             str0 = "MuxSquidTopDataGen.pre_config: Simulation transcript"
             display_obj.display_title(msg_p=str0, level_p=level0)
-            str0 = test_variant_filepath 
+            str0 = test_variant_filepath
             display_obj.display(msg_p=str0, level_p=level1)
 
             str0 = ""
