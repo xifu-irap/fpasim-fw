@@ -42,24 +42,42 @@ package pkg_utils is
   --     i_value = 16 => res = 4
   --     i_value = 8  => res = 3
   ---------------------------------------------------------------------
-  function pkg_width_from_value(i_value : in positive) return integer;
+  function pkg_width_from_value(
+    -- value to use in order to compute its width (minimal number of bits to represent its value)
+    i_value : in positive
+    ) return integer;
 
   ---------------------------------------------------------------------
   -- This function computes the width bus from 2 indexes
   --   example:
   --     i_idx_high = 15 and i_idx_low = 0 => res = (i_idx_high - i_idx_low) + 1
   ---------------------------------------------------------------------
-  function pkg_width_from_indexes(i_idx_high : in integer; i_idx_low : in integer) return integer;
+  function pkg_width_from_indexes(
+    -- bus index max
+     i_idx_high : in integer;
+    -- bus index min
+     i_idx_low : in integer
+     ) return integer;
 
   ---------------------------------------------------------------------
-  -- This function return the max value of 2 input integers
+  -- This function return the max value of 2 input integers: i_value0 and i_value1
   ---------------------------------------------------------------------
-  function max(i_value0: in integer ; i_value1 : in integer) return integer;
+  function max(
+    -- data value0
+    i_value0: in integer;
+    -- data value1
+    i_value1 : in integer
+     ) return integer;
 
   ---------------------------------------------------------------------
-  -- This function return the min value of 2 input integers
+  -- This function return the min value of 2 input integers: i_value0 and i_value1
   ---------------------------------------------------------------------
-  function min(i_value0: in integer ; i_value1 : in integer) return integer;
+  function min(
+    -- data value0
+    i_value0: in integer;
+    -- data value1
+    i_value1 : in integer
+    ) return integer;
 
 end pkg_utils;
 
@@ -74,8 +92,14 @@ package body pkg_utils is
   --     i_value = 16 => res = 4
   --     i_value = 8  => res = 3
   ---------------------------------------------------------------------
-  function pkg_width_from_value(i_value : in positive) return integer is
+  function pkg_width_from_value(
+    -- value to use in order to compute its width (minimal number of bits to represent its value)
+    i_value : in positive
+    ) return integer is
+
+    -- compute the log2(i_value). Number of minimum bits to represente i_value.
     variable v_result : integer;
+
   begin
     if i_value  = 1 then
       v_result := 1;
@@ -90,18 +114,34 @@ end;
   --   example:
   --     i_idx_high = 15 and i_idx_low = 0 => res = (i_idx_high - i_idx_low) + 1
   ---------------------------------------------------------------------
-  function pkg_width_from_indexes(i_idx_high : in integer; i_idx_low : in integer) return integer is
+  function pkg_width_from_indexes(
+    -- bus index max
+     i_idx_high : in integer;
+    -- bus index min
+     i_idx_low : in integer
+     ) return integer is
+
+    -- computed width (expressed in bits)
     variable v_result : integer;
+
   begin
     v_result := (i_idx_high - i_idx_low) + 1;
     return v_result;
   end;
 
   ---------------------------------------------------------------------
-  -- This function return the max value of 2 input integers
+  -- This function return the max value of 2 input integers: i_value0 and i_value1
   ---------------------------------------------------------------------
-  function max(i_value0: in integer; i_value1 : in integer) return integer is
+  function max(
+    -- data value0
+    i_value0: in integer;
+    -- data value1
+    i_value1 : in integer
+    ) return integer is
+
+    -- computed max value
     variable v_result : integer;
+
   begin
     if i_value0 > i_value1 then
        v_result:= i_value0;
@@ -112,10 +152,18 @@ end;
   end;
 
    ---------------------------------------------------------------------
-  -- This function return the min value of 2 input integers
+  -- This function return the min value of 2 input integers: i_value0 and i_value1
   ---------------------------------------------------------------------
-  function min(i_value0: in integer; i_value1 : in integer) return integer is
+  function min(
+    -- data value0
+    i_value0: in integer;
+    -- data value1
+    i_value1 : in integer
+    ) return integer is
+
+    -- computed min value
     variable v_result : integer;
+
   begin
     if i_value0 < i_value1 then
        v_result:= i_value0;
