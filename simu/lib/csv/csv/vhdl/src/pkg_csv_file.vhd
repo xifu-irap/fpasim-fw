@@ -58,75 +58,180 @@ use ieee.std_logic_textio.all;
 use ieee.math_real.all;
 
 package pkg_csv_file is
+    -- type definition in order to call function as usual fct() instead of fct
     type t_void is (VOID);
 
+    -- protected type definition
     type t_csv_file_reader is protected
         -- Open the CSV text file to be used for subsequent read operations
         -- FILE_OPEN_KIND values: READ_MODE, WRITE_MODE, APPEND_MODE
-        procedure initialize(i_file_pathname : in string; i_csv_separator : in character := ';'; i_open_kind : in FILE_OPEN_KIND := READ_MODE);
+        procedure initialize(
+                             i_file_pathname : in string; -- input *.csv file
+                             i_csv_separator : in character := ';'; -- *.csv separator
+                             i_open_kind : in FILE_OPEN_KIND := READ_MODE -- file mode: READ_MODE, WRITE_MODE, APPEND_MODE
+                             );
+
         -- Release (close) the associated CSV file
-        procedure dispose(i_dummy : in t_void := VOID);
+        procedure dispose(
+                          i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+                          );
+
         -- Read one line from the csv file, and keep it in the cache
-        procedure readline(i_dummy : in t_void := VOID);
+        procedure readline(
+                          i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+                          );
+
         -- Read a string from the csv file, until a separator character ';' is found
-        impure function read_string(i_dummy : in t_void := VOID) return string;
+        impure function read_string(
+                      i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+                      ) return string;
+
         -- Read a string from the csv file and convert it to an integer
-        impure function read_integer(i_dummy : in t_void := VOID) return integer;
+        impure function read_integer(
+              i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+              ) return integer;
+
         -- Read a string from the csv file and convert it to real
-        impure function read_real(i_dummy : in t_void := VOID) return real;
+        impure function read_real(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) return real;
+
         -- Read a string from the csv file and convert it to boolean
-        impure function read_boolean(i_dummy : in t_void := VOID) return boolean;
+        impure function read_boolean(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) return boolean;
+
         -- Read a string with a numeric value from the csv file and convert it to a boolean
-        impure function read_integer_as_boolean(i_dummy : in t_void := VOID) return boolean;
+        impure function read_integer_as_boolean(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) return boolean;
+
         -- Read a string from the csv file of the column specified by column_index, until a separator character ';' is found
-        impure function read_string_by_index(i_column_index : in integer) return string;
+        impure function read_string_by_index(
+            i_column_index : in integer -- index of the column to read (start @0)
+            ) return string;
+
         -- True when the end of the CSV file was reached
-        impure function end_of_file(i_dummy : in t_void := VOID) return boolean;
+        impure function end_of_file(
+                        i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+                        ) return boolean;
+
         -- Read a string (ex: 0 or 1) from the csv file and convert it to std_logic
-        impure function read_integer_as_std(i_dummy : in t_void := VOID) return std_logic;
+        impure function read_integer_as_std(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) return std_logic;
+
         -- Read a string (ex: 11010) from the csv file and convert it to std_logic_vector
-        impure function read_integer_as_std_vec(i_length : in integer; i_unsigned_value : boolean := true) return std_logic_vector;
-        -- Read a string (ex: ABC) from the csv file and convert it to std_logic_vector
-        impure function read_hex_as_std_vec(i_length : in integer) return std_logic_vector;
+        impure function read_integer_as_std_vec(
+            i_length : in integer; -- output std_logic_vector width (expressed in bits)
+            i_unsigned_value : boolean := true -- true: int string (file) -> uint -> std_vec, false: int string (file) -> int -> std_vec
+             ) return std_logic_vector;
+
+        -- Read a hexadecimal string (ex: ABC) from the csv file and convert it to std_logic_vector
+        impure function read_hex_as_std_vec(
+            i_length : in integer -- output std_logic_vector width (expressed in bits)
+            ) return std_logic_vector;
+
         -- read a data typ as std_logic_vector
-        --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-        --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-        --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-        --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-        --  data type = "STD_VEC" => no data convertion before writing in the output file
-        impure function read_data_typ_as_std_vec(i_length : in integer; i_data_typ : in string := "UINT") return std_logic_vector;
-        -- Read a string (ex: 10010) from the csv file and convert it to std_logic_vector
-        impure function read_std_vec(i_length : in integer) return std_logic_vector;
-        -- Read a string (ex: 1 or 0) from the csv file and convert it to std_logic
-        impure function read_std(i_dummy : in t_void := VOID) return std_logic;
+        --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+        --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+        --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+        --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+        --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+        impure function read_data_typ_as_std_vec(
+            i_length : in integer; -- output std_logic_vector width (expressed in bits)
+            i_data_typ : in string := "UINT" -- column data format of the csv file
+            ) return std_logic_vector;
+
+        -- Read a binary string (ex: 10010) from the csv file and convert it to std_logic_vector
+        impure function read_std_vec(
+            i_length : in integer -- output std_logic_vector width (expressed in bits)
+            ) return std_logic_vector;
+
+        -- Read a bit string (ex: 1 or 0) from the csv file and convert it to std_logic
+        impure function read_std(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) return std_logic;
+
         -- write a std_logic_vector to a csv file
-        procedure write_std_vec(i_value : in std_logic_vector; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1);
+        procedure write_std_vec(
+            i_value : in std_logic_vector; -- std_logic_vector to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            );
+
         -- write a std_logic into line
-        procedure write_std(i_value : in std_logic; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1);
+        procedure write_std(
+            i_value : in std_logic; -- std_logic to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            );
+
         -- write a string into line
-        procedure write_string(i_value : in string; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1);
+        procedure write_string(
+            i_value : in string; -- string to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            );
+
         -- write a integer into line
-        procedure write_integer(i_value : in integer; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1);
+        procedure write_integer(
+            i_value : in integer; -- integer to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            );
+
         -- write a real into line
-        procedure write_real(i_value : in real; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1);
+        procedure write_real(
+            i_value : in real; -- read value to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            );
+
         -- write a time into line
-        procedure write_time(i_value : in time; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1);
+        procedure write_time(
+            i_value : in time; -- time value to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            );
+
         -- write a boolean into line
-        procedure write_boolean(i_value : in boolean; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1);
+        procedure write_boolean(
+            i_value : in boolean; -- boolean value to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            );
+
         -- write a character into line
-        procedure write_char(i_value : in character);
+        procedure write_char(
+            i_value : in character -- character to write
+            );
+
         -- write a std_logic_vector as hexadecimal string into line
-        procedure write_std_vec_as_hex(i_value : in std_logic_vector; i_csv_separator : in character := ';';
-                                        constant i_use_csv_separator : in integer := 1; constant i_unsigned_value : boolean := true);
+        procedure write_std_vec_as_hex(
+            i_value : in std_logic_vector; -- std_logic_vector to write as hexadecimal value
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1; -- 1: write the csv separator, 0: otherwise
+            constant i_unsigned_value : boolean := true -- true: std_vec -> uint -> hex, false: std_vec -> int -> hex
+            );
+
         -- write a std_logic_vector as data type
-        --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-        --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-        --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-        --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-        --  data type = "STD_VEC" => no data convertion before writing in the output file
-        procedure write_std_vec_as_data_typ(i_value : in std_logic_vector; i_csv_separator : in character := ';'; i_data_typ : in string := "UINT"; constant i_use_csv_separator : in integer := 1);
+        --  data type = "UINT" => the data to write in the file are converted: std_logic_vector -> uint
+        --  data type = "INT" => the data to write in the file are converted: std_logic_vector -> int
+        --  data type = "HEX" => the data to write in the file are converted: std_logic_vector -> int -> hex
+        --  data type = "UHEX" => the data to write in the file are converted: std_logic_vector -> uint -> hex
+        --  data type = "STD_VEC" => the data to write in the file aren't converted : std_logic_vector -> std_logic_vector
+        procedure write_std_vec_as_data_typ(
+            i_value : in std_logic_vector; -- std_logic_vector to convert
+            i_csv_separator : in character := ';'; -- csv separator to write
+            i_data_typ : in string := "UINT";  -- column data format of the output csv file
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            );
+
         -- write a std_logic_vector in different ways
-        procedure writeline(i_dummy : in t_void := VOID);
+        procedure writeline(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            );
 
     end protected;
 end pkg_csv_file;
@@ -146,16 +251,24 @@ package body pkg_csv_file is
         -- true when end of file was reached and there are no more lines to read
         variable v_end_of_file_reached : boolean;
 
+        -- *.csv separator
         variable v_csv_sep : character;
 
         -- True when the end of the CSV file was reached
-        impure function end_of_file(i_dummy : in t_void := VOID) return boolean is
+        impure function end_of_file(
+                        i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+                        ) return boolean is
         begin
             return v_end_of_file_reached;
         end;
 
         -- Open the CSV text file to be used for subsequent read operations
-        procedure initialize(i_file_pathname : in string; i_csv_separator : in character := ';'; i_open_kind : in FILE_OPEN_KIND := READ_MODE) is
+        procedure initialize(
+            i_file_pathname : in string; -- input *.csv file
+            i_csv_separator : in character := ';'; -- *.csv separator
+            i_open_kind : in FILE_OPEN_KIND := READ_MODE -- file mode: READ_MODE, WRITE_MODE, APPEND_MODE
+            ) is
+
         begin
             -- FILE_OPEN_KIND values: READ_MODE, WRITE_MODE, APPEND_MODE
             file_open(my_csv_file, i_file_pathname, i_open_kind);
@@ -164,24 +277,38 @@ package body pkg_csv_file is
         end;
 
         -- Release (close) the associated CSV file
-        procedure dispose(i_dummy : in t_void := VOID) is
+        procedure dispose(
+                   i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+                   ) is
+
         begin
             file_close(my_csv_file);
         end;
 
         -- Read one line from the csv file, and keep it in the cache
-        procedure readline(i_dummy : in t_void := VOID) is
+        procedure readline(
+                   i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+                   ) is
+
         begin
             readline(my_csv_file, v_current_line);
             v_end_of_file_reached := endfile(my_csv_file);
         end;
 
         -- Read a string from the csv file, until a separator character ',' is found
-        impure function read_string(i_dummy : in t_void := VOID) return string is
+        impure function read_string(
+                 i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+                 ) return string is
+
+            -- output string
             variable v_return_string : string(1 to c_LINE_LENGTH_MAX);
+            -- read char from file
             variable v_read_char     : character;
+            -- test if the reading from file is valid
             variable v_read_ok       : boolean := true;
+            -- index where to write the read character into the output string
             variable v_index         : integer := 1;
+
         begin
             read(v_current_line, v_read_char, v_read_ok);
             while v_read_ok loop
@@ -202,13 +329,19 @@ package body pkg_csv_file is
         procedure skip_separator is
             -- string associated to the separator character.
             variable v_dummy_string: string(1 to c_LINE_LENGTH_MAX);
+
         begin
             v_dummy_string := read_string(VOID);
         end;
 
         -- Read a string from the csv file and convert it to integer
-        impure function read_integer(i_dummy : in t_void := VOID) return integer is
+        impure function read_integer(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) return integer is
+
+            -- read integer value
             variable v_read_value : integer;
+
         begin
             read(v_current_line, v_read_value);
             skip_separator;
@@ -216,8 +349,13 @@ package body pkg_csv_file is
         end;
 
         -- Read a string from the csv file and convert it to real
-        impure function read_real(i_dummy : in t_void := VOID) return real is
+        impure function read_real(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) return real is
+
+            -- read real value
             variable v_read_value : real;
+
         begin
             read(v_current_line, v_read_value);
             skip_separator;
@@ -225,12 +363,18 @@ package body pkg_csv_file is
         end;
 
         -- Read a string from the csv file and convert it to boolean
-        impure function read_boolean(i_dummy : in t_void := VOID) return boolean is
+        impure function read_boolean(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) return boolean is
+
         begin
             return boolean'value(read_string(VOID));
         end;
 
-        impure function read_integer_as_boolean(i_dummy : in t_void := VOID) return boolean is
+        impure function read_integer_as_boolean(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) return boolean is
+
         begin
             return (read_integer(VOID) /= 0);
         end;
@@ -238,13 +382,23 @@ package body pkg_csv_file is
 
 
         -- Read a string from the csv file, at the column index until a separator character ',' is found
-        impure function read_string_by_index(i_column_index : in integer) return string is
+        impure function read_string_by_index(
+            i_column_index : in integer -- index of the column to read (start @0)
+            ) return string is
+
+            -- output string
             variable v_return_string : string(1 to c_LINE_LENGTH_MAX);
+            -- read char from file
             variable v_read_char     : character;
+            -- test if the reading from file is valid
             variable v_read_ok       : boolean := true;
+            -- index where to write the read character into the output string
             variable v_index         : integer := 1;
+            -- copy of the line value
             variable v_line_tmp      : line;
+            -- count the number of column
             variable v_cnt           : integer := 0;
+
         begin
             v_line_tmp         := v_current_line;
             read(v_line_tmp, v_read_char, v_read_ok);
@@ -265,9 +419,15 @@ package body pkg_csv_file is
         end;
 
         -- Read a string (ex: 0 or 1) from the csv file and convert it to std_logic
-        impure function read_integer_as_std(i_dummy : in t_void := VOID) return std_logic is
+        impure function read_integer_as_std(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) return std_logic is
+
+            -- read integer value
             variable v_read_value : integer;
+            -- converted value: int -> std_logic
             variable v_val      : std_logic;
+
         begin
             read(v_current_line, v_read_value);
             skip_separator;
@@ -276,9 +436,16 @@ package body pkg_csv_file is
         end;
 
         -- Read a string (ex:255) from the csv file and convert it to std_logic_vector
-        impure function read_integer_as_std_vec(i_length : in integer; i_unsigned_value : boolean := true) return std_logic_vector is
+        impure function read_integer_as_std_vec(
+            i_length : in integer; -- output std_logic_vector width (expressed in bits)
+            i_unsigned_value : boolean := true -- true: int string (file) -> uint -> std_vec, false: int string (file) -> int -> std_vec
+             ) return std_logic_vector is
+
+            -- read integer value
             variable v_read_value : integer;
+            -- converted value: int -> uint -> std_vec or int -> uint -> std_vec
             variable v_val      : std_logic_vector(i_length - 1 downto 0);
+
         begin
             read(v_current_line, v_read_value);
             skip_separator;
@@ -290,10 +457,16 @@ package body pkg_csv_file is
             return v_val;
         end;
 
-        -- Read a string (ex: AB0) from the csv file and convert it to std_logic_vector
-        impure function read_hex_as_std_vec(i_length : in integer) return std_logic_vector is
+        -- Read a hexadecimal string (ex: AB0) from the csv file and convert it to std_logic_vector
+        impure function read_hex_as_std_vec(
+            i_length : in integer -- output std_logic_vector width (expressed in bits)
+            ) return std_logic_vector is
+
+            -- converted value: hex -> std_logic_vector
             variable v_val_tmp : std_logic_vector(2 ** integer(ceil(log2(real(i_length)))) - 1 downto 0);
+            -- truncated std_logic_vector
             variable v_val     : std_logic_vector(i_length - 1 downto 0);
+
         begin
             HREAD(v_current_line, v_val_tmp);
             -- get the LSB bits
@@ -303,13 +476,19 @@ package body pkg_csv_file is
         end;
 
         -- read a data typ as std_logic_vector
-        --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-        --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-        --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-        --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-        --  data type = "STD_VEC" => no data convertion before writing in the output file
-        impure function read_data_typ_as_std_vec(i_length : in integer; i_data_typ : in string := "UINT") return std_logic_vector is
+        --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+        --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+        --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+        --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+        --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+        impure function read_data_typ_as_std_vec(
+            i_length : in integer;  -- output std_logic_vector width (expressed in bits)
+            i_data_typ : in string := "UINT" -- column data format of the csv file
+            ) return std_logic_vector is
+
+            -- output std_logic_vector value
             variable v_val : std_logic_vector(i_length - 1 downto 0) := (others => '0');
+
         begin
 
             if i_data_typ = "UINT" then
@@ -325,18 +504,28 @@ package body pkg_csv_file is
             return v_val;
         end;
 
-        -- Read a string (ex: 10010) from the csv file and convert it to std_logic_vector
-        impure function read_std_vec(i_length : in integer) return std_logic_vector is
+        -- Read a binary string (ex: 10010) from the csv file and convert it to std_logic_vector
+        impure function read_std_vec(
+            i_length : in integer -- output std_logic_vector width (expressed in bits)
+            ) return std_logic_vector is
+
+            -- output std_logic_vector value
             variable v_val : std_logic_vector(i_length - 1 downto 0);
+
         begin
             READ(v_current_line, v_val);
             skip_separator;
             return v_val;
         end;
 
-        -- Read a string (ex: 10010) from the csv file and convert it to std_logic_vector
-        impure function read_std(i_dummy : in t_void := VOID) return std_logic is
+        -- Read a bit string (ex: 1 or 0) from the csv file and convert it to std_logic
+        impure function read_std(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) return std_logic is
+
+            -- output std_logic value
             variable v_val : std_ulogic;
+
         begin
             READ(v_current_line, v_val);
             skip_separator;
@@ -344,7 +533,12 @@ package body pkg_csv_file is
         end;
 
         -- write a std_logic_vector into line
-        procedure write_std_vec(i_value : in std_logic_vector; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1) is
+        procedure write_std_vec(
+            i_value : in std_logic_vector;  -- std_logic_vector to write
+            i_csv_separator : in character := ';';  -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            ) is
+
         begin
             WRITE(v_current_line, i_value);
             if i_use_csv_separator = 1 then
@@ -352,8 +546,15 @@ package body pkg_csv_file is
             end if;
         end;
         -- write a std_logic into line
-        procedure write_std(i_value : in std_logic; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1) is
+        procedure write_std(
+            i_value : in std_logic; -- std_logic to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            ) is
+
+            -- converted value: std_logic -> std_ulogic
             variable v_val : std_ulogic;
+
         begin
             v_val := std_ulogic(i_value);
             WRITE(v_current_line, v_val);
@@ -363,7 +564,12 @@ package body pkg_csv_file is
         end;
 
         -- write a string into line
-        procedure write_string(i_value : in string; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1) is
+        procedure write_string(
+            i_value : in string; -- string to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            ) is
+
         begin
             WRITE(v_current_line, i_value);
             if i_use_csv_separator = 1 then
@@ -372,7 +578,12 @@ package body pkg_csv_file is
         end;
 
         -- write a integer into line
-        procedure write_integer(i_value : in integer; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1) is
+        procedure write_integer(
+            i_value : in integer; -- integer to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            ) is
+
         begin
             WRITE(v_current_line, i_value);
             if i_use_csv_separator = 1 then
@@ -381,7 +592,12 @@ package body pkg_csv_file is
         end;
 
         -- write a real into line
-        procedure write_real(i_value : in real; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1) is
+        procedure write_real(
+            i_value : in real; -- read value to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            ) is
+
         begin
             WRITE(v_current_line, i_value);
             if i_use_csv_separator = 1 then
@@ -390,7 +606,12 @@ package body pkg_csv_file is
         end;
 
         -- write a time into line
-        procedure write_time(i_value : in time; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1) is
+        procedure write_time(
+            i_value : in time; -- time value to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            ) is
+
         begin
             WRITE(v_current_line, i_value);
             if i_use_csv_separator = 1 then
@@ -398,7 +619,12 @@ package body pkg_csv_file is
             end if;
         end;
         -- write a boolean into line
-        procedure write_boolean(i_value : in boolean; i_csv_separator : in character := ';'; constant i_use_csv_separator : in integer := 1) is
+        procedure write_boolean(
+            i_value : in boolean; -- boolean value to write
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            ) is
+
         begin
             WRITE(v_current_line, i_value);
             if i_use_csv_separator = 1 then
@@ -407,21 +633,27 @@ package body pkg_csv_file is
         end;
 
         -- write a character into line
-        procedure write_char(i_value : in character) is
+        procedure write_char(
+            i_value : in character -- character to write
+            ) is
+
         begin
             WRITE(v_current_line, i_value);
         end;
 
         -- write a std_logic_vector as hexadecimal string into line
-        procedure write_std_vec_as_hex(i_value : in std_logic_vector; i_csv_separator : in character := ';';
-                                       constant i_use_csv_separator : in integer := 1; constant i_unsigned_value : boolean := true) is
+        procedure write_std_vec_as_hex(
+            i_value : in std_logic_vector; -- std_logic_vector to write as hexadecimal value
+            i_csv_separator : in character := ';'; -- csv separator to write
+            constant i_use_csv_separator : in integer := 1; -- 1: write the csv separator, 0: otherwise
+            constant i_unsigned_value : boolean := true -- true: std_vec -> uint -> hex, false: std_vec -> int -> hex
+            ) is
+
             -- This function write in a file the hexadecimal value of an input "value" std_logic_vector
             -- with a minimal number of hexadecimal character.
-            -- The user can define if the input std_logic_vector must be processed as a signed vector or a unsigned vector
-            -- TO do that:
-            -- we build a "v_val0" variable of std_logic_vector type with the following properties:
-            --   . the length is a multiple of 4 bits (1 hexadécimal character = 4 bits)
-            --   . The length >= length(value)
+            -- The user has access at 2 conversion modes:
+            --    std_logic_vector -> signed -> HEX
+            --    std_logic_vector -> unsigned -> HEX
             variable v_val0 : std_logic_vector(integer(ceil(real(i_value'length) / real(4))) * 4 - 1 downto 0);
 
         begin
@@ -439,12 +671,19 @@ package body pkg_csv_file is
         end;
 
         -- write a std_logic_vector as data type
-        --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-        --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-        --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-        --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-        --  data type = "STD_VEC" => no data convertion before writing in the output file
-        procedure write_std_vec_as_data_typ(i_value : in std_logic_vector; i_csv_separator : in character := ';'; i_data_typ : in string := "UINT"; constant i_use_csv_separator : in integer := 1) is
+        --  data type = "UINT" => the data to write in the file are converted: std_logic_vector -> uint
+        --  data type = "INT" => the data to write in the file are converted: std_logic_vector -> int
+        --  data type = "HEX" => the data to write in the file are converted: std_logic_vector -> int -> hex
+        --  data type = "UHEX" => the data to write in the file are converted: std_logic_vector -> uint -> hex
+        --  data type = "STD_VEC" => the data to write in the file aren't converted : std_logic_vector -> std_logic_vector
+        procedure write_std_vec_as_data_typ(
+            i_value : in std_logic_vector; -- std_logic_vector to convert
+            i_csv_separator : in character := ';'; -- csv separator to write
+            i_data_typ : in string := "UINT"; -- column data format of the output csv file
+            constant i_use_csv_separator : in integer := 1 -- 1: write the csv separator, 0: otherwise
+            ) is
+
+            -- integer value
             variable v_val : integer := 0;
         begin
             if i_data_typ = "UINT" then
@@ -472,7 +711,10 @@ package body pkg_csv_file is
         end;
 
         -- write line into a csv file
-        procedure writeline(i_dummy : in t_void := VOID) is
+        procedure writeline(
+            i_dummy : in t_void := VOID -- dummy argument. The function is called as fct() instead fct
+            ) is
+
         begin
             writeline(my_csv_file, v_current_line);
         end;
