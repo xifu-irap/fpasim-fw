@@ -91,50 +91,50 @@ package pkg_usb is
   -- pkg_usb_wr
   ---------------------------------------------------------------------
   procedure pkg_usb_wr(
-    signal i_clk                       : in    std_logic;
-    signal i_start_wr                  : in    std_logic;
+    signal i_clk                       : in    std_logic; -- clock
+    signal i_start_wr                  : in    std_logic; -- start processing
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath_wr                      : in    string;
-    i_csv_separator                    : in    character;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_USB_WR_ADDR_TYP         : in    string := "HEX";
-    constant i_USB_WR_DATA_TYP         : in    string := "HEX";
+    i_filepath_wr                      : in    string; -- input *.csv filepath (data to read and to output/ data to check)
+    i_csv_separator                    : in    character; -- *.csv file separator
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_USB_WR_ADDR_TYP         : in    string := "HEX"; -- data format of the input csv file: column0
+    constant i_USB_WR_DATA_TYP         : in    string := "HEX"; -- data format of the input csv file: column1
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal i_wr_ready                  : in    std_logic;
+    signal i_wr_ready                  : in    std_logic; -- read a new data from file
     ---------------------------------------------------------------------
     -- usb
     ---------------------------------------------------------------------
-    variable b_front_panel_conf        : inout t_front_panel_conf;
-    signal o_internal_wr_if            : out   t_internal_wr_if;
-    signal i_internal_rd_if            : in    t_internal_rd_if;
+    variable b_front_panel_conf        : inout t_front_panel_conf; -- opal kelly: shared variable interface
+    signal o_internal_wr_if            : out   t_internal_wr_if; -- opal kelly: write interface
+    signal i_internal_rd_if            : in    t_internal_rd_if; -- opal kelly: read interface
     ---------------------------------------------------------------------
     -- Vunit Scoreboard objects
     ---------------------------------------------------------------------
-    constant i_sb_reg_data             : in    checker_t;
-    constant i_sb_ram_tes_pulse_shape  : in    checker_t;
-    constant i_sb_ram_amp_squid_tf     : in    checker_t;
-    constant i_sb_ram_mux_squid_tf     : in    checker_t;
-    constant i_sb_ram_tes_steady_state : in    checker_t;
-    constant i_sb_ram_mux_offset       : in    checker_t;
+    constant i_sb_reg_data             : in    checker_t; -- vunit checker object for the register
+    constant i_sb_ram_tes_pulse_shape  : in    checker_t; -- vunit checker object for the tes_pulse_shape ram
+    constant i_sb_ram_amp_squid_tf     : in    checker_t; -- vunit checker object for the amp_squid_tf ram
+    constant i_sb_ram_mux_squid_tf     : in    checker_t; -- vunit checker object for the mux_squid_tf ram
+    constant i_sb_ram_tes_steady_state : in    checker_t; -- vunit checker object for the tes_steady_state ram
+    constant i_sb_ram_mux_offset       : in    checker_t; -- vunit checker object for the mux_squid_offset ram
     ---------------------------------------------------------------------
     -- data
     ---------------------------------------------------------------------
-    signal o_reg_id                    : out   integer;
-    signal o_data_valid                : out   std_logic;
-    signal o_data                      : out   std_logic_vector(31 downto 0);
+    signal o_reg_id                    : out   integer; -- register id
+    signal o_data_valid                : out   std_logic; -- output data valid
+    signal o_data                      : out   std_logic_vector(31 downto 0); -- output data
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal o_wr_finish                 : out   std_logic;
-    signal o_error                     : out   std_logic_vector(0 downto 0)
+    signal o_wr_finish                 : out   std_logic; -- end of the file processing
+    signal o_error                     : out   std_logic_vector(0 downto 0) -- error during the data checking (data file /= data input?)
     );
 
 end package pkg_usb;
@@ -145,55 +145,60 @@ package body pkg_usb is
   -- pkg_usb_wr
   ---------------------------------------------------------------------
   procedure pkg_usb_wr(
-    signal i_clk                       : in    std_logic;
-    signal i_start_wr                  : in    std_logic;
+    signal i_clk                       : in    std_logic; -- clock
+    signal i_start_wr                  : in    std_logic; -- start processing
     ---------------------------------------------------------------------
     -- input file
     ---------------------------------------------------------------------
-    i_filepath_wr                      : in    string;
-    i_csv_separator                    : in    character;
-    --  data type = "UINT" => the input std_logic_vector value is converted into unsigned int value in the output file
-    --  data type = "INT" => the input std_logic_vector value is converted into signed int value in the output file
-    --  data type = "HEX" => the input std_logic_vector value is considered as a signed vector, then it's converted into hex value in the output file
-    --  data type = "UHEX" => the input std_logic_vector value is considered as a unsigned vector, then it's converted into hex value in the output file
-    --  data type = "STD_VEC" => no data convertion before writing in the output file
-    constant i_USB_WR_ADDR_TYP         : in    string := "HEX";
-    constant i_USB_WR_DATA_TYP         : in    string := "HEX";
+    i_filepath_wr                      : in    string; -- input *.csv filepath (data to read and to output/ data to check)
+    i_csv_separator                    : in    character; -- *.csv file separator
+    --  data type = "UINT" => the read data from the file are converted: uint -> std_logic_vector
+    --  data type = "INT" => the read data from the file are converted: int -> std_logic_vector
+    --  data type = "HEX" => the read data from the file are converted: hex-> int -> std_logic_vector
+    --  data type = "UHEX" => the read data from the file are converted: hex-> uint -> std_logic_vector
+    --  data type = "STD_VEC" => the read data from the file aren't converted : std_logic_vector -> std_logic_vector
+    constant i_USB_WR_ADDR_TYP         : in    string := "HEX"; -- data format of the input csv file: column0
+    constant i_USB_WR_DATA_TYP         : in    string := "HEX"; -- data format of the input csv file: column1
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    signal i_wr_ready                  : in    std_logic;
+    signal i_wr_ready                  : in    std_logic; -- read a new data from file
     ---------------------------------------------------------------------
     -- usb
     ---------------------------------------------------------------------
-    variable b_front_panel_conf        : inout t_front_panel_conf;
-    signal o_internal_wr_if            : out   t_internal_wr_if;
-    signal i_internal_rd_if            : in    t_internal_rd_if;
+    variable b_front_panel_conf        : inout t_front_panel_conf; -- opal kelly: shared variable interface
+    signal o_internal_wr_if            : out   t_internal_wr_if; -- opal kelly: write interface
+    signal i_internal_rd_if            : in    t_internal_rd_if; -- opal kelly: read interface
     ---------------------------------------------------------------------
     -- Vunit Scoreboard objects
     ---------------------------------------------------------------------
-    constant i_sb_reg_data             : in    checker_t;
-    constant i_sb_ram_tes_pulse_shape  : in    checker_t;
-    constant i_sb_ram_amp_squid_tf     : in    checker_t;
-    constant i_sb_ram_mux_squid_tf     : in    checker_t;
-    constant i_sb_ram_tes_steady_state : in    checker_t;
-    constant i_sb_ram_mux_offset       : in    checker_t;
+    constant i_sb_reg_data             : in    checker_t; -- vunit checker object for the register
+    constant i_sb_ram_tes_pulse_shape  : in    checker_t; -- vunit checker object for the tes_pulse_shape ram
+    constant i_sb_ram_amp_squid_tf     : in    checker_t; -- vunit checker object for the amp_squid_tf ram
+    constant i_sb_ram_mux_squid_tf     : in    checker_t; -- vunit checker object for the mux_squid_tf ram
+    constant i_sb_ram_tes_steady_state : in    checker_t; -- vunit checker object for the tes_steady_state ram
+    constant i_sb_ram_mux_offset       : in    checker_t; -- vunit checker object for the mux_squid_offset ram
     ---------------------------------------------------------------------
     -- data
     ---------------------------------------------------------------------
-    signal o_reg_id                    : out   integer;
-    signal o_data_valid                : out   std_logic;
-    signal o_data                      : out   std_logic_vector(31 downto 0);
+    signal o_reg_id                    : out   integer; -- register id
+    signal o_data_valid                : out   std_logic; -- output data valid
+    signal o_data                      : out   std_logic_vector(31 downto 0); -- output data
     ---------------------------------------------------------------------
     -- status
     ---------------------------------------------------------------------
-    signal o_wr_finish                 : out   std_logic;
-    signal o_error                     : out   std_logic_vector(0 downto 0)
+    signal o_wr_finish                 : out   std_logic; -- end of the file processing
+    signal o_error                     : out   std_logic_vector(0 downto 0) -- error during the data checking (data file /= data input?)
     ) is
+
+    -- csv object
     variable v_csv_file : t_csv_file_reader;
 
+    -- fsm type declaration
     type t_state is (E_RST, E_WAIT_WR, E_RUN, E_PIPE_OUT_DATA_COMPARE, E_DELAY, E_END);
+    -- state
     variable v_fsm_state : t_state := E_RST;
+    -- test condition for the infinite loop
     constant c_TEST      : boolean := true;
 
     ---------------------------------------------------------------------
@@ -632,7 +637,7 @@ package body pkg_usb is
                 if v_file_reg_id = 501 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get MAKE_PULSE Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
                 end if;
-                
+
 
                 if v_file_reg_id = 503 then
                   check_equal(i_sb_reg_data, v_wire_data2, v_wire_data1, result("[pkg_usb_wr] : Get MUX_SQ_FB_DELAY Register, index: " & to_string(v_wire_cnt) & ", v_file_reg_id: " & to_string(v_file_reg_id) & " (File) : " & to_string(v_wire_data1) & ", (VHDL) : " & to_string(v_wire_data2)));
