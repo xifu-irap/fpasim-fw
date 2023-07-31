@@ -103,65 +103,152 @@ package pkg_front_panel is
   ---------------------------------------------------------------------
   -- Don't touch: USB internal commands
   ---------------------------------------------------------------------
+  -- NOP command
   constant DNOP                  : std_logic_vector(2 downto 0) := "000";
+  -- reset command
   constant DReset                : std_logic_vector(2 downto 0) := "001";
+  -- wires command
   constant DWires                : std_logic_vector(2 downto 0) := "010";
+  -- update wire in command
   constant DUpdateWireIns        : std_logic_vector(2 downto 0) := "001";
+  -- update wire out command
   constant DUpdateWireOuts       : std_logic_vector(2 downto 0) := "010";
+  -- triggers command
   constant DTriggers             : std_logic_vector(2 downto 0) := "011";
+  -- activate triggers in command
   constant DActivateTriggerIn    : std_logic_vector(2 downto 0) := "001";
+  -- activate triggers out command
   constant DUpdateTriggerOuts    : std_logic_vector(2 downto 0) := "010";
+  -- pipe command
   constant DPipes                : std_logic_vector(2 downto 0) := "100";
+  -- write to pipe in command
   constant DWriteToPipeIn        : std_logic_vector(2 downto 0) := "001";
+  -- read from pipe out command
   constant DReadFromPipeOut      : std_logic_vector(2 downto 0) := "010";
+  -- write to block pipe in command
   constant DWriteToBlockPipeIn   : std_logic_vector(2 downto 0) := "011";
+  -- read from block pipe pout command
   constant DReadFromBlockPipeOut : std_logic_vector(2 downto 0) := "100";
+  -- registers command
   constant DRegisters            : std_logic_vector(2 downto 0) := "101";
+  -- write register command
   constant DWriteRegister        : std_logic_vector(2 downto 0) := "001";
+  -- read register command
   constant DReadRegister         : std_logic_vector(2 downto 0) := "010";
+  -- write register set command
   constant DWriteRegisterSet     : std_logic_vector(2 downto 0) := "011";
+  -- read register set command
   constant DReadRegisterSet      : std_logic_vector(2 downto 0) := "100";
 
+  -- type definition in order to call function as usual fct() instead of fct
   type t_void is (VOID);
 
   ---------------------------------------------------------------------
   -- define procedure/function records
   ---------------------------------------------------------------------
+  -- opal kelly: write interface (must be defined in the testbench)
   type t_internal_wr_if is record
-    hi_drive   : std_logic;
-    hi_cmd     : std_logic_vector(2 downto 0);
-    hi_dataout : std_logic_vector(31 downto 0);
+    hi_drive   : std_logic; -- usb drive
+    hi_cmd     : std_logic_vector(2 downto 0); -- usb command
+    hi_dataout : std_logic_vector(31 downto 0); -- usb data out
   end record;
 
+  -- opal kelly: read interface (must be defined in the testbench)
   type t_internal_rd_if is record
-    i_clk     : std_logic;
-    hi_busy   : std_logic;
-    hi_datain : std_logic_vector(31 downto 0);
+    i_clk     : std_logic; -- usb clock
+    hi_busy   : std_logic; -- usb busy
+    hi_datain : std_logic_vector(31 downto 0); -- usb data in
   end record;
 
   ---------------------------------------------------------------------
   -- define variable
   ---------------------------------------------------------------------
+  -- define the pipe_in array
   type PIPEIN_ARRAY is array (integer range <>) of std_logic_vector(7 downto 0);
+  -- define the pipe_out array
   type PIPEOUT_ARRAY is array (integer range <>) of std_logic_vector(7 downto 0);
+  -- define the std_logic_vector array
   type STD_ARRAY is array (integer range <>) of std_logic_vector(31 downto 0);
+  -- define the register array
   type REGISTER_ARRAY is array (integer range <>) of std_logic_vector(31 downto 0);
 
+  -- opal kelly: shared variable interface (must be defined in the testbench)
   type t_front_panel_conf is protected
-    procedure set_WireIns(i_index          : in integer; i_value : in std_logic_vector);
-    procedure set_WireOuts(i_index         : in integer; i_value : in std_logic_vector);
-    procedure set_Triggered(i_index        : in integer; i_value : in std_logic_vector);
-    procedure set_pipeIn(i_index           : in integer; i_value : in std_logic_vector);
-    procedure set_pipeOut(i_index          : in integer; i_value : in std_logic_vector);
-    procedure set_u32Data(i_index          : in integer; i_value : in std_logic_vector);
-    impure function get_WireIns(i_index    : in integer) return std_logic_vector;
-    impure function get_WireOuts(i_index   : in integer) return std_logic_vector;
-    impure function get_Triggered(i_index  : in integer) return std_logic_vector;
-    impure function get_pipeIn(i_index     : in integer) return std_logic_vector;
-    impure function get_pipeOut(i_index    : in integer) return std_logic_vector;
-    impure function get_u32Count return std_logic_vector;
-    impure function get_u32Address(i_index : in integer) return std_logic_vector;
-    impure function get_u32Data(i_index    : in integer) return std_logic_vector;
+      -- internal functions: not used by the user
+
+      -- set the value of WireIns[index] :internal function
+      procedure set_WireIns(
+        i_index : in integer; -- WireIns index
+        i_value : in std_logic_vector -- value to write
+        );
+
+      -- set the value of WireOuts[index] :internal function
+      procedure set_WireOuts(
+        i_index : in integer; -- WireOuts index
+        i_value : in std_logic_vector -- value to write
+        );
+
+      -- set the value of Triggered[index] :internal function
+      procedure set_Triggered(
+        i_index        : in integer; -- Triggered index
+        i_value : in std_logic_vector -- value to write
+        );
+
+      -- set the value of pipeIn[index] :internal function
+      procedure set_pipeIn(
+        i_index           : in integer; -- pipeIn index
+        i_value : in std_logic_vector -- value to write
+        );
+
+      -- set the value of pipeOut[index] :internal function
+      procedure set_pipeOut(
+        i_index          : in integer; -- pipeOut index
+        i_value : in std_logic_vector -- value to write
+        );
+
+      -- set the value of u32Data[index] :internal function
+      procedure set_u32Data(
+        i_index          : in integer; -- u32Data index
+        i_value : in std_logic_vector -- value to write
+        );
+
+      -- get the value of WireIns[index] :internal function
+      impure function get_WireIns(
+        i_index    : in integer -- WireIns index
+        ) return std_logic_vector;
+
+      -- get the value of WireOuts[index] :internal function
+      impure function get_WireOuts(
+        i_index   : in integer -- WireOuts index
+        ) return std_logic_vector;
+
+      -- get the value of Triggered[index] :internal function
+      impure function get_Triggered(
+        i_index  : in integer -- Triggered index
+        ) return std_logic_vector;
+
+      -- get the value of pipeIn[index] :internal function
+      impure function get_pipeIn(
+        i_index     : in integer -- pipeIn index
+        ) return std_logic_vector;
+
+      -- get the value of pipeOut[index] :internal function
+      impure function get_pipeOut(
+        i_index    : in integer -- pipeOut index
+        ) return std_logic_vector;
+
+      -- get the value of u32Count :internal function
+      impure function get_u32Count return std_logic_vector;
+
+      -- get the value of u32Address[index] :internal function
+      impure function get_u32Address(
+        i_index : in integer -- u32Address index
+        ) return std_logic_vector;
+
+      -- get the value of u32Data[index] :internal function
+      impure function get_u32Data(
+        i_index    : in integer -- u32Data index
+        ) return std_logic_vector;
 
   end protected;
 
@@ -218,300 +305,460 @@ package pkg_front_panel is
   -----------------------------------------------------------------------
 
   ---------------------------------------------------------------------
-  -- okHost_driver: to instanciate outside a process
+  -- okHost_driver: This function allows to drive usb signals in the testbench
+  --   . Note: must be instanciate outside process in the testbench
   ---------------------------------------------------------------------
   procedure okHost_driver(
+    -- usb clock
     signal i_clk            : in    std_logic;
+    -- usb signal
     signal o_okUH           : out   std_logic_vector (4 downto 0);
+    -- usb signal
     signal i_okHU           : in    std_logic_vector (2 downto 0);
+    -- usb signal
     signal b_okUHU          : inout std_logic_vector (31 downto 0);
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_wr_if : in    t_internal_wr_if;
+    -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_rd_if : out   t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
-  -- FrontPanelReset
+  -- FrontPanelReset:
   -----------------------------------------------------------------------
+  -- call this procedure to reset the usb
   procedure FrontPanelReset(
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if     : out   t_internal_wr_if;
+    -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if     : in    t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- SetWireInValue
+  -- Note: should be called before UpdateWireIns
   -----------------------------------------------------------------------
+  -- set the value of a wire in (locally)
   procedure SetWireInValue(
+    -- opal kelly address
     i_ep                        : in    std_logic_vector(7 downto 0);
+    -- data to write
     i_val                       : in    std_logic_vector(31 downto 0);
+    -- data mask to apply
     i_mask                      : in    std_logic_vector(31 downto 0);
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf
     );
 
   -----------------------------------------------------------------------
   -- GetWireOutValue
+  -- Note: should be called after UpdateWireOuts
   -----------------------------------------------------------------------
+  -- get a wire out value
   procedure GetWireOutValue(
+    -- opal kelly address
     i_ep                        :       std_logic_vector;
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
-    o_result                    : out   std_logic_vector);
+    -- wire out value
+    o_result                    : out   std_logic_vector
+    );
 
   -----------------------------------------------------------------------
   -- IsTriggered
   -----------------------------------------------------------------------
+  -- check detect if a trigger was detected
   procedure IsTriggered(
+    -- opal kelly address
     i_ep                        :       std_logic_vector;
+    -- mask to apply
     i_mask                      :       std_logic_vector(31 downto 0);
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
+    -- result
     o_result                    : out   boolean
     );
   -----------------------------------------------------------------------
   -- UpdateWireIns
+  -- Note: should be called after SetWireInValue
   -----------------------------------------------------------------------
+  -- update the wire in (transfer the wire in values on the usb link)
   procedure UpdateWireIns(
+     -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if     : in    t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- UpdateWireOuts
+  -- Note: should be called before GetWireOutValue
   -----------------------------------------------------------------------
+  -- update the wireout
   procedure UpdateWireOuts(
+     -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if     : in    t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- ActivateTriggerIn
   -----------------------------------------------------------------------
+  -- activate one trigger bit
   procedure ActivateTriggerIn(
+    -- opal kelly address
     i_ep                    : in  std_logic_vector(7 downto 0);
+    -- bit to set
     i_bit                   : in  integer;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if : out t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if : in  t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- ActivateTriggerIn_by_data
   -----------------------------------------------------------------------
+  -- activate one or several trigger bits
   procedure ActivateTriggerIn_by_data(
+    -- opal kelly address
     i_ep                    : in  std_logic_vector(7 downto 0);
+    -- bits to set
     i_data                  : in  std_logic_vector(31 downto 0);
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if : out t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if : in  t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- UpdateTriggerOuts
   -----------------------------------------------------------------------
+  -- update the trigger out
   procedure UpdateTriggerOuts(
+     -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if     : in    t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- WriteToPipeIn
   -----------------------------------------------------------------------
+  -- write in one of the Pipe In
   procedure WriteToPipeIn(
+    -- opal kelly address
     i_ep                        : in    std_logic_vector(7 downto 0);
+    -- number of bytes to write
     i_length                    : in    integer;
+     -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if     : in    t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- ReadFromPipeOut
   -----------------------------------------------------------------------
+  -- Read one of the PipeOut
   procedure ReadFromPipeOut(
+    -- opal kelly address
     i_ep                        : in    std_logic_vector(7 downto 0);
+    -- number of bytes to read
     i_length                    : in    integer;
+     -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if     : in    t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- WriteToBlockPipeIn
   -----------------------------------------------------------------------
+  -- write one of the Block PipeIn
   procedure WriteToBlockPipeIn(
+    -- opal kelly address
     i_ep                        : in    std_logic_vector(7 downto 0);
+    -- block length (expressed in bytes)
     i_blockLength               : in    integer;
+    -- number of bytes to write
     i_length                    : in    integer;
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if     : in    t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- ReadFromBlockPipeOut
   -----------------------------------------------------------------------
+  -- read one of the Block PipeOut
   procedure ReadFromBlockPipeOut(
+    -- opal kelly address
     i_ep                        : in    std_logic_vector(7 downto 0);
+    -- block length (expressed in bytes)
     i_blockLength               : in    integer;
+    -- number of bytes to write
     i_length                    : in    integer;
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if     : in    t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- WriteRegister
   -----------------------------------------------------------------------
+  -- write a register
   procedure WriteRegister(
+    -- adress where to write the data
     i_address               : in  std_logic_vector(31 downto 0);
+    -- data to write
     i_data                  : in  std_logic_vector(31 downto 0);
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if : out t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if : in  t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- ReadRegister
   -----------------------------------------------------------------------
+  -- get a register
   procedure ReadRegister(
+    -- adress where to read the data
     i_address               : in  std_logic_vector(31 downto 0);
+    -- read data
     o_data                  : out std_logic_vector(31 downto 0);
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if : out t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if : in  t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- WriteRegisterSet
   -----------------------------------------------------------------------
+  -- transfert register value
   procedure WriteRegisterSet(
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if     : in    t_internal_rd_if
     );
 
   -----------------------------------------------------------------------
   -- ReadRegisterSet
   -----------------------------------------------------------------------
+  -- read register
   procedure ReadRegisterSet(
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
     variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
     signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
     signal i_internal_rd_if     : in    t_internal_rd_if
     );
 
   ------------------------------------------------------
   -- this procedure allows to wait a number of rising edge
   -- then a margin is applied, if any
-  ------------------------------------------------------
   procedure wait_nb_rising_edge_plus_margin(
-    signal i_clk              : in std_logic;
-    constant i_nb_rising_edge : in natural;
-    constant i_margin         : in time
+    signal   i_clk            : in std_logic; -- clock
+    constant i_nb_rising_edge : in natural; -- number of clock rising edge to skip
+    constant i_margin         : in time -- additional time
     );
 
 end pkg_front_panel;
 
 package body pkg_front_panel is
 
+  -- opal kelly: shared variable interface
   type t_front_panel_conf is protected body
-                                         variable pipeIn : PIPEIN_ARRAY(0 to pipeInSize - 1);
+      -- depth of the pipe in :internal variable
+      variable pipeIn : PIPEIN_ARRAY(0 to pipeInSize - 1);
+      -- depth of the pipe out :internal variable
+      variable pipeOut : PIPEOUT_ARRAY(0 to pipeOutSize - 1);
+      -- number of wire in :internal variable
+      variable WireIns   : STD_ARRAY(0 to 31);  -- 32x32 array storing WireIn values
+      -- number of wire out :internal variable
+      variable WireOuts  : STD_ARRAY(0 to 31);  -- 32x32 array storing WireOut values
+      -- number of trigger :internal variable
+      variable Triggered : STD_ARRAY(0 to 31);  -- 32x32 array storing IsTriggered values
+      -- define the number of register (address part) :internal variable
+      variable u32Address : REGISTER_ARRAY(0 to registerSetSize - 1);
+      -- define the number of register (data part) :internal variable
+      variable u32Data    : REGISTER_ARRAY(0 to registerSetSize - 1);
+      -- counter value: internal variable
+      variable u32Count   : std_logic_vector(31 downto 0);
+      --ReadRegisterData : std_logic_vector(31 downto 0);
 
-                                       variable pipeOut : PIPEOUT_ARRAY(0 to pipeOutSize - 1);
+      -- set the value of WireIns[index] :internal function
+      procedure set_WireIns(
+          i_index : in integer; -- WireIns index
+          i_value : in std_logic_vector -- value to write
+          ) is
+        begin
+         WireIns(i_index) := i_value;
+      end;
 
-                                       variable WireIns   : STD_ARRAY(0 to 31);  -- 32x32 array storing WireIn values
-                                       variable WireOuts  : STD_ARRAY(0 to 31);  -- 32x32 array storing WireOut values
-                                       variable Triggered : STD_ARRAY(0 to 31);  -- 32x32 array storing IsTriggered values
+      -- set the value of WireOuts[index] :internal function
+      procedure set_WireOuts(
+        i_index : in integer; -- WireOuts index
+        i_value : in std_logic_vector -- value to write
+        ) is
+      begin
+        WireOuts(i_index) := i_value;
+      end;
 
-                                       variable u32Address : REGISTER_ARRAY(0 to registerSetSize - 1);
-                                       variable u32Data    : REGISTER_ARRAY(0 to registerSetSize - 1);
-                                       variable u32Count   : std_logic_vector(31 downto 0);
-                                       --ReadRegisterData : std_logic_vector(31 downto 0);
+      -- set the value of Triggered[index] :internal function
+      procedure set_Triggered(
+        i_index : in integer; -- Triggered index
+        i_value : in std_logic_vector -- value to write
+        ) is
+      begin
+        Triggered(i_index) := i_value;
+      end;
 
-                                       procedure set_WireIns(i_index : in integer; i_value : in std_logic_vector) is
-                                       begin
-                                         WireIns(i_index) := i_value;
-                                       end;
+      -- set the value of pipeIn[index] :internal function
+      procedure set_pipeIn(
+        i_index : in integer; -- pipeIn index
+        i_value : in std_logic_vector -- value to write
+        ) is
+      begin
+        pipeIn(i_index) := i_value;
+      end;
 
-  procedure set_WireOuts(i_index : in integer; i_value : in std_logic_vector) is
-  begin
-    WireOuts(i_index) := i_value;
-  end;
+      -- set the value of pipeOut[index] :internal function
+      procedure set_pipeOut(
+        i_index : in integer; -- pipeOut index
+        i_value : in std_logic_vector -- value to write
+        ) is
+      begin
+        pipeOut(i_index) := i_value;
+      end;
 
-  procedure set_Triggered(i_index : in integer; i_value : in std_logic_vector) is
-  begin
-    Triggered(i_index) := i_value;
-  end;
+      -- set the value of u32Data[index] :internal function
+      procedure set_u32Data(
+        i_index : in integer; -- u32Data index
+        i_value : in std_logic_vector -- value to write
+        ) is
+      begin
+        u32Data(i_index) := i_value;
+      end;
 
-  procedure set_pipeIn(i_index : in integer; i_value : in std_logic_vector) is
-  begin
-    pipeIn(i_index) := i_value;
-  end;
+      -- get the value of WireIns[index] :internal function
+      impure function get_WireIns(
+        i_index : in integer -- WireIns index
+        ) return std_logic_vector is
+      begin
+        return WireIns(i_index);
+      end;
 
-  procedure set_pipeOut(i_index : in integer; i_value : in std_logic_vector) is
-  begin
-    pipeOut(i_index) := i_value;
-  end;
+      -- get the value of WireOuts[index] :internal function
+      impure function get_WireOuts(
+        i_index : in integer -- WireOuts index
+        ) return std_logic_vector is
+      begin
+        return WireOuts(i_index);
+      end;
 
-  procedure set_u32Data(i_index : in integer; i_value : in std_logic_vector) is
-  begin
-    u32Data(i_index) := i_value;
-  end;
+      -- get the value of Triggered[index] :internal function
+      impure function get_Triggered(
+        i_index : in integer -- Triggered index
+        ) return std_logic_vector is
+      begin
+        return Triggered(i_index);
+      end;
 
-  impure function get_WireIns(i_index : in integer) return std_logic_vector is
-  begin
-    return WireIns(i_index);
-  end;
+      -- get the value of pipeIn[index] :internal function
+      impure function get_pipeIn(
+        i_index : in integer -- pipeIn index
+        ) return std_logic_vector is
+      begin
+        return pipeIn(i_index);
+      end;
 
-  impure function get_WireOuts(i_index : in integer) return std_logic_vector is
-  begin
-    return WireOuts(i_index);
-  end;
+      -- get the value of pipeOut[index] :internal function
+      impure function get_pipeOut(
+        i_index : in integer -- pipeOut index
+        ) return std_logic_vector is
+      begin
+        return pipeOut(i_index);
+      end;
 
-  impure function get_Triggered(i_index : in integer) return std_logic_vector is
-  begin
-    return Triggered(i_index);
-  end;
+      -- get the value of u32Count :internal function
+      impure function get_u32Count return std_logic_vector is
+      begin
+        return u32Count;
+      end;
 
-  impure function get_pipeIn(i_index : in integer) return std_logic_vector is
-  begin
-    return pipeIn(i_index);
-  end;
+      -- get the value of u32Address[index] :internal function
+      impure function get_u32Address(
+        i_index : in integer -- u32Address index
+        ) return std_logic_vector is
+      begin
+        return u32Address(i_index);
+      end;
 
-  impure function get_pipeOut(i_index : in integer) return std_logic_vector is
-  begin
-    return pipeOut(i_index);
-  end;
-
-  impure function get_u32Count return std_logic_vector is
-  begin
-    return u32Count;
-  end;
-
-  impure function get_u32Address(i_index : in integer) return std_logic_vector is
-  begin
-    return u32Address(i_index);
-  end;
-  impure function get_u32Data(i_index : in integer) return std_logic_vector is
-  begin
-    return u32Data(i_index);
-  end;
+      -- get the value of u32Data[index] :internal function
+      impure function get_u32Data(
+        i_index : in integer -- u32Data index
+        ) return std_logic_vector is
+      begin
+        return u32Data(i_index);
+      end;
 
 end protected body;
 
 ---------------------------------------------------------------------
--- okHost_driver
+-- okHost_driver: This function allows to drive usb signals in the testbench
+--   . Note: must be instanciate outside process in the testbench
 ---------------------------------------------------------------------
 procedure okHost_driver(
-  signal i_clk            : in    std_logic;
-  signal o_okUH           : out   std_logic_vector (4 downto 0);
-  signal i_okHU           : in    std_logic_vector (2 downto 0);
-  signal b_okUHU          : inout std_logic_vector (31 downto 0);
-  signal i_internal_wr_if : in    t_internal_wr_if;
-  signal o_internal_rd_if : out   t_internal_rd_if
+  -- usb clock
+    signal i_clk            : in    std_logic;
+    -- usb signal
+    signal o_okUH           : out   std_logic_vector (4 downto 0);
+    -- usb signal
+    signal i_okHU           : in    std_logic_vector (2 downto 0);
+    -- usb signal
+    signal b_okUHU          : inout std_logic_vector (31 downto 0);
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_wr_if : in    t_internal_wr_if;
+    -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_rd_if : out   t_internal_rd_if
   ) is
 
+  -- usb drive
   alias hi_drive   : std_logic is i_internal_wr_if.hi_drive;
+  -- usb command
   alias hi_cmd     : std_logic_vector(i_internal_wr_if.hi_cmd'range) is i_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(i_internal_wr_if.hi_dataout'range) is i_internal_wr_if.hi_dataout;
 
+  -- usb busy
   alias hi_busy   : std_logic is o_internal_rd_if.hi_busy;
+  -- usb data in
   alias hi_datain : std_logic_vector(o_internal_rd_if.hi_datain'range) is o_internal_rd_if.hi_datain;
 
 begin
@@ -532,16 +779,24 @@ end okHost_driver;
 -----------------------------------------------------------------------
 -- FrontPanelReset
 -----------------------------------------------------------------------
+-- call this procedure to reset the usb
 procedure FrontPanelReset(
-  variable b_front_panel_conf : inout t_front_panel_conf;
-  signal o_internal_wr_if     : out   t_internal_wr_if;
-  signal i_internal_rd_if     : in    t_internal_rd_if
+  -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if     : out   t_internal_wr_if;
+    -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if     : in    t_internal_rd_if
   ) is
-  alias hi_cmd : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
 
+  -- usb command
+  alias hi_cmd : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb clock
   alias i_clk   : std_logic is i_internal_rd_if.i_clk;
+  -- ubs busy
   alias hi_busy : std_logic is i_internal_rd_if.hi_busy;
 
+  -- init value
   constant c_ZEROS : std_logic_vector(31 downto 0) := (others => '0');
 
 begin
@@ -559,12 +814,18 @@ end procedure FrontPanelReset;
 
 -----------------------------------------------------------------------
 -- SetWireInValue
+-- Note: should be called before UpdateWireIns
 -----------------------------------------------------------------------
+-- set the value of a wire in (locally)
 procedure SetWireInValue(
-  i_ep                        : in    std_logic_vector(7 downto 0);
-  i_val                       : in    std_logic_vector(31 downto 0);
-  i_mask                      : in    std_logic_vector(31 downto 0);
-  variable b_front_panel_conf : inout t_front_panel_conf
+   -- opal kelly address
+    i_ep                        : in    std_logic_vector(7 downto 0);
+    -- data to write
+    i_val                       : in    std_logic_vector(31 downto 0);
+    -- data mask to apply
+    i_mask                      : in    std_logic_vector(31 downto 0);
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf
   ) is
 
   variable tmp_slv32 : std_logic_vector(31 downto 0);
@@ -578,17 +839,27 @@ end procedure SetWireInValue;
 
 -----------------------------------------------------------------------
 -- UpdateWireIns
+-- Note: should be called after SetWireInValue
 -----------------------------------------------------------------------
+-- update the wire in (transfer the wire in values on the usb link)
 procedure UpdateWireIns(
-  variable b_front_panel_conf : inout t_front_panel_conf;
-  signal o_internal_wr_if     : out   t_internal_wr_if;
-  signal i_internal_rd_if     : in    t_internal_rd_if
+   -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if     : in    t_internal_rd_if
   ) is
+  -- usb drive
   alias hi_drive   : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd     : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(o_internal_wr_if.hi_dataout'range) is o_internal_wr_if.hi_dataout;
 
+  -- usb clk
   alias i_clk   : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy : std_logic is i_internal_rd_if.hi_busy;
 
 begin
@@ -609,14 +880,21 @@ end procedure UpdateWireIns;
 
 -----------------------------------------------------------------------
 -- GetWireOutValue
+-- Note: should be called after UpdateWireOuts
 -----------------------------------------------------------------------
+-- get a wire out value
 procedure GetWireOutValue(
-  i_ep               :       std_logic_vector;
-  b_front_panel_conf : inout t_front_panel_conf;
-  o_result           : out   std_logic_vector
+    -- opal kelly address
+    i_ep                        :       std_logic_vector;
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- wire out value
+    o_result                    : out   std_logic_vector
   ) is
 
+  -- output value
   variable tmp_slv32 : std_logic_vector(31 downto 0);
+  -- converted address: std_logic_vector -> uint -> integer
   variable tmpI      : integer;
 
 begin
@@ -628,15 +906,23 @@ end GetWireOutValue;
 -----------------------------------------------------------------------
 -- IsTriggered
 ---------------------------------------------------------------------
+-- check detect if a trigger was detected
 procedure IsTriggered(
-  i_ep                        :       std_logic_vector;
-  i_mask                      :       std_logic_vector(31 downto 0);
-  variable b_front_panel_conf : inout t_front_panel_conf;
-  o_result                    : out   boolean
+  -- opal kelly address
+    i_ep                        :       std_logic_vector;
+    -- mask to apply
+    i_mask                      :       std_logic_vector(31 downto 0);
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- result
+    o_result                    : out   boolean
   ) is
 
+  -- trigger register value
   variable tmp_slv32 : std_logic_vector(i_mask'range);
+  -- converted address: std_logic_vector -> uint -> integer
   variable tmpI      : integer;
+  -- message
   variable msg_line  : line;
 
 begin
@@ -660,18 +946,28 @@ end IsTriggered;
 
 -----------------------------------------------------------------------
 -- UpdateWireOuts
+-- Note: should be called before GetWireOutValue
 -----------------------------------------------------------------------
+-- update the wireout
 procedure UpdateWireOuts(
-  variable b_front_panel_conf : inout t_front_panel_conf;
-  signal o_internal_wr_if     : out   t_internal_wr_if;
-  signal i_internal_rd_if     : in    t_internal_rd_if
+   -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if     : in    t_internal_rd_if
   ) is
 
+  -- usb drive
   alias hi_drive : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd   : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
 
+  -- usb clock
   alias i_clk     : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy   : std_logic is i_internal_rd_if.hi_busy;
+  -- usb data in
   alias hi_datain : std_logic_vector(i_internal_rd_if.hi_datain'range) is i_internal_rd_if.hi_datain;
 
 begin
@@ -696,20 +992,30 @@ end procedure UpdateWireOuts;
 -----------------------------------------------------------------------
 -- ActivateTriggerIn
 -----------------------------------------------------------------------
+-- activate one trigger bit
 procedure ActivateTriggerIn(
-  i_ep                    : in  std_logic_vector(7 downto 0);
-  i_bit                   : in  integer;
-  signal o_internal_wr_if : out t_internal_wr_if;
-  signal i_internal_rd_if : in  t_internal_rd_if
+  -- opal kelly address
+    i_ep                    : in  std_logic_vector(7 downto 0);
+    -- bit to set
+    i_bit                   : in  integer;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if : out t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if : in  t_internal_rd_if
   ) is
 
+  -- mask one bit
   constant c_ONE : unsigned(31 downto 0) := x"00000001";
-
+  -- usb drive
   alias hi_drive   : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd     : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(o_internal_wr_if.hi_dataout'range) is o_internal_wr_if.hi_dataout;
 
+  -- usb clk
   alias i_clk   : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy : std_logic is i_internal_rd_if.hi_busy;
 
 begin
@@ -731,18 +1037,28 @@ end procedure ActivateTriggerIn;
 -----------------------------------------------------------------------
 -- ActivateTriggerIn_by_data
 -----------------------------------------------------------------------
+-- activate one or several trigger bits
 procedure ActivateTriggerIn_by_data(
+  -- opal kelly address
   i_ep                    : in  std_logic_vector(7 downto 0);
+  -- bits to set
   i_data                  : in  std_logic_vector(31 downto 0);
-  signal o_internal_wr_if : out t_internal_wr_if;
-  signal i_internal_rd_if : in  t_internal_rd_if
+  -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if : out t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if : in  t_internal_rd_if
   ) is
 
+  -- usb drive
   alias hi_drive   : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd     : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(o_internal_wr_if.hi_dataout'range) is o_internal_wr_if.hi_dataout;
 
+  -- usb clk
   alias i_clk   : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy : std_logic is i_internal_rd_if.hi_busy;
 
 begin
@@ -764,17 +1080,26 @@ end procedure ActivateTriggerIn_by_data;
 -----------------------------------------------------------------------
 -- UpdateTriggerOuts
 -----------------------------------------------------------------------
+-- update the trigger out
 procedure UpdateTriggerOuts(
-  variable b_front_panel_conf : inout t_front_panel_conf;
-  signal o_internal_wr_if     : out   t_internal_wr_if;
-  signal i_internal_rd_if     : in    t_internal_rd_if
+   -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if     : in    t_internal_rd_if
   ) is
 
+  -- usb drive
   alias hi_drive : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd   : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
 
+  -- usb clock
   alias i_clk     : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy   : std_logic is i_internal_rd_if.hi_busy;
+  -- usb data in
   alias hi_datain : std_logic_vector(i_internal_rd_if.hi_datain'range) is i_internal_rd_if.hi_datain;
 
 begin
@@ -805,26 +1130,47 @@ end procedure UpdateTriggerOuts;
 -----------------------------------------------------------------------
 -- WriteToPipeIn
 -----------------------------------------------------------------------
+-- write in one of the Pipe In
 procedure WriteToPipeIn(
-  i_ep                        : in    std_logic_vector(7 downto 0);
-  i_length                    : in    integer;
-  variable b_front_panel_conf : inout t_front_panel_conf;
-  signal o_internal_wr_if     : out   t_internal_wr_if;
-  signal i_internal_rd_if     : in    t_internal_rd_if
+  -- opal kelly address
+    i_ep                        : in    std_logic_vector(7 downto 0);
+    -- number of bytes to write
+    i_length                    : in    integer;
+     -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if     : in    t_internal_rd_if
   ) is
 
-  variable len, i, j, k, blockSize : integer;
+  -- number of words
+  variable len : integer;
+  -- word index
+  variable i   : integer;
+  -- blockSize index
+  variable j   : integer;
+  -- BlockDelayStates index
+  variable k   : integer;
+  
+  -- block size
+  variable blockSize : integer;
+  -- block delay
   variable tmp_slv8                : std_logic_vector(7 downto 0);
+  -- number of words to write
   variable tmp_slv32               : std_logic_vector(31 downto 0);
 
+  -- usb drive
   alias hi_drive   : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd     : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(o_internal_wr_if.hi_dataout'range) is o_internal_wr_if.hi_dataout;
 
+  -- usb clock
   alias i_clk   : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy : std_logic is i_internal_rd_if.hi_busy;
-
-  --alias pipeIn           : PIPEIN_ARRAY(front_panel_conf.pipeIn'range) is front_panel_conf.pipeIn;
 
 begin
   len       := (i_length / 4);
@@ -864,28 +1210,46 @@ end procedure WriteToPipeIn;
 -----------------------------------------------------------------------
 -- ReadFromPipeOut
 -----------------------------------------------------------------------
+-- Read one of the PipeOut
 procedure ReadFromPipeOut(
-  i_ep                        : in    std_logic_vector(7 downto 0);
-  i_length                    : in    integer;
-  variable b_front_panel_conf : inout t_front_panel_conf;
-  signal o_internal_wr_if     : out   t_internal_wr_if;
-  signal i_internal_rd_if     : in    t_internal_rd_if
+  -- opal kelly address
+    i_ep                        : in    std_logic_vector(7 downto 0);
+    -- number of bytes to read
+    i_length                    : in    integer;
+     -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if     : in    t_internal_rd_if
   ) is
 
-
-  variable len       : integer;
-  variable i         : integer;
-  variable j         : integer;
+  -- number of words
+  variable len : integer;
+  -- word index
+  variable i   : integer;
+  -- blockSize index
+  variable j   : integer;
+  
+  -- block size
   variable blockSize : integer;
+  -- block delay
   variable tmp_slv8  : std_logic_vector(7 downto 0);
+  -- number of words to write
   variable tmp_slv32 : std_logic_vector(31 downto 0);
 
+  -- usb drive
   alias hi_drive   : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd     : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(o_internal_wr_if.hi_dataout'range) is o_internal_wr_if.hi_dataout;
 
+  -- usb clock
   alias i_clk     : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy   : std_logic is i_internal_rd_if.hi_busy;
+  -- usb data in
   alias hi_datain : std_logic_vector(i_internal_rd_if.hi_datain'range) is i_internal_rd_if.hi_datain;
 
 begin
@@ -927,29 +1291,51 @@ end procedure ReadFromPipeOut;
 -----------------------------------------------------------------------
 -- WriteToBlockPipeIn
 -----------------------------------------------------------------------
+-- write one of the Block PipeIn
 procedure WriteToBlockPipeIn(
-  i_ep                        : in    std_logic_vector(7 downto 0);
-  i_blockLength               : in    integer;
-  i_length                    : in    integer;
-  variable b_front_panel_conf : inout t_front_panel_conf;
-  signal o_internal_wr_if     : out   t_internal_wr_if;
-  signal i_internal_rd_if     : in    t_internal_rd_if
+  -- opal kelly address
+    i_ep                        : in    std_logic_vector(7 downto 0);
+    -- block length (expressed in bytes)
+    i_blockLength               : in    integer;
+    -- number of bytes to write
+    i_length                    : in    integer;
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if     : in    t_internal_rd_if
+
   ) is
 
-  variable len       : integer;
-  variable j         : integer;
-  variable k         : integer;
+   -- number of words
+  variable len : integer;
+  -- blockSize index
+  variable j   : integer;
+  -- BlockDelayStates index
+  variable k   : integer;
+  
+  -- block size
   variable blockSize : integer;
+  -- index usb packet
   variable blockNum  : integer;
+  -- block delay
   variable tmp_slv8  : std_logic_vector(7 downto 0);
+  -- number of blocks
   variable tmp_slv16 : std_logic_vector(15 downto 0);
+  -- number of words to write
   variable tmp_slv32 : std_logic_vector(31 downto 0);
 
+  -- usb drive
   alias hi_drive   : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd     : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(o_internal_wr_if.hi_dataout'range) is o_internal_wr_if.hi_dataout;
 
+  -- usb clock
   alias i_clk   : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy : std_logic is i_internal_rd_if.hi_busy;
 
 begin
@@ -1005,30 +1391,52 @@ end procedure WriteToBlockPipeIn;
 -----------------------------------------------------------------------
 -- ReadFromBlockPipeOut
 -----------------------------------------------------------------------
+-- read one of the Block PipeOut
 procedure ReadFromBlockPipeOut(
-  i_ep                        : in    std_logic_vector(7 downto 0);
-  i_blockLength               : in    integer;
-  i_length                    : in    integer;
-  variable b_front_panel_conf : inout t_front_panel_conf;
-  signal o_internal_wr_if     : out   t_internal_wr_if;
-  signal i_internal_rd_if     : in    t_internal_rd_if
+  -- opal kelly address
+    i_ep                        : in    std_logic_vector(7 downto 0);
+    -- block length (expressed in bytes)
+    i_blockLength               : in    integer;
+    -- number of bytes to write
+    i_length                    : in    integer;
+    -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if     : in    t_internal_rd_if
   ) is
 
-  variable len       : integer;
-  variable j         : integer;
-  variable k         : integer;
+   -- number of words
+  variable len : integer;
+  -- blockSize index
+  variable j   : integer;
+  -- BlockDelayStates index
+  variable k   : integer;
+  
+  -- block size
   variable blockSize : integer;
+  -- index usb packet
   variable blockNum  : integer;
+  -- block delay
   variable tmp_slv8  : std_logic_vector(7 downto 0);
+  -- number of blocks
   variable tmp_slv16 : std_logic_vector(15 downto 0);
+  -- number of words to write
   variable tmp_slv32 : std_logic_vector(31 downto 0);
 
+  -- usb drive
   alias hi_drive   : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd     : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(o_internal_wr_if.hi_dataout'range) is o_internal_wr_if.hi_dataout;
 
+  -- usb clock
   alias i_clk     : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy   : std_logic is i_internal_rd_if.hi_busy;
+  -- usb data in
   alias hi_datain : std_logic_vector(i_internal_rd_if.hi_datain'range) is i_internal_rd_if.hi_datain;
 
 begin
@@ -1086,18 +1494,28 @@ end procedure ReadFromBlockPipeOut;
 -----------------------------------------------------------------------
 -- WriteRegister
 -----------------------------------------------------------------------
+-- write a register
 procedure WriteRegister(
-  i_address               : in  std_logic_vector(31 downto 0);
-  i_data                  : in  std_logic_vector(31 downto 0);
-  signal o_internal_wr_if : out t_internal_wr_if;
-  signal i_internal_rd_if : in  t_internal_rd_if
+  -- adress where to write the data
+    i_address               : in  std_logic_vector(31 downto 0);
+    -- data to write
+    i_data                  : in  std_logic_vector(31 downto 0);
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if : out t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if : in  t_internal_rd_if
   ) is
 
+  -- usb drive
   alias hi_drive   : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd     : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(o_internal_wr_if.hi_dataout'range) is o_internal_wr_if.hi_dataout;
 
+  -- usb clock
   alias i_clk   : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy : std_logic is i_internal_rd_if.hi_busy;
 
 begin
@@ -1119,19 +1537,30 @@ end procedure WriteRegister;
 -----------------------------------------------------------------------
 -- ReadRegister
 -----------------------------------------------------------------------
+-- get a register
 procedure ReadRegister(
-  i_address               : in  std_logic_vector(31 downto 0);
-  o_data                  : out std_logic_vector(31 downto 0);
-  signal o_internal_wr_if : out t_internal_wr_if;
-  signal i_internal_rd_if : in  t_internal_rd_if
+  -- adress where to read the data
+    i_address               : in  std_logic_vector(31 downto 0);
+    -- read data
+    o_data                  : out std_logic_vector(31 downto 0);
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if : out t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if : in  t_internal_rd_if
   ) is
 
+  -- usb drive
   alias hi_drive   : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd     : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(o_internal_wr_if.hi_dataout'range) is o_internal_wr_if.hi_dataout;
 
+  -- usb clock
   alias i_clk     : std_logic is i_internal_rd_if.i_clk;
+  -- usb data in
   alias hi_datain : std_logic_vector(i_internal_rd_if.hi_datain'range) is i_internal_rd_if.hi_datain;
+  -- usb busy
   alias hi_busy   : std_logic is i_internal_rd_if.hi_busy;
 
 begin
@@ -1155,19 +1584,29 @@ end procedure ReadRegister;
 -----------------------------------------------------------------------
 -- WriteRegisterSet
 -----------------------------------------------------------------------
+-- transfert register value
 procedure WriteRegisterSet(
-  variable b_front_panel_conf : inout t_front_panel_conf;
-  signal o_internal_wr_if     : out   t_internal_wr_if;
-  signal i_internal_rd_if     : in    t_internal_rd_if
+  -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if     : in    t_internal_rd_if
   ) is
 
+  -- number of u32Count
   variable u32Count_int : integer;
-
+  
+  -- usb drive
   alias hi_drive   : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd     : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(o_internal_wr_if.hi_dataout'range) is o_internal_wr_if.hi_dataout;
 
+  -- usb clk
   alias i_clk   : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy : std_logic is i_internal_rd_if.hi_busy;
 
 begin
@@ -1196,19 +1635,31 @@ end procedure WriteRegisterSet;
 -----------------------------------------------------------------------
 -- ReadRegisterSet
 -----------------------------------------------------------------------
+-- read a register
 procedure ReadRegisterSet(
-  variable b_front_panel_conf : inout t_front_panel_conf;
-  signal o_internal_wr_if     : out   t_internal_wr_if;
-  signal i_internal_rd_if     : in    t_internal_rd_if
+  -- opal kelly: shared variable interface (link okHost_driver <-> function/procedure calls)
+    variable b_front_panel_conf : inout t_front_panel_conf;
+    -- opal kelly: write interface (link okHost_driver <-> function/procedure calls)
+    signal o_internal_wr_if     : out   t_internal_wr_if;
+     -- opal kelly: read interface (link okHost_driver <-> function/procedure calls)
+    signal i_internal_rd_if     : in    t_internal_rd_if
   ) is
-  variable u32Count_int : integer;
 
+  -- number of u32Count
+  variable u32Count_int : integer;
+  
+  -- usb drive
   alias hi_drive   : std_logic is o_internal_wr_if.hi_drive;
+  -- usb cmd
   alias hi_cmd     : std_logic_vector(o_internal_wr_if.hi_cmd'range) is o_internal_wr_if.hi_cmd;
+  -- usb data out
   alias hi_dataout : std_logic_vector(o_internal_wr_if.hi_dataout'range) is o_internal_wr_if.hi_dataout;
 
+  -- usb clk
   alias i_clk     : std_logic is i_internal_rd_if.i_clk;
+  -- usb busy
   alias hi_busy   : std_logic is i_internal_rd_if.hi_busy;
+  -- usb data in
   alias hi_datain : std_logic_vector(i_internal_rd_if.hi_datain'range) is i_internal_rd_if.hi_datain;
 
 begin
@@ -1238,11 +1689,10 @@ end procedure ReadRegisterSet;
 ------------------------------------------------------
 -- this procedure allows to wait a number of rising edge
 -- then a margin is applied, if any
-------------------------------------------------------
 procedure wait_nb_rising_edge_plus_margin(
-  signal i_clk              : in std_logic;
-  constant i_nb_rising_edge : in natural;
-  constant i_margin         : in time
+  signal   i_clk            : in std_logic; -- clock
+  constant i_nb_rising_edge : in natural; -- number of clock rising edge to skip
+  constant i_margin         : in time -- additional time
   ) is
 begin
   -- Wait for number of rising edges
