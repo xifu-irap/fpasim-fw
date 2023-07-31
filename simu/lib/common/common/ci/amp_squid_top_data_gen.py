@@ -79,6 +79,9 @@ class AmpSquidTopDataGen(VunitConf):
         # count the number of pre_config call
         self.index = 0
 
+        # name of the class (use for message)
+        self.class_name = "AmpSquidTopDataGen"
+
     def get_generic_dic(self):
         """
         Get the testbench vhdl generic parameters.
@@ -122,29 +125,133 @@ class AmpSquidTopDataGen(VunitConf):
             None
 
         """
-        tb_input_base_path = tb_input_base_path_p
-        test_variant_filepath = test_variant_filepath_p
-        display_obj = self.display_obj
-        level0 = self.level
-        level1 = level0 + 1
-        level2 = level0 + 2
-        verbosity = self.verbosity
-        csv_separator = self.csv_separator
-
         ################################################
         # Extract data from the configuration json file
         ################################################
         # Opening JSON file
-        with open(test_variant_filepath, 'r') as fid_in:
+        with open(test_variant_filepath_p, 'r') as fid_in:
             # returns JSON object as
             # a dictionary
-            json_variant = json.load(fid_in)
+            self.json_variant = json.load(fid_in)
+
+        ########################################################
+        # Generate the input valid sequence *.csv files for the vhdl testbench
+        ########################################################
+        self._gen_tb_input_valid_seq(output_base_path_p=tb_input_base_path_p)
+
+        ########################################################
+        # Copy the input RAM configuration files for the vhdl testbench in order to:
+        #  1. to write
+        #  2. to read
+        #  3. to compare written data Vs read data
+        # compute ram filepaths to used in order to compute data samples
+        ########################################################
+        self._gen_tb_ram_file(output_base_path_p=tb_input_base_path_p)
+
+        ########################################################
+        # compute the input data
+        # compute the reference output data
+        ########################################################
+        pts_list = self._compute_data()
+
+        # Generate the reference output data *.csv file for the vhdl testbench
+        ########################################################
+        self._gen_tb_ref_data_file(pts_list_p=pts_list, output_base_path_p=tb_input_base_path_p)
+
+        # Generate the input data *.csv file for the vhdl testbench
+        ########################################################
+        self._gen_tb_input_data_file(pts_list_p=pts_list, output_base_path_p=tb_input_base_path_p)
+
+        return None
+
+    def pre_config(self, output_path):
+        """
+        Define a list of actions to do before launching the VHDL simulator.
+
+        Note:
+            This method is the main entry point for the Vunit library
+
+        Parameters
+        ----------
+        output_path: str
+            Vunit Output Simulation Path (auto-computed by the Vunit library)
+
+        Returns
+        -------
+            bool
+
+        """
+        display_obj = self.display_obj
+        test_variant_filepath = self.new_test_variant_filepath_list[self.index]
+        self.index += 1
+        fct_name = self.class_name + ".pre_config"
+
+
+        level0 = self.level
+        level1 = level0 + 1
+
+        if self.verbosity > 0:
+            msg0 = ""
+            display_obj.display(msg_p=msg0, level_p=level0)
+            str0 = fct_name
+            display_obj.display_title(msg_p=str0, level_p=level0)
+
+        ###############################
+        # create directories (if not exist) for the VHDL testbench
+        # .input directory  for the input data/command files
+        # .output directory for the output data files
+        tb_input_base_path = str(Path(output_path, 'inputs').resolve())
+        tb_output_base_path = str(Path(output_path, 'outputs').resolve())
+        self.create_directory(path_p=tb_input_base_path, level_p=level1)
+        self.create_directory(path_p=tb_output_base_path, level_p=level1)
+
+        # copy the mif files into the Vunit simulation directory
+        if self.filepath_list_mif is not None:
+            self.copy_mif_files(output_path_p=output_path, level_p=level1)
+
+        ##########################################################
+        # generate files
+        ##########################################################
+        self._run(test_variant_filepath_p=test_variant_filepath, tb_input_base_path_p=tb_input_base_path)
+
+        if self.verbosity > 0:
+            str0 = fct_name+": Simulation transcript"
+            display_obj.display_title(msg_p=str0, level_p=level0)
+            str0 = test_variant_filepath
+            display_obj.display(msg_p=str0, level_p=level1)
+
+            str0 = ""
+            display_obj.display(msg_p=str0, level_p=level0)
+
+        # return True is mandatory for Vunit
+        return True
+
+    def _gen_tb_input_valid_seq(self, output_base_path_p):
+        """
+        Generate input sequence valid files for the vhdl testbench
+
+        Parameters
+        ----------
+        output_base_path_p: str
+            output base path of the *.csv file to write
+
+        Returns
+        -------
+            None
+
+        """
+        display_obj = self.display_obj
+        level0 = self.level
+        level1 = level0 + 1
+        csv_separator = self.csv_separator
+        json_variant = self.json_variant
+        fct_name = self.class_name+'._gen_tb_input_valid_seq'
 
         ########################################################
         # Generate the vhdl testbench input valid sequence files
         ########################################################
         if self.verbosity > 0:
-            msg0 = 'AmpSquidTopDataGen._run: Generate the testbench input valid sequence files'
+            msg0 = fct_name+': Generate the testbench input valid sequence files'
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         dic_sequence = []
@@ -153,7 +260,7 @@ class AmpSquidTopDataGen(VunitConf):
 
         for dic in dic_sequence:
             filename = dic["filename"]
-            filepath = str(Path(tb_input_base_path, filename).resolve())
+            filepath = str(Path(output_base_path_p, filename).resolve())
 
             ctrl = dic["ctrl"]
             min_value1 = dic["min_value1"]
@@ -163,7 +270,7 @@ class AmpSquidTopDataGen(VunitConf):
             time_shift = dic["time_shift"]
 
             seq = ValidSequencer(name_p=filename)
-            seq.set_verbosity(verbosity_p=verbosity)
+            seq.set_verbosity(verbosity_p=self.verbosity)
             seq.set_sequence(ctrl_p=ctrl,
                              min_value1_p=min_value1,
                              max_value1_p=max_value1,
@@ -176,22 +283,45 @@ class AmpSquidTopDataGen(VunitConf):
                 msg0 = 'filepath=' + filepath
                 display_obj.display(msg_p=msg0, level_p=level1)
 
-        ########################################################
-        # Copy the vhdl testbench input RAM configuration files
-        ########################################################
+    def _gen_tb_ram_file(self,output_base_path_p):
+        """
+        This method has 2 parts:
+
+        Generate input RAM files for
+           . write/read/check
+
+        compute the ram filepaths used to compute data.
+
+        Parameters
+        ----------
+        output_base_path_p: str
+            output base path of the *.csv file to write
+
+        Returns
+        -------
+            dic
+                list of ram filepahs used to compute data
+        """
+
+        json_variant = self.json_variant
+        display_obj = self.display_obj
+        level0 = self.level
+        level1 = level0 + 1
+        level2 = level1 + 1
+        fct_name = self.class_name+'._gen_tb_ram_file'
+
         if self.verbosity > 0:
-            msg0 = 'AmpSquidTopDataGen._run: Copy the testbench input RAM configuration files'
+            msg0 = fct_name+': Copy the testbench input RAM configuration files'
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         dic_sequence = []
         dic_sequence.append(json_variant["ram1"])
 
-
-        # files to use in order to write/read/check the memory with the testbench
+        # files to use in order to write/read/check the memory in the testbench
         for dic in dic_sequence:
             input_filename = dic["value"]['input_filename']
             output_filename = dic["value"]['output_filename']
-            output_filepath = str(Path(tb_input_base_path, output_filename))
+            output_filepath = str(Path(output_base_path_p, output_filename))
             input_filepath = self.get_data_filepath(filename_p=input_filename, level_p=level1)
 
             if self.verbosity > 0:
@@ -203,9 +333,10 @@ class AmpSquidTopDataGen(VunitConf):
             shutil.copyfile(input_filepath, output_filepath)
 
         if self.verbosity > 0:
-            msg0 = 'AmpSquidTopDataGen._run: Process RAM configuration files for the computation on the datapath'
+            msg0 = fct_name+': Process RAM configuration files for the computation on the datapath'
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
-        # process the Memory files to used for the datapath computation
+
+        # compute the ram filepaths used to compute data
         ram_filepath_dic = {}
         for dic in dic_sequence:
             name = dic["generic"]['name']
@@ -221,11 +352,34 @@ class AmpSquidTopDataGen(VunitConf):
             # save the ram content
             ram_filepath_dic[name] = input_data_filepath
 
-        ########################################################
-        # Get the testbench parameters
-        ########################################################
+        self.ram_filepath_dic = ram_filepath_dic
+
+    def _compute_data(self):
+        """
+        compute data samples with attributes
+
+        Parameters
+        ----------
+            None
+
+        Returns
+        -------
+            list of data samples with attributes
+
+        """
+
+        json_variant = self.json_variant
+        display_obj = self.display_obj
+        level0 = self.level
+        level1 = level0 + 1
+        level2 = level0 + 2
+        fct_name = self.class_name+'._compute_data'
+
+        amp_squid_tf_name = self.json_variant["ram1"]["generic"]["name"]
+        amp_squid_tf_filepath = self.ram_filepath_dic[amp_squid_tf_name]
+
         if self.verbosity > 0:
-            msg0 = 'AmpSquidTopDataGen._run: Get the testbench parameters'
+            msg0 = fct_name+': Get the testbench parameters'
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         nb_sample_by_pixel = json_variant["data"]["value"]["nb_sample_by_pixel"]
@@ -245,14 +399,12 @@ class AmpSquidTopDataGen(VunitConf):
         adc_amp_squid_offset_correction_min_val = adc_amp_squid_offset_correction_dic["min_value"]
         adc_amp_squid_offset_correction_max_val = adc_amp_squid_offset_correction_dic["max_value"]
 
-        amp_squid_tf_name = json_variant["ram1"]["generic"]["name"]
-        amp_squid_tf_filepath = ram_filepath_dic[amp_squid_tf_name]
 
         ########################################################
         # compute the vhdl testbench reference output values
         ########################################################
         if self.verbosity > 0:
-            msg0 = 'AmpSquidTopDataGen._run: compute the testbench reference output values'
+            msg0 = fct_name+': compute the testbench reference output values'
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         # adc: compute parameters
@@ -307,26 +459,49 @@ class AmpSquidTopDataGen(VunitConf):
         obj_amp.set_ram_amp_squid_tf(filepath_p=amp_squid_tf_filepath)
         pts_list = obj_amp.run(output_attribute_name_p="amp_squid_out")
 
-        # Generate the vhdl testbench reference output file
-        ########################################################
+        return pts_list
+
+    def _gen_tb_ref_data_file(self,pts_list_p, output_base_path_p):
+        """
+        Generate the output data reference file for the vhdl testbench
+
+        Parameters
+        ----------
+            pts_list: list of pts
+                computed data samples with attributes
+            output_base_path_p: str
+                output base path of the *.csv file to write
+        Returns
+        -------
+            None
+
+        """
+
+        display_obj = self.display_obj
+        level0 = self.level
+        level1 = level0 + 1
+        pts_list = pts_list_p
+        json_variant = self.json_variant
+
+        fct_name = self.class_name+'._gen_tb_ref_data_file'
+
         if self.verbosity > 0:
-            msg0 = 'AmpSquidTopDataGen._run: Generate the testbench reference output file'
+            msg0 = fct_name+': Generate the testbench reference output file'
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         output_filename = json_variant["model"]["value"]["output_filename"]
-        output_filepath = str(Path(tb_input_base_path_p, output_filename))
+        output_filepath = str(Path(output_base_path_p, output_filename))
 
         with open(output_filepath, 'w') as fid:
-            L = len(pts_list)
-            index_max = L - 1
+            # write header
+            fid.write('amp_squid_out')
+            fid.write('\n')
+            # write data
+            index_max = len(pts_list) - 1
             for index, obj_pt in enumerate(pts_list):
-                if index == 0:
-                    # header
-                    fid.write('amp_squid_out')
-                    fid.write('\n')
                 # get point attribute
                 amp_squid_out = obj_pt.get_attribute(name_p="amp_squid_out")
-
+                # write attribute value
                 fid.write(str(amp_squid_out))
                 if index != index_max:
                     fid.write('\n')
@@ -335,17 +510,39 @@ class AmpSquidTopDataGen(VunitConf):
             msg0 = 'filepath= ' + output_filepath
             display_obj.display(msg_p=msg0, level_p=level1)
 
-        ########################################################
-        # Generate the vhdl testbench input data file
-        ########################################################
+    def _gen_tb_input_data_file(self,pts_list_p, output_base_path_p):
+        """
+        Generate the input data file for the vhdl testbench: input data file
+
+        Parameters
+        ----------
+            pts_list: list of pts
+                computed data samples with attributes
+            output_base_path_p: str
+                output base path of the *.csv file to write
+        Returns
+        -------
+            None
+
+        """
+        display_obj = self.display_obj
+        level0 = self.level
+        level1 = level0 + 1
+        pts_list = pts_list_p
+        json_variant = self.json_variant
+        csv_separator = self.csv_separator
+
+        fct_name = self.class_name+'._gen_tb_input_data_file'
+
         if self.verbosity > 0:
-            msg0 = 'AmpSquidTopDataGen._run: Generate the testbench input data file'
+            msg0 = fct_name+': Generate the testbench input data file'
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         filename = json_variant["data"]["value"]["filename"]
-        filepath = str(Path(tb_input_base_path, filename))
+        filepath = str(Path(output_base_path_p, filename))
+
         with open(filepath, 'w') as fid:
-            # header
+            # write header
             fid.write('pixel_sof')
             fid.write(csv_separator)
             fid.write('pixel_eof')
@@ -363,6 +560,7 @@ class AmpSquidTopDataGen(VunitConf):
             fid.write('adc_amp_squid_offset_correction')
             fid.write('\n')
 
+            # write data
             L = len(pts_list)
             index_max = L - 1
             for index, obj_pt in enumerate(pts_list):
@@ -375,7 +573,7 @@ class AmpSquidTopDataGen(VunitConf):
                 frame_eof = obj_pt.get_attribute(name_p="frame_eof")
                 frame_id = obj_pt.get_attribute(name_p="frame_id")
                 adc_amp_squid_offset_correction = obj_pt.get_attribute(name_p="adc_amp_squid_offset_correction")
-
+                # write attributes
                 fid.write(str(pixel_sof))
                 fid.write(csv_separator)
                 fid.write(str(pixel_eof))
@@ -399,64 +597,3 @@ class AmpSquidTopDataGen(VunitConf):
             display_obj.display(msg_p=msg0, level_p=level1)
 
         return None
-
-    def pre_config(self, output_path):
-        """
-        Define a list of actions to do before launching the VHDL simulator.
-
-        Note:
-            This method is the main entry point for the Vunit library
-
-        Parameters
-        ----------
-        output_path: str
-            Vunit Output Simulation Path (auto-computed by the Vunit library)
-
-        Returns
-        -------
-            bool
-
-        """
-        display_obj = self.display_obj
-        test_variant_filepath = self.new_test_variant_filepath_list[self.index]
-        self.index += 1
-
-
-        level0 = self.level
-        level1 = level0 + 1
-
-        if self.verbosity > 0:
-            msg0 = ""
-            display_obj.display(msg_p=msg0, level_p=level0)
-            str0 = "AmpSquidTopDataGen.pre_config"
-            display_obj.display_title(msg_p=str0, level_p=level0)
-
-        ###############################
-        # create directories (if not exist) for the VHDL testbench
-        # .input directory  for the input data/command files
-        # .output directory for the output data files
-        tb_input_base_path = str(Path(output_path, 'inputs').resolve())
-        tb_output_base_path = str(Path(output_path, 'outputs').resolve())
-        self.create_directory(path_p=tb_input_base_path, level_p=level1)
-        self.create_directory(path_p=tb_output_base_path, level_p=level1)
-
-        # copy the mif files into the Vunit simulation directory
-        if self.filepath_list_mif is not None:
-            self.copy_mif_files(output_path_p=output_path, level_p=level1)
-
-        ##########################################################
-        # generate files
-        ##########################################################
-        self._run(test_variant_filepath_p=test_variant_filepath, tb_input_base_path_p=tb_input_base_path)
-
-        if self.verbosity > 0:
-            str0 = "AmpSquidTopDataGen.pre_config: Simulation transcript"
-            display_obj.display_title(msg_p=str0, level_p=level0)
-            str0 = test_variant_filepath
-            display_obj.display(msg_p=str0, level_p=level1)
-
-            str0 = ""
-            display_obj.display(msg_p=str0, level_p=level0)
-
-        # return True is mandatory for Vunit
-        return True
