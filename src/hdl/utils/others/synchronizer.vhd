@@ -66,6 +66,7 @@ architecture RTL of synchronizer is
 
    -- shift registers
   signal s_r1                 : t_array_data(g_SYNC_STAGES-1 downto 0) := (others => (others => g_INIT));
+  -- fpga specific attribute: force to use registers (very close)
   attribute async_reg         : string;
   -- apply attribute on signal
   attribute async_reg of s_r1 : signal is "true";
