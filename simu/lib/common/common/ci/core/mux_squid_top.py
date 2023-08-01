@@ -30,16 +30,16 @@
 #
 #    Note:
 #       Before using this class, the user needs to process the input list of point instances with the TesSignalling object.
-#    
+#
 #    Note:
 #       . Used for the VHDL simulation.
-#       . This class can be instanciated by the user. 
+#       . This class can be instanciated by the user.
 #       . It should be instanciated after:
 #            . Generator class
 #            . optional: OverSample class
-#            . optional: Attribute Class 
-#            . TesSignalling Class 
-#            . TesPulseShapeManager Class 
+#            . optional: Attribute Class
+#            . TesSignalling Class
+#            . TesPulseShapeManager Class
 #       . This script was tested with python 3.10
 #
 # -------------------------------------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ class MuxSquidTop(Points):
 
         # define the inter_squid_gain
         self._inter_squid_gain = 0
-        
+
         # define the inter_squid_gain width
         #  => the value must match the pkg_regdecode/pkg_CONF0_INTER_SQUID_GAIN_WIDTH + 1 value
         self._inter_squid_gain_width = 8
@@ -185,26 +185,28 @@ class MuxSquidTop(Points):
         add = mux_squid_offset + mux_squid_tf_with_gain
         res = math.floor(add)
 
-        # print(" ")
-        # print("index: ",self.i)
-        # print('pixel_id_p', pixel_id_p)
-        # print('tes_out_p', tes_out_p)
-        # print('adc_mux_squid_feedback_p', adc_mux_squid_feedback_p)
-        # print('sub: ', sub)
-        # print('addr', addr)
-        # print('mux_squid_tf: ', mux_squid_tf)
-        # print('mux_squid_tf_with_gain: ', mux_squid_tf_with_gain)
-        # print('mux_squid_offset: ', mux_squid_offset)
-        # print('add: ',add)
-        # print('res: ',res)
-        # self.i = self.i + 1
+        debug = 0
+        if debug == 1:
+            print(" ")
+            print("index: ",self.i)
+            print('pixel_id_p', pixel_id_p)
+            print('tes_out_p', tes_out_p)
+            print('adc_mux_squid_feedback_p', adc_mux_squid_feedback_p)
+            print('sub: ', sub)
+            print('addr', addr)
+            print('mux_squid_tf: ', mux_squid_tf)
+            print('mux_squid_tf_with_gain: ', mux_squid_tf_with_gain)
+            print('mux_squid_offset: ', mux_squid_offset)
+            print('add: ',add)
+            print('res: ',res)
+            self.i = self.i + 1
 
         return res
 
     def run(self, output_attribute_name_p="mux_squid_out"):
         """
         Compute the expected output values of the VHDL function (mux_squid_top.vhd).
-        
+
         Parameters
         ----------
         output_attribute_name_p: str
