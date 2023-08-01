@@ -294,9 +294,7 @@ class TesTopDataGen(VunitConf):
                              time_shift_p=time_shift)
             seq.save(filepath_p=filepath, csv_separator_p=csv_separator)
 
-            if self.verbosity > 0:
-                msg0 = 'filepath=' + filepath
-                display_obj.display(msg_p=msg0, level_p=level1)
+            self._display_filepath(verbosity_p=self.verbosity,filepath_p=filepath,level_p=level1,verbosity_min_p=0)
 
     def _gen_tb_ram_file(self,output_base_path_p):
         """
@@ -482,9 +480,7 @@ class TesTopDataGen(VunitConf):
                 if index != index_max:
                     fid.write('\n')
 
-        if self.verbosity > 0:
-            msg0 = 'filepath= ' + output_filepath
-            display_obj.display(msg_p=msg0, level_p=level1)
+        self._display_filepath(verbosity_p=self.verbosity,filepath_p=output_filepath,level_p=level1)
 
     def _gen_tb_input_data_file(self,pts_list_p, output_base_path_p):
         """
@@ -526,9 +522,7 @@ class TesTopDataGen(VunitConf):
                 if index != index_max:
                     fid.write('\n')
 
-        if self.verbosity > 0:
-            msg0 = 'filepath=' + filepath
-            display_obj.display(msg_p=msg0, level_p=level1)
+        self._display_filepath(verbosity_p=self.verbosity,filepath_p=filepath,level_p=level1)
 
         return None
 
@@ -584,9 +578,7 @@ class TesTopDataGen(VunitConf):
             fid.write(csv_separator)
             fid.write(str(nb_samples_by_frame_tmp))
 
-        if self.verbosity > 0:
-            msg0 = 'filepath=' + filepath
-            display_obj.display(msg_p=msg0, level_p=level1)
+        self._display_filepath(verbosity_p=self.verbosity,filepath_p=filepath,level_p=level1)
 
 
     def _gen_tb_input_cmd_file(self,output_base_path_p):
@@ -644,8 +636,35 @@ class TesTopDataGen(VunitConf):
 
                 index += 1
 
-        if self.verbosity > 0:
-            msg0 = 'filepath=' + filepath
-            display_obj.display(msg_p=msg0, level_p=level1)
+        self._display_filepath(verbosity_p=self.verbosity,filepath_p=filepath,level_p=level1)
+
+
 
         return None
+
+    def _display_filepath(self,verbosity_p,filepath_p,level_p,verbosity_min_p=0):
+        """
+            Display the filepath
+
+            Parameters
+            ----------
+                verbosity_p: int
+                    level of verbosity
+                filepath_p: str
+                    filepath to display
+                level_p: int
+                    indentation level
+                verbosity_min_p: int
+                    minimum level of verbosity in order to display the message
+            Returns
+            -------
+                None
+
+        """
+
+        display_obj = self.display_obj
+
+        if verbosity_p > verbosity_min_p:
+                msg0 = 'filepath=' + filepath_p
+                display_obj.display(msg_p=msg0, level_p=level_p)
+

@@ -1151,16 +1151,14 @@ class VunitConf(VunitUtils):
         if self.verbosity > 0:
             str0 = fct_name
             display_obj.display_title(msg_p=str0, level_p=level0)
-            str0 = 'Search in base_path=' + base_path
-            display_obj.display(msg_p=str0, level_p=level1)
+
+        self._display_searched_basepath(verbosity_p=self.verbosity,basepath_p=base_path,level_p=level1,verbosity_min_p=0)
 
         obj = FilepathListBuilder()
         obj.set_file_extension(file_extension_list_p=['.json'])
         filepath_list = []
         for filename in filename_list:
-            if self.verbosity > 0:
-                str0 = 'Searched filename=' + filename
-                display_obj.display(msg_p=str0, level_p=level2)
+            self._display_searched_filename(verbosity_p=self.verbosity,filename_p=filename,level_p=level2,verbosity_min_p=0)
             filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
             filepath_list.append(filepath)
 
@@ -1193,16 +1191,15 @@ class VunitConf(VunitUtils):
         if self.verbosity > 0:
             str0 = fct_name
             display_obj.display_title(msg_p=str0, level_p=level0)
-            str0 = 'Search in base_path=' + base_path
-            display_obj.display(msg_p=str0, level_p=level1)
+
+        self._display_searched_basepath(verbosity_p=self.verbosity,basepath_p=base_path,level_p=level1,verbosity_min_p=0)
+
 
         obj = FilepathListBuilder()
         obj.set_file_extension(file_extension_list_p=['.mem'])
         filepath_list = []
         for filename in filename_list_p:
-            if self.verbosity > 0:
-                str0 = 'Searched filename=' + filename
-                display_obj.display(msg_p=str0, level_p=level2)
+            self._display_searched_filename(verbosity_p=self.verbosity,filename_p=filename,level_p=level2,verbosity_min_p=0)
             filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename, level_p=level2)
             filepath_list.append(filepath)
 
@@ -1242,14 +1239,13 @@ class VunitConf(VunitUtils):
         if self.verbosity > 0:
             str0 = fct_name
             display_obj.display_title(msg_p=str0, level_p=level0)
-            str0 = 'Search in base_path=' + base_path
-            display_obj.display(msg_p=str0, level_p=level1)
+        self._display_searched_basepath(verbosity_p=self.verbosity,basepath_p=base_path,level_p=level1,verbosity_min_p=0)
+
 
         obj = FilepathListBuilder()
         obj.set_file_extension(file_extension_list_p=[ext])
-        if self.verbosity > 0:
-            str0 = 'Searched filename=' + filename_p
-            display_obj.display(msg_p=str0, level_p=level2)
+
+        self._display_searched_filename(verbosity_p=self.verbosity,filename_p=filename_p,level_p=level2,verbosity_min_p=0)
         filepath = obj.get_filepath_by_filename(basepath_p=base_path, filename_p=filename_p, level_p=level2)
 
         return filepath
@@ -1342,6 +1338,58 @@ class VunitConf(VunitUtils):
 
         """
         self.VU.main()
+
+    def _display_searched_filename(self,verbosity_p,filename_p,level_p,verbosity_min_p=0):
+        """
+            Display the searched filename
+
+            Parameters
+            ----------
+                verbosity_p: int
+                    level of verbosity
+                filename_p: str
+                    searched filename to display
+                level_p: int
+                    indentation level
+                verbosity_min_p: int
+                    minimum level of verbosity in order to display the message
+            Returns
+            -------
+                None
+
+        """
+
+        display_obj = self.display_obj
+
+        if verbosity_p > verbosity_min_p:
+                msg0 = 'Searched filename=' + filename_p
+                display_obj.display(msg_p=msg0, level_p=level_p)
+
+    def _display_searched_basepath(self,verbosity_p,basepath_p,level_p,verbosity_min_p=0):
+        """
+            Display the filepath
+
+            Parameters
+            ----------
+                verbosity_p: int
+                    level of verbosity
+                basepath_p: str
+                    searched basepath to display
+                level_p: int
+                    indentation level
+                verbosity_min_p: int
+                    minimum level of verbosity in order to display the message
+            Returns
+            -------
+                None
+
+        """
+
+        display_obj = self.display_obj
+
+        if verbosity_p > verbosity_min_p:
+            msg0 = 'Searched basepath =' + basepath_p
+            display_obj.display(msg_p=msg0, level_p=level_p)
 
     # def save_do_file(self,filepath_p,level_p=0):
 
