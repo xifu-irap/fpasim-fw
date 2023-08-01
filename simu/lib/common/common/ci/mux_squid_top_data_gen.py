@@ -379,8 +379,6 @@ class MuxSquidTopDataGen(VunitConf):
         json_variant = self.json_variant
         display_obj = self.display_obj
         level0 = self.level
-        level1 = level0 + 1
-        level2 = level0 + 2
         fct_name = self.class_name+'._compute_data'
 
         mux_squid_offset_name = self.json_variant["ram1"]["generic"]["name"]

@@ -385,11 +385,6 @@ class TesTopDataGen(VunitConf):
         """
 
         json_variant = self.json_variant
-        display_obj = self.display_obj
-        level0 = self.level
-        level1 = level0 + 1
-        level2 = level0 + 2
-        fct_name = self.class_name+'._compute_data'
 
          # adc: compute parameters
         ########################################################
@@ -511,7 +506,6 @@ class TesTopDataGen(VunitConf):
         level1 = level0 + 1
         pts_list = pts_list_p
         json_variant = self.json_variant
-        csv_separator = self.csv_separator
 
         fct_name = self.class_name+'._gen_tb_input_data_file'
 
@@ -567,14 +561,10 @@ class TesTopDataGen(VunitConf):
         filename = json_variant["register"]["value"]["filename"]
         nb_sample_by_pixel = json_variant["register"]["value"]["nb_sample_by_pixel"]
         nb_pixel_by_frame = json_variant["register"]["value"]["nb_pixel_by_frame"]
-        nb_frame_by_pulse = json_variant["register"]["value"]["nb_frame_by_pulse"]
-        nb_pulse = json_variant["register"]["value"]["nb_pulse"]
 
         # compute fpga values start from 0
         nb_sample_by_pixel_tmp = nb_sample_by_pixel - 1
         nb_pixel_by_frame_tmp = nb_pixel_by_frame - 1
-        # nb_frame_by_pulse_tmp = nb_frame_by_pulse - 1
-        # nb_pulse           = nb_pulse_tmp
         # auto-compute the VDHL expected nb_sample_by_frame value (start from 0)
         nb_samples_by_frame_tmp = nb_sample_by_pixel * nb_pixel_by_frame - 1
 
