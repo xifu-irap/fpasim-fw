@@ -43,6 +43,7 @@ context vunit_lib.vunit_context;
 library common_lib;
 context common_lib.common_context;
 
+
 entity tb_spi_top is
   generic(
     runner_cfg      : string   := runner_cfg_default;  -- vunit generic: don't touch
@@ -132,18 +133,18 @@ architecture Simulation of tb_spi_top is
   -- VUnit Scoreboard objects
   ---------------------------------------------------------------------
   -- Vunit logger for the summary
-  constant c_LOGGER_SUMMARY      : logger_t  := get_logger("log:summary"); -- Vunit: checker for the summary
+  constant c_LOGGER_SUMMARY      : logger_t  := get_logger("log:summary");
   -- checkers
   -- vunit checker associated to the errors
-  constant c_CHECKER_ERRORS      : checker_t := new_checker("check:errors"); -- vunit: checker on the errors (spi_top module)
+  constant c_CHECKER_ERRORS      : checker_t := new_checker("check:errors");
   -- vunit checker associated to the errors for the cdce spi link
-  constant c_CHECKER_ERRORS_CDCE : checker_t := new_checker("check:errors:cdce"); -- vunit: checker of the cdce spi bridge
+  constant c_CHECKER_ERRORS_CDCE : checker_t := new_checker("check:errors:cdce");
   -- vunit checker associated to the errors for the adc spi link
-  constant c_CHECKER_ERRORS_ADC  : checker_t := new_checker("check:errors:adc");-- vunit: checker of the adc spi bridge
+  constant c_CHECKER_ERRORS_ADC  : checker_t := new_checker("check:errors:adc");
   -- vunit checker associated to the errors for the dac spi link
-  constant c_CHECKER_ERRORS_DAC  : checker_t := new_checker("check:errors:dac");-- vunit: checker of the dac spi bridge
+  constant c_CHECKER_ERRORS_DAC  : checker_t := new_checker("check:errors:dac");
   -- vunit checker associated to the errors for the amc spi link
-  constant c_CHECKER_ERRORS_AMC  : checker_t := new_checker("check:errors:amc");-- vunit: checker of the amc spi bridge
+  constant c_CHECKER_ERRORS_AMC  : checker_t := new_checker("check:errors:amc");
 
 begin
 

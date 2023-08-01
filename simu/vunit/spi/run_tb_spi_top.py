@@ -20,10 +20,10 @@
 #    @file                   run_tb_spi_top.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
-#    Code Rules Reference    
+#    Code Rules Reference
 # -------------------------------------------------------------------------------------------------------------
-#    @details                
-# 
+#    @details
+#
 # -------------------------------------------------------------------------------------------------------------
 
 
@@ -76,7 +76,7 @@ def get_python_library_from_json_file(filepath_p):
     filepath = filepath_p
     # Opening JSON file
     fid = open(filepath,'r')
-    # returns JSON object as 
+    # returns JSON object as
     # a dictionary
     json_data = json.load(fid)
     # Closing file
@@ -112,7 +112,7 @@ from vunit import VUnit, VUnitCLI
 from common import Display, VunitConf
 
 from vunit import about
-     
+
 
 if __name__ == '__main__':
     # Add custom command line argument to standard CLI
@@ -139,6 +139,11 @@ if __name__ == '__main__':
     verbosity     = args.verbosity
     json_key_path = args.json_key_path
 
+    ###############################################
+    # extract parameters which uniquely identify the test
+    ###############################################
+    key_test_name, key_id = json_key_path.split('/')
+
 
     ###########################################################
     # It's impossible to pass a boolean to a subprocess call
@@ -146,7 +151,7 @@ if __name__ == '__main__':
     # So, we use an intermediary "--gui_mode" custom argument (string type) to pass the command
     ###########################################################
     if gui_mode == 'False':
-        args.gui = False 
+        args.gui = False
     else:
         args.gui = True
 
@@ -196,7 +201,7 @@ if __name__ == '__main__':
     # add compiled xilinx library
     #####################################################
     obj.xilinx_compile_lib_default_lib(level_p=level1)
-    
+
     #####################################################
     # add glbl library
     #####################################################
@@ -219,7 +224,7 @@ if __name__ == '__main__':
     obj.compile_opal_kelly_lib(level_p=level1)
     obj.compile_csv_lib(level_p=level1)
     obj.compile_common_lib(level_p=level1)
-    
+
     #####################################################
     # add source files
     #####################################################
@@ -256,7 +261,7 @@ if __name__ == '__main__':
     # get the list of test_variant_filepath (if any)
     ######################################################
     test_variant_filepath_list = obj.get_test_variant_filepath(level_p=level1)
-    
+
     ######################################################
     # get the Vunit testbench object + testbench name
     ######################################################
@@ -269,27 +274,29 @@ if __name__ == '__main__':
 
             str0 = 'Start the Test'
             obj_display.display_title(msg_p=str0, level_p=level1)
-            str0 = 'test_variant_filepath='+test_variant_filepath   
+            str0 = 'test_variant_filepath='+test_variant_filepath
             obj_display.display(msg_p=str0, level_p=level2)
-            str0 = 'tb_name='+tb_name   
+            str0 = 'tb_name='+tb_name
             obj_display.display(msg_p=str0, level_p=level2)
 
             variant_filename = str(Path(test_variant_filepath).stem)
 
-            name = variant_filename
-            test_name = tb_name
-                
+            # build the output directory name
+            dir_out_name = key_test_name + '.test_id_' +'{0:04d}'.format(int(key_id)) + '.' + variant_filename
+
             #####################################################
             # Mandatory: The simulator modelsim/Questa wants generics filepaths in the Linux format
             #####################################################
             tb.set_attribute(".requirement-117", None)
             tb.add_config(
-                          name=test_name,
+                          name=dir_out_name,
                           pre_config=obj.pre_config
                             )
     else:
+        # build the output directory name
+        dir_out_name = key_test_name + '.test_id_' +'{0:04d}'.format(int(key_id))
         tb.add_config(
-                        name=test_name,
+                        name=dir_out_name,
                     )
 
 
