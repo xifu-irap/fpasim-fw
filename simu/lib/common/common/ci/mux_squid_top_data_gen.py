@@ -426,7 +426,7 @@ class MuxSquidTopDataGen(VunitConf):
 
         # generate data
         ########################################################
-        # adc
+        # adc function
         obj_gen = Generator(nb_pts_p=nb_pts)
         pts_list = obj_gen.run()
 
@@ -445,7 +445,7 @@ class MuxSquidTopDataGen(VunitConf):
         obj_over.set_oversampling(value_p=oversample)
         pts_list = obj_over.run()
 
-        # tes
+        # tes function
         obj_sign = TesSignalling(pts_list_p=pts_list)
         obj_sign.set_conf(nb_pixel_by_frame_p=nb_pixel_by_frame, nb_sample_by_pixel_p=nb_sample_by_pixel,
                           nb_sample_by_frame_p=nb_sample_by_frame, nb_frame_by_pulse_p=nb_frame_by_pulse)
@@ -457,7 +457,7 @@ class MuxSquidTopDataGen(VunitConf):
         # obj_tes.add_command(pixel_id_p=cmd_pixel_id, time_shift_p=cmd_time_shift, pulse_heigth_p=cmd_pulse_heigth,skip_nb_samples_p=skip_nb_samples)
         # pts_list = obj_tes.run(output_attribute_name_p="tes_out")
 
-        # mux_squid
+        # mux_squid function
         obj_mux = MuxSquidTop(pts_list_p=pts_list)
         obj_mux.set_ram_mux_squid_offset(filepath_p=mux_squid_offset_filepath)
         obj_mux.set_ram_mux_squid_tf(filepath_p=mux_squid_tf_filepath)
