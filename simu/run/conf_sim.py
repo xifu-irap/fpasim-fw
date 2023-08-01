@@ -390,15 +390,15 @@ class DUT:
         :return:
         """
         if self.tb_filename == "":
-            str0 = 'ERROR: DUT.set_tb_filename (name=' + self.name + "): call the method at least one time."
+            str0 = 'ERROR: DUT.set_tb_filename: call the method at least one time. (name=' + self.name + ")"
             self.obj_display.display(str0, level_p=level_p, color_p='red')
 
         if self.run_filepath == "":
-            str0 = 'ERROR: DUT.set_vunit_run_filepath (name=' + self.name + "): call the method at least one time."
+            str0 = 'ERROR: DUT.set_vunit_run_filepath: call the method at least one time. (name=' + self.name + ")"
             self.obj_display.display(str0, level_p=level_p, color_p='red')
 
         if self.vunit_outpath == "":
-            str0 = 'ERROR: DUT.set_vunit_outpath (name=' + self.name + "): call the method at least one time."
+            str0 = 'ERROR: DUT.set_vunit_outpath: call the method at least one time. (name=' + self.name + ")"
             self.obj_display.display(str0, level_p=level_p, color_p='red')
 
 
@@ -479,12 +479,13 @@ if __name__ == '__main__':
     #   => set the values in the output file
     ############################################################################
     json_data_path = {}
+    env_msg = "On the VHDL simulation computer, the user must set a system environment variable called "
     # get the VUNIT_PATH environment variable
     ############################################################################
     env_name = "VUNIT_PATH"
     env = Env(env_name_p=env_name, mandatory_p=1, level_p=level1)
     env.add_description(
-        text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
+        text_p= env_msg + env_name)
     json_data_path[env_name.lower()] = env.get_dic()
     vunit_path = env.path
 
@@ -493,7 +494,7 @@ if __name__ == '__main__':
     env_name = "VUNIT_VIVADO_PATH"
     env = Env(env_name_p=env_name, mandatory_p=1, level_p=level1)
     env.add_description(
-        text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
+        text_p= env_msg + env_name)
     json_data_path[env_name.lower()] = env.get_dic()
     vivado_path = env.path
 
@@ -502,7 +503,7 @@ if __name__ == '__main__':
     env_name = "VUNIT_MODELSIM_PATH"
     env = Env(env_name_p=env_name, mandatory_p=0, level_p=level1)
     env.add_description(
-        text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
+        text_p=env_msg + env_name)
     json_data_path[env_name.lower()] = env.get_dic()
 
     # get the VUNIT_QUESTA_PATH environment variable
@@ -510,7 +511,7 @@ if __name__ == '__main__':
     env_name = "VUNIT_QUESTA_PATH"
     env = Env(env_name_p=env_name, mandatory_p=0, level_p=level1)
     env.add_description(
-        text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
+        text_p=env_msg + env_name)
     json_data_path[env_name.lower()] = env.get_dic()
 
     # get the VUNIT_MODELSIM_COMPILE_LIB_PATH environment variable
@@ -518,7 +519,7 @@ if __name__ == '__main__':
     env_name = "VUNIT_MODELSIM_COMPILE_LIB_PATH"
     env = Env(env_name_p=env_name, mandatory_p=0, level_p=level1)
     env.add_description(
-        text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
+        text_p= env_msg + env_name)
     json_data_path[env_name.lower()] = env.get_dic()
 
     # get the VUNIT_QUESTA_COMPILE_LIB_PATH environment variable
@@ -526,7 +527,7 @@ if __name__ == '__main__':
     env_name = "VUNIT_QUESTA_COMPILE_LIB_PATH"
     env = Env(env_name_p=env_name, mandatory_p=0, level_p=level1)
     env.add_description(
-        text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
+        text_p= env_msg + env_name)
     json_data_path[env_name.lower()] = env.get_dic()
 
     # get the VUNIT_QUESTA_COMPILE_LIB_PATH environment variable
@@ -534,7 +535,7 @@ if __name__ == '__main__':
     env_name = "VUNIT_OPAL_KELLY_PATH"
     env = Env(env_name_p=env_name, mandatory_p=1, level_p=level1)
     env.add_description(
-        text_p="On the VHDL simulation computer, the user must set a system environment variable called " + env_name)
+        text_p= env_msg + env_name)
     json_data_path[env_name.lower()] = env.get_dic()
     opal_kelly_path = env.path
 
@@ -621,6 +622,8 @@ if __name__ == '__main__':
     run_basepath = str(Path(root_path, 'simu/vunit'))
     # output simulation directory path
     vunit_outpath = str(Path(root_path, 'vunit_out'))
+
+    json_ext = '.json'
 
     # name of the testbench entity
     system_fpasim_top_tb_name0 = 'tb_system_fpasim_top'
@@ -1350,7 +1353,7 @@ if __name__ == '__main__':
     test_variant_filename_list = []
     for i in range(12):
         str_index = '{0:02d}'.format(i)
-        test_variant_filename_list.append("tb_tes_top_test_variant_debug"+str_index+".json")
+        test_variant_filename_list.append("tb_tes_top_test_variant_debug" + str_index + json_ext)
 
 
     # generate individual test
@@ -1384,7 +1387,7 @@ if __name__ == '__main__':
     test_variant_filename_list = []
     for i in range(7):
         str_index = '{0:02d}'.format(i)
-        test_variant_filename_list.append("tb_tes_top_test_variant_func"+str_index+".json")
+        test_variant_filename_list.append("tb_tes_top_test_variant_func"+str_index+json_ext)
 
     # generate individual test
     test0 = DUT()
@@ -1851,7 +1854,7 @@ if __name__ == '__main__':
     test_variant_filename_list = []
     for i in range(12):
         str_index = '{0:02d}'.format(i)
-        test_variant_filename_list.append("tb_mux_squid_top_test_variant_debug"+str_index+".json")
+        test_variant_filename_list.append("tb_mux_squid_top_test_variant_debug"+str_index+json_ext)
 
     # generate individual test
     test0 = DUT()
@@ -1883,7 +1886,7 @@ if __name__ == '__main__':
     test_variant_filename_list = []
     for i in range(3):
         str_index = '{0:02d}'.format(i)
-        test_variant_filename_list.append("tb_mux_squid_top_test_variant_func"+str_index+".json")
+        test_variant_filename_list.append("tb_mux_squid_top_test_variant_func"+str_index+json_ext)
 
     # generate individual test
     test0 = DUT()
@@ -2061,7 +2064,7 @@ if __name__ == '__main__':
     test_variant_filename_list = []
     for i in range(5):
         str_index = '{0:02d}'.format(i)
-        test_variant_filename_list.append("tb_amp_squid_top_test_variant_debug"+str_index+".json")
+        test_variant_filename_list.append("tb_amp_squid_top_test_variant_debug"+str_index+json_ext)
 
     # generate individual test
     test0 = DUT()
@@ -2093,7 +2096,7 @@ if __name__ == '__main__':
     test_variant_filename_list = []
     for i in range(3):
         str_index = '{0:02d}'.format(i)
-        test_variant_filename_list.append("tb_amp_squid_top_test_variant_func"+str_index+".json")
+        test_variant_filename_list.append("tb_amp_squid_top_test_variant_func"+str_index+json_ext)
 
 
     # generate individual test
