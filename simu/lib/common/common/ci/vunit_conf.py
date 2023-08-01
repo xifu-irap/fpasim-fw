@@ -27,7 +27,7 @@
 #    This python script defines the VunitConf class.
 #    This class defines methods to compile VHDL files (source files, testbench).
 #    These methods hide as much as possible the project tree to the user.
-#    
+#
 #    Note:
 #       . This script is aware of the project tree structure
 #       . If a new path need to be added, update VunitConf._build_path method with the new path.
@@ -131,7 +131,7 @@ class VunitConf(VunitUtils):
 
         # build GenDoFile object
         # self.obj_do = GenDoFile()
-        # 
+        #
         self.do_ext_lib_list = []
         self.do_lib_list = []
         self.do_list = []
@@ -142,8 +142,11 @@ class VunitConf(VunitUtils):
 
         # list the test_variant_filepath to simulate.
         #  => the order could be different to the test_variant_filename_list variable
-        #  => the number should be less or equal to test_variant_filename_list variable 
+        #  => the number should be less or equal to test_variant_filename_list variable
         self.new_test_variant_filepath_list = []
+
+        # name of the class (use for message)
+        self.class_name = "VunitConf"
 
     def set_test_variant_filepath(self, filepath_p):
         """
@@ -156,9 +159,10 @@ class VunitConf(VunitUtils):
         display_obj = self.display_obj
         level0 = self.level
         level1 = level0 + 1
+        fct_name = self.class_name + '.set_test_variant_filepath'
 
         if self.verbosity > 0:
-            msg0 = "VunitConf.set_test_variant_filepath: Process Configuration File"
+            msg0 = fct_name + ": Process Configuration File"
             display_obj.display_title(msg_p=msg0, level_p=level0)
 
             msg0 = 'test_variant_filepath=' + test_variant_filepath
@@ -198,9 +202,10 @@ class VunitConf(VunitUtils):
         display_obj = self.display_obj
         level0 = self.level
         level1 = level0 + 1
+        fct_name = self.class_name + '.add_test_variant_filepath'
 
         if self.verbosity > 0:
-            msg0 = "VunitConf.set_test_variant_filepath: Process Configuration File"
+            msg0 = fct_name + ": Process Configuration File"
             display_obj.display_title(msg_p=msg0, level_p=level0)
 
             msg0 = 'test_variant_filepath=' + test_variant_filepath
@@ -251,7 +256,7 @@ class VunitConf(VunitUtils):
         tb_filename    = dic_tmp["vunit"]["tb_filename"]
         wave_filename  = dic_tmp["vunit"]["wave_filename"]
         test_variant_filename_list = dic_tmp["test_variant"]["filename_list"]
-        
+
         self.tb_name = tb_entity_name
         self.tb_filename = tb_filename
         self.wave_filename = wave_filename
@@ -1017,6 +1022,7 @@ class VunitConf(VunitUtils):
         level1 = level0 + 1
         filename = self.wave_filename
         base_path = base_path_dic['wave_path']
+        fct_name = self.class_name + '.set_waveform'
 
         extension = str(Path(filename).suffix)
         if self.verbosity > 0:
@@ -1033,7 +1039,7 @@ class VunitConf(VunitUtils):
                 # set Linux separator
                 if simulator_name is None:
                     if self.verbosity > 0:
-                        msg0 = "ERROR: VunitConf.set_waveform: The set_vunit_simulator method should be called before"
+                        msg0 = fct_name + ": ERROR: The set_vunit_simulator method should be called before"
                         display_obj.display(msg_p=msg0, level_p=level1)
                 elif simulator_name in ['modelsim', 'questa']:
                     filepath = filepath.replace('\\', '/')
@@ -1042,7 +1048,7 @@ class VunitConf(VunitUtils):
                         msg0 = 'Enable the Waveform (linux separator mandatory): ' + filepath
                         display_obj.display(msg_p=msg0, level_p=level1)
                 else:
-                    msg0 = "ERROR: VunitConf.set_waveform: isn't defined for simulator other than modelsim, questa"
+                    msg0 = fct_name + ": ERROR: isn't defined for simulator other than modelsim, questa"
                     display_obj.display(msg_p=msg0, level_p=level1)
             self.wave_filepath = filepath
 
@@ -1104,13 +1110,14 @@ class VunitConf(VunitUtils):
         display_obj = self.display_obj
         tb_obj = self.tb_obj
         level0 = self.get_indentation_level(level_p=level_p)
+        fct_name = self.class_name + '.get_testbench'
 
         if self.verbosity > 0:
-            str0 = "VunitConf.get_testbench"
+            str0 = fct_name
             display_obj.display_title(msg_p=str0, level_p=level0)
 
         if tb_obj is None:
-            msg0 = 'VunitConf.get_testbench: KO: call the compile_tb method before'
+            msg0 = fct_name + ': KO: call the compile_tb method before'
             display_obj.display(msg_p=msg0, level_p=level0, color_p='red')
             return None
         else:
@@ -1139,9 +1146,10 @@ class VunitConf(VunitUtils):
         level0 = self.get_indentation_level(level_p=level_p)
         level1 = level0 + 1
         level2 = level0 + 2
+        fct_name = self.class_name + '.get_test_variant_filepath'
 
         if self.verbosity > 0:
-            str0 = "VunitConf.get_test_variant_filepath"
+            str0 = fct_name
             display_obj.display_title(msg_p=str0, level_p=level0)
             str0 = 'Search in base_path=' + base_path
             display_obj.display(msg_p=str0, level_p=level1)
@@ -1176,13 +1184,14 @@ class VunitConf(VunitUtils):
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['src_path']
         display_obj = self.display_obj
+        fct_name = self.class_name + '.get_ram_filepath'
 
         level0 = self.get_indentation_level(level_p=level_p)
         level1 = level0 + 1
         level2 = level0 + 2
 
         if self.verbosity > 0:
-            str0 = "VunitConf.get_ram_filepath"
+            str0 = fct_name
             display_obj.display_title(msg_p=str0, level_p=level0)
             str0 = 'Search in base_path=' + base_path
             display_obj.display(msg_p=str0, level_p=level1)
@@ -1222,6 +1231,7 @@ class VunitConf(VunitUtils):
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['data_path']
         display_obj = self.display_obj
+        fct_name = self.class_name + '.get_data_filepath'
 
         level0 = self.get_indentation_level(level_p=level_p)
         level1 = level0 + 1
@@ -1230,7 +1240,7 @@ class VunitConf(VunitUtils):
         ext = str(Path(filename_p).suffix)
 
         if self.verbosity > 0:
-            str0 = "VunitConf.get_data_filepath"
+            str0 = fct_name
             display_obj.display_title(msg_p=str0, level_p=level0)
             str0 = 'Search in base_path=' + base_path
             display_obj.display(msg_p=str0, level_p=level1)
@@ -1268,12 +1278,13 @@ class VunitConf(VunitUtils):
         test_variant_filepath = self.test_variant_filepath
         script_filepath = self.script_filepath
         verbosity = self.verbosity
+        fct_name = self.class_name + '.pre_config'
 
         level0 = self.level
         level1 = level0 + 1
 
         if self.verbosity > 0:
-            str0 = "VunitConf.pre_config"
+            str0 = fct_name
             display_obj.display_title(msg_p=str0, level_p=level0)
 
         ###############################
@@ -1309,7 +1320,7 @@ class VunitConf(VunitUtils):
             result.wait()
 
             if verbosity >= 1:
-                str0 = "VunitConf.pre_config: command: " + " ".join(cmd)
+                str0 = fct_name+ ": command: " + " ".join(cmd)
                 display_obj.display_title(msg_p=str0, level_p=level1)
 
         # copy the mif files into the Vunit simulation directory
