@@ -185,22 +185,6 @@ class MuxSquidTop(Points):
         add = mux_squid_offset + mux_squid_tf_with_gain
         res = math.floor(add)
 
-        debug = 0
-        if debug == 1:
-            print(" ")
-            print("index: ",self.i)
-            print('pixel_id_p', pixel_id_p)
-            print('tes_out_p', tes_out_p)
-            print('adc_mux_squid_feedback_p', adc_mux_squid_feedback_p)
-            print('sub: ', sub)
-            print('addr', addr)
-            print('mux_squid_tf: ', mux_squid_tf)
-            print('mux_squid_tf_with_gain: ', mux_squid_tf_with_gain)
-            print('mux_squid_offset: ', mux_squid_offset)
-            print('add: ',add)
-            print('res: ',res)
-            self.i = self.i + 1
-
         return res
 
     def run(self, output_attribute_name_p="mux_squid_out"):
