@@ -106,6 +106,9 @@ class SystemFpasimTopDataGen(VunitConf):
         # count the number of pre_config call
         self.index = 0
 
+        # name of the class (use for message)
+        self.class_name = "SystemFpasimTopDataGen"
+
     def get_generic_dic(self):
         """
         Get the testbench vhdl generic parameters.
@@ -128,13 +131,14 @@ class SystemFpasimTopDataGen(VunitConf):
 
         cmd_name, mode, *value_list = cmd_p.split(';')
         cmd = cmd_p
+        fct_name = self.class_name + '._compute_reg_from_field'
 
         key = '@' + cmd_name.lower()
         reg_dic = reg_def_section_dic_p.get(key)
 
         dic_mode = reg_dic.get(mode)
         if dic_mode is None:
-            msg0 = 'SystemFpasimTopDataGen._run: ERROR: the mode ' + str(mode) + " doesn't exist (" + cmd + ')'
+            msg0 = fct_name+': ERROR: the mode ' + str(mode) + " doesn't exist (" + cmd + ')'
             display_obj.display(msg_p=msg0, level_p=level1, color_p='red')
 
         reg_id = str(reg_dic[mode]["reg_id"])
@@ -151,7 +155,7 @@ class SystemFpasimTopDataGen(VunitConf):
             # test if the field exist
             dic_bit_field = dic_field.get(field_name_tmp)
             if dic_bit_field is None:
-                msg0 = 'SystemFpasimTopDataGen._run: ERROR: the field ' + str(
+                msg0 = fct_name+': ERROR: the field ' + str(
                     field_name_tmp) + " doesn't exist (" + cmd + ')'
                 display_obj.display(msg_p=msg0, level_p=level1, color_p='red')
             else:
@@ -173,7 +177,7 @@ class SystemFpasimTopDataGen(VunitConf):
             if width is not None:
                 max_value = 2 ** width - 1
                 if value > max_value:
-                    msg0 = 'SystemFpasimTopDataGen._run: ERROR: the field ' + str(
+                    msg0 = fct_name +': ERROR: the field ' + str(
                         key) + " value is out of range (" + cmd + ')'
                     display_obj.display(msg_p=msg0, level_p=level1, color_p='red')
 
@@ -183,7 +187,7 @@ class SystemFpasimTopDataGen(VunitConf):
                 bit_pos_max = bit_pos_min + (width - 1)
 
                 if bit_pos_max > reg_bit_pos_max:
-                    msg0 = 'SystemFpasimTopDataGen._run: ERROR: the field ' + str(
+                    msg0 = fct_name + ': ERROR: the field ' + str(
                         key) + " range is out of range (" + cmd + ')'
                     display_obj.display(msg_p=msg0, level_p=level1, color_p='red')
                     msg0 = 'the field ' + str(key) + " (" + str(bit_pos_max) + ',' + str(
@@ -246,6 +250,7 @@ class SystemFpasimTopDataGen(VunitConf):
         level1 = level0 + 1
         level2 = level0 + 2
         csv_separator = self.csv_separator
+        fct_name = self.class_name + '._run'
 
         ################################################
         # Extract data from the configuration json file
@@ -273,12 +278,12 @@ class SystemFpasimTopDataGen(VunitConf):
         # Generate the vhdl testbench input valid sequence files
         ########################################################
         if self.verbosity > 0:
-            msg0 = 'SystemFpasimTopDataGen._run: ram data generation from files'
+            msg0 = fct_name+': ram data generation from files'
             display_obj.display_subtitle(msg_p=msg0, level_p=level0)
 
         for cmd in cmd_list:
             if self.verbosity > 0:
-                msg0 = 'SystemFpasimTopDataGen._run: Generate the cmd: ' + cmd
+                msg0 = fct_name+': Generate the cmd: ' + cmd
                 display_obj.display(msg_p=msg0, level_p=level1)
 
             cmd_name, mode, *value_list = cmd.split(';')
@@ -287,7 +292,7 @@ class SystemFpasimTopDataGen(VunitConf):
             reg_dic = reg_def_section_dic.get(key)
 
             if reg_dic is None:
-                msg0 = 'SystemFpasimTopDataGen._run: ERROR: the key ' + str(key) + " doesn't exist (" + cmd + ')'
+                msg0 = fct_name+': ERROR: the key ' + str(key) + " doesn't exist (" + cmd + ')'
                 display_obj.display(msg_p=msg0, level_p=level1, color_p='red')
                 continue
 
@@ -300,7 +305,7 @@ class SystemFpasimTopDataGen(VunitConf):
 
                     dic_mode = dic.get(mode)
                     if dic_mode is None:
-                        msg0 = 'SystemFpasimTopDataGen._run: ERROR: the mode ' + str(
+                        msg0 = fct_name+': ERROR: the mode ' + str(
                             mode) + " doesn't exist (" + cmd + ')'
                         display_obj.display(msg_p=msg0, level_p=level1, color_p='red')
                         continue
@@ -480,6 +485,7 @@ class SystemFpasimTopDataGen(VunitConf):
         if self.new_test_variant_filepath_list != []:
             test_variant_filepath = self.new_test_variant_filepath_list[self.index]
         self.index += 1
+        fct_name = self.class_name + ".pre_config"
 
 
         level0 = self.level
@@ -488,7 +494,7 @@ class SystemFpasimTopDataGen(VunitConf):
         if self.verbosity > 0:
             msg0 = ""
             display_obj.display(msg_p=msg0, level_p=level0)
-            str0 = "SystemFpasimTopDataGen.pre_config"
+            str0 = fct_name
             display_obj.display_title(msg_p=str0, level_p=level0)
 
         ###############################
@@ -511,7 +517,7 @@ class SystemFpasimTopDataGen(VunitConf):
             self._run(test_variant_filepath_p=test_variant_filepath, tb_input_base_path_p=tb_input_base_path)
 
         if self.verbosity > 0:
-            str0 = "SystemFpasimTopDataGen.pre_config: Simulation transcript"
+            str0 = fct_name + ": Simulation transcript"
             display_obj.display_title(msg_p=str0, level_p=level0)
             str0 = test_variant_filepath
             display_obj.display(msg_p=str0, level_p=level1)
