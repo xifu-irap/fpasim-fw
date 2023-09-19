@@ -160,7 +160,6 @@ package pkg_fpasim is
   constant pkg_MUX_SQUID_TF_RAM_DATA_WIDTH       : positive := 16;
   -- user-defined: ram configuration file
   constant pkg_MUX_SQUID_TF_RAM_MEMORY_INIT_FILE : string   := "mux_squid_tf.mem";
-  --constant pkg_MUX_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "mux_squid_linear_tf.mem";
 
   -- amp squid tf
   -- user-defined: read latency of the RAM (port A). Possible values: [2; max integer value[
@@ -177,7 +176,7 @@ package pkg_fpasim is
   constant pkg_AMP_SQUID_TF_RAM_DATA_WIDTH       : natural := 16;
   -- user-defined: ram configuration file
   constant pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE : string  := "amp_squid_tf.mem";
-  --constant pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "amp_squid_linear_tf.mem";
+
 
   ---------------------------------------------------------------------
   -- regdecode
@@ -188,12 +187,22 @@ package pkg_fpasim is
   ---------------------------------------------------------------------
   -- adc_top
   ---------------------------------------------------------------------
+  -- harcoded: latency of the adc selection
+  constant pkg_ADC_SEL_SELECTION_LATENCY : natural := 1;
+  -- user-defined:add an additionnal output latency
+  constant pkg_ADC_SEL_OUTPUT_LATENCY : natural := 0;
+
+  -- auto-computed: latency of the adc_enable module
+  constant pkg_ADC_SEL_LATENCY : natural := pkg_ADC_SEL_OUTPUT_LATENCY + pkg_ADC_SEL_SELECTION_LATENCY;
 
   -- auto-computed: latency of the dynamic_shift_register module when the input delay is set to 0
-  constant pkg_ADC_DYNAMIC_SHIFT_REGISTER_LATENCY : natural := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
+  constant pkg_ADC_SHIFT_DYNAMIC_SHIFT_REGISTER_LATENCY : natural := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
+  -- auto-computed: latency of the adc_shift module
+  constant pkg_ADC_SHIFT_LATENCY : natural := pkg_ADC_SHIFT_DYNAMIC_SHIFT_REGISTER_LATENCY;
+
   -- auto-computed: minimum latency of the "adc_top" module
   --    IMPORTANT: cross clock domain latency is not taken into account
-  constant pkg_ADC_TOP_LATENCY                    : natural := pkg_ADC_DYNAMIC_SHIFT_REGISTER_LATENCY;
+  constant pkg_ADC_TOP_LATENCY                    : natural := pkg_ADC_SEL_LATENCY + pkg_ADC_SHIFT_LATENCY;
 
   -------------------------------------------------------------------
   -- tes
