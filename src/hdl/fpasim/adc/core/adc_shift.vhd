@@ -17,7 +17,7 @@
 --                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -- -------------------------------------------------------------------------------------------------------------
 --    email                   kenji.delarosa@alten.com
---    @file                   adc_top.vhd
+--    @file                   adc_shift.vhd
 -- -------------------------------------------------------------------------------------------------------------
 --    Automatic Generation    No
 --    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
@@ -48,7 +48,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 
-entity adc_top is
+entity adc_shift is
   generic(
     g_ADC1_WIDTH       : positive := 14; -- adc1 bus width (expressed in bits). Possible values [1; max integer value[
     g_ADC0_WIDTH       : positive := 14; -- adc0 bus width (expressed in bits). Possible values [1; max integer value[
@@ -78,9 +78,9 @@ entity adc_top is
     o_adc0        : out std_logic_vector(g_ADC0_WIDTH - 1 downto 0) -- adc0 value
 
   );
-end entity adc_top;
+end entity adc_shift;
 
-architecture RTL of adc_top is
+architecture RTL of adc_shift is
 
   ---------------------------------------------------------------------
   -- apply delay
