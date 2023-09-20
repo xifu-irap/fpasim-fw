@@ -22,10 +22,10 @@
 #    Automatic Generation    No
 #    Code Rules Reference    N/A
 ###############################################################################################################
-#    @details                
+#    @details
 #    This file set the timing constraints on the top_level I/O ports (temporary)
-#    
-# 
+#
+#
 ###############################################################################################################
 
 ###############################################################################################################
@@ -95,7 +95,7 @@ set_multicycle_path -1 -hold -from [get_clocks dac_clk] -to [get_clocks gen_dac_
 set_false_path -setup -rise_from [get_clocks dac_clk] -fall_to [get_clocks gen_dac_clk_out]
 set_false_path -setup -rise_from [get_clocks dac_clk] -fall_to [get_clocks gen_dac_clk_out]
 set_false_path -setup -fall_from [get_clocks dac_clk] -rise_to [get_clocks gen_dac_clk_out]
-set_false_path -hold -rise_from [get_clocks dac_clk] -rise_to [get_clocks gen_dac_clk_out]   
+set_false_path -hold -rise_from [get_clocks dac_clk] -rise_to [get_clocks gen_dac_clk_out]
 set_false_path -hold -fall_from [get_clocks dac_clk] -fall_to [get_clocks gen_dac_clk_out]
 
 
@@ -109,7 +109,7 @@ create_generated_clock -name usb_clk_regQ_on_clk_pin -source $usb_src -divide_by
 ###############################################################################################################
 # usb (input ports)
 ###############################################################################################################
-# Center-Aligned Rising Edge Source Synchronous Inputs 
+# Center-Aligned Rising Edge Source Synchronous Inputs
 #
 # For a center-aligned Source Synchronous interface, the clock
 # transition is aligned with the center of the data valid window.
@@ -117,11 +117,11 @@ create_generated_clock -name usb_clk_regQ_on_clk_pin -source $usb_src -divide_by
 # data. The constraints below rely on the default timing
 # analysis (setup = 1 cycle, hold = 0 cycle).
 #
-# input    ____           __________    
+# input    ____           __________
 # clock        |_________|          |_____
-#                        |                 
-#                 dv_bre | dv_are    
-#                <------>|<------>  
+#                        |
+#                 dv_bre | dv_are
+#                <------>|<------>
 #          __    ________|________    __
 # data     __XXXX____Rise_Data____XXXX__
 #
@@ -137,7 +137,7 @@ set input_ports         {i_okUH[*]};     # List of input ports
 set_input_delay -clock $input_clock -max [expr $input_clock_period - $dv_bre] [get_ports $input_ports] -add_delay;
 set_input_delay -clock $input_clock -min $dv_are                              [get_ports $input_ports] -add_delay;
 
-# Center-Aligned Rising Edge Source Synchronous Inputs 
+# Center-Aligned Rising Edge Source Synchronous Inputs
 #
 # For a center-aligned Source Synchronous interface, the clock
 # transition is aligned with the center of the data valid window.
@@ -145,11 +145,11 @@ set_input_delay -clock $input_clock -min $dv_are                              [g
 # data. The constraints below rely on the default timing
 # analysis (setup = 1 cycle, hold = 0 cycle).
 #
-# input    ____           __________    
+# input    ____           __________
 # clock        |_________|          |_____
-#                        |                 
-#                 dv_bre | dv_are    
-#                <------>|<------>  
+#                        |
+#                 dv_bre | dv_are
+#                <------>|<------>
 #          __    ________|________    __
 # data     __XXXX____Rise_Data____XXXX__
 #
@@ -169,16 +169,16 @@ set_input_delay -clock $input_clock -min $dv_are                              [g
 # usb (output ports)
 ###############################################################################################################
 
-#  Rising Edge Source Synchronous Outputs 
+#  Rising Edge Source Synchronous Outputs
 #
 #  Source synchronous output interfaces can be constrained either by the max data skew
 #  relative to the generated clock or by the destination device setup/hold requirements.
 #
 #  Setup/Hold Case:
 #  Setup and hold requirements for the destination device and board trace delays are known.
-#  
-# forwarded         ____                      ___________________ 
-# clock                 |____________________|                   |____________ 
+#
+# forwarded         ____                      ___________________
+# clock                 |____________________|                   |____________
 #                                            |
 #                                     tsu    |    thd
 #                                <---------->|<--------->
@@ -187,10 +187,10 @@ set_input_delay -clock $input_clock -min $dv_are                              [g
 #
 # Example of creating generated clock at clock output port
 # create_generated_clock -name <gen_clock_name> -multiply_by 1 -source [get_pins <source_pin>] [get_ports <output_clock_port>]
-# gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".	
+# gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".
 
-# set fwclk        $usb_clk;     # forwarded clock name (generated using create_generated_clock at output clock port)        
-set fwclk        usb_clk;     # forwarded clock name (generated using create_generated_clock at output clock port)        
+# set fwclk        $usb_clk;     # forwarded clock name (generated using create_generated_clock at output clock port)
+set fwclk        usb_clk;     # forwarded clock name (generated using create_generated_clock at output clock port)
 set tsu          2.000;            # destination device setup time requirement
 set thd          0.500;            # destination device hold time requirement
 set trce_dly_max 0.000;            # maximum board trace delay
@@ -215,7 +215,7 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 ##################################################################################
 # ADC (input ports)
 ##################################################################################
-# Center-Aligned Double Data Rate Source Synchronous Inputs 
+# Center-Aligned Double Data Rate Source Synchronous Inputs
 #
 # For a center-aligned Source Synchronous interface, the clock
 # transition is aligned with the center of the data valid window.
@@ -225,7 +225,7 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 #
 # input                  ____________________
 # clock    _____________|                    |_____________
-#                       |                    |                 
+#                       |                    |
 #                dv_bre | dv_are      dv_bfe | dv_afe
 #               <------>|<------>    <------>|<------>
 #          _    ________|________    ________|________    _
@@ -251,7 +251,7 @@ set_input_delay -clock $input_clock -min $dv_afe                                
 ##################################################################################
 # DAC (output ports)
 ##################################################################################
-#  Double Data Rate Source Synchronous Outputs 
+#  Double Data Rate Source Synchronous Outputs
 #
 #  Source synchronous output interfaces can be constrained either by the max data skew
 #  relative to the generated clock or by the destination device setup/hold requirements.
@@ -269,9 +269,9 @@ set_input_delay -clock $input_clock -min $dv_afe                                
 #
 # Example of creating generated clock at clock output port
 # create_generated_clock -name <gen_clock_name> -multiply_by 1 -source [get_pins <source_pin>] [get_ports <output_clock_port>]
-# gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".	
+# gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".
 
-set fwclk        gen_dac_clk_out;  # forwarded clock name (generated using create_generated_clock at output clock port)        
+set fwclk        gen_dac_clk_out;  # forwarded clock name (generated using create_generated_clock at output clock port)
 set tsu_r        0.025;            # destination device setup time requirement for rising edge
 set thd_r        0.375;            # destination device hold time requirement for rising edge
 set tsu_f        0.025;            # destination device setup time requirement for falling edge
@@ -286,16 +286,16 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd_r] [get_ports $ou
 set_output_delay -clock $fwclk -max [expr $trce_dly_max + $tsu_f] [get_ports $output_ports] -clock_fall -add_delay;
 set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd_f] [get_ports $output_ports] -clock_fall -add_delay;
 
-#  Rising Edge Source Synchronous Outputs 
+#  Rising Edge Source Synchronous Outputs
 #
 #  Source synchronous output interfaces can be constrained either by the max data skew
 #  relative to the generated clock or by the destination device setup/hold requirements.
 #
 #  Setup/Hold Case:
 #  Setup and hold requirements for the destination device and board trace delays are known.
-#  
-# forwarded         ____                      ___________________ 
-# clock                 |____________________|                   |____________ 
+#
+# forwarded         ____                      ___________________
+# clock                 |____________________|                   |____________
 #                                            |
 #                                     tsu    |    thd
 #                                <---------->|<--------->
@@ -304,9 +304,9 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd_f] [get_ports $ou
 #
 # Example of creating generated clock at clock output port
 # create_generated_clock -name <gen_clock_name> -multiply_by 1 -source [get_pins <source_pin>] [get_ports <output_clock_port>]
-# gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".	
+# gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".
 
-set fwclk        gen_dac_clk_out;     # forwarded clock name (generated using create_generated_clock at output clock port)        
+set fwclk        gen_dac_clk_out;     # forwarded clock name (generated using create_generated_clock at output clock port)
 set tsu          0.025;            # destination device setup time requirement
 set thd          0.375;            # destination device hold time requirement
 set trce_dly_max 0.000;            # maximum board trace delay
@@ -320,16 +320,16 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 ##################################################################################
 # reference (output ports)
 ##################################################################################
-#  Rising Edge Source Synchronous Outputs 
+#  Rising Edge Source Synchronous Outputs
 #
 #  Source synchronous output interfaces can be constrained either by the max data skew
 #  relative to the generated clock or by the destination device setup/hold requirements.
 #
 #  Setup/Hold Case:
 #  Setup and hold requirements for the destination device and board trace delays are known.
-#  
-# forwarded         ____                      ___________________ 
-# clock                 |____________________|                   |____________ 
+#
+# forwarded         ____                      ___________________
+# clock                 |____________________|                   |____________
 #                                            |
 #                                     tsu    |    thd
 #                                <---------->|<--------->
@@ -338,9 +338,9 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 #
 # Example of creating generated clock at clock output port
 # create_generated_clock -name <gen_clock_name> -multiply_by 1 -source [get_pins <source_pin>] [get_ports <output_clock_port>]
-# gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".	
+# gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".
 
-set fwclk        gen_sync_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)        
+set fwclk        gen_sync_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)
 set tsu          1.000;           # destination device setup time requirement
 set thd          1.500;           # destination device hold time requirement
 set trce_dly_max 0.000;            # maximum board trace delay
@@ -356,16 +356,16 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 # SPI: timing constraints (output ports)
 #    for all spi, we consider the worst case (CDCE @20MHz: cdce72010)
 ##################################################################################
-#  Rising Edge Source Synchronous Outputs 
+#  Rising Edge Source Synchronous Outputs
 #
 #  Source synchronous output interfaces can be constrained either by the max data skew
 #  relative to the generated clock or by the destination device setup/hold requirements.
 #
 #  Setup/Hold Case:
 #  Setup and hold requirements for the destination device and board trace delays are known.
-#  
-# forwarded         ____                      ___________________ 
-# clock                 |____________________|                   |____________ 
+#
+# forwarded         ____                      ___________________
+# clock                 |____________________|                   |____________
 #                                            |
 #                                     tsu    |    thd
 #                                <---------->|<--------->
@@ -374,10 +374,10 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 #
 # Example of creating generated clock at clock output port
 # create_generated_clock -name <gen_clock_name> -multiply_by 1 -source [get_pins <source_pin>] [get_ports <output_clock_port>]
-# gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".	
+# gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".
 
-# set fwclk        usb_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)        
-set fwclk        gen_spi_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)        
+# set fwclk        usb_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)
+set fwclk        gen_spi_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)
 set tsu          2.5;           # destination device setup time requirement
 set thd          2.5;           # destination device hold time requirement
 set trce_dly_max 0.000;            # maximum board trace delay
@@ -392,7 +392,7 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 # SPI: timing constraints (input ports)
 #    for all spi, we consider the worst case (CDCE @20MHz: cdce72010)
 ##################################################################################
-# Center-Aligned Rising Edge Source Synchronous Inputs 
+# Center-Aligned Rising Edge Source Synchronous Inputs
 #
 # For a center-aligned Source Synchronous interface, the clock
 # transition is aligned with the center of the data valid window.
@@ -400,11 +400,11 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 # data. The constraints below rely on the default timing
 # analysis (setup = 1 cycle, hold = 0 cycle).
 #
-# input    ____           __________    
+# input    ____           __________
 # clock        |_________|          |_____
-#                        |                 
-#                 dv_bre | dv_are    
-#                <------>|<------>  
+#                        |
+#                 dv_bre | dv_are
+#                <------>|<------>
 #          __    ________|________    __
 # data     __XXXX____Rise_Data____XXXX__
 #
@@ -426,6 +426,8 @@ set_input_delay -clock $input_clock -min $dv_are                              [g
 # set_false_path -from [get_ports "i_hardware_id*"]
 # set_false_path -from [get_ports "i_reset"]
 set_false_path -to   [get_ports "o_leds*"]
+set_false_path -to   [get_ports "o_led_fw"]
+set_false_path -to   [get_ports "o_led_pll_lock"]
 set_false_path  -from [get_clocks sys_clk] -to [get_cells inst_fpasim_top/inst_regdecode_top/gen_debug_ila.count_r1*]
 set_false_path -from [get_clocks usb_clk] -to  [get_cells gen_debug.count_r1*]
 

@@ -199,8 +199,12 @@ architecture Simulation of tb_system_fpasim_top is
   signal i_mon_n_int       : std_logic := '0'; --  galr_n: Global analog input out-of-range alarm.
   signal o_mon_n_reset     : std_logic; --  reset_n: hardware reset
 
-  -- leds
-  signal o_leds : std_logic_vector(3 downto 2);
+  -- Opal Kelly XEM7350 leds
+  signal o_leds : std_logic_vector(3 downto 0);
+  -- FMC firmware led
+  signal o_led_fw : std_logic_vector(3 downto 0);
+  -- FMC PLL lock led
+  signal o_led_fw : std_logic_vector(3 downto 0);
 
   ---------------------------------------------------------------------
   -- additional signals
@@ -737,7 +741,9 @@ begin
       ---------------------------------------------------------------------
       -- leds
       ---------------------------------------------------------------------
-      o_leds => o_leds
+      o_leds         => o_leds,
+      o_led_fw       => o_led_fw,
+      o_led_pll_lock => o_led_pll_lock
       );
 
 ---------------------------------------------------------------------

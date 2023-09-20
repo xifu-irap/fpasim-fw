@@ -198,7 +198,11 @@ architecture RTL of fpga_system_fpasim is
   signal mon_n_int   : std_logic := '0'; -- galr_n: Global analog input out-of-range alarm.
   signal mon_n_reset : std_logic; -- reset_n: hardware reset
   -- leds
-  signal leds        : std_logic_vector(3 downto 2); -- leds
+  signal leds          : std_logic_vector(3 downto 0); -- leds
+  -- FMC firmware led
+  signal led_fw        : std_logic;
+  -- FMC pll locked led
+  signal led_pll_lock  : std_logic;
 
   ---------------------------------------------------------------------
   -- dac3283_top
@@ -376,7 +380,9 @@ begin
       ---------------------------------------------------------------------
       -- leds
       ---------------------------------------------------------------------
-      o_leds            => leds              -- not connected
+      o_leds            => leds,              -- not connected
+      o_led_fw          => led_fw,            -- not connected
+      o_led_pll_lock    => led_pll_lock       -- not connected
       );
 
 ---------------------------------------------------------------------
