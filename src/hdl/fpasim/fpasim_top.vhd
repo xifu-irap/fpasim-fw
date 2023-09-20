@@ -403,6 +403,11 @@ architecture RTL of fpasim_top is
   -- adc amp_squid_offset_correction value
   signal amp_squid_offset_correction2 : std_logic_vector(i_adc_amp_squid_offset_correction'range);
 
+  -- first processed sample of a pulse
+  signal pulse_sof2 : std_logic;
+  -- last processed sample of a pulse
+  signal pulse_eof2 : std_logic;
+
   ---------------------------------------------------------------------
   -- amp_squid_top
   ---------------------------------------------------------------------
@@ -416,6 +421,15 @@ architecture RTL of fpasim_top is
   signal frame_id3         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  --  frame id
   signal amp_squid_errors0 : std_logic_vector(15 downto 0);  -- errors from the amp_squidt_top module
   signal amp_squid_status0 : std_logic_vector(7 downto 0);  -- status from the amp_squidt_top module
+
+  -- signals synchronization with amp_squid_top
+  ---------------------------------------------------------------------
+
+  -- first processed sample of a pulse
+  signal pulse_sof3 : std_logic;
+  -- last processed sample of a pulse
+  signal pulse_eof3 : std_logic;
+
 
   ---------------------------------------------------------------------
   -- dac_top
@@ -993,6 +1007,28 @@ begin
       o_data => amp_squid_offset_correction2  -- output data with/without delay
       );
 
+    gen_pipe_mux_squid_top_out: if true generate
+     -- temporary input pipe
+    signal data_tmp0 : std_logic_vector(1 downto 0);
+     -- temporary output pipe
+    signal data_tmp1 : std_logic_vector(1 downto 0);
+    begin
+      data_tmp0(1) <= pulse_sof1;
+      data_tmp0(0) <= pulse_eof1;
+      inst_pipeliner_sync_with_mux_squid_top_out_pulse : entity work.pipeliner
+    generic map(
+      g_NB_PIPES   => pkg_MUX_SQUID_TOP_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => data_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
+    port map(
+      i_clk  => i_clk,                  -- clock signal
+      i_data => data_tmp0,     -- input data
+      o_data => data_tmp1  -- output data with/without delay
+      );
+    pulse_sof2 <= data_tmp1(1);
+      pulse_eof2 <= data_tmp1(0);
+    end generate gen_pipe_mux_squid_top_out;
+
   ---------------------------------------------------------------------
   -- amp squid
   ---------------------------------------------------------------------
@@ -1061,6 +1097,30 @@ begin
       o_errors                      => amp_squid_errors0,  -- output errors
       o_status                      => amp_squid_status0   -- output status
       );
+
+  -- sync with amp_squid_top output
+  ---------------------------------------------------------------------
+  gen_pipe_amp_squid_top_out: if true generate
+     -- temporary input pipe
+    signal data_tmp0 : std_logic_vector(1 downto 0);
+     -- temporary output pipe
+    signal data_tmp1 : std_logic_vector(1 downto 0);
+    begin
+      data_tmp0(1) <= pulse_sof2;
+      data_tmp0(0) <= pulse_eof2;
+      inst_pipeliner_sync_with_mux_squid_top_out_pulse : entity work.pipeliner
+    generic map(
+      g_NB_PIPES   => pkg_AMP_SQUID_TOP_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_DATA_WIDTH => data_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
+      )
+    port map(
+      i_clk  => i_clk,                  -- clock signal
+      i_data => data_tmp0,     -- input data
+      o_data => data_tmp1  -- output data with/without delay
+      );
+      pulse_sof3 <= data_tmp1(1);
+      pulse_eof3 <= data_tmp1(0);
+    end generate gen_pipe_amp_squid_top_out;
 
   ---------------------------------------------------------------------
   -- dac_top
