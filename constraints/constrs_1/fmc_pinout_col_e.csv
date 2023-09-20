@@ -1,10 +1,10 @@
 fmc_loc;fmc_pin_name;fmc_io_standard;fpga_port_name;fpga_pin;comment
 E1;;;;;
-E2;;;;Y23;
+E2;o_CLK_REF_P;LVCMOS25;o_clk_ref;Y23;
 E3;;;;AA24;
 E4;;;;;
 E5;;;;;
-E6;;;;W23;
+E6;o_CLK_FRAME_P;LVCMOS25;o_clk_frame;W23;
 E7;;;;W24;
 E8;;;;;
 E9;;;;AD26;

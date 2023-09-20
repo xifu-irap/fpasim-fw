@@ -577,8 +577,8 @@ set_property IOSTANDARD LVDS_25 [get_ports {i_cha_00_n}];# CHA_00_N
 # set_property PACKAGE_PIN V22 [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-E2
-# set_property PACKAGE_PIN Y23 [get_ports {}]
-# set_property IOSTANDARD  [get_ports {}]
+set_property PACKAGE_PIN Y23 [get_ports {o_clk_ref}];# o_CLK_REF_P
+set_property IOSTANDARD LVCMOS25 [get_ports {o_clk_ref}];# o_CLK_REF_P
 # FMC-E20
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
@@ -652,8 +652,8 @@ set_property IOSTANDARD LVDS_25 [get_ports {i_cha_00_n}];# CHA_00_N
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-E6
-# set_property PACKAGE_PIN W23 [get_ports {}]
-# set_property IOSTANDARD  [get_ports {}]
+set_property PACKAGE_PIN W23 [get_ports {o_clk_frame}];# o_CLK_FRAME_P
+set_property IOSTANDARD LVCMOS25 [get_ports {o_clk_frame}];# o_CLK_FRAME_P
 # FMC-E7
 # set_property PACKAGE_PIN W24 [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
@@ -1270,12 +1270,6 @@ set_property PACKAGE_PIN T25 [get_ports {o_leds[1]}]
 set_property PACKAGE_PIN R25 [get_ports {o_leds[2]}]
 set_property PACKAGE_PIN P26 [get_ports {o_leds[3]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {o_leds[*]}]
-
-# TODO: temporary
-set_property PACKAGE_PIN T24 [get_ports {o_clk_ref}]
-set_property IOSTANDARD LVCMOS33 [get_ports o_clk_ref];
-set_property PACKAGE_PIN T25 [get_ports {o_clk_frame}]
-set_property IOSTANDARD LVCMOS33 [get_ports o_clk_frame];
 
 # Flash ####################################################################
 # set_property PACKAGE_PIN N17 [get_ports {spi_dq0}]
