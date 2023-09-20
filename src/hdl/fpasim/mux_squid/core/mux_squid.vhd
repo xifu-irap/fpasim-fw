@@ -126,7 +126,7 @@ architecture RTL of mux_squid is
   ---------------------------------------------------------------------
   -- default inter_squid_gain
   ---------------------------------------------------------------------
-  constant c_INTER_SQUID_GAIN_INIT : std_logic_vector(i_inter_squid_gain'range):= std_logic_vector(to_unsigned(pkg_CONF0_INTER_SQUID_GAIN_INIT,i_inter_squid_gain'length));
+  constant c_INTER_SQUID_GAIN_INIT : std_logic_vector(i_inter_squid_gain'range):= std_logic_vector(to_unsigned(pkg_INTER_SQUID_GAIN_INIT,i_inter_squid_gain'length));
   signal inter_squid_gain_r1 : std_logic_vector(i_inter_squid_gain'range):= c_INTER_SQUID_GAIN_INIT;
 
   ---------------------------------------------------------------------

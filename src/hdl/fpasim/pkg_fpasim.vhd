@@ -299,8 +299,11 @@ package pkg_fpasim is
   ---------------------------------------------------------------------
   -- mux_squid
   ---------------------------------------------------------------------
-    -- user-defined: inter_squid_gain divisor. In the FPGA, this value is used to build inter_squid_gain = 1/pkg_INTER_SQUID_DIVISOR_INIT
-  constant pkg_INTER_SQUID_DIVISOR_INIT : integer := 16;
+  -- user-defined: default inter_squid_gain value: applied gain at the output of the mux_squid_tf ram
+  -- This inter_squid_gain value (8 bits: [0:255]) is interpreted in the VHDL as:
+  --   . x with the [0; 1[ range (see pkg_MUX_SQUID_MULT_ADD_Q_M_A and pkg_MUX_SQUID_MULT_ADD_Q_M_B)
+  --   . x = inter_squid_gain_init/2**8.
+  constant pkg_INTER_SQUID_GAIN_INIT : integer := 16; -- <=> 1/16
 
   -- sub
   -- pixel_result
