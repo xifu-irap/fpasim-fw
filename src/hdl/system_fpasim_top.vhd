@@ -179,7 +179,7 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     -- leds
     ---------------------------------------------------------------------
-    -- XEM7350: status leds
+    -- FPGA board: status leds
     o_leds         : out std_logic_vector(3 downto 0);
     -- FMC firmware led
     o_led_fw       : out std_logic;

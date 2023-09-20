@@ -197,7 +197,7 @@ architecture RTL of fpga_system_fpasim is
   -- AMC : specific signals
   signal mon_n_int   : std_logic := '0'; -- galr_n: Global analog input out-of-range alarm.
   signal mon_n_reset : std_logic; -- reset_n: hardware reset
-  -- leds
+  -- FPGA board leds
   signal leds          : std_logic_vector(3 downto 0); -- leds
   -- FMC firmware led
   signal led_fw        : std_logic;
