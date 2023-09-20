@@ -297,6 +297,7 @@ class VunitConf(VunitUtils):
         base_path_dic['src_reset_path'] = str(Path(root_path, 'src/hdl/reset'))
         base_path_dic['src_spi_path'] = str(Path(root_path, 'src/hdl/spi'))
         base_path_dic['src_cosim_path'] = str(Path(root_path, 'simu/cosim'))
+        base_path_dic['src_led_path'] = str(Path(root_path, 'src/hdl/led'))
 
         base_path_dic['tb_path'] = str(Path(root_path, 'simu/tb'))
         base_path_dic['wave_path'] = str(Path(root_path, 'simu/wave'))
@@ -925,7 +926,7 @@ class VunitConf(VunitUtils):
         base_path_dic = self.base_path_dic
         directory_name = directory_name_p.lower()
 
-        if directory_name in ['system', 'clocking', 'fpasim', 'io', 'utils', 'usb', 'reset', 'spi', 'cosim']:
+        if directory_name in ['system', 'clocking', 'fpasim', 'io', 'utils', 'usb', 'reset', 'spi', 'cosim','led']:
             # based on the _build_path method, build the dictionary keys
             key_name = 'src_' + directory_name + '_path'
             base_path = base_path_dic[key_name]
