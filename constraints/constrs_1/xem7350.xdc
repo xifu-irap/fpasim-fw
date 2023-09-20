@@ -1045,8 +1045,8 @@ set_property IOSTANDARD LVDS_25 [get_ports {i_cha_02_n}];# CHA_02_N
 set_property PACKAGE_PIN V23 [get_ports {o_led_fw}];# LED_FW
 set_property IOSTANDARD LVCMOS25 [get_ports {o_led_fw}];# LED_FW
 # FMC-J16
-set_property PACKAGE_PIN V24 [get_ports {o_pll_lock}];# LED_PLL_Lock
-set_property IOSTANDARD LVCMOS25 [get_ports {o_pll_lock}];# LED_PLL_Lock
+set_property PACKAGE_PIN V24 [get_ports {o_led_pll_lock}];# LED_PLL_Lock
+set_property IOSTANDARD LVCMOS25 [get_ports {o_led_pll_lock}];# LED_PLL_Lock
 # FMC-J17
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
