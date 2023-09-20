@@ -263,6 +263,11 @@ package pkg_regdecode is
   -- auto-computed: inter_squid_gain width
   constant pkg_CONF0_INTER_SQUID_GAIN_WIDTH : integer := work.pkg_utils.pkg_width_from_indexes(i_idx_high => pkg_CONF0_INTER_SQUID_GAIN_IDX_H, i_idx_low => pkg_CONF0_INTER_SQUID_GAIN_IDX_L);
 
+  -- auto-computec: number of bits minimum to represent inter_squid_divisor
+  constant pkg_INTER_SQUID_DIVISOR_INIT_NB_BITS : integer := work.pkg_utils.pkg_width_from_value(pkg_INTER_SQUID_DIVISOR_INIT);
+  -- auto-computed: default inter_squid_gain
+  constant pkg_CONF0_INTER_SQUID_GAIN_INIT : integer := 2**(pkg_CONF0_INTER_SQUID_GAIN_WIDTH - pkg_INTER_SQUID_DIVISOR_INIT_NB_BITS);
+
   -- user-defined: rec_ctrl
   ---------------------------------------------------------------------
   -- user-defined: rec_adc_en (bit index high)

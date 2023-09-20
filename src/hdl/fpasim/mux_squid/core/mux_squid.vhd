@@ -60,11 +60,14 @@ entity mux_squid is
     );
   port(
     i_clk              : in std_logic;  -- clock
+    i_rst              : in std_logic;  -- reset
     i_rst_status       : in std_logic;  -- reset error flag(s)
     i_debug_pulse      : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
+    -- inter_squid_gain valid
+    i_inter_squid_gain_valid : in std_logic;
     -- inter_squid_gain value
     i_inter_squid_gain : in std_logic_vector(g_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
@@ -119,6 +122,12 @@ architecture RTL of mux_squid is
 
   constant c_MEMORY_SIZE_MUX_SQUID_OFFSET : positive := (2 ** (i_mux_squid_offset_wr_rd_addr'length)) * (i_mux_squid_offset_wr_data'length);  -- memory size in bits
   constant c_MEMORY_SIZE_MUX_SQUID_TF     : positive := (2 ** (i_mux_squid_tf_wr_rd_addr'length)) * i_mux_squid_tf_wr_data'length;  -- memory size in bits
+
+  ---------------------------------------------------------------------
+  -- default inter_squid_gain
+  ---------------------------------------------------------------------
+  constant c_INTER_SQUID_GAIN_INIT : std_logic_vector(i_inter_squid_gain'range):= std_logic_vector(to_unsigned(pkg_CONF0_INTER_SQUID_GAIN_INIT,i_inter_squid_gain'length));
+  signal inter_squid_gain_r1 : std_logic_vector(i_inter_squid_gain'range):= c_INTER_SQUID_GAIN_INIT;
 
   ---------------------------------------------------------------------
   -- compute
@@ -247,6 +256,20 @@ architecture RTL of mux_squid is
   signal error_tmp_bis : std_logic_vector(c_NB_ERRORS - 1 downto 0); -- temporary output errors
 
 begin
+
+  ---------------------------------------------------------------------
+  -- default inter_squid_gain
+  ---------------------------------------------------------------------
+  p_default_inter_squid_gain: process (i_clk) is
+  begin
+    if rising_edge(i_clk) then
+      if i_rst = '1' then
+        inter_squid_gain_r1 <= c_INTER_SQUID_GAIN_INIT;
+      elsif i_inter_squid_gain_valid = '1' then
+        inter_squid_gain_r1 <= i_inter_squid_gain;
+      end if;
+    end if;
+  end process p_default_inter_squid_gain;
 
   assert not ((i_pixel_result'length) /= ((pixel_result_tmp'length)))
          report "[mux_squid]: pixel result => input port width and sfixed package definition width doesn't match." severity error;
@@ -566,14 +589,14 @@ begin
   -- compute: inter_squid_gain* mux_squid_tf + mux_squid_offset
   -- requirement: FPASIM-FW-REQ-0150 (part1)
   ---------------------------------------------------------------------
-  assert not ((i_inter_squid_gain'length) /= ((inter_squid_gain_tmp'length) - 1))
+  assert not ((inter_squid_gain_r1'length) /= ((inter_squid_gain_tmp'length) - 1))
       report "[mux_squid]: inter_squid_gain_tmp => port width and sfixed package definition width doesn't match." severity error;
   assert not ((mux_squid_tf_doutb'length) /= ((mux_squid_tf_tmp'length) - 1))
      report "[mux_squid]: mux_squid_tf_tmp => port width and sfixed package definition width doesn't match." severity error;
   assert not ((mux_squid_offset_tmp'length) /= (mux_squid_offset_ry'length))
      report "[mux_squid]: mux_squid_offset_tmp => port width and sfixed package definition width doesn't match." severity error;
   -- unsigned to signed conversion: sign bit extension (add a sign bit)
-  inter_squid_gain_tmp <= std_logic_vector(resize(unsigned(i_inter_squid_gain), inter_squid_gain_tmp'length));
+  inter_squid_gain_tmp <= std_logic_vector(resize(unsigned(inter_squid_gain_r1), inter_squid_gain_tmp'length));
   mux_squid_tf_tmp     <= std_logic_vector(resize(unsigned(mux_squid_tf_doutb), mux_squid_tf_tmp'length));
   -- no conversion => width unchanged
   mux_squid_offset_tmp <= mux_squid_offset_ry;

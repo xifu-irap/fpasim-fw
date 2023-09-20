@@ -50,13 +50,16 @@ entity mux_squid_top is
     );
   port(
     i_clk              : in std_logic;  -- clock signal
+    i_rst              : in std_logic;  -- reset
     i_rst_status       : in std_logic;  -- reset error flag(s)
     i_debug_pulse      : in std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
     ---------------------------------------------------------------------
     -- input command: from the regdecode
     ---------------------------------------------------------------------
+    -- inter_squid_gain valid
+    i_inter_squid_gain_valid : in std_logic;
     -- inter_squid_gain value
-    i_inter_squid_gain : in std_logic_vector(g_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
+    i_inter_squid_gain       : in std_logic_vector(g_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
     -- RAM: mux_squid_offset
     -- wr
@@ -174,12 +177,14 @@ begin
       )
     port map(
       i_clk                         => i_clk,
+      i_rst                         => i_rst,
       i_rst_status                  => i_rst_status,
       i_debug_pulse                 => i_debug_pulse,
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
       -- command
+      i_inter_squid_gain_valid      => i_inter_squid_gain_valid,
       i_inter_squid_gain            => i_inter_squid_gain,
       -- RAM: mux_squid_offset
       -- wr
@@ -234,7 +239,7 @@ begin
   data_pipe_tmp0(c_IDX0_H downto c_IDX0_L) <= i_frame_id;
   inst_pipeliner_sync_with_mux_squid_out : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => pkg_MUX_SQUID_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_MUX_SQUID_TOP_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => data_pipe_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
       )
     port map(

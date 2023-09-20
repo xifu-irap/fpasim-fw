@@ -172,6 +172,7 @@ architecture RTL of fpasim_top is
   signal nb_sample_by_frame : std_logic_vector(pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
 
   -- conf0 register
+  signal inter_squid_gain_valid : std_logic;
   signal inter_squid_gain : std_logic_vector(pkg_CONF0_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
   -- debug_ctrl register
@@ -666,7 +667,8 @@ begin
   nb_sample_by_frame <= reg_tes_conf(pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_H downto pkg_TES_CONF_NB_SAMPLE_BY_FRAME_IDX_L);
 
   -- conf0 register
-  inter_squid_gain <= reg_conf0(pkg_CONF0_INTER_SQUID_GAIN_IDX_H downto pkg_CONF0_INTER_SQUID_GAIN_IDX_L);
+  inter_squid_gain_valid <= reg_valid;
+  inter_squid_gain       <= reg_conf0(pkg_CONF0_INTER_SQUID_GAIN_IDX_H downto pkg_CONF0_INTER_SQUID_GAIN_IDX_L);
 
   -- debug_ctrl register
   adc_bypass_valid <= reg_debug_ctrl_valid;
@@ -919,11 +921,13 @@ begin
       )
     port map(
       i_clk                         => i_clk,
+      i_rst                         => i_rst,
       i_rst_status                  => rst_status,
       i_debug_pulse                 => debug_pulse,
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
+      i_inter_squid_gain_valid      => inter_squid_gain_valid,
       i_inter_squid_gain            => inter_squid_gain,
       -- RAM: mux_squid_offset
       -- wr

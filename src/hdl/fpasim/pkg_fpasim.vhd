@@ -299,6 +299,8 @@ package pkg_fpasim is
   ---------------------------------------------------------------------
   -- mux_squid
   ---------------------------------------------------------------------
+    -- user-defined: inter_squid_gain divisor. In the FPGA, this value is used to build inter_squid_gain = 1/pkg_INTER_SQUID_DIVISOR_INIT
+  constant pkg_INTER_SQUID_DIVISOR_INIT : integer := 16;
 
   -- sub
   -- pixel_result
@@ -370,11 +372,8 @@ package pkg_fpasim is
   -- auto-computed: bus width
   constant pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S : positive := pkg_MUX_SQUID_MULT_ADD_Q_M_S + pkg_MUX_SQUID_MULT_ADD_Q_N_S;
 
-  -- auto-computed: rename the "add_sfixed" module latency
-  --constant pkg_MUX_SQUID_ADD_LATENCY : natural := pkg_ADD_SFIXED_LATENCY;
-
   -- auto-computed: latency of the "mux_squid" module
-  constant pkg_MUX_SQUID_LATENCY     : natural := pkg_SUB_SFIXED_LATENCY + pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY + pkg_ADD_SFIXED_LATENCY;
+  constant pkg_MUX_SQUID_LATENCY     : natural := pkg_SUB_SFIXED_LATENCY + pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY + pkg_MULT_ADD_SFIXED_LATENCY;
   -- auto-computed: latency of the "mux_squid_top" module
   constant pkg_MUX_SQUID_TOP_LATENCY : natural := pkg_MUX_SQUID_LATENCY;
 
