@@ -20,9 +20,9 @@
 #    @file                   run_tb_amp_squid_top.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
-#    Code Rules Reference    
+#    Code Rules Reference
 # -------------------------------------------------------------------------------------------------------------
-#    @details         
+#    @details
 #
 #     This script performs the necessary steps to launch the VHDL simulation.
 #     The main steps are:
@@ -33,8 +33,8 @@
 #        . Set the configuration memory files (if exist).
 #        . loop on the *.json file (test variant).
 #        . run the selected VHDL simulator.
-#               
-#     Note: 
+#
+#     Note:
 #       . Used for the VHDL simulation.
 #       . This script should be called by the launch_sim.py python script. But, it can be run in standalone.
 #
@@ -110,7 +110,7 @@ def get_python_library_from_json_file(filepath_p):
     filepath = filepath_p
     # Opening JSON file
     fid = open(filepath,'r')
-    # returns JSON object as 
+    # returns JSON object as
     # a dictionary
     json_data = json.load(fid)
     # Closing file
@@ -148,7 +148,7 @@ from vunit import about
 from common import Display
 from common import VunitConf
 from common import AmpSquidTopDataGen
-     
+
 
 if __name__ == '__main__':
     # Add custom command line argument to standard CLI
@@ -186,7 +186,7 @@ if __name__ == '__main__':
     # Instead, we use an intermediary "--gui_mode" custom argument (string type) to pass the command.
     ###########################################################
     if gui_mode == 'False':
-        args.gui = False 
+        args.gui = False
     else:
         args.gui = True
 
@@ -235,7 +235,7 @@ if __name__ == '__main__':
     # add compiled xilinx library
     #####################################################
     obj.xilinx_compile_lib_default_lib(level_p=level1)
-    
+
     #####################################################
     # add glbl library
     #####################################################
@@ -258,7 +258,7 @@ if __name__ == '__main__':
     obj.compile_opal_kelly_lib(level_p=level1)
     obj.compile_csv_lib(level_p=level1)
     obj.compile_common_lib(level_p=level1)
-    
+
     #####################################################
     # add the VHDL/verilog source files
     #####################################################
@@ -308,7 +308,6 @@ if __name__ == '__main__':
     # get the list of ram configuration filepath
     ######################################################
     ram_filename_list = []
-    ram_filename_list.append('amp_squid_linear_tf.mem')
     ram_filename_list.append('amp_squid_tf.mem')
     ram_filepath_list = obj.get_ram_filepath(filename_list_p=ram_filename_list,level_p=level1)
 
@@ -323,16 +322,16 @@ if __name__ == '__main__':
         if verbosity > 0:
             str0 = 'Start the Test'
             obj_display.display_title(msg_p=str0, level_p=level1)
-            str0 = 'test_variant_filepath='+test_variant_filepath   
+            str0 = 'test_variant_filepath='+test_variant_filepath
             obj_display.display(msg_p=str0, level_p=level2)
-            str0 = 'tb_name='+tb_name   
+            str0 = 'tb_name='+tb_name
             obj_display.display(msg_p=str0, level_p=level2)
 
         variant_filename = str(Path(test_variant_filepath).stem)
 
         # build the output directory name
         dir_out_name = key_test_name + '.test_id_' +'{0:04d}'.format(int(key_id)) + '.' + variant_filename
-        
+
         ####################################################################
         # generate the input command/data files and others actions before launching the simulator
         ####################################################################
