@@ -26,7 +26,9 @@
 --
 --    This module performs the following steps:
 --       . for each data path, add an independant user-defined dynamic latency
+--
 --    Note: The output valid signal is aligned with a data path when its i_adcx_delay is set to '0'
+--
 --    Example0:
 --    i_adcx_delay |   0                                       |
 --    o_adc_valid  |   1   1   1   1   1   1   1   1   1   1   |

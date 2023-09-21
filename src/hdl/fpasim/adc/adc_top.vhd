@@ -25,7 +25,7 @@
 --    @details
 --
 --    for each input ADCs, this module performs the following steps:
---      . fixed or not the adc values to a constant value
+--      . Apply or not a constant value.
 --      . add a configurable and dynamic delay.
 --
 -- -------------------------------------------------------------------------------------------------------------

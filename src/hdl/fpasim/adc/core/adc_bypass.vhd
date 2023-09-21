@@ -24,7 +24,11 @@
 -- -------------------------------------------------------------------------------------------------------------
 --    @details
 --
---    at the startup or after a reset, the ADCs data are output.
+--    This module allows to bypass or not each input ADCs.
+--
+--
+--      . When a bypass is applied one of the input ADCs, the corresponding output is set to fixed constant value (0)
+--      . Otherwise, no change is applied. That's mean, the input ADCs is copied into the corresponding output.
 --
 -- -------------------------------------------------------------------------------------------------------------
 
