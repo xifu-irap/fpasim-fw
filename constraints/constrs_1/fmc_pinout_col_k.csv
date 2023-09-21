@@ -2,7 +2,7 @@ fmc_loc;fmc_pin_name;fmc_io_standard;fpga_port_name;fpga_pin;comment
 K1;;;;;
 K2;;;;;
 K3;;;;;
-K4;;;;C12;
+K4;Trig_oscillo;LVCMOS25;o_trig_oscillo;C12;
 K5;;;;C11;
 K6;;;;;
 K7;;;;AE23;

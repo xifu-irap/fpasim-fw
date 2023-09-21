@@ -1243,8 +1243,8 @@ set_property IOSTANDARD LVCMOS25 [get_ports {o_led_pll_lock}];# LED_PLL_Lock
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-K4
-# set_property PACKAGE_PIN C12 [get_ports {}]
-# set_property IOSTANDARD  [get_ports {}]
+set_property PACKAGE_PIN C12 [get_ports {o_trig_oscillo}];# Trig_oscillo
+set_property IOSTANDARD LVCMOS25 [get_ports {o_trig_oscillo}];# Trig_oscillo
 # FMC-K40
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
