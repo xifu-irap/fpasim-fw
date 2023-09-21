@@ -490,14 +490,27 @@ package pkg_fpasim is
   -- auto-computed: latency of the dac_top output pipeliner to be synchronized to the sync_top ouptput
   constant pkg_DAC_OUT_LATENCY : natural := abs(pkg_DAC_LATENCY_TMP - work.pkg_utils.max(pkg_DAC_LATENCY_TMP, pkg_SYNC_LATENCY_TMP));
   -- auto-computed: latency of the "dac_top" module.
-  --constant pkg_DAC_TOP_LATENCY            : natural := pkg_DAC_FRAME_GENERATOR_LATENCY + pkg_DAC_DYNAMIC_SHIFT_REGISTER_LATENCY;
   constant pkg_DAC_TOP_LATENCY : natural := pkg_DAC_LATENCY_TMP + pkg_DAC_OUT_LATENCY;
 
   -- auto-computed: latency of the sync_top output pipeliner to be synchronized to the dac_top ouptput
   constant pkg_SYNC_OUT_LATENCY : natural := abs(pkg_SYNC_LATENCY_TMP - work.pkg_utils.max(pkg_DAC_LATENCY_TMP, pkg_SYNC_LATENCY_TMP));
   -- auto-computed: latency of the "sync_top" module.
-  --constant pkg_SYNC_TOP_LATENCY                    : natural  := pkg_SYNC_DYNAMIC_SHIFT_REGISTER_LATENCY + pkg_SYNC_PULSE_GENERATOR_LATENCY + pkg_SYNC_OUT_LATENCY;
   constant pkg_SYNC_TOP_LATENCY : natural := pkg_SYNC_LATENCY_TMP + pkg_SYNC_OUT_LATENCY;
+
+  ---------------------------------------------------------------------
+  -- pulse_top
+  --   It will be synchronized with the sync_top module output if the used sync dynamic delay is set to 0.
+  --   Be careful, the module won't be synchronized with the sync_top module at the FPGA pads
+  ---------------------------------------------------------------------
+  -- user-defined: width of the "pulse shape" pulse (expressed in number of clock cycles) on the FPGA pin. Possible values: [1;integer max value[
+  constant pkg_PULSE_DURATION  : positive := 4;
+  -- hardcoded: latency of the "sync_pulse_generator" module
+  constant pkg_PULSE_GENERATOR_LATENCY        : natural  := 1;
+  -- auto-computed: optional output latency = latency of the dynamic_shift_register module when the input delay is set to 0
+  constant pkg_PULSE_OUTPUT_LATENCY : natural  :=  pkg_SYNC_TOP_LATENCY - pkg_PULSE_GENERATOR_LATENCY;
+  -- auto-computed: latency of the "sync_top" module.
+  constant pkg_PULSE_TOP_LATENCY : natural := pkg_PULSE_GENERATOR_LATENCY + pkg_PULSE_OUTPUT_LATENCY;
+
 
   ---------------------------------------------------------------------
   -- Recording
