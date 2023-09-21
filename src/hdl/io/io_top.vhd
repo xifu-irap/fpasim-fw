@@ -184,7 +184,18 @@ entity io_top is
     o_dac6_n : out std_logic;           --  differential_n dac data (lane6)
 
     o_dac7_p : out std_logic;           --  differential_p dac data (lane7)
-    o_dac7_n : out std_logic            --  differential_n dac data (lane7)
+    o_dac7_n : out std_logic;           --  differential_n dac data (lane7)
+
+    ---------------------------------------------------------------------
+    -- pulse
+    ---------------------------------------------------------------------
+    -- input: from/to the user @i_sys_clk
+    -- first processed sample of a pulse
+    i_pulse_sof : in std_logic;
+
+    -- to the fpga pads : @i_sys_clk
+    -- first processed sample of a pulse
+    o_pulse_sof : out std_logic
     );
 end entity io_top;
 
@@ -432,6 +443,26 @@ begin
   -- output
   o_dac_errors <= dac_errors;
   o_dac_status <= dac_status;
+
+
+  ---------------------------------------------------------------------
+  -- pulse
+  ---------------------------------------------------------------------
+  inst_io_pulse : entity work.io_pulse
+    port map(
+      -- clock
+      i_clk       => i_sys_clk,
+      ---------------------------------------------------------------------
+      -- input @i_clk
+      ---------------------------------------------------------------------
+      -- first processed sample of a pulse
+      i_pulse_sof => i_pulse_sof,
+      ---------------------------------------------------------------------
+      -- output @i_clk
+      ---------------------------------------------------------------------
+      -- first processed sample of a pulse
+      o_pulse_sof => o_pulse_sof
+      );
 
 
 end architecture RTL;

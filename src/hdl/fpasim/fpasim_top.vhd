@@ -121,11 +121,22 @@ entity fpasim_top is
     o_dac_frame   : out std_logic;                      -- dac frame
     o_dac1        : out std_logic_vector(15 downto 0);  -- output dac1
     o_dac0        : out std_logic_vector(15 downto 0);  -- output dac0
+
     ---------------------------------------------------------------------
     -- from the ios @i_clk
     ---------------------------------------------------------------------
-    i_dac_errors  : in  std_logic_vector(15 downto 0);  -- errors
-    i_dac_status  : in  std_logic_vector(7 downto 0)    -- status
+    i_dac_errors : in std_logic_vector(15 downto 0);  -- errors
+    i_dac_status : in std_logic_vector(7 downto 0);   -- status
+
+    ---------------------------------------------------------------------
+    -- output pulse @i_clk
+    ---------------------------------------------------------------------
+    -- pulse valid
+    o_pulse_valid : out std_logic;
+    -- first processed sample of a pulse
+    o_pulse_sof   : out std_logic;
+    -- last processed sample of a pulse
+    o_pulse_eof   : out std_logic
     );
 end entity fpasim_top;
 
@@ -173,7 +184,7 @@ architecture RTL of fpasim_top is
 
   -- conf0 register
   signal inter_squid_gain_valid : std_logic;
-  signal inter_squid_gain : std_logic_vector(pkg_CONF0_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
+  signal inter_squid_gain       : std_logic_vector(pkg_CONF0_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
   -- debug_ctrl register
   -- reset error flag(s)
@@ -457,6 +468,16 @@ architecture RTL of fpasim_top is
 
   signal sync_errors0 : std_logic_vector(15 downto 0);  -- errors from the sync_top module
   signal sync_status0 : std_logic_vector(7 downto 0);  -- status from the sync_top module
+
+  ---------------------------------------------------------------------
+  -- pulse_top
+  ---------------------------------------------------------------------
+  -- pulse valid
+  signal pulse_valid5 : std_logic;
+  -- first processed sample of a pulse with user-defined width
+  signal pulse_sof5   : std_logic;
+  -- last processed sample of a pulse with user-defined width
+  signal pulse_eof5   : std_logic;
 
   ---------------------------------------------------------------------
   -- recording
@@ -1007,27 +1028,27 @@ begin
       o_data => amp_squid_offset_correction2  -- output data with/without delay
       );
 
-    gen_pipe_mux_squid_top_out: if true generate
-     -- temporary input pipe
+  gen_pipe_mux_squid_top_out : if true generate
+    -- temporary input pipe
     signal data_tmp0 : std_logic_vector(1 downto 0);
-     -- temporary output pipe
+    -- temporary output pipe
     signal data_tmp1 : std_logic_vector(1 downto 0);
-    begin
-      data_tmp0(1) <= pulse_sof1;
-      data_tmp0(0) <= pulse_eof1;
-      inst_pipeliner_sync_with_mux_squid_top_out_pulse : entity work.pipeliner
-    generic map(
-      g_NB_PIPES   => pkg_MUX_SQUID_TOP_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => data_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
-      )
-    port map(
-      i_clk  => i_clk,                  -- clock signal
-      i_data => data_tmp0,     -- input data
-      o_data => data_tmp1  -- output data with/without delay
-      );
+  begin
+    data_tmp0(1) <= pulse_sof1;
+    data_tmp0(0) <= pulse_eof1;
+    inst_pipeliner_sync_with_mux_squid_top_out_pulse : entity work.pipeliner
+      generic map(
+        g_NB_PIPES   => pkg_MUX_SQUID_TOP_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+        g_DATA_WIDTH => data_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
+        )
+      port map(
+        i_clk  => i_clk,                -- clock signal
+        i_data => data_tmp0,            -- input data
+        o_data => data_tmp1             -- output data with/without delay
+        );
     pulse_sof2 <= data_tmp1(1);
-      pulse_eof2 <= data_tmp1(0);
-    end generate gen_pipe_mux_squid_top_out;
+    pulse_eof2 <= data_tmp1(0);
+  end generate gen_pipe_mux_squid_top_out;
 
   ---------------------------------------------------------------------
   -- amp squid
@@ -1100,27 +1121,27 @@ begin
 
   -- sync with amp_squid_top output
   ---------------------------------------------------------------------
-  gen_pipe_amp_squid_top_out: if true generate
-     -- temporary input pipe
+  gen_pipe_amp_squid_top_out : if true generate
+    -- temporary input pipe
     signal data_tmp0 : std_logic_vector(1 downto 0);
-     -- temporary output pipe
+    -- temporary output pipe
     signal data_tmp1 : std_logic_vector(1 downto 0);
-    begin
-      data_tmp0(1) <= pulse_sof2;
-      data_tmp0(0) <= pulse_eof2;
-      inst_pipeliner_sync_with_mux_squid_top_out_pulse : entity work.pipeliner
-    generic map(
-      g_NB_PIPES   => pkg_AMP_SQUID_TOP_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
-      g_DATA_WIDTH => data_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
-      )
-    port map(
-      i_clk  => i_clk,                  -- clock signal
-      i_data => data_tmp0,     -- input data
-      o_data => data_tmp1  -- output data with/without delay
-      );
-      pulse_sof3 <= data_tmp1(1);
-      pulse_eof3 <= data_tmp1(0);
-    end generate gen_pipe_amp_squid_top_out;
+  begin
+    data_tmp0(1) <= pulse_sof2;
+    data_tmp0(0) <= pulse_eof2;
+    inst_pipeliner_sync_with_mux_squid_top_out_pulse : entity work.pipeliner
+      generic map(
+        g_NB_PIPES   => pkg_AMP_SQUID_TOP_LATENCY,  -- number of consecutives registers. Possibles values: [0, integer max value[
+        g_DATA_WIDTH => data_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
+        )
+      port map(
+        i_clk  => i_clk,                -- clock signal
+        i_data => data_tmp0,            -- input data
+        o_data => data_tmp1             -- output data with/without delay
+        );
+    pulse_sof3 <= data_tmp1(1);
+    pulse_eof3 <= data_tmp1(0);
+  end generate gen_pipe_amp_squid_top_out;
 
   ---------------------------------------------------------------------
   -- dac_top
@@ -1282,6 +1303,44 @@ begin
   ---------------------------------------------------------------------
   o_sync_valid <= sync_valid5;
   o_sync       <= sync5;
+
+  ---------------------------------------------------------------------
+  -- pulse: create user-defined pulse width
+  ---------------------------------------------------------------------
+  inst_pulse_top : entity work.pulse_top
+    generic map(
+      g_PULSE_DURATION => pkg_PULSE_DURATION  -- duration of the pulse. Possible values [1;integer max value[
+      )
+    port map(
+      i_clk         => i_clk,
+      i_rst         => i_rst,
+      i_rst_status  => rst_status,
+      i_debug_pulse => debug_pulse,
+      ---------------------------------------------------------------------
+      -- input
+      ---------------------------------------------------------------------
+      i_pulse_valid => pixel_valid3,
+      i_pulse_sof   => pulse_sof3,
+      i_pulse_eof   => pulse_eof3,
+      ---------------------------------------------------------------------
+      -- output
+      ---------------------------------------------------------------------
+      o_pulse_valid => pulse_valid5,
+      o_pulse_sof   => pulse_sof5,
+      o_pulse_eof   => pulse_eof5,
+      ---------------------------------------------------------------------
+      -- errors
+      ---------------------------------------------------------------------
+      o_errors      => open             -- output error
+      );
+
+---------------------------------------------------------------------
+-- output
+---------------------------------------------------------------------
+  o_pulse_valid <= pulse_valid5;
+  o_pulse_sof   <= pulse_sof5;
+  o_pulse_eof   <= pulse_eof5;
+
 
   ---------------------------------------------------------------------
   -- Recording

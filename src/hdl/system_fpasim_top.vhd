@@ -184,7 +184,13 @@ entity system_fpasim_top is
     -- FMC firmware led
     o_led_fw       : out std_logic;
     -- FMC PLL lock led
-    o_led_pll_lock : out std_logic
+    o_led_pll_lock : out std_logic;
+
+    ---------------------------------------------------------------------
+    -- FMC: to oscillo
+    ---------------------------------------------------------------------
+    -- first processed sample of a pulse
+    o_trig_oscillo : out std_logic
     );
 end entity system_fpasim_top;
 
@@ -274,6 +280,9 @@ architecture RTL of system_fpasim_top is
   signal dac0       : std_logic_vector(15 downto 0);  -- data for the dac0
   signal dac_errors : std_logic_vector(15 downto 0);  -- dac errors
   signal dac_status : std_logic_vector(7 downto 0);   -- dac status
+
+  -- pulse
+  signal pulse_sof : std_logic;
 
   ---------------------------------------------------------------------
   -- ios
@@ -465,7 +474,13 @@ begin
       o_dac1                            => dac1,
       o_dac0                            => dac0,
       i_dac_errors                      => dac_errors,
-      i_dac_status                      => dac_status
+      i_dac_status                      => dac_status,
+      ---------------------------------------------------------------------
+      -- output pulse @i_clk
+      ---------------------------------------------------------------------
+      o_pulse_valid                     => open,
+      o_pulse_sof                       => pulse_sof,
+      o_pulse_eof                       => open
       );
 
   adc_amp_squid_offset_correction <= adc_b;
@@ -593,7 +608,17 @@ begin
       o_dac6_p      => o_dac_d6_p,
       o_dac6_n      => o_dac_d6_n,
       o_dac7_p      => o_dac_d7_p,
-      o_dac7_n      => o_dac_d7_n
+      o_dac7_n      => o_dac_d7_n,
+
+      ---------------------------------------------------------------------
+      -- pulse
+      ---------------------------------------------------------------------
+      -- input: from/to the user @i_sys_clk
+      -- first processed sample of a pulse
+      i_pulse_sof => pulse_sof,
+      -- to the fpga pads : @i_sys_clk
+      -- first processed sample of a pulse
+      o_pulse_sof => o_trig_oscillo
       );
 
   ---------------------------------------------------------------------
