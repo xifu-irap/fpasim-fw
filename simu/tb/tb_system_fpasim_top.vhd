@@ -206,6 +206,9 @@ architecture Simulation of tb_system_fpasim_top is
   -- FMC PLL lock led
   signal o_led_pll_lock : std_logic;
 
+  -- first processed sample of a pulse
+  signal o_trig_oscillo : std_logic;
+
   ---------------------------------------------------------------------
   -- additional signals
   ---------------------------------------------------------------------
@@ -743,7 +746,13 @@ begin
       ---------------------------------------------------------------------
       o_leds         => o_leds,
       o_led_fw       => o_led_fw,
-      o_led_pll_lock => o_led_pll_lock
+      o_led_pll_lock => o_led_pll_lock,
+
+      ---------------------------------------------------------------------
+      -- FMC: to oscillo
+      ---------------------------------------------------------------------
+      -- first processed sample of a pulse
+      o_trig_oscillo => o_trig_oscillo
       );
 
 ---------------------------------------------------------------------

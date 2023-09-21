@@ -204,6 +204,9 @@ architecture RTL of fpga_system_fpasim is
   -- FMC pll locked led
   signal led_pll_lock  : std_logic;
 
+  -- first processed sample of a pulse
+  signal trig_oscillo : std_logic;
+
   ---------------------------------------------------------------------
   -- dac3283_top
   ---------------------------------------------------------------------
@@ -380,9 +383,15 @@ begin
       ---------------------------------------------------------------------
       -- leds
       ---------------------------------------------------------------------
-      o_leds            => leds,              -- not connected
-      o_led_fw          => led_fw,            -- not connected
-      o_led_pll_lock    => led_pll_lock       -- not connected
+      o_leds            => leds,             -- not connected
+      o_led_fw          => led_fw,           -- not connected
+      o_led_pll_lock    => led_pll_lock,     -- not connected
+
+      ---------------------------------------------------------------------
+      -- FMC: to oscillo
+      ---------------------------------------------------------------------
+      -- first processed sample of a pulse
+      o_trig_oscillo => trig_oscillo         -- not connected
       );
 
 ---------------------------------------------------------------------
