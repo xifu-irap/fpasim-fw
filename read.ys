@@ -112,6 +112,8 @@ verific -vhdl ./src/hdl/spi/core/spi_io.vhd
 verific -vhdl ./src/hdl/spi/spi_top.vhd
 verific -vhdl ./src/hdl/fpasim/sync/core/sync_pulse_generator.vhd
 verific -vhdl ./src/hdl/fpasim/sync/sync_top.vhd
+verific -vhdl ./src/hdl/fpasim/adc/core/adc_bypass.vhd
+verific -vhdl ./src/hdl/fpasim/adc/core/adc_shift.vhd
 verific -vhdl ./src/hdl/fpasim/adc/adc_top.vhd
 verific -vhdl ./src/hdl/fpasim/tes/core/tes_signalling_generator.vhd
 verific -vhdl ./src/hdl/fpasim/tes/core/tes_signalling.vhd
