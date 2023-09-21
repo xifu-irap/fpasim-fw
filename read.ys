@@ -64,12 +64,15 @@ verific -vhdl ./src/hdl/io/core/io_adc.vhd
 verific -vhdl ./src/hdl/io/core/io_dac_data_insert.vhd
 verific -vhdl ./src/hdl/io/core/io_dac.vhd
 verific -vhdl ./src/hdl/io/core/io_sync.vhd
+verific -vhdl ./src/hdl/io/core/io_pulse.vhd
 verific -vhdl ./src/hdl/io/io_top.vhd
 verific -vhdl ./src/hdl/utils/math/mult_add_sfixed.vhd
 verific -vhdl ./src/hdl/utils/math/mult_sub_sfixed.vhd
 verific -vhdl ./src/hdl/fpasim/regdecode/pkg_regdecode.vhd
 verific -vhdl ./src/hdl/fpasim/mux_squid/core/mux_squid.vhd
 verific -vhdl ./src/hdl/fpasim/mux_squid/mux_squid_top.vhd
+verific -vhdl ./src/hdl/fpasim/pulse/core/pulse_generator.vhd
+verific -vhdl ./src/hdl/fpasim/pulse/pulse_top.vhd
 verific -vhdl ./src/hdl/utils/others/pipeliner_with_init.vhd
 verific -vhdl ./src/hdl/spi/core/pkg_spi.vhd
 verific -vhdl ./src/hdl/pkg_system_fpasim_debug.vhd
