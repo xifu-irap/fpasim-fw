@@ -97,6 +97,8 @@ verific -vhdl ./src/hdl/fpasim/regdecode/core/regdecode_wire_errors.vhd
 verific -vhdl ./src/hdl/fpasim/regdecode/regdecode_top.vhd
 verific -vhdl ./ip/xilinx/xpm/cdc/synchronous_reset_synchronizer.vhd
 verific -vhdl ./src/hdl/utils/others/synchronous_reset_pulse.vhd
+verific -vhdl ./src/hdl/led/core/led_pulse.vhd
+verific -vhdl ./src/hdl/led/led_top.vhd
 verific -vhdl ./src/hdl/reset/core/reset_io.vhd
 verific -vhdl ./src/hdl/reset/reset_top.vhd
 verific -vhdl ./ip/xilinx/xpm/ram/sdpram.vhd
