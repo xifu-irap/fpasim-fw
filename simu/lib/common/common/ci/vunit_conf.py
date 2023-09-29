@@ -148,6 +148,11 @@ class VunitConf(VunitUtils):
         # name of the class (use for message)
         self.class_name = "VunitConf"
 
+        # path to the vcover exe (code coverage)
+        self.vcover_path = None
+        # enable code coverage
+        self.enable_coverage = 0
+
     def set_test_variant_filepath(self, filepath_p):
         """
         This method set the json test_variant filepath and get its dictionary
@@ -304,6 +309,7 @@ class VunitConf(VunitUtils):
         base_path_dic['script_path'] = str(Path(root_path, 'simu/script'))
         base_path_dic['conf_path'] = str(Path(root_path, 'simu/conf'))
         base_path_dic['data_path'] = str(Path(root_path, 'simu/data'))
+        base_path_dic['results_path'] = str(Path(root_path, 'simu/results'))
 
         base_path_dic['vivado_glbl_path'] = str(Path(vivado_path, 'data/verilog/src'))
 
@@ -431,12 +437,14 @@ class VunitConf(VunitUtils):
             os.environ['VUNIT_MODELSIM_PATH'] = modelsim_path
             os.environ['VUNIT_MODELSIM_INI'] = str(Path(root_path, 'simu/simulator/modelsim/modelsim.ini'))
             self.compile_lib_basepath = modelsim_compile_lib_path
+            self.vcover_path = modelsim_path
 
         elif name_p == 'questa':
             os.environ['VUNIT_SIMULATOR'] = 'modelsim'
             os.environ['VUNIT_MODELSIM_PATH'] = questa_path
             os.environ['VUNIT_MODELSIM_INI'] = str(Path(root_path, 'simu/simulator/questa/modelsim.ini'))
             self.compile_lib_basepath = questa_compile_lib_path
+            self.vcover_path = questa_path
         else:
             msg0 = "ERROR: The simulator is not Modelsim or Questa"
             display_obj.display(msg_p=msg0, level_p=level1, color_p='red')
@@ -817,8 +825,7 @@ class VunitConf(VunitUtils):
 
         return None
 
-    def compile_opal_kelly_lib(self, name_p='opal_kelly_lib', library_name_p='opal_kelly_lib', version_p='2008',
-                               level_p=None):
+    def compile_opal_kelly_lib(self, name_p='opal_kelly_lib', library_name_p='opal_kelly_lib', version_p='2008',level_p=None):
         """
         Compile the user-defined files associated to the opal kelly IP.
 
@@ -1206,8 +1213,34 @@ class VunitConf(VunitUtils):
 
         return filepath_list
 
-    def set_sim_option(self, name_p, value_p):
+    def set_sim_option(self, name_p, value_p, enable_coverage_p=True):
+        """
+        Get a list of data filepath
+
+        Parameters
+        ----------
+        name_p: str
+            The name of the simulation option: https://vunit.github.io/py/opts.html
+        value_p: list of str
+            The value of the simulation option
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
+        Returns
+        -------
+        None
+
+        """
         self.VU.set_sim_option(name_p, value_p)
+        self.enable_coverage = enable_coverage_p
+
+        if (enable_coverage_p == 1):
+            self.VU.set_sim_option("enable_coverage", True)
+            self.VU.set_compile_option("enable_coverage", True)
+
+            if (self.simulator_name == 'modelsim') or (self.simulator_name == 'questa'):
+                self.VU.set_compile_option("modelsim.vcom_flags", ["+cover=bs"])
+                self.VU.set_compile_option("modelsim.vlog_flags", ["+cover=bs"])
 
     def get_data_filepath(self, filename_p, level_p=None):
         """
@@ -1334,11 +1367,45 @@ class VunitConf(VunitUtils):
     def main(self):
         """
         Run vunit main function and exit
+        Parameters
+        ----------
+        post_run:
+          A callback function which is called after running tests. The function must accept a single results argument which is an instance of Results
         Returns
         -------
 
         """
-        self.VU.main()
+        def post_run(results):
+            import subprocess
+            options = []
+            # input_merge_file = "C:/Project/fpasim-fw-hardware/simu/results/coverage_data_merge.ucdb"
+            # output_merge_file = "C:/Project/fpasim-fw-hardware/simu/results/coverage_data_merge.xml"
+            input_merge_file = str(Path(self.base_path_dic["results_path"],"coverage_data_merge.ucdb"))
+            output_merge_file = str(Path(self.base_path_dic["results_path"],"coverage_data_merge.xml"))
+            options = []
+            # options.append("C:/Unsupported/questasim64_2020.3/win64/vcover.exe")
+            options.append(str(Path(self.vcover_path,"vcover.exe")))
+            options.append("report")
+            options.append("-output")
+            options.append(output_merge_file)
+            options.append("-srcfile=*")
+            options.append("-details")
+            options.append("-all")
+            options.append("-dump")
+            options.append("-option")
+            options.append("-code")
+            options.append("s b c")
+            options.append("-xml")
+            options.append(input_merge_file)
+
+            results.merge_coverage(file_name=input_merge_file)
+            subprocess.call(options)
+
+
+        if self.enable_coverage == 1:
+            self.VU.main(post_run=post_run)
+        else:
+            self.VU.main()
 
     def _display_searched_filename(self,verbosity_p,filename_p,level_p,verbosity_min_p=0):
         """

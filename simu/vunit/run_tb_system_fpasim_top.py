@@ -306,7 +306,7 @@ if __name__ == '__main__':
     simulation_option_list.append('fpasim.glbl')
     if args.gui == True:
         simulation_option_list.append('-voptargs=+acc')
-    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list)
+    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list, enable_coverage_p=True)
 
     ######################################################
     # get the list of json test_variant_filepath (if any)
