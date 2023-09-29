@@ -80,8 +80,8 @@ architecture Simulation of tb_system_fpasim_top is
   signal b_okAA  : std_logic                    := '0';  -- usb signals
 
   -- FMC: from the card
-  -- board_id
-  --signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');
+  -- i_hardware_id
+  signal i_hardware_id  : std_logic_vector(7 downto 0) := (others => '0');
   ---------------------------------------------------------------------
   -- FMC: from the adc
   ---------------------------------------------------------------------
@@ -632,6 +632,8 @@ begin
   ---------------------------------------------------------------------
   -- DUT
   ---------------------------------------------------------------------
+  i_hardware_id <= std_logic_vector(to_unsigned(1,i_hardware_id'length));
+
   inst_system_fpasim_top : entity fpasim.system_fpasim_top
     generic map (
       g_DEBUG => false
@@ -645,7 +647,7 @@ begin
       ---------------------------------------------------------------------
       -- FMC: from the card
       ---------------------------------------------------------------------
-      --i_board_id        => i_board_id,  -- card board id
+      i_hardware_id   => i_hardware_id,  -- i_hardware_id card
       ---------------------------------------------------------------------
       -- FMC: from the adc
       ---------------------------------------------------------------------

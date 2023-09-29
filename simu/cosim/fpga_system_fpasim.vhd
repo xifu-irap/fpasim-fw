@@ -36,6 +36,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 
 entity fpga_system_fpasim is
@@ -135,6 +136,8 @@ architecture RTL of fpga_system_fpasim is
 ---------------------------------------------------------------------
 -- system_fpasim_top
 ---------------------------------------------------------------------
+  signal i_hardware_id : std_logic_vector(7 downto 0);
+
   signal dac_clk_p   : std_logic;-- differential_p dac clock
   signal dac_clk_n   : std_logic;-- differential_n dac clock
 
@@ -272,6 +275,8 @@ begin
 ---------------------------------------------------------------------
 -- system_fpasim_top
 ---------------------------------------------------------------------
+i_hardware_id <= std_logic_vector(to_unsigned(1,i_hardware_id'length));
+
   inst_system_fpasim_top : entity work.system_fpasim_top
     generic map(
       g_DEBUG => false
@@ -285,7 +290,7 @@ begin
       ---------------------------------------------------------------------
       -- FMC: from the card
       ---------------------------------------------------------------------
-      --i_board_id : in    std_logic_vector(7 downto 0);  -- card board id
+      i_hardware_id => i_hardware_id,
       ---------------------------------------------------------------------
       -- FMC: from the adc
       ---------------------------------------------------------------------
