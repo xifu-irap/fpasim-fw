@@ -66,6 +66,9 @@ architecture RTL of led_top is
 -- status ON of the firmware.
   constant c_FIRMWARE_ON : std_logic := '1';
 
+ -- optional OUTPUT_DELAY (range = [0;inf[)
+ constant C_OUTPUT_DELAY : integer := 3;
+
 ---------------------------------------------------------------------
 -- usb led_pulse
 ---------------------------------------------------------------------
@@ -86,7 +89,7 @@ begin
       -- pulse period expressed in number of clock cycle. Should be a multiple of 2. The range is [2;inf[
       g_NB_CLK_OF_PULSE_PERIOD => 125_000_000,
       -- additional optional output delay
-      g_OUTPUT_DELAY           => 1
+      g_OUTPUT_DELAY           => C_OUTPUT_DELAY
       )
     port map(
       ---------------------------------------------------------------------
@@ -107,7 +110,7 @@ begin
       -- pulse period expressed in number of clock cycle. Should be a multiple of 2. The range is [2;inf[
       g_NB_CLK_OF_PULSE_PERIOD => 250_000_000,
       -- additional optional output delay
-      g_OUTPUT_DELAY           => 1
+      g_OUTPUT_DELAY           => C_OUTPUT_DELAY
       )
     port map(
       ---------------------------------------------------------------------
