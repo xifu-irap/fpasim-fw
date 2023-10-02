@@ -81,16 +81,16 @@ architecture Simulation of tb_system_fpasim_top is
 
   -- FMC: from the card
   -- i_hardware_id
-  signal i_hardware_id  : std_logic_vector(7 downto 0) := (others => '0');
+  signal i_hardware_id : std_logic_vector(7 downto 0) := (others => '0');
   ---------------------------------------------------------------------
   -- FMC: from the adc
   ---------------------------------------------------------------------
-  signal i_adc_clk_p : std_logic := '0';  --  differential clock p @250MHz
-  signal i_adc_clk_n : std_logic := '1';  --  differential clock n @250MHZ
+  signal i_adc_clk_p   : std_logic                    := '0';  --  differential clock p @250MHz
+  signal i_adc_clk_n   : std_logic                    := '1';  --  differential clock n @250MHZ
   -- adc_a
   -- bit P/N: 0-1
-  signal i_da0_p     : std_logic;         -- adc bit0_p: channel A
-  signal i_da0_n     : std_logic;         -- adc bit0_n: channel A
+  signal i_da0_p       : std_logic;     -- adc bit0_p: channel A
+  signal i_da0_n       : std_logic;     -- adc bit0_n: channel A
 
   signal i_da2_p : std_logic;           -- adc bit2_p: channel A
   signal i_da2_n : std_logic;           -- adc bit2_n: channel A
@@ -133,8 +133,10 @@ architecture Simulation of tb_system_fpasim_top is
 
   -- FMC: to sync
   ---------------------------------------------------------------------
-  signal o_ref_clk : std_logic;         -- clock reference
-  signal o_sync    : std_logic;         -- clock frame
+  signal o_clk_ref_p   : std_logic;     -- differential reference clock_p
+  signal o_clk_ref_n   : std_logic;     -- differential reference clock_n
+  signal o_clk_frame_p : std_logic;     -- differential clk_frame_p pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
+  signal o_clk_frame_n : std_logic;     -- differential clk_frame_n pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
 
   -- FMC: to dac
   ---------------------------------------------------------------------
@@ -632,7 +634,7 @@ begin
   ---------------------------------------------------------------------
   -- DUT
   ---------------------------------------------------------------------
-  i_hardware_id <= std_logic_vector(to_unsigned(1,i_hardware_id'length));
+  i_hardware_id <= std_logic_vector(to_unsigned(1, i_hardware_id'length));
 
   inst_system_fpasim_top : entity fpasim.system_fpasim_top
     generic map (
@@ -647,7 +649,7 @@ begin
       ---------------------------------------------------------------------
       -- FMC: from the card
       ---------------------------------------------------------------------
-      i_hardware_id   => i_hardware_id,  -- i_hardware_id card
+      i_hardware_id  => i_hardware_id,  -- i_hardware_id card
       ---------------------------------------------------------------------
       -- FMC: from the adc
       ---------------------------------------------------------------------
@@ -687,8 +689,10 @@ begin
       ---------------------------------------------------------------------
       -- FMC: to sync
       ---------------------------------------------------------------------
-      o_clk_ref      => o_ref_clk,
-      o_clk_frame    => o_sync,
+      o_clk_ref_p    => o_clk_ref_p,
+      o_clk_ref_n    => o_clk_ref_n,
+      o_clk_frame_p  => o_clk_frame_p,
+      o_clk_frame_n  => o_clk_frame_n,
       ---------------------------------------------------------------------
       -- FMC: to dac
       ---------------------------------------------------------------------

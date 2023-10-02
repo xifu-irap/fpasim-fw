@@ -64,16 +64,16 @@ entity tb_fpga_system_fpasim_top is
     g_ERROR_DELAY        : natural := 4;  -- [0;(2**6) - 1]
     g_RA_DELAY           : natural := 4;  -- [0;(2**6) - 1]
     g_INTER_SQUID_GAIN   : natural := 255;  -- inter squid gain. The range is: [0;(2**8) - 1]
-    g_NB_PIXEL_BY_FRAME  : natural := 34; -- number of pixel by frame. The range is : [1;pkg_MUX_FACT_MAX(64)]
-    g_NB_SAMPLE_BY_PIXEL : natural := 40; -- number of sample by pixel. The range is [1;pkg_NB_SAMPLE_BY_PIXEL_MAX(64)]
+    g_NB_PIXEL_BY_FRAME  : natural := 34;  -- number of pixel by frame. The range is : [1;pkg_MUX_FACT_MAX(64)]
+    g_NB_SAMPLE_BY_PIXEL : natural := 40;  -- number of sample by pixel. The range is [1;pkg_NB_SAMPLE_BY_PIXEL_MAX(64)]
 
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
-    g_VUNIT_DEBUG : boolean  := true; -- true: stop simulator on failures, false: stop the simulator on errors.
-    g_TEST_NAME   : string   := ""; -- name of the test
-    g_ENABLE_CHECK: boolean  := true;-- true: compare the simulation output with the reference one, false: do nothing.
-    g_ENABLE_LOG  : boolean  := true-- true: save simulation data in files, false: don't save simulation data in files
+    g_VUNIT_DEBUG  : boolean := true;  -- true: stop simulator on failures, false: stop the simulator on errors.
+    g_TEST_NAME    : string  := "";     -- name of the test
+    g_ENABLE_CHECK : boolean := true;  -- true: compare the simulation output with the reference one, false: do nothing.
+    g_ENABLE_LOG   : boolean := true  -- true: save simulation data in files, false: don't save simulation data in files
     );
 end tb_fpga_system_fpasim_top;
 
@@ -105,10 +105,14 @@ architecture Simulation of tb_fpga_system_fpasim_top is
   ---------------------------------------------------------------------
   -- to sync
   ---------------------------------------------------------------------
-  -- ref clock
-  signal o_ref_clk          : std_logic;
-  -- clk_frame (sync signal)
-  signal o_sync             : std_logic;
+  -- differential reference clock_p
+  signal o_clk_ref_p        : std_logic;
+  -- differential reference clock_n
+  signal o_clk_ref_n        : std_logic;
+  -- differential clk_frame_p pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
+  signal o_clk_frame_p      : std_logic;
+  -- differential clk_frame_n pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
+  signal o_clk_frame_n      : std_logic;
   ---------------------------------------------------------------------
   -- to DAC
   ---------------------------------------------------------------------
@@ -316,8 +320,10 @@ begin
       ---------------------------------------------------------------------
       -- to sync
       ---------------------------------------------------------------------
-      o_ref_clk          => o_ref_clk,
-      o_sync             => o_sync,
+      o_clk_ref_p        => o_clk_ref_p,
+      o_clk_ref_n        => o_clk_ref_n,
+      o_clk_frame_p      => o_clk_frame_p,
+      o_clk_frame_n      => o_clk_frame_n,
       ---------------------------------------------------------------------
       -- to DAC
       ---------------------------------------------------------------------
