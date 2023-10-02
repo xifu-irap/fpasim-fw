@@ -137,7 +137,7 @@ entity fpasim_top is
     o_pulse_sof   : out std_logic;
     -- last processed sample of a pulse
     o_pulse_eof   : out std_logic;
-    
+
     ---------------------------------------------------------------------
     -- debug
     ---------------------------------------------------------------------
@@ -488,20 +488,20 @@ architecture RTL of fpasim_top is
   signal data_pipe_tmp2 : std_logic_vector(c_DAC_IDX5_H downto 0);
   signal data_pipe_tmp3 : std_logic_vector(c_DAC_IDX5_H downto 0);
 
-  signal pixel_sof4        : std_logic;  -- @suppress "signal pixel_sof3 is never read"
-  signal pixel_eof4        : std_logic;  -- @suppress "signal pixel_eof3 is never read"
-  signal pixel_valid4      : std_logic;
-  signal pixel_id4         : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);  -- @suppress "signal pixel_id3 is never read"
-  signal frame_sof4        : std_logic;
-  signal frame_eof4        : std_logic;  -- @suppress "signal frame_eof3 is never read"
-  signal frame_id4         : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  -- @suppress "signal frame_id3 is never read"
-  
+  signal pixel_sof4   : std_logic;  -- @suppress "signal pixel_sof3 is never read"
+  signal pixel_eof4   : std_logic;  -- @suppress "signal pixel_eof3 is never read"
+  signal pixel_valid4 : std_logic;
+  signal pixel_id4    : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);  -- @suppress "signal pixel_id3 is never read"
+  signal frame_sof4   : std_logic;
+  signal frame_eof4   : std_logic;  -- @suppress "signal frame_eof3 is never read"
+  signal frame_id4    : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  -- @suppress "signal frame_id3 is never read"
+
 
   ---------------------------------------------------------------------
   -- sync_top
   ---------------------------------------------------------------------
-  signal sync_valid5      : std_logic;                      -- sync valid
-  signal sync5            : std_logic;                      -- sync value
+  signal sync_valid4      : std_logic;                      -- sync valid
+  signal sync4            : std_logic;                      -- sync value
   signal sync_errors0_tmp : std_logic_vector(15 downto 0);  -- sync error
 
   signal sync_errors0 : std_logic_vector(15 downto 0);  -- errors from the sync_top module
@@ -511,11 +511,11 @@ architecture RTL of fpasim_top is
   -- pulse_top
   ---------------------------------------------------------------------
   -- pulse valid
-  signal pulse_valid5 : std_logic;
+  signal pulse_valid4 : std_logic;
   -- first processed sample of a pulse with user-defined width
-  signal pulse_sof5   : std_logic;
+  signal pulse_sof4   : std_logic;
   -- last processed sample of a pulse with user-defined width
-  signal pulse_eof5   : std_logic;
+  signal pulse_eof4   : std_logic;
 
   ---------------------------------------------------------------------
   -- recording
@@ -541,7 +541,7 @@ architecture RTL of fpasim_top is
   -- pipe: spy
   signal data_pipe_tmp4 : std_logic_vector(15 downto 0);
   signal data_pipe_tmp5 : std_logic_vector(15 downto 0);
-  
+
   -- Select the dac pattern source: '1': custom debug pattern, '0': hardcoded pattern
   signal debug_dac_pattern_sel : std_logic := '0';
   signal debug_dac_pattern0    : std_logic_vector(7 downto 0);  -- custom dac pattern0
@@ -1280,7 +1280,7 @@ begin
   data_pipe_tmp2(c_DAC_IDX1_H)                     <= frame_eof3;
   data_pipe_tmp2(c_DAC_IDX0_H downto c_DAC_IDX0_L) <= frame_id3;
 
- inst_pipeliner_sync_with_dac_top_out : entity work.pipeliner
+  inst_pipeliner_sync_with_dac_top_out : entity work.pipeliner
     generic map(
       g_NB_PIPES   => pkg_DAC_TOP_LATENCY,
       g_DATA_WIDTH => data_pipe_tmp2'length
@@ -1293,10 +1293,10 @@ begin
 
   pixel_sof4 <= data_pipe_tmp3(c_DAC_IDX5_H);
   pixel_eof4 <= data_pipe_tmp3(c_DAC_IDX4_H);
-  pixel_id4 <= data_pipe_tmp3(c_DAC_IDX3_H downto c_DAC_IDX3_L);
+  pixel_id4  <= data_pipe_tmp3(c_DAC_IDX3_H downto c_DAC_IDX3_L);
   frame_sof4 <= data_pipe_tmp3(c_DAC_IDX2_H);
   frame_eof4 <= data_pipe_tmp3(c_DAC_IDX1_H);
-  frame_id4 <= data_pipe_tmp3(c_DAC_IDX0_H downto c_DAC_IDX0_L);
+  frame_id4  <= data_pipe_tmp3(c_DAC_IDX0_H downto c_DAC_IDX0_L);
 
   ---------------------------------------------------------------------
   -- output
@@ -1362,8 +1362,8 @@ begin
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      o_sync_valid  => sync_valid5,
-      o_sync        => sync5,
+      o_sync_valid  => sync_valid4,
+      o_sync        => sync4,
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------
@@ -1373,8 +1373,8 @@ begin
   ---------------------------------------------------------------------
   -- output
   ---------------------------------------------------------------------
-  o_sync_valid <= sync_valid5;
-  o_sync       <= sync5;
+  o_sync_valid <= sync_valid4;
+  o_sync       <= sync4;
 
   ---------------------------------------------------------------------
   -- pulse: create user-defined pulse width
@@ -1397,9 +1397,9 @@ begin
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      o_pulse_valid => pulse_valid5,
-      o_pulse_sof   => pulse_sof5,
-      o_pulse_eof   => pulse_eof5,
+      o_pulse_valid => pulse_valid4,
+      o_pulse_sof   => pulse_sof4,
+      o_pulse_eof   => pulse_eof4,
       ---------------------------------------------------------------------
       -- errors
       ---------------------------------------------------------------------
@@ -1409,9 +1409,9 @@ begin
 ---------------------------------------------------------------------
 -- output
 ---------------------------------------------------------------------
-  o_pulse_valid <= pulse_valid5;
-  o_pulse_sof   <= pulse_sof5;
-  o_pulse_eof   <= pulse_eof5;
+  o_pulse_valid <= pulse_valid4;
+  o_pulse_sof   <= pulse_sof4;
+  o_pulse_eof   <= pulse_eof4;
 
 
   ---------------------------------------------------------------------
@@ -1456,14 +1456,14 @@ begin
   ---------------------------------------------------------------------
   -- debug
   ---------------------------------------------------------------------
-  data_pipe_tmp4(15)           <= sync5;
+  data_pipe_tmp4(15)           <= sync4;
   data_pipe_tmp4(14 downto 11) <= (others => '0');
-  data_pipe_tmp4(10 downto 5)  <= pixel_id3;
-  data_pipe_tmp4(4)            <= pixel_sof3;
-  data_pipe_tmp4(3)            <= pixel_eof3;
-  data_pipe_tmp4(2)            <= pixel_valid3;
-  data_pipe_tmp4(1)            <= frame_sof3;
-  data_pipe_tmp4(0)            <= frame_eof3;
+  data_pipe_tmp4(10 downto 5)  <= pixel_id4;
+  data_pipe_tmp4(4)            <= pixel_sof4;
+  data_pipe_tmp4(3)            <= pixel_eof4;
+  data_pipe_tmp4(2)            <= pixel_valid4;
+  data_pipe_tmp4(1)            <= frame_sof4;
+  data_pipe_tmp4(0)            <= frame_eof4;
 
   inst_pipeliner_spy : entity work.pipeliner
     generic map(
@@ -1566,16 +1566,16 @@ begin
         probe0(27)          => cmd_valid,
         probe0(26)          => adc_valid0,
         probe0(25)          => i_rst,
-        probe0(24)          => sync5,
-        probe0(23)          => sync_valid5,
+        probe0(24)          => sync4,
+        probe0(23)          => sync_valid4,
         probe0(22)          => dac_valid4,
-        probe0(21)          => pixel_sof3,
-        probe0(20)          => pixel_eof3,
-        probe0(19)          => pixel_valid3,
-        probe0(18)          => frame_sof3,
-        probe0(17)          => frame_eof3,
-        probe0(16 downto 6) => frame_id3,
-        probe0(5 downto 0)  => pixel_id3,
+        probe0(21)          => pixel_sof4,
+        probe0(20)          => pixel_eof4,
+        probe0(19)          => pixel_valid4,
+        probe0(18)          => frame_sof4,
+        probe0(17)          => frame_eof4,
+        probe0(16 downto 6) => frame_id4,
+        probe0(5 downto 0)  => pixel_id4,
 
         -- probe1
         probe1(56)           => dac_frame4,

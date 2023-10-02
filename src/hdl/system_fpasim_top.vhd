@@ -107,8 +107,8 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     o_clk_ref_p   : out std_logic;  -- differential reference clock_p
     o_clk_ref_n   : out std_logic;  -- differential reference clock_n
-    o_clk_frame_p      : out std_logic;  -- differential clk_frame_p pulse (at the beginning of the first pixel of a column (@o_ref_clk))
-    o_clk_frame_n      : out std_logic;  -- differential clk_frame_n pulse (at the beginning of the first pixel of a column (@o_ref_clk))
+    o_clk_frame_p : out std_logic;  -- differential clk_frame_p pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
+    o_clk_frame_n : out std_logic;  -- differential clk_frame_n pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
     ---------------------------------------------------------------------
     -- FMC: to dac
     ---------------------------------------------------------------------
