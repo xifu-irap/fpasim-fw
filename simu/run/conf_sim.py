@@ -2277,6 +2277,32 @@ if __name__ == '__main__':
     description_list.append('   . Each individual test can run one or more test_variant(s) (set of simulation parameters).')
     json_test_dic["description_list"] = description_list
 
+    # Linty tests
+    json_test_dic["tb_linty_test"] = []
+
+    # tb_tes_top tests
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_tes_top_test_variant_debug_all'])
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_tes_top_test_variant_func_all'])
+
+    # tb_mux_squid_top tests
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_mux_squid_top_test_variant_debug_all'])
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_mux_squid_top_test_variant_func_all'])
+
+    # tb_amp_squid_top tests
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_amp_squid_top_test_variant_debug_all'])
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_amp_squid_top_test_variant_func_all'])
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_amp_squid_top_test_variant_func_all'])
+
+    # tb_fpga_system_fpasim tests
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_fpga_system_fpasim_top_debug'])
+    # tb_system_fpasim tests
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_system_fpasim_top_test_variant_func01'])
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_system_fpasim_top_test_variant_func02'])
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_system_fpasim_top_test_variant_func00'])
+    # spi test
+    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_spi_top_conf_debug'])
+
+
     # 0: first sequence of individual tests
     # fpga_system_fpasim
     json_test_dic["tb_fpga_system_fpasim_top_debug_test0"] = [solo_test_dic['tb_fpga_system_fpasim_top_debug']]
@@ -2348,6 +2374,8 @@ if __name__ == '__main__':
 
     # spi_top
     json_test_dic["tb_spi_top_debug_test0"] = [solo_test_dic['tb_spi_top_conf_debug']]
+
+
 
 
 
