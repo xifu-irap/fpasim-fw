@@ -63,7 +63,7 @@ set mmcm_dac_clk_div_90_out_pin [get_pins inst_clocking_top/inst_fpasim_clk_wiz_
 
 
 # rename clocks
-create_generated_clock -name ref_clk -source $mmcm_clk_in_pin $mmcm_clk_ref_out_pin;
+create_generated_clock -name clk_ref -source $mmcm_clk_in_pin $mmcm_clk_ref_out_pin;
 create_generated_clock -name dac_clk -source $mmcm_clk_in_pin $mmcm_dac_clk_out_pin;
 create_generated_clock -name dac_clk_phase90 -source $mmcm_clk_in_pin $mmcm_dac_clk_out_90_pin;
 create_generated_clock -name dac_clk_div -source $mmcm_clk_in_pin $mmcm_dac_clk_div_out_pin;
@@ -76,7 +76,7 @@ create_generated_clock -name usb_clk -source $usb_clk_in_pin $usb_clk_out_pin;
 # ODDR : forward clock
 ###############################################################################################################
 create_generated_clock -name gen_dac_clk_out -multiply_by 1 -source [get_pins inst_io_top/inst_io_dac/gen_io_dac_clk.inst_selectio_wiz_dac_clk/clk_in] [get_ports {o_dac_dclk_p}];
-create_generated_clock -name gen_sync_clk -multiply_by 1 -source [get_pins inst_io_top/inst_io_sync/gen_io_sync.inst_selectio_wiz_sync/inst/oddr_inst/C] [get_ports {o_clk_ref}];
+create_generated_clock -name gen_clk_ref -multiply_by 1 -source [get_pins inst_io_top/inst_io_sync/gen_io_sync.inst_selectio_wiz_sync/inst/oddr_inst/C] [get_ports {o_clk_ref_p}];
 create_generated_clock -name gen_spi_clk -multiply_by 1 -source [get_pins inst_spi_top/inst_spi_io/gen_user_to_pads_clk.inst_oddr/C] [get_ports {o_spi_sclk}];
 
 
@@ -306,7 +306,7 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 # create_generated_clock -name <gen_clock_name> -multiply_by 1 -source [get_pins <source_pin>] [get_ports <output_clock_port>]
 # gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".
 
-set fwclk        ref_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)
+set fwclk        gen_clk_ref;      # forwarded clock name (generated using create_generated_clock at output clock port)
 set tsu          1.000;           # destination device setup time requirement
 set thd          1.500;           # destination device hold time requirement
 set trce_dly_max 0.000;            # maximum board trace delay
@@ -423,36 +423,29 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 ##################################################################################
 # o_leds[3]: timing constraints (output ports)
 ##################################################################################
-#  Rising Edge Source Synchronous Outputs
+# Rising Edge System Synchronous Outputs
 #
-#  Source synchronous output interfaces can be constrained either by the max data skew
-#  relative to the generated clock or by the destination device setup/hold requirements.
+# A System Synchronous design interface is a clocking technique in which the same
+# active-edge of a system clock is used for both the source and destination device.
 #
-#  Setup/Hold Case:
-#  Setup and hold requirements for the destination device and board trace delays are known.
-#
-# forwarded         ____                      ___________________
-# clock                 |____________________|                   |____________
-#                                            |
-#                                     tsu    |    thd
-#                                <---------->|<--------->
-#                                ____________|___________
-# data @ destination    XXXXXXXXX________________________XXXXX
-#
-# Example of creating generated clock at clock output port
-# create_generated_clock -name <gen_clock_name> -multiply_by 1 -source [get_pins <source_pin>] [get_ports <output_clock_port>]
-# gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".
+# dest        __________            __________
+# clk    ____|          |__________|
+#                                  |
+#     (trce_dly_max+tsu) <---------|
+#             (trce_dly_min-thd) <-|
+#                        __    __
+# data   XXXXXXXXXXXXXXXX__DATA__XXXXXXXXXXXXX
 
-set fwclk        sys_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)
-set tsu          1.5;           # destination device setup time requirement
-set thd          1.5;           # destination device hold time requirement
-set trce_dly_max 0.000;            # maximum board trace delay
-set trce_dly_min 0.000;            # minimum board trace delay
+set destination_clock sys_clk;    # Name of destination clock
+set tsu               0.500;      # Destination device setup time requirement
+set thd               0.500;      # Destination device hold time requirement
+set trce_dly_max      0.000;      # Maximum board trace delay
+set trce_dly_min      0.000;      # Minimum board trace delay
 set output_ports {o_leds[3]};   # list of output ports
 
-# Output Delay Constraints
-set_output_delay -clock $fwclk -max [expr $trce_dly_max + $tsu] [get_ports $output_ports];
-set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $output_ports];
+# Output Delay Constraint
+set_output_delay -clock $destination_clock -max [expr $trce_dly_max + $tsu] [get_ports $output_ports];
+set_output_delay -clock $destination_clock -min [expr $trce_dly_min - $thd] [get_ports $output_ports];
 
 ##################################################################################
 # o_leds[2]: timing constraints (output ports)
@@ -491,10 +484,10 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 ##################################################################################
 # spy (output ports)
 ##################################################################################
-# Rising Edge System Synchronous Outputs 
+# Rising Edge System Synchronous Outputs
 #
-# A System Synchronous design interface is a clocking technique in which the same 
-# active-edge of a system clock is used for both the source and destination device. 
+# A System Synchronous design interface is a clocking technique in which the same
+# active-edge of a system clock is used for both the source and destination device.
 #
 # dest        __________            __________
 # clk    ____|          |__________|
@@ -506,7 +499,7 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 #
 
 set destination_clock sys_clk;    # Name of destination clock
-set tsu               2.000;      # Destination device setup time requirement
+set tsu               0.500;      # Destination device setup time requirement
 set thd               0.500;      # Destination device hold time requirement
 set trce_dly_max      0.000;      # Maximum board trace delay
 set trce_dly_min      0.000;      # Minimum board trace delay
@@ -574,6 +567,12 @@ set_false_path -hold  -rise_from [get_clocks virt_adc_clk_in] -fall_to [get_cloc
 set_false_path -hold  -fall_from [get_clocks virt_adc_clk_in] -rise_to [get_clocks gen_dac_clk_out]
 
 
+set_false_path -setup  -rise_from [get_clocks clk_ref] -fall_to [get_clocks gen_clk_ref]
+set_false_path -setup  -fall_from [get_clocks clk_ref] -rise_to [get_clocks gen_clk_ref]
+set_false_path -hold  -rise_from [get_clocks clk_ref] -fall_to [get_clocks gen_clk_ref]
+set_false_path -hold  -fall_from [get_clocks clk_ref] -rise_to [get_clocks gen_clk_ref]
+
+
 
 # SPI source-synchronuous
 # Add false path exceptions for cross-clock transfers
@@ -593,7 +592,7 @@ set_false_path -hold  -fall_from [get_clocks virt_adc_clk_in] -rise_to [get_cloc
 # others (input ports): asynchronuous ports
 ##################################################################################
 
-# set_false_path -from [get_ports "i_hardware_id*"]
+set_false_path -from [get_ports "i_hardware_id*"]
 set_false_path -to   [get_ports "o_leds[1]"];
 set_false_path -to   [get_ports "o_leds[0]"];
 set_false_path -to   [get_ports "o_led_fw"];
