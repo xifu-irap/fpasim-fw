@@ -578,7 +578,7 @@ set_property IOSTANDARD LVCMOS25 [get_ports {o_spy[15]}];# o_spy_15
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-E2
 set_property PACKAGE_PIN Y23 [get_ports {o_clk_ref_p}];# o_CLK_REF_P
-set_property IOSTANDARD LVDS25 [get_ports {o_clk_ref_p}];# o_CLK_REF_P
+set_property IOSTANDARD LVDS_25 [get_ports {o_clk_ref_p}];# o_CLK_REF_P
 # FMC-E20
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
@@ -611,7 +611,7 @@ set_property IOSTANDARD LVDS25 [get_ports {o_clk_ref_p}];# o_CLK_REF_P
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-E3
 set_property PACKAGE_PIN AA24 [get_ports {o_clk_ref_n}];# o_CLK_REF_N
-set_property IOSTANDARD LVDS25 [get_ports {o_clk_ref_n}];# o_CLK_REF_N
+set_property IOSTANDARD LVDS_25 [get_ports {o_clk_ref_n}];# o_CLK_REF_N
 # FMC-E30
 # set_property PACKAGE_PIN AB14 [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
@@ -653,10 +653,10 @@ set_property IOSTANDARD LVDS25 [get_ports {o_clk_ref_n}];# o_CLK_REF_N
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-E6
 set_property PACKAGE_PIN W23 [get_ports {o_clk_frame_p}];# o_CLK_FRAME_P
-set_property IOSTANDARD LVDS25 [get_ports {o_clk_frame_p}];# o_CLK_FRAME_P
+set_property IOSTANDARD LVDS_25 [get_ports {o_clk_frame_p}];# o_CLK_FRAME_P
 # FMC-E7
 set_property PACKAGE_PIN W24 [get_ports {o_clk_frame_n}];# o_CLK_FRAME_N
-set_property IOSTANDARD LVDS25 [get_ports {o_clk_frame_n}];# o_CLK_FRAME_N
+set_property IOSTANDARD LVDS_25 [get_ports {o_clk_frame_n}];# o_CLK_FRAME_N
 # FMC-E8
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
@@ -1052,10 +1052,10 @@ set_property IOSTANDARD LVCMOS25 [get_ports {o_led_pll_lock}];# LED_PLL_Lock
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-J18
 # set_property PACKAGE_PIN AD21 [get_ports {}];# i_spare_00_P
-# set_property IOSTANDARD LVDS25 [get_ports {}];# i_spare_00_P
+# set_property IOSTANDARD LVDS_25 [get_ports {}];# i_spare_00_P
 # FMC-J19
 # set_property PACKAGE_PIN AE21 [get_ports {}];# i_spare_00_N
-# set_property IOSTANDARD LVDS25 [get_ports {}];# i_spare_00_N
+# set_property IOSTANDARD LVDS_25 [get_ports {}];# i_spare_00_N
 # FMC-J2
 # set_property PACKAGE_PIN AB16 [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
@@ -1064,10 +1064,10 @@ set_property IOSTANDARD LVCMOS25 [get_ports {o_led_pll_lock}];# LED_PLL_Lock
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-J21
 # set_property PACKAGE_PIN V21 [get_ports {}];# i_spare_02_P
-# set_property IOSTANDARD LVDS25 [get_ports {}];# i_spare_02_P
+# set_property IOSTANDARD LVDS_25 [get_ports {}];# i_spare_02_P
 # FMC-J22
 # set_property PACKAGE_PIN W21 [get_ports {}];# i_spare_02_N
-# set_property IOSTANDARD LVDS25 [get_ports {}];# i_spare_02_N
+# set_property IOSTANDARD LVDS_25 [get_ports {}];# i_spare_02_N
 # FMC-J23
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
@@ -1166,31 +1166,31 @@ set_property IOSTANDARD LVCMOS25 [get_ports {o_spy[11]}];# o_spy_11
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-K16
 # set_property PACKAGE_PIN AC23 [get_ports {}];# i_spare_clock_P
-# set_property IOSTANDARD LVDS25 [get_ports {}];# i_spare_clock_P
+# set_property IOSTANDARD LVDS_25 [get_ports {}];# i_spare_clock_P
 # FMC-K17
 # set_property PACKAGE_PIN AC24 [get_ports {}];# i_spare_clock_N
-# set_property IOSTANDARD LVDS25 [get_ports {}];# i_spare_clock_N
+# set_property IOSTANDARD LVDS_25 [get_ports {}];# i_spare_clock_N
 # FMC-K18
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-K19
 # set_property PACKAGE_PIN AE22 [get_ports {}];# i_spare_01_P
-# set_property IOSTANDARD LVDS25 [get_ports {}];# i_spare_01_P
+# set_property IOSTANDARD LVDS_25 [get_ports {}];# i_spare_01_P
 # FMC-K2
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-K20
 # set_property PACKAGE_PIN AF22 [get_ports {}];# i_spare_01_N
-# set_property IOSTANDARD LVDS25 [get_ports {}];# i_spare_01_N
+# set_property IOSTANDARD LVDS_25 [get_ports {}];# i_spare_01_N
 # FMC-K21
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]
 # FMC-K22
 # set_property PACKAGE_PIN W20 [get_ports {}];# i_spare_04_P
-# set_property IOSTANDARD LVDS25 [get_ports {}];# i_spare_04_P
+# set_property IOSTANDARD LVDS_25 [get_ports {}];# i_spare_04_P
 # FMC-K23
 # set_property PACKAGE_PIN Y21 [get_ports {}];# i_spare_04_N
-# set_property IOSTANDARD LVDS25 [get_ports {}];# i_spare_04_N
+# set_property IOSTANDARD LVDS_25 [get_ports {}];# i_spare_04_N
 # FMC-K24
 # set_property PACKAGE_PIN  [get_ports {}]
 # set_property IOSTANDARD  [get_ports {}]

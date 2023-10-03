@@ -1,11 +1,11 @@
 fmc_loc;fmc_pin_name;fmc_io_standard;fpga_port_name;fpga_pin;comment
 E1;;;;;
-E2;o_CLK_REF_P;LVDS25;o_clk_ref_p;Y23;
-E3;o_CLK_REF_N;LVDS25;o_clk_ref_n;AA24;
+E2;o_CLK_REF_P;LVDS_25;o_clk_ref_p;Y23;
+E3;o_CLK_REF_N;LVDS_25;o_clk_ref_n;AA24;
 E4;;;;;
 E5;;;;;
-E6;o_CLK_FRAME_P;LVDS25;o_clk_frame_p;W23;
-E7;o_CLK_FRAME_N;LVDS25;o_clk_frame_n;W24;
+E6;o_CLK_FRAME_P;LVDS_25;o_clk_frame_p;W23;
+E7;o_CLK_FRAME_N;LVDS_25;o_clk_frame_n;W24;
 E8;;;;;
 E9;i_hardware_id_06;LVCMOS25;i_hardware_id[6];AD26;
 E10;i_hardware_id_07;LVCMOS25;i_hardware_id[7];AE26;
