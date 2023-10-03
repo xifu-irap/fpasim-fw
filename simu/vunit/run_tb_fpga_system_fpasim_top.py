@@ -167,6 +167,9 @@ if __name__ == '__main__':
     help0 = 'Specify the json key path: test_name/test_id with test_name: name of the test and test_id: test index of the test list defined in test_name (see the launch_sim_processed.json file)'
     cli.parser.add_argument('--json_key_path', default='tb_fpga_system_fpasim_top_debug_test0/0',help=help0)
 
+    help0 = 'Enable the code Coverage'
+    cli.parser.add_argument('--enable_coverage', default='True',choices = ['True','False'], help=help0)
+
     args = cli.parse_args()
 
     # retrieve the command line arguments
@@ -174,6 +177,7 @@ if __name__ == '__main__':
     gui_mode      = args.gui_mode
     verbosity     = args.verbosity
     json_key_path = args.json_key_path
+    enable_coverage = args.enable_coverage
 
     ###############################################
     # extract parameters which uniquely identify the test
@@ -189,6 +193,11 @@ if __name__ == '__main__':
         args.gui = False
     else:
         args.gui = True
+
+    if enable_coverage == 'False':
+        enable_coverage = False
+    else:
+        enable_coverage = True
 
     ################################################
     # build the display object
@@ -307,7 +316,7 @@ if __name__ == '__main__':
     simulation_option_list.append('fpasim.glbl')
     if args.gui == True:
         simulation_option_list.append('-voptargs=+acc')
-    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list, enable_coverage_p=True)
+    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list, enable_coverage_p=enable_coverage)
 
     ######################################################
     # get the list of json test_variant_filepath (if any)

@@ -131,6 +131,9 @@ if __name__ == '__main__':
     help0 = 'Specify the json key path: test_name/tb_entity_name'
     cli.parser.add_argument('--json_key_path', default='tb_spi_top_debug_test0/tb_spi_top',help=help0)
 
+    help0 = 'Enable the code Coverage'
+    cli.parser.add_argument('--enable_coverage', default='True',choices = ['True','False'], help=help0)
+
     args = cli.parse_args()
 
     # retrieve the command line arguments
@@ -138,23 +141,27 @@ if __name__ == '__main__':
     gui_mode      = args.gui_mode
     verbosity     = args.verbosity
     json_key_path = args.json_key_path
+    enable_coverage = args.enable_coverage
 
     ###############################################
     # extract parameters which uniquely identify the test
     ###############################################
     key_test_name, key_id = json_key_path.split('/')
 
-
     ###########################################################
-    # It's impossible to pass a boolean to a subprocess call
-    # We can't directly use the vunit defined --gui argument (boolean type)
-    # So, we use an intermediary "--gui_mode" custom argument (string type) to pass the command
+    # When this script is called by an another python script with the subprocess function,
+    # I don't know how to pass a boolean as command line argument (--gui argument defined by the Vunit library).
+    # Instead, we use an intermediary "--gui_mode" custom argument (string type) to pass the command.
     ###########################################################
     if gui_mode == 'False':
         args.gui = False
     else:
         args.gui = True
 
+    if enable_coverage == 'False':
+        enable_coverage = False
+    else:
+        enable_coverage = True
 
     ################################################
     # build the display object
@@ -163,8 +170,9 @@ if __name__ == '__main__':
     level1 = 1
     level2 = 2
     obj_display = Display()
-    msg0 = 'Start Python Script: '+__file__
-    obj_display.display_title(msg_p=msg0,level_p=0)
+    if verbosity > 0:
+        msg0 = 'Start Python Script: '+__file__
+        obj_display.display_title(msg_p=msg0,level_p=0)
 
     #####################################################
     # Order matter:
@@ -226,21 +234,21 @@ if __name__ == '__main__':
     obj.compile_common_lib(level_p=level1)
 
     #####################################################
-    # add source files
+    # add the VHDL/verilog source files
     #####################################################
     obj.compile_src_directory(directory_name_p='utils',level_p=level1)
     obj.compile_src_directory(directory_name_p='fpasim',level_p=level1)
     obj.compile_src_directory(directory_name_p='spi',level_p=level1)
 
     #####################################################
-    # add testbench file
+    # add the VHDL testbench file
     #####################################################
     obj.compile_tb(level_p=level1)
 
     #####################################################
-    # simulator configuration
+    # Set the simulator waveform
     #####################################################
-    # Set the simulator options
+    # Set the simulator waveform
     obj.set_waveform(level_p=level1)
     # Get the simulator wave
     wave_filepath = obj.get_waveform(level_p=level1)
@@ -264,10 +272,10 @@ if __name__ == '__main__':
     simulation_option_list.append(sim_title)
     if args.gui == True:
         simulation_option_list.append('-voptargs=+acc')
-    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list, enable_coverage_p=True)
+    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list, enable_coverage_p=enable_coverage)
 
     ######################################################
-    # get the list of test_variant_filepath (if any)
+    # get the list of json test_variant_filepath (if any)
     ######################################################
     test_variant_filepath_list = obj.get_test_variant_filepath(level_p=level1)
 
