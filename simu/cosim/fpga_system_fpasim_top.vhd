@@ -66,7 +66,6 @@ entity fpga_system_fpasim_top is
     g_DAC_VPP            : natural := 2;  -- DAC differential output voltage ( Vpp expressed in Volts)
     g_DAC_DELAY          : natural := 0;  -- DAC conversion delay (expressed in number of clock cycles @i_dac_clk). The range is: [0;max integer value[)
     -- design parameters
-    g_FPASIM_GAIN        : natural := 3;  -- 0:0.25, 1:0.5, 3:1, 4:1.5, 5:2, 6:3, 7:4
     g_MUX_SQ_FB_DELAY    : natural := 3;  -- delay on the adc0 input path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
     g_AMP_SQ_OF_DELAY    : natural := 3;  -- delay on the adc1 input path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
     g_ERROR_DELAY        : natural := 3;  -- delay on the dac output path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
@@ -242,26 +241,6 @@ begin
     -- add tempo: to wait the end of the reset
     ---------------------------------------------------------------------
     pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 16, i_margin => 12 ps);
-
-    ---------------------------------------------------------------------
-    -- set FPASIM_GAIN
-    ---------------------------------------------------------------------
-    v_opal_kelly_addr := x"02";
-    v_data            := g_FPASIM_GAIN;  -- reset bit to '1'
-    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
-    SetWireInValue(
-      i_ep               => v_opal_kelly_addr,
-      i_val              => v_data_vect,
-      i_mask             => c_WIRE_NO_MASK,
-      b_front_panel_conf => v_front_panel_conf
-      );
-
-    UpdateWireIns(
-      b_front_panel_conf => v_front_panel_conf,
-      o_internal_wr_if   => usb_wr_if0,
-      i_internal_rd_if   => usb_rd_if0);
-
-    pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- set MUX_SQ_FB_DELAY

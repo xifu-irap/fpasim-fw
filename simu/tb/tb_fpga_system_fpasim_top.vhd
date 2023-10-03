@@ -58,7 +58,6 @@ entity tb_fpga_system_fpasim_top is
     g_DAC_VPP            : natural := 2;  -- DAC differential output voltage ( Vpp expressed in Volts)
     g_DAC_DELAY          : natural := 0;  -- DAC conversion delay
     -- design parameters
-    g_FPASIM_GAIN        : natural := 3;  -- 0:0.25, 1:0.5, 3:1, 4:1.5, 5:2, 6:3, 7:4
     g_MUX_SQ_FB_DELAY    : natural := 0;  -- [0;(2**6) - 1]
     g_AMP_SQ_OF_DELAY    : natural := 1;  -- [0;(2**6) - 1]
     g_ERROR_DELAY        : natural := 4;  -- [0;(2**6) - 1]
@@ -207,7 +206,6 @@ begin
     info("    g_ADC_DELAY = " & to_string(g_ADC_DELAY));
     info("    g_DAC_VPP = " & to_string(g_DAC_VPP));
     info("    g_DAC_DELAY = " & to_string(g_DAC_DELAY));
-    info("    g_FPASIM_GAIN = " & to_string(g_FPASIM_GAIN));
     info("    g_MUX_SQ_FB_DELAY = " & to_string(g_MUX_SQ_FB_DELAY));
     info("    g_AMP_SQ_OF_DELAY = " & to_string(g_AMP_SQ_OF_DELAY));
     info("    g_ERROR_DELAY = " & to_string(g_ERROR_DELAY));
@@ -293,7 +291,6 @@ begin
       g_DAC_VPP            => g_DAC_VPP,  -- DAC differential output voltage ( Vpp expressed in Volts)
       g_DAC_DELAY          => g_DAC_DELAY,    -- DAC conversion delay
       -- design parameters
-      g_FPASIM_GAIN        => g_FPASIM_GAIN,  -- 0:0.25, 1:0.5, 3:1, 4:1.5, 5:2, 6:3, 7:4
       g_MUX_SQ_FB_DELAY    => g_MUX_SQ_FB_DELAY,  -- [0;(2**6) - 1]
       g_AMP_SQ_OF_DELAY    => g_AMP_SQ_OF_DELAY,  -- [0;(2**6) - 1]
       g_ERROR_DELAY        => g_ERROR_DELAY,  -- [0;(2**6) - 1]
