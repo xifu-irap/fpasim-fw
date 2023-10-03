@@ -2291,7 +2291,6 @@ if __name__ == '__main__':
     # tb_amp_squid_top tests
     json_test_dic["tb_linty_test"].append(solo_test_dic['tb_amp_squid_top_test_variant_debug_all'])
     json_test_dic["tb_linty_test"].append(solo_test_dic['tb_amp_squid_top_test_variant_func_all'])
-    json_test_dic["tb_linty_test"].append(solo_test_dic['tb_amp_squid_top_test_variant_func_all'])
 
     # tb_fpga_system_fpasim tests
     json_test_dic["tb_linty_test"].append(solo_test_dic['tb_fpga_system_fpasim_top_debug'])
