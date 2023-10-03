@@ -47,6 +47,9 @@ create_clock -name virt_adc_clk_in   -period 4;
 # 500 MHz (data part)
 create_clock -name virt_dac_clk   -period 2;
 
+# 250 MHz (sys)
+create_clock -name virt_sys_clk   -period 4;
+
 ###############################################################################################################
 # rename auto-derived clock
 ###############################################################################################################
@@ -409,7 +412,7 @@ set_input_delay -clock $input_clock -min $dv_are                              [g
 # create_generated_clock -name <gen_clock_name> -multiply_by 1 -source [get_pins <source_pin>] [get_ports <output_clock_port>]
 # gen_clock_name is the name of forwarded clock here. It should be used below for defining "fwclk".
 
-set fwclk        sys_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)
+set fwclk        virt_sys_clk;      # forwarded clock name (generated using create_generated_clock at output clock port)
 set tsu          0.5;           # destination device setup time requirement
 set thd          0.5;           # destination device hold time requirement
 set trce_dly_max 0.000;            # maximum board trace delay
@@ -436,7 +439,7 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 #                        __    __
 # data   XXXXXXXXXXXXXXXX__DATA__XXXXXXXXXXXXX
 
-set destination_clock sys_clk;    # Name of destination clock
+set destination_clock virt_sys_clk;    # Name of destination clock
 set tsu               0.500;      # Destination device setup time requirement
 set thd               0.500;      # Destination device hold time requirement
 set trce_dly_max      0.000;      # Maximum board trace delay
@@ -498,7 +501,7 @@ set_output_delay -clock $fwclk -min [expr $trce_dly_min - $thd] [get_ports $outp
 # data   XXXXXXXXXXXXXXXX__DATA__XXXXXXXXXXXXX
 #
 
-set destination_clock sys_clk;    # Name of destination clock
+set destination_clock virt_sys_clk;    # Name of destination clock
 set tsu               0.500;      # Destination device setup time requirement
 set thd               0.500;      # Destination device hold time requirement
 set trce_dly_max      0.000;      # Maximum board trace delay
@@ -521,17 +524,6 @@ set_clock_groups -name async_mmcm_usb_user_virt -asynchronous -group {usb_clk} -
 ###############################################################################################################
 #  uncorrelate the opposite clock edge of identical clock
 ###############################################################################################################
-# set_multicycle_path 0 -from [get_clocks dac_clk] -to [get_clocks gen_dac_clk_out]
-# set_multicycle_path -1 -hold -from [get_clocks dac_clk] -to [get_clocks gen_dac_clk_out]
-# set_false_path -setup -rise_from [get_clocks dac_clk] -fall_to [get_clocks gen_dac_clk_out];
-# set_false_path -hold -rise_from [get_clocks dac_clk] -fall_to [get_clocks gen_dac_clk_out];
-
-# set_false_path -setup -rise_from [get_clocks virt_adc_clk_in] -fall_to [get_clocks adc_clk_in];
-# set_false_path -hold -rise_from [get_clocks virt_adc_clk_in] -fall_to [get_clocks adc_clk_in;
-
-# set_false_path -setup -rise_from [get_clocks virt_usb_clk_in] -fall_to [get_clocks usb_clk_in];
-# set_false_path -hold -rise_from [get_clocks virt_usb_clk_in] -fall_to [get_clocks usb_clk_in];
-
 # set_multicycle_path 2 -from [get_clocks virt_usb_clk_in] -to [get_clocks usb_clk_in];
 # set_multicycle_path 2 -from [get_clocks usb_clk_in] -to [get_clocks virt_usb_clk_in];
 
@@ -539,16 +531,10 @@ set_clock_groups -name async_mmcm_usb_user_virt -asynchronous -group {usb_clk} -
 
 # set_multicycle_path 2 -from [get_clocks virt_dac_clk] -to [get_clocks dac_clk];
 
-set_multicycle_path 2 -from [get_ports i_adc_sdo i_mon_sdo i_cdce_sdo i_mon_n_int i_dac_sdo i_pll_status]
+# set_multicycle_path 2 -from [get_ports i_adc_sdo i_mon_sdo i_cdce_sdo i_mon_n_int i_dac_sdo i_pll_status]
 
 
-set dac_clk_net inst_clocking_top/inst_fpasim_clk_wiz_0/inst/clk_out3
-set dac_clk_div_net inst_clocking_top/inst_fpasim_clk_wiz_0/inst/clk_out5
-set_property CLOCK_DELAY_GROUP dac_out [get_nets "$dac_clk_net $dac_clk_div_net"]
-
-set dac_clk_phase_90_net inst_clocking_top/inst_fpasim_clk_wiz_0/inst/clk_out4
-set dac_clk_phase_90_div_net inst_clocking_top/inst_fpasim_clk_wiz_0/inst/clk_out6
-set_property CLOCK_DELAY_GROUP dac_phase90_out [get_nets "$dac_clk_phase_90_net $dac_clk_phase_90_div_net"]
+# set dac_clk_net inst_clocking_top/inst_fpasim_clk_wiz_0/inst/clk_out3
 
 # DAC source-synchronuous
 # Add false path exceptions for cross-clock transfers
@@ -560,17 +546,26 @@ set_false_path -setup  -fall_from [get_clocks dac_clk] -rise_to [get_clocks gen_
 set_false_path -hold  -rise_from [get_clocks dac_clk] -fall_to [get_clocks gen_dac_clk_out]
 set_false_path -hold  -fall_from [get_clocks dac_clk] -rise_to [get_clocks gen_dac_clk_out]
 
-
-set_false_path -setup  -rise_from [get_clocks virt_adc_clk_in] -fall_to [get_clocks gen_dac_clk_out]
-set_false_path -setup  -fall_from [get_clocks virt_adc_clk_in] -rise_to [get_clocks gen_dac_clk_out]
-set_false_path -hold  -rise_from [get_clocks virt_adc_clk_in] -fall_to [get_clocks gen_dac_clk_out]
-set_false_path -hold  -fall_from [get_clocks virt_adc_clk_in] -rise_to [get_clocks gen_dac_clk_out]
-
-
+# clk_ref
+# Add false path exceptions for cross-clock transfers
+#   disable analysis (setup, hold):
+#   clk_ref: rise -> fall (gen_clk_ref)
+#   clk_ref: fall  -> rise (gen_clk_ref)
 set_false_path -setup  -rise_from [get_clocks clk_ref] -fall_to [get_clocks gen_clk_ref]
 set_false_path -setup  -fall_from [get_clocks clk_ref] -rise_to [get_clocks gen_clk_ref]
 set_false_path -hold  -rise_from [get_clocks clk_ref] -fall_to [get_clocks gen_clk_ref]
 set_false_path -hold  -fall_from [get_clocks clk_ref] -rise_to [get_clocks gen_clk_ref]
+
+# sys_clk
+# Add false path exceptions for cross-clock transfers
+#   disable analysis (setup, hold):
+#   sys_clk: rise -> fall (virt_sys_clk)
+#   sys_clk: fall  -> rise (virt_sys_clk)
+set_false_path -setup  -rise_from [get_clocks sys_clk] -fall_to [get_clocks virt_sys_clk]
+set_false_path -setup  -fall_from [get_clocks sys_clk] -rise_to [get_clocks virt_sys_clk]
+set_false_path -hold  -rise_from [get_clocks sys_clk] -fall_to [get_clocks virt_sys_clk]
+set_false_path -hold  -fall_from [get_clocks sys_clk] -rise_to [get_clocks virt_sys_clk]
+
 
 
 
@@ -591,11 +586,15 @@ set_false_path -hold  -fall_from [get_clocks clk_ref] -rise_to [get_clocks gen_c
 ##################################################################################
 # others (input ports): asynchronuous ports
 ##################################################################################
-
+# hardware_id is constant => no constraints
 set_false_path -from [get_ports "i_hardware_id*"]
+# constants value in the steady state => no constraints
 set_false_path -to   [get_ports "o_leds[1]"];
+# constants value in the steady state => no constraints
 set_false_path -to   [get_ports "o_leds[0]"];
+# constants value in the steady state => no constraints
 set_false_path -to   [get_ports "o_led_fw"];
+# constants value in the steady state => no constraints
 set_false_path -to   [get_ports "o_led_pll_lock"];
 
 
@@ -658,12 +657,12 @@ set_property IOB true [get_ports o_clk_frame_p]
 ##################################################################################
 # pulse: IO
 ##################################################################################
-# set_property IOB true [get_ports o_trig_oscillo];
+set_property IOB true [get_ports o_trig_oscillo];
 
 ##################################################################################
 # led: IO
 ##################################################################################
-# set_property IOB true [get_ports o_leds[3]];
+set_property IOB true [get_ports o_leds[3]];
 set_property IOB true [get_ports o_leds[2]];
 
 ##################################################################################
