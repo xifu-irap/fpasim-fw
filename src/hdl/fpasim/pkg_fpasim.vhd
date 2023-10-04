@@ -55,7 +55,7 @@ package pkg_fpasim is
   -- hardcoded : latency of the "mult_add_sfixed" module
   constant pkg_MULT_ADD_SFIXED_LATENCY                    : natural := 3;
   -- hardcoded : latency of the dynamic shif register when its input delay is set to 0
-  constant pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY : natural := 1;
+  constant pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY : natural := 2;
 
   -- pixel:
   -- requirement: FPASIM-FW-REQ-0030

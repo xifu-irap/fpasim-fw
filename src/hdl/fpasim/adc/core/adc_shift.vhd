@@ -49,6 +49,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
+use work.pkg_fpasim.all;
+
 
 entity adc_shift is
   generic(
@@ -137,7 +139,7 @@ begin
 data_valid1 <= i_adc_valid and i_en;
   inst_pipeliner_sync_with_dynamic_shift_register_when_delay_eq_0 : entity work.pipeliner
     generic map(
-      g_NB_PIPES   => 1,                -- number of consecutives registers. Possibles values: [0, integer max value[
+      g_NB_PIPES   => pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY, -- number of consecutives registers. Possibles values: [0, integer max value[
       g_DATA_WIDTH => 1                 -- width of the input/output data.  Possibles values: [1, integer max value[
     )
     port map(

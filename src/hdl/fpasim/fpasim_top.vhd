@@ -467,34 +467,53 @@ architecture RTL of fpasim_top is
   ---------------------------------------------------------------------
   -- signals synchronization with dac_top output
   ---------------------------------------------------------------------
+  -- index0: low
   constant c_DAC_IDX0_L : integer := 0;
+  -- index0: high
   constant c_DAC_IDX0_H : integer := c_DAC_IDX0_L + pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1;
 
+  -- index1: low
   constant c_DAC_IDX1_L : integer := c_DAC_IDX0_H + 1;
+  -- index1: high
   constant c_DAC_IDX1_H : integer := c_DAC_IDX1_L + 1 - 1;
 
+  -- index2: low
   constant c_DAC_IDX2_L : integer := c_DAC_IDX1_H + 1;
+  -- index2: high
   constant c_DAC_IDX2_H : integer := c_DAC_IDX2_L + 1 - 1;
 
+  -- index3: low
   constant c_DAC_IDX3_L : integer := c_DAC_IDX2_H + 1;
+  -- index3: high
   constant c_DAC_IDX3_H : integer := c_DAC_IDX3_L + pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1;
 
+  -- index4: low
   constant c_DAC_IDX4_L : integer := c_DAC_IDX3_H + 1;
+  -- index4: high
   constant c_DAC_IDX4_H : integer := c_DAC_IDX4_L + 1 - 1;
 
+  -- index5: low
   constant c_DAC_IDX5_L : integer := c_DAC_IDX4_H + 1;
+  -- index5: high
   constant c_DAC_IDX5_H : integer := c_DAC_IDX5_L + 1 - 1;
 
-  signal data_pipe_tmp2 : std_logic_vector(c_DAC_IDX5_H downto 0);
-  signal data_pipe_tmp3 : std_logic_vector(c_DAC_IDX5_H downto 0);
+  -- index6: low
+  constant c_DAC_IDX6_L : integer := c_DAC_IDX5_H + 1;
+  -- index6: high
+  constant c_DAC_IDX6_H : integer := c_DAC_IDX6_L + 1 - 1;
 
-  signal pixel_sof4   : std_logic;  -- @suppress "signal pixel_sof3 is never read"
-  signal pixel_eof4   : std_logic;  -- @suppress "signal pixel_eof3 is never read"
-  signal pixel_valid4 : std_logic;
-  signal pixel_id4    : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);  -- @suppress "signal pixel_id3 is never read"
-  signal frame_sof4   : std_logic;
-  signal frame_eof4   : std_logic;  -- @suppress "signal frame_eof3 is never read"
-  signal frame_id4    : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  -- @suppress "signal frame_id3 is never read"
+   -- temporary input pipe
+  signal data_pipe_tmp2 : std_logic_vector(c_DAC_IDX6_H downto 0);
+   -- temporary output pipe
+  signal data_pipe_tmp3 : std_logic_vector(c_DAC_IDX6_H downto 0);
+
+  signal pixel_sof4   : std_logic;  -- first pixel sample
+  signal pixel_eof4   : std_logic;  -- last pixel sample
+  signal pixel_valid4 : std_logic;  -- valid pixel sample
+  signal pixel_id4    : std_logic_vector(pkg_NB_PIXEL_BY_FRAME_MAX_WIDTH - 1 downto 0);  -- pixel id
+  signal frame_sof4   : std_logic;  -- first frame sample
+  signal frame_eof4   : std_logic;  -- last frame sample
+  signal frame_id4    : std_logic_vector(pkg_NB_FRAME_BY_PULSE_SHAPE_WIDTH - 1 downto 0);  --  frame id
 
 
   ---------------------------------------------------------------------
@@ -539,7 +558,9 @@ architecture RTL of fpasim_top is
   -- debug
   ---------------------------------------------------------------------
   -- pipe: spy
+   -- temporary input pipe
   signal data_pipe_tmp4 : std_logic_vector(15 downto 0);
+   -- temporary output pipe
   signal data_pipe_tmp5 : std_logic_vector(15 downto 0);
 
   -- Select the dac pattern source: '1': custom debug pattern, '0': hardcoded pattern
@@ -936,8 +957,8 @@ begin
       ---------------------------------------------------------------------
       -- output
       ---------------------------------------------------------------------
-      o_pulse_sof                  => pulse_sof1,  -- not connected
-      o_pulse_eof                  => pulse_eof1,  -- not connected
+      o_pulse_sof                  => pulse_sof1,
+      o_pulse_eof                  => pulse_eof1,
       o_pixel_sof                  => pixel_sof1,
       o_pixel_eof                  => pixel_eof1,
       o_pixel_valid                => pixel_valid1,
@@ -1273,6 +1294,7 @@ begin
   ---------------------------------------------------------------------
   -- signals synchronization with dac_top output
   ---------------------------------------------------------------------
+  data_pipe_tmp2(c_DAC_IDX6_H)                     <= pixel_valid3;
   data_pipe_tmp2(c_DAC_IDX5_H)                     <= pixel_sof3;
   data_pipe_tmp2(c_DAC_IDX4_H)                     <= pixel_eof3;
   data_pipe_tmp2(c_DAC_IDX3_H downto c_DAC_IDX3_L) <= pixel_id3;
@@ -1291,12 +1313,13 @@ begin
       o_data => data_pipe_tmp3
       );
 
-  pixel_sof4 <= data_pipe_tmp3(c_DAC_IDX5_H);
-  pixel_eof4 <= data_pipe_tmp3(c_DAC_IDX4_H);
-  pixel_id4  <= data_pipe_tmp3(c_DAC_IDX3_H downto c_DAC_IDX3_L);
-  frame_sof4 <= data_pipe_tmp3(c_DAC_IDX2_H);
-  frame_eof4 <= data_pipe_tmp3(c_DAC_IDX1_H);
-  frame_id4  <= data_pipe_tmp3(c_DAC_IDX0_H downto c_DAC_IDX0_L);
+  pixel_valid4 <= data_pipe_tmp3(c_DAC_IDX6_H);
+  pixel_sof4   <= data_pipe_tmp3(c_DAC_IDX5_H);
+  pixel_eof4   <= data_pipe_tmp3(c_DAC_IDX4_H);
+  pixel_id4    <= data_pipe_tmp3(c_DAC_IDX3_H downto c_DAC_IDX3_L);
+  frame_sof4   <= data_pipe_tmp3(c_DAC_IDX2_H);
+  frame_eof4   <= data_pipe_tmp3(c_DAC_IDX1_H);
+  frame_id4    <= data_pipe_tmp3(c_DAC_IDX0_H downto c_DAC_IDX0_L);
 
   ---------------------------------------------------------------------
   -- output
@@ -1457,7 +1480,10 @@ begin
   -- debug
   ---------------------------------------------------------------------
   data_pipe_tmp4(15)           <= sync4;
-  data_pipe_tmp4(14 downto 11) <= (others => '0');
+  data_pipe_tmp4(14)           <= pulse_valid4;
+  data_pipe_tmp4(13)           <= pulse_sof4;
+  data_pipe_tmp4(12)           <= pulse_eof4;
+  data_pipe_tmp4(11)           <= pixel_valid4;
   data_pipe_tmp4(10 downto 5)  <= pixel_id4;
   data_pipe_tmp4(4)            <= pixel_sof4;
   data_pipe_tmp4(3)            <= pixel_eof4;
