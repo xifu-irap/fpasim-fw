@@ -56,10 +56,10 @@ entity tb_system_fpasim_top is
     ---------------------------------------------------------------------
     -- simulation parameters
     ---------------------------------------------------------------------
-    g_VUNIT_DEBUG  : boolean  := true; -- true: stop simulator on failures, false: stop the simulator on errors.
-    g_TEST_NAME    : string   := ""; -- name of the test
-    g_ENABLE_CHECK : boolean  := true;-- true: compare the simulation output with the reference one, false: do nothing.
-    g_ENABLE_LOG   : boolean  := true-- true: save simulation data in files, false: don't save simulation data in files
+    g_VUNIT_DEBUG  : boolean := true;  -- true: stop simulator on failures, false: stop the simulator on errors.
+    g_TEST_NAME    : string  := "";     -- name of the test
+    g_ENABLE_CHECK : boolean := true;  -- true: compare the simulation output with the reference one, false: do nothing.
+    g_ENABLE_LOG   : boolean := true  -- true: save simulation data in files, false: don't save simulation data in files
     );
 end tb_system_fpasim_top;
 
@@ -74,133 +74,142 @@ architecture Simulation of tb_system_fpasim_top is
   -- module input signals
   ---------------------------------------------------------------------
   --  Opal Kelly inouts --
-  signal i_okUH  : std_logic_vector(4 downto 0) := (others => '0'); -- usb signals
-  signal o_okHU  : std_logic_vector(2 downto 0) := (others => '0'); -- usb signals
-  signal b_okUHU : std_logic_vector(31 downto 0); -- usb signals
-  signal b_okAA  : std_logic                    := '0'; -- usb signals
+  signal i_okUH  : std_logic_vector(4 downto 0) := (others => '0');  -- usb signals
+  signal o_okHU  : std_logic_vector(2 downto 0) := (others => '0');  -- usb signals
+  signal b_okUHU : std_logic_vector(31 downto 0);        -- usb signals
+  signal b_okAA  : std_logic                    := '0';  -- usb signals
 
   -- FMC: from the card
-  -- board_id
-  --signal i_board_id  : std_logic_vector(7 downto 0) := (others => '0');
+  -- i_hardware_id
+  signal i_hardware_id : std_logic_vector(7 downto 0) := (others => '0');
   ---------------------------------------------------------------------
   -- FMC: from the adc
   ---------------------------------------------------------------------
-  signal i_adc_clk_p : std_logic                    := '0';  --  differential clock p @250MHz
-  signal i_adc_clk_n : std_logic                    := '1';  --  differential clock n @250MHZ
+  signal i_adc_clk_p   : std_logic                    := '0';  --  differential clock p @250MHz
+  signal i_adc_clk_n   : std_logic                    := '1';  --  differential clock n @250MHZ
   -- adc_a
   -- bit P/N: 0-1
-  signal i_da0_p     : std_logic; -- adc bit0_p: channel A
-  signal i_da0_n     : std_logic; -- adc bit0_n: channel A
+  signal i_da0_p       : std_logic;     -- adc bit0_p: channel A
+  signal i_da0_n       : std_logic;     -- adc bit0_n: channel A
 
-  signal i_da2_p     : std_logic; -- adc bit2_p: channel A
-  signal i_da2_n     : std_logic; -- adc bit2_n: channel A
+  signal i_da2_p : std_logic;           -- adc bit2_p: channel A
+  signal i_da2_n : std_logic;           -- adc bit2_n: channel A
 
-  signal i_da4_p     : std_logic; -- adc bit4_p: channel A
-  signal i_da4_n     : std_logic; -- adc bit4_n: channel A
+  signal i_da4_p : std_logic;           -- adc bit4_p: channel A
+  signal i_da4_n : std_logic;           -- adc bit4_n: channel A
 
-  signal i_da6_p     : std_logic; -- adc bit6_p: channel A
-  signal i_da6_n     : std_logic; -- adc bit6_n: channel A
+  signal i_da6_p : std_logic;           -- adc bit6_p: channel A
+  signal i_da6_n : std_logic;           -- adc bit6_n: channel A
 
-  signal i_da8_p     : std_logic; -- adc bit8_p: channel A
-  signal i_da8_n     : std_logic; -- adc bit8_n: channel A
+  signal i_da8_p : std_logic;           -- adc bit8_p: channel A
+  signal i_da8_n : std_logic;           -- adc bit8_n: channel A
 
-  signal i_da10_p    : std_logic; -- adc bit10_p: channel A
-  signal i_da10_n    : std_logic; -- adc bit10_n: channel A
+  signal i_da10_p : std_logic;          -- adc bit10_p: channel A
+  signal i_da10_n : std_logic;          -- adc bit10_n: channel A
 
-  signal i_da12_p    : std_logic; -- adc bit12_p: channel A
-  signal i_da12_n    : std_logic; -- adc bit12_n: channel A
+  signal i_da12_p : std_logic;          -- adc bit12_p: channel A
+  signal i_da12_n : std_logic;          -- adc bit12_n: channel A
   -- adc_b
-  signal i_db0_p     : std_logic; -- adc bit0_p: channel B
-  signal i_db0_n     : std_logic; -- adc bit0_n: channel B
+  signal i_db0_p  : std_logic;          -- adc bit0_p: channel B
+  signal i_db0_n  : std_logic;          -- adc bit0_n: channel B
 
-  signal i_db2_p     : std_logic; -- adc bit2_p: channel B
-  signal i_db2_n     : std_logic; -- adc bit2_n: channel B
+  signal i_db2_p : std_logic;           -- adc bit2_p: channel B
+  signal i_db2_n : std_logic;           -- adc bit2_n: channel B
 
-  signal i_db4_p     : std_logic; -- adc bit4_p: channel B
-  signal i_db4_n     : std_logic; -- adc bit4_n: channel B
+  signal i_db4_p : std_logic;           -- adc bit4_p: channel B
+  signal i_db4_n : std_logic;           -- adc bit4_n: channel B
 
-  signal i_db6_p     : std_logic; -- adc bit6_p: channel B
-  signal i_db6_n     : std_logic; -- adc bit6_n: channel B
+  signal i_db6_p : std_logic;           -- adc bit6_p: channel B
+  signal i_db6_n : std_logic;           -- adc bit6_n: channel B
 
-  signal i_db8_p     : std_logic; -- adc bit8_p: channel B
-  signal i_db8_n     : std_logic; -- adc bit8_n: channel B
+  signal i_db8_p : std_logic;           -- adc bit8_p: channel B
+  signal i_db8_n : std_logic;           -- adc bit8_n: channel B
 
-  signal i_db10_p    : std_logic; -- adc bit10_p: channel B
-  signal i_db10_n    : std_logic; -- adc bit10_n: channel B
+  signal i_db10_p : std_logic;          -- adc bit10_p: channel B
+  signal i_db10_n : std_logic;          -- adc bit10_n: channel B
 
-  signal i_db12_p    : std_logic; -- adc bit12_p: channel B
-  signal i_db12_n    : std_logic; -- adc bit12_n: channel B
+  signal i_db12_p : std_logic;          -- adc bit12_p: channel B
+  signal i_db12_n : std_logic;          -- adc bit12_n: channel B
 
   -- FMC: to sync
   ---------------------------------------------------------------------
-  signal o_ref_clk : std_logic; -- clock reference
-  signal o_sync    : std_logic; -- clock frame
+  signal o_clk_ref_p   : std_logic;     -- differential reference clock_p
+  signal o_clk_ref_n   : std_logic;     -- differential reference clock_n
+  signal o_clk_frame_p : std_logic;     -- differential clk_frame_p pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
+  signal o_clk_frame_n : std_logic;     -- differential clk_frame_n pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
 
   -- FMC: to dac
   ---------------------------------------------------------------------
-  signal o_dac_clk_p   : std_logic; -- dac clock_p
-  signal o_dac_clk_n   : std_logic; -- dac clock_n
+  signal o_dac_clk_p : std_logic;       -- dac clock_p
+  signal o_dac_clk_n : std_logic;       -- dac clock_n
 
-  signal o_dac_frame_p : std_logic; -- dac frame_p
-  signal o_dac_frame_n : std_logic; -- dac frame_n
+  signal o_dac_frame_p : std_logic;     -- dac frame_p
+  signal o_dac_frame_n : std_logic;     -- dac frame_n
 
-  signal o_dac0_p      : std_logic; -- dac bit0_p
-  signal o_dac0_n      : std_logic; -- dac bit0_n
+  signal o_dac0_p : std_logic;          -- dac bit0_p
+  signal o_dac0_n : std_logic;          -- dac bit0_n
 
-  signal o_dac1_p      : std_logic; -- dac bit1_p
-  signal o_dac1_n      : std_logic; -- dac bit1_n
+  signal o_dac1_p : std_logic;          -- dac bit1_p
+  signal o_dac1_n : std_logic;          -- dac bit1_n
 
-  signal o_dac2_p      : std_logic; -- dac bit2_p
-  signal o_dac2_n      : std_logic; -- dac bit2_n
+  signal o_dac2_p : std_logic;          -- dac bit2_p
+  signal o_dac2_n : std_logic;          -- dac bit2_n
 
-  signal o_dac3_p      : std_logic; -- dac bit3_p
-  signal o_dac3_n      : std_logic; -- dac bit3_n
+  signal o_dac3_p : std_logic;          -- dac bit3_p
+  signal o_dac3_n : std_logic;          -- dac bit3_n
 
-  signal o_dac4_p      : std_logic; -- dac bit4_p
-  signal o_dac4_n      : std_logic; -- dac bit4_n
+  signal o_dac4_p : std_logic;          -- dac bit4_p
+  signal o_dac4_n : std_logic;          -- dac bit4_n
 
-  signal o_dac5_p      : std_logic; -- dac bit5_p
-  signal o_dac5_n      : std_logic; -- dac bit5_n
+  signal o_dac5_p : std_logic;          -- dac bit5_p
+  signal o_dac5_n : std_logic;          -- dac bit5_n
 
-  signal o_dac6_p      : std_logic; -- dac bit6_p
-  signal o_dac6_n      : std_logic; -- dac bit6_n
+  signal o_dac6_p : std_logic;          -- dac bit6_p
+  signal o_dac6_n : std_logic;          -- dac bit6_n
 
-  signal o_dac7_p      : std_logic; -- dac bit7_p
-  signal o_dac7_n      : std_logic; -- dac bit7_n
+  signal o_dac7_p : std_logic;          -- dac bit7_p
+  signal o_dac7_n : std_logic;          -- dac bit7_n
 
   ---------------------------------------------------------------------
   -- devices: spi links + specific signals
   ---------------------------------------------------------------------
   -- common: shared link between the spi
-  signal o_spi_sclk        : std_logic; --  Shared SPI clock line
-  signal o_spi_sdata       : std_logic; --  Shared SPI MOSI
+  signal o_spi_sclk        : std_logic;  --  Shared SPI clock line
+  signal o_spi_sdata       : std_logic;  --  Shared SPI MOSI
   -- CDCE: SPI
-  signal i_cdce_sdo        : std_logic := '0'; --  SPI MISO
-  signal o_cdce_n_en       : std_logic; --  SPI chip select
+  signal i_cdce_sdo        : std_logic := '0';  --  SPI MISO
+  signal o_cdce_n_en       : std_logic;  --  SPI chip select
   -- CDCE: specific signals
-  signal i_cdce_pll_status : std_logic := '1'; --  pll_status : This pin is set high if the PLL is in lock.
-  signal o_cdce_n_reset    : std_logic; --  reset_n or hold_n
-  signal o_cdce_n_pd       : std_logic; --  power_down_n
-  signal o_ref_en          : std_logic; --  enable the primary reference clock
+  signal i_cdce_pll_status : std_logic := '1';  --  pll_status : This pin is set high if the PLL is in lock.
+  signal o_cdce_n_reset    : std_logic;  --  reset_n or hold_n
+  signal o_cdce_n_pd       : std_logic;  --  power_down_n
+  signal o_ref_en          : std_logic;  --  enable the primary reference clock
   -- ADC: SPI
-  signal i_adc_sdo         : std_logic := '0'; --  SPI MISO
-  signal o_adc_n_en        : std_logic; --  SPI chip select
+  signal i_adc_sdo         : std_logic := '0';  --  SPI MISO
+  signal o_adc_n_en        : std_logic;  --  SPI chip select
   -- ADC: specific signals
-  signal o_adc_reset       : std_logic; --  adc hardware reset
+  signal o_adc_reset       : std_logic;  --  adc hardware reset
   -- DAC: SPI
-  signal i_dac_sdo         : std_logic := '0'; --  SPI MISO
-  signal o_dac_n_en        : std_logic; --  SPI chip select
+  signal i_dac_sdo         : std_logic := '0';  --  SPI MISO
+  signal o_dac_n_en        : std_logic;  --  SPI chip select
   -- DAC: specific signal
-  signal o_dac_tx_present  : std_logic; --  enable tx acquisition
+  signal o_dac_tx_present  : std_logic;  --  enable tx acquisition
   -- AMC: SPI (monitoring)
-  signal i_mon_sdo         : std_logic := '0'; --  SPI data out
-  signal o_mon_n_en        : std_logic; --  SPI chip select
+  signal i_mon_sdo         : std_logic := '0';  --  SPI data out
+  signal o_mon_n_en        : std_logic;  --  SPI chip select
   -- AMC : specific signals
-  signal i_mon_n_int       : std_logic := '0'; --  galr_n: Global analog input out-of-range alarm.
-  signal o_mon_n_reset     : std_logic; --  reset_n: hardware reset
+  signal i_mon_n_int       : std_logic := '0';  --  galr_n: Global analog input out-of-range alarm.
+  signal o_mon_n_reset     : std_logic;  --  reset_n: hardware reset
 
-  -- leds
-  signal o_leds : std_logic_vector(3 downto 2);
+  -- FPGA BOARD leds
+  signal o_leds         : std_logic_vector(3 downto 0);
+  -- FMC firmware led
+  signal o_led_fw       : std_logic;
+  -- FMC PLL lock led
+  signal o_led_pll_lock : std_logic;
+
+  -- first processed sample of a pulse
+  signal o_trig_oscillo : std_logic;
 
   ---------------------------------------------------------------------
   -- additional signals
@@ -625,119 +634,131 @@ begin
   ---------------------------------------------------------------------
   -- DUT
   ---------------------------------------------------------------------
+  i_hardware_id <= std_logic_vector(to_unsigned(1, i_hardware_id'length));
+
   inst_system_fpasim_top : entity fpasim.system_fpasim_top
     generic map (
       g_DEBUG => false
       )
     port map(
       --  Opal Kelly inouts --
-      i_okUH            => i_okUH,
-      o_okHU            => o_okHU,
-      b_okUHU           => b_okUHU,
-      b_okAA            => b_okAA,
+      i_okUH         => i_okUH,
+      o_okHU         => o_okHU,
+      b_okUHU        => b_okUHU,
+      b_okAA         => b_okAA,
       ---------------------------------------------------------------------
       -- FMC: from the card
       ---------------------------------------------------------------------
-      --i_board_id        => i_board_id,  -- card board id
+      i_hardware_id  => i_hardware_id,  -- i_hardware_id card
       ---------------------------------------------------------------------
       -- FMC: from the adc
       ---------------------------------------------------------------------
-      i_clk_ab_p       => i_adc_clk_p,  -- differential clock p @250MHz
-      i_clk_ab_n       => i_adc_clk_n,  -- differential clock n @250MHZ
+      i_clk_ab_p     => i_adc_clk_p,    -- differential clock p @250MHz
+      i_clk_ab_n     => i_adc_clk_n,    -- differential clock n @250MHZ
       -- adc_a
       -- bit P/N: 0-1
-      i_cha_00_p           => i_da0_p,
-      i_cha_00_n           => i_da0_n,
-      i_cha_02_p           => i_da2_p,
-      i_cha_02_n           => i_da2_n,
-      i_cha_04_p           => i_da4_p,
-      i_cha_04_n           => i_da4_n,
-      i_cha_06_p           => i_da6_p,
-      i_cha_06_n           => i_da6_n,
-      i_cha_08_p           => i_da8_p,
-      i_cha_08_n           => i_da8_n,
-      i_cha_10_p           => i_da10_p,
-      i_cha_10_n           => i_da10_n,
-      i_cha_12_p           => i_da12_p,
-      i_cha_12_n           => i_da12_n,
+      i_cha_00_p     => i_da0_p,
+      i_cha_00_n     => i_da0_n,
+      i_cha_02_p     => i_da2_p,
+      i_cha_02_n     => i_da2_n,
+      i_cha_04_p     => i_da4_p,
+      i_cha_04_n     => i_da4_n,
+      i_cha_06_p     => i_da6_p,
+      i_cha_06_n     => i_da6_n,
+      i_cha_08_p     => i_da8_p,
+      i_cha_08_n     => i_da8_n,
+      i_cha_10_p     => i_da10_p,
+      i_cha_10_n     => i_da10_n,
+      i_cha_12_p     => i_da12_p,
+      i_cha_12_n     => i_da12_n,
       -- adc_b
-      i_chb_00_p           => i_db0_p,
-      i_chb_00_n           => i_db0_n,
-      i_chb_02_p           => i_db2_p,
-      i_chb_02_n           => i_db2_n,
-      i_chb_04_p           => i_db4_p,
-      i_chb_04_n           => i_db4_n,
-      i_chb_06_p           => i_db6_p,
-      i_chb_06_n           => i_db6_n,
-      i_chb_08_p           => i_db8_p,
-      i_chb_08_n           => i_db8_n,
-      i_chb_10_p           => i_db10_p,
-      i_chb_10_n           => i_db10_n,
-      i_chb_12_p           => i_db12_p,
-      i_chb_12_n           => i_db12_n,
+      i_chb_00_p     => i_db0_p,
+      i_chb_00_n     => i_db0_n,
+      i_chb_02_p     => i_db2_p,
+      i_chb_02_n     => i_db2_n,
+      i_chb_04_p     => i_db4_p,
+      i_chb_04_n     => i_db4_n,
+      i_chb_06_p     => i_db6_p,
+      i_chb_06_n     => i_db6_n,
+      i_chb_08_p     => i_db8_p,
+      i_chb_08_n     => i_db8_n,
+      i_chb_10_p     => i_db10_p,
+      i_chb_10_n     => i_db10_n,
+      i_chb_12_p     => i_db12_p,
+      i_chb_12_n     => i_db12_n,
       ---------------------------------------------------------------------
       -- FMC: to sync
       ---------------------------------------------------------------------
-      o_clk_ref         => o_ref_clk,
-      o_clk_frame       => o_sync,
+      o_clk_ref_p    => o_clk_ref_p,
+      o_clk_ref_n    => o_clk_ref_n,
+      o_clk_frame_p  => o_clk_frame_p,
+      o_clk_frame_n  => o_clk_frame_n,
       ---------------------------------------------------------------------
       -- FMC: to dac
       ---------------------------------------------------------------------
-      o_dac_dclk_p        => o_dac_clk_p,
-      o_dac_dclk_n        => o_dac_clk_n,
-      o_frame_p           => o_dac_frame_p,
-      o_frame_n           => o_dac_frame_n,
-      o_dac_d0_p          => o_dac0_p,
-      o_dac_d0_n          => o_dac0_n,
-      o_dac_d1_p          => o_dac1_p,
-      o_dac_d1_n          => o_dac1_n,
-      o_dac_d2_p          => o_dac2_p,
-      o_dac_d2_n          => o_dac2_n,
-      o_dac_d3_p          => o_dac3_p,
-      o_dac_d3_n          => o_dac3_n,
-      o_dac_d4_p          => o_dac4_p,
-      o_dac_d4_n          => o_dac4_n,
-      o_dac_d5_p          => o_dac5_p,
-      o_dac_d5_n          => o_dac5_n,
-      o_dac_d6_p          => o_dac6_p,
-      o_dac_d6_n          => o_dac6_n,
-      o_dac_d7_p          => o_dac7_p,
-      o_dac_d7_n          => o_dac7_n,
+      o_dac_dclk_p   => o_dac_clk_p,
+      o_dac_dclk_n   => o_dac_clk_n,
+      o_frame_p      => o_dac_frame_p,
+      o_frame_n      => o_dac_frame_n,
+      o_dac_d0_p     => o_dac0_p,
+      o_dac_d0_n     => o_dac0_n,
+      o_dac_d1_p     => o_dac1_p,
+      o_dac_d1_n     => o_dac1_n,
+      o_dac_d2_p     => o_dac2_p,
+      o_dac_d2_n     => o_dac2_n,
+      o_dac_d3_p     => o_dac3_p,
+      o_dac_d3_n     => o_dac3_n,
+      o_dac_d4_p     => o_dac4_p,
+      o_dac_d4_n     => o_dac4_n,
+      o_dac_d5_p     => o_dac5_p,
+      o_dac_d5_n     => o_dac5_n,
+      o_dac_d6_p     => o_dac6_p,
+      o_dac_d6_n     => o_dac6_n,
+      o_dac_d7_p     => o_dac7_p,
+      o_dac_d7_n     => o_dac7_n,
       ---------------------------------------------------------------------
       -- devices: spi links + specific signals
       ---------------------------------------------------------------------
       -- common: shared link between the spi
-      o_spi_sclk        => o_spi_sclk,  -- Shared SPI clock line
-      o_spi_sdata       => o_spi_sdata,  -- Shared SPI MOSI
+      o_spi_sclk     => o_spi_sclk,     -- Shared SPI clock line
+      o_spi_sdata    => o_spi_sdata,    -- Shared SPI MOSI
       -- CDCE: SPI
-      i_cdce_sdo        => i_cdce_sdo,  -- SPI MISO
-      o_cdce_n_en       => o_cdce_n_en,  -- SPI chip select
+      i_cdce_sdo     => i_cdce_sdo,     -- SPI MISO
+      o_cdce_n_en    => o_cdce_n_en,    -- SPI chip select
       -- CDCE: specific signals
-      i_pll_status      => i_cdce_pll_status,  -- pll_status : This pin is set high if the PLL is in lock.
-      o_cdce_n_reset    => o_cdce_n_reset,     -- reset_n or hold_n
-      o_cdce_n_pd       => o_cdce_n_pd,  -- power_down_n
-      o_ref_en          => o_ref_en,    -- enable the primary reference clock
+      i_pll_status   => i_cdce_pll_status,  -- pll_status : This pin is set high if the PLL is in lock.
+      o_cdce_n_reset => o_cdce_n_reset,     -- reset_n or hold_n
+      o_cdce_n_pd    => o_cdce_n_pd,    -- power_down_n
+      o_ref_en       => o_ref_en,       -- enable the primary reference clock
       -- ADC: SPI
-      i_adc_sdo         => i_adc_sdo,   -- SPI MISO
-      o_adc_n_en        => o_adc_n_en,  -- SPI chip select
+      i_adc_sdo      => i_adc_sdo,      -- SPI MISO
+      o_adc_n_en     => o_adc_n_en,     -- SPI chip select
       -- ADC: specific signals
-      o_adc_reset       => o_adc_reset,  -- adc hardware reset
+      o_adc_reset    => o_adc_reset,    -- adc hardware reset
       -- DAC: SPI
-      i_dac_sdo         => i_dac_sdo,   -- SPI MISO
-      o_dac_n_en        => o_dac_n_en,  -- SPI chip select
+      i_dac_sdo      => i_dac_sdo,      -- SPI MISO
+      o_dac_n_en     => o_dac_n_en,     -- SPI chip select
       -- DAC: specific signal
-      o_tx_enable       => o_dac_tx_present,   -- enable tx acquisition
+      o_tx_enable    => o_dac_tx_present,   -- enable tx acquisition
       -- AMC: SPI (monitoring)
-      i_mon_sdo         => i_mon_sdo,   -- SPI data out
-      o_mon_n_en        => o_mon_n_en,  -- SPI chip select
+      i_mon_sdo      => i_mon_sdo,      -- SPI data out
+      o_mon_n_en     => o_mon_n_en,     -- SPI chip select
       -- AMC : specific signals
-      i_mon_n_int       => i_mon_n_int,  -- galr_n: Global analog input out-of-range alarm.
-      o_mon_n_reset     => o_mon_n_reset,      -- reset_n: hardware reset
+      i_mon_n_int    => i_mon_n_int,  -- galr_n: Global analog input out-of-range alarm.
+      o_mon_n_reset  => o_mon_n_reset,  -- reset_n: hardware reset
 
       ---------------------------------------------------------------------
       -- leds
       ---------------------------------------------------------------------
-      o_leds => o_leds
+      o_leds         => o_leds,
+      o_led_fw       => o_led_fw,
+      o_led_pll_lock => o_led_pll_lock,
+
+      ---------------------------------------------------------------------
+      -- FMC: to oscillo
+      ---------------------------------------------------------------------
+      -- first processed sample of a pulse
+      o_trig_oscillo => o_trig_oscillo
       );
 
 ---------------------------------------------------------------------

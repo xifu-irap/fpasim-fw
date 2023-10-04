@@ -134,8 +134,10 @@ entity io_top is
     o_sync_status : out std_logic_vector(7 downto 0);   -- sync status
 
     -- to the fpga pads : @sync_clk
-    o_sync_clk : out std_logic;         -- sync/ref clock
-    o_sync     : out std_logic;         -- sync signal value
+    o_sync_clk_p : out std_logic;         -- differential sync/ref clock p
+    o_sync_clk_n : out std_logic;         -- differential sync/ref clock n
+    o_sync_p     : out std_logic;         -- differential sync_p
+    o_sync_n     : out std_logic;         -- differential sync_n
 
     ---------------------------------------------------------------------
     -- dac
@@ -184,7 +186,18 @@ entity io_top is
     o_dac6_n : out std_logic;           --  differential_n dac data (lane6)
 
     o_dac7_p : out std_logic;           --  differential_p dac data (lane7)
-    o_dac7_n : out std_logic            --  differential_n dac data (lane7)
+    o_dac7_n : out std_logic;           --  differential_n dac data (lane7)
+
+    ---------------------------------------------------------------------
+    -- pulse
+    ---------------------------------------------------------------------
+    -- input: from/to the user @i_sys_clk
+    -- first processed sample of a pulse
+    i_pulse_sof : in std_logic;
+
+    -- to the fpga pads : @i_sys_clk
+    -- first processed sample of a pulse
+    o_pulse_sof : out std_logic
     );
 end entity io_top;
 
@@ -359,8 +372,10 @@ begin
       i_io_clk_rst => i_sync_io_clk_rst,
       i_io_rst     => i_sync_io_rst,
       -- data
-      o_sync_clk   => o_sync_clk,
-      o_sync       => o_sync,
+      o_sync_clk_p   => o_sync_clk_p,
+      o_sync_clk_n   => o_sync_clk_n,
+      o_sync_p       => o_sync_p,
+      o_sync_n       => o_sync_n,
       ---------------------------------------------------------------------
       -- errors/status
       ---------------------------------------------------------------------
@@ -432,6 +447,26 @@ begin
   -- output
   o_dac_errors <= dac_errors;
   o_dac_status <= dac_status;
+
+
+  ---------------------------------------------------------------------
+  -- pulse
+  ---------------------------------------------------------------------
+  inst_io_pulse : entity work.io_pulse
+    port map(
+      -- clock
+      i_clk       => i_sys_clk,
+      ---------------------------------------------------------------------
+      -- input @i_clk
+      ---------------------------------------------------------------------
+      -- first processed sample of a pulse
+      i_pulse_sof => i_pulse_sof,
+      ---------------------------------------------------------------------
+      -- output @i_clk
+      ---------------------------------------------------------------------
+      -- first processed sample of a pulse
+      o_pulse_sof => o_pulse_sof
+      );
 
 
 end architecture RTL;

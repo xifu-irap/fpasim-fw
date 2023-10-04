@@ -64,12 +64,15 @@ verific -vhdl ./src/hdl/io/core/io_adc.vhd
 verific -vhdl ./src/hdl/io/core/io_dac_data_insert.vhd
 verific -vhdl ./src/hdl/io/core/io_dac.vhd
 verific -vhdl ./src/hdl/io/core/io_sync.vhd
+verific -vhdl ./src/hdl/io/core/io_pulse.vhd
 verific -vhdl ./src/hdl/io/io_top.vhd
 verific -vhdl ./src/hdl/utils/math/mult_add_sfixed.vhd
 verific -vhdl ./src/hdl/utils/math/mult_sub_sfixed.vhd
 verific -vhdl ./src/hdl/fpasim/regdecode/pkg_regdecode.vhd
 verific -vhdl ./src/hdl/fpasim/mux_squid/core/mux_squid.vhd
 verific -vhdl ./src/hdl/fpasim/mux_squid/mux_squid_top.vhd
+verific -vhdl ./src/hdl/fpasim/pulse/core/pulse_generator.vhd
+verific -vhdl ./src/hdl/fpasim/pulse/pulse_top.vhd
 verific -vhdl ./src/hdl/utils/others/pipeliner_with_init.vhd
 verific -vhdl ./src/hdl/spi/core/pkg_spi.vhd
 verific -vhdl ./src/hdl/pkg_system_fpasim_debug.vhd
@@ -97,6 +100,8 @@ verific -vhdl ./src/hdl/fpasim/regdecode/core/regdecode_wire_errors.vhd
 verific -vhdl ./src/hdl/fpasim/regdecode/regdecode_top.vhd
 verific -vhdl ./ip/xilinx/xpm/cdc/synchronous_reset_synchronizer.vhd
 verific -vhdl ./src/hdl/utils/others/synchronous_reset_pulse.vhd
+verific -vhdl ./src/hdl/led/core/led_pulse.vhd
+verific -vhdl ./src/hdl/led/led_top.vhd
 verific -vhdl ./src/hdl/reset/core/reset_io.vhd
 verific -vhdl ./src/hdl/reset/reset_top.vhd
 verific -vhdl ./ip/xilinx/xpm/ram/sdpram.vhd
@@ -112,6 +117,8 @@ verific -vhdl ./src/hdl/spi/core/spi_io.vhd
 verific -vhdl ./src/hdl/spi/spi_top.vhd
 verific -vhdl ./src/hdl/fpasim/sync/core/sync_pulse_generator.vhd
 verific -vhdl ./src/hdl/fpasim/sync/sync_top.vhd
+verific -vhdl ./src/hdl/fpasim/adc/core/adc_bypass.vhd
+verific -vhdl ./src/hdl/fpasim/adc/core/adc_shift.vhd
 verific -vhdl ./src/hdl/fpasim/adc/adc_top.vhd
 verific -vhdl ./src/hdl/fpasim/tes/core/tes_signalling_generator.vhd
 verific -vhdl ./src/hdl/fpasim/tes/core/tes_signalling.vhd

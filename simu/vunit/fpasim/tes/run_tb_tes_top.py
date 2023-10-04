@@ -20,9 +20,9 @@
 #    @file                   run_tb_tes_top.py
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
-#    Code Rules Reference    
+#    Code Rules Reference
 # -------------------------------------------------------------------------------------------------------------
-#    @details         
+#    @details
 #
 #     This script performs the necessary steps to launch the VHDL simulation.
 #     The main steps are:
@@ -33,8 +33,8 @@
 #        . Set the configuration memory files (if exist).
 #        . loop on the *.json file (test variant).
 #        . run the selected VHDL simulator.
-#               
-#     Note: 
+#
+#     Note:
 #       . Used for the VHDL simulation.
 #       . This script should be called by the launch_sim.py python script. But, it can be run in standalone.
 #
@@ -110,7 +110,7 @@ def get_python_library_from_json_file(filepath_p):
     filepath = filepath_p
     # Opening JSON file
     fid = open(filepath,'r')
-    # returns JSON object as 
+    # returns JSON object as
     # a dictionary
     json_data = json.load(fid)
     # Closing file
@@ -148,7 +148,7 @@ from vunit import about
 from common import Display
 from common import VunitConf
 from common import TesTopDataGen
-     
+
 
 if __name__ == '__main__':
     # Add custom command line argument to standard CLI
@@ -167,6 +167,9 @@ if __name__ == '__main__':
     help0 = 'Specify the json key path: test_name/test_id with test_name: name of the test and test_id: test index of the test list defined in test_name (see the launch_sim_processed.json file)'
     cli.parser.add_argument('--json_key_path', default='tb_tes_top_test_variant00/0',help=help0)
 
+    help0 = 'Enable the code Coverage'
+    cli.parser.add_argument('--enable_coverage', default='True',choices = ['True','False'], help=help0)
+
     args = cli.parse_args()
 
     # retrieve the command line arguments
@@ -174,6 +177,7 @@ if __name__ == '__main__':
     gui_mode      = args.gui_mode
     verbosity     = args.verbosity
     json_key_path = args.json_key_path
+    enable_coverage = args.enable_coverage
 
     ###############################################
     # extract parameters which uniquely identify the test
@@ -186,9 +190,14 @@ if __name__ == '__main__':
     # Instead, we use an intermediary "--gui_mode" custom argument (string type) to pass the command.
     ###########################################################
     if gui_mode == 'False':
-        args.gui = False 
+        args.gui = False
     else:
         args.gui = True
+
+    if enable_coverage == 'False':
+        enable_coverage = False
+    else:
+        enable_coverage = True
 
     ################################################
     # build the display object
@@ -235,7 +244,7 @@ if __name__ == '__main__':
     # add compiled xilinx library
     #####################################################
     obj.xilinx_compile_lib_default_lib(level_p=level1)
-    
+
     #####################################################
     # add glbl library
     #####################################################
@@ -258,7 +267,7 @@ if __name__ == '__main__':
     obj.compile_opal_kelly_lib(level_p=level1)
     obj.compile_csv_lib(level_p=level1)
     obj.compile_common_lib(level_p=level1)
-    
+
     #####################################################
     # add the VHDL/verilog source files
     #####################################################
@@ -297,7 +306,7 @@ if __name__ == '__main__':
     simulation_option_list.append(sim_title)
     if args.gui == True:
         simulation_option_list.append('-voptargs=+acc')
-    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list)
+    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list, enable_coverage_p=enable_coverage)
 
     ######################################################
     # get the list of json test_variant_filepath (if any)
@@ -323,16 +332,16 @@ if __name__ == '__main__':
         if verbosity > 0:
             str0 = 'Start the Test'
             obj_display.display_title(msg_p=str0, level_p=level1)
-            str0 = 'test_variant_filepath='+test_variant_filepath   
+            str0 = 'test_variant_filepath='+test_variant_filepath
             obj_display.display(msg_p=str0, level_p=level2)
-            str0 = 'tb_name='+tb_name   
+            str0 = 'tb_name='+tb_name
             obj_display.display(msg_p=str0, level_p=level2)
 
         variant_filename = str(Path(test_variant_filepath).stem)
 
         # build the output directory name
         dir_out_name = key_test_name + '.test_id_' +'{0:04d}'.format(int(key_id)) + '.' + variant_filename
-        
+
         ####################################################################
         # generate the input command/data files and others actions before launching the simulator
         ####################################################################

@@ -55,7 +55,7 @@ package pkg_fpasim is
   -- hardcoded : latency of the "mult_add_sfixed" module
   constant pkg_MULT_ADD_SFIXED_LATENCY                    : natural := 3;
   -- hardcoded : latency of the dynamic shif register when its input delay is set to 0
-  constant pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY : natural := 1;
+  constant pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY : natural := 2;
 
   -- pixel:
   -- requirement: FPASIM-FW-REQ-0030
@@ -160,7 +160,6 @@ package pkg_fpasim is
   constant pkg_MUX_SQUID_TF_RAM_DATA_WIDTH       : positive := 16;
   -- user-defined: ram configuration file
   constant pkg_MUX_SQUID_TF_RAM_MEMORY_INIT_FILE : string   := "mux_squid_tf.mem";
-  --constant pkg_MUX_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "mux_squid_linear_tf.mem";
 
   -- amp squid tf
   -- user-defined: read latency of the RAM (port A). Possible values: [2; max integer value[
@@ -177,7 +176,7 @@ package pkg_fpasim is
   constant pkg_AMP_SQUID_TF_RAM_DATA_WIDTH       : natural := 16;
   -- user-defined: ram configuration file
   constant pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE : string  := "amp_squid_tf.mem";
-  --constant pkg_AMP_SQUID_TF_RAM_MEMORY_INIT_FILE   : string := "amp_squid_linear_tf.mem";
+
 
   ---------------------------------------------------------------------
   -- regdecode
@@ -188,12 +187,22 @@ package pkg_fpasim is
   ---------------------------------------------------------------------
   -- adc_top
   ---------------------------------------------------------------------
+  -- harcoded: latency of the adc selection
+  constant pkg_ADC_SEL_SELECTION_LATENCY : natural := 1;
+  -- user-defined:add an additionnal output latency
+  constant pkg_ADC_SEL_OUTPUT_LATENCY : natural := 0;
+
+  -- auto-computed: latency of the adc_enable module
+  constant pkg_ADC_SEL_LATENCY : natural := pkg_ADC_SEL_OUTPUT_LATENCY + pkg_ADC_SEL_SELECTION_LATENCY;
 
   -- auto-computed: latency of the dynamic_shift_register module when the input delay is set to 0
-  constant pkg_ADC_DYNAMIC_SHIFT_REGISTER_LATENCY : natural := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
+  constant pkg_ADC_SHIFT_DYNAMIC_SHIFT_REGISTER_LATENCY : natural := pkg_DYNAMIC_SHIFT_REGISTER_WITH_DELAY0_LATENCY;
+  -- auto-computed: latency of the adc_shift module
+  constant pkg_ADC_SHIFT_LATENCY : natural := pkg_ADC_SHIFT_DYNAMIC_SHIFT_REGISTER_LATENCY;
+
   -- auto-computed: minimum latency of the "adc_top" module
   --    IMPORTANT: cross clock domain latency is not taken into account
-  constant pkg_ADC_TOP_LATENCY                    : natural := pkg_ADC_DYNAMIC_SHIFT_REGISTER_LATENCY;
+  constant pkg_ADC_TOP_LATENCY                    : natural := pkg_ADC_SEL_LATENCY + pkg_ADC_SHIFT_LATENCY;
 
   -------------------------------------------------------------------
   -- tes
@@ -290,6 +299,11 @@ package pkg_fpasim is
   ---------------------------------------------------------------------
   -- mux_squid
   ---------------------------------------------------------------------
+  -- user-defined: default inter_squid_gain value: applied gain at the output of the mux_squid_tf ram
+  -- This inter_squid_gain value (8 bits: [0:255]) is interpreted in the VHDL as:
+  --   . x with the [0; 1[ range (see pkg_MUX_SQUID_MULT_ADD_Q_M_A and pkg_MUX_SQUID_MULT_ADD_Q_M_B)
+  --   . x = inter_squid_gain_init/2**8.
+  constant pkg_INTER_SQUID_GAIN_INIT : integer := 16; -- <=> 1/16
 
   -- sub
   -- pixel_result
@@ -361,11 +375,8 @@ package pkg_fpasim is
   -- auto-computed: bus width
   constant pkg_MUX_SQUID_MULT_ADD_Q_WIDTH_S : positive := pkg_MUX_SQUID_MULT_ADD_Q_M_S + pkg_MUX_SQUID_MULT_ADD_Q_N_S;
 
-  -- auto-computed: rename the "add_sfixed" module latency
-  --constant pkg_MUX_SQUID_ADD_LATENCY : natural := pkg_ADD_SFIXED_LATENCY;
-
   -- auto-computed: latency of the "mux_squid" module
-  constant pkg_MUX_SQUID_LATENCY     : natural := pkg_SUB_SFIXED_LATENCY + pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY + pkg_ADD_SFIXED_LATENCY;
+  constant pkg_MUX_SQUID_LATENCY     : natural := pkg_SUB_SFIXED_LATENCY + pkg_MUX_SQUID_TF_RAM_B_RD_LATENCY + pkg_MULT_ADD_SFIXED_LATENCY;
   -- auto-computed: latency of the "mux_squid_top" module
   constant pkg_MUX_SQUID_TOP_LATENCY : natural := pkg_MUX_SQUID_LATENCY;
 
@@ -479,14 +490,27 @@ package pkg_fpasim is
   -- auto-computed: latency of the dac_top output pipeliner to be synchronized to the sync_top ouptput
   constant pkg_DAC_OUT_LATENCY : natural := abs(pkg_DAC_LATENCY_TMP - work.pkg_utils.max(pkg_DAC_LATENCY_TMP, pkg_SYNC_LATENCY_TMP));
   -- auto-computed: latency of the "dac_top" module.
-  --constant pkg_DAC_TOP_LATENCY            : natural := pkg_DAC_FRAME_GENERATOR_LATENCY + pkg_DAC_DYNAMIC_SHIFT_REGISTER_LATENCY;
   constant pkg_DAC_TOP_LATENCY : natural := pkg_DAC_LATENCY_TMP + pkg_DAC_OUT_LATENCY;
 
   -- auto-computed: latency of the sync_top output pipeliner to be synchronized to the dac_top ouptput
   constant pkg_SYNC_OUT_LATENCY : natural := abs(pkg_SYNC_LATENCY_TMP - work.pkg_utils.max(pkg_DAC_LATENCY_TMP, pkg_SYNC_LATENCY_TMP));
   -- auto-computed: latency of the "sync_top" module.
-  --constant pkg_SYNC_TOP_LATENCY                    : natural  := pkg_SYNC_DYNAMIC_SHIFT_REGISTER_LATENCY + pkg_SYNC_PULSE_GENERATOR_LATENCY + pkg_SYNC_OUT_LATENCY;
   constant pkg_SYNC_TOP_LATENCY : natural := pkg_SYNC_LATENCY_TMP + pkg_SYNC_OUT_LATENCY;
+
+  ---------------------------------------------------------------------
+  -- pulse_top
+  --   It will be synchronized with the sync_top module output if the used sync dynamic delay is set to 0.
+  --   Be careful, the module won't be synchronized with the sync_top module at the FPGA pads
+  ---------------------------------------------------------------------
+  -- user-defined: width of the "pulse shape" pulse (expressed in number of clock cycles) on the FPGA pin. Possible values: [1;integer max value[
+  constant pkg_PULSE_DURATION  : positive := 4;
+  -- hardcoded: latency of the "sync_pulse_generator" module
+  constant pkg_PULSE_GENERATOR_LATENCY        : natural  := 1;
+  -- auto-computed: optional output latency = latency of the dynamic_shift_register module when the input delay is set to 0
+  constant pkg_PULSE_OUTPUT_LATENCY : natural  :=  pkg_SYNC_TOP_LATENCY - pkg_PULSE_GENERATOR_LATENCY;
+  -- auto-computed: latency of the "sync_top" module.
+  constant pkg_PULSE_TOP_LATENCY : natural := pkg_PULSE_GENERATOR_LATENCY + pkg_PULSE_OUTPUT_LATENCY;
+
 
   ---------------------------------------------------------------------
   -- Recording

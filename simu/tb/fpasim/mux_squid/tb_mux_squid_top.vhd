@@ -90,11 +90,14 @@ architecture Simulation of tb_mux_squid_top is
   -- module input signals
   ---------------------------------------------------------------------
   signal i_clk         : std_logic := '0'; -- clock signal
+  signal i_rst         : std_logic := '0'; -- clock signal
   signal i_rst_status  : std_logic := '0';  -- reset error flag(s)
   signal i_debug_pulse : std_logic := '0'; -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
 
   -- input command: from the regdecode
   ---------------------------------------------------------------------
+  -- inter_squid_gain valid
+  signal i_inter_squid_gain_valid : std_logic := '1';
   -- inter_squid_gain value
   signal  i_inter_squid_gain : std_logic_vector(g_INTER_SQUID_GAIN_WIDTH - 1 downto 0):= std_logic_vector(to_unsigned(g_INTER_SQUID_GAIN,g_INTER_SQUID_GAIN_WIDTH));
   -- RAM: mux_squid_offset
@@ -360,11 +363,13 @@ begin
     -- reset
     ---------------------------------------------------------------------
     info("Enable the reset");
+    i_rst         <= '1';
     i_rst_status  <= '1';
     i_debug_pulse <= '0';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     info("Disable the reset");
+    i_rst         <= '0';
     i_rst_status  <= '0';
     i_debug_pulse <= '0';
     pkg_wait_nb_rising_edge_plus_margin(i_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
@@ -719,12 +724,14 @@ begin
     )
     port map(
       i_clk                         => i_clk, -- clock signal
+      i_rst                         => i_rst, -- reset signal
       i_rst_status                  => i_rst_status, -- reset error flag(s)
       i_debug_pulse                 => i_debug_pulse, -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
       ---------------------------------------------------------------------
       -- input command: from the regdecode
       ---------------------------------------------------------------------
-       i_inter_squid_gain          => i_inter_squid_gain,
+      i_inter_squid_gain_valid     => i_inter_squid_gain_valid,
+      i_inter_squid_gain           => i_inter_squid_gain,
       -- RAM: mux_squid_offset
       -- wr
       i_mux_squid_offset_wr_en      => i_mux_squid_offset_wr_en, -- write enable

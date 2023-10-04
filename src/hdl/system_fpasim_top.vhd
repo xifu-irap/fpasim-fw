@@ -43,15 +43,15 @@ entity system_fpasim_top is
     );
   port(
     --  Opal Kelly inouts --
-    i_okUH        : in    std_logic_vector(4 downto 0);  -- usb interface signal
-    o_okHU        : out   std_logic_vector(2 downto 0);  -- usb interface signal
-    b_okUHU       : inout std_logic_vector(31 downto 0);  -- usb interface signal
-    b_okAA        : inout std_logic;    -- usb interface signal
+    i_okUH  : in    std_logic_vector(4 downto 0);   -- usb interface signal
+    o_okHU  : out   std_logic_vector(2 downto 0);   -- usb interface signal
+    b_okUHU : inout std_logic_vector(31 downto 0);  -- usb interface signal
+    b_okAA  : inout std_logic;                      -- usb interface signal
     ---------------------------------------------------------------------
     -- FMC: from the card
     -- requirement: FPASIM-FW-REQ-0270
     ---------------------------------------------------------------------
-    --i_hardware_id : in    std_logic_vector(7 downto 0);  -- card hardware id
+    i_hardware_id : in    std_logic_vector(7 downto 0);  -- card hardware id
 
     ---------------------------------------------------------------------
     -- FMC: from the adc @i_adc_clk_p
@@ -105,13 +105,15 @@ entity system_fpasim_top is
     ---------------------------------------------------------------------
     -- FMC: to sync
     ---------------------------------------------------------------------
-    o_clk_ref   : out std_logic;  -- reference clock
-    o_clk_frame : out std_logic;  -- sync pulse at the beginning of the first pixel of a column/frame (@o_ref_clk)
+    o_clk_ref_p   : out std_logic;  -- differential reference clock_p
+    o_clk_ref_n   : out std_logic;  -- differential reference clock_n
+    o_clk_frame_p : out std_logic;  -- differential clk_frame_p pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
+    o_clk_frame_n : out std_logic;  -- differential clk_frame_n pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
     ---------------------------------------------------------------------
     -- FMC: to dac
     ---------------------------------------------------------------------
-    o_dac_dclk_p  : out std_logic;      -- differential_p dac clock
-    o_dac_dclk_n  : out std_logic;      -- differential_n dac clock
+    o_dac_dclk_p : out std_logic;       -- differential_p dac clock
+    o_dac_dclk_n : out std_logic;       -- differential_n dac clock
 
     o_frame_p : out std_logic;          -- differential_p dac frame
     o_frame_n : out std_logic;          -- differential_n dac frame
@@ -177,9 +179,24 @@ entity system_fpasim_top is
     o_mon_n_reset : out std_logic;      -- reset_n: hardware reset
 
     ---------------------------------------------------------------------
+    -- debug
+    ---------------------------------------------------------------------
+    o_spy  : out std_logic_vector(15 downto 0);
+    ---------------------------------------------------------------------
     -- leds
     ---------------------------------------------------------------------
-    o_leds : out std_logic_vector(3 downto 2)  -- status leds
+    -- FPGA board: status leds
+    o_leds         : out std_logic_vector(3 downto 0);
+    -- FMC firmware led
+    o_led_fw       : out std_logic;
+    -- FMC PLL lock led
+    o_led_pll_lock : out std_logic;
+
+    ---------------------------------------------------------------------
+    -- FMC: to oscillo
+    ---------------------------------------------------------------------
+    -- first processed sample of a pulse
+    o_trig_oscillo : out std_logic
     );
 end entity system_fpasim_top;
 
@@ -270,6 +287,9 @@ architecture RTL of system_fpasim_top is
   signal dac_errors : std_logic_vector(15 downto 0);  -- dac errors
   signal dac_status : std_logic_vector(7 downto 0);   -- dac status
 
+  -- pulse
+  signal pulse_sof : std_logic;
+
   ---------------------------------------------------------------------
   -- ios
   ---------------------------------------------------------------------
@@ -308,13 +328,12 @@ architecture RTL of system_fpasim_top is
   -- AMC : specific signals
   signal mon_n_reset : std_logic;       -- reset_n: hardware reset
 
+
+
   ---------------------------------------------------------------------
-  -- leds
+  -- debug
   ---------------------------------------------------------------------
-  -- clock period counter
-  signal count_pulse_r1 : unsigned(30 downto 0) := (others => '0');
-  -- pulse signal
-  signal pulse          : std_logic;
+  signal spy : std_logic_vector(15 downto 0);
 
 begin
 
@@ -384,9 +403,8 @@ begin
       o_sync_io_rst         => sync_io_rst
       );
 
-  -- TODO: connect to input port
-  --hardware_id <= i_hardware_id;
-  hardware_id <= (others => '0');
+  hardware_id <= i_hardware_id;
+
   ---------------------------------------------------------------------
   -- top_fpasim
   ---------------------------------------------------------------------
@@ -466,11 +484,25 @@ begin
       o_dac1                            => dac1,
       o_dac0                            => dac0,
       i_dac_errors                      => dac_errors,
-      i_dac_status                      => dac_status
+      i_dac_status                      => dac_status,
+      ---------------------------------------------------------------------
+      -- output pulse @i_clk
+      ---------------------------------------------------------------------
+      o_pulse_valid                     => open,
+      o_pulse_sof                       => pulse_sof,
+      o_pulse_eof                       => open,
+
+      ---------------------------------------------------------------------
+      -- debug
+      ---------------------------------------------------------------------
+      o_spy                             => spy
       );
 
   adc_amp_squid_offset_correction <= adc_b;
   adc_mux_squid_feedback          <= adc_a;
+
+  -- debug
+  o_spy <= spy;
 
   ---------------------------------------------------------------------
   -- Xilinx IOs
@@ -552,8 +584,10 @@ begin
       o_sync_status => sync_status,
 
       -- to the fpga pads: @sync_clk
-      o_sync_clk   => o_clk_ref,
-      o_sync       => o_clk_frame,
+      o_sync_clk_p => o_clk_ref_p,
+      o_sync_clk_n => o_clk_ref_n,
+      o_sync_p     => o_clk_frame_p,
+      o_sync_n     => o_clk_frame_n,
       ---------------------------------------------------------------------
       -- dac
       ---------------------------------------------------------------------
@@ -594,7 +628,17 @@ begin
       o_dac6_p      => o_dac_d6_p,
       o_dac6_n      => o_dac_d6_n,
       o_dac7_p      => o_dac_d7_p,
-      o_dac7_n      => o_dac_d7_n
+      o_dac7_n      => o_dac_d7_n,
+
+      ---------------------------------------------------------------------
+      -- pulse
+      ---------------------------------------------------------------------
+      -- input: from/to the user @i_sys_clk
+      -- first processed sample of a pulse
+      i_pulse_sof => pulse_sof,
+      -- to the fpga pads : @i_sys_clk
+      -- first processed sample of a pulse
+      o_pulse_sof => o_trig_oscillo
       );
 
   ---------------------------------------------------------------------
@@ -688,40 +732,31 @@ begin
 ---------------------------------------------------------------------
 -- leds
 ---------------------------------------------------------------------
-  p_clock : process (adc_clk_div) is
-  begin
-    if rising_edge(adc_clk_div) then
-      count_pulse_r1 <= count_pulse_r1 + 1;
-    end if;
-  end process p_clock;
-  pulse <= count_pulse_r1(count_pulse_r1'high);
+  inst_led_top : entity work.led_top
+    port map(
+      ---------------------------------------------------------------------
+      -- from/to the usb
+      ---------------------------------------------------------------------
+      i_usb_clk      => usb_clk,        -- clock @usb_clk
+      ---------------------------------------------------------------------
+      -- from/to the mmcm
+      ---------------------------------------------------------------------
+      i_sys_clk      => sys_clk,        -- system clock
+      i_mmcm_locked  => mmcm_locked,    -- mmcm locked signal
+      ---------------------------------------------------------------------
+      -- to the XEM7350
+      ---------------------------------------------------------------------
+      -- leds of the Opal Kelly XEM7350 board
+      o_leds         => o_leds,
+      ---------------------------------------------------------------------
+      -- to FMC
+      ---------------------------------------------------------------------
+      -- status of the firmware programmation. 1: programmed , 0: otherwise
+      o_led_fw       => o_led_fw,
+      -- status of the PLL. '1': ADC clock alive (programmed spi devices), 0: otherwise
+      o_led_pll_lock => o_led_pll_lock
+      );
 
-  gen_leds_3_2 : if true generate
-    -- temporary input data
-    signal data_tmp0 : std_logic_vector(1 downto 0);
-    -- temporary output data
-    signal data_tmp1 : std_logic_vector(1 downto 0);
-  begin
-
-    data_tmp0(1) <= mmcm_locked;
-    data_tmp0(0) <= pulse;
-
-    inst_pipeliner : entity work.pipeliner
-      generic map(
-        g_NB_PIPES   => 1,
-        g_DATA_WIDTH => data_tmp0'length
-        )
-      port map(
-        i_clk  => adc_clk_div,
-        i_data => data_tmp0,
-        o_data => data_tmp1
-        );
-    o_leds(3) <= data_tmp1(1);
-    o_leds(2) <= data_tmp1(0);
-  end generate gen_leds_3_2;
-
---o_leds(1) <= '0'; -- TODO: temporary used by o_sync
---o_leds(0) <= '0'; -- TODO: temporary used by o_ref_clk
 
 ---------------------------------------------------------------------
 -- debug

@@ -66,13 +66,12 @@ entity fpga_system_fpasim_top is
     g_DAC_VPP            : natural := 2;  -- DAC differential output voltage ( Vpp expressed in Volts)
     g_DAC_DELAY          : natural := 0;  -- DAC conversion delay (expressed in number of clock cycles @i_dac_clk). The range is: [0;max integer value[)
     -- design parameters
-    g_FPASIM_GAIN        : natural := 3;  -- 0:0.25, 1:0.5, 3:1, 4:1.5, 5:2, 6:3, 7:4
     g_MUX_SQ_FB_DELAY    : natural := 3;  -- delay on the adc0 input path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
     g_AMP_SQ_OF_DELAY    : natural := 3;  -- delay on the adc1 input path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
     g_ERROR_DELAY        : natural := 3;  -- delay on the dac output path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
     g_RA_DELAY           : natural := 4;  -- delay on the sync output path (expressed in number of clock cycles @i_sys_clk). The range is: [0;(2**6) - 1]
     g_INTER_SQUID_GAIN   : natural := 255;  -- inter squid gain. The range is: [0;(2**8) - 1]
-    g_NB_PIXEL_BY_FRAME  : natural := 34;  -- number of pixels by column
+    g_NB_PIXEL_BY_FRAME  : natural := 34;   -- number of pixels by column
     g_NB_SAMPLE_BY_PIXEL : natural := 40  -- number of pixels by pixels
     );
   port (
@@ -80,46 +79,48 @@ entity fpga_system_fpasim_top is
     ---------------------------------------------------------------------
     -- command
     ---------------------------------------------------------------------
-    i_make_pulse_valid : in  std_logic; -- make pulse command valid
-    i_make_pulse       : in  std_logic_vector(31 downto 0); -- make pulse command
-    o_auto_conf_busy   : out std_logic; -- '1': auto-configuration is in progress, '0': end of the auto-configuration
-    o_ready            : out std_logic; -- '1': ready to receive a make pulse command, '0': otherwise
+    i_make_pulse_valid : in  std_logic;  -- make pulse command valid
+    i_make_pulse       : in  std_logic_vector(31 downto 0);  -- make pulse command
+    o_auto_conf_busy   : out std_logic;  -- '1': auto-configuration is in progress, '0': end of the auto-configuration
+    o_ready            : out std_logic;  -- '1': ready to receive a make pulse command, '0': otherwise
     ---------------------------------------------------------------------
     -- ADC
     ---------------------------------------------------------------------
-    i_adc_clk_phase    : in  std_logic; -- adc clock (for the clock path): i_adc_clk_phase = i_adc_clk + 90 degree
-    i_adc_clk          : in  std_logic; -- adc clock (for the data path)
-    i_adc0_real        : in  real; --  adc0 value (mux_squid_feedback)
-    i_adc1_real        : in  real; --  adc1 value (amp_squid_offset_correction)
+    i_adc_clk_phase    : in  std_logic;  -- adc clock (for the clock path): i_adc_clk_phase = i_adc_clk + 90 degree
+    i_adc_clk          : in  std_logic;  -- adc clock (for the data path)
+    i_adc0_real        : in  real;      --  adc0 value (mux_squid_feedback)
+    i_adc1_real        : in  real;  --  adc1 value (amp_squid_offset_correction)
 
     ---------------------------------------------------------------------
     -- to sync
     ---------------------------------------------------------------------
-    o_ref_clk : out std_logic; -- reference clock @62.5Mhz
-    o_sync    : out std_logic; -- pulse at the beginning of the first pixel of a column (@o_ref_clk)
+    o_clk_ref_p   : out std_logic;  -- -- differential reference clock_p @62.5Mhz
+    o_clk_ref_n   : out std_logic;  -- -- differential reference clock_n @62.5Mhz
+    o_clk_frame_p : out std_logic;  -- differential clk_frame_p pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
+    o_clk_frame_n : out std_logic;  -- differential clk_frame_p pulse (at the beginning of the first pixel of a column (@o_clk_ref_P)
 
     ---------------------------------------------------------------------
     -- to DAC
     ---------------------------------------------------------------------
-    o_dac_real_valid : out std_logic; --  dac valid
-    o_dac_real       : out real       --  dac value
+    o_dac_real_valid : out std_logic;   --  dac valid
+    o_dac_real       : out real         --  dac value
     );
 end entity fpga_system_fpasim_top;
 
 architecture RTL of fpga_system_fpasim_top is
 
   --  Opal Kelly inouts --
-  signal i_okUH  : std_logic_vector(4 downto 0); -- usb interface signal
-  signal o_okHU  : std_logic_vector(2 downto 0); -- usb interface signal
-  signal b_okUHU : std_logic_vector(31 downto 0); -- usb interface signal
-  signal b_okAA  : std_logic; -- usb interface signal
+  signal i_okUH  : std_logic_vector(4 downto 0);   -- usb interface signal
+  signal o_okHU  : std_logic_vector(2 downto 0);   -- usb interface signal
+  signal b_okUHU : std_logic_vector(31 downto 0);  -- usb interface signal
+  signal b_okAA  : std_logic;                      -- usb interface signal
 
   ---------------------------------------------------------------------
   -- additional signals
   ---------------------------------------------------------------------
   -- usb clock
   signal usb_clk           : std_logic := '0';
-   -- busy: 1: auto-conf in progress, 0: end of the auto-conf
+  -- busy: 1: auto-conf in progress, 0: end of the auto-conf
   signal auto_conf_busy_r1 : std_logic := '1';
   -- ready, 1: command can be received, 0: otherwise
   signal ready_r1          : std_logic := '0';
@@ -149,13 +150,13 @@ architecture RTL of fpga_system_fpasim_top is
   shared variable v_front_panel_conf : opal_kelly_lib.pkg_front_panel.t_front_panel_conf;
 
   -- mask to apply on the wire
-  constant c_WIRE_NO_MASK            : std_logic_vector(31 downto 0) := x"ffff_ffff";  -- wire mask value
+  constant c_WIRE_NO_MASK : std_logic_vector(31 downto 0) := x"ffff_ffff";  -- wire mask value
   -- convert an uint to std_logic_vector
   function uint_to_stdv (
     constant value_p : integer; width_p : integer
     )
     return std_logic_vector is
-     -- result of the convertion : uint -> std_logic_vector
+    -- result of the convertion : uint -> std_logic_vector
     variable v_value_vect : std_logic_vector(width_p - 1 downto 0);
   begin
     v_value_vect := std_logic_vector(to_unsigned(value_p, width_p));
@@ -240,26 +241,6 @@ begin
     -- add tempo: to wait the end of the reset
     ---------------------------------------------------------------------
     pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 16, i_margin => 12 ps);
-
-    ---------------------------------------------------------------------
-    -- set FPASIM_GAIN
-    ---------------------------------------------------------------------
-    v_opal_kelly_addr := x"02";
-    v_data            := g_FPASIM_GAIN;  -- reset bit to '1'
-    v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
-    SetWireInValue(
-      i_ep               => v_opal_kelly_addr,
-      i_val              => v_data_vect,
-      i_mask             => c_WIRE_NO_MASK,
-      b_front_panel_conf => v_front_panel_conf
-      );
-
-    UpdateWireIns(
-      b_front_panel_conf => v_front_panel_conf,
-      o_internal_wr_if   => usb_wr_if0,
-      i_internal_rd_if   => usb_rd_if0);
-
-    pkg_wait_nb_rising_edge_plus_margin(i_clk => usb_clk, i_nb_rising_edge => 1, i_margin => 12 ps);
 
     ---------------------------------------------------------------------
     -- set MUX_SQ_FB_DELAY
@@ -399,7 +380,7 @@ begin
     ---------------------------------------------------------------------
     v_opal_kelly_addr := x"18";
     --v_data            := 2**4; -- dac_en_pattern=1
-    v_data            := 0; -- dac_en_pattern=0
+    v_data            := 0;             -- dac_en_pattern=0
     v_data_vect       := uint_to_stdv(value_p => v_data, width_p => 32);
     SetWireInValue(
       i_ep               => v_opal_kelly_addr,
@@ -541,8 +522,10 @@ begin
       ---------------------------------------------------------------------
       -- to sync
       ---------------------------------------------------------------------
-      o_ref_clk        => o_ref_clk,
-      o_sync           => o_sync,
+      o_clk_ref_p      => o_clk_ref_p,
+      o_clk_ref_n      => o_clk_ref_n,
+      o_clk_frame_p    => o_clk_frame_p,
+      o_clk_frame_n    => o_clk_frame_n,
       ---------------------------------------------------------------------
       -- DAC
       ---------------------------------------------------------------------

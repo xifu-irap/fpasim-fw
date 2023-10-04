@@ -90,5 +90,11 @@ package pkg_io is
   constant pkg_IO_SYNC_LATENCY           : natural := pkg_IO_SYNC_FIFO + pkg_IO_SYNC_OUT_LATENCY;
 
 
+  -- IOs: pulse
+  -------------------------------------------------------------------
+  -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
+  constant pkg_IO_PULSE_OUT_LATENCY       : natural := 1;
+
+
 end pkg_io;
 

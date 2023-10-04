@@ -43,7 +43,7 @@ package pkg_regdecode is
   ---------------------------------------------------------------------
   -- user-defined: Firmware ID Value
   -- requirement: FPASIM-FW-REQ-0290
-  constant pkg_FIRMWARE_ID_VALUE : integer := 9;
+  constant pkg_FIRMWARE_ID_VALUE : integer := 10;
 
   -- user-defined: FIRMWARE name
   -- requirement: FPASIM-FW-REQ-0280
@@ -310,6 +310,10 @@ package pkg_regdecode is
   constant pkg_DEBUG_CTRL_RST_STATUS_IDX_H  : integer := 1;
   -- user-defined: dac_en_pattern (bit index)
   constant pkg_DEBUG_CTRL_DAC_EN_PATTERN_IDX_H  : integer := 4;
+  -- user-defined: adc0_sel (bit index)
+  constant pkg_DEBUG_CTRL_ADC0_BYPASS_IDX_H  : integer := 8;
+  -- user-defined: adc1_sel (bit index)
+  constant pkg_DEBUG_CTRL_ADC1_BYPASS_IDX_H  : integer := 9;
 
   -- user-defined: error_sel
   ---------------------------------------------------------------------

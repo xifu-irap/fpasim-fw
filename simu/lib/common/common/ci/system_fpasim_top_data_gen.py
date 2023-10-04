@@ -519,7 +519,11 @@ class SystemFpasimTopDataGen(VunitConf):
         if self.verbosity > 0:
             str0 = fct_name + ": Simulation transcript"
             display_obj.display_title(msg_p=str0, level_p=level0)
-            str0 = test_variant_filepath
+            if self.new_test_variant_filepath_list != []:
+                str0 = test_variant_filepath
+
+            else:
+                str0 = "No test_variant filepath"
             display_obj.display(msg_p=str0, level_p=level1)
 
             str0 = ""

@@ -54,29 +54,22 @@ entity synchronizer is
     );
   port(
     i_clk        : in  std_logic;       -- clock signal
-    i_async_data : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0); -- async input
+    i_async_data : in  std_logic_vector(g_DATA_WIDTH - 1 downto 0);  -- async input
     o_data       : out std_logic_vector(g_DATA_WIDTH - 1 downto 0)  -- output data with/without delay
     );
 end entity synchronizer;
 
 architecture RTL of synchronizer is
 
-   -- define an array of registers
+  -- define an array of registers
   type t_array_data is array (natural range <>) of std_logic_vector(i_async_data'range);
 
-   -- shift registers
+  -- shift registers
   signal s_r1                 : t_array_data(g_SYNC_STAGES-1 downto 0) := (others => (others => g_INIT));
   -- fpga specific attribute: force to use registers (very close)
   attribute async_reg         : string;
   -- apply attribute on signal
   attribute async_reg of s_r1 : signal is "true";
-
-  -- additionnal output registers
-  signal sreg_pipe_r1     : t_array_data(g_PIPELINE_STAGES-1 downto 0) := (others => (others => g_INIT));
-  -- fpga specific attribute: force to use registers (no shift_register)
-  attribute shreg_extract : string;
-  -- apply attribute on signal
-  attribute shreg_extract of sreg_pipe_r1 : signal is "false";
 
   -- output data
   signal data_tmp : std_logic_vector(o_data'range);
@@ -86,7 +79,7 @@ begin
   ---------------------------------------------------------------------
   -- shift the input data
   ---------------------------------------------------------------------
-  p_shift_data: process(i_clk)
+  p_shift_data : process(i_clk)
   begin
     if rising_edge(i_clk) then
       s_r1 <= s_r1(s_r1'high - 1 downto 0) & i_async_data;  -- Async Input <async_in>
@@ -105,7 +98,7 @@ begin
     ---------------------------------------------------------------------
     -- delayed the input data
     ---------------------------------------------------------------------
-    p_pipe_data: process(i_clk)
+    p_pipe_data : process(i_clk)
     begin
       if rising_edge(i_clk) then
         data_tmp <= s_r1(s_r1'high);
@@ -113,13 +106,19 @@ begin
     end process p_pipe_data;
   end generate one_pipeline;
 
- -- add 2 or more registers on the data path
+  -- add 2 or more registers on the data path
   multiple_pipeline : if g_PIPELINE_STAGES > 1 generate
+    -- additionnal output registers
+    signal sreg_pipe_r1                     : t_array_data(g_PIPELINE_STAGES-1 downto 0) := (others => (others => g_INIT));
+    -- fpga specific attribute: force to use registers (no shift_register)
+    attribute shreg_extract                 : string;
+    -- apply attribute on signal
+    attribute shreg_extract of sreg_pipe_r1 : signal is "false";
   begin
     ---------------------------------------------------------------------
     -- shift the input data to the left
     ---------------------------------------------------------------------
-    p_shift_data: process(i_clk)
+    p_shift_data : process(i_clk)
     begin
       if rising_edge(i_clk) then
         sreg_pipe_r1 <= sreg_pipe_r1(sreg_pipe_r1'high - 1 downto 0) & s_r1(s_r1'high);
