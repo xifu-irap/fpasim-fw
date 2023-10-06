@@ -1477,6 +1477,32 @@ class VunitConf(VunitUtils):
 
             return None
 
+        def convert_absolute_to_relative_path(input_file_path_p,output_file_path_p):
+            """
+            for all file path defined in the input xml file, replace the absolute path by its relative path from the git_root_path
+
+            Parameters
+            ----------
+            input_file_path_p: str
+                input *.xml file
+            output_file_path_p: str
+                output *.xml file
+            Returns
+            -------
+                None
+            """
+            with open(input_file_path_p,'r') as fid:
+                lines = fid.readlines()
+
+            # git root path: convert windows separator into linux separator
+            root_path = self.root_path.replace('\\','/')
+
+            with open(output_file_path_p,'w') as fid:
+                for line in lines:
+                    line = line.replace(root_path,'.')
+                    fid.write(line)
+
+
 
         def post_run(results):
             """
@@ -1503,6 +1529,8 @@ class VunitConf(VunitUtils):
             # convert the merge usdb file into xml file
             convert_usdb_to_xml(input_file_path_p=input_merge_file,output_file_path_p=output_merge_file)
 
+            # for all file path defined in the input xml file, replace the absolute path by its relative path from the git_root_path
+            convert_absolute_to_relative_path(input_file_path_p=output_merge_file,output_file_path_p=output_replace_file)
 
 
         if self.enable_coverage == 1:
