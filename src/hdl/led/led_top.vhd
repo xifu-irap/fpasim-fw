@@ -125,14 +125,18 @@ begin
 
 
 ---------------------------------------------------------------------
--- output
+-- output: FPGA board leds
+--  Active Low signals (see https://docs.opalkelly.com/xem7350/leds/)
 ---------------------------------------------------------------------
   o_leds(3) <= sys_pulse;
   o_leds(2) <= usb_pulse;
-  o_leds(1) <= i_mmcm_locked;
-  o_leds(0) <= c_FIRMWARE_ON;
+  o_leds(1) <= not(i_mmcm_locked);-- invert the desired state
+  o_leds(0) <= not(c_FIRMWARE_ON);-- invert the desired state
 
-
+  ---------------------------------------------------------------------
+  -- output: facade leds
+  --  Active high signals
+  ---------------------------------------------------------------------
   o_led_pll_lock <= i_mmcm_locked;
   o_led_fw       <= c_FIRMWARE_ON;
 
