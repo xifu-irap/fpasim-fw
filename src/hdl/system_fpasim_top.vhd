@@ -788,6 +788,7 @@ begin
         probe0(31 downto 0) => std_logic_vector(count_r1),
 
         -- probe1
+        probe1(2) => mmcm_locked,
         probe1(1) => usb_rst_out,
         probe1(0) => sys_rst
         );
