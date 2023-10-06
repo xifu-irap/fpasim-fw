@@ -522,7 +522,7 @@ class VunitConf(VunitUtils):
 
         return None
 
-    def _add_source_file(self, filepath_list_p, msg_p, library_name_p, version_p, level_p):
+    def _add_source_file(self, filepath_list_p, msg_p, library_name_p, version_p, level_p, enable_coverage_p):
         """
         Add source files to the Vunit object.
 
@@ -538,12 +538,15 @@ class VunitConf(VunitUtils):
             VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
-
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
         Returns
         -------
         None
 
         """
+
         VU = self.VU
         display_obj = self.display_obj
         msg = msg_p
@@ -557,12 +560,24 @@ class VunitConf(VunitUtils):
         for filepath in filepath_list:
             file_tmp = VU.add_source_file(filepath, vhdl_standard=version, library_name=library_name)
             path = str(Path(file_tmp.name).resolve())
+            suffix = Path(filepath).suffix
+
+            if enable_coverage_p == True:
+                if suffix == '.vhd':
+                    file_tmp.add_compile_option("modelsim.vcom_flags", ["+cover=bs"])
+                elif suffix == '.vhdl':
+                    file_tmp.add_compile_option("modelsim.vcom_flags", ["+cover=bs"])
+                elif suffix == '.v':
+                    file_tmp.add_compile_option("modelsim.vlog_flags", ["+cover=bs"])
+                elif suffix == '.sv':
+                    file_tmp.add_compile_option("modelsim.vlog_flags", ["+cover=bs"])
+
             msg0 = library_name + ':' + version + ":" + path
             if self.verbosity > 0:
                 display_obj.display(msg_p=msg0, level_p=level1)
 
+
             # build the external library
-            suffix = Path(filepath).suffix
             filepath = filepath.replace('\\', '/')
             if suffix == '.vhd':
                 str0 = " ".join(['vcom', '-work', library_name, '-' + version, filepath])
@@ -576,9 +591,13 @@ class VunitConf(VunitUtils):
             self.do_filepath_list.append(filepath)
             # obj_do.add_source_file(filepath_p=filepath,library_name_p=library_name,version_p=version)
 
+            # Be sure do not desactivate the enable_coverage if already defined somewhere else
+            if enable_coverage_p == True:
+                self.enable_coverage = enable_coverage_p
+
         return None
 
-    def _compile_by_filepath(self, filepath_list_p, msg_p, library_name_p, version_p, level_p):
+    def _compile_by_filepath(self, filepath_list_p, msg_p, library_name_p, version_p, level_p,enable_coverage_p):
         """
         Compile files by filepath
 
@@ -594,6 +613,9 @@ class VunitConf(VunitUtils):
             VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
         Returns
         -------
         None
@@ -610,9 +632,9 @@ class VunitConf(VunitUtils):
 
         # add files to compile in the Vunit object
         self._add_source_file(filepath_list_p=filepath_list, msg_p=msg_p, version_p=version_p,
-                              library_name_p=library_name_p, level_p=level0)
+                              library_name_p=library_name_p, level_p=level0,enable_coverage_p=enable_coverage_p)
 
-    def _compile_by_base_path(self, base_path_p, msg_p, library_name_p, version_p, level_p):
+    def _compile_by_base_path(self, base_path_p, msg_p, library_name_p, version_p, level_p, enable_coverage_p):
         """
         Search Files with a base_path root address and compile them.
 
@@ -628,6 +650,9 @@ class VunitConf(VunitUtils):
             VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
 
         Returns
         -------
@@ -645,9 +670,9 @@ class VunitConf(VunitUtils):
 
         # add files to compile in the Vunit object
         self._add_source_file(filepath_list_p=filepath_list, msg_p=msg_p, version_p=version_p,
-                              library_name_p=library_name_p, level_p=level0)
+                              library_name_p=library_name_p, level_p=level0, enable_coverage_p=enable_coverage_p)
 
-    def _compile_by_filename(self, base_path_p, filename_p, msg_p, library_name_p, version_p, level_p):
+    def _compile_by_filename(self, base_path_p, filename_p, msg_p, library_name_p, version_p, level_p,enable_coverage_p):
         """
 
         Parameters
@@ -664,6 +689,9 @@ class VunitConf(VunitUtils):
             VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
 
         Returns
         -------
@@ -681,9 +709,9 @@ class VunitConf(VunitUtils):
 
         # add files to compile in the Vunit object
         self._add_source_file(filepath_list_p=[filepath], msg_p=msg_p, version_p=version_p,
-                              library_name_p=library_name_p, level_p=level0)
+                              library_name_p=library_name_p, level_p=level0,enable_coverage_p=enable_coverage_p)
 
-    def compile_glbl_lib(self, name_p='vivado_glbl', library_name_p='fpasim', version_p='2008', level_p=None):
+    def compile_glbl_lib(self, name_p='vivado_glbl', library_name_p='fpasim', version_p='2008', level_p=None, enable_coverage_p=False):
         """
         Compile the glbl library
 
@@ -697,6 +725,9 @@ class VunitConf(VunitUtils):
             VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
 
         Returns
         -------
@@ -711,11 +742,11 @@ class VunitConf(VunitUtils):
         filepath_list.append(str(Path(base_path, 'glbl.v')))
 
         self._compile_by_filepath(filepath_list_p=filepath_list, msg_p=name_p, library_name_p=library_name_p,
-                                  version_p=version_p, level_p=level_p)
+                                  version_p=version_p, level_p=level_p, enable_coverage_p=enable_coverage_p)
 
         return None
 
-    def compile_xilinx_xpm_ip(self, name_p='ip_xpm', library_name_p='fpasim', version_p='2008', level_p=None):
+    def compile_xilinx_xpm_ip(self, name_p='ip_xpm', library_name_p='fpasim', version_p='2008', level_p=None,enable_coverage_p=False):
         """
         Compile the user vhdl files associated to the Xilinx XPM.
 
@@ -729,6 +760,9 @@ class VunitConf(VunitUtils):
             VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
 
         Returns
         -------
@@ -738,11 +772,11 @@ class VunitConf(VunitUtils):
         base_path_dic = self.base_path_dic
         base_path = base_path_dic['ip_xilinx_xpm_path']
         self._compile_by_base_path(base_path_p=base_path, msg_p=name_p, library_name_p=library_name_p,
-                                   version_p=version_p, level_p=level_p)
+                                   version_p=version_p, level_p=level_p,enable_coverage_p=enable_coverage_p)
 
         return None
 
-    def compile_xilinx_coregen_ip(self, name_p='ip_coregen', library_name_p='fpasim', version_p='2008', level_p=None):
+    def compile_xilinx_coregen_ip(self, name_p='ip_coregen', library_name_p='fpasim', version_p='2008', level_p=None, enable_coverage_p=False):
         """
         Compile the simulation files associated to the Xilinx Coregen.
 
@@ -756,6 +790,9 @@ class VunitConf(VunitUtils):
             VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
 
         Returns
         -------
@@ -792,11 +829,11 @@ class VunitConf(VunitUtils):
         filepath_list.append(str(Path(base_path, 'fpasim_spi_device_select_vio/sim/fpasim_spi_device_select_vio.vhd')))
 
         self._compile_by_filepath(filepath_list_p=filepath_list, msg_p=name_p, library_name_p=library_name_p,
-                                  version_p=version_p, level_p=level_p)
+                                  version_p=version_p, level_p=level_p, enable_coverage_p=enable_coverage_p)
 
         return None
 
-    def compile_opal_kelly_ip(self, name_p='ip_opal_kelly', library_name_p='fpasim', version_p='2008', level_p=None):
+    def compile_opal_kelly_ip(self, name_p='ip_opal_kelly', library_name_p='fpasim', version_p='2008', level_p=None,enable_coverage_p=False):
         """
         Compile the source files provided by the Opal Kelly company.
 
@@ -810,6 +847,9 @@ class VunitConf(VunitUtils):
             VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
 
         Returns
         -------
@@ -821,11 +861,11 @@ class VunitConf(VunitUtils):
         base_path = base_path_dic['ip_opal_kelly_simu_path']
 
         self._compile_by_base_path(base_path_p=base_path, msg_p=name_p, library_name_p=library_name_p,
-                                   version_p=version_p, level_p=level_p)
+                                   version_p=version_p, level_p=level_p,enable_coverage_p=enable_coverage_p)
 
         return None
 
-    def compile_opal_kelly_lib(self, name_p='opal_kelly_lib', library_name_p='opal_kelly_lib', version_p='2008',level_p=None):
+    def compile_opal_kelly_lib(self, name_p='opal_kelly_lib', library_name_p='opal_kelly_lib', version_p='2008',level_p=None,enable_coverage_p=False):
         """
         Compile the user-defined files associated to the opal kelly IP.
 
@@ -839,6 +879,9 @@ class VunitConf(VunitUtils):
             VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
 
         Returns
         -------
@@ -849,11 +892,11 @@ class VunitConf(VunitUtils):
         base_path = base_path_dic['lib_opal_kelly_simu_path']
 
         self._compile_by_base_path(base_path_p=base_path, msg_p=name_p, library_name_p=library_name_p,
-                                   version_p=version_p, level_p=level_p)
+                                   version_p=version_p, level_p=level_p,enable_coverage_p=enable_coverage_p)
 
         return None
 
-    def compile_csv_lib(self, name_p='csv_lib', library_name_p='csv_lib', version_p='2008', level_p=None):
+    def compile_csv_lib(self, name_p='csv_lib', library_name_p='csv_lib', version_p='2008', level_p=None, enable_coverage_p=False):
         """
         Compile the user-defined files associated to the vhdl csv lib.
 
@@ -867,6 +910,9 @@ class VunitConf(VunitUtils):
             VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
 
         Returns
         -------
@@ -877,11 +923,11 @@ class VunitConf(VunitUtils):
         base_path = base_path_dic['lib_csv_path']
 
         self._compile_by_base_path(base_path_p=base_path, msg_p=name_p, library_name_p=library_name_p,
-                                   version_p=version_p, level_p=level_p)
+                                   version_p=version_p, level_p=level_p, enable_coverage_p=enable_coverage_p)
 
         return None
 
-    def compile_common_lib(self, name_p='common_lib', library_name_p='common_lib', version_p='2008', level_p=None):
+    def compile_common_lib(self, name_p='common_lib', library_name_p='common_lib', version_p='2008', level_p=None, enable_coverage_p=False):
         """
         Compile the user-defined files associated to the vhdl utility lib.
 
@@ -895,6 +941,9 @@ class VunitConf(VunitUtils):
             VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
 
         Returns
         -------
@@ -906,11 +955,11 @@ class VunitConf(VunitUtils):
         base_path = base_path_dic['lib_common_path']
 
         self._compile_by_base_path(base_path_p=base_path, msg_p=name_p, library_name_p=library_name_p,
-                                   version_p=version_p, level_p=level_p)
+                                   version_p=version_p, level_p=level_p, enable_coverage_p=enable_coverage_p)
 
         return None
 
-    def compile_src_directory(self, directory_name_p, library_name_p='fpasim', version_p='2008', level_p=None):
+    def compile_src_directory(self, directory_name_p, library_name_p='fpasim', version_p='2008', level_p=None, enable_coverage_p=False):
         """
         Compile source files from a directory and its subdirectories.
 
@@ -924,6 +973,9 @@ class VunitConf(VunitUtils):
              VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
 
         Returns
         -------
@@ -940,11 +992,11 @@ class VunitConf(VunitUtils):
             msg = directory_name + ' Source files '
 
             self._compile_by_base_path(base_path_p=base_path, msg_p=msg, library_name_p=library_name_p,
-                                       version_p=version_p, level_p=level_p)
+                                       version_p=version_p, level_p=level_p,enable_coverage_p=enable_coverage_p)
 
         return None
 
-    def compile_src(self, filename_p, library_name_p='fpasim', version_p='2008', level_p=None):
+    def compile_src(self, filename_p, library_name_p='fpasim', version_p='2008', level_p=None,enable_coverage_p=False):
         """
         Search a file in the file source directory and compile it.
 
@@ -959,6 +1011,10 @@ class VunitConf(VunitUtils):
         level_p: int
             (int >= 0) define the level of indentation of the message to print
 
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
+
         Returns
         -------
         None
@@ -971,10 +1027,10 @@ class VunitConf(VunitUtils):
 
         self._compile_by_filename(base_path_p=base_path, filename_p=filename_p, msg_p=msg,
                                   library_name_p=library_name_p,
-                                  version_p=version_p, level_p=level_p)
+                                  version_p=version_p, level_p=level_p,enable_coverage_p=enable_coverage_p)
         return None
 
-    def compile_tb(self, library_name_p='tb_fpasim', version_p='2008', level_p=None):
+    def compile_tb(self, library_name_p='tb_fpasim', version_p='2008', level_p=None,enable_coverage_p=False):
         """
         Search a testbench file in the file testbench directory and compile it.
 
@@ -986,6 +1042,9 @@ class VunitConf(VunitUtils):
              VHDL version if relevant (not applicable for verilog or system verilog file)
         level_p: int
             (int >= 0) define the level of indentation of the message to print
+        enable_coverage_p: boolean
+            True: enable the code coverage
+            False: disable the code coverage
 
         Returns
         -------
@@ -1000,7 +1059,7 @@ class VunitConf(VunitUtils):
         msg = str(Path(filename).stem)
 
         self._compile_by_filename(base_path_p=base_path, filename_p=filename, msg_p=msg, library_name_p=library_name_p,
-                                  version_p=version_p, level_p=level_p)
+                                  version_p=version_p, level_p=level_p,enable_coverage_p=enable_coverage_p)
 
         # get the testbench object
         tb_lib = VU.library(library_name_p)
@@ -1213,9 +1272,12 @@ class VunitConf(VunitUtils):
 
         return filepath_list
 
-    def set_sim_option(self, name_p, value_p, enable_coverage_p=True):
+    def set_sim_option(self, name_p, value_p, enable_coverage_p=False):
         """
-        Get a list of data filepath
+        For all files:
+          . set the simulation options
+          . set the compilation options (if enabled)
+
 
         Parameters
         ----------
@@ -1226,21 +1288,24 @@ class VunitConf(VunitUtils):
         enable_coverage_p: boolean
             True: enable the code coverage
             False: disable the code coverage
+
         Returns
         -------
         None
 
         """
+        # For all files, set the simulation options
         self.VU.set_sim_option(name_p, value_p)
-        self.enable_coverage = enable_coverage_p
+
+        # Be sure do not desactivate the enable_coverage if already defined somewhere else
+        if enable_coverage_p == True:
+            self.enable_coverage = enable_coverage_p
 
         if (enable_coverage_p == 1):
-            self.VU.set_sim_option("enable_coverage", True)
-            self.VU.set_compile_option("enable_coverage", True)
-
+            # For all files, set the code coverage options
             if (self.simulator_name == 'modelsim') or (self.simulator_name == 'questa'):
-                self.VU.set_compile_option("modelsim.vcom_flags", ["+cover=bs"])
-                self.VU.set_compile_option("modelsim.vlog_flags", ["+cover=bs"])
+                self.VU.add_compile_option("modelsim.vcom_flags", ["+cover=bs"])
+                self.VU.add_compile_option("modelsim.vlog_flags", ["+cover=bs"])
 
     def get_data_filepath(self, filename_p, level_p=None):
         """
@@ -1375,6 +1440,7 @@ class VunitConf(VunitUtils):
         -------
 
         """
+
         def post_run(results):
             import subprocess
             options = []
@@ -1403,6 +1469,9 @@ class VunitConf(VunitUtils):
 
 
         if self.enable_coverage == 1:
+            # Enable the code coverage
+            self.VU.set_sim_option("enable_coverage", True)
+            self.VU.add_compile_option("enable_coverage", True)
             self.VU.main(post_run=post_run)
         else:
             self.VU.main()
@@ -1459,120 +1528,4 @@ class VunitConf(VunitUtils):
             msg0 = 'Searched basepath =' + basepath_p
             display_obj.display(msg_p=msg0, level_p=level_p)
 
-    # def save_do_file(self,filepath_p,level_p=0):
 
-    #     VU = self.VU
-    #     display_obj   = self.display_obj
-    #     root_path =self.root_path
-
-    #     level0 = level_p
-    #     level1 = level_p + 1
-
-    #     str0 = "VunitConf.save_do_file"
-    #     display_obj.display_title(msg_p=str0, level_p=level0)
-    #     str0 = "do_filepath: "+filepath_p
-    #     display_obj.display(msg_p=str0, level_p=level1)
-
-    #     do_cmd_list = []
-    #     do_cmd_list.append("###################### Parameters ######################")
-    #     root_path = root_path.replace('\\','/')
-    #     do_cmd = " ".join(["quietly","set","PR_DIR",root_path])
-    #     do_cmd_list.append(do_cmd)
-    #     do_cmd_list.append("\n")
-
-    #     # write external compiled lib
-    #     do_cmd_list.append("###################### External Compiled libraries ######################")
-    #     do_cmd_list.extend(self.do_ext_lib_list)
-    #     do_cmd_list.append("\n")
-
-    #     # write libraries
-    #     do_cmd_list.append("###################### Source files libraries ######################")
-    #     do_cmd_list.extend(self.do_lib_list)
-    #     do_cmd_list.append("\n")
-
-    #     def element_exists(list_p, element_p):
-    #         # Try to get the index of the element in the list
-    #         index = -1
-    #         try:
-    #             index = list_p.index(element_p)
-    #              # If the element is found, return True
-    #             return index
-    #         # If a ValueError is raised, the element is not in the list
-    #         except ValueError:
-    #             # Return False in this case
-    #             return -1
-
-    #     def get_src_do_compile(filepath_p,library_name_p,version_p):
-    #         filepath = filepath_p
-    #         library_name = library_name_p
-    #         version = version_p
-
-    #         compile_lib_list = []
-    #         compile_lib_list.append('xilinx_vip')
-    #         compile_lib_list.append('xpm')
-    #         compile_lib_list.append('unisims_ver')
-    #         compile_lib_list.append('unisim')
-    #         compile_lib_list.append('unimacro')
-    #         compile_lib_list.append('unimacro_ver')
-    #         compile_lib_list.append('unifast')
-    #         compile_lib_list.append('secureip')
-    #         str2 = ''
-    #         for name in compile_lib_list:
-    #             str2 = str2 + " -L "+name
-
-    #         compile_lib_list = []
-    #         compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/xilinx_vip')
-    #         compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/xpm')
-    #         compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/unisims_ver')
-    #         compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/unisim')
-    #         compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/unimacro')
-    #         compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/unimacro_ver')
-    #         compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/unifast')
-    #         compile_lib_list.append('C:/Xifu/xilinx_compile_lib/questa/secureip')
-    #         str1 = ''
-    #         for name in compile_lib_list:
-    #             str1 = str1 + ' +incdir+'+'"'+name+'"'
-
-    #         str1 = ""
-    #         str2 = ""
-
-    #         suffix = Path(filepath).suffix
-    #         filepath = filepath.replace('\\','/')
-    #         if suffix == '.vhd':
-    #             str0 = " ".join(['vcom','-work',library_name,'-'+version,filepath])
-    #         elif suffix == '.vhdl':
-    #             str0 = " ".join(['vcom','-work',library_name,'-'+version,filepath])
-    #         elif suffix == '.v':
-    #             str0 = " ".join(['vlog','-work',library_name,filepath,str1,str2])
-    #         elif suffix == '.sv':
-    #             str0 = " ".join(['vlog','-work',library_name,filepath,str1,str2])
-    #         return str0
-
-    #     # print("test**************************************************************\n")
-
-    #     do_cmd_list.append("###################### Source files ######################")
-
-    #     print("orderedfilepath")
-    #     SourceFile_list = VU.get_compile_order()
-    #     ordered_filepath_list = []
-    #     for source in SourceFile_list:
-    #         filepath = str(Path(source.name).resolve())
-    #         library_name = source.library.name
-    #         vhdl_standard = source.vhdl_standard
-
-    #         filepath = filepath.replace('\\','/')
-    #         ordered_filepath_list.append(filepath)
-    #         # print(filepath,library_name,vhdl_standard)
-    #         str0 = get_src_do_compile(filepath_p=filepath,library_name_p=library_name,version_p=vhdl_standard)
-    #         str0 = str0.replace(root_path,"${PR_DIR}")
-    #         do_cmd_list.append(str0)
-
-    #     ##########################################
-    #     # write in the output file
-    #     ##########################################
-    #     fid = open(filepath_p,'w')
-    #     for line in do_cmd_list:
-    #         # replace path by variables
-    #         fid.write(line)
-    #         fid.write('\n')
-    #     fid.close()
