@@ -148,6 +148,8 @@ class VunitConf(VunitUtils):
         # name of the class (use for message)
         self.class_name = "VunitConf"
 
+        ## Code Coverage
+        ############################################
         # path to the vcover exe (code coverage)
         self.vcover_path = None
         # enable code coverage
@@ -1436,24 +1438,32 @@ class VunitConf(VunitUtils):
         ----------
         post_run:
           A callback function which is called after running tests. The function must accept a single results argument which is an instance of Results
-        Returns
-        -------
+
 
         """
 
-        def post_run(results):
+        def convert_usdb_to_xml(input_file_path_p,output_file_path_p):
+            """
+            This function convert a usdb file (from the coverage) into a xml file.
+
+            Parameters
+            ----------
+            input_file_path_p: str
+                input converage file (*.usdb)
+            output_file_path_p: str
+                output *.xml file
+            Returns
+            -------
+                None
+            """
             import subprocess
+
             options = []
-            # input_merge_file = "C:/Project/fpasim-fw-hardware/simu/results/coverage_data_merge.ucdb"
-            # output_merge_file = "C:/Project/fpasim-fw-hardware/simu/results/coverage_data_merge.xml"
-            input_merge_file = str(Path(self.base_path_dic["results_path"],"coverage_data_merge.ucdb"))
-            output_merge_file = str(Path(self.base_path_dic["results_path"],"coverage_data_merge.xml"))
-            options = []
-            # options.append("C:/Unsupported/questasim64_2020.3/win64/vcover.exe")
+            # convert the usdb file into xml file
             options.append(str(Path(self.vcover_path,"vcover.exe")))
             options.append("report")
             options.append("-output")
-            options.append(output_merge_file)
+            options.append(output_file_path_p)
             options.append("-srcfile=*")
             options.append("-details")
             options.append("-all")
@@ -1462,10 +1472,37 @@ class VunitConf(VunitUtils):
             options.append("-code")
             options.append("s b c")
             options.append("-xml")
-            options.append(input_merge_file)
-
-            results.merge_coverage(file_name=input_merge_file)
+            options.append(input_file_path_p)
             subprocess.call(options)
+
+            return None
+
+
+        def post_run(results):
+            """
+            This function merge all coverage files (*.usdb) into one *.xml file
+            Then, convert the absolute "fileData path" into relative path from the git root path
+
+            Note:
+            This function will be run after the end of the simulation.
+
+            Parameters
+            ----------
+            post_run:
+                A callback function which is called after running tests. The function must accept a single results argument which is an instance of Results
+            Returns
+            -------
+
+            """
+
+            input_merge_file = str(Path(self.base_path_dic["results_path"],"coverage_data_merge.ucdb"))
+            output_merge_file = str(Path(self.base_path_dic["results_path"],"coverage_data_merge.xml"))
+            output_replace_file = str(Path(self.base_path_dic["results_path"],"coverage_data_replace.xml"))
+            # merge the coverage files (*.usdb)
+            results.merge_coverage(file_name=input_merge_file)
+            # convert the merge usdb file into xml file
+            convert_usdb_to_xml(input_file_path_p=input_merge_file,output_file_path_p=output_merge_file)
+
 
 
         if self.enable_coverage == 1:
@@ -1475,6 +1512,7 @@ class VunitConf(VunitUtils):
             self.VU.main(post_run=post_run)
         else:
             self.VU.main()
+
 
     def _display_searched_filename(self,verbosity_p,filename_p,level_p,verbosity_min_p=0):
         """
