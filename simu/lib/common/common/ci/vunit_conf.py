@@ -558,7 +558,7 @@ class VunitConf(VunitUtils):
         level0 = self.get_indentation_level(level_p=level_p)
         level1 = level0 + 1
         if self.verbosity > 0:
-            display_obj.display_title(msg_p=msg + ' Compilation (library_name:version:path)', level_p=level0)
+            display_obj.display_title(msg_p=msg + ' Compilation (library_name:version:path:enable_coverage)', level_p=level0)
         for filepath in filepath_list:
             file_tmp = VU.add_source_file(filepath, vhdl_standard=version, library_name=library_name)
             path = str(Path(file_tmp.name).resolve())
@@ -574,7 +574,7 @@ class VunitConf(VunitUtils):
                 elif suffix == '.sv':
                     file_tmp.add_compile_option("modelsim.vlog_flags", ["+cover=bs"])
 
-            msg0 = library_name + ':' + version + ":" + path
+            msg0 = library_name + ':' + version + ":" + path + ":" + str(enable_coverage_p)
             if self.verbosity > 0:
                 display_obj.display(msg_p=msg0, level_p=level1)
 
@@ -1523,14 +1523,13 @@ class VunitConf(VunitUtils):
 
             input_merge_file = str(Path(self.base_path_dic["results_path"],"coverage_data_merge.ucdb"))
             output_merge_file = str(Path(self.base_path_dic["results_path"],"coverage_data_merge.xml"))
-            output_replace_file = str(Path(self.base_path_dic["results_path"],"coverage_data_replace.xml"))
             # merge the coverage files (*.usdb)
             results.merge_coverage(file_name=input_merge_file)
             # convert the merge usdb file into xml file
             convert_usdb_to_xml(input_file_path_p=input_merge_file,output_file_path_p=output_merge_file)
 
             # for all file path defined in the input xml file, replace the absolute path by its relative path from the git_root_path
-            convert_absolute_to_relative_path(input_file_path_p=output_merge_file,output_file_path_p=output_replace_file)
+            convert_absolute_to_relative_path(input_file_path_p=output_merge_file,output_file_path_p=output_merge_file)
 
 
         if self.enable_coverage == 1:
