@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       EXT_LIB_PATH: xifu-irap/third-party-libraries-for-linty
-      DEST_EXT_LIB_PATH: third-party-libraries/ip/
+      DEST_EXT_LIB_PATH: ip/
       PROJECT_NAME: fpasim-fw
       LINTY_SCANNER: latest
 
@@ -35,8 +35,8 @@ jobs:
 
       - name: Get Libraries
         run: |
-          mv ./${{ env.EXT_LIB_PATH }}/${{ env.PROJECT_NAME }}/* ./${{ env.DEST_EXT_LIB_PATH }}
-          ls -a ./${{ env.DEST_EXT_LIB_PATH }}
+          mv ./${{ env.EXT_LIB_PATH }}/${{ env.PROJECT_NAME }}/* ${{ env.DEST_EXT_LIB_PATH }}
+          ls -a ${{ env.DEST_EXT_LIB_PATH }}
 
       - name: Cache
         uses: actions/cache@v3.3.0
