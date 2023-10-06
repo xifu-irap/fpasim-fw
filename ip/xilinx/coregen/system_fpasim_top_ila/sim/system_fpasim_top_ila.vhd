@@ -56,7 +56,7 @@ clk : IN STD_LOGIC;
 
 
 probe0 : IN STD_LOGIC_VECTOR(32 DOWNTO 0);
-    probe1 : IN STD_LOGIC_VECTOR(1 DOWNTO 0)
+    probe1 : IN STD_LOGIC_VECTOR(2 DOWNTO 0)
 );
 END system_fpasim_top_ila;
 

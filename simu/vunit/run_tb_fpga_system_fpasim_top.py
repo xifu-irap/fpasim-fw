@@ -48,6 +48,7 @@ import sys
 import argparse
 from pathlib import Path
 from pathlib import PurePosixPath
+# Json lib
 import json
 
 # get the name of the script name without file extension
@@ -243,50 +244,60 @@ if __name__ == '__main__':
     #####################################################
     # add compiled xilinx library
     #####################################################
+    # external pre-compiled Xilinx libraries
     obj.xilinx_compile_lib_default_lib(level_p=level1)
 
     #####################################################
     # add glbl library
     #####################################################
-    obj.compile_glbl_lib(level_p=level1)
+    # simulation file
+    obj.compile_glbl_lib(level_p=level1, enable_coverage_p=False)
 
     #####################################################
     # add xilinx Coregen
     #####################################################
-    obj.compile_xilinx_coregen_ip(level_p=level1)
+    # source file
+    obj.compile_xilinx_coregen_ip(level_p=level1, enable_coverage_p=False)
 
     #####################################################
     # add opal kelly library
     #####################################################
-    obj.compile_opal_kelly_ip(level_p=level1)
+    # simulation files
+    obj.compile_opal_kelly_ip(level_p=level1, enable_coverage_p=False)
 
     #####################################################
     # add custom library
     #####################################################
-    obj.compile_xilinx_xpm_ip(level_p=level1)
-    obj.compile_opal_kelly_lib(level_p=level1)
-    obj.compile_csv_lib(level_p=level1)
-    obj.compile_common_lib(level_p=level1)
+    # source files
+    obj.compile_xilinx_xpm_ip(level_p=level1, enable_coverage_p=True)
+    # simulation files
+    obj.compile_opal_kelly_lib(level_p=level1, enable_coverage_p=False)
+    obj.compile_csv_lib(level_p=level1, enable_coverage_p=False)
+    obj.compile_common_lib(level_p=level1, enable_coverage_p=False)
 
     #####################################################
     # add the VHDL/verilog source files
     #####################################################
-    obj.compile_src(filename_p='system_fpasim_top.vhd',level_p=level1)
-    obj.compile_src(filename_p='pkg_system_fpasim_debug.vhd',level_p=level1)
-    obj.compile_src_directory(directory_name_p='utils',level_p=level1)
-    obj.compile_src_directory(directory_name_p='clocking',level_p=level1)
-    obj.compile_src_directory(directory_name_p='fpasim',level_p=level1)
-    obj.compile_src_directory(directory_name_p='usb',level_p=level1)
-    obj.compile_src_directory(directory_name_p='io',level_p=level1)
-    obj.compile_src_directory(directory_name_p='reset',level_p=level1)
-    obj.compile_src_directory(directory_name_p='spi',level_p=level1)
+    # source files
+    obj.compile_src(filename_p='system_fpasim_top.vhd',level_p=level1, enable_coverage_p=enable_coverage)
+    obj.compile_src(filename_p='pkg_system_fpasim_debug.vhd',level_p=level1, enable_coverage_p=enable_coverage)
+    obj.compile_src_directory(directory_name_p='utils',level_p=level1, enable_coverage_p=enable_coverage)
+    obj.compile_src_directory(directory_name_p='clocking',level_p=level1, enable_coverage_p=enable_coverage)
+    obj.compile_src_directory(directory_name_p='fpasim',level_p=level1, enable_coverage_p=enable_coverage)
+    obj.compile_src_directory(directory_name_p='usb',level_p=level1, enable_coverage_p=enable_coverage)
+    obj.compile_src_directory(directory_name_p='io',level_p=level1, enable_coverage_p=enable_coverage)
+    obj.compile_src_directory(directory_name_p='reset',level_p=level1, enable_coverage_p=enable_coverage)
+    obj.compile_src_directory(directory_name_p='spi',level_p=level1, enable_coverage_p=enable_coverage)
+    obj.compile_src_directory(directory_name_p='led',level_p=level1, enable_coverage_p=enable_coverage)
+
+    # simulation files
     obj.compile_src_directory(directory_name_p='cosim',level_p=level1)
-    obj.compile_src_directory(directory_name_p='led',level_p=level1)
 
     #####################################################
     # add the VHDL testbench file
     #####################################################
-    obj.compile_tb(level_p=level1)
+    # simulation file
+    obj.compile_tb(level_p=level1, enable_coverage_p=False)
 
     #####################################################
     # Set the simulator waveform
@@ -316,7 +327,9 @@ if __name__ == '__main__':
     simulation_option_list.append('fpasim.glbl')
     if args.gui == True:
         simulation_option_list.append('-voptargs=+acc')
-    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list, enable_coverage_p=enable_coverage)
+    # simulation + sources files
+    enable_coverage_for_all_files = False
+    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list, enable_coverage_p=enable_coverage_for_all_files)
 
     ######################################################
     # get the list of json test_variant_filepath (if any)
