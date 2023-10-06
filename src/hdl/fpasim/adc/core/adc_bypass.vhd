@@ -137,17 +137,10 @@ begin
   end process p_latch_command;
 
 -- for each adc, force or not the adc data to a constant value
-  p_select_adc : process (i_clk) is
+  p_select_adc0 : process (i_clk) is
   begin
     if rising_edge(i_clk) then
       adc_valid_r1 <= i_adc_valid;
-
-      -- adc1 selection
-      if adc1_bypass_r0 = '1' then
-        adc1_r1 <= c_ADC1;
-      else
-        adc1_r1 <= i_adc1;
-      end if;
 
       -- adc0 selection
       if adc0_bypass_r0 = '1' then
@@ -157,7 +150,22 @@ begin
       end if;
 
     end if;
-  end process p_select_adc;
+  end process p_select_adc0;
+
+-- for each adc1, force or not the adc data to a constant value
+  p_select_adc1 : process (i_clk) is
+  begin
+    if rising_edge(i_clk) then
+
+      -- adc1 selection
+      if adc1_bypass_r0 = '1' then
+        adc1_r1 <= c_ADC1;
+      else
+        adc1_r1 <= i_adc1;
+      end if;
+
+    end if;
+  end process p_select_adc1;
 
 ---------------------------------------------------------------------
 -- optional output delay
