@@ -1,3 +1,9 @@
+#############################################################################
+# Argument definition
+#  "-vhdl": compilation of vhdl file
+#  "-sv": compilation of verilog/system_verilog file
+#  "-lib": process the file as black box
+#############################################################################
 
 #############################################################################
 # Add Vivado library
