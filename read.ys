@@ -4,11 +4,11 @@
 #  Those files can be found in the Vivado installation directory (2022.1)
 #############################################################################
 # XPM library: partial
-verific -work xpm -vhdl -lib ./third-party-libraries/ip/vivado/2022.1/data/ip/xpm/xpm_VCOMP.vhd
+verific -work xpm -vhdl -lib ./ip/vivado/2022.1/data/ip/xpm/xpm_VCOMP.vhd
 
 # UNISIM library: partial
-verific -work unisim -vhdl ./third-party-libraries/ip/vivado/2022.1/data/vhdl/src/unisims/unisim_VCOMP.vhd
-verific -work unisim -vhdl ./third-party-libraries/ip/vivado/2022.1/data/vhdl/src/unisims/unisim_VPKG.vhd
+verific -work unisim -vhdl ./ip/vivado/2022.1/data/vhdl/src/unisims/unisim_VCOMP.vhd
+verific -work unisim -vhdl ./ip/vivado/2022.1/data/vhdl/src/unisims/unisim_VPKG.vhd
 
 ##############################################################################
 # The list of source files was generated from Vivado by a TCL command
@@ -19,23 +19,23 @@ verific -work unisim -vhdl ./third-party-libraries/ip/vivado/2022.1/data/vhdl/sr
 
 # FrontPanelUSB
 #    module component declaration
-verific -vhdl -lib ./third-party-libraries/ip/opal_kelly/syn/okLibrary.vhd
+verific -vhdl -lib ./ip/opal_kelly/syn/okLibrary.vhd
 
 # Xilinx IP
 #    Top level module
-verific -vhdl -lib ./third-party-libraries/ip/xilinx/coregen/system_fpasim_top_ila/synth/system_fpasim_top_ila.vhd
-verific -vhdl -lib ./third-party-libraries/ip/xilinx/coregen/fpasim_spi_device_select_ila/synth/fpasim_spi_device_select_ila.vhd
-verific -sv -lib ./third-party-libraries/ip/xilinx/coregen/fpasim_spi_device_select_vio/synth/fpasim_spi_device_select_vio.v
-verific -sv -lib ./third-party-libraries/ip/xilinx/coregen/selectio_wiz_dac_frame/selectio_wiz_dac_frame.v
-verific -sv -lib ./third-party-libraries/ip/xilinx/coregen/selectio_wiz_dac/selectio_wiz_dac.v
-verific -sv -lib ./third-party-libraries/ip/xilinx/coregen/selectio_wiz_dac_clk/selectio_wiz_dac_clk.v
-verific -sv -lib ./third-party-libraries/ip/xilinx/coregen/selectio_wiz_sync/selectio_wiz_sync.v
-verific -sv -lib ./third-party-libraries/ip/xilinx/coregen/selectio_wiz_adc/selectio_wiz_adc.v
-verific -sv -lib ./third-party-libraries/ip/xilinx/coregen/fpasim_top_vio_0/synth/fpasim_top_vio_0.v
-verific -vhdl -lib ./third-party-libraries/ip/xilinx/coregen/fpasim_top_ila_0/synth/fpasim_top_ila_0.vhd
-verific -vhdl -lib ./third-party-libraries/ip/xilinx/coregen/fpasim_regdecode_top_ila_1/synth/fpasim_regdecode_top_ila_1.vhd
-verific -vhdl -lib ./third-party-libraries/ip/xilinx/coregen/fpasim_regdecode_top_ila_0/synth/fpasim_regdecode_top_ila_0.vhd
-verific -sv -lib ./third-party-libraries/ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0.v
+verific -vhdl -lib ./ip/xilinx/coregen/system_fpasim_top_ila/synth/system_fpasim_top_ila.vhd
+verific -vhdl -lib ./ip/xilinx/coregen/fpasim_spi_device_select_ila/synth/fpasim_spi_device_select_ila.vhd
+verific -sv -lib ./ip/xilinx/coregen/fpasim_spi_device_select_vio/synth/fpasim_spi_device_select_vio.v
+verific -sv -lib ./ip/xilinx/coregen/selectio_wiz_dac_frame/selectio_wiz_dac_frame.v
+verific -sv -lib ./ip/xilinx/coregen/selectio_wiz_dac/selectio_wiz_dac.v
+verific -sv -lib ./ip/xilinx/coregen/selectio_wiz_dac_clk/selectio_wiz_dac_clk.v
+verific -sv -lib ./ip/xilinx/coregen/selectio_wiz_sync/selectio_wiz_sync.v
+verific -sv -lib ./ip/xilinx/coregen/selectio_wiz_adc/selectio_wiz_adc.v
+verific -sv -lib ./ip/xilinx/coregen/fpasim_top_vio_0/synth/fpasim_top_vio_0.v
+verific -vhdl -lib ./ip/xilinx/coregen/fpasim_top_ila_0/synth/fpasim_top_ila_0.vhd
+verific -vhdl -lib ./ip/xilinx/coregen/fpasim_regdecode_top_ila_1/synth/fpasim_regdecode_top_ila_1.vhd
+verific -vhdl -lib ./ip/xilinx/coregen/fpasim_regdecode_top_ila_0/synth/fpasim_regdecode_top_ila_0.vhd
+verific -sv -lib ./ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0.v
 
 # VHDL
 #    Source files
