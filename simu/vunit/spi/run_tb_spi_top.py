@@ -24,15 +24,30 @@
 # -------------------------------------------------------------------------------------------------------------
 #    @details
 #
+#     This script performs the necessary steps to launch the VHDL simulation.
+#     The main steps are:
+#        . compilation of the VHDL libraries.
+#        . compilation of the VHDL source files.
+#        . compilation of the VHDL testbench file.
+#        . Set the waveform (if exists).
+#        . Set the configuration memory files (if exist).
+#        . loop on the *.json file (test variant).
+#        . run the selected VHDL simulator.
+#
+#     Note:
+#       . Used for the VHDL simulation.
+#       . This script should be called by the launch_sim.py python script. But, it can be run in standalone.
+#
 # -------------------------------------------------------------------------------------------------------------
 
-
+# standard library
 import os
 # Enable the coloring in the console
 os.system("")
 import sys
 import argparse
-from pathlib import Path,PurePosixPath
+from pathlib import Path
+from pathlib import PurePosixPath
 # Json lib
 import json
 
@@ -45,10 +60,18 @@ def find_file_in_hierarchy(filename_p='DONT_DELETE.txt', depth_level_p=10):
     This function searches in this script parent directories, the filename_p parameter.
     If found, it returns the base path of the filename_p as well as its corresponding filepath
 
-    :param filename_p: (string) filename to search in the hierarchy
-    :param depth_level_p: (integer >= 0) search depth limit
-    :return: basepath, filepath: (string, string) (basepath of filename_p, filepath of filename_p) if found.
-                                                  Otherwise (None, None)
+    Parameters
+    ----------
+    filename_p: str
+            filename to search in the hierarchy
+    depth_level_p: int
+        (int >= 0) search depth limit
+
+    Returns
+    -------
+    basepath, filepath: (string, string) (basepath of filename_p, filepath of filename_p) if found.
+    Otherwise (None, None)
+
     """
     script_name0 = str(Path(__file__).stem)
     start_path = Path(__file__)
@@ -72,6 +95,18 @@ def find_file_in_hierarchy(filename_p='DONT_DELETE.txt', depth_level_p=10):
 
 # retrieve all python library path in order to import them
 def get_python_library_from_json_file(filepath_p):
+    """
+    Get the path to the simulation python libraries.
+
+    Parameters
+    ----------
+    filepath_p: str
+        configuration json filepath (test variant)
+
+    Returns: list of str.
+    -------
+        list of path.
+    """
 
     filepath = filepath_p
     # Opening JSON file
@@ -108,10 +143,11 @@ if path_list != None:
 #################################################################
 # import specific library
 #################################################################
-from vunit import VUnit, VUnitCLI
-from common import Display, VunitConf
-
+from vunit import VUnitCLI
+from vunit import VUnit
 from vunit import about
+from common import Display
+from common import VunitConf
 
 
 if __name__ == '__main__':
@@ -128,8 +164,8 @@ if __name__ == '__main__':
     help0 = 'Specify the verbosity level. Possible values (uint): 0 to 2'
     cli.parser.add_argument('--verbosity', default=0,choices = [0,1,2], type = int, help=help0)
 
-    help0 = 'Specify the json key path: test_name/tb_entity_name'
-    cli.parser.add_argument('--json_key_path', default='tb_spi_top_debug_test0/tb_spi_top',help=help0)
+    help0 = 'Specify the json key path: test_name/test_id with test_name: name of the test and test_id: test index of the test list defined in test_name (see the launch_sim_processed.json file)'
+    cli.parser.add_argument('--json_key_path', default='tb_spi_top_debug_test0/0',help=help0)
 
     help0 = 'Enable the code Coverage'
     cli.parser.add_argument('--enable_coverage', default='True',choices = ['True','False'], help=help0)
@@ -181,8 +217,7 @@ if __name__ == '__main__':
     # So, the following steps need to be followed:
     #  1. Create the VunitConf class instance
     #  2. Call the VunitConf.set_vunit_simulator instance method
-    #  3. create the VUNIT class instance
-    #  4. call the VunitConf.set_vunit instance method
+    #  3. call the VunitConf.set_vunit instance method
     #####################################################
     obj = VunitConf( json_filepath_p =json_filepath, json_key_path_p = json_key_path)
     obj.set_vunit_simulator(name_p = simulator,level_p=level1)
@@ -208,42 +243,49 @@ if __name__ == '__main__':
     #####################################################
     # add compiled xilinx library
     #####################################################
+    # external pre-compiled Xilinx libraries
     obj.xilinx_compile_lib_default_lib(level_p=level1)
 
     #####################################################
     # add glbl library
     #####################################################
-    obj.compile_glbl_lib(level_p=level1)
+    # simulation file
+    obj.compile_glbl_lib(level_p=level1, enable_coverage_p=False)
 
     #####################################################
     # add xilinx Coregen
     #####################################################
-    obj.compile_xilinx_coregen_ip(level_p=level1)
+    # source file
+    obj.compile_xilinx_coregen_ip(level_p=level1, enable_coverage_p=False)
 
     #####################################################
     # add opal kelly library
     #####################################################
-    obj.compile_opal_kelly_ip(level_p=level1)
+    # simulation files
+    obj.compile_opal_kelly_ip(level_p=level1, enable_coverage_p=False)
 
     #####################################################
     # add custom library
     #####################################################
-    obj.compile_xilinx_xpm_ip(level_p=level1)
-    obj.compile_opal_kelly_lib(level_p=level1)
-    obj.compile_csv_lib(level_p=level1)
-    obj.compile_common_lib(level_p=level1)
+    # source files
+    obj.compile_xilinx_xpm_ip(level_p=level1, enable_coverage_p=True)
+    # simulation files
+    obj.compile_opal_kelly_lib(level_p=level1, enable_coverage_p=False)
+    obj.compile_csv_lib(level_p=level1, enable_coverage_p=False)
+    obj.compile_common_lib(level_p=level1, enable_coverage_p=False)
 
     #####################################################
     # add the VHDL/verilog source files
     #####################################################
-    obj.compile_src_directory(directory_name_p='utils',level_p=level1)
-    obj.compile_src_directory(directory_name_p='fpasim',level_p=level1)
-    obj.compile_src_directory(directory_name_p='spi',level_p=level1)
+    obj.compile_src_directory(directory_name_p='utils',level_p=level1, enable_coverage_p=enable_coverage)
+    obj.compile_src_directory(directory_name_p='fpasim',level_p=level1, enable_coverage_p=enable_coverage)
+    obj.compile_src_directory(directory_name_p='spi',level_p=level1, enable_coverage_p=enable_coverage)
 
     #####################################################
     # add the VHDL testbench file
     #####################################################
-    obj.compile_tb(level_p=level1)
+    # simulation file
+    obj.compile_tb(level_p=level1, enable_coverage_p=False)
 
     #####################################################
     # Set the simulator waveform
@@ -272,7 +314,9 @@ if __name__ == '__main__':
     simulation_option_list.append(sim_title)
     if args.gui == True:
         simulation_option_list.append('-voptargs=+acc')
-    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list, enable_coverage_p=enable_coverage)
+    # simulation + sources files
+    enable_coverage_for_all_files = False
+    obj.set_sim_option(name_p="modelsim.vsim_flags", value_p=simulation_option_list, enable_coverage_p=enable_coverage_for_all_files)
 
     ######################################################
     # get the list of json test_variant_filepath (if any)
@@ -285,7 +329,7 @@ if __name__ == '__main__':
     tb = obj.get_testbench(level_p=level1)
     tb_name = obj.get_testbench_name()
 
-    # loop on all configuration files
+    # loop on all test variant files
     if test_variant_filepath_list != []:
         for test_variant_filepath in test_variant_filepath_list :
 
@@ -316,5 +360,7 @@ if __name__ == '__main__':
                         name=dir_out_name,
                     )
 
-
+    # should be:
+    #   . outside the loop on the test_variant_filepath if add_test_variant_filepath is called
+    #   . inside the loop on the test_variant_filepath if set_test_variant_filepath is called
     obj.main()
