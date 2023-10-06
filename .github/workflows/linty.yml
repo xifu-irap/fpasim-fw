@@ -35,8 +35,8 @@ jobs:
 
       - name: Get Libraries
         run: |
-          mv ./${{ env.EXT_LIB_PATH }}/${{ env.PROJECT_NAME }}/* ${{ env.DEST_EXT_LIB_PATH }}
-          ls -a ${{ env.DEST_EXT_LIB_PATH }}
+          mv ./${{ env.EXT_LIB_PATH }}/${{ env.PROJECT_NAME }}/* ./${{ env.DEST_EXT_LIB_PATH }}
+          ls -a ./${{ env.DEST_EXT_LIB_PATH }}
 
       - name: Cache
         uses: actions/cache@v3.3.0
