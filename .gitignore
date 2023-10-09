@@ -1,141 +1,48 @@
+# remove vscode,sigasi, pycharm files
+##########################
+/.settings
+.project
+.library_mapping.xml
+/.vscode
+/.idea
+
+# untrack doc files
+/doc
+
+
 #########################################################
-# untracked temporary directories/files
+# untracked project files
 #########################################################
-# Untracked no necessary project files
-/project/vivado00/fpasim.runs/.jobs/**/*
-/project/vivado00/fpasim.runs/synth_1/**/*
-/project/vivado00/fpasim.ip_user_files/**/*
-/project/vivado00/fpasim.hw/**/*
-/project/vivado00/fpasim.cache/*
-/project/vivado00/fpasim.sim/*
-/project/vivado00/fpasim.srcs/*
-/project/vivado00/fpasim.runs/**/*.pb
-/project/vivado00/fpasim.runs/**/*.txt
-/project/vivado00/fpasim.runs/**/*.js
-/project/vivado00/fpasim.runs/**/*.sh
-/project/vivado00/fpasim.runs/**/*.wdf
-/project/vivado00/fpasim.runs/**/*.bat
-/project/vivado00/fpasim.runs/**/*.log
-/project/vivado00/fpasim.runs/**/*.jou
-/project/vivado00/fpasim.runs/**/*.dcp
-/project/vivado00/fpasim.runs/**/*.rpt
-/project/vivado00/fpasim.runs/**/*.rpw
-/project/vivado00/fpasim.runs/**/*.xml
-/project/vivado00/fpasim.runs/**/*.rst
-/project/vivado00/fpasim.runs/**/*.tcl
-/project/vivado00/fpasim.runs/**/*.vdi
-/project/vivado00/fpasim.runs/**/*.rpx
-/project/vivado00/fpasim.runs/**/*.dmp
-/project/vivado00/fpasim.runs/**/*.xdc
-/project/vivado00/fpasim.runs/**/*.vds
-/project/vivado00/fpasim.runs/**/__synthesis_is_complete__
-/project/vivado00/fpasim.runs/**/*.mmi
-/project/vivado00/fpasim.runs/**/*.bit
-/project/vivado00/fpasim.runs/**/*.ltx
-/project/vivado00/fpasim.runs/**/*.lpr
-/project/vivado00/fpasim.runs/**/*.wpc
-/project/vivado00/fpasim.runs/**/.Xil/*
-/project/vivado00/fpasim.runs/**/*.v
-/project/vivado00/fpasim.runs/**/*.vhdl
-/project/vivado00/*.log
+# Untracked all files
+/project/vivado00/*
+# track only the *.xpr files
+!/project/vivado00/*.xpr
 
-# Untracked no necessary project files
-/project/vivado01/fpasim.runs/.jobs/**/*
-/project/vivado01/fpasim.runs/synth_1/**/*
-/project/vivado01/fpasim.ip_user_files/**/*
-/project/vivado01/fpasim.hw/**/*
-/project/vivado01/fpasim.cache/*
-/project/vivado01/fpasim.sim/*
-/project/vivado01/fpasim.srcs/*
-/project/vivado01/fpasim.runs/**/*.pb
-/project/vivado01/fpasim.runs/**/*.txt
-/project/vivado01/fpasim.runs/**/*.js
-/project/vivado01/fpasim.runs/**/*.sh
-/project/vivado01/fpasim.runs/**/*.wdf
-/project/vivado01/fpasim.runs/**/*.bat
-/project/vivado01/fpasim.runs/**/*.log
-/project/vivado01/fpasim.runs/**/*.jou
-/project/vivado01/fpasim.runs/**/*.dcp
-/project/vivado01/fpasim.runs/**/*.rpt
-/project/vivado01/fpasim.runs/**/*.rpw
-/project/vivado01/fpasim.runs/**/*.xml
-/project/vivado01/fpasim.runs/**/*.rst
-/project/vivado01/fpasim.runs/**/*.tcl
-/project/vivado01/fpasim.runs/**/*.vdi
-/project/vivado01/fpasim.runs/**/*.rpx
-/project/vivado01/fpasim.runs/**/*.dmp
-/project/vivado01/fpasim.runs/**/*.xdc
-/project/vivado01/fpasim.runs/**/*.vds
-/project/vivado01/fpasim.runs/**/__synthesis_is_complete__
-/project/vivado01/fpasim.runs/**/*.mmi
-/project/vivado01/fpasim.runs/**/*.bit
-/project/vivado01/fpasim.runs/**/*.ltx
-/project/vivado01/fpasim.runs/**/*.lpr
-/project/vivado01/fpasim.runs/**/*.wpc
-/project/vivado01/fpasim.runs/**/.Xil/*
-/project/vivado01/fpasim.runs/**/*.v
-/project/vivado01/fpasim.runs/**/*.vhdl
-/project/vivado01/*.log
-# Untracked no necessary Xilinx IP Files
-/ip/xilinx/coregen/*/*.dcp
-/ip/xilinx/coregen/*/*.vho
-/ip/xilinx/coregen/*/*.xml
-/ip/xilinx/coregen/*/doc
-/ip/xilinx/coregen/*/hdl
-/ip/xilinx/coregen/*/synth
-/ip/xilinx/coregen/*/ila*
-/ip/xilinx/coregen/*/*_stub.*
-/ip/xilinx/coregen/*/*.v
-/ip/xilinx/coregen/*/*.vh
-/ip/xilinx/coregen/*/*.veo
-/ip/xilinx/coregen/*/*ila*netlist.vhdl
-/ip/xilinx/coregen/*/*vio*netlist.vhdl
+# Untracked all files
+/project/vivado01/*
+# track only the *.xpr files
+!/project/vivado01/*.xpr
 
-
+# untracked temporary files
+/constraints/*/*_tmp.xdc
 
 # Track essential Xilinx IP files
+/ip/xilinx/coregen/*/*
 !/ip/xilinx/coregen/*/*.xdc
 !/ip/xilinx/coregen/*/*.xci
 !/ip/xilinx/coregen/*/*.mif
+/ip/opal_kelly
 
 # Untracked python compiled files
 /simu/lib/common/**/__pycache__
 # Untracked python unitary tes output files
 /simu/lib/common/**/__output__
-# Untracked output simulation directory
-/vunit_out
-# Untracked vendor Opal Kelly Source file directory
-/ip/opal_kelly/simu/*.vhd
-/ip/opal_kelly/simu/*.txt
-/ip/opal_kelly/syn/*.v
-/ip/opal_kelly/syn/*.vhd
-# Untracked temporary vhdl source files
-/src/hdl/fmc
-# Untracked documentation
-/doc/**/*
-# Untracked vscode editor files
-/.vscode/*
-external_libraries.json
-language_version.json
-library_mapping.json
-.settings
-.project
-.library_mapping.xml
-
-# untracked temporary Vunit test
-/simu/vunit/tmp_test
-
-# untracked auto-generated simulation file
-launch_sim_processed.json
-
-# untracked some script files
 /simu/script/*/*
 /simu/script/*.mem
 /simu/script/*.log
 /simu/script/*.ini
-
-# untracked pycharm files
-/.idea
-
-# untracked temporary files
-/constraints/*/*_tmp.xdc
+/simu/launch_sim_processed.json
+# untracked coverage files
+/simu/results/tmp
+# Untracked output simulation directory
+/vunit_out
