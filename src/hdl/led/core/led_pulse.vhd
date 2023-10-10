@@ -58,11 +58,14 @@ end entity led_pulse;
 
 architecture RTL of led_pulse is
 
+ -- init value of the pulse
+ constant c_INIT_VALUE : std_logic := '1';
+
  -- counter width minimal in order to represent the g_OUTPUT_PULSE_PERIOD value
  constant c_CNT_WIDTH : integer := pkg_width_from_value(i_value=> g_NB_CLK_OF_PULSE_PERIOD);
 
  -- counter value
- signal cnt_r1 : unsigned(c_CNT_WIDTH - 1 downto 0):= (others => '0');
+ signal cnt_r1 : unsigned(c_CNT_WIDTH - 1 downto 0):= to_unsigned(integer(g_NB_CLK_OF_PULSE_PERIOD*0.5),c_CNT_WIDTH);
 
  -- pulse: change state every 0.5 periods
  signal pulse_tmp1 : std_logic;
@@ -94,8 +97,9 @@ gen_pulse: if true generate
   begin
     data_tmp0(0) <= pulse_tmp1;
 
-    inst_pipeliner_pulse : entity work.pipeliner
+    inst_pipeliner_init_pulse : entity work.pipeliner_with_init
         generic map(
+          g_INIT       => c_INIT_VALUE,
           g_NB_PIPES   => g_OUTPUT_DELAY,  -- number of consecutives registers. Possibles values: [0, integer max value[
           g_DATA_WIDTH => data_tmp0'length  -- width of the input/output data.  Possibles values: [1, integer max value[
           )
