@@ -267,55 +267,55 @@ architecture RTL of tes_pulse_shape_manager is
   signal en_table_tmp : std_logic;
 
   -- RAM: pulse_heigth_table
-  signal pulse_heigth_table_wea   : std_logic; -- port A: en
-  signal pulse_heigth_table_ena   : std_logic; -- port A: we
-  signal pulse_heigth_table_addra : std_logic_vector(i_pixel_id'range);  -- port A: address
-  signal pulse_heigth_table_dina  : std_logic_vector(i_cmd_pulse_height'range); -- port A: data in
-  --signal pulse_heigth_table_regcea : std_logic;-- port A: regce
-  --signal pulse_heigth_table_douta  : std_logic_vector(0 downto 0); -- port A: data out
+  signal pulse_heigth_table_wea   : std_logic; -- portA en
+  signal pulse_heigth_table_ena   : std_logic; -- portA we
+  signal pulse_heigth_table_addra : std_logic_vector(i_pixel_id'range);  -- portA address
+  signal pulse_heigth_table_dina  : std_logic_vector(i_cmd_pulse_height'range); -- portA data in
+  --signal pulse_heigth_table_regcea : std_logic;-- portA regce
+  --signal pulse_heigth_table_douta  : std_logic_vector(0 downto 0); -- portA data out
 
-  signal pulse_heigth_table_enb    : std_logic; -- port B: en
-  --signal pulse_heigth_table_web    : std_logic; -- port B: we
-  signal pulse_heigth_table_addrb  : std_logic_vector(i_pixel_id'range); -- port B: address
-  --signal pulse_heigth_table_dinb   : std_logic_vector(0 downto 0); -- port B: data in
-  signal pulse_heigth_table_regceb : std_logic; -- port B: regce
-  signal pulse_heigth_table_doutb  : std_logic_vector(i_cmd_pulse_height'range); -- port B: data out
+  signal pulse_heigth_table_enb    : std_logic; -- portB en
+  --signal pulse_heigth_table_web    : std_logic; -- portB we
+  signal pulse_heigth_table_addrb  : std_logic_vector(i_pixel_id'range); -- portB address
+  --signal pulse_heigth_table_dinb   : std_logic_vector(0 downto 0); -- portB data in
+  signal pulse_heigth_table_regceb : std_logic; -- portB regce
+  signal pulse_heigth_table_doutb  : std_logic_vector(i_cmd_pulse_height'range); -- portB data out
 
   -- temporary pulse_heigth value
   signal pulse_heigth_table_tmp : std_logic_vector(i_cmd_pulse_height'range);
 
   -- RAM: time_shift_table
-  signal time_shift_table_wea   : std_logic; -- port A: en
-  signal time_shift_table_ena   : std_logic; -- port A: we
-  signal time_shift_table_addra : std_logic_vector(i_pixel_id'range);  -- port A: address
-  signal time_shift_table_dina  : std_logic_vector(i_cmd_time_shift'range); -- port A: data in
-  --signal time_shift_table_regcea : std_logic; -- port A: regce
-  --signal time_shift_table_douta  : std_logic_vector(0 downto 0); -- port A: data out
+  signal time_shift_table_wea   : std_logic; -- portA en
+  signal time_shift_table_ena   : std_logic; -- portA we
+  signal time_shift_table_addra : std_logic_vector(i_pixel_id'range);  -- portA address
+  signal time_shift_table_dina  : std_logic_vector(i_cmd_time_shift'range); -- portA data in
+  --signal time_shift_table_regcea : std_logic; -- portA regce
+  --signal time_shift_table_douta  : std_logic_vector(0 downto 0); -- portA data out
 
-  signal time_shift_table_enb    : std_logic; -- port B: en
-  --signal pulse_heigth_table_web    : std_logic; -- port B: we
-  signal time_shift_table_addrb  : std_logic_vector(i_pixel_id'range); -- port B: address
-  --signal time_shift_table_dinb   : std_logic_vector(0 downto 0); -- port B: data in
-  signal time_shift_table_regceb : std_logic; -- port B: regce
-  signal time_shift_table_doutb  : std_logic_vector(i_cmd_time_shift'range); -- port B: data out
+  signal time_shift_table_enb    : std_logic; -- portB en
+  --signal pulse_heigth_table_web    : std_logic; -- portB we
+  signal time_shift_table_addrb  : std_logic_vector(i_pixel_id'range); -- portB address
+  --signal time_shift_table_dinb   : std_logic_vector(0 downto 0); -- portB data in
+  signal time_shift_table_regceb : std_logic; -- portB regce
+  signal time_shift_table_doutb  : std_logic_vector(i_cmd_time_shift'range); -- portB data out
 
   -- temporary time_shift value
   signal time_shift_table_tmp : std_logic_vector(i_cmd_time_shift'range);
 
   -- RAM: cnt_sample_pulse_shape_table
-  signal cnt_sample_pulse_shape_table_wea   : std_logic; -- port A: en
-  signal cnt_sample_pulse_shape_table_ena   : std_logic; -- port A: we
-  signal cnt_sample_pulse_shape_table_addra : std_logic_vector(i_pixel_id'range);  -- port A: address
-  signal cnt_sample_pulse_shape_table_dina  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0); -- port A: data in
-  --signal cnt_sample_pulse_shape_table_regcea : std_logic; -- port A: regce
-  --signal cnt_sample_pulse_shape_table_douta  : std_logic_vector(0 downto 0); -- port A: data out
+  signal cnt_sample_pulse_shape_table_wea   : std_logic; -- portA en
+  signal cnt_sample_pulse_shape_table_ena   : std_logic; -- portA we
+  signal cnt_sample_pulse_shape_table_addra : std_logic_vector(i_pixel_id'range);  -- portA address
+  signal cnt_sample_pulse_shape_table_dina  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0); -- portA data in
+  --signal cnt_sample_pulse_shape_table_regcea : std_logic; -- portA regce
+  --signal cnt_sample_pulse_shape_table_douta  : std_logic_vector(0 downto 0); -- portA data out
 
-  signal cnt_sample_pulse_shape_table_enb    : std_logic; -- port B: en
-  --signal cnt_sample_pulse_shapeth_table_web    : std_logic; -- port B: we
-  signal cnt_sample_pulse_shape_table_addrb  : std_logic_vector(i_pixel_id'range); -- port B: address
-  --signal cnt_sample_pulse_shape_table_dinb   : std_logic_vector(0 downto 0); -- port B: data in
-  signal cnt_sample_pulse_shape_table_regceb : std_logic; -- port B: regce
-  signal cnt_sample_pulse_shape_table_doutb  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0); -- port B: data out
+  signal cnt_sample_pulse_shape_table_enb    : std_logic; -- portB en
+  --signal cnt_sample_pulse_shapeth_table_web    : std_logic; -- portB we
+  signal cnt_sample_pulse_shape_table_addrb  : std_logic_vector(i_pixel_id'range); -- portB address
+  --signal cnt_sample_pulse_shape_table_dinb   : std_logic_vector(0 downto 0); -- portB data in
+  signal cnt_sample_pulse_shape_table_regceb : std_logic; -- portB regce
+  signal cnt_sample_pulse_shape_table_doutb  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0); -- portB data out
 
   -- temporary cnt_sample_pulse_shape value
   signal cnt_sample_pulse_shape_table_tmp : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);

@@ -74,7 +74,9 @@ end entity adc_bypass;
 
 architecture RTL of adc_bypass is
 
+  -- adc1 value when bypassed
   constant c_ADC1       : std_logic_vector(i_adc1'range) := (others => '0');
+  -- adc0 value when bypassed
   constant c_ADC0       : std_logic_vector(i_adc0'range) := (others => '0');
 
   ---------------------------------------------------------------------
@@ -112,6 +114,7 @@ architecture RTL of adc_bypass is
   -- temporary output pipe
   signal data_pipe_tmp1 : std_logic_vector(c_IDX2_H downto 0);
 
+  -- delayed adc valid
   signal adc_valid_rx : std_logic;
   -- delayed adc1
   signal adc1_rx      : std_logic_vector(i_adc1'range);

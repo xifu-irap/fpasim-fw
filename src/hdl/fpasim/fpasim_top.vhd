@@ -141,6 +141,7 @@ entity fpasim_top is
     ---------------------------------------------------------------------
     -- debug
     ---------------------------------------------------------------------
+    -- debug port
     o_spy : out std_logic_vector(15 downto 0)
     );
 end entity fpasim_top;

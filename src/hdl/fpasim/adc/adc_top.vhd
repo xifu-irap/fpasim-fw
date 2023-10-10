@@ -85,15 +85,21 @@ architecture RTL of adc_top is
 ---------------------------------------------------------------------
 -- adc_select
 ---------------------------------------------------------------------
+  -- valid adc value
   signal adc_valid : std_logic;
+  -- bypassed or not adc1 value
   signal adc1      : std_logic_vector(i_adc1'range);
+  -- bypassed or not adc0 value
   signal adc0      : std_logic_vector(i_adc0'range);
 
 ---------------------------------------------------------------------
 -- adc_shift
 ---------------------------------------------------------------------
+  -- shifted valid adc value
   signal shift_adc_valid : std_logic;
+  -- shifted adc1 value
   signal shift_adc1      : std_logic_vector(i_adc1'range);
+  -- shifted adc0 value
   signal shift_adc0      : std_logic_vector(i_adc0'range);
 
 begin
