@@ -363,6 +363,12 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../../src/hdl/io/core/io_pulse.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../../src/hdl/io/core/io_sync.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -370,6 +376,12 @@
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../src/hdl/io/io_top.vhd">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PPRDIR/../../src/hdl/utils/others/pipeliner_with_init.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -422,12 +434,6 @@
       <File Path="$PPRDIR/../../ip/opal_kelly/syn/okLibrary.vhd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../../src/hdl/utils/others/pipeliner_with_init.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../../src/hdl/spi/core/pkg_spi.vhd">
@@ -769,13 +775,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../../src/hdl/io/core/io_pulse.vhd">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../../src/hdl/fpasim/mux_squid/core/mux_squid_tf.mem">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -998,8 +997,8 @@
         <Step Id="synth_design">
           <Option Id="ShregMinSize">5</Option>
           <Option Id="ReTiming">1</Option>
-          <Option Id="KeepEquivalentRegisters">1</Option>
           <Option Id="IncrementalMode">2</Option>
+          <Option Id="KeepEquivalentRegisters">1</Option>
         </Step>
       </Strategy>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2022"/>
