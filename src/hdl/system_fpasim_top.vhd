@@ -329,11 +329,10 @@ architecture RTL of system_fpasim_top is
   -- AMC : specific signals
   signal mon_n_reset : std_logic;       -- reset_n: hardware reset
 
-
-
   ---------------------------------------------------------------------
   -- debug
   ---------------------------------------------------------------------
+  -- board debug
   signal spy : std_logic_vector(15 downto 0);
 
 begin

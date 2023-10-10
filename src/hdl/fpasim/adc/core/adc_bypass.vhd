@@ -74,6 +74,8 @@ end entity adc_bypass;
 
 architecture RTL of adc_bypass is
 
+  -- initial value of the adcx_bypass signal
+  constant c_ADC_BYPASS_INIT : std_logic:= '0';
   -- adc1 value when bypassed
   constant c_ADC1       : std_logic_vector(i_adc1'range) := (others => '0');
   -- adc0 value when bypassed
@@ -83,9 +85,9 @@ architecture RTL of adc_bypass is
   -- latch input command
   ---------------------------------------------------------------------
   -- adc1 latched command
-  signal adc1_bypass_r0 : std_logic := '0';
+  signal adc1_bypass_r0 : std_logic := c_ADC_BYPASS_INIT;
   -- adc1 latched command
-  signal adc0_bypass_r0 : std_logic := '0';
+  signal adc0_bypass_r0 : std_logic := c_ADC_BYPASS_INIT;
 
   ---------------------------------------------------------------------
   -- select the adc
@@ -129,8 +131,8 @@ begin
     if rising_edge(i_clk) then
       if i_rst = '1' then
         -- default command
-        adc1_bypass_r0 <= '0';
-        adc0_bypass_r0 <= '0';
+        adc1_bypass_r0 <= c_ADC_BYPASS_INIT;
+        adc0_bypass_r0 <= c_ADC_BYPASS_INIT;
       elsif i_adc_bypass_valid = '1' then
         -- latch command
         adc1_bypass_r0 <= i_adc1_bypass;

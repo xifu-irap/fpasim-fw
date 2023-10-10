@@ -189,7 +189,9 @@ architecture RTL of fpasim_top is
   signal nb_sample_by_frame : std_logic_vector(pkg_TES_CONF_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
 
   -- conf0 register
+  -- inter_squid_gain valid
   signal inter_squid_gain_valid : std_logic;
+  -- inter_squid_gain value
   signal inter_squid_gain       : std_logic_vector(pkg_CONF0_INTER_SQUID_GAIN_WIDTH - 1 downto 0);
 
   -- debug_ctrl register

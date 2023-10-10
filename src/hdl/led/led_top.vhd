@@ -67,17 +67,19 @@ architecture RTL of led_top is
   constant c_FIRMWARE_ON : std_logic := '1';
 
  -- optional OUTPUT_DELAY (range = [0;inf[)
- constant C_OUTPUT_DELAY : integer := 3;
+ constant c_OUTPUT_DELAY : integer := 3;
 
 ---------------------------------------------------------------------
 -- usb led_pulse
 ---------------------------------------------------------------------
-  signal usb_pulse : std_logic;
+-- pulse generated @usb_clk
+signal usb_pulse : std_logic;
 
 ---------------------------------------------------------------------
 -- sys led_pulse
 ---------------------------------------------------------------------
-  signal sys_pulse : std_logic;
+-- pulse generated @sys_clk
+signal sys_pulse : std_logic;
 
 begin
 

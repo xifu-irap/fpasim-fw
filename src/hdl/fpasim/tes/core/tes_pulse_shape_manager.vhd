@@ -249,73 +249,121 @@ architecture RTL of tes_pulse_shape_manager is
   -- table
   ---------------------------------------------------------------------
   -- RAM: en_table
-  signal en_table_wea   : std_logic; -- port A: en
-  signal en_table_ena   : std_logic; -- port A: we
-  signal en_table_addra : std_logic_vector(i_pixel_id'range);  -- port A: address
-  signal en_table_dina  : std_logic_vector(0 downto 0); -- port A: data in
-  --signal en_table_regcea : std_logic;-- port A: regce
-  --signal en_table_douta  : std_logic_vector(0 downto 0); -- port A: data out
+  -- portA en
+  signal en_table_wea   : std_logic;
+  -- portA we
+  signal en_table_ena   : std_logic;
+  -- portA address
+  signal en_table_addra : std_logic_vector(i_pixel_id'range);
+  -- portA data in
+  signal en_table_dina  : std_logic_vector(0 downto 0);
+  -- portA regce
+  --signal en_table_regcea : std_logic;
+  -- portA data out
+  --signal en_table_douta  : std_logic_vector(0 downto 0);
 
-  signal en_table_enb    : std_logic; -- port B: en
-  --signal en_table_web    : std_logic; -- port B: we
-  signal en_table_addrb  : std_logic_vector(i_pixel_id'range); -- port B: address
-  --signal en_table_dinb   : std_logic_vector(0 downto 0); -- port B: data in
-  signal en_table_regceb : std_logic; -- port B: regce
-  signal en_table_doutb  : std_logic_vector(0 downto 0); -- port B: data out
+  -- portB en
+  signal en_table_enb    : std_logic;
+  -- portB we
+  --signal en_table_web    : std_logic;
+  -- portB address
+  signal en_table_addrb  : std_logic_vector(i_pixel_id'range);
+  -- portB data in
+  --signal en_table_dinb   : std_logic_vector(0 downto 0);
+  -- portB regce
+  signal en_table_regceb : std_logic;
+   -- portB data out
+  signal en_table_doutb  : std_logic_vector(0 downto 0);
 
   -- temporary en value
   signal en_table_tmp : std_logic;
 
   -- RAM: pulse_heigth_table
-  signal pulse_heigth_table_wea   : std_logic; -- portA en
-  signal pulse_heigth_table_ena   : std_logic; -- portA we
-  signal pulse_heigth_table_addra : std_logic_vector(i_pixel_id'range);  -- portA address
-  signal pulse_heigth_table_dina  : std_logic_vector(i_cmd_pulse_height'range); -- portA data in
-  --signal pulse_heigth_table_regcea : std_logic;-- portA regce
-  --signal pulse_heigth_table_douta  : std_logic_vector(0 downto 0); -- portA data out
+  -- portA en
+  signal pulse_heigth_table_wea   : std_logic;
+  -- portA we
+  signal pulse_heigth_table_ena   : std_logic;
+  -- portA address
+  signal pulse_heigth_table_addra : std_logic_vector(i_pixel_id'range);
+  -- portA data in
+  signal pulse_heigth_table_dina  : std_logic_vector(i_cmd_pulse_height'range);
+  -- portA regce
+  --signal pulse_heigth_table_regcea : std_logic;
+  -- portA data out
+  --signal pulse_heigth_table_douta  : std_logic_vector(0 downto 0);
 
-  signal pulse_heigth_table_enb    : std_logic; -- portB en
-  --signal pulse_heigth_table_web    : std_logic; -- portB we
-  signal pulse_heigth_table_addrb  : std_logic_vector(i_pixel_id'range); -- portB address
-  --signal pulse_heigth_table_dinb   : std_logic_vector(0 downto 0); -- portB data in
-  signal pulse_heigth_table_regceb : std_logic; -- portB regce
-  signal pulse_heigth_table_doutb  : std_logic_vector(i_cmd_pulse_height'range); -- portB data out
+  -- portB en
+  signal pulse_heigth_table_enb    : std_logic;
+  -- portB we
+  --signal pulse_heigth_table_web    : std_logic;
+  -- portB address
+  signal pulse_heigth_table_addrb  : std_logic_vector(i_pixel_id'range);
+  -- portB data in
+  --signal pulse_heigth_table_dinb   : std_logic_vector(0 downto 0);
+  -- portB regce
+  signal pulse_heigth_table_regceb : std_logic;
+  -- portB data out
+  signal pulse_heigth_table_doutb  : std_logic_vector(i_cmd_pulse_height'range);
 
   -- temporary pulse_heigth value
   signal pulse_heigth_table_tmp : std_logic_vector(i_cmd_pulse_height'range);
 
   -- RAM: time_shift_table
-  signal time_shift_table_wea   : std_logic; -- portA en
-  signal time_shift_table_ena   : std_logic; -- portA we
-  signal time_shift_table_addra : std_logic_vector(i_pixel_id'range);  -- portA address
-  signal time_shift_table_dina  : std_logic_vector(i_cmd_time_shift'range); -- portA data in
-  --signal time_shift_table_regcea : std_logic; -- portA regce
-  --signal time_shift_table_douta  : std_logic_vector(0 downto 0); -- portA data out
+  -- portA en
+  signal time_shift_table_wea   : std_logic;
+  -- portA we
+  signal time_shift_table_ena   : std_logic;
+  -- portA address
+  signal time_shift_table_addra : std_logic_vector(i_pixel_id'range);
+  -- portA data in
+  signal time_shift_table_dina  : std_logic_vector(i_cmd_time_shift'range);
+  -- portA regce
+  --signal time_shift_table_regcea : std_logic;
+  -- portA data out
+  --signal time_shift_table_douta  : std_logic_vector(0 downto 0);
 
-  signal time_shift_table_enb    : std_logic; -- portB en
-  --signal pulse_heigth_table_web    : std_logic; -- portB we
-  signal time_shift_table_addrb  : std_logic_vector(i_pixel_id'range); -- portB address
-  --signal time_shift_table_dinb   : std_logic_vector(0 downto 0); -- portB data in
-  signal time_shift_table_regceb : std_logic; -- portB regce
-  signal time_shift_table_doutb  : std_logic_vector(i_cmd_time_shift'range); -- portB data out
+  -- portB en
+  signal time_shift_table_enb    : std_logic;
+  -- portB we
+  --signal pulse_heigth_table_web    : std_logic;
+  -- portB address
+  signal time_shift_table_addrb  : std_logic_vector(i_pixel_id'range);
+  -- portB data in
+  --signal time_shift_table_dinb   : std_logic_vector(0 downto 0);
+  -- portB regce
+  signal time_shift_table_regceb : std_logic;
+  -- portB data out
+  signal time_shift_table_doutb  : std_logic_vector(i_cmd_time_shift'range);
 
   -- temporary time_shift value
   signal time_shift_table_tmp : std_logic_vector(i_cmd_time_shift'range);
 
   -- RAM: cnt_sample_pulse_shape_table
-  signal cnt_sample_pulse_shape_table_wea   : std_logic; -- portA en
-  signal cnt_sample_pulse_shape_table_ena   : std_logic; -- portA we
-  signal cnt_sample_pulse_shape_table_addra : std_logic_vector(i_pixel_id'range);  -- portA address
-  signal cnt_sample_pulse_shape_table_dina  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0); -- portA data in
-  --signal cnt_sample_pulse_shape_table_regcea : std_logic; -- portA regce
-  --signal cnt_sample_pulse_shape_table_douta  : std_logic_vector(0 downto 0); -- portA data out
+  -- portA en
+  signal cnt_sample_pulse_shape_table_wea   : std_logic;
+  -- portA we
+  signal cnt_sample_pulse_shape_table_ena   : std_logic;
+  -- portA address
+  signal cnt_sample_pulse_shape_table_addra : std_logic_vector(i_pixel_id'range);
+  -- portA data in
+  signal cnt_sample_pulse_shape_table_dina  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
+  -- portA regce
+  --signal cnt_sample_pulse_shape_table_regcea : std_logic;
+  -- portA data out
+  --signal cnt_sample_pulse_shape_table_douta  : std_logic_vector(0 downto 0);
 
-  signal cnt_sample_pulse_shape_table_enb    : std_logic; -- portB en
-  --signal cnt_sample_pulse_shapeth_table_web    : std_logic; -- portB we
-  signal cnt_sample_pulse_shape_table_addrb  : std_logic_vector(i_pixel_id'range); -- portB address
-  --signal cnt_sample_pulse_shape_table_dinb   : std_logic_vector(0 downto 0); -- portB data in
-  signal cnt_sample_pulse_shape_table_regceb : std_logic; -- portB regce
-  signal cnt_sample_pulse_shape_table_doutb  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0); -- portB data out
+   -- portB en
+  signal cnt_sample_pulse_shape_table_enb    : std_logic;
+  -- portB we
+  --signal cnt_sample_pulse_shapeth_table_web    : std_logic;
+  -- portB address
+  signal cnt_sample_pulse_shape_table_addrb  : std_logic_vector(i_pixel_id'range);
+  -- portB data in
+  --signal cnt_sample_pulse_shape_table_dinb   : std_logic_vector(0 downto 0);
+  -- portB regce
+  signal cnt_sample_pulse_shape_table_regceb : std_logic;
+  -- portB data out
+  signal cnt_sample_pulse_shape_table_doutb  : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
 
   -- temporary cnt_sample_pulse_shape value
   signal cnt_sample_pulse_shape_table_tmp : std_logic_vector(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0);
@@ -362,7 +410,7 @@ architecture RTL of tes_pulse_shape_manager is
   -- first processed sample of a pulse (registered)
   signal pulse_sof_r1   : std_logic := '0';
 
-  ---- last processed sample of a pulse
+  -- last processed sample of a pulse
   signal pulse_eof_next : std_logic;
   ---- last processed sample of a pulse (registered)
   signal pulse_eof_r1   : std_logic := '0';
@@ -389,29 +437,29 @@ architecture RTL of tes_pulse_shape_manager is
   signal cnt_sample_pulse_shape_r1   : unsigned(g_NB_SAMPLE_BY_FRAME_WIDTH - 1 downto 0) := (others => '0');
 
   -- parameters to store in the tables
-  -- RAM: write enable
+  -- RAM write enable
   signal ram_wr_en_next : std_logic;
-  -- RAM: write enable (registered)
+  -- RAM write enable (registered)
   signal ram_wr_en_r1   : std_logic := '0';
 
-  -- RAM: write enable
+  -- RAM write enable
   signal ram_wr_pulse_heigth_next : std_logic;
-  -- RAM: write enable (registered)
+  -- RAM write enable (registered)
   signal ram_wr_pulse_heigth_r1   : std_logic := '0';
 
-  -- RAM: write enable
+  -- RAM write enable
   signal ram_wr_time_shift_next : std_logic;
-  -- RAM: write enable (registered)
+  -- RAM write enable (registered)
   signal ram_wr_time_shift_r1   : std_logic := '0';
 
-  -- RAM: write enable
+  -- RAM write enable
   signal ram_wr_cnt_sample_pulse_shape_next : std_logic;
-  -- RAM: write enable (registered)
+  -- RAM write enable (registered)
   signal ram_wr_cnt_sample_pulse_shape_r1   : std_logic := '0';
 
-  -- RAM: shared address (write side)
+  -- RAM shared address (write side)
   signal ram_addr_next : unsigned(i_pixel_id'range);
-  -- RAM: shared address (write side: registered)
+  -- RAM shared address (write side: registered)
   signal ram_addr_r1   : unsigned(i_pixel_id'range);
 
   -- RAM (en): data to write
@@ -474,20 +522,31 @@ architecture RTL of tes_pulse_shape_manager is
   -- tes_pulse_shape
   ---------------------------------------------------------------------
   -- RAM
-  signal pulse_shape_wea    : std_logic; -- port A: en
-  signal pulse_shape_ena    : std_logic; -- port A: we
-  signal pulse_shape_addra  : std_logic_vector(i_pulse_shape_wr_rd_addr'range);  -- port A: address
-  signal pulse_shape_dina   : std_logic_vector(i_pulse_shape_wr_data'range); -- port A: data in
-  signal pulse_shape_regcea : std_logic;-- port A: regce
-  signal pulse_shape_douta  : std_logic_vector(i_pulse_shape_wr_data'range); -- port A: data out
+  -- portA en
+  signal pulse_shape_wea    : std_logic;
+  -- portA we
+  signal pulse_shape_ena    : std_logic;
+  -- portA address
+  signal pulse_shape_addra  : std_logic_vector(i_pulse_shape_wr_rd_addr'range);
+  -- portA data in
+  signal pulse_shape_dina   : std_logic_vector(i_pulse_shape_wr_data'range);
+  -- portA regce
+  signal pulse_shape_regcea : std_logic;
+  -- portA data out
+  signal pulse_shape_douta  : std_logic_vector(i_pulse_shape_wr_data'range);
 
-  signal pulse_shape_enb    : std_logic; -- port B: en
-  signal pulse_shape_web    : std_logic; -- port B: we
-  signal pulse_shape_addrb  : std_logic_vector(i_pulse_shape_wr_rd_addr'range); -- port B: address
-  signal pulse_shape_dinb   : std_logic_vector(i_pulse_shape_wr_data'range); -- port B: data in
-  signal pulse_shape_regceb : std_logic; -- port B: regce
-  signal pulse_shape_doutb  : std_logic_vector(i_pulse_shape_wr_data'range); -- port B: data out
-
+  -- portB en
+  signal pulse_shape_enb    : std_logic;
+  -- portB we
+  signal pulse_shape_web    : std_logic;
+  -- portB address
+  signal pulse_shape_addrb  : std_logic_vector(i_pulse_shape_wr_rd_addr'range);
+  -- portB data in
+  signal pulse_shape_dinb   : std_logic_vector(i_pulse_shape_wr_data'range);
+  -- portB regce
+  signal pulse_shape_regceb : std_logic;
+  -- portB data out
+  signal pulse_shape_doutb  : std_logic_vector(i_pulse_shape_wr_data'range);
   -- sync with rd RAM output
   signal pulse_shape_rd_en_rz : std_logic;
   -- ram check
@@ -497,19 +556,31 @@ architecture RTL of tes_pulse_shape_manager is
   -- tes_pulse_shape
   ---------------------------------------------------------------------
   -- RAM
-  signal steady_state_wea    : std_logic; -- port A: en
-  signal steady_state_ena    : std_logic; -- port A: we
-  signal steady_state_addra  : std_logic_vector(i_steady_state_wr_rd_addr'range);  -- port A: address
-  signal steady_state_dina   : std_logic_vector(i_steady_state_wr_data'range); -- port A: data in
-  signal steady_state_regcea : std_logic;-- port A: regce
-  signal steady_state_douta  : std_logic_vector(i_steady_state_wr_data'range); -- port A: data out
+  -- portA en
+  signal steady_state_wea    : std_logic;
+  -- portA we
+  signal steady_state_ena    : std_logic;
+  -- portA address
+  signal steady_state_addra  : std_logic_vector(i_steady_state_wr_rd_addr'range);
+  -- portA data in
+  signal steady_state_dina   : std_logic_vector(i_steady_state_wr_data'range);
+  -- portA regce
+  signal steady_state_regcea : std_logic;
+  -- portA data out
+  signal steady_state_douta  : std_logic_vector(i_steady_state_wr_data'range);
 
-  signal steady_state_enb    : std_logic; -- port B: en
-  signal steady_state_web    : std_logic; -- port B: we
-  signal steady_state_addrb  : std_logic_vector(i_steady_state_wr_rd_addr'range); -- port B: address
-  signal steady_state_dinb   : std_logic_vector(i_steady_state_wr_data'range); -- port B: data in
-  signal steady_state_regceb : std_logic; -- port B: regce
-  signal steady_state_doutb  : std_logic_vector(i_steady_state_wr_data'range); -- port B: data out
+  -- portB en
+  signal steady_state_enb    : std_logic;
+  -- portB we
+  signal steady_state_web    : std_logic;
+  -- portB address
+  signal steady_state_addrb  : std_logic_vector(i_steady_state_wr_rd_addr'range);
+  -- portB data in
+  signal steady_state_dinb   : std_logic_vector(i_steady_state_wr_data'range);
+  -- portB regce
+  signal steady_state_regceb : std_logic;
+  -- portB data out
+  signal steady_state_doutb  : std_logic_vector(i_steady_state_wr_data'range);
 
   -- sync with rd RAM output
   signal steady_state_rd_en_rz : std_logic;
