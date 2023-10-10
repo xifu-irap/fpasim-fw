@@ -120,13 +120,17 @@ end entity mux_squid;
 
 architecture RTL of mux_squid is
 
-  constant c_MEMORY_SIZE_MUX_SQUID_OFFSET : positive := (2 ** (i_mux_squid_offset_wr_rd_addr'length)) * (i_mux_squid_offset_wr_data'length);  -- memory size in bits
-  constant c_MEMORY_SIZE_MUX_SQUID_TF     : positive := (2 ** (i_mux_squid_tf_wr_rd_addr'length)) * i_mux_squid_tf_wr_data'length;  -- memory size in bits
+  -- memory size in bits
+  constant c_MEMORY_SIZE_MUX_SQUID_OFFSET : positive := (2 ** (i_mux_squid_offset_wr_rd_addr'length)) * (i_mux_squid_offset_wr_data'length);
+  -- memory size in bits
+  constant c_MEMORY_SIZE_MUX_SQUID_TF     : positive := (2 ** (i_mux_squid_tf_wr_rd_addr'length)) * i_mux_squid_tf_wr_data'length;
 
   ---------------------------------------------------------------------
   -- default inter_squid_gain
   ---------------------------------------------------------------------
+  -- init value (startup) of the inter_squid_gain
   constant c_INTER_SQUID_GAIN_INIT : std_logic_vector(i_inter_squid_gain'range):= std_logic_vector(to_unsigned(pkg_INTER_SQUID_GAIN_INIT,i_inter_squid_gain'length));
+  -- latched inter_squid_gain value
   signal inter_squid_gain_r1 : std_logic_vector(i_inter_squid_gain'range):= c_INTER_SQUID_GAIN_INIT;
 
   ---------------------------------------------------------------------
@@ -167,19 +171,31 @@ architecture RTL of mux_squid is
   -- mux_squid_offset
   ---------------------------------------------------------------------
   -- RAM
-  signal mux_squid_offset_wea    : std_logic; -- port A: en
-  signal mux_squid_offset_ena    : std_logic; -- port A: we
-  signal mux_squid_offset_addra  : std_logic_vector(i_mux_squid_offset_wr_rd_addr'range);  -- port A: address
-  signal mux_squid_offset_dina   : std_logic_vector(i_mux_squid_offset_wr_data'range); -- port A: data in
-  signal mux_squid_offset_regcea : std_logic;-- port A: regce
-  signal mux_squid_offset_douta  : std_logic_vector(i_mux_squid_offset_wr_data'range); -- port A: data out
+  -- portA en
+  signal mux_squid_offset_wea    : std_logic;
+  -- portA we
+  signal mux_squid_offset_ena    : std_logic;
+   -- portA address
+  signal mux_squid_offset_addra  : std_logic_vector(i_mux_squid_offset_wr_rd_addr'range);
+  -- portA data in
+  signal mux_squid_offset_dina   : std_logic_vector(i_mux_squid_offset_wr_data'range);
+  -- portA regce
+  signal mux_squid_offset_regcea : std_logic;
+  -- portA data out
+  signal mux_squid_offset_douta  : std_logic_vector(i_mux_squid_offset_wr_data'range);
 
-  signal mux_squid_offset_web    : std_logic; -- port B: en
-  signal mux_squid_offset_enb    : std_logic; -- port B: we
-  signal mux_squid_offset_addrb  : std_logic_vector(i_mux_squid_offset_wr_rd_addr'range); -- port B: address
-  signal mux_squid_offset_dinb   : std_logic_vector(i_mux_squid_offset_wr_data'range); -- port B: data in
-  signal mux_squid_offset_regceb : std_logic; -- port B: regce
-  signal mux_squid_offset_doutb  : std_logic_vector(i_mux_squid_offset_wr_data'range); -- port B: data out
+  -- portB en
+  signal mux_squid_offset_web    : std_logic;
+  -- portB we
+  signal mux_squid_offset_enb    : std_logic;
+  -- portB address
+  signal mux_squid_offset_addrb  : std_logic_vector(i_mux_squid_offset_wr_rd_addr'range);
+  -- portB data in
+  signal mux_squid_offset_dinb   : std_logic_vector(i_mux_squid_offset_wr_data'range);
+  -- portB regce
+  signal mux_squid_offset_regceb : std_logic;
+  -- portB data out
+  signal mux_squid_offset_doutb  : std_logic_vector(i_mux_squid_offset_wr_data'range);
 
   -- sync with rd RAM output
   signal mux_squid_offset_rd_en_rw : std_logic;
@@ -190,19 +206,31 @@ architecture RTL of mux_squid is
   -- mux_squid_tf
   ---------------------------------------------------------------------
   -- RAM
-  signal mux_squid_tf_wea    : std_logic; -- port A: en
-  signal mux_squid_tf_ena    : std_logic; -- port A: we
-  signal mux_squid_tf_addra  : std_logic_vector(i_mux_squid_tf_wr_rd_addr'range);  -- port A: address
-  signal mux_squid_tf_dina   : std_logic_vector(i_mux_squid_tf_wr_data'range); -- port A: data in
-  signal mux_squid_tf_regcea : std_logic;-- port A: regce
-  signal mux_squid_tf_douta  : std_logic_vector(i_mux_squid_tf_wr_data'range); -- port A: data out
+  -- portA en
+  signal mux_squid_tf_wea    : std_logic;
+  -- portA we
+  signal mux_squid_tf_ena    : std_logic;
+  -- portA address
+  signal mux_squid_tf_addra  : std_logic_vector(i_mux_squid_tf_wr_rd_addr'range);
+  -- portA data in
+  signal mux_squid_tf_dina   : std_logic_vector(i_mux_squid_tf_wr_data'range);
+  -- portA regce
+  signal mux_squid_tf_regcea : std_logic;
+  -- portA data out
+  signal mux_squid_tf_douta  : std_logic_vector(i_mux_squid_tf_wr_data'range);
 
-  signal mux_squid_tf_web    : std_logic; -- port B: en
-  signal mux_squid_tf_enb    : std_logic; -- port B: we
-  signal mux_squid_tf_addrb  : std_logic_vector(i_mux_squid_tf_wr_rd_addr'range); -- port B: address
-  signal mux_squid_tf_dinb   : std_logic_vector(i_mux_squid_tf_wr_data'range); -- port B: data in
-  signal mux_squid_tf_regceb : std_logic; -- port B: regce
-  signal mux_squid_tf_doutb  : std_logic_vector(i_mux_squid_tf_wr_data'range); -- port B: data out
+  -- portB en
+  signal mux_squid_tf_web    : std_logic;
+  -- portB we
+  signal mux_squid_tf_enb    : std_logic;
+  -- portB address
+  signal mux_squid_tf_addrb  : std_logic_vector(i_mux_squid_tf_wr_rd_addr'range);
+  -- portB data in
+  signal mux_squid_tf_dinb   : std_logic_vector(i_mux_squid_tf_wr_data'range);
+  -- portB regce
+  signal mux_squid_tf_regceb : std_logic;
+  -- portB data out
+  signal mux_squid_tf_doutb  : std_logic_vector(i_mux_squid_tf_wr_data'range);
 
   -- sync with rd ram output
   signal mux_squid_tf_rd_en_rw : std_logic;

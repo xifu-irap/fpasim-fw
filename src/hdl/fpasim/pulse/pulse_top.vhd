@@ -47,10 +47,14 @@ entity pulse_top is
     g_PULSE_DURATION : positive := 1  -- duration of the pulse. Possible values [1;integer max value[
     );
   port(
-    i_clk         : in  std_logic;      -- clock
-    i_rst         : in  std_logic;      -- reset
-    i_rst_status  : in  std_logic;      -- reset error flag(s)
-    i_debug_pulse : in  std_logic;  -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    -- clock
+    i_clk         : in  std_logic;
+    -- reset
+    i_rst         : in  std_logic;
+    -- reset error flag(s)
+    i_rst_status  : in  std_logic;
+    -- error mode (transparent vs capture). Possible values: '1': delay the error(s), '0': capture the error(s)
+    i_debug_pulse : in  std_logic;
     ---------------------------------------------------------------------
     -- input
     ---------------------------------------------------------------------
@@ -81,27 +85,35 @@ architecture RTL of pulse_top is
 ---------------------------------------------------------------------
 -- pulse generator (sof)
 ---------------------------------------------------------------------
-  signal pulse_valid0     : std_logic;
-  signal pulse_sof0       : std_logic;
-  signal pulse_error_sof0 : std_logic;
+-- pulse valid
+signal pulse_valid0     : std_logic;
+-- pulse sof (user-defined pulse width)
+signal pulse_sof0       : std_logic;
+-- associated pulse generator error
+signal pulse_error_sof0 : std_logic;
 
 ---------------------------------------------------------------------
 -- pulse generator
 ---------------------------------------------------------------------
-  signal pulse_eof0       : std_logic;
-  signal pulse_error_eof0 : std_logic;
+-- pulse eof (user-defined pulse width)
+signal pulse_eof0       : std_logic;
+-- associated pulse generator error
+signal pulse_error_eof0 : std_logic;
 
 ---------------------------------------------------------------------
 -- additional optional output pipeline
 ---------------------------------------------------------------------
-  -- temporary input pipe
-  signal data_pipe_tmp0 : std_logic_vector(2 downto 0);
-  -- temporary output pipe
-  signal data_pipe_tmp1 : std_logic_vector(2 downto 0);
+-- temporary input pipe
+signal data_pipe_tmp0 : std_logic_vector(2 downto 0);
+-- temporary output pipe
+signal data_pipe_tmp1 : std_logic_vector(2 downto 0);
 
-  signal pulse_valid1 : std_logic;
-  signal pulse_sof1   : std_logic;
-  signal pulse_eof1   : std_logic;
+-- delayed pulse valid
+signal pulse_valid1 : std_logic;
+-- delayed pulse_sof
+signal pulse_sof1   : std_logic;
+-- delayed pulse_eof
+signal pulse_eof1   : std_logic;
 
 begin
 

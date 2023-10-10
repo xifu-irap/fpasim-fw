@@ -64,7 +64,7 @@ architecture RTL of io_pulse is
   signal data_pipe_tmp0 : std_logic_vector(0 downto 0);
   -- temporary output pipe
   signal data_pipe_tmp1 : std_logic_vector(0 downto 0);
-
+  -- first processed sample of a pulse
   signal pulse_sof1 : std_logic;
 
 begin
