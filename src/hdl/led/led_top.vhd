@@ -91,7 +91,7 @@ begin
       -- pulse period expressed in number of clock cycle. Should be a multiple of 2. The range is [2;inf[
       g_NB_CLK_OF_PULSE_PERIOD => 125_000_000,
       -- additional optional output delay
-      g_OUTPUT_DELAY           => C_OUTPUT_DELAY
+      g_OUTPUT_DELAY           => c_OUTPUT_DELAY
       )
     port map(
       ---------------------------------------------------------------------
@@ -112,7 +112,7 @@ begin
       -- pulse period expressed in number of clock cycle. Should be a multiple of 2. The range is [2;inf[
       g_NB_CLK_OF_PULSE_PERIOD => 250_000_000,
       -- additional optional output delay
-      g_OUTPUT_DELAY           => C_OUTPUT_DELAY
+      g_OUTPUT_DELAY           => c_OUTPUT_DELAY
       )
     port map(
       ---------------------------------------------------------------------
