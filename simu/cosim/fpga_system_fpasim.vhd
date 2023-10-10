@@ -138,6 +138,7 @@ architecture RTL of fpga_system_fpasim is
 ---------------------------------------------------------------------
 -- system_fpasim_top
 ---------------------------------------------------------------------
+  -- board id (resistor pattern)
   signal i_hardware_id : std_logic_vector(7 downto 0);
 
   signal dac_clk_p : std_logic;         -- differential_p dac clock
