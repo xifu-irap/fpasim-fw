@@ -17,12 +17,12 @@
 #                              along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # -------------------------------------------------------------------------------------------------------------
 #    email                   kenji.delarosa@alten.com
-#    @file                   compile.do 
+#    @file                   compile.do
 # -------------------------------------------------------------------------------------------------------------
 #    Automatic Generation    No
 #    Code Rules Reference    SOC of design and VHDL handbook for VLSI development, CNES Edition (v2.1)
 # -------------------------------------------------------------------------------------------------------------
-#    @details                
+#    @details
 #
 #    This Modesim *.do file allows to do the following steps:
 #      . define the project libraries
@@ -70,8 +70,7 @@ file copy -force "${PR_DIR}/src/hdl/fpasim/tes/core/tes_pulse_shape.mem" .
 file copy -force "${PR_DIR}/src/hdl/fpasim/mux_squid/core/mux_squid_offset.mem" .
 file copy -force "${PR_DIR}/src/hdl/fpasim/mux_squid/core/mux_squid_tf.mem" .
 file copy -force "${PR_DIR}/src/hdl/fpasim/amp_squid/core/amp_squid_tf.mem" .
-file copy -force "${PR_DIR}/src/hdl/fpasim/mux_squid/core/mux_squid_linear_tf.mem" .
-file copy -force "${PR_DIR}/src/hdl/fpasim/amp_squid/core/amp_squid_linear_tf.mem" .
+
 
 ###################### IP Source files ######################
 # don't edit except if you know what you do
@@ -92,7 +91,7 @@ vcom -work fpasim  -93 \
 "${PR_DIR}/ip/xilinx/coregen/fpasim_clk_wiz_0/fpasim_clk_wiz_0_sim_netlist.vhdl" \
 
 
-vlog -work fpasim ${VIVADO_DIR}/data/verilog/src/glbl.v  
+vlog -work fpasim ${VIVADO_DIR}/data/verilog/src/glbl.v
 
 ###################### Source files ######################
 # don't edit except if you know what you do
@@ -122,14 +121,13 @@ vcom -work fpasim  -2008 \
 "${PR_DIR}/src/hdl/utils/math/sub_sfixed.vhd" \
 "${PR_DIR}/src/hdl/utils/math/mult_add_sfixed.vhd" \
 
+
 vcom -work fpasim  -93 \
 "${PR_DIR}/ip/xilinx/xpm/ram/sdpram.vhd" \
 "${PR_DIR}/ip/xilinx/xpm/ram/tdpram.vhd" \
 "${PR_DIR}/src/hdl/utils/ram/ram_check.vhd" \
-"${PR_DIR}/src/hdl/fpasim/amp_squid/core/amp_squid_fpagain_table.vhd" \
 
-vcom -work fpasim  -2008 \
-"${PR_DIR}/src/hdl/utils/math/mult_sfixed.vhd" \
+
 
 vcom -work fpasim  -93 \
 "${PR_DIR}/src/hdl/utils/error/one_error_latch.vhd" \
@@ -198,7 +196,14 @@ vcom -work fpasim  -93 \
 "${PR_DIR}/src/hdl/fpasim/regdecode/regdecode_top.vhd" \
 
 vcom -work fpasim  -2008 \
+"${PR_DIR}/src/hdl/fpasim/adc/core/adc_bypass.vhd" \
+"${PR_DIR}/src/hdl/fpasim/adc/core/adc_shift.vhd" \
 "${PR_DIR}/src/hdl/fpasim/adc/adc_top.vhd" \
+
+vcom -work fpasim  -2008 \
+"${PR_DIR}/src/hdl/fpasim/pulse/core/pulse_generator.vhd" \
+"${PR_DIR}/src/hdl/fpasim/pulse/pulse_top.vhd" \
+
 
 vcom -work fpasim  -93 \
 "${PR_DIR}/src/hdl/fpasim/tes/core/tes_signalling_generator.vhd" \
@@ -215,8 +220,6 @@ vcom -work fpasim  -93 \
 "${PR_DIR}/src/hdl/fpasim/tes/core/tes_pulse_shape_manager.vhd" \
 "${PR_DIR}/src/hdl/fpasim/tes/tes_top.vhd" \
 
-vcom -work fpasim  -2008 \
-"${PR_DIR}/src/hdl/utils/math/add_sfixed.vhd" \
 
 vcom -work fpasim  -93 \
 "${PR_DIR}/src/hdl/fpasim/mux_squid/core/mux_squid.vhd" \
@@ -229,6 +232,10 @@ vcom -work fpasim  -93 \
 vcom -work fpasim  -2008 \
 "${PR_DIR}/src/hdl/fpasim/fpasim_top.vhd" \
 
+vcom -work fpasim  -2008 \
+"${PR_DIR}/src/hdl/led/core/led_pulse.vhd" \
+"${PR_DIR}/src/hdl/led/led_top.vhd" \
+
 vcom -work fpasim  -93 \
 "${PR_DIR}/src/hdl/io/pkg_io.vhd" \
 "${PR_DIR}/src/hdl/io/core/io_adc_single.vhd" \
@@ -236,6 +243,7 @@ vcom -work fpasim  -93 \
 "${PR_DIR}/src/hdl/io/core/io_sync.vhd" \
 "${PR_DIR}/src/hdl/io/core/io_dac_data_insert.vhd" \
 "${PR_DIR}/src/hdl/io/core/io_dac.vhd" \
+"${PR_DIR}/src/hdl/io/core/io_pulse.vhd" \
 "${PR_DIR}/src/hdl/io/io_top.vhd" \
 "${PR_DIR}/src/hdl/utils/others/synchronizer.vhd" \
 "${PR_DIR}/src/hdl/utils/others/pipeliner_with_init.vhd" \
