@@ -65,7 +65,7 @@ architecture RTL of led_pulse is
  constant c_CNT_WIDTH : integer := pkg_width_from_value(i_value=> g_NB_CLK_OF_PULSE_PERIOD);
 
  -- counter value
- signal cnt_r1 : unsigned(c_CNT_WIDTH - 1 downto 0):= to_unsigned(integer(g_NB_CLK_OF_PULSE_PERIOD*0.5),c_CNT_WIDTH);
+ signal cnt_r1 : unsigned(c_CNT_WIDTH - 1 downto 0):= to_unsigned(integer(real(g_NB_CLK_OF_PULSE_PERIOD)*0.5),c_CNT_WIDTH);
 
  -- pulse: change state every 0.5 periods
  signal pulse_tmp1 : std_logic;
