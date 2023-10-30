@@ -92,8 +92,8 @@ package pkg_io is
 
   -- IOs: pulse
   -------------------------------------------------------------------
-  -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[
-  constant pkg_IO_PULSE_OUT_LATENCY       : natural := 1;
+  -- user-defined: add latency before the output IOs. Possible values: [0;max integer value[. The value was weaked by simulation
+  constant pkg_IO_PULSE_OUT_LATENCY       : natural := pkg_IO_DAC_LATENCY*2 + 10;
 
 
 end pkg_io;
