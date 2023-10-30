@@ -43,7 +43,7 @@ package pkg_regdecode is
   ---------------------------------------------------------------------
   -- user-defined: Firmware ID Value
   -- requirement: FPASIM-FW-REQ-0290
-  constant pkg_FIRMWARE_ID_VALUE : integer := 10;
+  constant pkg_FIRMWARE_ID_VALUE : integer := 11;
 
   -- user-defined: FIRMWARE name
   -- requirement: FPASIM-FW-REQ-0280
