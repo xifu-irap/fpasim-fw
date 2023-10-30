@@ -16,80 +16,80 @@ byFile="1">
 <fileData path="./src/hdl/fpasim/mux_squid/core/mux_squid.vhd">
 <branches active="4" hits="3" percent="75.00"/>
 <if hasElse="0" active="1" hits="1" percent="100.00">
-<ielem ln="265" st="1" true="36" false="0"/>
+<ielem ln="293" st="1" true="36" false="0"/>
 </if>
 <if hasElse="0" active="3" hits="2" percent="66.66">
-<ielem ln="266" st="1" true="12" false="24"/>
-<ielem ln="268" st="1" true="24" false="0"/>
-<ielem ln="266" st="1" true="0" false="0"/>
+<ielem ln="294" st="1" true="12" false="24"/>
+<ielem ln="296" st="1" true="24" false="0"/>
+<ielem ln="294" st="1" true="0" false="0"/>
 </if>
 <statements active="66" hits="66" percent="100.00"/>
-<stmt ln="267" st="1" hits="12"/>
-<stmt ln="269" st="1" hits="24"/>
-<stmt ln="284" st="1" hits="643099"/>
-<stmt ln="288" st="1" hits="626722"/>
-<stmt ln="319" st="1" hits="278238"/>
-<stmt ln="320" st="1" hits="1286216"/>
-<stmt ln="321" st="1" hits="1286204"/>
-<stmt ln="322" st="1" hits="626725"/>
-<stmt ln="334" st="1" hits="278238"/>
-<stmt ln="335" st="1" hits="1286216"/>
-<stmt ln="336" st="1" hits="1286204"/>
-<stmt ln="337" st="1" hits="626725"/>
-<stmt ln="342" st="1" hits="1664"/>
-<stmt ln="343" st="1" hits="128"/>
-<stmt ln="344" st="1" hits="1548"/>
-<stmt ln="345" st="1" hits="804"/>
-<stmt ln="347" st="1" hits="12"/>
-<stmt ln="396" st="1" hits="12"/>
-<stmt ln="397" st="1" hits="12"/>
-<stmt ln="398" st="1" hits="278238"/>
-<stmt ln="399" st="1" hits="626725"/>
-<stmt ln="400" st="1" hits="12"/>
-<stmt ln="418" st="1" hits="1560"/>
-<stmt ln="419" st="1" hits="804"/>
-<stmt ln="448" st="1" hits="204894"/>
-<stmt ln="449" st="1" hits="8286"/>
-<stmt ln="450" st="1" hits="196620"/>
-<stmt ln="451" st="1" hits="98340"/>
-<stmt ln="453" st="1" hits="12"/>
-<stmt ln="502" st="1" hits="12"/>
-<stmt ln="503" st="1" hits="12"/>
-<stmt ln="504" st="1" hits="278238"/>
-<stmt ln="505" st="1" hits="643048"/>
-<stmt ln="506" st="1" hits="12"/>
-<stmt ln="524" st="1" hits="196632"/>
-<stmt ln="525" st="1" hits="98340"/>
-<stmt ln="553" st="1" hits="278238"/>
-<stmt ln="554" st="1" hits="1286216"/>
-<stmt ln="555" st="1" hits="1286204"/>
-<stmt ln="556" st="1" hits="626725"/>
-<stmt ln="568" st="1" hits="278238"/>
-<stmt ln="569" st="1" hits="1286216"/>
-<stmt ln="570" st="1" hits="1286204"/>
-<stmt ln="571" st="1" hits="626725"/>
-<stmt ln="599" st="1" hits="48"/>
-<stmt ln="600" st="1" hits="642893"/>
-<stmt ln="602" st="1" hits="24"/>
-<stmt ln="636" st="1" hits="278238"/>
-<stmt ln="637" st="1" hits="1286216"/>
-<stmt ln="638" st="1" hits="1286204"/>
-<stmt ln="639" st="1" hits="626725"/>
-<stmt ln="651" st="1" hits="278238"/>
-<stmt ln="652" st="1" hits="1286216"/>
-<stmt ln="653" st="1" hits="1286204"/>
-<stmt ln="654" st="1" hits="626725"/>
-<stmt ln="659" st="1" hits="1286216"/>
-<stmt ln="660" st="1" hits="1286204"/>
-<stmt ln="661" st="1" hits="278238"/>
-<stmt ln="662" st="1" hits="626725"/>
-<stmt ln="663" st="1" hits="573231"/>
-<stmt ln="668" st="1" hits="24"/>
-<stmt ln="669" st="1" hits="24"/>
-<stmt ln="681" st="1" hits="12"/>
-<stmt ln="682" st="1" hits="24"/>
-<stmt ln="683" st="1" hits="24"/>
-<stmt ln="685" st="1" hits="12"/>
+<stmt ln="295" st="1" hits="12"/>
+<stmt ln="297" st="1" hits="24"/>
+<stmt ln="312" st="1" hits="643099"/>
+<stmt ln="316" st="1" hits="626722"/>
+<stmt ln="347" st="1" hits="278238"/>
+<stmt ln="348" st="1" hits="1286216"/>
+<stmt ln="349" st="1" hits="1286204"/>
+<stmt ln="350" st="1" hits="626725"/>
+<stmt ln="362" st="1" hits="278238"/>
+<stmt ln="363" st="1" hits="1286216"/>
+<stmt ln="364" st="1" hits="1286204"/>
+<stmt ln="365" st="1" hits="626725"/>
+<stmt ln="370" st="1" hits="1664"/>
+<stmt ln="371" st="1" hits="128"/>
+<stmt ln="372" st="1" hits="1548"/>
+<stmt ln="373" st="1" hits="804"/>
+<stmt ln="375" st="1" hits="12"/>
+<stmt ln="424" st="1" hits="12"/>
+<stmt ln="425" st="1" hits="12"/>
+<stmt ln="426" st="1" hits="278238"/>
+<stmt ln="427" st="1" hits="626725"/>
+<stmt ln="428" st="1" hits="12"/>
+<stmt ln="446" st="1" hits="1560"/>
+<stmt ln="447" st="1" hits="804"/>
+<stmt ln="476" st="1" hits="204894"/>
+<stmt ln="477" st="1" hits="8286"/>
+<stmt ln="478" st="1" hits="196620"/>
+<stmt ln="479" st="1" hits="98340"/>
+<stmt ln="481" st="1" hits="12"/>
+<stmt ln="530" st="1" hits="12"/>
+<stmt ln="531" st="1" hits="12"/>
+<stmt ln="532" st="1" hits="278238"/>
+<stmt ln="533" st="1" hits="643048"/>
+<stmt ln="534" st="1" hits="12"/>
+<stmt ln="552" st="1" hits="196632"/>
+<stmt ln="553" st="1" hits="98340"/>
+<stmt ln="581" st="1" hits="278238"/>
+<stmt ln="582" st="1" hits="1286216"/>
+<stmt ln="583" st="1" hits="1286204"/>
+<stmt ln="584" st="1" hits="626725"/>
+<stmt ln="596" st="1" hits="278238"/>
+<stmt ln="597" st="1" hits="1286216"/>
+<stmt ln="598" st="1" hits="1286204"/>
+<stmt ln="599" st="1" hits="626725"/>
+<stmt ln="627" st="1" hits="48"/>
+<stmt ln="628" st="1" hits="642893"/>
+<stmt ln="630" st="1" hits="24"/>
+<stmt ln="664" st="1" hits="278238"/>
+<stmt ln="665" st="1" hits="1286216"/>
+<stmt ln="666" st="1" hits="1286204"/>
+<stmt ln="667" st="1" hits="626725"/>
+<stmt ln="679" st="1" hits="278238"/>
+<stmt ln="680" st="1" hits="1286216"/>
+<stmt ln="681" st="1" hits="1286204"/>
+<stmt ln="682" st="1" hits="626725"/>
+<stmt ln="687" st="1" hits="1286216"/>
+<stmt ln="688" st="1" hits="1286204"/>
+<stmt ln="689" st="1" hits="278238"/>
+<stmt ln="690" st="1" hits="626725"/>
+<stmt ln="691" st="1" hits="573231"/>
+<stmt ln="696" st="1" hits="24"/>
+<stmt ln="697" st="1" hits="24"/>
+<stmt ln="709" st="1" hits="12"/>
+<stmt ln="710" st="1" hits="24"/>
+<stmt ln="711" st="1" hits="24"/>
+<stmt ln="713" st="1" hits="12"/>
 </fileData>
 <fileData path="./src/hdl/fpasim/mux_squid/mux_squid_top.vhd">
 <statements active="20" hits="20" percent="100.00"/>
