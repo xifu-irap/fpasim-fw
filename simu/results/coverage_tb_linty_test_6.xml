@@ -4116,17 +4116,17 @@ byFile="1">
 <fileData path="./src/hdl/utils/others/pipeliner.vhd">
 <branches active="2" hits="2" percent="100.00"/>
 <if hasElse="0" active="1" hits="1" percent="100.00">
-<ielem ln="69" st="1" true="51559" false="0"/>
+<ielem ln="69" st="1" true="51558" false="0"/>
 </if>
 <if hasElse="0" active="1" hits="1" percent="100.00">
-<ielem ln="88" st="1" true="61101" false="0"/>
+<ielem ln="88" st="1" true="61102" false="0"/>
 </if>
 <statements active="6" hits="6" percent="100.00"/>
 <stmt ln="58" st="1" hits="112031"/>
-<stmt ln="70" st="1" hits="51559"/>
-<stmt ln="73" st="1" hits="51598"/>
-<stmt ln="89" st="1" hits="61101"/>
-<stmt ln="93" st="1" hits="51200"/>
+<stmt ln="70" st="1" hits="51558"/>
+<stmt ln="73" st="1" hits="51597"/>
+<stmt ln="89" st="1" hits="61102"/>
+<stmt ln="93" st="1" hits="51201"/>
 <stmt ln="99" st="1" hits="214907"/>
 </fileData>
 <fileData path="./src/hdl/utils/others/pipeliner_with_init.vhd">
